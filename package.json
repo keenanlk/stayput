@@ -15,7 +15,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "playwright test"
+    "test": "playwright test",
+    "launch-assets": "node scripts/make-launch-samples.mjs && python3 scripts/make-launch-samples.py && node scripts/make-launch-assets.mjs && python3 scripts/make-launch-gif.py"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",
