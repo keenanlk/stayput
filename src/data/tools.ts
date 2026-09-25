@@ -84,15 +84,15 @@ export const tools: Tool[] = [
     name: 'Image Converter',
     title: 'Convert Images to JPG, PNG or WebP Online, Private | Stayput',
     description:
-      'Convert PNG, JPG, WebP, GIF, BMP, AVIF and HEIC images to JPG, PNG or WebP without uploading. Free, fast, works offline.',
+      'Convert PNG, JPG, WebP, GIF, BMP, AVIF, JPEG XL and HEIC images to JPG, PNG or WebP without uploading. Free, fast, works offline.',
     heading: 'Convert images between formats',
-    tagline: 'PNG, JPG, WebP, GIF, BMP, AVIF, SVG and HEIC in. JPG, PNG or WebP out. Converted on your device.',
+    tagline: 'PNG, JPG, WebP, GIF, BMP, AVIF, JPEG XL, SVG and HEIC in. JPG, PNG or WebP out. Converted on your device.',
     category: 'images',
-    accept: 'image/*,.heic,.heif,.avif,.svg',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
     multiple: true,
     dropLabel: 'Drop images here',
     action: 'Convert',
-    keywords: ['png to jpg', 'webp to png', 'webp to jpg', 'jpg to png', 'avif to jpg', 'image converter'],
+    keywords: ['png to jpg', 'webp to png', 'webp to jpg', 'jpg to png', 'avif to jpg', 'jxl to png', 'image converter'],
     steps: [
       'Drop any images onto the page.',
       'Pick the output format and, for JPG and WebP, the quality.',
@@ -101,7 +101,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Which formats can I convert from?',
-        a: 'Anything your browser can display: JPG, PNG, WebP, GIF (first frame), BMP, SVG and, in current browsers, AVIF. HEIC and HEIF photos are decoded with a WebAssembly build of libheif, so they work everywhere too.',
+        a: 'Anything your browser can display: JPG, PNG, WebP, GIF (first frame), BMP, SVG and AVIF. HEIC and HEIF photos are decoded with a WebAssembly build of libheif, and JPEG XL (and AVIF in older browsers) with the Squoosh decoders compiled to WebAssembly, so they work everywhere.',
       },
       {
         q: 'Why is WebP the smallest option?',
@@ -393,11 +393,133 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'reorder-pdf',
+    name: 'Reorder & Delete Pages',
+    title: 'Reorder, Rearrange and Delete PDF Pages Online, Private | Stayput',
+    description:
+      'Drag PDF pages into a new order, delete the ones you do not need, and save. Runs in your browser: no upload, no limits, free.',
+    heading: 'Reorder and delete PDF pages',
+    tagline: 'See every page as a thumbnail, drag them into the order you want, remove the extras. Saved on your device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF here',
+    action: 'Save PDF',
+    keywords: ['reorder pdf pages', 'rearrange pdf pages', 'delete pdf pages', 'remove pages from pdf', 'organize pdf', 'move pdf pages'],
+    steps: [
+      'Drop a PDF. Every page appears as a thumbnail.',
+      'Drag pages into a new order, or use the arrows. Click the × on a page to delete it, or type an order like 3, 1, 2.',
+      'Save. The new PDF downloads with only the pages you kept, in your order.',
+    ],
+    faq: [
+      {
+        q: 'Does reordering change the quality of the pages?',
+        a: 'No. Pages are copied into the new document as they are, with their text, images and vector graphics untouched. Only the order and the set of pages change.',
+      },
+      {
+        q: 'Can I duplicate a page?',
+        a: 'Yes. Type the order by hand and repeat a page number, for example 1, 1, 2 to get two copies of page 1.',
+      },
+      {
+        q: 'What about bookmarks, links and form fields?',
+        a: 'Text and graphics on every page are preserved. Links inside a page keep working. Document-level bookmarks (the outline) are not carried over because page numbers change; most viewers show the page list instead.',
+      },
+      {
+        q: 'Is the PDF uploaded?',
+        a: 'No. Thumbnails are rendered with pdf.js and the new file is written with pdf-lib, both running in your browser. Switch off your network after the page loads and it still works.',
+      },
+    ],
+  },
+  {
+    slug: 'sign-pdf',
+    name: 'Sign PDF',
+    title: 'Sign a PDF Online Without Uploading It, Free | Stayput',
+    description:
+      'Draw or type your signature, place it on any page and download the signed PDF. Everything stays in your browser. No account, no upload, no watermark.',
+    heading: 'Sign a PDF',
+    tagline: 'Draw your signature with a finger or mouse, or type it. Drop it onto the page, resize it, download. Your document never leaves this device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF to sign',
+    action: 'Download signed PDF',
+    keywords: ['sign pdf', 'sign pdf online free', 'add signature to pdf', 'esign pdf', 'sign pdf without uploading', 'draw signature'],
+    steps: [
+      'Drop the PDF you need to sign.',
+      'Draw your signature, or type your name and pick a style. Add a date or initials if you need them.',
+      'Click a page to place the signature, drag it into position, resize it, then download the signed PDF.',
+    ],
+    faq: [
+      {
+        q: 'Is this a legally binding signature?',
+        a: 'It adds an image of your signature to the document, the same as printing, signing and scanning. In most countries that is an accepted electronic signature for everyday documents such as leases, consent forms and contracts between people who trust each other. It is not a cryptographic digital certificate; if a counterparty requires one, they will usually say so.',
+      },
+      {
+        q: 'Is my document or signature stored anywhere?',
+        a: 'No. The PDF, your signature drawing and the signed result exist only in this browser tab. Nothing is sent to a server, and nothing is kept once you close or reload the page.',
+      },
+      {
+        q: 'Can I sign several pages?',
+        a: 'Yes. Place the signature on every page that needs it. Each placement can be moved and resized on its own. You can also add your initials or the date the same way.',
+      },
+      {
+        q: 'Can I sign on a phone?',
+        a: 'Yes. Draw with your finger in the signature box. It works in Safari on iPhone and in Chrome on Android, offline included.',
+      },
+      {
+        q: 'What if the PDF is a form or is password protected?',
+        a: 'Forms work: the signature is drawn on top of the page. Password-protected PDFs need to be unlocked first; the tool will tell you if it cannot open the file.',
+      },
+    ],
+  },
+  {
+    slug: 'pdf-page-numbers',
+    name: 'Add Page Numbers',
+    title: 'Add Page Numbers to a PDF Online, Free and Private | Stayput',
+    description:
+      'Stamp page numbers on every page of a PDF. Choose the position, format such as "Page 1 of 10", font and starting number. No upload, works offline.',
+    heading: 'Add page numbers to a PDF',
+    tagline: 'Number every page in the corner or the centre, in the format you want, without sending the document anywhere.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF here',
+    action: 'Add page numbers',
+    keywords: ['add page numbers to pdf', 'pdf page numbers', 'number pdf pages', 'insert page numbers pdf', 'page numbers pdf free'],
+    steps: [
+      'Drop a PDF.',
+      'Pick where the numbers go, the format (1, Page 1, 1 of 12), the font and size, and where numbering starts.',
+      'Add page numbers and download. The preview shows the first numbered page.',
+    ],
+    faq: [
+      {
+        q: 'Can I skip the cover page?',
+        a: 'Yes. Set "First page to number" to 2 and the cover stays clean. You can also choose the number printed on that first numbered page, so page 2 can be numbered 1.',
+      },
+      {
+        q: 'Which formats are available?',
+        a: 'A plain number, "Page 1", "1 of 12" and "Page 1 of 12", or write your own using {n} for the number and {total} for the last number. The total counts only numbered pages.',
+      },
+      {
+        q: 'What if the PDF already has page numbers?',
+        a: 'The new numbers are drawn on top, so pick a different corner or use the Reorder tool to remove pages before numbering. The tool never edits existing content.',
+      },
+      {
+        q: 'Do rotated or mixed-size pages work?',
+        a: 'Yes. The position is computed per page, so landscape and portrait pages in the same file each get their number in the same corner as the reader sees it.',
+      },
+      {
+        q: 'Is the file uploaded?',
+        a: 'No. Numbers are drawn with pdf-lib inside your browser using the standard PDF fonts, so the file does not grow and nothing leaves your device.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
 
 export const categories: { id: Category; label: string; blurb: string }[] = [
   { id: 'images', label: 'Image tools', blurb: 'Convert, shrink and clean photos.' },
-  { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress and rotate documents.' },
+  { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress, reorder, sign and number documents.' },
 ];

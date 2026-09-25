@@ -1,0 +1,23 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('reorder-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="pages" hidden>
+    <div class="field-row" style="margin-bottom:12px">
+      <span class="small" id="page-info" style="font-weight:600"></span>
+      <button class="btn btn-sm" type="button" id="reverse">Reverse order</button>
+      <button class="btn btn-sm" type="button" id="restore">Restore original</button>
+      <span class="muted small">Drag pages to move them. Click × to delete.</span>
+    </div>
+    <div class="thumb-grid reorder-grid" id="page-grid" role="list" aria-label="Pages in their new order"></div>
+  </div>
+  <Fragment slot="options">
+    <div class="field wide">
+      <label for="order">Or type the order <span class="muted">(page numbers of the original, in the order you want; leave a page out to delete it)</span></label>
+      <input type="text" id="order" placeholder="e.g. 3, 1, 2, 5-8" autocomplete="off" />
+    </div>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/reorder-pdf.ts"></script>
