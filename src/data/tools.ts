@@ -515,6 +515,48 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'pdf-to-word',
+    name: 'PDF to Word',
+    title: 'PDF to Word Converter, Free, No Upload | Stayput',
+    description:
+      'Convert a PDF to an editable Word document (.docx) or plain text in your browser. Paragraphs and headings are rebuilt from the text layer. Nothing is uploaded.',
+    heading: 'Convert PDF to Word',
+    tagline: 'The text of a PDF as an editable Word document, with paragraphs and headings, extracted on your device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF here',
+    action: 'Convert',
+    keywords: ['pdf to word', 'convert pdf to word', 'pdf to docx', 'pdf to text', 'extract text from pdf', 'pdf to word free without email'],
+    steps: [
+      'Drop a PDF, or tap to pick one.',
+      'Choose a Word document (.docx) or plain text (.txt), and whether each PDF page should start a new page.',
+      'Convert. A preview of the text appears and the file downloads.',
+    ],
+    faq: [
+      {
+        q: 'Does the Word file look like the PDF?',
+        a: 'It keeps the text, the paragraph breaks and the headings, in reading order, as normal editable Word paragraphs. It does not reproduce the page layout: columns, tables, images, fonts and exact positions are not carried over. That is the honest limit of what runs in a browser, and it is what you need when the goal is to edit or reuse the words.',
+      },
+      {
+        q: 'Why is my output empty or garbled?',
+        a: 'A scanned PDF has no text layer: each page is a picture of text, so there is nothing to extract without OCR. The tool tells you when that is the case. Garbled text usually means the PDF embeds fonts with a custom encoding; nothing browser-side can fix that without OCR.',
+      },
+      {
+        q: 'How are paragraphs and headings detected?',
+        a: 'Lines are grouped by baseline and joined into paragraphs using the spacing between them, the length of the previous line and changes in font size. Lines noticeably larger than the body text become Word headings, so the document outline works.',
+      },
+      {
+        q: 'Which programs open the .docx?',
+        a: 'Microsoft Word, Google Docs, LibreOffice, Pages and any other .docx reader. The file uses the standard Office Open XML format with normal paragraph and heading styles.',
+      },
+      {
+        q: 'Is the PDF uploaded?',
+        a: 'No. pdf.js reads the text inside your browser and the Word file is assembled in memory in your tab. You can convert with the network switched off.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
