@@ -112,6 +112,41 @@ async function zipAll(page: Page): Promise<Record<string, Uint8Array>> {
   return unzipSync(await bytesOf(d));
 }
 
+/** Width and height from a JPEG's first SOF marker. */
+function jpegSize(b: Uint8Array) {
+  const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  let i = 2;
+  while (i < b.length) {
+    if (b[i] !== 0xff) throw new Error('bad jpeg');
+    const marker = b[i + 1]!;
+    const len = dv.getUint16(i + 2);
+    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+      return { height: dv.getUint16(i + 5), width: dv.getUint16(i + 7) };
+    }
+    i += 2 + len;
+  }
+  throw new Error('no SOF');
+}
+
+/** Decode an image in the page and read one pixel's RGBA. */
+async function pixelAt(page: Page, bytes: Uint8Array, x: number, y: number): Promise<number[]> {
+  return page.evaluate(
+    async ([b64, px, py]) => {
+      const bin = atob(b64 as string);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const bmp = await createImageBitmap(new Blob([arr]));
+      const c = document.createElement('canvas');
+      c.width = bmp.width;
+      c.height = bmp.height;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(bmp, 0, 0);
+      return Array.from(ctx.getImageData(px as number, py as number, 1, 1).data);
+    },
+    [Buffer.from(bytes).toString('base64'), x, y],
+  );
+}
+
 function pngSize(b: Uint8Array) {
   const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
   return { width: dv.getUint32(16), height: dv.getUint32(20) };
@@ -123,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(14);
+  expect(await page.locator('.tool-card').count()).toBe(15);
   expect(errors).toEqual([]);
 });
 
@@ -315,7 +350,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -562,6 +597,11 @@ test('preset landing pages render, run their base tool with the preset options a
     ['compress-jpg', 'compress-image', async () => expect(page.locator('#quality')).toHaveValue('75')],
     ['remove-location-from-photos', 'strip-exif', async () => expect(page.locator('#keep-icc')).toBeChecked()],
     ['pdf-to-text', 'pdf-to-word', async () => expect(page.locator('#format')).toHaveValue('txt')],
+    ['crop-image-to-circle', 'crop-image', async () => {
+      await expect(page.locator('input[name="shape"][value="circle"]')).toBeChecked();
+      await expect(page.locator('#format')).toHaveValue('image/png');
+    }],
+    ['crop-image-to-square', 'crop-image', async () => expect(page.locator('#aspect')).toHaveValue('1:1')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -694,4 +734,78 @@ test('PDF to text page saves plain text and refuses a scan with a clear message'
   await page.locator('#run').click();
   await expect(page.locator('#error')).toHaveClass(/is-active/);
   await expect(page.locator('#error')).toContainText('no text layer');
+});
+
+test('Crop image crops by handle drag and by exact pixels, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'crop-image');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg')]);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  // Starts as the whole 800x600 image.
+  await expect(page.locator('#crop-w')).toHaveValue('800');
+  await expect(page.locator('#crop-h')).toHaveValue('600');
+  // Locking the ratio to square centres the largest square.
+  await page.locator('#aspect').selectOption('1:1');
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '100,0,600,600');
+  // Dragging the bottom-right handle inward keeps the square.
+  const handle = page.locator('.crop-handle-se');
+  await handle.scrollIntoViewIfNeeded();
+  const hb = (await handle.boundingBox())!;
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(hb.x + hb.width / 2 - 120, hb.y + hb.height / 2 - 60, { steps: 6 });
+  await page.mouse.up();
+  const w = Number(await page.locator('#crop-w').inputValue());
+  const h = Number(await page.locator('#crop-h').inputValue());
+  expect(w).toBeLessThan(600);
+  expect(w).toBe(h);
+  await expect(page.locator('#crop-x')).toHaveValue('100');
+  // Dragging the box moves it without resizing.
+  const box = page.locator('#crop-box');
+  const bb = (await box.boundingBox())!;
+  await page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(bb.x + bb.width / 2 - 200, bb.y + bb.height / 2 + 30, { steps: 6 });
+  await page.mouse.up();
+  expect(Number(await page.locator('#crop-x').inputValue())).toBeLessThan(100);
+  await expect(page.locator('#crop-w')).toHaveValue(String(w));
+  // Exact pixels, free ratio, and the result is a JPG of that size.
+  await page.locator('#aspect').selectOption('free');
+  await page.locator('#crop-x').fill('10');
+  await page.locator('#crop-x').dispatchEvent('change');
+  await page.locator('#crop-y').fill('20');
+  await page.locator('#crop-y').dispatchEvent('change');
+  await page.locator('#crop-w').fill('300');
+  await page.locator('#crop-w').dispatchEvent('change');
+  await page.locator('#crop-h').fill('200');
+  await page.locator('#crop-h').dispatchEvent('change');
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '10,20,300,200');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect(download.suggestedFilename()).toBe('plain-cropped.jpg');
+  expect(jpegSize(await bytesOf(download))).toEqual({ width: 300, height: 200 });
+  net.assertNothingLeft(['plain.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Crop to circle page saves a transparent PNG and the square page a 1:1 crop', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/crop-image-to-circle');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['plain.jpg']);
+  expect(downloads[0]!.suggestedFilename()).toBe('plain-circle.png');
+  const png = await bytesOf(downloads[0]!);
+  expect(pngSize(png)).toEqual({ width: 600, height: 600 });
+  // Corners are outside the circle and transparent; the centre keeps the photo.
+  expect((await pixelAt(page, png, 2, 2))[3]).toBe(0);
+  expect((await pixelAt(page, png, 300, 300))[3]).toBe(255);
+  net.assertNothingLeft(['plain.jpg']);
+
+  await page.goto('/crop-image-to-square');
+  await expect(page.locator('#tool')).toBeVisible();
+  const square = await run(page, ['graphic.png']);
+  expect(square.downloads[0]!.suggestedFilename()).toBe('graphic-cropped.png');
+  const size = pngSize(await bytesOf(square.downloads[0]!));
+  expect(size.width).toBe(size.height);
 });
