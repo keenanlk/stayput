@@ -26,7 +26,7 @@ That is the whole pitch, and you can check it in three ways:
 | | [Sign PDF](https://stayput.app/tools/sign-pdf) (draw or type, place on any page) |
 | | [Add page numbers](https://stayput.app/tools/pdf-page-numbers) |
 
-Plus dedicated pages for the conversions people search for: [HEIC to PNG](https://stayput.app/heic-to-png), [PNG to JPG](https://stayput.app/png-to-jpg), [JPG to PNG](https://stayput.app/jpg-to-png), [WebP to PNG](https://stayput.app/webp-to-png), [WebP to JPG](https://stayput.app/webp-to-jpg), [PNG to WebP](https://stayput.app/png-to-webp), [JPG to WebP](https://stayput.app/jpg-to-webp), [AVIF to JPG](https://stayput.app/avif-to-jpg), [AVIF to PNG](https://stayput.app/avif-to-png), [SVG to PNG](https://stayput.app/svg-to-png).
+Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.app/heic-to-png), [PNG to JPG](https://stayput.app/png-to-jpg), [WebP to PNG](https://stayput.app/webp-to-png), [AVIF to JPG](https://stayput.app/avif-to-jpg) and [JXL to PNG](https://stayput.app/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.app/jpg-to-pdf), [PDF to JPG](https://stayput.app/pdf-to-jpg), [Combine PDF](https://stayput.app/combine-pdf), [Resize image](https://stayput.app/resize-image) and [Remove location from photos](https://stayput.app/remove-location-from-photos); and [guides](https://stayput.app/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
 
 ## How it works
 
@@ -92,7 +92,7 @@ Every push to `main` redeploys; pull requests get preview URLs. `public/_headers
 3. Create `src/tools/<slug>.ts`, call `createShell({ process })` from `src/lib/shell.ts`, and return the output files.
 4. Add a test to `tests/tools.spec.ts`, then run `node scripts/make-og.mjs`.
 
-A format-pair landing page ("WebP to PNG") is just an entry in `src/data/pairs.ts`; the page, its social image and its sitemap entry are generated.
+A format-pair landing page ("WebP to PNG") is just an entry in `src/data/pairs.ts`; the page, its social image and its sitemap entry are generated. A preset landing page for any other tool ("JPG to PDF", "Combine PDF") is an entry in `src/data/presets.ts` naming the base tool and its option defaults; the base tool's option controls live in `src/components/options/` so the tool page and its presets share one copy. A guide is an entry in `src/data/guides.ts` (sections, FAQ, the tools it points to); copy supports `[text](/path)` links and `**bold**`. Run `node scripts/make-og.mjs` after adding any of these. The ranked list of pages and tools to build next is in `growth/backlog.md`.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the ground rules, the main one being that no change may make a file leave the browser.
 

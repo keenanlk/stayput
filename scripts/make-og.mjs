@@ -1,6 +1,6 @@
 // Renders a 1200x630 social image per tool page (and the site-wide one) with
 // headless Chromium, from the same copy that feeds the pages. Run after
-// changing src/data/tools.ts or src/data/pairs.ts:
+// changing src/data/tools.ts, pairs.ts, presets.ts or guides.ts:
 //   node scripts/make-og.mjs
 // Output: public/og.png and public/og/<slug>.png (committed; the build does
 // not regenerate them).
@@ -13,10 +13,14 @@ const src = execSync(
   `node --input-type=module -e "
     import { tools } from './src/data/tools.ts';
     import { pairs, pairAsTool } from './src/data/pairs.ts';
+    import { presets, presetAsTool } from './src/data/presets.ts';
+    import { guides } from './src/data/guides.ts';
     console.log(JSON.stringify([
       { slug: 'site', heading: 'Your files stay put.', tagline: 'Free file tools that run entirely in your browser. Nothing is uploaded, nothing is capped, it works offline.', category: 'site' },
       ...tools.map(t => ({ slug: t.slug, heading: t.heading, tagline: t.tagline, category: t.category })),
       ...pairs.map(p => { const t = pairAsTool(p); return { slug: t.slug, heading: t.heading, tagline: t.tagline, category: 'images' }; }),
+      ...presets.map(p => { const t = presetAsTool(p); return { slug: t.slug, heading: t.heading, tagline: t.tagline, category: t.category }; }),
+      ...guides.map(g => ({ slug: 'guide-' + g.slug, heading: g.heading, tagline: g.dek, category: 'guide' })),
     ]));
   "`,
   { encoding: 'utf8' },
@@ -39,7 +43,7 @@ const html = ({ heading, tagline, category }) => `<!doctype html>
 </style></head><body>
   <div class="glow"></div>
   <div class="brand"><svg viewBox="0 0 32 32"><rect x="2" y="2" width="28" height="28" rx="8" fill="#1f6f5f"/><path d="M16 8.5c-3.6 0-6 2.6-6 5.9 0 4.2 6 9.6 6 9.6s6-5.4 6-9.6c0-3.3-2.4-5.9-6-5.9z" fill="#fff"/><circle cx="16" cy="14.3" r="2.3" fill="#1f6f5f"/></svg>Stayput</div>
-  <div class="kicker">${category === 'pdf' ? 'PDF tool' : category === 'images' ? 'Image tool' : 'Free file tools, in your browser'}</div>
+  <div class="kicker">${category === 'pdf' ? 'PDF tool' : category === 'images' ? 'Image tool' : category === 'guide' ? 'Guide' : 'Free file tools, in your browser'}</div>
   <h1>${esc(heading)}</h1>
   <p>${esc(tagline)}</p>
   <div class="bar"><span>Nothing is uploaded</span><span>Works offline</span><span>Open source</span><span class="url">stayput.app</span></div>

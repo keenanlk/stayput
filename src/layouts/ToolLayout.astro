@@ -4,6 +4,8 @@ import Icon from '../components/Icon.astro';
 import ToolCard from '../components/ToolCard.astro';
 import { tools, toolPath, type Tool } from '../data/tools';
 import { pairs } from '../data/pairs';
+import { presets } from '../data/presets';
+import { guidesFor } from '../data/guides';
 import { engineFor } from '../data/engine';
 
 interface Props {
@@ -12,14 +14,22 @@ interface Props {
   intro?: string[];
   /** Which engine copy to use when the page is a preset of another tool. */
   engineSlug?: string;
+  /** Slug of the tool whose script runs this page (landing pages). */
+  base?: string;
 }
-const { tool, intro = [], engineSlug } = Astro.props;
+const { tool, intro = [], engineSlug, base } = Astro.props;
 const path = toolPath(tool);
 const url = new URL(path, Astro.site).toString();
 const engine = engineFor(engineSlug ?? tool.slug);
 const related = tools.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 4);
 const isPair = path.startsWith('/') && !path.startsWith('/tools/');
 const conversions = pairs.filter((p) => p.slug !== tool.slug).slice(0, 10);
+// Landing pages that are presets of tools in this category, so "JPG to PDF" is reachable from the PDF tools.
+const presetLinks = presets
+  .filter((p) => p.slug !== tool.slug && tools.find((t) => t.slug === p.base)?.category === tool.category)
+  .sort((a, b) => Number(b.base === (base ?? tool.slug)) - Number(a.base === (base ?? tool.slug)))
+  .slice(0, 8);
+const guides = guidesFor([tool.slug, base ?? tool.slug]).slice(0, 4);
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -66,7 +76,7 @@ const jsonLd = [
   </section>
 
   <section class="wrap">
-    <div class="tool-panel" id="tool" data-slug={tool.slug} data-multiple={String(tool.multiple)}>
+    <div class="tool-panel" id="tool" data-slug={tool.slug} data-base={base} data-multiple={String(tool.multiple)}>
       <div class="dropzone" id="drop" tabindex="0" role="button" aria-label={`${tool.dropLabel} or press Enter to choose`}>
         <Icon name="upload" />
         <strong>{tool.dropLabel}</strong>
@@ -152,10 +162,22 @@ const jsonLd = [
     <div class="tool-grid">{related.map((t) => <ToolCard tool={t} />)}</div>
   </section>
 
-  {tool.category === 'images' && (
+  {(tool.category === 'images' || presetLinks.length > 0) && (
     <section class="wrap section">
       <h2>{isPair ? 'Other conversions' : 'Popular conversions'}</h2>
-      <ul class="chips">{conversions.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}</ul>
+      <ul class="chips">
+        {tool.category === 'images' && conversions.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}
+        {presetLinks.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}
+      </ul>
+    </section>
+  )}
+
+  {guides.length > 0 && (
+    <section class="wrap section">
+      <h2>Guides</h2>
+      <ul class="guide-list">
+        {guides.map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}
+      </ul>
     </section>
   )}
 </Base>

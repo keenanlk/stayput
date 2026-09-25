@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import { guides } from '../../data/guides';
+
+const title = 'Guides: File Privacy, Conversion and PDF How-Tos | Stayput';
+const description = 'Plain-language guides to the questions behind file tools: is it safe to merge PDFs online, how to remove location data from photos, which image format to use, and how to check whether a website uploads your files.';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Stayput guides',
+    url: new URL('/guides', Astro.site).toString(),
+    description,
+    hasPart: guides.map((g) => ({ '@type': 'Article', headline: g.heading, url: new URL(`/guides/${g.slug}`, Astro.site).toString() })),
+  },
+];
+---
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <section class="wrap-narrow guide">
+    <h1>Guides</h1>
+    <p class="dek">Straight answers to the questions people ask before they reach for a file tool: what is safe, what a file reveals, which format to use, and how to check for yourself.</p>
+    <ul class="guide-list guide-index">
+      {guides.map((g) => (
+        <li>
+          <a href={`/guides/${g.slug}`}>{g.heading}</a>
+          <span class="muted">{g.dek}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>

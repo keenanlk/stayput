@@ -1,29 +1,10 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import { toolBySlug } from '../../data/tools';
+import ConvertImage from '../../components/options/ConvertImage.astro';
 const tool = toolBySlug('convert-image')!;
 ---
 <ToolLayout tool={tool}>
-  <Fragment slot="options">
-    <div class="field">
-      <label for="format">Convert to</label>
-      <select id="format">
-        <option value="image/jpeg">JPG</option>
-        <option value="image/png">PNG</option>
-        <option value="image/webp">WebP</option>
-      </select>
-    </div>
-    <div class="field" id="quality-field">
-      <label for="quality">Quality <output id="quality-out">90</output></label>
-      <input type="range" id="quality" min="40" max="100" value="90" />
-    </div>
-    <div class="field" id="background-field">
-      <label for="background">Background for transparent areas</label>
-      <input type="color" id="background" value="#ffffff" />
-    </div>
-    <div class="field" id="exif-field">
-      <label class="check"><input type="checkbox" id="keep-exif" /> Keep EXIF metadata</label>
-    </div>
-  </Fragment>
+  <Fragment slot="options"><ConvertImage /></Fragment>
 </ToolLayout>
 <script src="../../tools/convert-image.ts"></script>
