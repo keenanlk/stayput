@@ -7,9 +7,9 @@ needed today; Claude will ask for each one when it is next, and not before.
 | When | Step | Why it is his |
 | --- | --- | --- |
 | Now (already asked) | Import keenanlk/stayput into Vercel | His Vercel account |
-| Before soft launch | Buy stayput.app and attach it in Vercel | Purchase and DNS |
+| Before soft launch | Buy stayput.dev (stayput.app is taken) and attach it in Vercel | Purchase and DNS |
 | Before soft launch | Make the stayput repo public | Repo settings |
-| Before soft launch | Verify stayput.app in Google Search Console (one DNS TXT record); Bing imports from it in a click | Domain ownership |
+| Before soft launch | Verify stayput.dev in Google Search Console (one DNS TXT record); Bing imports from it in a click | Domain ownership |
 | Before launch, optional | Enable GitHub Sponsors on his account | Account enrolment |
 | Oct 27 | Post Show HN, then reply to comments using the reply bank | His HN account; each post is a public publish step |
 | Oct 27 | Submit AlternativeTo, Privacy Guides forum, Uneed, Peerlist | Those sites need an account |

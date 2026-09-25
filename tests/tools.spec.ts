@@ -317,8 +317,8 @@ test('every tool page renders with structured data and no errors', async ({ page
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.app/tools/${slug}`);
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `https://stayput.app/og/${slug}.png`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.dev/tools/${slug}`);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `https://stayput.dev/og/${slug}.png`);
     expect((await page.request.get(`/og/${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
     expect(errors, slug).toEqual([]);
   }
@@ -333,9 +333,9 @@ test('format-pair pages render, preset the converter and link a social image', a
     await page.goto(`/${slug}`);
     await expect(page.locator('#tool')).toBeVisible();
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.app/${slug}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.dev/${slug}`);
     const og = await page.locator('meta[property="og:image"]').getAttribute('content');
-    expect(og).toBe(`https://stayput.app/og/${slug}.png`);
+    expect(og).toBe(`https://stayput.dev/og/${slug}.png`);
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');

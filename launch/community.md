@@ -18,7 +18,7 @@ Title: `I built an open-source replacement for the "convert HEIC" and "compress 
 
 > The HEIC-to-JPG and PDF-compress sites that come up first in search all work the same way: upload, wait, download from a page full of ads, and hit a daily limit. The upload is the part I object to. A browser can do all of this itself.
 >
-> Stayput (https://stayput.app) is a static site with no backend. Thirteen tools run in your tab: HEIC to JPG, image convert and compress, EXIF/GPS removal, and PDF merge, split, compress, rotate, reorder, sign, page numbers, images to PDF, PDF to images. It works offline after one visit.
+> Stayput (https://stayput.dev) is a static site with no backend. Thirteen tools run in your tab: HEIC to JPG, image convert and compress, EXIF/GPS removal, and PDF merge, split, compress, rotate, reorder, sign, page numbers, images to PDF, PDF to images. It works offline after one visit.
 >
 > You can check the claim: open the network tab and watch it stay empty, or turn on airplane mode and keep using it. The code is MIT (https://github.com/keenanlk/stayput). The analytics are a self-hosted, cookieless Umami counter, and the numbers are public, so you can see everything that is collected.
 >
@@ -34,7 +34,7 @@ Title: `Open-source, browser-only tools for HEIC, PDF and EXIF removal. Nothing 
 >
 > Verification: network tab, airplane mode, or read the code (MIT, https://github.com/keenanlk/stayput). The only requests after page load are one anonymous page count to a self-hosted Umami instance (no cookies, no IP stored, honours Do Not Track, stats are public) and the one-time fetch of the HEIC decoder from jsDelivr on the HEIC pages. The CSP in the repo blocks connections anywhere else.
 >
-> https://stayput.app
+> https://stayput.dev
 
 ### r/webdev Showoff Saturday (Sat Nov 7)
 
@@ -46,13 +46,13 @@ Title: `Showoff Saturday: Stayput, a file toolkit where the network tab stays em
 >
 > Every tool page counts its own requests after you add files and shows the list, which turned out to be the most convincing feature.
 >
-> Live: https://stayput.app · Code (MIT): https://github.com/keenanlk/stayput · Playwright tests assert that no request carries a body after files are added.
+> Live: https://stayput.dev · Code (MIT): https://github.com/keenanlk/stayput · Playwright tests assert that no request carries a body after files are added.
 
 ### r/InternetIsBeautiful (Wed Nov 4)
 
 Title: `Stayput: convert HEIC photos and fix PDFs in your browser. Nothing is uploaded, and it works offline.`
 
-Link post to https://stayput.app. First comment:
+Link post to https://stayput.dev. First comment:
 
 > Made this because every "HEIC to JPG" site wanted my photos uploaded first. This one has no server; it is a static site and the work happens in your tab. Open the network tab and watch. Open source, free, no accounts, no limits.
 
@@ -62,7 +62,7 @@ For HEIC and PDF questions already asked on r/iphone, r/techsupport, r/mac,
 r/windows. One reply per thread, only where a browser tool is the honest best
 answer, no more than a few a week. Template:
 
-> If you don't want to install anything or upload the photos: https://stayput.app/tools/heic-to-jpg does the conversion in the browser (no server; you can watch the network tab). Batch works, and you can keep or drop the EXIF. On a Mac, Preview's Export also works one file at a time.
+> If you don't want to install anything or upload the photos: https://stayput.dev/tools/heic-to-jpg does the conversion in the browser (no server; you can watch the network tab). Batch works, and you can keep or drop the EXIF. On a Mac, Preview's Export also works one file at a time.
 
 Always include the non-Stayput option (Preview, Windows HEIF extension,
 `sips`, `heif-convert`) so the answer is an answer, not a pitch.
@@ -93,7 +93,7 @@ browser-based tool is a legitimate answer to a question already asked, and
 always alongside the native way. Disclose authorship every time ("I made
 this"). Template:
 
-> Two options that do not need software installed: (1) on macOS, open the HEIC files in Preview, select all, File → Export Selected, choose JPEG; (2) in any browser, https://stayput.app/tools/heic-to-jpg converts batches locally in the tab, with nothing uploaded (disclosure: I made it, it is open source). Both keep or drop EXIF as you choose.
+> Two options that do not need software installed: (1) on macOS, open the HEIC files in Preview, select all, File → Export Selected, choose JPEG; (2) in any browser, https://stayput.dev/tools/heic-to-jpg converts batches locally in the tab, with nothing uploaded (disclosure: I made it, it is open source). Both keep or drop EXIF as you choose.
 
 ## Rules for all of the above
 
