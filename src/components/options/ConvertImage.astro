@@ -1,0 +1,28 @@
+---
+/** Option controls for the image converter, shared by the tool page and every format-pair landing page. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'image/jpeg';
+const formats = [
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field">
+  <label for="format">Convert to</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field" id="quality-field">
+  <label for="quality">Quality <output id="quality-out">90</output></label>
+  <input type="range" id="quality" min="40" max="100" value="90" />
+</div>
+<div class="field" id="background-field">
+  <label for="background">Background for transparent areas</label>
+  <input type="color" id="background" value="#ffffff" />
+</div>
+<div class="field" id="exif-field">
+  <label class="check"><input type="checkbox" id="keep-exif" /> Keep EXIF metadata</label>
+</div>

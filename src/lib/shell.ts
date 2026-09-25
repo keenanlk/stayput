@@ -358,6 +358,8 @@ export function createShell(opts: ShellOptions) {
   render();
   mountNetProof(root);
   mountInstallPrompt(root);
+  // Landing pages load the tool module on demand; this marks the shell as live.
+  root.dataset.ready = 'true';
 
   return {
     get files() {

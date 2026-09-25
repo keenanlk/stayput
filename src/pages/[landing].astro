@@ -1,0 +1,50 @@
+---
+/**
+ * Landing pages at /<slug>: format pairs (WebP to PNG) run the image converter
+ * with the output preset; tool presets (JPG to PDF, Combine PDF) run another
+ * tool with its options preset. Both share ToolLayout and the base tool's
+ * script, loaded by src/tools/landing.ts.
+ */
+import ToolLayout from '../layouts/ToolLayout.astro';
+import { pairs, pairAsTool } from '../data/pairs';
+import { presets, presetAsTool } from '../data/presets';
+import ConvertImage from '../components/options/ConvertImage.astro';
+import CompressImage from '../components/options/CompressImage.astro';
+import StripExif from '../components/options/StripExif.astro';
+import MergePdf from '../components/options/MergePdf.astro';
+import SplitPdf from '../components/options/SplitPdf.astro';
+import ImageToPdf from '../components/options/ImageToPdf.astro';
+import PdfToImage from '../components/options/PdfToImage.astro';
+
+export function getStaticPaths() {
+  return [
+    ...pairs.map((p) => ({ params: { landing: p.slug }, props: { tool: pairAsTool(p), base: 'convert-image', intro: p.intro, defaults: { format: p.outputType } } })),
+    ...presets.map((p) => ({ params: { landing: p.slug }, props: { tool: presetAsTool(p), base: p.base, intro: p.intro, defaults: p.defaults ?? {} } })),
+  ];
+}
+const { tool, base, intro, defaults } = Astro.props;
+const options = {
+  'convert-image': ConvertImage,
+  'compress-image': CompressImage,
+  'strip-exif': StripExif,
+  'merge-pdf': MergePdf,
+  'split-pdf': SplitPdf,
+  'image-to-pdf': ImageToPdf,
+  'pdf-to-image': PdfToImage,
+} as const;
+const Options = options[base as keyof typeof options];
+if (!Options) throw new Error(`Landing page ${tool.slug} has no options component for ${base}`);
+---
+<ToolLayout tool={tool} intro={intro} engineSlug={base} base={base}>
+  {base === 'strip-exif' && <div slot="panel" id="meta-report" class="meta-report" hidden></div>}
+  <Fragment slot="options"><Options defaults={defaults} /></Fragment>
+</ToolLayout>
+{base === 'strip-exif' && (
+  <style is:global>
+    .meta-report { display: grid; gap: 8px; font-size: 14px; }
+    .meta-row { padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); }
+    .meta-row strong { color: var(--ink); }
+    .meta-row.has-gps { border-left: 4px solid var(--warn); }
+  </style>
+)}
+<script src="../tools/landing.ts"></script>

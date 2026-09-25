@@ -1,39 +1,10 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import { toolBySlug } from '../../data/tools';
+import CompressImage from '../../components/options/CompressImage.astro';
 const tool = toolBySlug('compress-image')!;
 ---
 <ToolLayout tool={tool}>
-  <Fragment slot="options">
-    <div class="field wide">
-      <label>Resize</label>
-      <div class="segmented" role="radiogroup" aria-label="Resize mode">
-        <label><input type="radio" name="resize-mode" value="max" checked /><span>Limit dimensions</span></label>
-        <label><input type="radio" name="resize-mode" value="percent" /><span>Percentage</span></label>
-        <label><input type="radio" name="resize-mode" value="none" /><span>Keep size</span></label>
-      </div>
-    </div>
-    <div class="field-row wide" id="max-fields">
-      <div class="field"><label for="max-width">Max width (px)</label><input type="number" id="max-width" min="1" step="1" value="2000" /></div>
-      <div class="field"><label for="max-height">Max height (px)</label><input type="number" id="max-height" min="1" step="1" value="2000" /></div>
-    </div>
-    <div class="field" id="percent-field" hidden>
-      <label for="percent">Scale <output id="percent-out">50%</output></label>
-      <input type="range" id="percent" min="5" max="100" value="50" />
-    </div>
-    <div class="field">
-      <label for="quality">Quality <output id="quality-out">80</output></label>
-      <input type="range" id="quality" min="30" max="100" value="80" />
-    </div>
-    <div class="field">
-      <label for="format">Output format</label>
-      <select id="format">
-        <option value="keep">Same as original</option>
-        <option value="image/jpeg">JPG</option>
-        <option value="image/webp">WebP (smallest)</option>
-        <option value="image/png">PNG (lossless)</option>
-      </select>
-    </div>
-  </Fragment>
+  <Fragment slot="options"><CompressImage /></Fragment>
 </ToolLayout>
 <script src="../../tools/compress-image.ts"></script>

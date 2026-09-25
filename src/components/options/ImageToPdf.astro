@@ -1,0 +1,28 @@
+---
+/** Option controls for images to PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const pageSize = defaults['page-size'] ?? 'fit';
+const orientation = defaults.orientation ?? 'auto';
+const margin = defaults.margin ?? '0';
+---
+<div class="field">
+  <label for="page-size">Page size</label>
+  <select id="page-size">
+    <option value="fit" selected={pageSize === 'fit'}>Fit to each image</option>
+    <option value="a4" selected={pageSize === 'a4'}>A4</option>
+    <option value="letter" selected={pageSize === 'letter'}>US Letter</option>
+  </select>
+</div>
+<div class="field">
+  <label for="orientation">Orientation</label>
+  <select id="orientation">
+    <option value="auto" selected={orientation === 'auto'}>Auto (match image)</option>
+    <option value="portrait" selected={orientation === 'portrait'}>Portrait</option>
+    <option value="landscape" selected={orientation === 'landscape'}>Landscape</option>
+  </select>
+</div>
+<div class="field">
+  <label for="margin">Margin (mm)</label>
+  <input type="number" id="margin" min="0" max="50" step="1" value={margin} />
+</div>

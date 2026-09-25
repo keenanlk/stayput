@@ -50,16 +50,6 @@
       "permanent": true
     },
     {
-      "source": "/jpg-to-pdf",
-      "destination": "/tools/image-to-pdf",
-      "permanent": true
-    },
-    {
-      "source": "/pdf-to-jpg",
-      "destination": "/tools/pdf-to-image",
-      "permanent": true
-    },
-    {
       "source": "/pdf-to-image",
       "destination": "/tools/pdf-to-image",
       "permanent": true
@@ -132,6 +122,71 @@
     {
       "source": "/jpeg-xl-to-png",
       "destination": "/jxl-to-png",
+      "permanent": true
+    },
+    {
+      "source": "/jpeg-to-pdf",
+      "destination": "/jpg-to-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/pdf-to-jpeg",
+      "destination": "/pdf-to-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/merge-pdf-files",
+      "destination": "/tools/merge-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/pdf-combiner",
+      "destination": "/combine-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/join-pdf",
+      "destination": "/combine-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/extract-pdf-pages",
+      "destination": "/extract-pages-from-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/resize-photo",
+      "destination": "/resize-image",
+      "permanent": true
+    },
+    {
+      "source": "/image-resizer",
+      "destination": "/resize-image",
+      "permanent": true
+    },
+    {
+      "source": "/compress-jpeg",
+      "destination": "/compress-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/remove-gps-from-photos",
+      "destination": "/remove-location-from-photos",
+      "permanent": true
+    },
+    {
+      "source": "/remove-metadata-from-photos",
+      "destination": "/remove-location-from-photos",
+      "permanent": true
+    },
+    {
+      "source": "/guide",
+      "destination": "/guides",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/guides",
       "permanent": true
     }
   ],
