@@ -1,5 +1,6 @@
 import { decodeHeic } from './heic';
-import { extOf, isHeicFile } from './files';
+import { decodeWithWasm, sniffWasmCodec, type WasmCodec } from './codecs';
+import { extOf, isHeicFile, readHead } from './files';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
 
@@ -42,6 +43,12 @@ function loadViaImageElement(file: Blob): Promise<ImageBitmap> {
   });
 }
 
+function wasmCodecFor(file: Blob, ext: string): WasmCodec | undefined {
+  if (ext === 'jxl' || file.type === 'image/jxl') return 'jxl';
+  if (ext === 'avif' || file.type === 'image/avif') return 'avif';
+  return undefined;
+}
+
 /** Decode any supported image into an ImageBitmap with EXIF orientation applied. */
 export async function decodeImage(file: File): Promise<Decoded> {
   const ext = extOf(file.name);
@@ -57,7 +64,10 @@ export async function decodeImage(file: File): Promise<Decoded> {
     try {
       bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
     } catch {
-      bitmap = await loadViaImageElement(file);
+      // AVIF and JPEG XL fall back to a WebAssembly decoder when the browser
+      // has no native one (JPEG XL everywhere but Safari, AVIF in old browsers).
+      const codec = wasmCodecFor(file, ext) ?? sniffWasmCodec(await readHead(file, 12));
+      bitmap = codec ? await decodeWithWasm(file, codec) : await loadViaImageElement(file);
     }
   }
   return { bitmap, width: bitmap.width, height: bitmap.height, heic: false };

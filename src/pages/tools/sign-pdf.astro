@@ -1,0 +1,64 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('sign-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="sign-panel" class="sign-panel" hidden>
+    <div class="sign-maker">
+      <div class="field-row" style="justify-content:space-between">
+        <div class="segmented" role="radiogroup" aria-label="Signature style">
+          <label><input type="radio" name="sig-mode" value="draw" checked /><span>Draw</span></label>
+          <label><input type="radio" name="sig-mode" value="type" /><span>Type</span></label>
+        </div>
+        <div class="field-row">
+          <label class="small" for="sig-color">Ink</label>
+          <select id="sig-color" aria-label="Ink colour">
+            <option value="#111111">Black</option>
+            <option value="#1a3f8f">Blue</option>
+            <option value="#5a2d0c">Brown</option>
+          </select>
+        </div>
+      </div>
+      <div id="draw-box">
+        <canvas id="sig-pad" class="sig-pad" width="900" height="300" aria-label="Signature drawing area. Draw with your mouse, pen or finger."></canvas>
+        <div class="field-row" style="justify-content:space-between;margin-top:8px">
+          <span class="muted small">Sign above with a mouse, pen or finger.</span>
+          <button class="btn btn-sm btn-ghost" type="button" id="sig-clear">Clear</button>
+        </div>
+      </div>
+      <div id="type-box" hidden>
+        <div class="field-row">
+          <input type="text" id="sig-text" class="sig-text" placeholder="Type your name" autocomplete="name" aria-label="Signature text" />
+          <select id="sig-font" aria-label="Signature font">
+            <option value="Caveat">Handwriting</option>
+            <option value="serif-italic">Italic serif</option>
+            <option value="sans">Plain</option>
+          </select>
+        </div>
+        <div class="sig-preview" id="sig-preview" aria-hidden="true"></div>
+      </div>
+      <div class="field-row sign-actions">
+        <button class="btn btn-primary" type="button" id="add-signature">Add signature to this page</button>
+        <button class="btn" type="button" id="add-initials">Add initials</button>
+        <button class="btn" type="button" id="add-date">Add today's date</button>
+        <button class="btn" type="button" id="add-text">Add text</button>
+      </div>
+      <p class="muted small" id="sign-hint">Drag the signature into place on the page and use the corner handle to resize it. Place it on as many pages as you need.</p>
+    </div>
+    <div class="pdf-stage-wrap">
+      <div class="field-row pager">
+        <button class="btn btn-sm" type="button" id="prev-page" aria-label="Previous page">←</button>
+        <span id="page-label" class="small" style="font-weight:600">Page 1 of 1</span>
+        <button class="btn btn-sm" type="button" id="next-page" aria-label="Next page">→</button>
+        <span class="muted small" id="placement-count"></span>
+      </div>
+      <div class="pdf-stage" id="stage">
+        <canvas id="page-canvas"></canvas>
+        <div class="stamp-layer" id="stamp-layer"></div>
+      </div>
+    </div>
+  </div>
+  <Fragment slot="options"></Fragment>
+</ToolLayout>
+<script src="../../tools/sign-pdf.ts"></script>
