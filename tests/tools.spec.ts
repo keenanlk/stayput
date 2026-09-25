@@ -274,6 +274,50 @@ test('every tool page renders with structured data and no errors', async ({ page
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.app/tools/${slug}`);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `https://stayput.app/og/${slug}.png`);
+    expect((await page.request.get(`/og/${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
     expect(errors, slug).toEqual([]);
   }
+});
+
+test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png'];
+  for (const slug of pairs) {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool')).toBeVisible();
+    expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.app/${slug}`);
+    const og = await page.locator('meta[property="og:image"]').getAttribute('content');
+    expect(og).toBe(`https://stayput.app/og/${slug}.png`);
+    const res = await page.request.get(`/og/${slug}.png`);
+    expect(res.status(), `og image for ${slug}`).toBe(200);
+    const [, to] = slug.split('-to-');
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[to!];
+    await expect(page.locator('#format')).toHaveValue(expected!);
+    expect(errors, slug).toEqual([]);
+  }
+});
+
+test('WebP to PNG page converts with the preset format', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/webp-to-png');
+  const { downloads } = await run(page, ['picture.webp']);
+  expect(downloads[0]!.suggestedFilename()).toBe('picture.png');
+  expect(sniffFormat(await bytesOf(downloads[0]!))).toBe('png');
+});
+
+test('no request carries a file: the network stays empty after files are added', async ({ page }) => {
+  await open(page, 'strip-exif');
+  const requests: string[] = [];
+  page.on('request', (r) => requests.push(r.url()));
+  await run(page, ['photo.jpg']);
+  const external = requests.filter((u) => !u.startsWith('blob:') && !u.startsWith('data:'));
+  // The only request allowed after files are added is the analytics call, which our stub answers.
+  expect(external.filter((u) => !u.startsWith('https://stats.keenankaufman.com/'))).toEqual([]);
+  await expect(page.locator('#netproof')).toBeVisible();
+  await expect(page.locator('#netproof-summary')).toContainText(/Since you added files, this tab made \d+ network requests?/);
+  await expect(page.locator('#netproof-summary')).not.toContainText('unexpected');
 });

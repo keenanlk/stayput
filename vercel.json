@@ -3,27 +3,115 @@
   "framework": "astro",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/heic-to-jpg",
+      "destination": "/tools/heic-to-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/compress-pdf",
+      "destination": "/tools/compress-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/merge-pdf",
+      "destination": "/tools/merge-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/split-pdf",
+      "destination": "/tools/split-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/rotate-pdf",
+      "destination": "/tools/rotate-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/compress-image",
+      "destination": "/tools/compress-image",
+      "permanent": true
+    },
+    {
+      "source": "/remove-exif",
+      "destination": "/tools/strip-exif",
+      "permanent": true
+    },
+    {
+      "source": "/strip-exif",
+      "destination": "/tools/strip-exif",
+      "permanent": true
+    },
+    {
+      "source": "/image-to-pdf",
+      "destination": "/tools/image-to-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/jpg-to-pdf",
+      "destination": "/tools/image-to-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/pdf-to-jpg",
+      "destination": "/tools/pdf-to-image",
+      "permanent": true
+    },
+    {
+      "source": "/pdf-to-image",
+      "destination": "/tools/pdf-to-image",
+      "permanent": true
+    },
+    {
+      "source": "/convert-image",
+      "destination": "/tools/convert-image",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/_astro/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/sw.js",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://stats.keenankaufman.com 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cdn.jsdelivr.net https://stats.keenankaufman.com; manifest-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://stats.keenankaufman.com 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cdn.jsdelivr.net https://stats.keenankaufman.com; manifest-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'"
+        }
       ]
     }
   ]
