@@ -29,7 +29,11 @@ export interface Tool {
   keywords: string[];
   steps: string[];
   faq: Faq[];
+  /** Served path. Defaults to /tools/<slug>. Format-pair landing pages override it. */
+  path?: string;
 }
+
+export const toolPath = (t: Pick<Tool, 'slug' | 'path'>): string => t.path ?? `/tools/${t.slug}`;
 
 export const tools: Tool[] = [
   {

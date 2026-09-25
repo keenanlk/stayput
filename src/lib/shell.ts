@@ -5,6 +5,8 @@
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
 import { trackToolRun } from './analytics';
+import { mountNetProof } from './netproof';
+import { mountInstallPrompt } from './install';
 
 export interface ShellFile {
   id: number;
@@ -115,6 +117,8 @@ export function createShell(opts: ShellOptions) {
         if (img && entry.thumb) img.innerHTML = `<img src="${entry.thumb}" alt="">`;
       }
     }
+    root.dataset.inputBytes = String(files.reduce((n, f) => n + f.file.size, 0));
+    root.dispatchEvent(new CustomEvent('stayput:files'));
     await opts.onFilesChanged?.(files);
   }
 
@@ -283,6 +287,7 @@ export function createShell(opts: ShellOptions) {
       if (outs.length === 0) throw new Error('Nothing was produced. Check the options and try again.');
       showResults(outs);
       trackToolRun({ tool, outcome: 'ok', files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started });
+      root.dispatchEvent(new CustomEvent('stayput:done'));
     } catch (e) {
       console.error(e);
       showError(e instanceof Error ? e.message : String(e));
@@ -351,6 +356,8 @@ export function createShell(opts: ShellOptions) {
   document.getElementById('options')?.addEventListener('change', () => hideResults());
 
   render();
+  mountNetProof(root);
+  mountInstallPrompt(root);
 
   return {
     get files() {

@@ -1,5 +1,6 @@
 ---
 import { tools } from '../data/tools';
+import { pairs } from '../data/pairs';
 const images = tools.filter((t) => t.category === 'images');
 const pdfs = tools.filter((t) => t.category === 'pdf');
 ---
@@ -9,7 +10,7 @@ const pdfs = tools.filter((t) => t.category === 'pdf');
       <div>
         <h3>Stayput</h3>
         <p>Free file tools that run entirely in your browser. Nothing you drop here is uploaded anywhere. Open source under the MIT license.</p>
-        <p><a href="https://github.com/keenanlk/stayput" rel="noopener">Source code on GitHub</a></p>
+        <p><a href="https://github.com/keenanlk/stayput" rel="noopener">Source code on GitHub</a><br /><a href="https://stats.keenankaufman.com/share/878bb036d828/Stayput" rel="noopener">Live usage stats, public</a></p>
       </div>
       <div>
         <h3>Image tools</h3>
@@ -19,12 +20,17 @@ const pdfs = tools.filter((t) => t.category === 'pdf');
         <h3>PDF tools</h3>
         <ul>{pdfs.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
       </div>
+      <div>
+        <h3>Conversions</h3>
+        <ul>{pairs.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}</ul>
+      </div>
     </div>
     <div class="legal">
       <span>© {new Date().getFullYear()} Stayput</span>
       <a href="/privacy">Privacy</a>
       <a href="/about">About</a>
-      <span>No cookies, no tracking, no uploads.</span>
+      <a href="https://github.com/keenanlk/stayput/issues" rel="noopener">Report a bug</a>
+      <span>No cookies, no uploads, no accounts.</span>
     </div>
   </div>
 </footer>

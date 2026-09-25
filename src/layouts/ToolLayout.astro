@@ -2,14 +2,24 @@
 import Base from './Base.astro';
 import Icon from '../components/Icon.astro';
 import ToolCard from '../components/ToolCard.astro';
-import { tools, type Tool } from '../data/tools';
+import { tools, toolPath, type Tool } from '../data/tools';
+import { pairs } from '../data/pairs';
+import { engineFor } from '../data/engine';
 
 interface Props {
   tool: Tool;
+  /** Optional explanatory paragraphs shown above "How it works" (format-pair pages). */
+  intro?: string[];
+  /** Which engine copy to use when the page is a preset of another tool. */
+  engineSlug?: string;
 }
-const { tool } = Astro.props;
-const url = new URL(`/tools/${tool.slug}`, Astro.site).toString();
+const { tool, intro = [], engineSlug } = Astro.props;
+const path = toolPath(tool);
+const url = new URL(path, Astro.site).toString();
+const engine = engineFor(engineSlug ?? tool.slug);
 const related = tools.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 4);
+const isPair = path.startsWith('/') && !path.startsWith('/tools/');
+const conversions = pairs.filter((p) => p.slug !== tool.slug).slice(0, 10);
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -43,7 +53,7 @@ const jsonLd = [
   },
 ];
 ---
-<Base title={tool.title} description={tool.description} jsonLd={jsonLd}>
+<Base title={tool.title} description={tool.description} jsonLd={jsonLd} ogImage={`/og/${tool.slug}.png`}>
   <section class="tool-hero wrap">
     <h1>{tool.heading}</h1>
     <p class="tagline">{tool.tagline}</p>
@@ -57,13 +67,13 @@ const jsonLd = [
 
   <section class="wrap">
     <div class="tool-panel" id="tool" data-slug={tool.slug} data-multiple={String(tool.multiple)}>
-      <div class="dropzone" id="drop" tabindex="0" role="button" aria-label={`${tool.dropLabel} or click to choose`}>
+      <div class="dropzone" id="drop" tabindex="0" role="button" aria-label={`${tool.dropLabel} or press Enter to choose`}>
         <Icon name="upload" />
         <strong>{tool.dropLabel}</strong>
         <span>or click to choose {tool.multiple ? 'files' : 'a file'}. {tool.multiple ? 'Batches welcome.' : ''}</span>
-        <input class="visually-hidden" id="file-input" type="file" accept={tool.accept} multiple={tool.multiple} />
       </div>
-      <ul class="file-list" id="file-list" aria-live="polite"></ul>
+      <input class="visually-hidden" id="file-input" type="file" accept={tool.accept} multiple={tool.multiple} tabindex="-1" aria-hidden="true" />
+      <ul class="file-list" id="file-list" aria-live="polite" aria-label="Selected files"></ul>
       <slot name="panel" />
       <div class="options" id="options">
         <slot name="options" />
@@ -73,11 +83,11 @@ const jsonLd = [
         <button class="btn btn-ghost" id="clear" type="button" hidden>Clear</button>
         <div class="progress" id="progress" aria-live="polite">
           <span class="text" id="progress-text">Working…</span>
-          <div class="bar"><i id="progress-bar"></i></div>
+          <div class="bar" aria-hidden="true"><i id="progress-bar"></i></div>
         </div>
       </div>
       <div class="error" id="error" role="alert"></div>
-      <div class="results" id="results">
+      <div class="results" id="results" aria-live="polite">
         <div class="results-head">
           <h2 id="results-title">Done</h2>
           <div class="field-row">
@@ -86,13 +96,43 @@ const jsonLd = [
         </div>
         <div id="results-list" class="file-list"></div>
       </div>
+      <div class="install" id="install" hidden role="region" aria-label="Install Stayput">
+        <div>
+          <strong>Keep Stayput a tap away.</strong>
+          <span>Install it as an app. It works offline and takes no space worth mentioning.</span>
+        </div>
+        <div class="field-row">
+          <button class="btn btn-sm btn-primary" id="install-yes" type="button">Install</button>
+          <button class="btn btn-sm btn-ghost" id="install-no" type="button">Not now</button>
+        </div>
+      </div>
+      <details class="netproof" id="netproof" hidden>
+        <summary><Icon name="eye" /> <span>Open the network tab. It stays empty.</span></summary>
+        <p id="netproof-summary" class="muted">Add files and run the tool to see every request this tab makes.</p>
+        <ul id="netproof-list" class="netproof-list"></ul>
+      </details>
       <p class="privacy-note"><Icon name="shield" /><span>Your files are processed on this device and never sent to a server. Reload the page to clear everything from memory.</span></p>
     </div>
   </section>
 
+  {intro.length > 0 && (
+    <section class="wrap section prose-wide">
+      {intro.map((p) => <p>{p}</p>)}
+    </section>
+  )}
+
   <section class="wrap section">
     <h2>How it works</h2>
     <ol class="steps">{tool.steps.map((s) => <li>{s}</li>)}</ol>
+  </section>
+
+  <section class="wrap section">
+    <h2>In your browser, not on a server</h2>
+    <div class="engine">
+      <p>{engine.how}</p>
+      <p class="versus"><strong>Compared with upload-based tools:</strong> {engine.versus}</p>
+      <p class="verify"><strong>Verify it yourself.</strong> Load this page, turn off Wi-Fi or switch to airplane mode, and run the tool. Or open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, and watch it while you convert. The panel above does the same count for you.</p>
+    </div>
   </section>
 
   <section class="wrap section">
@@ -111,4 +151,11 @@ const jsonLd = [
     <h2>More {tool.category === 'pdf' ? 'PDF' : 'image'} tools</h2>
     <div class="tool-grid">{related.map((t) => <ToolCard tool={t} />)}</div>
   </section>
+
+  {tool.category === 'images' && (
+    <section class="wrap section">
+      <h2>{isPair ? 'Other conversions' : 'Popular conversions'}</h2>
+      <ul class="chips">{conversions.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}</ul>
+    </section>
+  )}
 </Base>

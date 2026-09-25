@@ -9,12 +9,14 @@ interface Props {
   /** JSON-LD objects to embed. */
   jsonLd?: object[];
   ogType?: string;
+  /** Path of a 1200x630 social image. Defaults to the site-wide one. */
+  ogImage?: string;
 }
-const { title, description, jsonLd = [], ogType = 'website' } = Astro.props;
+const { title, description, jsonLd = [], ogType = 'website', ogImage: ogPath = '/og.png' } = Astro.props;
 // Astro builds `format: 'file'` pages as /x.html; the served URL is /x.
 const cleanPath = Astro.url.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
 const canonical = new URL(cleanPath, Astro.site);
-const ogImage = new URL('/og.png', Astro.site);
+const ogImage = new URL(ogPath, Astro.site);
 ---
 <!doctype html>
 <html lang="en">
@@ -36,6 +38,9 @@ const ogImage = new URL('/og.png', Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -43,6 +48,7 @@ const ogImage = new URL('/og.png', Astro.site);
     {jsonLd.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <Header />
     <main id="main">
       <slot />
