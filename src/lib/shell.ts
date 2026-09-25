@@ -4,6 +4,7 @@
  * function and read their options through the helpers below.
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
+import { trackToolRun } from './analytics';
 
 export interface ShellFile {
   id: number;
@@ -274,13 +275,18 @@ export function createShell(opts: ShellOptions) {
     hideResults();
     setBusy(true);
     progressApi.set('Preparing…', 0);
+    const started = performance.now();
+    const inputBytes = files.reduce((n, f) => n + f.file.size, 0);
+    const tool = root.dataset.slug ?? 'unknown';
     try {
       const outs = await opts.process(files, progressApi);
       if (outs.length === 0) throw new Error('Nothing was produced. Check the options and try again.');
       showResults(outs);
+      trackToolRun({ tool, outcome: 'ok', files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started });
     } catch (e) {
       console.error(e);
       showError(e instanceof Error ? e.message : String(e));
+      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started });
     } finally {
       setBusy(false);
     }

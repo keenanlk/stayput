@@ -17,6 +17,16 @@ test.beforeAll(() => {
   }
 });
 
+/** Replace the self-hosted Umami script with a stub that records events on window. */
+async function stubAnalytics(page: Page) {
+  await page.route('https://stats.keenankaufman.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: 'window.__events=[];window.umami={track:(n,d)=>window.__events.push({n,d})};',
+    }),
+  );
+}
+
 async function open(page: Page, slug: string) {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -25,6 +35,7 @@ async function open(page: Page, slug: string) {
   });
   // Serve the HEIC decoder locally so tests do not depend on the network.
   await page.route(HEIC_URL, (route) => route.fulfill({ path: heicLocal, contentType: 'text/javascript' }));
+  await stubAnalytics(page);
   await page.goto(`/tools/${slug}`);
   await expect(page.locator('#tool')).toBeVisible();
   return errors;
@@ -63,6 +74,7 @@ function pngSize(b: Uint8Array) {
 test('home page lists every tool and has no console errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
+  await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
   expect(await page.locator('.tool-card').count()).toBe(10);
@@ -116,9 +128,14 @@ test('Image converter applies EXIF orientation and converts to PNG and WebP', as
   expect(sniffFormat(zip['graphic.webp']!)).toBe('webp');
 });
 
-test('Compress and resize shrinks a large photo', async ({ page }) => {
+test('Compress and resize shrinks a large photo and records a bucketed event', async ({ page }) => {
   await open(page, 'compress-image');
   const { downloads } = await run(page, ['big.jpg']);
+  const events = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events);
+  expect(events).toHaveLength(1);
+  expect(events[0]!.n).toBe('tool_run');
+  expect(events[0]!.d).toMatchObject({ tool: 'compress-image', outcome: 'ok', files: '1', input: '<1MB', output: '<1MB' });
+  expect(JSON.stringify(events[0]!.d)).not.toContain('big.jpg');
   const out = await bytesOf(downloads[0]!);
   const original = readFileSync(fx('big.jpg')).length;
   expect(out.length).toBeLessThan(original / 2);
