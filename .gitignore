@@ -7,3 +7,7 @@ playwright-report/
 tests/fixtures/generated/
 *.log
 .DS_Store
+
+# launch asset intermediates
+launch/assets/frames/
+launch/assets/samples/

@@ -12,7 +12,7 @@ is live on stayput.app.
 | [community.md](community.md) | Reddit posts, the DEV.to write-up outline, Stack Exchange answer templates |
 | [checklist.md](checklist.md) | Launch-day checklist with timing, from the soft launch to the retrospective |
 | [needs-keenan.md](needs-keenan.md) | The short list of steps that need Keenan's accounts |
-| [assets.md](assets.md) | Spec for the GIF and screenshots, pending until the site is live |
+| [assets.md](assets.md) | The GIF and screenshots in `assets/`, how they were made, and when to redo them |
 
 ## Dates
 
@@ -42,14 +42,15 @@ is live on stayput.app.
   a paragraph) and reused, so every listing says the same thing.
 - Voice follows the brand notes: short sentences, no exclamation marks, no
   "blazing fast", no fear. It says what happens.
-- The GIF and the five screenshots are specified but not made. They need the
-  live site, which is waiting on the Vercel import. See assets.md.
+- The GIF and the five screenshots are made from a local build of main with
+  generated sample files, in Inter so they match Mac and Windows rendering. See
+  assets.md for when to redo them.
 - The word is **Stayput**, one word, capital S. Never "StayPut".
 
 ## Before anything is posted
 
 1. Site live on https://stayput.app with the domain attached and HTTPS working.
 2. `noindex` removed, sitemap submitted, at least a few pages indexed.
-3. GIF and screenshots made from the live site (assets.md).
+3. GIF and screenshots re-checked against the live site (assets.md).
 4. Every link in these drafts opened once from a phone and once from a desktop.
 5. Keenan's explicit OK in the project, per post.
