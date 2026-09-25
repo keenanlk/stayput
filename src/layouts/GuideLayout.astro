@@ -1,0 +1,113 @@
+---
+import Base from './Base.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { tools, toolBySlug, toolPath, type Tool } from '../data/tools';
+import { pairBySlug, pairAsTool } from '../data/pairs';
+import { presetBySlug, presetAsTool } from '../data/presets';
+import { guides, type Guide } from '../data/guides';
+import { inline, plain } from '../lib/inline';
+
+interface Props { guide: Guide }
+const { guide } = Astro.props;
+const url = new URL(`/guides/${guide.slug}`, Astro.site).toString();
+
+/** Resolve a tool, pair or preset slug to something the layout can link. */
+const resolve = (slug: string): Tool | undefined => {
+  const t = toolBySlug(slug);
+  if (t) return t;
+  const p = pairBySlug(slug);
+  if (p) return pairAsTool(p);
+  const q = presetBySlug(slug);
+  return q ? presetAsTool(q) : undefined;
+};
+const linked = guide.tools.map(resolve).filter((t): t is Tool => !!t);
+const primary = linked[0];
+const more = guides.filter((g) => g.slug !== guide.slug).slice(0, 4);
+const wordCount = guide.sections.reduce((n, s) => n + [...s.p, ...(s.list ?? [])].join(' ').split(/\s+/).length, 0);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.heading,
+    description: guide.description,
+    url,
+    datePublished: guide.updated,
+    dateModified: guide.updated,
+    wordCount,
+    author: { '@type': 'Organization', name: 'Stayput', url: Astro.site?.toString() },
+    publisher: { '@type': 'Organization', name: 'Stayput', url: Astro.site?.toString() },
+    isAccessibleForFree: true,
+    image: new URL(`/og/guide-${guide.slug}.png`, Astro.site).toString(),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: guide.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: plain(f.a) } })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Stayput', item: Astro.site?.toString() },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: new URL('/guides', Astro.site).toString() },
+      { '@type': 'ListItem', position: 3, name: guide.heading, item: url },
+    ],
+  },
+];
+const updated = new Date(guide.updated + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+<Base title={guide.title} description={guide.description} jsonLd={jsonLd} ogType="article" ogImage={`/og/guide-${guide.slug}.png`}>
+  <article class="wrap-narrow guide">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Stayput</a> <span aria-hidden="true">/</span> <a href="/guides">Guides</a></nav>
+    <h1>{guide.heading}</h1>
+    <p class="dek">{guide.dek}</p>
+    <p class="meta muted small">Updated <time datetime={guide.updated}>{updated}</time> · {Math.max(1, Math.round(wordCount / 220))} min read</p>
+
+    {primary && (
+      <aside class="guide-cta" aria-label="Do it now">
+        <div>
+          <strong>Do it now, without uploading:</strong>
+          <span class="muted">{primary.tagline}</span>
+        </div>
+        <a class="btn btn-primary" href={toolPath(primary)}>{primary.name}</a>
+      </aside>
+    )}
+
+    <div class="prose">
+      {guide.sections.map((s) => (
+        <section>
+          <h2>{s.h}</h2>
+          {s.p.map((p) => <p set:html={inline(p)} />)}
+          {s.list && <ul>{s.list.map((li) => <li set:html={inline(li)} />)}</ul>}
+        </section>
+      ))}
+
+      <section>
+        <h2>Questions</h2>
+        <div class="faq">
+          {guide.faq.map((f, i) => (
+            <details open={i === 0}>
+              <summary>{f.q}</summary>
+              <p set:html={inline(f.a)} />
+            </details>
+          ))}
+        </div>
+      </section>
+    </div>
+  </article>
+
+  {linked.length > 0 && (
+    <section class="wrap section">
+      <h2>Tools mentioned in this guide</h2>
+      <div class="tool-grid">{linked.map((t) => <ToolCard tool={t} />)}</div>
+    </section>
+  )}
+
+  <section class="wrap section">
+    <h2>More guides</h2>
+    <ul class="guide-list">
+      {more.map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}
+    </ul>
+  </section>
+</Base>

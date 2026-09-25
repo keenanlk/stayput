@@ -1,26 +1,10 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import { toolBySlug } from '../../data/tools';
+import SplitPdf from '../../components/options/SplitPdf.astro';
 const tool = toolBySlug('split-pdf')!;
 ---
 <ToolLayout tool={tool}>
-  <Fragment slot="options">
-    <div class="field wide">
-      <label>Mode <span class="muted" id="page-info"></span></label>
-      <div class="segmented" role="radiogroup" aria-label="Split mode">
-        <label><input type="radio" name="split-mode" value="range" checked /><span>Extract pages</span></label>
-        <label><input type="radio" name="split-mode" value="each" /><span>Every page separately</span></label>
-        <label><input type="radio" name="split-mode" value="every" /><span>Every N pages</span></label>
-      </div>
-    </div>
-    <div class="field wide" id="range-field">
-      <label for="range">Pages to keep</label>
-      <input type="text" id="range" placeholder="e.g. 1-3, 5" autocomplete="off" />
-    </div>
-    <div class="field" id="every-field" hidden>
-      <label for="every">Pages per file</label>
-      <input type="number" id="every" min="1" step="1" value="2" />
-    </div>
-  </Fragment>
+  <Fragment slot="options"><SplitPdf /></Fragment>
 </ToolLayout>
 <script src="../../tools/split-pdf.ts"></script>

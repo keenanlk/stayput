@@ -86,6 +86,8 @@ async function open(page: Page, slug: string) {
 }
 
 async function run(page: Page, files: string[], configure?: () => Promise<void>): Promise<{ downloads: Download[]; items: number }> {
+  // Landing pages load their tool module on demand, so wait for the shell before dropping files.
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(files.map((f) => (f.includes('/') ? f : fx(f))));
   await expect(page.locator('#tool')).toHaveAttribute('data-count', String(Math.min(files.length, (await page.locator('#tool').getAttribute('data-multiple')) === 'true' ? files.length : 1)));
   await configure?.();
@@ -541,4 +543,107 @@ test('Page numbers land in the chosen corner, skip the cover, and follow page ro
   expect(one!.x).toBeCloseTo(612 - 36, 0);
   expect(one!.y).toBeGreaterThan(380);
   expect(one!.y).toBeLessThan(400);
+});
+
+/* ------------------------------------------------------------------ */
+/* Growth: preset landing pages and guides                             */
+/* ------------------------------------------------------------------ */
+
+test('preset landing pages render, run their base tool with the preset options and link a social image', async ({ page }) => {
+  const presets: [string, string, () => Promise<void>][] = [
+    ['jpg-to-pdf', 'image-to-pdf', async () => expect(page.locator('#page-size')).toHaveValue('fit')],
+    ['png-to-pdf', 'image-to-pdf', async () => expect(page.locator('#page-size')).toHaveValue('fit')],
+    ['heic-to-pdf', 'image-to-pdf', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /heic/)],
+    ['pdf-to-jpg', 'pdf-to-image', async () => expect(page.locator('#format')).toHaveValue('image/jpeg')],
+    ['pdf-to-png', 'pdf-to-image', async () => expect(page.locator('#format')).toHaveValue('image/png')],
+    ['combine-pdf', 'merge-pdf', async () => expect(page.locator('#run')).toHaveText('Combine')],
+    ['extract-pages-from-pdf', 'split-pdf', async () => expect(page.locator('input[name="split-mode"][value="range"]')).toBeChecked()],
+    ['resize-image', 'compress-image', async () => expect(page.locator('#max-width')).toHaveValue('1920')],
+    ['compress-jpg', 'compress-image', async () => expect(page.locator('#quality')).toHaveValue('75')],
+    ['remove-location-from-photos', 'strip-exif', async () => expect(page.locator('#keep-icc')).toBeChecked()],
+  ];
+  for (const [slug, base, check] of presets) {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool')).toBeVisible();
+    await expect(page.locator('#tool')).toHaveAttribute('data-base', base);
+    expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.dev/${slug}`);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `https://stayput.dev/og/${slug}.png`);
+    expect((await page.request.get(`/og/${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
+    await check();
+    expect(errors, slug).toEqual([]);
+  }
+});
+
+test('JPG to PDF page builds a PDF and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/jpg-to-pdf');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['photo.jpg', 'plain.jpg']);
+  expect(downloads[0]!.suggestedFilename()).toBe('images.pdf');
+  const doc = await PDFDocument.load(await bytesOf(downloads[0]!));
+  expect(doc.getPageCount()).toBe(2);
+  net.assertNothingLeft(['photo.jpg', 'plain.jpg']);
+});
+
+test('PDF to JPG page renders pages as JPG with the preset format', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/pdf-to-jpg');
+  await expect(page.locator('#tool')).toBeVisible();
+  const { items } = await run(page, ['text.pdf']);
+  expect(items).toBe(3);
+  const zip = await zipAll(page);
+  expect(Object.keys(zip).sort()).toEqual(['text-page-1.jpg', 'text-page-2.jpg', 'text-page-3.jpg']);
+  expect(sniffFormat(zip['text-page-1.jpg']!)).toBe('jpeg');
+});
+
+test('Remove location page reports GPS and strips it losslessly', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/remove-location-from-photos');
+  await expect(page.locator('#tool')).toBeVisible();
+  const { downloads } = await run(page, ['photo.jpg'], async () => {
+    await expect(page.locator('#meta-report')).toContainText('GPS location: yes');
+  });
+  const out = await bytesOf(downloads[0]!);
+  expect(inspect(out).hasGps).toBe(false);
+  expect(inspect(out).kinds).not.toContain('EXIF');
+});
+
+test('guide pages render with article structured data, a social image and tool links', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await stubAnalytics(page);
+  await page.goto('/guides');
+  await expect(page.locator('h1')).toHaveText('Guides');
+  const links = await page.locator('.guide-index a').evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute('href')!));
+  expect(links.length).toBeGreaterThanOrEqual(10);
+  for (const href of links) {
+    await page.goto(href);
+    const slug = href.replace('/guides/', '');
+    await expect(page.locator('article h1')).toBeVisible();
+    const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(ld.map((s) => JSON.parse(s)['@type']).sort()).toEqual(['Article', 'BreadcrumbList', 'FAQPage']);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.dev${href}`);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `https://stayput.dev/og/guide-${slug}.png`);
+    expect((await page.request.get(`/og/guide-${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
+    // Every guide links to at least one tool, and every internal link resolves.
+    expect(await page.locator('.guide-cta a.btn').count()).toBe(1);
+    const internal = await page.locator('article a[href^="/"]').evaluateAll((as) => [...new Set(as.map((a) => (a as HTMLAnchorElement).getAttribute('href')!))]);
+    for (const l of internal) expect((await page.request.get(l)).status(), `${slug} links ${l}`).toBe(200);
+    // No leftover markup from the inline formatter.
+    expect(await page.locator('article').textContent()).not.toMatch(/\]\(|\*\*/);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('tool pages link to related guides and preset landing pages', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/tools/strip-exif');
+  await expect(page.locator('a[href="/guides/remove-location-data-from-photos"]').first()).toBeVisible();
+  await page.goto('/tools/image-to-pdf');
+  await expect(page.locator('a[href="/jpg-to-pdf"]').first()).toBeVisible();
 });

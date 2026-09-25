@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { tools } from '../data/tools';
 import { pairs } from '../data/pairs';
+import { presets } from '../data/presets';
+import { guides } from '../data/guides';
 
 /**
  * Service worker generated at build time so it knows every tool page.
@@ -9,7 +11,7 @@ import { pairs } from '../data/pairs';
  * HEIC decoder on jsDelivr are cache-first because their contents never change.
  */
 export const GET: APIRoute = () => {
-  const pages = ['/', '/about', '/privacy', ...tools.map((t) => `/tools/${t.slug}`), ...pairs.map((p) => `/${p.slug}`)];
+  const pages = ['/', '/about', '/privacy', ...tools.map((t) => `/tools/${t.slug}`), ...pairs.map((p) => `/${p.slug}`), ...presets.map((p) => `/${p.slug}`), '/guides', ...guides.map((g) => `/guides/${g.slug}`)];
   const version = `stayput-${Date.now().toString(36)}`;
   const body = `
 const VERSION = ${JSON.stringify(version)};
