@@ -6,7 +6,7 @@ import Base from '../layouts/Base.astro';
     <h1>Privacy</h1>
     <p>The short version: your files never leave your device, and we do not know who you are.</p>
     <h2>Your files</h2>
-    <p>Every tool on this site processes files inside your browser. Files are read from your disk into memory, converted there, and offered back to you as a download. No file, file name or file content is ever transmitted to Stayput or to anyone else. You can verify this with your browser's network inspector, or by loading a tool, disconnecting from the internet and using it.</p>
+    <p>Every tool on this site processes files inside your browser. Files are read from your disk into memory, converted there, and offered back to you as a download. No file, file name or file content is ever transmitted to Stayput or to anyone else. You can verify this with your browser's network inspector, or by loading a tool, disconnecting from the internet and using it. Every tool page also counts the requests it makes after you add files and shows you the list.</p>
     <h2>What the site loads</h2>
     <ul>
       <li>The pages, scripts and styles of this site, served from our host (Vercel).</li>
@@ -15,7 +15,7 @@ import Base from '../layouts/Base.astro';
     </ul>
     <p>That is the complete list. There are no advertising scripts, no fonts from third parties and no cookies.</p>
     <h2>Usage counting</h2>
-    <p>To know whether anyone uses Stayput, we count page views and tool runs with Umami, an open-source analytics tool we host ourselves. It sets no cookies, stores no identifier for you and does not follow you across sites. A tool run is recorded only as: which tool, whether it succeeded, and rough buckets for the number of files (for example "2-5"), their total size (for example "1-10MB") and how long it took. File names, file types and file contents are never recorded. If your browser sends a Do Not Track or Global Privacy Control signal, nothing is recorded at all.</p>
+    <p>To know whether anyone uses Stayput, we count page views and tool runs with Umami, an open-source analytics tool we host ourselves. It sets no cookies, stores no identifier for you and does not follow you across sites. A tool run is recorded only as: which tool, whether it succeeded, and rough buckets for the number of files (for example "2-5"), their total size (for example "1-10MB") and how long it took. File names, file types and file contents are never recorded. If your browser sends a Do Not Track or Global Privacy Control signal, nothing is recorded at all. The resulting numbers are <a href="https://stats.keenankaufman.com/share/878bb036d828/Stayput" rel="noopener">public</a>, so you can see exactly what is collected.</p>
     <h2>What we can see</h2>
     <p>Our host keeps standard, short-lived server logs of page requests (the page URL, your IP address and browser type) for security and capacity purposes. We do not add anything to that. We cannot see which files you use, how many, or what is in them, because that information never reaches a server.</p>
     <h2>Offline storage</h2>
