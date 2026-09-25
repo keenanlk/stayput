@@ -409,3 +409,144 @@ export async function pageCount(bytes: Uint8Array): Promise<number> {
   const doc = await loadDocument(bytes);
   return doc.getPageCount();
 }
+
+/* ------------------------------------------------------------------ */
+/* Reorder, delete, number and sign                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Write a new document whose pages are `order` (zero-based indexes into the
+ * source) in that sequence. Pages missing from `order` are dropped.
+ */
+export async function reorderPages(source: Uint8Array, order: number[]): Promise<Uint8Array> {
+  const { PDFDocument } = await loadPdfLib();
+  const src = await loadDocument(source);
+  const out = await PDFDocument.create();
+  const pages = await out.copyPages(src, order);
+  for (const p of pages) out.addPage(p);
+  return out.save({ useObjectStreams: true });
+}
+
+export type NumberPosition = 'bottom-center' | 'bottom-left' | 'bottom-right' | 'top-center' | 'top-left' | 'top-right';
+export type NumberFont = 'helvetica' | 'times' | 'courier';
+
+export interface PageNumberOptions {
+  position: NumberPosition;
+  /** Template with {n} for the page number and {total} for the count, e.g. "Page {n} of {total}". */
+  template: string;
+  /** Number printed on the first numbered page. */
+  start: number;
+  /** Zero-based index of the first page that gets a number (pages before it are skipped). */
+  firstPage: number;
+  fontSize: number;
+  /** Distance from the page edge in points. */
+  margin: number;
+  font: NumberFont;
+  /** Hex colour like #333333. */
+  color: string;
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return [0.2, 0.2, 0.2];
+  const n = parseInt(m[1]!, 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+/**
+ * Place a point given in the page's *displayed* frame (as the reader sees it,
+ * rotation applied) into PDF user space, and return the rotation needed for
+ * drawn text or images to appear upright. `x`/`y` are fractions 0..1 of the
+ * displayed width/height measured from the bottom-left of the displayed page.
+ */
+function displayedToUserSpace(page: PdfLib.PDFPage, fx: number, fy: number): { x: number; y: number; rotate: number; w: number; h: number } {
+  const { width, height } = page.getSize();
+  const rot = ((page.getRotation().angle % 360) + 360) % 360;
+  // Displayed size swaps for 90/270.
+  const [dw, dh] = rot === 90 || rot === 270 ? [height, width] : [width, height];
+  const dx = fx * dw;
+  const dy = fy * dh;
+  switch (rot) {
+    case 90:
+      // Displayed right is user-space up; displayed up is user-space left.
+      return { x: width - dy, y: dx, rotate: 90, w: dw, h: dh };
+    case 180:
+      return { x: width - dx, y: height - dy, rotate: 180, w: dw, h: dh };
+    case 270:
+      return { x: dy, y: height - dx, rotate: -90, w: dw, h: dh };
+    default:
+      return { x: dx, y: dy, rotate: 0, w: dw, h: dh };
+  }
+}
+
+export async function addPageNumbers(source: Uint8Array, opts: PageNumberOptions, onProgress?: (done: number, total: number) => void): Promise<{ bytes: Uint8Array; numbered: number }> {
+  const lib = await loadPdfLib();
+  const { StandardFonts, rgb, degrees } = lib;
+  const doc = await loadDocument(source);
+  const fontName = opts.font === 'times' ? StandardFonts.TimesRoman : opts.font === 'courier' ? StandardFonts.Courier : StandardFonts.Helvetica;
+  const font = await doc.embedFont(fontName);
+  const pages = doc.getPages();
+  const numberedPages = pages.slice(Math.max(0, opts.firstPage));
+  const total = numberedPages.length;
+  const [r, g, b] = hexToRgb(opts.color);
+  const color = rgb(r, g, b);
+  const size = Math.max(4, opts.fontSize);
+  numberedPages.forEach((page, i) => {
+    const n = opts.start + i;
+    const text = opts.template.replace(/\{n\}/g, String(n)).replace(/\{total\}/g, String(opts.start + total - 1)).replace(/\{count\}/g, String(total));
+    const textWidth = font.widthOfTextAtSize(text, size);
+    const rot = ((page.getRotation().angle % 360) + 360) % 360;
+    const { width, height } = page.getSize();
+    const [dw, dh] = rot === 90 || rot === 270 ? [height, width] : [width, height];
+    // Position of the text's baseline-left corner in the displayed frame.
+    const vertical = opts.position.startsWith('top') ? dh - opts.margin - size * 0.75 : opts.margin;
+    const horizontal = opts.position.endsWith('left') ? opts.margin : opts.position.endsWith('right') ? dw - opts.margin - textWidth : (dw - textWidth) / 2;
+    const p = displayedToUserSpace(page, horizontal / dw, vertical / dh);
+    page.drawText(text, { x: p.x, y: p.y, size, font, color, rotate: degrees(p.rotate) });
+    onProgress?.(i + 1, total);
+  });
+  return { bytes: await doc.save({ useObjectStreams: true }), numbered: total };
+}
+
+export interface Stamp {
+  /** Zero-based page index. */
+  page: number;
+  /** PNG bytes of the stamp (signature, initials, date text). */
+  png: Uint8Array;
+  /** Position and size as fractions 0..1 of the displayed page, origin top-left. */
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** Draw PNG stamps onto pages. Coordinates come from the on-screen preview. */
+export async function stampPdf(source: Uint8Array, stamps: Stamp[], onProgress?: (done: number, total: number) => void): Promise<Uint8Array> {
+  const { degrees } = await loadPdfLib();
+  const doc = await loadDocument(source);
+  const pages = doc.getPages();
+  const cache = new Map<Uint8Array, PdfLib.PDFImage>();
+  for (const [i, s] of stamps.entries()) {
+    const page = pages[s.page];
+    if (!page) continue;
+    let img = cache.get(s.png);
+    if (!img) {
+      img = await doc.embedPng(s.png);
+      cache.set(s.png, img);
+    }
+    // Preview coordinates are top-left based; PDF is bottom-left based.
+    const rot = ((page.getRotation().angle % 360) + 360) % 360;
+    const { width, height } = page.getSize();
+    const [dw, dh] = rot === 90 || rot === 270 ? [height, width] : [width, height];
+    const w = s.width * dw;
+    const h = s.height * dh;
+    const fx = s.x;
+    const fy = 1 - s.y - s.height; // bottom-left of the stamp in the displayed frame
+    const p = displayedToUserSpace(page, fx, fy);
+    // pdf-lib rotates around the drawn image's own bottom-left corner, which is
+    // exactly the point we mapped, so width/height stay in displayed terms.
+    page.drawImage(img, { x: p.x, y: p.y, width: w, height: h, rotate: degrees(p.rotate) });
+    onProgress?.(i + 1, stamps.length);
+  }
+  return doc.save({ useObjectStreams: true });
+}

@@ -1,0 +1,73 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('pdf-page-numbers')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="preview-panel" class="number-preview" hidden>
+    <div class="page-thumb number-thumb">
+      <div class="number-page" id="number-page">
+        <img id="preview-img" alt="First numbered page" />
+        <span class="number-sample" id="number-sample">1</span>
+      </div>
+      <span class="label" id="page-info"></span>
+    </div>
+  </div>
+  <Fragment slot="options">
+    <div class="field">
+      <label for="position">Position</label>
+      <select id="position">
+        <option value="bottom-center" selected>Bottom centre</option>
+        <option value="bottom-right">Bottom right</option>
+        <option value="bottom-left">Bottom left</option>
+        <option value="top-center">Top centre</option>
+        <option value="top-right">Top right</option>
+        <option value="top-left">Top left</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="format">Format</label>
+      <select id="format">
+        <option value={"{n}"} selected>1</option>
+        <option value={"Page {n}"}>Page 1</option>
+        <option value={"{n} of {total}"}>1 of 12</option>
+        <option value={"Page {n} of {total}"}>Page 1 of 12</option>
+        <option value={"- {n} -"}>- 1 -</option>
+        <option value="custom">Custom…</option>
+      </select>
+    </div>
+    <div class="field" id="custom-field" hidden>
+      <label for="custom">Custom format <span class="muted">{"{n} = number, {total} = last number"}</span></label>
+      <input type="text" id="custom" value={"Page {n} of {total}"} autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="first-page">First page to number</label>
+      <input type="number" id="first-page" min="1" step="1" value="1" />
+    </div>
+    <div class="field">
+      <label for="start">Start counting at</label>
+      <input type="number" id="start" min="0" step="1" value="1" />
+    </div>
+    <div class="field">
+      <label for="font">Font</label>
+      <select id="font">
+        <option value="helvetica" selected>Helvetica</option>
+        <option value="times">Times</option>
+        <option value="courier">Courier</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="font-size">Size <output id="font-size-out">11</output> pt</label>
+      <input type="range" id="font-size" min="6" max="24" step="1" value="11" />
+    </div>
+    <div class="field">
+      <label for="margin">Distance from edge <output id="margin-out">36</output> pt</label>
+      <input type="range" id="margin" min="12" max="90" step="2" value="36" />
+    </div>
+    <div class="field">
+      <label for="color">Colour</label>
+      <input type="color" id="color" value="#333333" />
+    </div>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/pdf-page-numbers.ts"></script>

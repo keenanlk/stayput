@@ -17,11 +17,14 @@ That is the whole pitch, and you can check it in three ways:
 | Images | PDFs |
 | --- | --- |
 | [HEIC to JPG or PNG](https://stayput.app/tools/heic-to-jpg) (batch, keep or drop EXIF) | [Merge PDF](https://stayput.app/tools/merge-pdf) |
-| [Convert images](https://stayput.app/tools/convert-image) (PNG, JPG, WebP, AVIF, HEIC, SVG in; JPG, PNG, WebP out) | [Split PDF / extract pages](https://stayput.app/tools/split-pdf) |
+| [Convert images](https://stayput.app/tools/convert-image) (PNG, JPG, WebP, AVIF, JPEG XL, HEIC, SVG in; JPG, PNG, WebP out) | [Split PDF / extract pages](https://stayput.app/tools/split-pdf) |
 | [Compress and resize images](https://stayput.app/tools/compress-image) | [Compress PDF](https://stayput.app/tools/compress-pdf) (lossless cleanup, image recompression, or flatten) |
 | [Remove EXIF and GPS data](https://stayput.app/tools/strip-exif) (lossless, no re-encode) | [Rotate PDF pages](https://stayput.app/tools/rotate-pdf) |
 | | [Images to PDF](https://stayput.app/tools/image-to-pdf) |
 | | [PDF to images](https://stayput.app/tools/pdf-to-image) |
+| | [Reorder and delete pages](https://stayput.app/tools/reorder-pdf) |
+| | [Sign PDF](https://stayput.app/tools/sign-pdf) (draw or type, place on any page) |
+| | [Add page numbers](https://stayput.app/tools/pdf-page-numbers) |
 
 Plus dedicated pages for the conversions people search for: [HEIC to PNG](https://stayput.app/heic-to-png), [PNG to JPG](https://stayput.app/png-to-jpg), [JPG to PNG](https://stayput.app/jpg-to-png), [WebP to PNG](https://stayput.app/webp-to-png), [WebP to JPG](https://stayput.app/webp-to-jpg), [PNG to WebP](https://stayput.app/png-to-webp), [JPG to WebP](https://stayput.app/jpg-to-webp), [AVIF to JPG](https://stayput.app/avif-to-jpg), [AVIF to PNG](https://stayput.app/avif-to-png), [SVG to PNG](https://stayput.app/svg-to-png).
 
@@ -30,9 +33,11 @@ Plus dedicated pages for the conversions people search for: [HEIC to PNG](https:
 The site is a static [Astro](https://astro.build) build: one page per tool, a shared tool shell, and a TypeScript module per tool that does the work in the tab.
 
 - **HEIC decoding**: [heic-to](https://github.com/hoppergee/heic-to), a WebAssembly build of libheif, loaded on demand from jsDelivr. The request fetches only the decoder; no image data is sent.
-- **PDF editing**: [pdf-lib](https://pdf-lib.js.org) for merge, split, rotate, image embedding and rewriting image streams.
+- **PDF editing**: [pdf-lib](https://pdf-lib.js.org) for merge, split, rotate, reorder, page numbers (standard fonts, nothing embedded), signature stamps, image embedding and rewriting image streams.
 - **PDF rendering**: [pdf.js](https://mozilla.github.io/pdf.js/) (legacy build for wide browser support) on a dedicated web worker.
 - **Image resize and encode**: the canvas API, with stepped downscaling for sharp results.
+- **JPEG XL and AVIF decoding**: the browser's own decoder when it has one (AVIF everywhere, JXL in Safari); otherwise the [jSquash](https://github.com/jamsinclair/jSquash) WebAssembly builds of libjxl and libavif, loaded on demand from jsDelivr like the HEIC decoder.
+- **Signatures**: drawn on a canvas with pointer events (pressure-aware for pens) or typed in the self-hosted Caveat font, cropped to a transparent PNG and placed at preview coordinates mapped into PDF user space, page rotation included.
 - **EXIF removal**: a hand-written, lossless segment and chunk editor for JPEG, PNG and WebP in `src/lib/exif.ts`. It deletes only the metadata segments and writes the untouched image data back, so the pixels are identical and the file only gets smaller. It also extracts EXIF from HEIC containers so "keep metadata" works on HEIC conversions.
 - **Zip downloads**: [fflate](https://github.com/101arrowz/fflate) in the tab when there is more than one output.
 - **Offline**: a service worker generated at build time (`src/pages/sw.js.ts`) caches every tool page and the hashed assets. Pages are network-first so deploys show up immediately; assets are cache-first because their names are content-hashed.
@@ -97,4 +102,4 @@ Stayput is free and will stay free. There are no ads, no accounts and no paid ti
 
 ## License
 
-MIT. See `LICENSE`. Third-party libraries keep their own licenses: heic-to (LGPL-3.0, loaded as a separate module at runtime), pdf-lib (MIT), pdf.js (Apache-2.0), fflate (MIT), Astro (MIT).
+MIT. See `LICENSE`. Third-party libraries keep their own licenses: heic-to (LGPL-3.0, loaded as a separate module at runtime), @jsquash/jxl and @jsquash/avif (Apache-2.0, loaded as separate modules at runtime), pdf-lib (MIT), pdf.js (Apache-2.0), fflate (MIT), Astro (MIT). The Caveat font in `public/fonts` is under the SIL Open Font License 1.1 (see `public/fonts/OFL-Caveat.txt`).

@@ -1,15 +1,58 @@
 import { test, expect, type Page, type Download } from '@playwright/test';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFName, degrees } from 'pdf-lib';
+import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { inspect, sniffFormat } from '../src/lib/exif';
 
 const fixtures = fileURLToPath(new URL('./fixtures/generated/', import.meta.url));
 const fx = (name: string) => fixtures + name;
 const HEIC_URL = 'https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/csp/heic-to.min.js';
 const heicLocal = fileURLToPath(new URL('../node_modules/heic-to/dist/csp/heic-to.min.js', import.meta.url));
+const staticFx = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
+const nodeModules = fileURLToPath(new URL('../node_modules/', import.meta.url));
+
+/** Serve the jSquash decoders (normally fetched from jsDelivr) from node_modules so tests stay offline. */
+async function serveLocalCodecs(page: Page) {
+  await page.route('https://cdn.jsdelivr.net/npm/@jsquash/**', (route) => {
+    const m = /\/npm\/(@jsquash\/[a-z]+)@[\d.]+\/(.+)$/.exec(route.request().url());
+    if (!m) return route.abort();
+    const file = nodeModules + m[1] + '/' + m[2];
+    const type = file.endsWith('.wasm') ? 'application/wasm' : 'text/javascript';
+    return route.fulfill({ path: file, contentType: type });
+  });
+}
+
+/**
+ * Record every request the tab makes from now on. `assertNothingLeft` then
+ * checks that no request could have carried file bytes: only GETs without a
+ * body to this site or the code CDN, plus the small anonymous usage ping.
+ */
+function watchNetwork(page: Page) {
+  const seen: { url: string; method: string; body: string | null }[] = [];
+  page.on('request', (r) => seen.push({ url: r.url(), method: r.method(), body: r.postData() }));
+  return {
+    reset: () => seen.splice(0),
+    assertNothingLeft(fixtureNames: string[]) {
+      for (const r of seen) {
+        if (r.url.startsWith('blob:') || r.url.startsWith('data:')) continue;
+        const host = new URL(r.url).hostname;
+        if (host === 'stats.keenankaufman.com') {
+          // The usage ping is tiny and names only the tool and size bucket.
+          expect((r.body ?? '').length, r.url).toBeLessThan(2048);
+          for (const n of fixtureNames) expect(r.body ?? '', 'usage ping must not name the file').not.toContain(n);
+          continue;
+        }
+        expect(['localhost', 'cdn.jsdelivr.net'], `unexpected host ${host}`).toContain(host);
+        expect(r.method, `${r.url} must be a plain GET`).toBe('GET');
+        expect(r.body, `${r.url} must carry no body`).toBeNull();
+      }
+    },
+  };
+}
 
 test.beforeAll(() => {
   if (!existsSync(fx('text.pdf'))) {
@@ -35,6 +78,7 @@ async function open(page: Page, slug: string) {
   });
   // Serve the HEIC decoder locally so tests do not depend on the network.
   await page.route(HEIC_URL, (route) => route.fulfill({ path: heicLocal, contentType: 'text/javascript' }));
+  await serveLocalCodecs(page);
   await stubAnalytics(page);
   await page.goto(`/tools/${slug}`);
   await expect(page.locator('#tool')).toBeVisible();
@@ -42,7 +86,7 @@ async function open(page: Page, slug: string) {
 }
 
 async function run(page: Page, files: string[], configure?: () => Promise<void>): Promise<{ downloads: Download[]; items: number }> {
-  await page.locator('#file-input').setInputFiles(files.map(fx));
+  await page.locator('#file-input').setInputFiles(files.map((f) => (f.includes('/') ? f : fx(f))));
   await expect(page.locator('#tool')).toHaveAttribute('data-count', String(Math.min(files.length, (await page.locator('#tool').getAttribute('data-multiple')) === 'true' ? files.length : 1)));
   await configure?.();
   const downloads: Download[] = [];
@@ -77,7 +121,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(10);
+  expect(await page.locator('.tool-card').count()).toBe(13);
   expect(errors).toEqual([]);
 });
 
@@ -269,7 +313,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -281,7 +325,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -320,4 +364,181 @@ test('no request carries a file: the network stays empty after files are added',
   await expect(page.locator('#netproof')).toBeVisible();
   await expect(page.locator('#netproof-summary')).toContainText(/Since you added files, this tab made \d+ network requests?/);
   await expect(page.locator('#netproof-summary')).not.toContainText('unexpected');
+});
+
+/* ------------------------------------------------------------------ */
+/* Launch tools                                                        */
+/* ------------------------------------------------------------------ */
+
+/** Text items on a page with their user-space position, via pdf.js in Node. */
+async function textItems(bytes: Uint8Array, pageNumber: number): Promise<{ str: string; x: number; y: number }[]> {
+  const doc = await getDocument({ data: bytes.slice(), useWorkerFetch: false, standardFontDataUrl: nodeModules + 'pdfjs-dist/standard_fonts/' }).promise;
+  const page = await doc.getPage(pageNumber);
+  const content = await page.getTextContent();
+  const items = content.items.filter((i): i is TextItem => 'str' in i).map((i) => ({ str: i.str, x: i.transform[4]!, y: i.transform[5]! }));
+  await doc.loadingTask.destroy();
+  return items;
+}
+
+test('Image converter decodes JPEG XL and AVIF, with the JXL decoder fetched as code only', async ({ page }) => {
+  const errors = await open(page, 'convert-image');
+  const net = watchNetwork(page);
+  const { items } = await run(page, [staticFx('checker.jxl'), staticFx('checker.avif')], async () => {
+    await page.locator('#format').selectOption('image/png');
+  });
+  expect(items).toBe(2);
+  const zip = await zipAll(page);
+  // Both inputs share a base name, so the zip de-duplicates with a suffix.
+  expect(Object.keys(zip).sort()).toEqual(['checker (2).png', 'checker.png']);
+  for (const name of Object.keys(zip)) expect(pngSize(zip[name]!), name).toEqual({ width: 320, height: 240 });
+  net.assertNothingLeft(['checker.jxl', 'checker.avif']);
+  expect(errors).toEqual([]);
+});
+
+test('JXL to PNG page converts with the preset format and lists the decoder in the network proof', async ({ page }) => {
+  await serveLocalCodecs(page);
+  await stubAnalytics(page);
+  await page.goto('/jxl-to-png');
+  await expect(page.locator('#format')).toHaveValue('image/png');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [staticFx('checker.jxl')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('checker.png');
+  expect(pngSize(await bytesOf(downloads[0]!))).toEqual({ width: 320, height: 240 });
+  net.assertNothingLeft(['checker.jxl']);
+  await expect(page.locator('#netproof-summary')).toContainText('none carrying your files');
+  await expect(page.locator('#netproof-list')).toContainText('decoder program');
+  await expect(page.locator('#netproof-summary')).not.toContainText('unexpected');
+});
+
+test('Reorder PDF moves, deletes and duplicates pages and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'reorder-pdf');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#page-grid .reorder-cell')).toHaveCount(3);
+  await expect(page.locator('#order')).toHaveValue('1, 2, 3');
+  await page.getByLabel('Move page 3 left').click();
+  await expect(page.locator('#order')).toHaveValue('1, 3, 2');
+  await page.getByLabel('Delete page 1').click();
+  await expect(page.locator('#order')).toHaveValue('3, 2');
+  await expect(page.locator('#page-info')).toContainText('1 deleted');
+  // Typing an order wins over the grid, and a repeated page duplicates it.
+  await page.locator('#order').fill('3, 1, 1');
+  await page.locator('#order').dispatchEvent('change');
+  await expect(page.locator('#page-grid .reorder-cell')).toHaveCount(3);
+  await expect(page.locator('#page-grid .reorder-cell .label').first()).toHaveText('1. was page 3');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/);
+  expect(download.suggestedFilename()).toBe('text-reordered.pdf');
+  const out = await bytesOf(download);
+  expect((await PDFDocument.load(out)).getPageCount()).toBe(3);
+  expect((await textItems(out, 1)).map((t) => t.str).join(' ')).toContain('Page 3 of the fixture');
+  expect((await textItems(out, 2)).map((t) => t.str).join(' ')).toContain('Page 1 of the fixture');
+  expect((await textItems(out, 3)).map((t) => t.str).join(' ')).toContain('Page 1 of the fixture');
+  net.assertNothingLeft(['text.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Sign PDF places a drawn and a typed signature on two pages and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'sign-pdf');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#sign-panel')).toBeVisible();
+  await expect(page.locator('#page-label')).toHaveText('Page 1 of 3');
+  // Running without a signature is an error, not a silent no-op.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  // Draw a squiggle.
+  const pad = page.locator('#sig-pad');
+  await pad.scrollIntoViewIfNeeded();
+  const box = (await pad.boundingBox())!;
+  await page.mouse.move(box.x + 40, box.y + 80);
+  await page.mouse.down();
+  for (let i = 1; i <= 20; i++) await page.mouse.move(box.x + 40 + i * 12, box.y + 80 + Math.sin(i / 2) * 30);
+  await page.mouse.up();
+  await page.locator('#add-signature').click();
+  await expect(page.locator('.stamp-signature')).toHaveCount(1);
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  // Drag it up and to the left.
+  const stamp = page.locator('.stamp-signature');
+  await stamp.scrollIntoViewIfNeeded();
+  const before = (await stamp.boundingBox())!;
+  await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(before.x + before.width / 2 - 120, before.y + before.height / 2 - 200, { steps: 8 });
+  await page.mouse.up();
+  const after = (await stamp.boundingBox())!;
+  expect(after.x).toBeLessThan(before.x - 100);
+  expect(after.y).toBeLessThan(before.y - 150);
+  // Second page: typed signature plus the date.
+  await page.locator('#next-page').click();
+  await expect(page.locator('#page-label')).toHaveText('Page 2 of 3');
+  await expect(page.locator('.stamp')).toHaveCount(0);
+  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await page.locator('#sig-text').fill('Keenan Example');
+  await page.locator('#add-signature').click();
+  await page.locator('#add-date').click();
+  await expect(page.locator('.stamp')).toHaveCount(2);
+  await expect(page.locator('#placement-count')).toHaveText('3 items placed on 2 pages');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect(download.suggestedFilename()).toBe('text-signed.pdf');
+  const doc = await PDFDocument.load(await bytesOf(download));
+  expect(doc.getPageCount()).toBe(3);
+  const imagesOn = (i: number) => {
+    const res = doc.getPage(i).node.Resources();
+    const xo = res?.lookup(PDFName.of('XObject'));
+    return xo ? (xo as unknown as { keys(): unknown[] }).keys().length : 0;
+  };
+  expect(imagesOn(0)).toBe(1);
+  expect(imagesOn(1)).toBe(2);
+  expect(imagesOn(2)).toBe(0);
+  net.assertNothingLeft(['text.pdf']);
+  // The only console error is the deliberate "no signature yet" run above.
+  expect(errors.filter((e) => !e.includes('Add your signature to a page first'))).toEqual([]);
+});
+
+test('Page numbers land in the chosen corner, skip the cover, and follow page rotation', async ({ page }) => {
+  const errors = await open(page, 'pdf-page-numbers');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['text.pdf'], async () => {
+    await expect(page.locator('#preview-panel')).toBeVisible();
+    await page.locator('#format').selectOption('Page {n} of {total}');
+    await page.locator('#first-page').fill('2');
+    await page.locator('#first-page').dispatchEvent('change');
+    await expect(page.locator('#number-sample')).toHaveText('Page 1 of 2');
+    await expect(page.locator('#page-info')).toContainText('numbering 2 of them, starting on page 2');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('text-numbered.pdf');
+  const out = await bytesOf(downloads[0]!);
+  const p1 = (await textItems(out, 1)).map((t) => t.str).join(' ');
+  expect(p1).not.toContain('Page 1 of 2');
+  const p2 = await textItems(out, 2);
+  const num = p2.find((t) => t.str === 'Page 1 of 2');
+  expect(num, 'page 2 carries the first number').toBeTruthy();
+  expect(num!.y).toBeCloseTo(36, 0); // bottom margin
+  expect(num!.x).toBeGreaterThan(250); // centred on a 612 pt page
+  expect(num!.x).toBeLessThan(320);
+  expect((await textItems(out, 3)).some((t) => t.str === 'Page 2 of 2')).toBe(true);
+  await expect(page.locator('.result-item .meta')).toContainText('2 pages numbered');
+  net.assertNothingLeft(['text.pdf']);
+  expect(errors).toEqual([]);
+
+  // A page rotated 90 degrees: the number must sit at the *displayed* bottom
+  // centre, which in user space is the right-hand edge, running upwards.
+  const rotated = await PDFDocument.create();
+  rotated.addPage([612, 792]).setRotation(degrees(90));
+  const rotatedPath = fx('rotated.pdf');
+  writeFileSync(rotatedPath, await rotated.save());
+  await page.locator('#clear').click();
+  const second = await run(page, ['rotated.pdf'], async () => {
+    await page.locator('#format').selectOption('{n}');
+    await page.locator('#first-page').fill('1');
+    await page.locator('#first-page').dispatchEvent('change');
+  });
+  const items = await textItems(await bytesOf(second.downloads[0]!), 1);
+  const one = items.find((t) => t.str === '1');
+  expect(one, 'rotated page is numbered').toBeTruthy();
+  expect(one!.x).toBeCloseTo(612 - 36, 0);
+  expect(one!.y).toBeGreaterThan(380);
+  expect(one!.y).toBeLessThan(400);
 });
