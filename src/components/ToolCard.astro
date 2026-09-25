@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+import type { Tool } from '../data/tools';
+interface Props { tool: Tool }
+const { tool } = Astro.props;
+const icons: Record<string, string> = {
+  'heic-to-jpg': 'image', 'convert-image': 'convert', 'compress-image': 'resize', 'strip-exif': 'eye',
+  'merge-pdf': 'merge', 'split-pdf': 'split', 'compress-pdf': 'compress', 'rotate-pdf': 'rotate',
+  'image-to-pdf': 'pdf', 'pdf-to-image': 'image',
+};
+---
+<a class="tool-card" href={`/tools/${tool.slug}`}>
+  <div class="icon"><Icon name={icons[tool.slug] ?? 'pdf'} /></div>
+  <h3>{tool.name}</h3>
+  <p>{tool.tagline}</p>
+</a>

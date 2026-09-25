@@ -1,0 +1,11 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('merge-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options">
+    <p class="small muted wide" style="margin:0">Files are combined top to bottom. Use the arrows to reorder.</p>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/merge-pdf.ts"></script>

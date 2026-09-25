@@ -1,0 +1,114 @@
+---
+import Base from './Base.astro';
+import Icon from '../components/Icon.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { tools, type Tool } from '../data/tools';
+
+interface Props {
+  tool: Tool;
+}
+const { tool } = Astro.props;
+const url = new URL(`/tools/${tool.slug}`, Astro.site).toString();
+const related = tools.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 4);
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: `${tool.name} | Stayput`,
+    url,
+    description: tool.description,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires a modern browser with WebAssembly',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    isAccessibleForFree: true,
+    license: 'https://opensource.org/licenses/MIT',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: tool.faq.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Stayput', item: Astro.site?.toString() },
+      { '@type': 'ListItem', position: 2, name: tool.name, item: url },
+    ],
+  },
+];
+---
+<Base title={tool.title} description={tool.description} jsonLd={jsonLd}>
+  <section class="tool-hero wrap">
+    <h1>{tool.heading}</h1>
+    <p class="tagline">{tool.tagline}</p>
+    <div class="badges">
+      <span class="badge"><Icon name="shield" /> Nothing is uploaded</span>
+      <span class="badge"><Icon name="offline" /> Works offline</span>
+      <span class="badge"><Icon name="open" /> Open source</span>
+      <span class="badge"><Icon name="check" /> No limits, no watermark</span>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="tool-panel" id="tool" data-slug={tool.slug} data-multiple={String(tool.multiple)}>
+      <div class="dropzone" id="drop" tabindex="0" role="button" aria-label={`${tool.dropLabel} or click to choose`}>
+        <Icon name="upload" />
+        <strong>{tool.dropLabel}</strong>
+        <span>or click to choose {tool.multiple ? 'files' : 'a file'}. {tool.multiple ? 'Batches welcome.' : ''}</span>
+        <input class="visually-hidden" id="file-input" type="file" accept={tool.accept} multiple={tool.multiple} />
+      </div>
+      <ul class="file-list" id="file-list" aria-live="polite"></ul>
+      <slot name="panel" />
+      <div class="options" id="options">
+        <slot name="options" />
+      </div>
+      <div class="run-row">
+        <button class="btn btn-primary btn-lg" id="run" type="button" disabled>{tool.action}</button>
+        <button class="btn btn-ghost" id="clear" type="button" hidden>Clear</button>
+        <div class="progress" id="progress" aria-live="polite">
+          <span class="text" id="progress-text">Working…</span>
+          <div class="bar"><i id="progress-bar"></i></div>
+        </div>
+      </div>
+      <div class="error" id="error" role="alert"></div>
+      <div class="results" id="results">
+        <div class="results-head">
+          <h2 id="results-title">Done</h2>
+          <div class="field-row">
+            <button class="btn btn-sm" id="download-all" type="button" hidden>Download all as zip</button>
+          </div>
+        </div>
+        <div id="results-list" class="file-list"></div>
+      </div>
+      <p class="privacy-note"><Icon name="shield" /><span>Your files are processed on this device and never sent to a server. Reload the page to clear everything from memory.</span></p>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <h2>How it works</h2>
+    <ol class="steps">{tool.steps.map((s) => <li>{s}</li>)}</ol>
+  </section>
+
+  <section class="wrap section">
+    <h2>Questions</h2>
+    <div class="faq">
+      {tool.faq.map((f, i) => (
+        <details open={i === 0}>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <h2>More {tool.category === 'pdf' ? 'PDF' : 'image'} tools</h2>
+    <div class="tool-grid">{related.map((t) => <ToolCard tool={t} />)}</div>
+  </section>
+</Base>

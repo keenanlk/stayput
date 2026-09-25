@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { tools } from '../data/tools';
+---
+<Base title="Page not found | Stayput" description="That page does not exist.">
+  <section class="wrap" style="padding-top:48px">
+    <h1>That page does not exist</h1>
+    <p class="muted" style="margin:12px 0 28px">Try one of the tools instead.</p>
+    <div class="tool-grid">{tools.map((t) => <ToolCard tool={t} />)}</div>
+  </section>
+</Base>
