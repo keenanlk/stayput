@@ -28,6 +28,7 @@ Shipped so far: 14 tools, 12 format-pair pages, 11 preset landing pages, 10 guid
 - Format pairs not yet covered: `bmp-to-jpg`, `tiff-to-jpg` (needs a TIFF decoder; UTIF.js), `gif-to-png`, `heic-to-webp`, `svg-to-jpg`, `png-to-ico` (favicon generator, "favicon generator" ~300k, high fit).
 - PDF: delete pages preset of reorder (`/delete-pdf-pages` exists as a redirect; make it a page), `/pdf-to-jpg-high-quality`, PDF metadata viewer and remover (title/author/producer, high privacy angle, small).
 - Images: EXIF viewer as its own page (`/exif-viewer`, "exif viewer" ~100k) reusing the strip-exif report panel; "remove background" is in demand (~2M) but needs a segmentation model, out of scope for now.
+- Site pages from the marketing plan: `/changelog` rendered from CHANGELOG.md, `/press` rendered from launch/press-kit.md, an IndexNow key file in `public/`, `public/.well-known/atproto-did` once Keenan pastes the Bluesky DID, hello@stayput.dev and the Bluesky handle in the footer, and the 20-second demo video (WebM via Playwright) embedded under the home hero.
 - Guides: "what does a PDF know about you (metadata)", "why free online tools ask for your email", "how to send large photos without losing quality".
 
 ## How to pick

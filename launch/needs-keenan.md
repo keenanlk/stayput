@@ -16,6 +16,10 @@ needed today; Claude will ask for each one when it is next, and not before.
 | Oct 28 to 30 | Publish the DEV.to write-up | His DEV.to account |
 | Nov 2 evening | Fill and schedule the Product Hunt listing | Maker account |
 | Nov 3 to 7 | Post the four Reddit posts | His Reddit account |
+| Week of Sep 28 | Create the Hacker News, Reddit (if none) and Product Hunt accounts and comment three times a week until launch; PH maker account by Oct 3 (marketing-plan.md section 2) | Accounts need history before launch day |
+| Week of Sep 28 | Namecheap: hello@stayput.dev forwarder and catch-all | His registrar login |
+| Week of Sep 28 | Bluesky account with the stayput.dev domain handle; paste the DID in the thread | His account; Claude adds the .well-known file |
+| Week of Sep 28 | Uptime Kuma on the Pi: two monitors for stayput.dev | His homelab UI |
 | Optional | Ten minutes on his iPhone with a few HEIC photos and a big PDF during the soft launch | Headless tests cannot replicate Safari's memory behaviour |
 
 What Claude does without asking: everything in the drafts, the directory PRs
