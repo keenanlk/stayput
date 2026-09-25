@@ -1,0 +1,35 @@
+---
+/** Option controls for PDF to images, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'image/png';
+const dpi = defaults.dpi ?? '150';
+---
+<div class="field wide">
+  <label>Pages <span class="muted" id="page-info"></span></label>
+  <div class="segmented" role="radiogroup" aria-label="Pages">
+    <label><input type="radio" name="pages" value="all" checked /><span>All pages</span></label>
+    <label><input type="radio" name="pages" value="range" /><span>Choose pages</span></label>
+  </div>
+</div>
+<div class="field wide" id="range-field" hidden>
+  <label for="range">Pages</label>
+  <input type="text" id="range" placeholder="e.g. 1-3, 5" autocomplete="off" />
+</div>
+<div class="field">
+  <label for="format">Format</label>
+  <select id="format">
+    <option value="image/png" selected={format === 'image/png'}>PNG</option>
+    <option value="image/jpeg" selected={format === 'image/jpeg'}>JPG</option>
+  </select>
+</div>
+<div class="field">
+  <label for="dpi">Resolution</label>
+  <select id="dpi">
+    {['72', '96', '150', '300'].map((d) => <option value={d} selected={d === dpi}>{d} DPI</option>)}
+  </select>
+</div>
+<div class="field" id="quality-field" hidden>
+  <label for="quality">JPG quality <output id="quality-out">90</output></label>
+  <input type="range" id="quality" min="40" max="100" value="90" />
+</div>

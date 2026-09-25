@@ -1,0 +1,22 @@
+---
+/** Option controls for split/extract, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const mode = defaults['split-mode'] ?? 'range';
+---
+<div class="field wide">
+  <label>Mode <span class="muted" id="page-info"></span></label>
+  <div class="segmented" role="radiogroup" aria-label="Split mode">
+    <label><input type="radio" name="split-mode" value="range" checked={mode === 'range'} /><span>Extract pages</span></label>
+    <label><input type="radio" name="split-mode" value="each" checked={mode === 'each'} /><span>Every page separately</span></label>
+    <label><input type="radio" name="split-mode" value="every" checked={mode === 'every'} /><span>Every N pages</span></label>
+  </div>
+</div>
+<div class="field wide" id="range-field">
+  <label for="range">Pages to keep</label>
+  <input type="text" id="range" placeholder="e.g. 1-3, 5" autocomplete="off" />
+</div>
+<div class="field" id="every-field" hidden>
+  <label for="every">Pages per file</label>
+  <input type="number" id="every" min="1" step="1" value="2" />
+</div>
