@@ -12,6 +12,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'split-pdf': () => import('./split-pdf'),
   'image-to-pdf': () => import('./image-to-pdf'),
   'pdf-to-image': () => import('./pdf-to-image'),
+  'pdf-to-word': () => import('./pdf-to-word'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

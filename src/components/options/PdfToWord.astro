@@ -1,0 +1,17 @@
+---
+/** Option controls for PDF to Word, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'docx';
+---
+<div class="field">
+  <label for="format">Save as <span class="muted" id="page-info"></span></label>
+  <select id="format">
+    <option value="docx" selected={format === 'docx'}>Word document (.docx)</option>
+    <option value="txt" selected={format === 'txt'}>Plain text (.txt)</option>
+  </select>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="page-breaks" /> Start each PDF page on a new page</label>
+  <span class="small muted">Off by default, so paragraphs flow naturally.</span>
+</div>

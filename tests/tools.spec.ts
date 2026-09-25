@@ -123,7 +123,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(13);
+  expect(await page.locator('.tool-card').count()).toBe(14);
   expect(errors).toEqual([]);
 });
 
@@ -315,7 +315,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -561,6 +561,7 @@ test('preset landing pages render, run their base tool with the preset options a
     ['resize-image', 'compress-image', async () => expect(page.locator('#max-width')).toHaveValue('1920')],
     ['compress-jpg', 'compress-image', async () => expect(page.locator('#quality')).toHaveValue('75')],
     ['remove-location-from-photos', 'strip-exif', async () => expect(page.locator('#keep-icc')).toBeChecked()],
+    ['pdf-to-text', 'pdf-to-word', async () => expect(page.locator('#format')).toHaveValue('txt')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -646,4 +647,51 @@ test('tool pages link to related guides and preset landing pages', async ({ page
   await expect(page.locator('a[href="/guides/remove-location-data-from-photos"]').first()).toBeVisible();
   await page.goto('/tools/image-to-pdf');
   await expect(page.locator('a[href="/jpg-to-pdf"]').first()).toBeVisible();
+});
+
+/* ------------------------------------------------------------------ */
+/* PDF to Word                                                         */
+/* ------------------------------------------------------------------ */
+
+const xmlText = (xml: string) => [...xml.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)].map((m) => m[1]!);
+
+test('PDF to Word rebuilds paragraphs and headings into a .docx and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'pdf-to-word');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['article.pdf'], async () => {
+    await expect(page.locator('#page-info')).toHaveText('2 pages');
+    await page.locator('#page-breaks').check();
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('article.docx');
+  const zip = unzipSync(await bytesOf(downloads[0]!));
+  expect(Object.keys(zip).sort()).toEqual(['[Content_Types].xml', '_rels/.rels', 'docProps/app.xml', 'docProps/core.xml', 'word/_rels/document.xml.rels', 'word/document.xml', 'word/styles.xml']);
+  const doc = new TextDecoder().decode(zip['word/document.xml']!);
+  const paragraphs = [...doc.matchAll(/<w:p>(.*?)<\/w:p>/g)].map((m) => ({ style: /w:pStyle w:val="([^"]+)"/.exec(m[1]!)?.[1], text: xmlText(m[1]!).join(''), pageBreak: m[1]!.includes('<w:pageBreakBefore/>') }));
+  expect(paragraphs.map((p) => p.style)).toEqual(['Heading1', 'Heading2', undefined, undefined, undefined, 'Heading2', undefined]);
+  expect(paragraphs[0]!.text).toBe('Fixture Article Title');
+  expect(paragraphs[2]!.text).toMatch(/^The quick brown fox jumps over the lazy dog .* every district\.$/);
+  expect(paragraphs[3]!.text).toMatch(/^Second paragraph begins here .* in the test\.$/);
+  // The hyphenated line break is mended.
+  expect(paragraphs[4]!.text).toBe('This line ends with a hyphen because the word extraordinary was split across two lines.');
+  expect(paragraphs[5]).toEqual({ style: 'Heading2', text: 'Second page', pageBreak: true });
+  await expect(page.locator('#text-preview')).toContainText('Fixture Article Title');
+  net.assertNothingLeft(['article.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('PDF to text page saves plain text and refuses a scan with a clear message', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/pdf-to-text');
+  await expect(page.locator('#tool')).toBeVisible();
+  const { downloads } = await run(page, ['text.pdf']);
+  expect(downloads[0]!.suggestedFilename()).toBe('text.txt');
+  const txt = new TextDecoder().decode(await bytesOf(downloads[0]!));
+  expect(txt).toBe('Page 1 of the fixture document\n\nPage 2 of the fixture document\n\nPage 3 of the fixture document\n');
+  await page.locator('#clear').click();
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '0');
+  await page.locator('#file-input').setInputFiles([fx('scan.pdf')]);
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  await expect(page.locator('#error')).toContainText('no text layer');
 });
