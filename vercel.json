@@ -188,6 +188,26 @@
       "source": "/blog",
       "destination": "/guides",
       "permanent": true
+    },
+    {
+      "source": "/pdf-to-word",
+      "destination": "/tools/pdf-to-word",
+      "permanent": true
+    },
+    {
+      "source": "/pdf-to-docx",
+      "destination": "/tools/pdf-to-word",
+      "permanent": true
+    },
+    {
+      "source": "/extract-text-from-pdf",
+      "destination": "/pdf-to-text",
+      "permanent": true
+    },
+    {
+      "source": "/pdf-to-txt",
+      "destination": "/pdf-to-text",
+      "permanent": true
     }
   ],
   "headers": [

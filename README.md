@@ -25,6 +25,7 @@ That is the whole pitch, and you can check it in three ways:
 | | [Reorder and delete pages](https://stayput.dev/tools/reorder-pdf) |
 | | [Sign PDF](https://stayput.dev/tools/sign-pdf) (draw or type, place on any page) |
 | | [Add page numbers](https://stayput.dev/tools/pdf-page-numbers) |
+| | [PDF to Word or text](https://stayput.dev/tools/pdf-to-word) (paragraphs and headings, not layout) |
 
 Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [WebP to PNG](https://stayput.dev/webp-to-png), [AVIF to JPG](https://stayput.dev/avif-to-jpg) and [JXL to PNG](https://stayput.dev/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.dev/jpg-to-pdf), [PDF to JPG](https://stayput.dev/pdf-to-jpg), [Combine PDF](https://stayput.dev/combine-pdf), [Resize image](https://stayput.dev/resize-image) and [Remove location from photos](https://stayput.dev/remove-location-from-photos); and [guides](https://stayput.dev/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
 
@@ -34,6 +35,7 @@ The site is a static [Astro](https://astro.build) build: one page per tool, a sh
 
 - **HEIC decoding**: [heic-to](https://github.com/hoppergee/heic-to), a WebAssembly build of libheif, loaded on demand from jsDelivr. The request fetches only the decoder; no image data is sent.
 - **PDF editing**: [pdf-lib](https://pdf-lib.js.org) for merge, split, rotate, reorder, page numbers (standard fonts, nothing embedded), signature stamps, image embedding and rewriting image streams.
+- **PDF to Word**: pdf.js reads the positioned text runs; `src/lib/pdftext.ts` rebuilds lines, paragraphs and headings and `src/lib/docx.ts` writes a minimal Office Open XML document with fflate. Text and structure only, no layout.
 - **PDF rendering**: [pdf.js](https://mozilla.github.io/pdf.js/) (legacy build for wide browser support) on a dedicated web worker.
 - **Image resize and encode**: the canvas API, with stepped downscaling for sharp results.
 - **JPEG XL and AVIF decoding**: the browser's own decoder when it has one (AVIF everywhere, JXL in Safari); otherwise the [jSquash](https://github.com/jamsinclair/jSquash) WebAssembly builds of libjxl and libavif, loaded on demand from jsDelivr like the HEIC decoder.
