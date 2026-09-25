@@ -2,7 +2,7 @@
 
 **Your files stay put.** Free, open-source tools that convert HEIC photos, merge and compress PDFs, shrink images and strip EXIF data, entirely inside your browser. Nothing is uploaded. There is no server that could receive your files. No accounts, no limits, no watermarks, and it works offline.
 
-Live site: **https://stayput.app**
+Live site: **https://stayput.dev**
 
 ## Open the network tab. It stays empty.
 
@@ -10,23 +10,23 @@ That is the whole pitch, and you can check it in three ways:
 
 1. **Watch the network.** Open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, open any tool and drop a file. You will see requests for the page's own code, once for the HEIC decoder program on the HEIC pages, and one anonymous page count. You will never see a request carrying your file, because there is nowhere for it to go. Every tool page also counts its own requests after you add files and shows you the list.
 2. **Turn the network off.** Load a tool, switch to airplane mode, and use it. It keeps working, because after one visit the site is cached by a service worker and the work happens in your tab.
-3. **Read the code.** This repository is the site. It builds to static HTML, CSS and JavaScript with no backend; the deploy has no server-side code at all. The [privacy page](https://stayput.app/privacy) lists every request the site makes and the [usage stats are public](https://stats.keenankaufman.com/share/878bb036d828/Stayput).
+3. **Read the code.** This repository is the site. It builds to static HTML, CSS and JavaScript with no backend; the deploy has no server-side code at all. The [privacy page](https://stayput.dev/privacy) lists every request the site makes and the [usage stats are public](https://stats.keenankaufman.com/share/878bb036d828/Stayput).
 
 ## Tools
 
 | Images | PDFs |
 | --- | --- |
-| [HEIC to JPG or PNG](https://stayput.app/tools/heic-to-jpg) (batch, keep or drop EXIF) | [Merge PDF](https://stayput.app/tools/merge-pdf) |
-| [Convert images](https://stayput.app/tools/convert-image) (PNG, JPG, WebP, AVIF, JPEG XL, HEIC, SVG in; JPG, PNG, WebP out) | [Split PDF / extract pages](https://stayput.app/tools/split-pdf) |
-| [Compress and resize images](https://stayput.app/tools/compress-image) | [Compress PDF](https://stayput.app/tools/compress-pdf) (lossless cleanup, image recompression, or flatten) |
-| [Remove EXIF and GPS data](https://stayput.app/tools/strip-exif) (lossless, no re-encode) | [Rotate PDF pages](https://stayput.app/tools/rotate-pdf) |
-| | [Images to PDF](https://stayput.app/tools/image-to-pdf) |
-| | [PDF to images](https://stayput.app/tools/pdf-to-image) |
-| | [Reorder and delete pages](https://stayput.app/tools/reorder-pdf) |
-| | [Sign PDF](https://stayput.app/tools/sign-pdf) (draw or type, place on any page) |
-| | [Add page numbers](https://stayput.app/tools/pdf-page-numbers) |
+| [HEIC to JPG or PNG](https://stayput.dev/tools/heic-to-jpg) (batch, keep or drop EXIF) | [Merge PDF](https://stayput.dev/tools/merge-pdf) |
+| [Convert images](https://stayput.dev/tools/convert-image) (PNG, JPG, WebP, AVIF, JPEG XL, HEIC, SVG in; JPG, PNG, WebP out) | [Split PDF / extract pages](https://stayput.dev/tools/split-pdf) |
+| [Compress and resize images](https://stayput.dev/tools/compress-image) | [Compress PDF](https://stayput.dev/tools/compress-pdf) (lossless cleanup, image recompression, or flatten) |
+| [Remove EXIF and GPS data](https://stayput.dev/tools/strip-exif) (lossless, no re-encode) | [Rotate PDF pages](https://stayput.dev/tools/rotate-pdf) |
+| | [Images to PDF](https://stayput.dev/tools/image-to-pdf) |
+| | [PDF to images](https://stayput.dev/tools/pdf-to-image) |
+| | [Reorder and delete pages](https://stayput.dev/tools/reorder-pdf) |
+| | [Sign PDF](https://stayput.dev/tools/sign-pdf) (draw or type, place on any page) |
+| | [Add page numbers](https://stayput.dev/tools/pdf-page-numbers) |
 
-Plus dedicated pages for the conversions people search for: [HEIC to PNG](https://stayput.app/heic-to-png), [PNG to JPG](https://stayput.app/png-to-jpg), [JPG to PNG](https://stayput.app/jpg-to-png), [WebP to PNG](https://stayput.app/webp-to-png), [WebP to JPG](https://stayput.app/webp-to-jpg), [PNG to WebP](https://stayput.app/png-to-webp), [JPG to WebP](https://stayput.app/jpg-to-webp), [AVIF to JPG](https://stayput.app/avif-to-jpg), [AVIF to PNG](https://stayput.app/avif-to-png), [SVG to PNG](https://stayput.app/svg-to-png).
+Plus dedicated pages for the conversions people search for: [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [JPG to PNG](https://stayput.dev/jpg-to-png), [WebP to PNG](https://stayput.dev/webp-to-png), [WebP to JPG](https://stayput.dev/webp-to-jpg), [PNG to WebP](https://stayput.dev/png-to-webp), [JPG to WebP](https://stayput.dev/jpg-to-webp), [AVIF to JPG](https://stayput.dev/avif-to-jpg), [AVIF to PNG](https://stayput.dev/avif-to-png), [SVG to PNG](https://stayput.dev/svg-to-png).
 
 ## How it works
 
@@ -44,7 +44,7 @@ The site is a static [Astro](https://astro.build) build: one page per tool, a sh
 - **Security headers**: `vercel.json` ships a strict Content-Security-Policy. Scripts may load only from the site itself, jsDelivr (the decoder) and the self-hosted analytics host. `connect-src` is limited the same way, so even a bug could not send a file elsewhere.
 - **Analytics**: a self-hosted, cookie-free [Umami](https://umami.is) counter records page views and tool runs as coarse buckets (tool, outcome, file count bucket, size bucket, duration bucket). Never file names, types or contents. It honours Do Not Track. The dashboard is public.
 
-There is no backend and no cookies. See [`/privacy`](https://stayput.app/privacy) for the full statement.
+There is no backend and no cookies. See [`/privacy`](https://stayput.dev/privacy) for the full statement.
 
 ## Development
 
@@ -81,7 +81,7 @@ The site is a plain static export, so Vercel's Hobby plan (or any static host) i
 
 1. In Vercel, **Add New Project** and import this repository. Vercel detects Astro: build command `npm run build`, output directory `dist`. No environment variables are needed.
 2. Deploy. `vercel.json` sets clean URLs, redirects for the short tool URLs, long-lived caching for hashed assets, and the security headers.
-3. Add the custom domain under **Settings, Domains**. If the domain is not `stayput.app`, change `site` in `astro.config.mjs` and the `Sitemap:` line in `public/robots.txt`, then redeploy.
+3. Add the custom domain under **Settings, Domains**. If the domain is not `stayput.dev`, change `site` in `astro.config.mjs` and the `Sitemap:` line in `public/robots.txt`, then redeploy.
 
 Every push to `main` redeploys; pull requests get preview URLs. `public/_headers` carries the same headers for Cloudflare Pages, so moving hosts is a DNS change.
 

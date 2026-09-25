@@ -7,7 +7,7 @@ Claude does.
 ## Blocked until the site is live
 
 - [ ] Vercel import of keenanlk/stayput done and production deploy green (Keenan)
-- [ ] stayput.app bought and attached in Vercel (Keenan)
+- [ ] stayput.dev bought (stayput.app was taken) and attached in Vercel (Keenan)
 - [ ] `noindex` removed if present; `robots.txt` and sitemap verified at the live URL
 - [ ] Search Console property added, sitemap submitted (Keenan verifies with the DNS TXT record)
 - [x] GIF and five screenshots made (assets.md); re-check against the live site
