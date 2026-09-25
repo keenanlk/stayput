@@ -13,6 +13,9 @@ is live on stayput.dev.
 | [checklist.md](checklist.md) | Launch-day checklist with timing, from the soft launch to the retrospective |
 | [needs-keenan.md](needs-keenan.md) | The short list of steps that need Keenan's accounts |
 | [assets.md](assets.md) | The GIF and screenshots in `assets/`, how they were made, and when to redo them |
+| [marketing-plan.md](marketing-plan.md) | Channel research with evidence, the account list and aging schedule, the scheduling decision, and everything else set up for free |
+| [calendar.md](calendar.md) | The week-by-week content calendar from account warm-up (Sep 28) through the launch weeks; a Monday routine reads it |
+| [press-kit.md](press-kit.md) | Descriptions, facts, verification steps, assets and brand notes for directories and press |
 
 ## Dates
 
