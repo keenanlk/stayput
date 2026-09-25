@@ -16,7 +16,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Upload-based HEIC converters send every photo, location data included, to a server you have never heard of, then cap you at a handful per day. Here a hundred photos convert in the time the first one would take to upload.',
   },
   'convert-image': {
-    how: 'Your browser already knows how to decode JPG, PNG, WebP, AVIF and SVG. Stayput draws each image onto an off-screen canvas and asks the browser to encode it again in the format you picked. HEIC input goes through the libheif WebAssembly decoder. Nothing here needs a server because nothing here is beyond what a browser can do on its own.',
+    how: 'Your browser already knows how to decode JPG, PNG, WebP, AVIF and SVG. Stayput draws each image onto an off-screen canvas and asks the browser to encode it again in the format you picked. HEIC input goes through the libheif WebAssembly decoder, and JPEG XL (or AVIF, in a browser without native support) through the Squoosh decoders compiled to WebAssembly, fetched once as program files and cached. Nothing here needs a server because nothing here is beyond what a browser can do on its own.',
     versus: 'Online converters upload your image, convert it on their machine and hand it back through an ad-covered download page. This does the same conversion with the same codecs, on your device, in less time than the upload.',
   },
   'compress-image': {
@@ -50,6 +50,18 @@ export const engines: Record<string, Engine> = {
   'pdf-to-image': {
     how: 'pdf.js renders each page to a canvas at the resolution you choose, the same engine Firefox uses to display PDFs. The browser encodes each page as JPG or PNG, and if there is more than one they are zipped in your tab with fflate.',
     versus: 'Online PDF-to-image tools rasterise your document on their server and often limit you to the first few pages. Here every page is rendered locally, at any resolution, with no page cap.',
+  },
+  'reorder-pdf': {
+    how: 'pdf.js renders a thumbnail of every page so you can see what you are moving. When you save, pdf-lib copies the pages you kept, in your order, into a new document. The page contents are not re-rendered or recompressed, so text stays text and images keep their quality.',
+    versus: 'Reordering pages is a five-second job that upload-based tools turn into an upload, a queue and a download page, often behind a login or a daily cap. Here the thumbnails appear as fast as your device can draw them and the result is written in your tab.',
+  },
+  'sign-pdf': {
+    how: 'Your signature is captured as strokes on a canvas (or typed with an embedded handwriting font), turned into a transparent PNG in memory, and drawn onto the page with pdf-lib at the exact spot and size you chose on the pdf.js preview. The signed PDF is assembled in your tab and handed to your browser’s download.',
+    versus: 'E-signature sites keep a copy of your contract, your signature and your email address, and most limit free users to a few documents a month. This tool has no server, so there is nothing to keep, nothing to count and nothing to leak.',
+  },
+  'pdf-page-numbers': {
+    how: 'pdf-lib opens the document and draws each number with one of the standard PDF fonts (Helvetica, Times or Courier), which every PDF reader has built in, so no font is embedded and the file barely grows. The position is computed per page from its size and rotation so the number lands in the same corner as the reader sees it.',
+    versus: 'Adding page numbers should not require uploading a 200-page report to a stranger’s server. Here the stamping happens on your device and finishes in about the time the upload alone would take.',
   },
 };
 

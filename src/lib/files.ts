@@ -95,6 +95,8 @@ export function mimeForExt(ext: string): string {
       return 'image/gif';
     case 'avif':
       return 'image/avif';
+    case 'jxl':
+      return 'image/jxl';
     case 'heic':
     case 'heif':
       return 'image/heic';

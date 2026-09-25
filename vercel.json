@@ -68,6 +68,71 @@
       "source": "/convert-image",
       "destination": "/tools/convert-image",
       "permanent": true
+    },
+    {
+      "source": "/reorder-pdf",
+      "destination": "/tools/reorder-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/rearrange-pdf",
+      "destination": "/tools/reorder-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/delete-pdf-pages",
+      "destination": "/tools/reorder-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/organize-pdf",
+      "destination": "/tools/reorder-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/sign-pdf",
+      "destination": "/tools/sign-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/esign",
+      "destination": "/tools/sign-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/signature",
+      "destination": "/tools/sign-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/pdf-page-numbers",
+      "destination": "/tools/pdf-page-numbers",
+      "permanent": true
+    },
+    {
+      "source": "/page-numbers",
+      "destination": "/tools/pdf-page-numbers",
+      "permanent": true
+    },
+    {
+      "source": "/add-page-numbers",
+      "destination": "/tools/pdf-page-numbers",
+      "permanent": true
+    },
+    {
+      "source": "/number-pdf",
+      "destination": "/tools/pdf-page-numbers",
+      "permanent": true
+    },
+    {
+      "source": "/jxl-to-jpeg",
+      "destination": "/jxl-to-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/jpeg-xl-to-png",
+      "destination": "/jxl-to-png",
+      "permanent": true
     }
   ],
   "headers": [
