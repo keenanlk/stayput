@@ -304,6 +304,32 @@ export const presets: Preset[] = [
       { q: 'Is the image re-compressed?', a: 'No. Only the metadata blocks are removed. The image data is copied byte for byte, so there is zero quality loss.' },
     ],
   },
+  {
+    slug: 'pdf-to-text',
+    base: 'pdf-to-word',
+    name: 'PDF to text',
+    title: 'PDF to Text Converter, Free, No Upload | Stayput',
+    description: 'Extract the text of a PDF into a plain .txt file in your browser, paragraphs rebuilt, reading order kept. Nothing is uploaded, works offline.',
+    heading: 'Extract text from a PDF',
+    tagline: 'Every word of a PDF as a plain text file, pulled out on your device.',
+    keywords: ['pdf to text', 'extract text from pdf', 'pdf to txt', 'copy text from pdf', 'get text out of pdf', 'pdf text extractor'],
+    defaults: { format: 'txt' },
+    intro: [
+      'Copying text out of a PDF by hand gives you one line per paragraph, broken hyphens and page headers in the middle of sentences. This page reads the text layer with pdf.js inside your browser, groups the runs back into lines and paragraphs, mends words split across lines, and saves a clean .txt file. A preview appears before you download.',
+      'Plain text is the right output when the words are going into another program: a note-taking app, a script, a search index, a language model, a translation tool. If you want an editable document with headings, switch the format to Word.',
+    ],
+    steps: [
+      'Drop a PDF, or tap to pick one. The page count appears next to the format.',
+      'Leave plain text selected, or switch to Word. Tick page breaks if you want a form feed between pages.',
+      'Convert. The preview shows the start of the text and the .txt file downloads.',
+    ],
+    faq: [
+      { q: 'Does it work on scanned PDFs?', a: 'No. A scan is a picture of text with no text layer, so there is nothing to extract without OCR. The tool says so when it finds no text.' },
+      { q: 'Does it keep reading order for two-column pages?', a: 'Lines are ordered top to bottom and left to right within a line. Simple two-column layouts usually come out column by column; complex ones can interleave. Check the preview.' },
+      { q: 'Can I extract text from many PDFs at once?', a: 'One file at a time for now. Batch extraction is on the roadmap.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

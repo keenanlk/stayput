@@ -1,0 +1,14 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import PdfToWord from '../../components/options/PdfToWord.astro';
+const tool = toolBySlug('pdf-to-word')!;
+---
+<ToolLayout tool={tool}>
+  <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>
+  <Fragment slot="options"><PdfToWord /></Fragment>
+</ToolLayout>
+<style is:global>
+  .text-preview { max-height: 260px; overflow: auto; white-space: pre-wrap; font: 14px/1.5 var(--font-body, inherit); padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); margin: 0; }
+</style>
+<script src="../../tools/pdf-to-word.ts"></script>
