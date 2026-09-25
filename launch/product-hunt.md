@@ -41,15 +41,15 @@ treats PH as a backlink and a story, not the main channel.
 
 ## Gallery
 
-Five images plus the GIF, 1270 by 760 pixels, light theme, made from the live
-site (see assets.md). Captions in order:
+The GIF plus five screenshots, 1270 by 760, light theme, in `launch/assets/`
+(see assets.md). Captions in order:
 
-1. **GIF** (first slot): "Ten HEIC photos converting with the network tab open. Nothing carrying a file leaves."
-2. "Every tool is one page: drop files, pick an option, download. Same layout everywhere."
-3. "Sign a PDF by drawing or typing. The signature is placed in your tab; no copy is kept anywhere."
-4. "Remove EXIF and GPS data losslessly. The pixels are untouched and the file only gets smaller."
-5. "Works offline after one visit and installs as an app. There is no server to be down."
-6. "The stats are public. Cookieless, self-hosted, coarse buckets only. See exactly what is counted."
+1. **network-tab.gif**: "Ten HEIC photos converting with the request panel open. One request, for the decoder. Nothing carrying a file leaves."
+2. **01-home.png**: "Nothing uploaded, works offline, open source, free with no account. The four promises, above the fold."
+3. **02-merge-pdf.png**: "Every tool is one page: drop files, pick an option, download. Same layout everywhere."
+4. **03-sign-pdf.png**: "Sign a PDF by drawing or typing. The signature is placed in your tab; no copy is kept anywhere."
+5. **04-strip-exif.png**: "See what a photo reveals, then remove it losslessly. The pixels are untouched and the file only gets smaller."
+6. **05-network-proof.png**: "The page counts its own requests after you add files and shows you the list."
 
 ## Launch-day replies
 
