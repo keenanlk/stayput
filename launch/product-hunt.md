@@ -12,7 +12,7 @@ treats PH as a backlink and a story, not the main channel.
 | Name | Stayput | |
 | Tagline | Convert HEIC and fix PDFs in your browser. Nothing uploaded. | 60 chars (this is exactly 60) |
 | Alternate tagline | Free file tools where the network tab stays empty | 49 |
-| Website | https://stayput.app | |
+| Website | https://stayput.dev | |
 | Topics | Privacy, Open Source, Productivity, Developer Tools, Web App | pick up to 3 if PH limits: Privacy, Open Source, Productivity |
 | Pricing | Free | |
 | Makers | Keenan | |

@@ -15,7 +15,7 @@ re-submission).
 2. `Show HN: Stayput – Free HEIC and PDF tools that never upload your files`
 3. `Show HN: Open-source file tools where the network tab stays empty`
 
-URL: `https://stayput.app`
+URL: `https://stayput.dev`
 
 ## First comment (goes in the text field)
 
@@ -32,7 +32,7 @@ URL: `https://stayput.app`
 > Code: https://github.com/keenanlk/stayput
 
 Replace `[stats link]` with https://stats.keenankaufman.com/share/878bb036d828/Stayput
-(or the stayput.app alias if one exists by then).
+(or the stayput.dev alias if one exists by then).
 
 ## Reply bank
 
