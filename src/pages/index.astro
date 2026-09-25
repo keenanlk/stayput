@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { tools, categories } from '../data/tools';
+
+const title = 'Stayput: Free File Tools That Never Upload Your Files';
+const description =
+  'Convert HEIC to JPG, merge and compress PDFs, shrink images and strip EXIF data, all inside your browser. No uploads, no limits, no watermarks, works offline. Open source.';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Stayput',
+    url: Astro.site?.toString(),
+    description,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: tools.map((t, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: t.name,
+      url: new URL(`/tools/${t.slug}`, Astro.site).toString(),
+    })),
+  },
+];
+---
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <section class="home-hero wrap">
+    <h1>Your files stay put.</h1>
+    <p class="lede">
+      Convert, compress and clean images and PDFs right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off.
+    </p>
+    <div class="badges">
+      <span class="badge"><Icon name="shield" /> Nothing is uploaded</span>
+      <span class="badge"><Icon name="offline" /> Works offline</span>
+      <span class="badge"><Icon name="open" /> Open source (MIT)</span>
+      <span class="badge"><Icon name="check" /> Free, no account</span>
+    </div>
+  </section>
+
+  {categories.map((c) => (
+    <section class="wrap section" id={`${c.id === 'images' ? 'image' : 'pdf'}-tools`} style="margin-top:32px">
+      <h2>{c.label}</h2>
+      <p class="muted" style="margin-bottom:16px">{c.blurb}</p>
+      <div class="tool-grid">{tools.filter((t) => t.category === c.id).map((t) => <ToolCard tool={t} />)}</div>
+    </section>
+  ))}
+
+  <section class="wrap">
+    <div class="pillars">
+      <div class="pillar">
+        <h3>Private by construction</h3>
+        <p>There is no server to upload to. The site is static files; every conversion runs as JavaScript and WebAssembly in your tab. Check the network panel if you like.</p>
+      </div>
+      <div class="pillar">
+        <h3>No limits</h3>
+        <p>No file size caps, no "two tasks per hour", no sign-up wall, no watermark. Batch a hundred photos if your device can hold them.</p>
+      </div>
+      <div class="pillar">
+        <h3>Works offline</h3>
+        <p>Open a tool once and it is cached for offline use. Install it as an app from your browser menu to keep it a tap away.</p>
+      </div>
+      <div class="pillar">
+        <h3>Open source</h3>
+        <p>MIT licensed and <a href="https://github.com/keenanlk/stayput" rel="noopener">on GitHub</a>. Read the code, report a bug, or host your own copy.</p>
+      </div>
+    </div>
+  </section>
+</Base>

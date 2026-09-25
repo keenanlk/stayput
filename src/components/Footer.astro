@@ -1,0 +1,30 @@
+---
+import { tools } from '../data/tools';
+const images = tools.filter((t) => t.category === 'images');
+const pdfs = tools.filter((t) => t.category === 'pdf');
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h3>Stayput</h3>
+        <p>Free file tools that run entirely in your browser. Nothing you drop here is uploaded anywhere. Open source under the MIT license.</p>
+        <p><a href="https://github.com/keenanlk/stayput" rel="noopener">Source code on GitHub</a></p>
+      </div>
+      <div>
+        <h3>Image tools</h3>
+        <ul>{images.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
+      </div>
+      <div>
+        <h3>PDF tools</h3>
+        <ul>{pdfs.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© {new Date().getFullYear()} Stayput</span>
+      <a href="/privacy">Privacy</a>
+      <a href="/about">About</a>
+      <span>No cookies, no tracking, no uploads.</span>
+    </div>
+  </div>
+</footer>

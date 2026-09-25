@@ -1,0 +1,30 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('image-to-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options">
+    <div class="field">
+      <label for="page-size">Page size</label>
+      <select id="page-size">
+        <option value="fit">Fit to each image</option>
+        <option value="a4">A4</option>
+        <option value="letter">US Letter</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="orientation">Orientation</label>
+      <select id="orientation">
+        <option value="auto">Auto (match image)</option>
+        <option value="portrait">Portrait</option>
+        <option value="landscape">Landscape</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="margin">Margin (mm)</label>
+      <input type="number" id="margin" min="0" max="50" step="1" value="0" />
+    </div>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/image-to-pdf.ts"></script>

@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Privacy | Stayput" description="Stayput never uploads your files. Here is exactly what the site does and does not do with your data.">
+  <article class="wrap-narrow prose" style="padding-top:40px">
+    <h1>Privacy</h1>
+    <p>The short version: your files never leave your device, and we do not know who you are.</p>
+    <h2>Your files</h2>
+    <p>Every tool on this site processes files inside your browser. Files are read from your disk into memory, converted there, and offered back to you as a download. No file, file name or file content is ever transmitted to Stayput or to anyone else. You can verify this with your browser's network inspector, or by loading a tool, disconnecting from the internet and using it.</p>
+    <h2>What the site loads</h2>
+    <ul>
+      <li>The pages, scripts and styles of this site, served from our host (Vercel).</li>
+      <li>On the HEIC pages only, the libheif WebAssembly decoder is fetched from the jsDelivr CDN. That request downloads the decoder program; it carries none of your data.</li>
+    </ul>
+    <p>That is the complete list. There are no analytics scripts, no advertising scripts, no fonts from third parties and no cookies.</p>
+    <h2>What we can see</h2>
+    <p>Our host keeps standard, short-lived server logs of page requests (the page URL, your IP address and browser type) for security and capacity purposes. We do not add anything to that. We cannot see which files you use, how many, or what is in them, because that information never reaches a server.</p>
+    <h2>Offline storage</h2>
+    <p>To work offline, the site asks your browser to cache its own pages and scripts using a service worker. This cache contains only the site's code, never your files. You can clear it at any time from your browser's site settings.</p>
+    <h2>Open source</h2>
+    <p>The full source code is at <a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>, so anyone can confirm the above.</p>
+    <p class="muted small">Last updated September 25, 2026.</p>
+  </article>
+</Base>

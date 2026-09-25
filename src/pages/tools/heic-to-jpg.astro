@@ -1,0 +1,24 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('heic-to-jpg')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options">
+    <div class="field">
+      <label>Output format</label>
+      <div class="segmented" role="radiogroup" aria-label="Output format">
+        <label><input type="radio" name="format" value="jpg" checked /><span>JPG</span></label>
+        <label><input type="radio" name="format" value="png" /><span>PNG</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="quality">JPG quality <output id="quality-out">92</output></label>
+      <input type="range" id="quality" min="50" max="100" value="92" />
+    </div>
+    <div class="field">
+      <label class="check"><input type="checkbox" id="keep-exif" /> Keep EXIF metadata (date, camera, location)</label>
+    </div>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/heic-to-jpg.ts"></script>

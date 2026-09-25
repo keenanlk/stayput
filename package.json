@@ -1,0 +1,33 @@
+{
+  "name": "stayput",
+  "version": "0.1.0",
+  "description": "Free, open-source file tools that run entirely in your browser. Nothing is uploaded.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://stayput.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keenanlk/stayput.git"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
+    "astro": "7.3.5",
+    "fflate": "0.8.3",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "6.3.289"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.6.2",
+    "heic-to": "1.5.2",
+    "typescript": "7.0.2"
+  }
+}

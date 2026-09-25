@@ -1,0 +1,17 @@
+---
+import Logo from './Logo.astro';
+const path = Astro.url.pathname;
+const is = (p: string) => (path === p ? 'page' : undefined);
+---
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Stayput home"><Logo /> Stayput</a>
+    <nav class="nav" aria-label="Main">
+      <a href="/#image-tools" aria-current={is('/#image-tools')}>Image tools</a>
+      <a href="/#pdf-tools">PDF tools</a>
+      <a href="/privacy" aria-current={is('/privacy')}>Privacy</a>
+      <a href="/about" aria-current={is('/about')}>About</a>
+      <a class="cta" href="https://github.com/keenanlk/stayput" rel="noopener">Source</a>
+    </nav>
+  </div>
+</header>

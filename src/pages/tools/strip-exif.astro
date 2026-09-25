@@ -1,0 +1,25 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('strip-exif')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="meta-report" class="meta-report" hidden></div>
+  <Fragment slot="options">
+    <div class="field">
+      <label class="check"><input type="checkbox" id="keep-icc" checked /> Keep color profile (ICC)</label>
+      <span class="small muted">Recommended. Removing it can shift colors.</span>
+    </div>
+    <div class="field">
+      <label class="check"><input type="checkbox" id="apply-orientation" checked /> Apply orientation to sideways photos</label>
+      <span class="small muted">Rotated photos are re-encoded so they still display upright. Untick for a purely lossless strip.</span>
+    </div>
+  </Fragment>
+</ToolLayout>
+<style is:global>
+  .meta-report { display: grid; gap: 8px; font-size: 14px; }
+  .meta-row { padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); }
+  .meta-row strong { color: var(--ink); }
+  .meta-row.has-gps { border-left: 4px solid var(--warn); }
+</style>
+<script src="../../tools/strip-exif.ts"></script>

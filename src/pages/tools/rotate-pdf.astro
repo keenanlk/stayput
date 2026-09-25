@@ -1,0 +1,18 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('rotate-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="pages" hidden>
+    <div class="field-row" style="margin-bottom:12px">
+      <span class="small" style="font-weight:600">All pages:</span>
+      <button class="btn btn-sm" type="button" id="rotate-all-ccw">↺ 90° left</button>
+      <button class="btn btn-sm" type="button" id="rotate-all-cw">↻ 90° right</button>
+      <button class="btn btn-sm" type="button" id="rotate-all-180">180°</button>
+    </div>
+    <div class="thumb-grid" id="page-grid"></div>
+  </div>
+  <Fragment slot="options"></Fragment>
+</ToolLayout>
+<script src="../../tools/rotate-pdf.ts"></script>

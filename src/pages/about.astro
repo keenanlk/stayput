@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="About Stayput" description="Why Stayput exists, how it works, and how it is funded (it is not).">
+  <article class="wrap-narrow prose" style="padding-top:40px">
+    <h1>About Stayput</h1>
+    <p>Stayput is a small collection of file tools that run entirely inside your web browser. Convert an iPhone photo, shrink a PDF, remove the location data from a picture before posting it. The kind of chores that usually send you to a site that uploads your file to a server, makes you wait, and then asks you to sign up or pay after the second one.</p>
+    <h2>How it works</h2>
+    <p>Modern browsers can run real programs. Stayput uses JavaScript libraries and WebAssembly builds of well-known open-source code (libheif for HEIC photos, pdf-lib and pdf.js for PDFs) to do the work on your device. The website is just static files served from a CDN. There is no backend and there is nothing to upload to.</p>
+    <p>That has three consequences. Your files are private because they never leave your computer or phone. There are no limits because nobody is paying for server time. And it works offline because, after the first visit, everything a tool needs is cached in your browser.</p>
+    <h2>Funding</h2>
+    <p>Stayput is free and has no ads, no tracking and no accounts. Hosting a static site costs nothing at this scale. If it becomes expensive, the plan is to ask for donations, not to add uploads or ads.</p>
+    <h2>Open source</h2>
+    <p>The code is published under the MIT license at <a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>. Bug reports, feature requests and pull requests are welcome. If you want to verify the privacy claim, the repository is the place to look.</p>
+    <h2>Credits</h2>
+    <ul>
+      <li><a href="https://github.com/strukturag/libheif" rel="noopener">libheif</a> via <a href="https://github.com/hoppergee/heic-to" rel="noopener">heic-to</a> (LGPL-3.0) for HEIC decoding</li>
+      <li><a href="https://pdf-lib.js.org" rel="noopener">pdf-lib</a> (MIT) for editing PDFs</li>
+      <li><a href="https://mozilla.github.io/pdf.js/" rel="noopener">pdf.js</a> (Apache-2.0) for rendering PDFs</li>
+      <li><a href="https://github.com/101arrowz/fflate" rel="noopener">fflate</a> (MIT) for zip downloads</li>
+      <li><a href="https://astro.build" rel="noopener">Astro</a> (MIT) for building the site</li>
+    </ul>
+  </article>
+</Base>
