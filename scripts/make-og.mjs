@@ -42,7 +42,7 @@ const html = ({ heading, tagline, category }) => `<!doctype html>
   <div class="kicker">${category === 'pdf' ? 'PDF tool' : category === 'images' ? 'Image tool' : 'Free file tools, in your browser'}</div>
   <h1>${esc(heading)}</h1>
   <p>${esc(tagline)}</p>
-  <div class="bar"><span>Nothing is uploaded</span><span>Works offline</span><span>Open source</span><span class="url">stayput.app</span></div>
+  <div class="bar"><span>Nothing is uploaded</span><span>Works offline</span><span>Open source</span><span class="url">stayput.dev</span></div>
 </body></html>`;
 
 function esc(s) {

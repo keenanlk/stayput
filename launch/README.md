@@ -2,7 +2,7 @@
 
 Drafts for launching Stayput. Nothing in this folder is posted anywhere; every
 piece goes out from Keenan's own accounts after his OK, and only once the site
-is live on stayput.app.
+is live on stayput.dev.
 
 | File | What it holds |
 | --- | --- |
@@ -49,7 +49,7 @@ is live on stayput.app.
 
 ## Before anything is posted
 
-1. Site live on https://stayput.app with the domain attached and HTTPS working.
+1. Site live on https://stayput.dev with the domain attached and HTTPS working.
 2. `noindex` removed, sitemap submitted, at least a few pages indexed.
 3. GIF and screenshots re-checked against the live site (assets.md).
 4. Every link in these drafts opened once from a phone and once from a desktop.

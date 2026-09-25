@@ -25,9 +25,9 @@ lengths and reused everywhere so every listing says the same thing.
 
 | # | Where | Account | Who submits | Exact text and notes |
 | --- | --- | --- | --- | --- |
-| 1 | **nologin.tools** (github.com/theisensanders-wf/nologin.tools or current maintainer) | GitHub PR | Claude | Add an entry under File tools: `[Stayput](https://stayput.app) - Convert HEIC, compress and merge PDFs, strip EXIF, all in the browser. Nothing uploaded, works offline.` Follow the repo's line format exactly. |
+| 1 | **nologin.tools** (github.com/theisensanders-wf/nologin.tools or current maintainer) | GitHub PR | Claude | Add an entry under File tools: `[Stayput](https://stayput.dev) - Convert HEIC, compress and merge PDFs, strip EXIF, all in the browser. Nothing uploaded, works offline.` Follow the repo's line format exactly. |
 | 2 | **AlternativeTo** | Keenan's account | Keenan | Name: Stayput. Description: paragraph above. Platforms: Online, Self-Hosted, PWA. License: Free and Open Source (MIT). Alternative to: iLovePDF, Smallpdf, CloudConvert, HEICtoJPG, Squoosh, PDF24 Tools. Tags: heic-converter, pdf-tools, privacy-focused, no-registration, works-offline. |
-| 3 | **awesome-privacy** (github.com/pluja/awesome-privacy or the current fork) | GitHub PR | Claude | Under the file tools or utilities section, in the list's format: `- [Stayput](https://stayput.app) - HEIC, image and PDF tools that run entirely in the browser; nothing is uploaded. Open source (MIT), works offline. [Source](https://github.com/keenanlk/stayput)`. |
+| 3 | **awesome-privacy** (github.com/pluja/awesome-privacy or the current fork) | GitHub PR | Claude | Under the file tools or utilities section, in the list's format: `- [Stayput](https://stayput.dev) - HEIC, image and PDF tools that run entirely in the browser; nothing is uploaded. Open source (MIT), works offline. [Source](https://github.com/keenanlk/stayput)`. |
 | 4 | **awesome-wasm** (github.com/mbasso/awesome-wasm) | GitHub PR | Claude | Under Web frameworks/libraries or Apps: `- [Stayput](https://github.com/keenanlk/stayput) - Browser-only file toolkit using libheif, libjxl and libavif Wasm builds for HEIC, JPEG XL and AVIF decoding; no server.` |
 | 5 | **Privacy Guides forum** (discuss.privacyguides.net, Tool Suggestions) | Forum account | Keenan | Title: `Stayput: browser-only HEIC and PDF tools, nothing uploaded (open source)`. Body: paragraph above, then the three ways to verify (network tab, airplane mode, read the code), the public stats link, and the honest limits (no OCR, no video). Ask for feedback, not votes. |
 | 6 | **Uneed** (uneed.best) | Uneed account | Keenan | Name: Stayput. Tagline: one line above. Description: paragraph. Category: Productivity or Utilities. Pricing: Free. Schedule for Oct 27. |
@@ -37,7 +37,7 @@ lengths and reused everywhere so every listing says the same thing.
 | 10 | **Product Hunt** | Keenan's account | Keenan | Nov 3. See product-hunt.md. |
 | 11 | **Hacker News** | Keenan's account | Keenan | Oct 27. See show-hn.md. |
 | 12 | **DEV.to** | Keenan's account | Keenan | Oct 28 to 30. See community.md. |
-| 13 | **Astro showcase** (astro.build/showcase, submitted via the Astro Discord or the showcase form) | Form | Claude if no account needed, else Keenan | Stayput, https://stayput.app, repo link, one line above. |
+| 13 | **Astro showcase** (astro.build/showcase, submitted via the Astro Discord or the showcase form) | Form | Claude if no account needed, else Keenan | Stayput, https://stayput.dev, repo link, one line above. |
 | 14 | **PWA directories** (appsco.pe or its current successor, progressiveapp.store) | Form | Claude | Name, URL, one line, category Utilities, screenshot. |
 | 15 | **Free Software Directory / awesome-selfhosted** | GitHub | Skip for now | Stayput is static and self-hostable but not a "self-hosted service" in their sense. Revisit if a Docker image is ever published. |
 

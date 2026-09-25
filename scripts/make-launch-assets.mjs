@@ -159,7 +159,7 @@ await page.setContent(`<!doctype html><html><head>${endFont}</head><body style="
 <div style="text-align:center">
   <svg width="60" height="74" viewBox="0 0 18 22"><circle cx="9" cy="7" r="6" fill="#1F6F50"/><rect x="7.6" y="11" width="2.8" height="10" rx="1.4" fill="#1F6F50"/></svg>
   <div style="font-size:56px;font-weight:700;letter-spacing:-.02em;margin-top:18px">Open the network tab.<br>It stays empty.</div>
-  <div style="font-size:26px;color:#465249;margin-top:22px">stayput.app · free, open source, nothing uploaded</div>
+  <div style="font-size:26px;color:#465249;margin-top:22px">stayput.dev · free, open source, nothing uploaded</div>
 </div></body></html>`);
 await page.evaluate(() => document.fonts.ready);
 await settle(300);
