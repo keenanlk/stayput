@@ -10,7 +10,7 @@ Claude does.
 - [ ] stayput.app bought and attached in Vercel (Keenan)
 - [ ] `noindex` removed if present; `robots.txt` and sitemap verified at the live URL
 - [ ] Search Console property added, sitemap submitted (Keenan verifies with the DNS TXT record)
-- [ ] GIF and five screenshots made from the live site (assets.md)
+- [x] GIF and five screenshots made (assets.md); re-check against the live site
 - [ ] GitHub Sponsors enabled so the footer link resolves (Keenan; optional for launch)
 - [ ] Repo made public (Keenan)
 
