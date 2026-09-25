@@ -19,9 +19,9 @@ users see (the site itself uses the system UI font).
 ## Redo them when
 
 - Any tool page copy or layout changes before launch.
-- The site is on stayput.app and the domain should show in a browser-chrome mock (the current images have no browser chrome, which Product Hunt prefers anyway).
+- The site is on stayput.dev and the domain should show in a browser-chrome mock (the current images have no browser chrome, which Product Hunt prefers anyway).
 - A screenshot with real DevTools open is wanted for Show HN: that needs a headed browser, so record it on Keenan's machine the week of launch (two minutes: open the HEIC tool, F12, Network tab, drop photos, screen-record). Optional; the on-page request panel makes the same point.
 
 ## Still to make
 
-- A 1200 by 630 launch card for Reddit link posts: the pin mark, the hook line, stayput.app. Can be produced by `scripts/make-og.mjs` with a home-page variant once the domain is final.
+- A 1200 by 630 launch card for Reddit link posts: the pin mark, the hook line, stayput.dev. Can be produced by `scripts/make-og.mjs` with a home-page variant once the domain is final.
