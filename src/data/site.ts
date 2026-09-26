@@ -12,3 +12,15 @@ export const siteVerification = {
 
 /** IndexNow key. The same value is served at /<key>.txt (public/) and used by scripts/indexnow.mjs. */
 export const indexNowKey = 'ce50fbcd4b1e3ea6661da3979e0be697';
+
+/**
+ * Official profiles, listed as schema.org sameAs so search engines tie them to
+ * the site. Reserved to protect the name; only Bluesky is actively posted to.
+ */
+export const profiles = [
+  'https://github.com/keenanlk/stayput',
+  'https://www.facebook.com/profile.php?id=61594601468983',
+  'https://www.instagram.com/stayputdev/',
+  'https://x.com/stayputdev',
+  'https://www.youtube.com/@stayputdev',
+];
