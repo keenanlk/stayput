@@ -1054,6 +1054,31 @@ test.describe('offline', () => {
     // offline those formats failed even after a visit. Pretend this browser has
     // no native AVIF decoder (Chromium has one) so all three Wasm decoders run.
     await page.addInitScript(() => {
+      const t0 = performance.now();
+      const diag: string[] = ((window as unknown as { __diag: string[] }).__diag = []);
+      const log = (m: string) => diag.push(`${Math.round(performance.now() - t0)}ms ${m}`);
+      const ric = window.requestIdleCallback.bind(window);
+      window.requestIdleCallback = ((cb: IdleRequestCallback, o?: IdleRequestOptions) => {
+        log('ric scheduled');
+        return ric((d) => { log('ric fired'); cb(d); }, o);
+      }) as typeof window.requestIdleCallback;
+      const addAll = Cache.prototype.addAll;
+      Cache.prototype.addAll = function (reqs: RequestInfo[]) {
+        log('addAll start ' + reqs.map(String).join(','));
+        return addAll.call(this, reqs).then((r) => { log('addAll ok'); return r; }, (e) => { log('addAll FAILED ' + e); throw e; });
+      };
+      const match = Cache.prototype.match;
+      Cache.prototype.match = function (...a: Parameters<Cache['match']>) {
+        return match.apply(this, a).then((r) => { log('match ' + String(a[0]) + ' ' + !!r); return r; });
+      };
+      navigator.serviceWorker?.addEventListener('controllerchange', () => log('controllerchange'));
+      window.addEventListener('load', () => log('load'));
+      const native0 = window.createImageBitmap.bind(window);
+      window.createImageBitmap = ((src: ImageBitmapSource, ...rest: unknown[]) => {
+        const kind = src instanceof Blob ? 'blob ' + src.type : 'other';
+        log('cib start ' + kind);
+        return (native0 as (...a: unknown[]) => Promise<ImageBitmap>)(src, ...rest).then((b) => { log('cib ok ' + kind); return b; }, (e) => { log('cib err ' + kind + ' ' + e); throw e; });
+      }) as typeof window.createImageBitmap;
       const native = window.createImageBitmap.bind(window);
       window.createImageBitmap = (async (src: ImageBitmapSource, ...rest: unknown[]) => {
         if (src instanceof Blob) {
@@ -1070,8 +1095,19 @@ test.describe('offline', () => {
     });
     // The page puts the decoders it may need into the offline cache once idle.
     const cached = () => page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).map((r) => new URL(r.url).pathname));
-    for (const file of ['heic-to.min.js', 'jxl_dec.wasm', 'avif_dec.wasm']) {
-      await expect.poll(async () => (await cached()).some((p) => p.startsWith('/vendor/') && p.endsWith(file)), { message: file, timeout: 30_000 }).toBe(true);
+    try {
+      for (const file of ['heic-to.min.js', 'jxl_dec.wasm', 'avif_dec.wasm']) {
+        await expect.poll(async () => (await cached()).some((p) => p.startsWith('/vendor/') && p.endsWith(file)), { message: file, timeout: 30_000 }).toBe(true);
+      }
+    } catch (e) {
+      const info = await page.evaluate(async () => ({
+        diag: (window as unknown as { __diag: string[] }).__diag,
+        controlled: !!navigator.serviceWorker.controller,
+        visibility: document.visibilityState,
+        cached: (await (await caches.open('stayput-assets')).keys()).map((r) => new URL(r.url).pathname),
+      }));
+      console.log('DIAG ' + JSON.stringify(info, null, 1));
+      throw e;
     }
     await expect.poll(async () => (await cached()).length, { timeout: 30_000 }).toBeGreaterThan(20);
     await context.setOffline(true);
