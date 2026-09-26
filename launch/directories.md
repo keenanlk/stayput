@@ -97,3 +97,36 @@ See company/experiments.md in stayput-ops for the fuller note.
 - Row 9, **openalternative.co**: skipped. /submit redirects to a login page,
   so it needs an account. Waiting on hello@stayput.dev (and an account
   decision).
+
+**2026-09-26 02:36 UTC, Keenan approved "Post as me" for the 4 GitHub-identity
+listings (rows 3, 4, 13, 14).** Checked each one's rules first:
+
+- Row 3, **awesome-privacy**: requirements are a clear privacy policy, no
+  tracking beyond what the list's Analytics section allows, and open source
+  is a plus. Stayput meets all three (no server, no accounts, MIT, no
+  tracking). Drafted for the "File Management and Sharing" section, inserted
+  alphabetically after Snapdrop, before Winden:
+  `- [Stayput](https://stayput.dev) - HEIC, image and PDF tools that run entirely in the browser; nothing is uploaded. Open source (MIT), works offline. [Source](https://github.com/keenanlk/stayput)`
+  One-click link (forks and opens the PR editor): https://github.com/pluja/awesome-privacy/edit/main/README.md
+- Row 4, **awesome-wasm**: only rule is format and an individual PR per
+  suggestion; no star or age minimum. Drafted for the "Others" section under
+  Projects, appended after the last entry (ssheasy):
+  `- [Stayput - Browser-only file toolkit using libheif, libjxl and libavif Wasm builds for HEIC, JPEG XL and AVIF decoding; no server.](https://github.com/keenanlk/stayput)`
+  One-click link: https://github.com/mbasso/awesome-wasm/edit/master/README.md
+- Row 13, **Astro showcase**: not a PR. The actual mechanism (found by
+  reading astro.build's own update script) is a URL posted as a comment in
+  a GitHub Discussion (withastro/roadmap#521); a weekly bot turns it into a
+  PR with screenshots. No form, no Discord needed.
+  One-click link: https://github.com/withastro/roadmap/discussions/521
+  Comment text: `https://stayput.dev — free, open-source HEIC/PDF/image tools that run entirely in the browser, built with Astro.`
+- Row 14, **PWA directories**: skipped. Both appsco.pe and progressiveapp.store
+  are unreachable from here (network egress blocks both domains outright), and
+  a web search turns up no evidence progressiveapp.store is a live, working
+  directory or that appsco.pe still accepts submissions (one source flags
+  appsco.pe as no longer active). Not submitting to an unverified target;
+  recommend dropping this row unless Keenan checks the sites himself and
+  finds a live submission form.
+
+Claude has no working path to open these PRs or post the Discussion comment
+under Keenan's own GitHub login from this session, so the draft text and
+one-click links above are for Keenan to use directly.
