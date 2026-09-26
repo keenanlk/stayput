@@ -46,7 +46,7 @@ Keenan's voice; each one fits in a single comment.
 > Bandwidth. The site is on a free static host with a 100 GB monthly cap. The HEIC decoder is a few MB and is fetched once per device, so pushing it through a CDN that is free for open-source npm packages keeps the site free to run at any traffic level. It is pinned by version and hashed; the request carries no image data.
 
 **"The analytics call is a request. So something does leave."**
-> Yes, one page count per view and a tool_run event with the tool name and coarse buckets (file count, size, duration). No file name, type, hash or content. The full list is on /privacy, the tracker is self-hosted Umami, it sets no cookies, it stores no IP, and the resulting stats are public so you can see exactly what is collected. Do Not Track turns it off.
+> Yes: a page count per view and three small events (visit start, files added, tool run) with the tool name, coarse buckets (file count, size, duration), the page you came from on the site, a named referrer like "google", and days-since-last-visit ranges worked out from a note in your own browser storage. No identifier, no file name, type, hash or content. The full list is on /privacy, the tracker is self-hosted Umami, it sets no cookies, it stores no IP, and the resulting stats are public so you can see exactly what is collected. Do Not Track turns it off.
 
 **"HEVC patents?"**
 > libheif is the same decoder Linux desktops ship. Stayput is non-commercial and open source and loads the library as a separate module at runtime, the same footing as heic2any and dozens of others. On Safari the browser's own decoder is used.

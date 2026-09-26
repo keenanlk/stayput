@@ -15,13 +15,20 @@ import Base from '../layouts/Base.astro';
     </ul>
     <p>That is the complete list. There are no advertising scripts, no fonts from third parties and no cookies.</p>
     <h2>Usage counting</h2>
-    <p>To know whether anyone uses Stayput, we count page views and tool runs with Umami, an open-source analytics tool we host ourselves. It sets no cookies, stores no identifier for you and does not follow you across sites. A tool run is recorded only as: which tool, whether it succeeded, and rough buckets for the number of files (for example "2-5"), their total size (for example "1-10MB") and how long it took. File names, file types and file contents are never recorded. If your browser sends a Do Not Track or Global Privacy Control signal, nothing is recorded at all. The resulting numbers are <a href="https://stats.keenankaufman.com/share/878bb036d828/Stayput" rel="noopener">public</a>, so you can see exactly what is collected.</p>
+    <p>To know whether Stayput is useful, we count page views and a few anonymous events with Umami, an open-source analytics tool we host ourselves. It sets no cookies, stores no identifier for you and does not follow you across sites. If your browser sends a Do Not Track or Global Privacy Control signal, nothing is recorded at all. The resulting numbers are <a href="https://stats.keenankaufman.com/share/878bb036d828/Stayput" rel="noopener">public</a>.</p>
+    <p>Exactly what the events contain:</p>
+    <ul>
+      <li><strong>Visit start</strong>, once per visit: the page you arrived on, the name of the site that linked you here if it is a well-known one (for example "google" or "reddit"; otherwise "other" or "direct", never the full link), and roughly how long since your last visit ("new", "same day", "1 day", "2-7 days", "8-30 days" or "31+ days").</li>
+      <li><strong>Files added</strong>, when you first add files to a tool: which tool, the number of files as a range (for example "2-5"), their total size as a range (for example "1-10MB"), the previous page you looked at on this site, and the three visit details above.</li>
+      <li><strong>Tool run</strong>, each time a tool runs: the same details, plus whether it succeeded, the output size range, how long it took as a range, which tool you ran before it in this tab, whether this is your first, second or third-plus run in this visit, how many different Stayput tools this browser has used (1, 2 or 3+), and roughly how long since your last successful run.</li>
+    </ul>
+    <p>File names, file types, exact sizes and file contents are never recorded. To work out the "since your last visit" and "tools used" ranges, the site keeps a small note in your browser's own storage: the date of your last visit, the date of your last run and the list of Stayput tools you have used. That note never leaves your device as-is; only the ranges above are sent. Clearing site data for stayput.dev removes it.</p>
     <h2>What we can see</h2>
     <p>Our host keeps standard, short-lived server logs of page requests (the page URL, your IP address and browser type) for security and capacity purposes. We do not add anything to that. We cannot see which files you use, how many, or what is in them, because that information never reaches a server.</p>
     <h2>Offline storage</h2>
     <p>To work offline, the site asks your browser to cache its own pages and scripts using a service worker. This cache contains only the site's code, never your files. You can clear it at any time from your browser's site settings.</p>
     <h2>Open source</h2>
     <p>The full source code is at <a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>, so anyone can confirm the above.</p>
-    <p class="muted small">Last updated September 25, 2026.</p>
+    <p class="muted small">Last updated September 26, 2026.</p>
   </article>
 </Base>
