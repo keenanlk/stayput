@@ -1,6 +1,7 @@
 // Copies the WebAssembly decoders listed in src/data/vendor.json from node_modules
 // into public/vendor/<name>@<version>/, so the site serves them itself instead of
-// loading them from a CDN. Runs before `astro build` and `astro dev`. The version is
+// loading them from a CDN. Runs from an integration in astro.config.mjs, so every
+// `astro build` and `astro dev` gets it. The version is
 // part of the path, so the files can be cached forever and an upgrade gets new URLs.
 import { copyFile, mkdir, readFile, rm } from 'node:fs/promises';
 import { dirname } from 'node:path';

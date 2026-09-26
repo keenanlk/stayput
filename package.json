@@ -11,8 +11,8 @@
     "url": "https://github.com/keenanlk/stayput.git"
   },
   "scripts": {
-    "dev": "node scripts/vendor.mjs && astro dev",
-    "build": "node scripts/vendor.mjs && astro build && node scripts/postbuild.mjs",
+    "dev": "astro dev",
+    "build": "astro build && node scripts/postbuild.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "playwright test",
