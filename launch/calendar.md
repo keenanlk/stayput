@@ -80,6 +80,17 @@ product-hunt.md, community.md, directories.md); this file says when.
 - [ ] **Sat Nov 7** r/webdev Showoff Saturday post. Indie Hackers product page created.
 - [ ] **Sun Nov 8** Claude compiles the numbers for the Mon Nov 9 retrospective; the retrospective is posted on Indie Hackers and as Bluesky post 11.
 
+## Open submissions to check every Monday
+
+Directory PRs Keenan opened from his own GitHub account. Each Monday reminder
+reports whether each is open, merged or closed, and any maintainer comment or
+requested change. If a maintainer asks for an edit, the reminder drafts the
+exact text for Keenan to paste, since the PRs are under his name. Move a line
+to "Done" once it is merged or closed.
+
+- [ ] awesome-privacy: https://github.com/pluja/awesome-privacy/pull/1143
+- [ ] awesome-wasm: https://github.com/mbasso/awesome-wasm/pull/325
+
 ## After Nov 9
 
 The retrospective decides the cadence. Default: one Bluesky post per new tool
