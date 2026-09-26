@@ -1,0 +1,38 @@
+{
+  "heic": {
+    "package": "heic-to",
+    "version": "1.5.2",
+    "entry": "heic-to.min.js",
+    "files": { "heic-to.min.js": "dist/csp/heic-to.min.js", "LICENSE": "LICENSE" }
+  },
+  "jxl": {
+    "package": "@jsquash/jxl",
+    "version": "1.3.0",
+    "entry": "decode.js",
+    "files": {
+      "decode.js": "decode.js",
+      "utils.js": "utils.js",
+      "codec/dec/jxl_dec.js": "codec/dec/jxl_dec.js",
+      "codec/dec/jxl_dec.wasm": "codec/dec/jxl_dec.wasm",
+      "LICENSE": "LICENSE"
+    }
+  },
+  "avif": {
+    "package": "@jsquash/avif",
+    "version": "2.1.1",
+    "entry": "decode.js",
+    "files": {
+      "decode.js": "decode.js",
+      "utils.js": "utils.js",
+      "codec/dec/avif_dec.js": "codec/dec/avif_dec.js",
+      "codec/dec/avif_dec.wasm": "codec/dec/avif_dec.wasm",
+      "LICENSE": "LICENSE"
+    }
+  },
+  "qpdf": {
+    "package": "@neslinesli93/qpdf-wasm",
+    "version": "0.3.0",
+    "entry": "qpdf.js",
+    "files": { "qpdf.js": "dist/qpdf.js", "qpdf.wasm": "dist/qpdf.wasm" }
+  }
+}

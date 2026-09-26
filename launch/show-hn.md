@@ -23,7 +23,7 @@ URL: `https://stayput.dev`
 >
 > So Stayput is a static site. There is no backend. Thirteen tools (HEIC to JPG, image convert, compress, EXIF strip, PDF merge, split, compress, rotate, reorder, sign, page numbers, images to PDF, PDF to images), all running in the tab. Open the network tab, drop a file, and watch: nothing carrying the file ever leaves. Each tool page also counts its own requests after you add files and shows you the list.
 >
-> How it works: libheif compiled to WebAssembly for HEIC (loaded from jsDelivr on demand, cached by a service worker), pdf-lib for PDF editing, pdf.js for rendering, the canvas for image encoding, and jSquash's libjxl and libavif builds for JPEG XL and AVIF where the browser has no native decoder. The EXIF stripper is hand-written: it walks the JPEG, PNG or WebP container and removes only the metadata segments, so the pixels are untouched and the output is byte-for-byte the same image, just smaller. The site works offline after one visit and installs as a PWA.
+> How it works: libheif compiled to WebAssembly for HEIC (served by the site itself and cached for offline use), pdf-lib for PDF editing, pdf.js for rendering, the canvas for image encoding, and jSquash's libjxl and libavif builds for JPEG XL and AVIF where the browser has no native decoder. The EXIF stripper is hand-written: it walks the JPEG, PNG or WebP container and removes only the metadata segments, so the pixels are untouched and the output is byte-for-byte the same image, just smaller. The site works offline after one visit and installs as a PWA.
 >
 > Honest limits: no OCR, no video, no Office formats, because each needs a 25 MB+ Wasm download or a library that is not reliable yet. Large batches on iOS Safari are constrained by its memory limits, so files are processed one at a time and buffers are released between them. HEIC decoding is slower than a native app on a phone.
 >
@@ -40,10 +40,10 @@ Short answers to the questions HN reliably asks. Post them as replies in
 Keenan's voice; each one fits in a single comment.
 
 **"How do I know it does not phone home later?"**
-> The Content-Security-Policy in vercel.json limits connect-src to the site itself, jsDelivr and the stats host. A bug could not send a file anywhere else even if it tried; the browser would block it. The service worker is generated at build time from the page list and you can read it at /sw.js.
+> The Content-Security-Policy in vercel.json limits connect-src to the site itself and the stats host. A bug could not send a file anywhere else even if it tried; the browser would block it. The service worker is generated at build time from the page list and you can read it at /sw.js.
 
-**"Why load Wasm from jsDelivr instead of self-hosting?"**
-> Bandwidth. The site is on a free static host with a 100 GB monthly cap. The HEIC decoder is a few MB and is fetched once per device, so pushing it through a CDN that is free for open-source npm packages keeps the site free to run at any traffic level. It is pinned by version and hashed; the request carries no image data.
+**"Do the Wasm decoders come from a CDN?"**
+> No. They are served from stayput.dev itself under versioned /vendor/ paths, so no third party sees a request. They are not downloaded on every page: a tool page that accepts HEIC, or JPEG XL/AVIF in a browser that cannot decode them, caches the decoder in the background once, which is what makes it work offline. PDF pages never download them.
 
 **"The analytics call is a request. So something does leave."**
 > Yes: a page count per view and three small events (visit start, files added, tool run) with the tool name, coarse buckets (file count, size, duration), the page you came from on the site, a named referrer like "google", and days-since-last-visit ranges worked out from a note in your own browser storage. No identifier, no file name, type, hash or content. The full list is on /privacy, the tracker is self-hosted Umami, it sets no cookies, it stores no IP, and the resulting stats are public so you can see exactly what is collected. Do Not Track turns it off.

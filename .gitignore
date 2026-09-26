@@ -11,3 +11,4 @@ tests/fixtures/generated/
 # launch asset intermediates
 launch/assets/frames/
 launch/assets/samples/
+public/vendor/

@@ -8,7 +8,12 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file' },
-  integrations: [sitemap({ filter: (page) => !page.includes('/sw') })],
+  integrations: [
+    sitemap({ filter: (page) => !page.includes('/sw') }),
+    // Copy the Wasm decoders into public/vendor/ before every build and dev server,
+    // however astro is invoked (see scripts/vendor.mjs).
+    { name: 'stayput-vendor', hooks: { 'astro:config:setup': async () => void (await import('./scripts/vendor.mjs')) } },
+  ],
   vite: {
     build: { target: 'es2022', assetsInlineLimit: 0 },
     worker: { format: 'es' },

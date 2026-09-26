@@ -35,7 +35,7 @@ treats PH as a backlink and a story, not the main channel.
 >
 > The proof is the point: open your browser's network tab while you use it and watch it stay empty. Every tool page also counts its own requests and shows you the list. The code is MIT on GitHub, and the analytics are a self-hosted, cookieless counter whose numbers are public.
 >
-> Why free forever: a static site costs nothing to run at any scale, the codecs load from a free open-source CDN, and the only bill is the domain. There are no ads, no paid tier and no plans for either. If it saves you a subscription, the GitHub Sponsors link covers the domain and nothing else.
+> Why free forever: a static site costs almost nothing to run at any scale, and the only bills are the hosting and the domain. There are no ads, no paid tier and no plans for either. If it saves you a subscription, the GitHub Sponsors link covers the domain and nothing else.
 >
 > What it does not do yet: OCR, video, Word documents. Those need bigger downloads than I am willing to push to a phone. New tools land about once a week; tell me which one you want first.
 

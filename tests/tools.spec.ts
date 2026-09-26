@@ -10,34 +10,14 @@ import { inspect, sniffFormat } from '../src/lib/exif';
 
 const fixtures = fileURLToPath(new URL('./fixtures/generated/', import.meta.url));
 const fx = (name: string) => fixtures + name;
-const HEIC_URL = 'https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/csp/heic-to.min.js';
-const heicLocal = fileURLToPath(new URL('../node_modules/heic-to/dist/csp/heic-to.min.js', import.meta.url));
 const staticFx = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
 const nodeModules = fileURLToPath(new URL('../node_modules/', import.meta.url));
-
-/** Serve the qpdf WebAssembly unlocker (normally fetched from jsDelivr) from node_modules. */
-async function serveLocalQpdf(page: Page) {
-  await page.route('https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@*/dist/*', (route) => {
-    const file = nodeModules + '@neslinesli93/qpdf-wasm/dist/' + route.request().url().split('/').pop();
-    return route.fulfill({ path: file, contentType: file.endsWith('.wasm') ? 'application/wasm' : 'text/javascript' });
-  });
-}
-
-/** Serve the jSquash decoders (normally fetched from jsDelivr) from node_modules so tests stay offline. */
-async function serveLocalCodecs(page: Page) {
-  await page.route('https://cdn.jsdelivr.net/npm/@jsquash/**', (route) => {
-    const m = /\/npm\/(@jsquash\/[a-z]+)@[\d.]+\/(.+)$/.exec(route.request().url());
-    if (!m) return route.abort();
-    const file = nodeModules + m[1] + '/' + m[2];
-    const type = file.endsWith('.wasm') ? 'application/wasm' : 'text/javascript';
-    return route.fulfill({ path: file, contentType: type });
-  });
-}
 
 /**
  * Record every request the tab makes from now on. `assertNothingLeft` then
  * checks that no request could have carried file bytes: only GETs without a
- * body to this site or the code CDN, plus the small anonymous usage ping.
+ * body to this site (which serves its own decoders), plus the small anonymous
+ * usage ping. Any other host fails, a code CDN included.
  */
 function watchNetwork(page: Page) {
   const seen: { url: string; method: string; body: string | null }[] = [];
@@ -54,7 +34,7 @@ function watchNetwork(page: Page) {
           for (const n of fixtureNames) expect(r.body ?? '', 'usage ping must not name the file').not.toContain(n);
           continue;
         }
-        expect(['localhost', 'cdn.jsdelivr.net'], `unexpected host ${host}`).toContain(host);
+        expect(host, `unexpected host ${host}`).toBe('localhost');
         expect(r.method, `${r.url} must be a plain GET`).toBe('GET');
         expect(r.body, `${r.url} must carry no body`).toBeNull();
       }
@@ -86,10 +66,6 @@ async function open(page: Page, slug: string) {
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());
   });
-  // Serve the HEIC decoder locally so tests do not depend on the network.
-  await page.route(HEIC_URL, (route) => route.fulfill({ path: heicLocal, contentType: 'text/javascript' }));
-  await serveLocalCodecs(page);
-  await serveLocalQpdf(page);
   await stubAnalytics(page);
   await page.goto(`/tools/${slug}`);
   await expect(page.locator('#tool')).toBeVisible();
@@ -459,8 +435,25 @@ test('Image converter decodes JPEG XL and AVIF, with the JXL decoder fetched as 
   expect(errors).toEqual([]);
 });
 
+test('Decoders are fetched only by pages that can need them, from this site, and only when the browser lacks one', async ({ page }) => {
+  await stubAnalytics(page);
+  const vendor: string[] = [];
+  page.on('request', (r) => {
+    const url = new URL(r.url());
+    if (url.pathname.startsWith('/vendor/')) vendor.push(url.pathname);
+  });
+  // A PDF tool never needs an image decoder, so a visit costs none of those bytes.
+  await page.goto('/tools/merge-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.waitForTimeout(3000);
+  expect(vendor).toEqual([]);
+  // The image converter warms HEIC and JPEG XL; Chromium decodes AVIF itself, so that decoder is skipped.
+  await page.goto('/tools/convert-image');
+  await expect.poll(() => vendor.some((p) => p.endsWith('/jxl_dec.wasm')) && vendor.some((p) => p.endsWith('/heic-to.min.js')), { timeout: 15_000 }).toBe(true);
+  expect(vendor.filter((p) => p.includes('avif'))).toEqual([]);
+});
+
 test('JXL to PNG page converts with the preset format and lists the decoder in the network proof', async ({ page }) => {
-  await serveLocalCodecs(page);
   await stubAnalytics(page);
   await page.goto('/jxl-to-png');
   await expect(page.locator('#format')).toHaveValue('image/png');
@@ -876,9 +869,9 @@ test('Encrypted PDFs (owner password only) are unlocked in the tab instead of me
   expect(doc.isEncrypted).toBe(false);
   const firstPage = (await textItems(out, 1)).map((t) => t.str).join(' ');
   expect(firstPage).toContain('Page 1 of the fixture document');
-  // The unlocker is fetched as code from the CDN; the PDF itself never leaves.
+  // The unlocker is fetched as code from this site; the PDF itself never leaves.
   net.assertNothingLeft(['owner-locked.pdf', 'text.pdf']);
-  await expect(page.locator('#netproof-list')).toContainText('cdn.jsdelivr.net');
+  await expect(page.locator('#netproof-list')).toContainText('decoder program');
   expect(errors).toEqual([]);
 });
 
@@ -1008,6 +1001,44 @@ test.describe('offline', () => {
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     const { downloads } = await run(page, ['text.pdf', 'scan.pdf']);
     expect((await PDFDocument.load(await bytesOf(downloads[0]!))).getPageCount()).toBe(5);
+    await context.setOffline(false);
+  });
+
+  test('After one visit to an image tool, HEIC, JPEG XL and AVIF files convert offline', async ({ page, context }) => {
+    // The decoders used to load from a CDN at the moment a file needed them, so
+    // offline those formats failed even after a visit. Pretend this browser has
+    // no native AVIF decoder (Chromium has one) so all three Wasm decoders run.
+    await page.addInitScript(() => {
+      const native = window.createImageBitmap.bind(window);
+      window.createImageBitmap = (async (src: ImageBitmapSource, ...rest: unknown[]) => {
+        if (src instanceof Blob) {
+          const head = new Uint8Array(await src.slice(0, 12).arrayBuffer());
+          if (String.fromCharCode(...head.subarray(4, 12)) === 'ftypavif') throw new DOMException('no native AVIF', 'InvalidStateError');
+        }
+        return (native as (...a: unknown[]) => Promise<ImageBitmap>)(src, ...rest);
+      }) as typeof window.createImageBitmap;
+    });
+    await stubAnalytics(page);
+    await page.goto('/tools/convert-image');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    // The page puts the decoders it may need into the offline cache once idle.
+    const cached = () => page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).map((r) => new URL(r.url).pathname));
+    for (const file of ['heic-to.min.js', 'jxl_dec.wasm', 'avif_dec.wasm']) {
+      await expect.poll(async () => (await cached()).some((p) => p.startsWith('/vendor/') && p.endsWith(file)), { message: file, timeout: 30_000 }).toBe(true);
+    }
+    await expect.poll(async () => (await cached()).length, { timeout: 30_000 }).toBeGreaterThan(20);
+    await context.setOffline(true);
+    await page.goto('/tools/convert-image');
+    const { items } = await run(page, ['iphone.heic', staticFx('checker.jxl'), staticFx('checker.avif')], async () => {
+      await page.locator('#format').selectOption('image/png');
+    });
+    expect(items).toBe(3);
+    const zip = await zipAll(page);
+    expect(Object.keys(zip).sort()).toEqual(['checker (2).png', 'checker.png', 'iphone.png']);
+    expect(pngSize(zip['iphone.png']!)).toEqual({ width: 1200, height: 900 });
+    for (const name of ['checker.png', 'checker (2).png']) expect(pngSize(zip[name]!), name).toEqual({ width: 320, height: 240 });
     await context.setOffline(false);
   });
 });

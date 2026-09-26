@@ -32,7 +32,7 @@ Title: `Open-source, browser-only tools for HEIC, PDF and EXIF removal. Nothing 
 >
 > Stayput strips EXIF, XMP, ICC and IPTC from JPG, PNG and WebP losslessly, in the tab: it rewrites only the metadata segments, so the pixels are byte-identical and the file gets smaller. Same idea for HEIC conversion and a full set of PDF tools. No server exists; the site is static and works offline.
 >
-> Verification: network tab, airplane mode, or read the code (MIT, https://github.com/keenanlk/stayput). The only requests after page load are anonymous page counts and tool-usage events (bucketed, no identifier, never file details) to a self-hosted Umami instance (no cookies, no IP stored, honours Do Not Track, stats are public) and the one-time fetch of the HEIC decoder from jsDelivr on the HEIC pages. The CSP in the repo blocks connections anywhere else.
+> Verification: network tab, airplane mode, or read the code (MIT, https://github.com/keenanlk/stayput). The only requests after page load are anonymous page counts and tool-usage events (bucketed, no identifier, never file details) to a self-hosted Umami instance (no cookies, no IP stored, honours Do Not Track, stats are public) and the one-time fetch of the site's own HEIC decoder on the image pages. The CSP in the repo blocks connections anywhere else.
 >
 > https://stayput.dev
 
@@ -40,7 +40,7 @@ Title: `Open-source, browser-only tools for HEIC, PDF and EXIF removal. Nothing 
 
 Title: `Showoff Saturday: Stayput, a file toolkit where the network tab stays empty (Astro + Wasm, no backend)`
 
-> Stack: Astro static export, TypeScript, no client framework. pdf-lib for PDF editing, pdf.js on a dedicated worker for rendering, libheif and jSquash's libjxl/libavif compiled to Wasm and loaded from jsDelivr on demand, canvas for encoding, fflate for zips, a build-time service worker for offline. Strict CSP so nothing can connect anywhere but the site, the CDN and the stats host.
+> Stack: Astro static export, TypeScript, no client framework. pdf-lib for PDF editing, pdf.js on a dedicated worker for rendering, libheif and jSquash's libjxl/libavif compiled to Wasm and served by the site itself, canvas for encoding, fflate for zips, a build-time service worker for offline. Strict CSP so nothing can connect anywhere but the site and the stats host.
 >
 > The fun part was the EXIF stripper: no library, just walking JPEG segments, PNG chunks and WebP RIFF chunks and dropping the metadata ones. Lossless and about 600 lines.
 >

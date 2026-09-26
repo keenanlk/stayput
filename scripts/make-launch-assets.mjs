@@ -13,8 +13,6 @@ const out = fileURLToPath(new URL('../launch/assets/', import.meta.url));
 const frames = out + 'frames/';
 const sample = (n) => fileURLToPath(new URL(`../launch/assets/samples/${n}`, import.meta.url));
 const fontDir = process.env.LAUNCH_FONT_DIR;
-const nodeModules = fileURLToPath(new URL('../node_modules/', import.meta.url));
-const HEIC_URL = 'https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/csp/heic-to.min.js';
 
 mkdirSync(out, { recursive: true });
 rmSync(frames, { recursive: true, force: true });
@@ -24,13 +22,7 @@ const browser = await chromium.launch({
   executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
 });
 const ctx = await browser.newContext({ viewport: { width: 1270, height: 760 }, deviceScaleFactor: 1, colorScheme: 'light' });
-// Same routing as the tests: codecs from node_modules, analytics stubbed.
-await ctx.route(HEIC_URL, (r) => r.fulfill({ path: nodeModules + 'heic-to/dist/csp/heic-to.min.js', contentType: 'text/javascript' }));
-await ctx.route('https://cdn.jsdelivr.net/npm/@jsquash/**', (r) => {
-  const m = /\/npm\/(@jsquash\/[a-z]+)@[\d.]+\/(.+)$/.exec(r.request().url());
-  if (!m) return r.abort();
-  return r.fulfill({ path: nodeModules + m[1] + '/' + m[2], contentType: m[2].endsWith('.wasm') ? 'application/wasm' : 'text/javascript' });
-});
+// Same as the tests: analytics stubbed (the site serves its own decoders).
 await ctx.route('https://stats.keenankaufman.com/**', (r) =>
   r.fulfill({ contentType: 'text/javascript', body: 'window.umami={track(){}};' }),
 );

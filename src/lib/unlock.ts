@@ -7,16 +7,13 @@
  * blank or broken when opened.
  *
  * The fix runs qpdf (compiled to WebAssembly, Apache-2.0) inside the tab to
- * strip the encryption first. Like the HEIC decoder it is fetched on demand
- * from jsDelivr, only when an encrypted PDF is dropped, and only the program
- * is downloaded: the PDF never leaves the tab. Files that need a user
- * password prompt for it once; the outputs are written without encryption.
- *
- * Tests and self-hosted deployments can override the URL by setting
- * `window.STAYPUT_QPDF_URL` before the tool script runs.
+ * strip the encryption first. Like the HEIC decoder it is served from this
+ * site's /vendor/ directory, fetched only when an encrypted PDF is dropped
+ * (and then cached for offline use), and only the program is downloaded: the
+ * PDF never leaves the tab. Files that need a user password prompt for it
+ * once; the outputs are written without encryption.
  */
-export const QPDF_VERSION = '0.3.0';
-export const QPDF_BASE = `https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@${QPDF_VERSION}/dist/`;
+import { vendorDir } from './vendor';
 
 interface QpdfModule {
   FS: {
@@ -30,7 +27,6 @@ type QpdfFactory = (opts: { locateFile: (file: string) => string; noInitialRun?:
 
 declare global {
   interface Window {
-    STAYPUT_QPDF_URL?: string;
     Module?: unknown;
   }
 }
@@ -41,9 +37,8 @@ let factoryPromise: Promise<QpdfFactory> | undefined;
 function loadFactory(): Promise<QpdfFactory> {
   if (!factoryPromise) {
     factoryPromise = new Promise<QpdfFactory>((resolve, reject) => {
-      const base = window.STAYPUT_QPDF_URL ?? QPDF_BASE;
       const script = document.createElement('script');
-      script.src = `${base}qpdf.js`;
+      script.src = `${vendorDir('qpdf')}qpdf.js`;
       script.async = true;
       script.onload = () => {
         const factory = window.Module as QpdfFactory | undefined;
@@ -104,14 +99,13 @@ function loadModule(): Promise<QpdfModule> {
   if (!modulePromise) {
     modulePromise = (async () => {
       const factory = await loadFactory();
-      const base = window.STAYPUT_QPDF_URL ?? QPDF_BASE;
       const original = console.error;
       console.error = (...args: unknown[]) => {
         if (sink) sink.push(args.map(String).join(' '));
         else original(...args);
       };
       try {
-        return await factory({ locateFile: (file) => `${base}${file}`, noInitialRun: true });
+        return await factory({ locateFile: (file) => `${vendorDir('qpdf')}${file}`, noInitialRun: true });
       } finally {
         console.error = original;
       }
