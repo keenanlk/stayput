@@ -27,12 +27,9 @@ URL: `https://stayput.dev`
 >
 > Honest limits: no OCR, no video, no Office formats, because each needs a 25 MB+ Wasm download or a library that is not reliable yet. Large batches on iOS Safari are constrained by its memory limits, so files are processed one at a time and buffers are released between them. HEIC decoding is slower than a native app on a phone.
 >
-> It is MIT licensed, and the analytics (self-hosted Umami, cookieless, coarse buckets only, honours Do Not Track) are public: [stats link]. The whole thing costs the domain to run, so there are no ads, no accounts and no paid tier, and there will not be. Happy to answer anything about the Wasm choices, the CSP, or why lossless EXIF removal is harder than it sounds.
+> It is MIT licensed, and the analytics (self-hosted Umami, cookieless, coarse buckets only, honours Do Not Track) are described field by field on /privacy. The whole thing costs the domain to run, so there are no ads, no accounts and no paid tier, and there will not be. Happy to answer anything about the Wasm choices, the CSP, or why lossless EXIF removal is harder than it sounds.
 >
 > Code: https://github.com/keenanlk/stayput
-
-Replace `[stats link]` with https://stats.keenankaufman.com/share/878bb036d828/Stayput
-(or the stayput.dev alias if one exists by then).
 
 ## Reply bank
 
@@ -46,7 +43,7 @@ Keenan's voice; each one fits in a single comment.
 > No. They are served from stayput.dev itself under versioned /vendor/ paths, so no third party sees a request. They are not downloaded on every page: a tool page that accepts HEIC, or JPEG XL/AVIF in a browser that cannot decode them, caches the decoder in the background once, which is what makes it work offline. PDF pages never download them.
 
 **"The analytics call is a request. So something does leave."**
-> Yes: a page count per view and three small events (visit start, files added, tool run) with the tool name, coarse buckets (file count, size, duration), the page you came from on the site, a named referrer like "google", and days-since-last-visit ranges worked out from a note in your own browser storage. No identifier, no file name, type, hash or content. The full list is on /privacy, the tracker is self-hosted Umami, it sets no cookies, it stores no IP, and the resulting stats are public so you can see exactly what is collected. Do Not Track turns it off.
+> Yes: a page count per view and three small events (visit start, files added, tool run) with the tool name, coarse buckets (file count, size, duration), the page you came from on the site, a named referrer like "google", and days-since-last-visit ranges worked out from a note in your own browser storage. No identifier, no file name, type, hash or content. The full list is on /privacy, the tracker is self-hosted Umami, it sets no cookies, and it stores no IP. Do Not Track turns it off.
 
 **"HEVC patents?"**
 > libheif is the same decoder Linux desktops ship. Stayput is non-commercial and open source and loads the library as a separate module at runtime, the same footing as heic2any and dozens of others. On Safari the browser's own decoder is used.

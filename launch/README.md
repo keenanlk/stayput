@@ -31,7 +31,7 @@ is live on stayput.dev.
 ## Defaults picked while drafting
 
 - The hook everywhere is the one line from the plan: **Open the network tab. It stays empty.**
-  HEIC is the specific wedge; the public stats page and the MIT repo are the proof.
+  HEIC is the specific wedge; the empty network tab and the MIT repo are the proof.
 - Show HN leads with HEIC and PDFs, not with "privacy", because privacy alone
   has been said a hundred times on HN. The first comment admits the limits
   (no OCR, no video, no Office formats) before anyone else does.
