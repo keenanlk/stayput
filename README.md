@@ -76,6 +76,7 @@ Requirements: Node 22+.
 npm install
 npm run dev              # http://localhost:4321
 npm run build            # static output in dist/
+npm run check-links      # fail on any broken internal link in dist/ (--external also checks outbound links)
 node scripts/serve.mjs   # serve dist/ locally with clean URLs and the production headers
 npm run check            # Astro and TypeScript checks
 ```

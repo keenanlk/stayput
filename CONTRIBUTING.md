@@ -23,7 +23,7 @@ npm install
 npm run dev
 ```
 
-See the README for the test setup. Please run `npm run check`, `npm run build` and `npm test` before opening a pull request. CI runs the same.
+See the README for the test setup. Please run `npm run check`, `npm run build`, `npm run check-links` and `npm test` before opening a pull request. CI runs the same.
 
 ## Adding a tool
 

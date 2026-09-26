@@ -224,6 +224,61 @@
       "source": "/pdf-to-txt",
       "destination": "/pdf-to-text",
       "permanent": true
+    },
+    {
+      "source": "/tools/remove-location-from-photos",
+      "destination": "/remove-location-from-photos",
+      "permanent": true
+    },
+    {
+      "source": "/tools/resize-image",
+      "destination": "/resize-image",
+      "permanent": true
+    },
+    {
+      "source": "/tools/compress-jpg",
+      "destination": "/compress-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/tools/png-to-jpg",
+      "destination": "/png-to-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/tools/heic-to-png",
+      "destination": "/heic-to-png",
+      "permanent": true
+    },
+    {
+      "source": "/tools/heic-to-pdf",
+      "destination": "/heic-to-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/tools/jpg-to-webp",
+      "destination": "/jpg-to-webp",
+      "permanent": true
+    },
+    {
+      "source": "/tools/jfif-to-jpg",
+      "destination": "/jfif-to-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/tools/gif-to-png",
+      "destination": "/gif-to-png",
+      "permanent": true
+    },
+    {
+      "source": "/tools/svg-to-jpg",
+      "destination": "/svg-to-jpg",
+      "permanent": true
+    },
+    {
+      "source": "/tools/combine-pdf",
+      "destination": "/combine-pdf",
+      "permanent": true
     }
   ],
   "headers": [
