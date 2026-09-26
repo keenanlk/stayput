@@ -51,3 +51,24 @@ and records each URL in the ops work log under `launch-directories`. Rows 2, 5,
 - Paste the copy as written. Directories that ask for exclamation marks or superlatives do not get them.
 - Where a directory asks for a "launch date", use Oct 27, 2026.
 - If a list maintainer asks for changes to a PR, make them the same day.
+
+## Attempt log
+
+**2026-09-26 (moved up from Oct 27 by decision):** tried the 7 no-account
+rows (1, 3, 4, 8, 9, 13, 14) from a Claude cloud session. 0 of 7 completed:
+
+- Rows 1, 3, 4 (nologin.tools, awesome-privacy, awesome-wasm): assumed a
+  GitHub PR, but the session's GitHub access only reaches keenanlk's own
+  repos, so forking a third-party repo is refused. nologin.tools also turned
+  out to review submissions through its own web form, not a PR, and its
+  domain is blocked by the sandbox's network egress.
+- Rows 8, 9 (opensourcealternative.to, openalternative.co): both domains are
+  blocked by the sandbox's egress proxy; their forms could not be reached at
+  all.
+- Rows 13, 14 (Astro showcase, PWA directories): both need a browser or a
+  GitHub Discussion post, neither of which this session can drive headlessly.
+
+Next attempt should run from a Remote Control session on Keenan's own
+device, with his real GitHub login (forking works there) and a normal
+browser (reaches the blocked sites). See company/experiments.md in
+stayput-ops for the full note.
