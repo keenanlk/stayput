@@ -20,14 +20,14 @@ That is the whole pitch, and you can check it in three ways:
 | [Convert images](https://stayput.dev/tools/convert-image) (PNG, JPG, WebP, AVIF, JPEG XL, HEIC, SVG in; JPG, PNG, WebP out) | [Split PDF / extract pages](https://stayput.dev/tools/split-pdf) |
 | [Compress and resize images](https://stayput.dev/tools/compress-image) | [Compress PDF](https://stayput.dev/tools/compress-pdf) (lossless cleanup, image recompression, or flatten) |
 | [Remove EXIF and GPS data](https://stayput.dev/tools/strip-exif) (lossless, no re-encode) | [Rotate PDF pages](https://stayput.dev/tools/rotate-pdf) |
-| | [Images to PDF](https://stayput.dev/tools/image-to-pdf) |
+| [Crop image](https://stayput.dev/tools/crop-image) (ratios, exact pixels, circle) | [Images to PDF](https://stayput.dev/tools/image-to-pdf) |
 | | [PDF to images](https://stayput.dev/tools/pdf-to-image) |
 | | [Reorder and delete pages](https://stayput.dev/tools/reorder-pdf) |
 | | [Sign PDF](https://stayput.dev/tools/sign-pdf) (draw or type, place on any page) |
 | | [Add page numbers](https://stayput.dev/tools/pdf-page-numbers) |
 | | [PDF to Word or text](https://stayput.dev/tools/pdf-to-word) (paragraphs and headings, not layout) |
 
-Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [WebP to PNG](https://stayput.dev/webp-to-png), [AVIF to JPG](https://stayput.dev/avif-to-jpg) and [JXL to PNG](https://stayput.dev/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.dev/jpg-to-pdf), [PDF to JPG](https://stayput.dev/pdf-to-jpg), [Combine PDF](https://stayput.dev/combine-pdf), [Resize image](https://stayput.dev/resize-image) and [Remove location from photos](https://stayput.dev/remove-location-from-photos); and [guides](https://stayput.dev/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
+Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [WebP to PNG](https://stayput.dev/webp-to-png), [AVIF to JPG](https://stayput.dev/avif-to-jpg) and [JXL to PNG](https://stayput.dev/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.dev/jpg-to-pdf), [PDF to JPG](https://stayput.dev/pdf-to-jpg), [Combine PDF](https://stayput.dev/combine-pdf), [Resize image](https://stayput.dev/resize-image), [Crop to circle](https://stayput.dev/crop-image-to-circle) and [Remove location from photos](https://stayput.dev/remove-location-from-photos); and [guides](https://stayput.dev/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
 
 ## How it works
 

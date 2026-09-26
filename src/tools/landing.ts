@@ -13,6 +13,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'image-to-pdf': () => import('./image-to-pdf'),
   'pdf-to-image': () => import('./pdf-to-image'),
   'pdf-to-word': () => import('./pdf-to-word'),
+  'crop-image': () => import('./crop-image'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';
