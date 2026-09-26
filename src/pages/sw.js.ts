@@ -11,7 +11,7 @@ import { guides } from '../data/guides';
  * HEIC decoder on jsDelivr are cache-first because their contents never change.
  */
 export const GET: APIRoute = () => {
-  const pages = ['/', '/about', '/privacy', ...tools.map((t) => `/tools/${t.slug}`), ...pairs.map((p) => `/${p.slug}`), ...presets.map((p) => `/${p.slug}`), '/guides', ...guides.map((g) => `/guides/${g.slug}`)];
+  const pages = ['/', '/about', '/privacy', '/terms', ...tools.map((t) => `/tools/${t.slug}`), ...pairs.map((p) => `/${p.slug}`), ...presets.map((p) => `/${p.slug}`), '/guides', ...guides.map((g) => `/guides/${g.slug}`)];
   const version = `stayput-${Date.now().toString(36)}`;
   const body = `
 const VERSION = ${JSON.stringify(version)};
