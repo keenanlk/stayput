@@ -25,7 +25,7 @@ product-hunt.md, community.md, directories.md); this file says when.
 - [ ] **Bluesky** follow: Astro, pdf.js, Squoosh/jSquash maintainers, Privacy Guides, EFF, a few HEIC/photography accounts Claude lists in the Monday reminder.
 - [ ] **Bluesky** post 1 (Tue):
   > Building a file toolkit that never uploads anything. HEIC to JPG, PDF merge, compress, sign, EXIF removal, all inside the browser tab. Open the network tab and it stays empty. Launching in October; building it in the open until then.
-- [ ] **Namecheap** hello@stayput.dev forwarder and catch-all.
+- [x] **Namecheap** hello@stayput.dev forwarder and catch-all.
 - [ ] **Search Console and Bing** verified, sitemap submitted.
 
 ## Week 2, Mon Oct 5 to Sun Oct 11: keep commenting
