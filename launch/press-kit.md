@@ -29,6 +29,7 @@ kit and the assets are in `launch/assets/`.
 | Code | https://github.com/keenanlk/stayput (MIT) |
 | Public usage stats | https://stats.keenankaufman.com/share/878bb036d828/Stayput |
 | Contact | hello@stayput.dev |
+| Profiles | Reserved, not posted to: [Facebook](https://www.facebook.com/profile.php?id=61594601468983), [Instagram](https://www.instagram.com/stayputdev/), [X](https://x.com/stayputdev), [YouTube](https://www.youtube.com/@stayputdev). Updates go out on Bluesky @stayput.dev |
 | Maker | Keenan Kaufman, solo |
 | Launched | October 2026 |
 | Tools | 14: HEIC to JPG, convert image (JPG, PNG, WebP, AVIF, JPEG XL), compress image, strip EXIF, merge PDF, split PDF, compress PDF, rotate PDF, reorder and delete pages, sign PDF, add page numbers, images to PDF, PDF to images, PDF to Word/text |

@@ -6,6 +6,7 @@ import { tools, categories } from '../data/tools';
 import { pairs } from '../data/pairs';
 import { presets } from '../data/presets';
 import { guides } from '../data/guides';
+import { profiles } from '../data/site';
 
 const title = 'Stayput: Free File Tools That Never Upload Your Files';
 const description =
@@ -17,6 +18,15 @@ const jsonLd = [
     name: 'Stayput',
     url: Astro.site?.toString(),
     description,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Stayput',
+    url: Astro.site?.toString(),
+    logo: new URL('/icons/icon-512.png', Astro.site).toString(),
+    email: 'hello@stayput.dev',
+    sameAs: profiles,
   },
   {
     '@context': 'https://schema.org',
