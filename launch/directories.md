@@ -82,3 +82,18 @@ one:
   allowlist covers these domains).
 
 See company/experiments.md in stayput-ops for the fuller note.
+
+**2026-09-26 02:40 UTC, from the homelab (Remote Control, no accounts, no email):**
+
+- Row 1, **nologin.tools**: not listed yet (checked their API). The form at
+  nologin.tools/submit needs only the URL, email optional, no captcha. Not
+  submitted: the homelab's auto-mode permission check blocked the POST as an
+  external write. Keenan can submit it by hand in 10 seconds (paste
+  https://stayput.dev, leave email blank), or allow the request next time.
+- Row 8, **opensourcealternative.to**: skipped. Email is required, the only
+  paths are a paid 48-hour review (+$29) or a 6+ month waitlist, and its
+  guidelines want self-hosted projects. Waiting on hello@stayput.dev; even
+  then, only the free waitlist.
+- Row 9, **openalternative.co**: skipped. /submit redirects to a login page,
+  so it needs an account. Waiting on hello@stayput.dev (and an account
+  decision).
