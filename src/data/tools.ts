@@ -164,7 +164,7 @@ export const tools: Tool[] = [
     heading: 'Remove EXIF and location data from photos',
     tagline: 'See what a photo reveals, then delete it. Lossless: pixels are untouched, only the metadata is removed.',
     category: 'images',
-    accept: 'image/jpeg,image/png,image/webp,image/tiff,.jpg,.jpeg,.png,.webp',
+    accept: 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp',
     multiple: true,
     dropLabel: 'Drop photos here',
     action: 'Remove metadata',

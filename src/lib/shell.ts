@@ -18,6 +18,14 @@ export interface Progress {
   set(text: string, fraction?: number): void;
 }
 
+export interface Skipped {
+  name: string;
+  reason: string;
+}
+
+/** What `process` returns: plain outputs, or outputs plus the files that were skipped. */
+export type ProcessResult = OutputFile[] | { outputs: OutputFile[]; skipped: Skipped[] };
+
 export interface ShellOptions {
   /** Produce a preview URL for a file in the list (optional). */
   thumbnail?: (file: File) => Promise<string | undefined>;
@@ -26,7 +34,7 @@ export interface ShellOptions {
   /** Called after files are added, removed or reordered. */
   onFilesChanged?: (files: ShellFile[]) => void | Promise<void>;
   /** Do the work. Return the outputs to show. */
-  process: (files: ShellFile[], progress: Progress) => Promise<OutputFile[]>;
+  process: (files: ShellFile[], progress: Progress) => Promise<ProcessResult>;
   /** Title shown above the results. */
   resultsTitle?: (outputs: OutputFile[]) => string;
   /** Automatically download when there is exactly one output. Default true. */
@@ -66,6 +74,44 @@ export function bindRange(id: string, outId: string, format: (v: number) => stri
   update();
 }
 
+/** Prefix an error with the file it came from, once. */
+export function describeError(file: File, e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  return msg.startsWith(file.name) ? msg : `${file.name}: ${msg}`;
+}
+
+/**
+ * Run `fn` for every file in a batch. One bad file (a corrupt download, a
+ * PDF dropped on an image tool) no longer fails the whole batch: it is
+ * reported as skipped and the rest go through. If every file fails, the
+ * first error is thrown so the tool shows it.
+ */
+export async function processEach(
+  files: ShellFile[],
+  progress: Progress,
+  verb: string,
+  fn: (entry: ShellFile, index: number) => Promise<OutputFile | OutputFile[] | undefined>,
+): Promise<{ outputs: OutputFile[]; skipped: Skipped[] }> {
+  const outputs: OutputFile[] = [];
+  const skipped: Skipped[] = [];
+  let firstError: unknown;
+  for (const [i, entry] of files.entries()) {
+    progress.set(`${verb} ${entry.file.name} (${i + 1} of ${files.length})`, i / files.length);
+    try {
+      const out = await fn(entry, i);
+      if (Array.isArray(out)) outputs.push(...out);
+      else if (out) outputs.push(out);
+    } catch (e) {
+      console.warn(`${entry.file.name}:`, e);
+      firstError ??= e;
+      skipped.push({ name: entry.file.name, reason: e instanceof Error ? e.message : String(e) });
+    }
+  }
+  if (outputs.length === 0 && skipped.length > 0) throw new Error(describeError(files[0]!.file, firstError));
+  progress.set('Done', 1);
+  return { outputs, skipped };
+}
+
 export function createShell(opts: ShellOptions) {
   const root = $('tool');
   const multiple = root.dataset.multiple === 'true';
@@ -96,7 +142,19 @@ export function createShell(opts: ShellOptions) {
   const isImage = (f: File) => f.type.startsWith('image/') || /\.(heic|heif|avif|jxl)$/i.test(f.name);
 
   async function addFiles(incoming: FileList | File[]) {
-    const arr = Array.from(incoming).filter((f) => f.size > 0);
+    const all = Array.from(incoming);
+    const empty = all.filter((f) => f.size === 0);
+    const arr = all.filter((f) => f.size > 0);
+    hideResults();
+    hideError();
+    if (empty.length > 0) {
+      const names = empty.map((f) => f.name).slice(0, 3).join(', ');
+      showError(
+        empty.length === all.length
+          ? `${names} ${empty.length === 1 ? 'is' : 'are'} empty (0 bytes). ${empty.length === 1 ? 'It' : 'They'} may not have finished downloading or syncing.`
+          : `Skipped ${empty.length} empty file${empty.length === 1 ? '' : 's'} (0 bytes): ${names}${empty.length > 3 ? '…' : ''}.`,
+      );
+    }
     if (arr.length === 0) return;
     if (!multiple) files = [];
     for (const file of arr) {
@@ -104,13 +162,15 @@ export function createShell(opts: ShellOptions) {
       files.push(entry);
       if (!multiple) break;
     }
-    hideResults();
-    hideError();
     render();
     if (!attempt || attempt.ok) {
       attempt = { ok: false };
       trackFilesAdded({ tool: root.dataset.slug ?? 'unknown', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0) });
     }
+    // Announce the files before any inspection work (thumbnails, unlocking),
+    // so the network panel counts every request made from here on.
+    root.dataset.inputBytes = String(files.reduce((n, f) => n + f.file.size, 0));
+    root.dispatchEvent(new CustomEvent('stayput:files'));
     // Thumbnails after render so the list appears immediately.
     if (opts.thumbnail) {
       for (const entry of files) {
@@ -125,16 +185,30 @@ export function createShell(opts: ShellOptions) {
         if (img && entry.thumb) img.innerHTML = `<img src="${entry.thumb}" alt="">`;
       }
     }
-    root.dataset.inputBytes = String(files.reduce((n, f) => n + f.file.size, 0));
-    root.dispatchEvent(new CustomEvent('stayput:files'));
-    await opts.onFilesChanged?.(files);
+    await filesChanged();
+  }
+
+  /**
+   * Tools inspect files as soon as they are added (page counts, thumbnails).
+   * A failure there (a damaged PDF, a wrong password) used to vanish as an
+   * unhandled rejection; now it is shown where the result would be.
+   */
+  async function filesChanged() {
+    try {
+      await opts.onFilesChanged?.(files);
+    } catch (e) {
+      console.warn(e);
+      const first = files[0];
+      showError(first ? describeError(first.file, e) : e instanceof Error ? e.message : String(e));
+    }
   }
 
   function remove(id: number) {
     files = files.filter((f) => f.id !== id);
     hideResults();
+    hideError();
     render();
-    void opts.onFilesChanged?.(files);
+    void filesChanged();
   }
 
   function move(id: number, delta: number) {
@@ -145,7 +219,7 @@ export function createShell(opts: ShellOptions) {
     files.splice(j, 0, item!);
     hideResults();
     render();
-    void opts.onFilesChanged?.(files);
+    void filesChanged();
   }
 
   function render() {
@@ -291,11 +365,20 @@ export function createShell(opts: ShellOptions) {
     const inputBytes = files.reduce((n, f) => n + f.file.size, 0);
     const tool = root.dataset.slug ?? 'unknown';
     try {
-      const outs = await opts.process(files, progressApi);
+      const result = await opts.process(files, progressApi);
+      const outs = Array.isArray(result) ? result : result.outputs;
+      const skipped = Array.isArray(result) ? [] : result.skipped;
       if (outs.length === 0) throw new Error('Nothing was produced. Check the options and try again.');
       showResults(outs);
       const firstOk = !!attempt && !attempt.ok;
       if (attempt) attempt.ok = true;
+      if (skipped.length > 0) {
+        const list = skipped
+          .slice(0, 5)
+          .map((s) => `${s.name} (${s.reason.replace(/\.$/, '')})`)
+          .join('; ');
+        showError(`${skipped.length} of ${files.length} files ${skipped.length === 1 ? 'was' : 'were'} skipped: ${list}${skipped.length > 5 ? '; …' : ''}.`);
+      }
       trackToolRun({ tool, outcome: 'ok', firstOk, files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started });
       root.dispatchEvent(new CustomEvent('stayput:done'));
     } catch (e) {
@@ -350,7 +433,7 @@ export function createShell(opts: ShellOptions) {
     hideResults();
     hideError();
     render();
-    void opts.onFilesChanged?.(files);
+    void filesChanged();
   });
   downloadAll.addEventListener('click', async () => {
     downloadAll.disabled = true;

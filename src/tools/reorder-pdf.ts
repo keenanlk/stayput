@@ -1,5 +1,5 @@
 import { createShell, str } from '../lib/shell';
-import { closePdfJs, openWithPdfJs, pageThumbnail, reorderPages } from '../lib/pdf';
+import { closePdfJs, loadDocument, openWithPdfJs, pageThumbnail, reorderPages } from '../lib/pdf';
 import { describePages, parsePageRange } from '../lib/ranges';
 import { suffixName, type OutputFile } from '../lib/files';
 
@@ -138,6 +138,7 @@ const shell = createShell({
   },
   async process(files, progress) {
     const entry = files[0]!;
+    if (total === 0) await loadDocument(new Uint8Array(await entry.file.arrayBuffer()));
     if (order.length === 0) throw new Error('Keep at least one page.');
     if (order.length === total && order.every((p, i) => p === i)) throw new Error('The pages are still in their original order. Move or delete a page first.');
     progress.set('Writing pages', 0.3);

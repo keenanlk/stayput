@@ -1,5 +1,5 @@
 import { createShell, radio, str } from '../lib/shell';
-import { closePdfJs, loadDocument, openWithPdfJs, renderPage, stampPdf, type Stamp } from '../lib/pdf';
+import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, renderPage, stampPdf, type Stamp } from '../lib/pdf';
 import type * as PdfJs from 'pdfjs-dist';
 import { suffixName, type OutputFile } from '../lib/files';
 
@@ -444,11 +444,7 @@ const shell = createShell({
     const bytes = new Uint8Array(await f.file.arrayBuffer());
     // Validate with pdf-lib first so the error message is the friendly one.
     const doc = await loadDocument(bytes);
-    pageSizes = doc.getPages().map((p) => {
-      const { width, height } = p.getSize();
-      const rot = ((p.getRotation().angle % 360) + 360) % 360;
-      return rot === 90 || rot === 270 ? { w: height, h: width } : { w: width, h: height };
-    });
+    pageSizes = doc.getPages().map((p) => displayedSize(p));
     pdf = await openWithPdfJs(bytes);
     pageCount = pdf.numPages;
     panel.hidden = false;
@@ -456,6 +452,7 @@ const shell = createShell({
   },
   async process(files, progress) {
     const entry = files[0]!;
+    if (!pdf) await loadDocument(new Uint8Array(await entry.file.arrayBuffer()));
     if (placements.length === 0) throw new Error('Add your signature to a page first: draw or type it, then click "Add signature to this page".');
     progress.set('Placing signatures', 0.2);
     const stamps: Stamp[] = placements.map((p) => ({ page: p.page, png: p.png, x: p.x, y: p.y, width: p.width, height: p.height }));

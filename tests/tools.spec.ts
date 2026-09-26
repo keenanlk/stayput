@@ -3,7 +3,7 @@ import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
-import { PDFDocument, PDFName, degrees } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees } from 'pdf-lib';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { inspect, sniffFormat } from '../src/lib/exif';
@@ -14,6 +14,14 @@ const HEIC_URL = 'https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/csp/heic-to.mi
 const heicLocal = fileURLToPath(new URL('../node_modules/heic-to/dist/csp/heic-to.min.js', import.meta.url));
 const staticFx = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
 const nodeModules = fileURLToPath(new URL('../node_modules/', import.meta.url));
+
+/** Serve the qpdf WebAssembly unlocker (normally fetched from jsDelivr) from node_modules. */
+async function serveLocalQpdf(page: Page) {
+  await page.route('https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@*/dist/*', (route) => {
+    const file = nodeModules + '@neslinesli93/qpdf-wasm/dist/' + route.request().url().split('/').pop();
+    return route.fulfill({ path: file, contentType: file.endsWith('.wasm') ? 'application/wasm' : 'text/javascript' });
+  });
+}
 
 /** Serve the jSquash decoders (normally fetched from jsDelivr) from node_modules so tests stay offline. */
 async function serveLocalCodecs(page: Page) {
@@ -79,6 +87,7 @@ async function open(page: Page, slug: string) {
   // Serve the HEIC decoder locally so tests do not depend on the network.
   await page.route(HEIC_URL, (route) => route.fulfill({ path: heicLocal, contentType: 'text/javascript' }));
   await serveLocalCodecs(page);
+  await serveLocalQpdf(page);
   await stubAnalytics(page);
   await page.goto(`/tools/${slug}`);
   await expect(page.locator('#tool')).toBeVisible();
@@ -808,4 +817,166 @@ test('Crop to circle page saves a transparent PNG and the square page a 1:1 crop
   expect(square.downloads[0]!.suggestedFilename()).toBe('graphic-cropped.png');
   const size = pngSize(await bytesOf(square.downloads[0]!));
   expect(size.width).toBe(size.height);
+});
+
+
+/* ------------------------------------------------------------------ */
+/* Regressions from the QA pass                                        */
+/* ------------------------------------------------------------------ */
+
+test('Encrypted PDFs (owner password only) are unlocked in the tab instead of merged into a broken file', async ({ page }) => {
+  // Before the fix, pdf-lib copied still-encrypted streams into an unencrypted
+  // file: the merge "succeeded" and every page of the output was blank.
+  const errors = await open(page, 'merge-pdf');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [staticFx('owner-locked.pdf'), 'text.pdf']);
+  const out = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(out);
+  expect(doc.getPageCount()).toBe(6);
+  expect(doc.isEncrypted).toBe(false);
+  const firstPage = (await textItems(out, 1)).map((t) => t.str).join(' ');
+  expect(firstPage).toContain('Page 1 of the fixture document');
+  // The unlocker is fetched as code from the CDN; the PDF itself never leaves.
+  net.assertNothingLeft(['owner-locked.pdf', 'text.pdf']);
+  await expect(page.locator('#netproof-list')).toContainText('cdn.jsdelivr.net');
+  expect(errors).toEqual([]);
+});
+
+test('A PDF with an open password asks for it, retries on a wrong one, and every PDF tool can use it', async ({ page }) => {
+  const errors = await open(page, 'pdf-page-numbers');
+  const prompts: string[] = [];
+  const answers = ['wrong', 'stayput'];
+  page.on('dialog', (d) => {
+    prompts.push(d.message());
+    void d.accept(answers.shift() ?? '');
+  });
+  const { downloads } = await run(page, [staticFx('user-locked.pdf')], async () => {
+    await expect(page.locator('#page-info')).toContainText('3 pages');
+  });
+  expect(prompts).toHaveLength(2);
+  expect(prompts[1]).toContain('did not work');
+  const out = await bytesOf(downloads[0]!);
+  expect((await PDFDocument.load(out)).isEncrypted).toBe(false);
+  expect((await textItems(out, 2)).some((t) => t.str === '2')).toBe(true);
+  expect(errors).toEqual([]);
+
+  // Cancelling the prompt gives a clear error rather than a silent failure.
+  await page.goto('/tools/split-pdf');
+  page.removeAllListeners('dialog');
+  page.on('dialog', (d) => void d.dismiss());
+  await page.locator('#file-input').setInputFiles(staticFx('user-locked.pdf'));
+  await expect(page.locator('#error')).toContainText('password-protected');
+});
+
+test('Page numbers and signatures land inside pages whose MediaBox is offset or cropped', async ({ page }) => {
+  // Before the fix, placement assumed the page started at 0,0, so on these
+  // pages numbers and signatures were drawn outside the visible area.
+  const errors = await open(page, 'pdf-page-numbers');
+  const { downloads } = await run(page, ['boxes.pdf']);
+  const out = await bytesOf(downloads[0]!);
+  const p1 = (await textItems(out, 1)).find((t) => t.str === '1');
+  expect(p1, 'offset page is numbered').toBeTruthy();
+  expect(p1!.y).toBeCloseTo(200 + 36, 0); // visible bottom (y=200) plus the margin
+  expect(p1!.x).toBeGreaterThan(100 + 250);
+  expect(p1!.x).toBeLessThan(100 + 320);
+  const p2 = (await textItems(out, 2)).find((t) => t.str === '2');
+  expect(p2!.y).toBeCloseTo(50 + 36, 0); // crop box starts at y=50
+  expect(p2!.x).toBeGreaterThan(50 + 150); // centred in a 400 pt wide crop
+  expect(p2!.x).toBeLessThan(50 + 250);
+  expect(errors).toEqual([]);
+
+  await page.goto('/tools/sign-pdf');
+  const signed = await run(page, ['boxes.pdf'], async () => {
+    await expect(page.locator('#page-label')).toHaveText('Page 1 of 2');
+    await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+    await page.locator('#sig-text').fill('Keenan');
+    await page.locator('#add-signature').click();
+  });
+  const signedDoc = await PDFDocument.load(await bytesOf(signed.downloads[0]!));
+  // The image is placed with a cm operator; its translation must fall inside the offset MediaBox.
+  const contents = signedDoc.getPage(0).node.Contents();
+  const refs = contents instanceof PDFArray ? contents.asArray() : [contents];
+  const text = refs
+    .map((r) => signedDoc.context.lookup(r!))
+    .filter((o): o is PDFRawStream => o instanceof PDFRawStream)
+    .map((o) => new TextDecoder('latin1').decode(decodePDFRawStream(o).decode()))
+    .join('\n');
+  const m = /1 0 0 1 ([\d.]+) ([\d.]+) cm\s+1 0 0 1 0 0 cm\s+[\d.]+ 0 0 [\d.]+ 0 0 cm/.exec(text);
+  expect(m, 'signature placement found').toBeTruthy();
+  const [x, y] = [Number(m![1]), Number(m![2])];
+  expect(x).toBeGreaterThan(100);
+  expect(x).toBeLessThan(712);
+  expect(y).toBeGreaterThan(200);
+  expect(y).toBeLessThan(992);
+});
+
+test('One bad file in a batch is skipped and named; the rest convert', async ({ page }) => {
+  const errors = await open(page, 'convert-image');
+  const bad = fx('not-an-image.jpg');
+  writeFileSync(bad, 'this is text, not a JPEG');
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg'), bad, fx('graphic.png')]);
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '3');
+  await page.locator('#format').selectOption('image/png');
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect(await page.locator('#results-list .result-item').count()).toBe(2);
+  await expect(page.locator('#error')).toContainText('1 of 3 files was skipped: not-an-image.jpg');
+  // The skipped file is logged as a warning, not an uncaught error.
+  expect(errors).toEqual([]);
+});
+
+test('Empty files are reported instead of silently ignored', async ({ page }) => {
+  await open(page, 'heic-to-jpg');
+  const empty = fx('empty.heic');
+  writeFileSync(empty, '');
+  await page.locator('#file-input').setInputFiles(empty);
+  await expect(page.locator('#error')).toContainText('empty.heic is empty (0 bytes)');
+  await expect(page.locator('#run')).toBeDisabled();
+});
+
+test('A file that cannot be opened shows an error as soon as it is added', async ({ page }) => {
+  // Before the fix the failure was an unhandled promise rejection: the page
+  // showed nothing, or "Keep at least one page" when the user pressed run.
+  await open(page, 'reorder-pdf');
+  const uncaught: string[] = [];
+  page.on('pageerror', (e) => uncaught.push(e.message));
+  const fake = fx('notes.pdf');
+  writeFileSync(fake, 'plain text with a .pdf extension\n'.repeat(20));
+  await page.locator('#file-input').setInputFiles(fake);
+  await expect(page.locator('#error')).toContainText('notes.pdf: This file is not a PDF');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('not a PDF');
+  expect(uncaught).toEqual([]);
+});
+
+test.describe('offline', () => {
+  test.use({ serviceWorkers: 'allow' });
+  test('After one visit every tool works offline, including code it never loaded online', async ({ page, context }) => {
+    // Before the fix the service worker cached only chunks the visit happened to
+    // load, so a first-time visitor who went offline could not run a PDF tool.
+    await stubAnalytics(page);
+    await page.goto('/');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    // Wait until the install step has put every asset in the cache.
+    await expect
+      .poll(async () => page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).length), { timeout: 30_000 })
+      .toBeGreaterThan(20);
+    await context.setOffline(true);
+    await page.goto('/tools/merge-pdf');
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    const { downloads } = await run(page, ['text.pdf', 'scan.pdf']);
+    expect((await PDFDocument.load(await bytesOf(downloads[0]!))).getPageCount()).toBe(5);
+    await context.setOffline(false);
+  });
+});
+
+test('The drop zone is named by its visible text and footer links are large enough to tap', async ({ page }) => {
+  await open(page, 'merge-pdf');
+  const drop = page.locator('#drop');
+  await expect(drop).not.toHaveAttribute('aria-label', /.*/);
+  await expect(drop).toHaveAttribute('aria-describedby', 'drop-hint');
+  const box = await page.locator('.site-footer .links a').first().boundingBox();
+  expect(box!.height).toBeGreaterThanOrEqual(24);
 });

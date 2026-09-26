@@ -38,12 +38,13 @@ The site is a static [Astro](https://astro.build) build: one page per tool, a sh
 - **PDF to Word**: pdf.js reads the positioned text runs; `src/lib/pdftext.ts` rebuilds lines, paragraphs and headings and `src/lib/docx.ts` writes a minimal Office Open XML document with fflate. Text and structure only, no layout.
 - **PDF rendering**: [pdf.js](https://mozilla.github.io/pdf.js/) (legacy build for wide browser support) on a dedicated web worker.
 - **Image resize and encode**: the canvas API, with stepped downscaling for sharp results.
+- **Encrypted PDFs**: many PDFs carry "owner" encryption with an empty user password (statements, forms with printing restrictions). pdf-lib cannot read those streams, so every PDF tool first checks the trailer for `/Encrypt` and, when found, runs [qpdf](https://github.com/qpdf/qpdf) compiled to WebAssembly (`@neslinesli93/qpdf-wasm`, loaded on demand from jsDelivr) to strip the encryption in the tab. Files with a user password prompt for it once; outputs are written without encryption. See `src/lib/unlock.ts`.
 - **JPEG XL and AVIF decoding**: the browser's own decoder when it has one (AVIF everywhere, JXL in Safari); otherwise the [jSquash](https://github.com/jamsinclair/jSquash) WebAssembly builds of libjxl and libavif, loaded on demand from jsDelivr like the HEIC decoder.
 - **Signatures**: drawn on a canvas with pointer events (pressure-aware for pens) or typed in the self-hosted Caveat font, cropped to a transparent PNG and placed at preview coordinates mapped into PDF user space, page rotation included.
 - **EXIF removal**: a hand-written, lossless segment and chunk editor for JPEG, PNG and WebP in `src/lib/exif.ts`. It deletes only the metadata segments and writes the untouched image data back, so the pixels are identical and the file only gets smaller. It also extracts EXIF from HEIC containers so "keep metadata" works on HEIC conversions.
 - **Zip downloads**: [fflate](https://github.com/101arrowz/fflate) in the tab when there is more than one output.
-- **Offline**: a service worker generated at build time (`src/pages/sw.js.ts`) caches every tool page and the hashed assets. Pages are network-first so deploys show up immediately; assets are cache-first because their names are content-hashed.
-- **Security headers**: `vercel.json` ships a strict Content-Security-Policy. Scripts may load only from the site itself, jsDelivr (the decoder) and the self-hosted analytics host. `connect-src` is limited the same way, so even a bug could not send a file elsewhere.
+- **Offline**: a service worker generated at build time (`src/pages/sw.js.ts`) caches every tool page, and `scripts/postbuild.mjs` writes the list of hashed assets and fonts into it so all tool code (including the on-demand pdf-lib and pdf.js chunks) is cached on the first visit. Pages are network-first so deploys show up immediately; assets are cache-first because their names are content-hashed, and assets from earlier deploys are pruned on activation.
+- **Security headers**: `vercel.json` ships a strict Content-Security-Policy. Scripts may load only from the site itself, jsDelivr (the decoders and qpdf) and the self-hosted analytics host. `connect-src` is limited the same way, so even a bug could not send a file elsewhere.
 - **Analytics**: a self-hosted, cookie-free [Umami](https://umami.is) counter records page views and three anonymous events (visit start, files added, tool run) with coarse buckets: tool, outcome, file count, size and duration ranges, the entry page and previous page on the site, a named referrer, the previous tool in the tab, and days-since-last-visit ranges computed from a note kept in the browser's own storage. No identifier, and never file names, types or contents. Every property is listed in `src/lib/analytics.ts` and on /privacy, and `tests/analytics.spec.ts` fails if an event gains an unlisted property or names a file. It honours Do Not Track. The dashboard is public.
 
 There is no backend and no cookies. See [`/privacy`](https://stayput.dev/privacy) for the full statement.
@@ -62,7 +63,7 @@ npm run check            # Astro and TypeScript checks
 
 ### Tests
 
-End-to-end tests drive every tool in headless Chromium with generated fixtures (JPEG with EXIF and GPS, PNG, WebP, HEIC, multi-page PDFs), then check the downloaded outputs. One test also asserts the privacy claim directly: after files are added, no request leaves the page except the stubbed analytics call.
+End-to-end tests drive every tool in headless Chromium with generated fixtures (JPEG with EXIF and GPS, PNG, WebP, HEIC, multi-page PDFs, plus static encrypted and offset-box PDFs under `tests/fixtures/static`), then check the downloaded outputs. One test also asserts the privacy claim directly: after files are added, no request leaves the page except the stubbed analytics call. The local server (`scripts/serve.mjs`) applies the headers from `vercel.json`, so tests run under the production Content-Security-Policy and a violation shows up as a console error.
 
 ```bash
 pip install pillow pillow-heif            # once, for fixture generation
@@ -106,4 +107,4 @@ Stayput is free and will stay free. There are no ads, no accounts and no paid ti
 
 ## License
 
-MIT. See `LICENSE`. Third-party libraries keep their own licenses: heic-to (LGPL-3.0, loaded as a separate module at runtime), @jsquash/jxl and @jsquash/avif (Apache-2.0, loaded as separate modules at runtime), pdf-lib (MIT), pdf.js (Apache-2.0), fflate (MIT), Astro (MIT). The Caveat font in `public/fonts` is under the SIL Open Font License 1.1 (see `public/fonts/OFL-Caveat.txt`).
+MIT. See `LICENSE`. Third-party libraries keep their own licenses: heic-to (LGPL-3.0, loaded as a separate module at runtime), qpdf (Apache-2.0, loaded as a separate module at runtime), @jsquash/jxl and @jsquash/avif (Apache-2.0, loaded as separate modules at runtime), pdf-lib (MIT), pdf.js (Apache-2.0), fflate (MIT), Astro (MIT). The Caveat font in `public/fonts` is under the SIL Open Font License 1.1 (see `public/fonts/OFL-Caveat.txt`).

@@ -25,14 +25,10 @@ createShell({
     info.textContent = '';
     const f = files[0];
     if (!f) return;
-    try {
-      const doc = await openWithPdfJs(new Uint8Array(await f.file.arrayBuffer()));
-      count = doc.numPages;
-      await closePdfJs(doc);
-      info.textContent = `${count} page${count === 1 ? '' : 's'}`;
-    } catch (e) {
-      info.textContent = e instanceof Error ? e.message : String(e);
-    }
+    const doc = await openWithPdfJs(new Uint8Array(await f.file.arrayBuffer()));
+    count = doc.numPages;
+    await closePdfJs(doc);
+    info.textContent = `${count} page${count === 1 ? '' : 's'}`;
   },
   async process(files, progress) {
     const entry = files[0]!;

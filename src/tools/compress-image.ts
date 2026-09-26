@@ -1,4 +1,4 @@
-import { createShell, bindRange, num, str, radio } from '../lib/shell';
+import { createShell, bindRange, num, str, radio, processEach } from '../lib/shell';
 import { decodeImage, encodeBitmap, extForType, fitSize, supportsWebpEncoding, thumbnail, type EncodeType } from '../lib/image';
 import { replaceExt, type OutputFile } from '../lib/files';
 
@@ -35,23 +35,20 @@ createShell({
     const scale = mode === 'percent' ? num('percent', 100) / 100 : 1;
     const quality = num('quality', 80) / 100;
     const choice = str('format', 'keep');
-    const outs: OutputFile[] = [];
-    for (const [i, entry] of files.entries()) {
-      progress.set(`Compressing ${entry.file.name} (${i + 1} of ${files.length})`, i / files.length);
+    return processEach(files, progress, 'Compressing', async (entry) => {
       const decoded = await decodeImage(entry.file);
       const type = targetType(entry.file, choice);
       const size = fitSize(decoded.width, decoded.height, { maxWidth, maxHeight, scale });
       const blob = await encodeBitmap(decoded.bitmap, { type, quality, ...size });
-      outs.push({
+      const out: OutputFile = {
         name: replaceExt(entry.file.name, extForType(type)),
         blob,
         originalSize: entry.file.size,
         previewUrl: await thumbnail(decoded.bitmap),
         note: `${size.width}×${size.height}`,
-      });
+      };
       decoded.bitmap.close();
-    }
-    progress.set('Done', 1);
-    return outs;
+      return out;
+    });
   },
 });

@@ -1,4 +1,4 @@
-import { createShell, bindRange, num, radio, bool } from '../lib/shell';
+import { createShell, bindRange, num, radio, bool, processEach } from '../lib/shell';
 import { compressPdf, type CompressMode } from '../lib/pdf';
 import type { OutputFile } from '../lib/files';
 
@@ -25,9 +25,7 @@ createShell({
       flattenDpi: num('dpi', 110),
       grayscale: bool('grayscale'),
     };
-    const outs: OutputFile[] = [];
-    for (const [i, entry] of files.entries()) {
-      progress.set(`Compressing ${entry.file.name} (${i + 1} of ${files.length})`, i / files.length);
+    return processEach(files, progress, 'Compressing', async (entry, i) => {
       const src = new Uint8Array(await entry.file.arrayBuffer());
       const { bytes, stats } = await compressPdf(src, opts, (msg) => progress.set(`${entry.file.name}: ${msg}`, i / files.length));
       // Never hand back a bigger file than the original.
@@ -40,14 +38,13 @@ createShell({
             : grew
               ? 'already compact, original kept'
               : 'structure rewritten';
-      outs.push({
+      const out: OutputFile = {
         name: entry.file.name,
         blob: new Blob([(grew && mode !== 'flatten' ? src : bytes) as BlobPart], { type: 'application/pdf' }),
         originalSize: entry.file.size,
         note,
-      });
-    }
-    progress.set('Done', 1);
-    return outs;
+      };
+      return out;
+    });
   },
 });

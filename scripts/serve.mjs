@@ -5,6 +5,15 @@ import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 
 const root = new URL('../dist/', import.meta.url).pathname;
+// Apply the response headers from vercel.json (the strict CSP among them) so the
+// local server behaves like production and the tests catch CSP violations.
+const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+const headerRules = (vercel.headers ?? []).map((h) => ({ re: new RegExp('^' + h.source.replace(/\(\.\*\)/g, '.*') + '$'), headers: h.headers }));
+function extraHeaders(pathname) {
+  const out = {};
+  for (const rule of headerRules) if (rule.re.test(pathname)) for (const h of rule.headers) out[h.key] = h.value;
+  return out;
+}
 const port = Number(process.argv[2] ?? process.env.PORT ?? 4321);
 const types = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -34,7 +43,7 @@ createServer(async (req, res) => {
   }
   try {
     const body = await readFile(file);
-    res.writeHead(status, { 'Content-Type': types[extname(file)] ?? 'application/octet-stream', 'Cache-Control': 'no-store' });
+    res.writeHead(status, { ...extraHeaders(url.pathname), 'Content-Type': types[extname(file)] ?? 'application/octet-stream', 'Cache-Control': 'no-store' });
     res.end(body);
   } catch {
     res.writeHead(500);

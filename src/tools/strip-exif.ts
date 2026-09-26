@@ -1,4 +1,4 @@
-import { createShell, bool, type ShellFile } from '../lib/shell';
+import { createShell, bool, processEach, type ShellFile } from '../lib/shell';
 import { inspect, strip, sniffFormat, type MetadataSummary } from '../lib/exif';
 import { decodeImage, encodeBitmap, thumbnail } from '../lib/image';
 import { formatBytes, type OutputFile } from '../lib/files';
@@ -53,9 +53,7 @@ createShell({
   async process(files, progress) {
     const keepIcc = bool('keep-icc');
     const applyOrientation = bool('apply-orientation');
-    const outs: OutputFile[] = [];
-    for (const [i, entry] of files.entries()) {
-      progress.set(`Cleaning ${entry.file.name} (${i + 1} of ${files.length})`, i / files.length);
+    return processEach(files, progress, 'Cleaning', async (entry) => {
       const bytes = new Uint8Array(await entry.file.arrayBuffer());
       const format = sniffFormat(bytes);
       const before = inspect(bytes);
@@ -81,9 +79,8 @@ createShell({
       } catch {
         previewUrl = undefined;
       }
-      outs.push({ name: entry.file.name, blob, originalSize: entry.file.size, previewUrl, note });
-    }
-    progress.set('Done', 1);
-    return outs;
+      const out: OutputFile = { name: entry.file.name, blob, originalSize: entry.file.size, previewUrl, note };
+      return out;
+    });
   },
 });

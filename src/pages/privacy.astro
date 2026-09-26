@@ -10,7 +10,7 @@ import Base from '../layouts/Base.astro';
     <h2>What the site loads</h2>
     <ul>
       <li>The pages, scripts and styles of this site, served from our host (Vercel).</li>
-      <li>On the HEIC pages only, the libheif WebAssembly decoder is fetched from the jsDelivr CDN. That request downloads the decoder program; it carries none of your data.</li>
+      <li>Some tools fetch a WebAssembly program from the jsDelivr CDN on demand: the libheif decoder on the HEIC pages, the libjxl and libavif decoders when your browser cannot open a JPEG XL or AVIF file itself, and qpdf when you drop a password-protected PDF (it removes the encryption inside your tab). Each request downloads only the program; it carries none of your data, and the file is decoded or unlocked in memory here.</li>
       <li>A small usage-counting script from our own self-hosted <a href="https://umami.is" rel="noopener">Umami</a> instance, described below.</li>
     </ul>
     <p>That is the complete list. There are no advertising scripts, no fonts from third parties and no cookies.</p>

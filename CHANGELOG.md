@@ -9,6 +9,14 @@ site will render this file.
 ### Added
 - Marketing plan, content calendar and press kit under `launch/` (this changelog too).
 
+### Fixed
+- Password-protected and owner-restricted PDFs now open in every PDF tool. They are unlocked in the tab by qpdf (WebAssembly); before, they produced blank or broken output.
+- Page numbers and signatures land on the visible page when a PDF's page box does not start at 0,0 or is cropped.
+- One unreadable file in a batch is skipped and named instead of failing the whole batch.
+- Files that cannot be opened, and empty (0 byte) files, show an error as soon as they are added.
+- Every tool works offline after one visit, not only the parts that visit happened to load.
+- Accessibility: the drop zone's accessible name matches its text, and footer links are large enough to tap.
+
 ## 2026-09-25
 
 ### Added
