@@ -310,9 +310,9 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 }
 .sign-panel { display: grid; gap: 18px; }
 .sign-maker { display: grid; gap: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px; background: var(--ground); }
-.sig-pad { display: block; width: 100%; max-width: 600px; aspect-ratio: 3 / 1; height: auto; background: var(--surface); border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); touch-action: none; cursor: crosshair; }
+.sig-pad { display: block; width: 100%; max-width: 600px; aspect-ratio: 3 / 1; height: auto; background: #fdfdfa; background-image: linear-gradient(to bottom, transparent calc(74% - 1px), #d8d4c4 calc(74% - 1px), #d8d4c4 74%, transparent 74%); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); box-shadow: var(--shadow); touch-action: none; cursor: crosshair; }
 .sig-text { flex: 1; min-width: 180px; }
-.sig-preview { min-height: 64px; display: flex; align-items: center; padding: 6px 14px; background: var(--surface); border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); margin-top: 10px; white-space: nowrap; overflow: hidden; }
+.sig-preview { min-height: 64px; display: flex; align-items: center; padding: 6px 14px; background: #fdfdfa; color: #1b1f23; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); box-shadow: var(--shadow); margin-top: 10px; white-space: nowrap; overflow: hidden; }
 .sign-actions { gap: 8px; }
 .pdf-stage-wrap { display: grid; gap: 10px; }
 .pager { gap: 10px; }
