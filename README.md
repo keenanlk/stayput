@@ -10,7 +10,7 @@ That is the whole pitch, and you can check it in three ways:
 
 1. **Watch the network.** Open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, open any tool and drop a file. You will see requests for the page's own code, once for the HEIC decoder program on the HEIC pages, and one anonymous page count. You will never see a request carrying your file, because there is nowhere for it to go. Every tool page also counts its own requests after you add files and shows you the list.
 2. **Turn the network off.** Load a tool, switch to airplane mode, and use it. It keeps working, because after one visit the site is cached by a service worker and the work happens in your tab.
-3. **Read the code.** This repository is the site. It builds to static HTML, CSS and JavaScript with no backend; the deploy has no server-side code at all. The [privacy page](https://stayput.dev/privacy) lists every request the site makes and the [usage stats are public](https://stats.keenankaufman.com/share/878bb036d828/Stayput).
+3. **Read the code.** This repository is the site. It builds to static HTML, CSS and JavaScript with no backend; the deploy has no server-side code at all. The [privacy page](https://stayput.dev/privacy) lists every request the site makes.
 
 ## Tools
 

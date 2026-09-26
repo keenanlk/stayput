@@ -568,6 +568,51 @@ test('Sign PDF places a drawn and a typed signature on two pages and no bytes le
   expect(errors.filter((e) => !e.includes('Add your signature to a page first'))).toEqual([]);
 });
 
+test('Sign PDF draw pad and typed preview stay paper-bright and legible in dark mode', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await open(page, 'sign-pdf');
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#sign-panel')).toBeVisible();
+
+  const luminance = (rgb: string) => {
+    const [r, g, b] = rgb.match(/\d+/g)!.map(Number) as [number, number, number];
+    const chan = (c: number) => (c / 255 <= 0.03928 ? c / 255 / 12.92 : ((c / 255 + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
+  };
+  const contrast = (a: number, bLum: number) => (Math.max(a, bLum) + 0.05) / (Math.min(a, bLum) + 0.05);
+
+  const padBg = await page.locator('#sig-pad').evaluate((el) => getComputedStyle(el).backgroundColor);
+  const padLum = luminance(padBg);
+  expect(padLum, `sig-pad background ${padBg} must read as paper (light) in dark mode`).toBeGreaterThan(0.6);
+
+  for (const [value, label] of [
+    ['#111111', 'Black'],
+    ['#1a3f8f', 'Blue'],
+    ['#5a2d0c', 'Brown'],
+  ] as const) {
+    await page.locator('#sig-color').selectOption(value);
+    const inkLum = luminance(
+      await page.locator('#sig-color').evaluate((el, v) => {
+        const p = document.createElement('div');
+        p.style.color = v;
+        document.body.append(p);
+        const c = getComputedStyle(p).color;
+        p.remove();
+        return c;
+      }, value),
+    );
+    expect(contrast(padLum, inkLum), `${label} ink must be readable against the pad`).toBeGreaterThan(4.5);
+  }
+
+  // Typed preview: same paper background, and the chosen ink stays legible on it.
+  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await page.locator('#sig-text').fill('Keenan Example');
+  const previewBg = await page.locator('#sig-preview').evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(luminance(previewBg)).toBeGreaterThan(0.6);
+  const previewInk = luminance(await page.locator('#sig-preview').evaluate((el) => getComputedStyle(el).color));
+  expect(contrast(luminance(previewBg), previewInk)).toBeGreaterThan(4.5);
+});
+
 test('Page numbers land in the chosen corner, skip the cover, and follow page rotation', async ({ page }) => {
   const errors = await open(page, 'pdf-page-numbers');
   const net = watchNetwork(page);

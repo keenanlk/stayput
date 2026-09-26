@@ -13,7 +13,7 @@ lengths and reused everywhere so every listing says the same thing.
 > Free, open-source file tools that run entirely in your browser: HEIC to JPG, PDF merge, split, compress, sign, EXIF removal. Nothing is uploaded. Works offline.
 
 **Paragraph**
-> Stayput is a free, open-source toolkit for the file jobs people search for every day: converting HEIC photos, converting and compressing images, removing EXIF and GPS data, and merging, splitting, compressing, rotating, reordering, signing and numbering PDFs. Every tool runs inside the browser tab. There is no server, so nothing is uploaded, there are no accounts, no file limits and no watermarks, and the site keeps working with the network off. The code is MIT on GitHub and the usage statistics are public.
+> Stayput is a free, open-source toolkit for the file jobs people search for every day: converting HEIC photos, converting and compressing images, removing EXIF and GPS data, and merging, splitting, compressing, rotating, reordering, signing and numbering PDFs. Every tool runs inside the browser tab. There is no server, so nothing is uploaded, there are no accounts, no file limits and no watermarks, and the site keeps working with the network off. The code is MIT on GitHub.
 
 **Tags**: heic, pdf, privacy, offline, open-source, webassembly, pwa, no-upload, converter, compress
 
@@ -29,7 +29,7 @@ lengths and reused everywhere so every listing says the same thing.
 | 2 | **AlternativeTo** | Keenan's account | Keenan | Name: Stayput. Description: paragraph above. Platforms: Online, Self-Hosted, PWA. License: Free and Open Source (MIT). Alternative to: iLovePDF, Smallpdf, CloudConvert, HEICtoJPG, Squoosh, PDF24 Tools. Tags: heic-converter, pdf-tools, privacy-focused, no-registration, works-offline. |
 | 3 | **awesome-privacy** (github.com/pluja/awesome-privacy or the current fork) | GitHub PR | Claude | Under the file tools or utilities section, in the list's format: `- [Stayput](https://stayput.dev) - HEIC, image and PDF tools that run entirely in the browser; nothing is uploaded. Open source (MIT), works offline. [Source](https://github.com/keenanlk/stayput)`. |
 | 4 | **awesome-wasm** (github.com/mbasso/awesome-wasm) | GitHub PR | Claude | Under Web frameworks/libraries or Apps: `- [Stayput](https://github.com/keenanlk/stayput) - Browser-only file toolkit using libheif, libjxl and libavif Wasm builds for HEIC, JPEG XL and AVIF decoding; no server.` |
-| 5 | **Privacy Guides forum** (discuss.privacyguides.net, Tool Suggestions) | Forum account | Keenan | Title: `Stayput: browser-only HEIC and PDF tools, nothing uploaded (open source)`. Body: paragraph above, then the three ways to verify (network tab, airplane mode, read the code), the public stats link, and the honest limits (no OCR, no video). Ask for feedback, not votes. |
+| 5 | **Privacy Guides forum** (discuss.privacyguides.net, Tool Suggestions) | Forum account | Keenan | Title: `Stayput: browser-only HEIC and PDF tools, nothing uploaded (open source)`. Body: paragraph above, then the three ways to verify (network tab, airplane mode, read the code), the privacy page, and the honest limits (no OCR, no video). Ask for feedback, not votes. |
 | 6 | **Uneed** (uneed.best) | Uneed account | Keenan | Name: Stayput. Tagline: one line above. Description: paragraph. Category: Productivity or Utilities. Pricing: Free. Schedule for Oct 27. |
 | 7 | **Peerlist Launchpad** (peerlist.io/launchpad) | Peerlist account | Keenan | Same fields as Uneed. Launch week of Oct 26. |
 | 8 | **Open Source Alternative To** (opensourcealternative.to) | Submission form | Claude (no account) | Name: Stayput. Alternative to: iLovePDF, Smallpdf, CloudConvert. License: MIT. Description: short 160 above. Repo URL. |
@@ -130,3 +130,26 @@ listings (rows 3, 4, 13, 14).** Checked each one's rules first:
 Claude has no working path to open these PRs or post the Discussion comment
 under Keenan's own GitHub login from this session, so the draft text and
 one-click links above are for Keenan to use directly.
+
+**2026-09-26 03:49 UTC:** Keenan submitted all three — the awesome-privacy
+PR, the awesome-wasm PR, and the withastro/roadmap#521 Discussion comment.
+Rows 3, 13 pending review from those maintainers; row 4 pending. Row 14
+(PWA directories) stays skipped.
+
+**2026-09-26 03:54 UTC, retried from a fresh cloud session after Keenan
+widened this environment's network access:**
+
+- Row 1, **nologin.tools**: reachable now. POSTed `https://stayput.dev` to
+  `nologin.tools/api/submit` directly (plain JSON form endpoint, no email).
+  Response: `"This tool has already been submitted"`, slug `stayput-dev`,
+  status `pending` — so the homelab's blocked attempt from earlier the same
+  day actually went through. **Done.** Nothing further to do; it's in their
+  review queue.
+- Row 14, **PWA directories**: both reachable now (not a network block), but
+  both are dead as directories. **appsco.pe** returns a Heroku "Application
+  Error" page (503, the underlying dyno is crashed) — the directory itself
+  is down, not just slow. **progressiveapp.store** returns "upstream connect
+  error or disconnect/reset before headers" (503 over HTTP, TLS connection
+  reset over HTTPS) — its backend is unreachable. Neither has a working
+  submit form to use. **Dropping this row for good**: these aren't
+  temporary outages worth re-checking, they're gone.

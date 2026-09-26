@@ -6,6 +6,7 @@ import { tools, categories } from '../data/tools';
 import { pairs } from '../data/pairs';
 import { presets } from '../data/presets';
 import { guides } from '../data/guides';
+import { profiles } from '../data/site';
 
 const title = 'Stayput: Free File Tools That Never Upload Your Files';
 const description =
@@ -17,6 +18,15 @@ const jsonLd = [
     name: 'Stayput',
     url: Astro.site?.toString(),
     description,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Stayput',
+    url: Astro.site?.toString(),
+    logo: new URL('/icons/icon-512.png', Astro.site).toString(),
+    email: 'hello@stayput.dev',
+    sameAs: profiles,
   },
   {
     '@context': 'https://schema.org',
@@ -92,7 +102,7 @@ const jsonLd = [
     <div class="pillars">
       <div class="pillar">
         <h3>Private by construction</h3>
-        <p>There is no server to upload to. The site is static files; every conversion runs as JavaScript and WebAssembly in your tab. The only requests are for code and an anonymous, cookie-free page count, and the <a href="https://stats.keenankaufman.com/share/878bb036d828/Stayput" rel="noopener">usage stats are public</a>.</p>
+        <p>There is no server to upload to. The site is static files; every conversion runs as JavaScript and WebAssembly in your tab. The only requests are for code and an anonymous, cookie-free page count.</p>
       </div>
       <div class="pillar">
         <h3>No limits</h3>

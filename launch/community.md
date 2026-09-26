@@ -20,7 +20,7 @@ Title: `I built an open-source replacement for the "convert HEIC" and "compress 
 >
 > Stayput (https://stayput.dev) is a static site with no backend. Thirteen tools run in your tab: HEIC to JPG, image convert and compress, EXIF/GPS removal, and PDF merge, split, compress, rotate, reorder, sign, page numbers, images to PDF, PDF to images. It works offline after one visit.
 >
-> You can check the claim: open the network tab and watch it stay empty, or turn on airplane mode and keep using it. The code is MIT (https://github.com/keenanlk/stayput). The analytics are a self-hosted, cookieless Umami counter, and the numbers are public, so you can see everything that is collected.
+> You can check the claim: open the network tab and watch it stay empty, or turn on airplane mode and keep using it. The code is MIT (https://github.com/keenanlk/stayput). The analytics are a self-hosted, cookieless Umami counter, and the privacy page lists everything that is collected.
 >
 > Limits: no OCR, no video, no DOCX. Feedback welcome, especially anything that breaks on your phone.
 
@@ -32,7 +32,7 @@ Title: `Open-source, browser-only tools for HEIC, PDF and EXIF removal. Nothing 
 >
 > Stayput strips EXIF, XMP, ICC and IPTC from JPG, PNG and WebP losslessly, in the tab: it rewrites only the metadata segments, so the pixels are byte-identical and the file gets smaller. Same idea for HEIC conversion and a full set of PDF tools. No server exists; the site is static and works offline.
 >
-> Verification: network tab, airplane mode, or read the code (MIT, https://github.com/keenanlk/stayput). The only requests after page load are anonymous page counts and tool-usage events (bucketed, no identifier, never file details) to a self-hosted Umami instance (no cookies, no IP stored, honours Do Not Track, stats are public) and the one-time fetch of the site's own HEIC decoder on the image pages. The CSP in the repo blocks connections anywhere else.
+> Verification: network tab, airplane mode, or read the code (MIT, https://github.com/keenanlk/stayput). The only requests after page load are anonymous page counts and tool-usage events (bucketed, no identifier, never file details) to a self-hosted Umami instance (no cookies, no IP stored, honours Do Not Track) and the one-time fetch of the site's own HEIC decoder on the image pages. The CSP in the repo blocks connections anywhere else.
 >
 > https://stayput.dev
 
