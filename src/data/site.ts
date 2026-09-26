@@ -19,7 +19,7 @@ export const indexNowKey = 'ce50fbcd4b1e3ea6661da3979e0be697';
  */
 export const profiles = [
   'https://github.com/keenanlk/stayput',
-  'https://www.facebook.com/profile.php?id=61594601468983',
+  'https://www.facebook.com/stayputdev',
   'https://www.instagram.com/stayputdev/',
   'https://x.com/stayputdev',
   'https://www.youtube.com/@stayputdev',
