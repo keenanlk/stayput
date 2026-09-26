@@ -3,30 +3,16 @@
  *
  * AVIF is decoded by every current browser, and JPEG XL by Safari 17+. When
  * `createImageBitmap` refuses a file, the matching jSquash decoder (the Squoosh
- * codecs repackaged as ES modules, Apache-2.0) is loaded on demand from
- * jsDelivr. The request fetches only the decoder program; the image itself is
- * decoded in this tab and never leaves it.
- *
- * Tests and self-hosted deployments can override the base URL by setting
- * `window.STAYPUT_CODEC_BASE` before the tool script runs.
+ * codecs repackaged as ES modules, Apache-2.0) is loaded on demand from this
+ * site's /vendor/ directory (see vendor.ts). The request fetches only the
+ * decoder program; the image itself is decoded in this tab and never leaves it.
  */
-export const JSQUASH_VERSIONS = { jxl: '1.3.0', avif: '2.1.1' } as const;
-export type WasmCodec = keyof typeof JSQUASH_VERSIONS;
+import { vendorEntry } from './vendor';
 
-export const CODEC_BASE = 'https://cdn.jsdelivr.net/npm/@jsquash/';
-
-export function codecUrl(codec: WasmCodec, base = window.STAYPUT_CODEC_BASE ?? CODEC_BASE): string {
-  return `${base}${codec}@${JSQUASH_VERSIONS[codec]}/decode.js`;
-}
+export type WasmCodec = 'jxl' | 'avif';
 
 interface DecoderModule {
   default(buffer: ArrayBuffer): Promise<ImageData>;
-}
-
-declare global {
-  interface Window {
-    STAYPUT_CODEC_BASE?: string;
-  }
 }
 
 const modules = new Map<WasmCodec, Promise<DecoderModule>>();
@@ -34,7 +20,7 @@ const modules = new Map<WasmCodec, Promise<DecoderModule>>();
 export function loadDecoder(codec: WasmCodec): Promise<DecoderModule> {
   let p = modules.get(codec);
   if (!p) {
-    p = import(/* @vite-ignore */ codecUrl(codec)).catch((err) => {
+    p = import(/* @vite-ignore */ vendorEntry(codec)).catch((err) => {
       modules.delete(codec);
       throw new Error(
         `The ${codec.toUpperCase()} decoder could not be loaded (${err instanceof Error ? err.message : String(err)}). Check your connection and try again.`,

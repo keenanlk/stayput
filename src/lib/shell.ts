@@ -8,6 +8,7 @@ import { trackFilesAdded, trackToolRun } from './analytics';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
+import { warmDecoders } from './vendor';
 
 export interface ShellFile {
   id: number;
@@ -456,6 +457,7 @@ export function createShell(opts: ShellOptions) {
   mountNetProof(root);
   mountInstallPrompt(root);
   mountNextSteps(root);
+  warmDecoders(input.accept);
   // Landing pages load the tool module on demand; this marks the shell as live.
   root.dataset.ready = 'true';
 

@@ -15,6 +15,7 @@ site will render this file.
 - One unreadable file in a batch is skipped and named instead of failing the whole batch.
 - Files that cannot be opened, and empty (0 byte) files, show an error as soon as they are added.
 - Every tool works offline after one visit, not only the parts that visit happened to load.
+- The HEIC, JPEG XL, AVIF and PDF-unlock WebAssembly programs are served by the site itself instead of the jsDelivr CDN, and image tools cache the decoders they may need, so HEIC, JPEG XL and AVIF conversion works offline too. The CSP no longer allows any CDN.
 - Accessibility: the drop zone's accessible name matches its text, and footer links are large enough to tap.
 
 ## 2026-09-25

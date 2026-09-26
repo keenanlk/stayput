@@ -43,7 +43,7 @@ Three ways, in the order a sceptical reader tries them:
 
 1. Open the browser's developer tools on the Network tab, drop a file into any tool, and watch: the only requests are the page load, the on-demand codec download on HEIC, AVIF and JPEG XL pages, and one anonymous page count. Nothing carries the file. Every tool page also counts its own requests after files are added and shows the list.
 2. Turn on airplane mode after the page has loaded and keep using the tool.
-3. Read the Content-Security-Policy in `vercel.json`: `connect-src` allows only the site itself, the codec CDN and the stats host, so a bug could not send a file anywhere else even if it tried. The Playwright tests assert that no request carries a body after files are added.
+3. Read the Content-Security-Policy in `vercel.json`: `connect-src` allows only the site itself and the stats host, so a bug could not send a file anywhere else even if it tried. The Playwright tests assert that no request carries a body after files are added.
 
 ## Assets
 
