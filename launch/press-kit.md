@@ -19,7 +19,7 @@ kit and the assets are in `launch/assets/`.
 > Free, open-source file tools that run entirely in your browser: HEIC to JPG, PDF merge, split, compress, sign, EXIF removal. Nothing is uploaded. Works offline.
 
 **Paragraph**
-> Stayput is a free, open-source toolkit for the file jobs people search for every day: converting HEIC photos, converting and compressing images, removing EXIF and GPS data, and merging, splitting, compressing, rotating, reordering, signing and numbering PDFs. Every tool runs inside the browser tab. There is no server, so nothing is uploaded, there are no accounts, no file limits and no watermarks, and the site keeps working with the network off. The code is MIT on GitHub and the usage statistics are public.
+> Stayput is a free, open-source toolkit for the file jobs people search for every day: converting HEIC photos, converting and compressing images, removing EXIF and GPS data, and merging, splitting, compressing, rotating, reordering, signing and numbering PDFs. Every tool runs inside the browser tab. There is no server, so nothing is uploaded, there are no accounts, no file limits and no watermarks, and the site keeps working with the network off. The code is MIT on GitHub.
 
 ## Facts
 
@@ -27,7 +27,6 @@ kit and the assets are in `launch/assets/`.
 | --- | --- |
 | Site | https://stayput.dev |
 | Code | https://github.com/keenanlk/stayput (MIT) |
-| Public usage stats | https://stats.keenankaufman.com/share/878bb036d828/Stayput |
 | Contact | hello@stayput.dev |
 | Profiles | Reserved, not posted to: [Facebook](https://www.facebook.com/stayputdev), [Instagram](https://www.instagram.com/stayputdev/), [X](https://x.com/stayputdev), [YouTube](https://www.youtube.com/@stayputdev). Updates go out on Bluesky @stayput.dev |
 | Maker | Keenan Kaufman, solo |

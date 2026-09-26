@@ -21,7 +21,7 @@ treats PH as a backlink and a story, not the main channel.
 
 ## Description (260 characters)
 
-> Stayput converts HEIC photos, compresses and merges PDFs, signs documents and strips EXIF data entirely inside your browser tab. No upload, no account, no limits, no watermark. It works offline, the code is MIT, and the usage stats are public.
+> Stayput converts HEIC photos, compresses and merges PDFs, signs documents and strips EXIF data entirely inside your browser tab. No upload, no account, no limits, no watermark. It works offline, and the code is MIT.
 
 (243 characters.)
 
@@ -33,7 +33,7 @@ treats PH as a backlink and a story, not the main channel.
 >
 > So Stayput has no server. Thirteen tools run in your tab: HEIC to JPG, image convert and compress, EXIF and GPS removal, and a full set of PDF tools (merge, split, compress, rotate, reorder, sign, page numbers, images to PDF, PDF to images). Drop files, get files. Batches are fine. It works with Wi-Fi off after the first visit.
 >
-> The proof is the point: open your browser's network tab while you use it and watch it stay empty. Every tool page also counts its own requests and shows you the list. The code is MIT on GitHub, and the analytics are a self-hosted, cookieless counter whose numbers are public.
+> The proof is the point: open your browser's network tab while you use it and watch it stay empty. Every tool page also counts its own requests and shows you the list. The code is MIT on GitHub, and the analytics are a self-hosted, cookieless counter described in full on the privacy page.
 >
 > Why free forever: a static site costs almost nothing to run at any scale, and the only bills are the hosting and the domain. There are no ads, no paid tier and no plans for either. If it saves you a subscription, the GitHub Sponsors link covers the domain and nothing else.
 >

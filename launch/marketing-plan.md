@@ -158,8 +158,8 @@ Hunt exists, and the rule is that public posts get his OK.
 | **GitHub social preview** | Not set. | Upload `public/og.png` (1200x630; GitHub recommends 1280x640 and accepts this) under Settings → Social preview. Without it, shared repo links show a grey avatar card. | Keenan, same moment |
 | **GitHub Sponsors** | FUNDING.yml already points at `keenanlk`; Sponsors not enabled. | Optional, already in needs-keenan.md. The footer link 404s until enabled, so either enable it or Claude removes the footer link before launch (Claude will remove it Oct 19 if not enabled, and restore it later). | Keenan, optional |
 | **Bluesky domain verification** | Waiting for the DID (account row 5). | Claude adds `public/.well-known/atproto-did` (a text file with the DID) in one PR; Vercel serves it as text/plain. | Claude, after Keenan pastes the DID |
-| **Public stats link** | Live: https://stats.keenankaufman.com/share/878bb036d828/Stayput | Already in the footer and the launch copy. A `stats.stayput.dev` alias would read better on HN; that needs one CNAME at Namecheap and a host in the homelab proxy. Low priority; the launch copy uses the current link. | Later, optional |
-| **Site footer** | Has GitHub and stats links. | Add hello@stayput.dev and the Bluesky handle once both exist; add "Changelog" and "Press" once the pages exist. | Claude |
+| **Public stats link** | Dropped 2026-09-26: Keenan decided usage numbers stay private. /privacy still says exactly what is measured and why. | Do not link or promise public stats anywhere. | Done |
+| **Site footer** | Has GitHub link. | Add hello@stayput.dev and the Bluesky handle once both exist; add "Changelog" and "Press" once the pages exist. | Claude |
 
 ## 5. What Keenan does this week, in order
 
