@@ -8,6 +8,8 @@ ordering, not precision. "Fit" is how well the job suits browser-only processing
 
 Shipped so far: 14 tools, 12 format-pair pages, 11 preset landing pages, 10 guides.
 
+> **Paused (2026-09-26):** new tools are on hold until measurement shows which tools get used. Crop image shipped (PR #8). Work in progress on password-protect and unlock PDF (#2 and #3 below: an untested standard security handler with AES-256 R6 encrypt and RC4/AES decrypt, in `src/lib/pdfcrypt.ts` and `src/lib/pdfsecurity.ts`) lives on branch `claude/pdf-protect-wip`. It has no UI, page or tests yet.
+
 ## Next ten, in order
 
 | # | Item | Kind | Demand signal | Fit | Notes |
