@@ -32,7 +32,7 @@ Title: `Open-source, browser-only tools for HEIC, PDF and EXIF removal. Nothing 
 >
 > Stayput strips EXIF, XMP, ICC and IPTC from JPG, PNG and WebP losslessly, in the tab: it rewrites only the metadata segments, so the pixels are byte-identical and the file gets smaller. Same idea for HEIC conversion and a full set of PDF tools. No server exists; the site is static and works offline.
 >
-> Verification: network tab, airplane mode, or read the code (MIT, https://github.com/keenanlk/stayput). The only requests after page load are one anonymous page count to a self-hosted Umami instance (no cookies, no IP stored, honours Do Not Track, stats are public) and the one-time fetch of the HEIC decoder from jsDelivr on the HEIC pages. The CSP in the repo blocks connections anywhere else.
+> Verification: network tab, airplane mode, or read the code (MIT, https://github.com/keenanlk/stayput). The only requests after page load are anonymous page counts and tool-usage events (bucketed, no identifier, never file details) to a self-hosted Umami instance (no cookies, no IP stored, honours Do Not Track, stats are public) and the one-time fetch of the HEIC decoder from jsDelivr on the HEIC pages. The CSP in the repo blocks connections anywhere else.
 >
 > https://stayput.dev
 

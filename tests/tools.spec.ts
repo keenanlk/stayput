@@ -212,9 +212,9 @@ test('Image converter applies EXIF orientation and converts to PNG and WebP', as
 test('Compress and resize shrinks a large photo and records a bucketed event', async ({ page }) => {
   await open(page, 'compress-image');
   const { downloads } = await run(page, ['big.jpg']);
-  const events = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events);
-  expect(events).toHaveLength(1);
-  expect(events[0]!.n).toBe('tool_run');
+  const all = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events);
+  expect(all.map((e) => e.n)).toEqual(['visit_start', 'files_added', 'tool_run']);
+  const events = all.filter((e) => e.n === 'tool_run');
   expect(events[0]!.d).toMatchObject({ tool: 'compress-image', outcome: 'ok', files: '1', input: '<1MB', output: '<1MB' });
   expect(JSON.stringify(events[0]!.d)).not.toContain('big.jpg');
   const out = await bytesOf(downloads[0]!);

@@ -4,7 +4,7 @@
  * function and read their options through the helpers below.
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
-import { trackToolRun } from './analytics';
+import { trackFilesAdded, trackToolRun } from './analytics';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 
@@ -88,6 +88,10 @@ export function createShell(opts: ShellOptions) {
   let nextId = 1;
   let outputs: OutputFile[] = [];
   let busy = false;
+  // An attempt starts when files are added and ends at a clear or when new
+  // files arrive after a successful run. files_added fires once per attempt, and
+  // tool_run marks the attempt's first success, so completion = first successes / files_added.
+  let attempt: { ok: boolean } | undefined;
 
   const isImage = (f: File) => f.type.startsWith('image/') || /\.(heic|heif|avif|jxl)$/i.test(f.name);
 
@@ -103,6 +107,10 @@ export function createShell(opts: ShellOptions) {
     hideResults();
     hideError();
     render();
+    if (!attempt || attempt.ok) {
+      attempt = { ok: false };
+      trackFilesAdded({ tool: root.dataset.slug ?? 'unknown', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0) });
+    }
     // Thumbnails after render so the list appears immediately.
     if (opts.thumbnail) {
       for (const entry of files) {
@@ -286,7 +294,9 @@ export function createShell(opts: ShellOptions) {
       const outs = await opts.process(files, progressApi);
       if (outs.length === 0) throw new Error('Nothing was produced. Check the options and try again.');
       showResults(outs);
-      trackToolRun({ tool, outcome: 'ok', files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started });
+      const firstOk = !!attempt && !attempt.ok;
+      if (attempt) attempt.ok = true;
+      trackToolRun({ tool, outcome: 'ok', firstOk, files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started });
       root.dispatchEvent(new CustomEvent('stayput:done'));
     } catch (e) {
       console.error(e);
@@ -336,6 +346,7 @@ export function createShell(opts: ShellOptions) {
   run.addEventListener('click', () => void execute());
   clear.addEventListener('click', () => {
     files = [];
+    attempt = undefined;
     hideResults();
     hideError();
     render();
