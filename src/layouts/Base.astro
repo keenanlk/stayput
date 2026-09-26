@@ -60,10 +60,10 @@ const ogImage = new URL(ogPath, Astro.site);
     </main>
     <Footer />
     <script src="/register-sw.js" defer></script>
-    <!-- Umami, self-hosted, cookie-free. Records page views and the anonymous events in src/lib/analytics.ts; never file names or contents. Only runs on stayput.dev, so previews and tests are not counted. -->
-    <script defer src="https://stats.keenankaufman.com/st.js" data-website-id="52e5e00a-c867-497a-9f44-14c769361768" data-do-not-track="true" data-domains="stayput.dev"></script>
+    <!-- Umami, self-hosted, cookie-free, loaded by src/lib/analytics.ts (skipped for automated browsers and opted-out owners). Records page views and the anonymous events listed there; never file names or contents. -->
     <script>
-      import { trackPageContext } from '../lib/analytics';
+      import { loadAnalytics, trackPageContext } from '../lib/analytics';
+      loadAnalytics();
       trackPageContext();
     </script>
   </body>

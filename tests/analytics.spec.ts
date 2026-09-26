@@ -13,6 +13,8 @@ const ALLOWED = new Set([
 
 /** Replace Umami with a stub that keeps events in sessionStorage so they survive navigation. */
 async function stub(page: Page) {
+  // The site skips analytics in automated browsers; pretend to be a person so the stub loads.
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
   await page.route('https://stats.keenankaufman.com/**', (route) =>
     route.fulfill({
       contentType: 'text/javascript',
@@ -139,4 +141,37 @@ test('E2 "off" arm never shows next steps, and landing pages suggest by their ba
   await expect(page.locator('#next-steps')).toBeHidden();
   await expect(page.locator('#next-steps a')).toHaveText(['Remove EXIF Data', 'Image to PDF']);
   expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ tool: 'compress-jpg', ns: 'off' });
+});
+
+test('automated browsers and opted-out browsers load no analytics at all', async ({ page }) => {
+  const hits: string[] = [];
+  page.on('request', (r) => {
+    if (r.url().includes('stats.keenankaufman.com')) hits.push(r.url());
+  });
+  // Playwright sets navigator.webdriver, like every automation tool.
+  await page.goto('/tools/strip-exif');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fx('photo.jpg'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/);
+  await page.waitForLoadState('load');
+  expect(hits).toEqual([]);
+  expect(await page.evaluate(() => 'umami' in window)).toBe(false);
+});
+
+test('#notrack opts this browser out and #track opts it back in', async ({ page }) => {
+  await stub(page);
+  page.on('dialog', (d) => void d.accept());
+  const hits: string[] = [];
+  page.on('request', (r) => {
+    if (r.url().includes('stats.keenankaufman.com')) hits.push(r.url());
+  });
+  await page.goto('/#notrack');
+  await expect(page).toHaveURL(/\/$/);
+  expect(await page.evaluate(() => localStorage.getItem('umami.disabled'))).toBe('1');
+  await page.goto('/guides');
+  expect(hits).toEqual([]);
+  await page.goto('/#track');
+  expect(await page.evaluate(() => localStorage.getItem('umami.disabled'))).toBeNull();
+  await expect.poll(() => hits.length).toBeGreaterThan(0);
 });
