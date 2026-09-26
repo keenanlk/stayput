@@ -135,3 +135,21 @@ one-click links above are for Keenan to use directly.
 PR, the awesome-wasm PR, and the withastro/roadmap#521 Discussion comment.
 Rows 3, 13 pending review from those maintainers; row 4 pending. Row 14
 (PWA directories) stays skipped.
+
+**2026-09-26 03:54 UTC, retried from a fresh cloud session after Keenan
+widened this environment's network access:**
+
+- Row 1, **nologin.tools**: reachable now. POSTed `https://stayput.dev` to
+  `nologin.tools/api/submit` directly (plain JSON form endpoint, no email).
+  Response: `"This tool has already been submitted"`, slug `stayput-dev`,
+  status `pending` — so the homelab's blocked attempt from earlier the same
+  day actually went through. **Done.** Nothing further to do; it's in their
+  review queue.
+- Row 14, **PWA directories**: both reachable now (not a network block), but
+  both are dead as directories. **appsco.pe** returns a Heroku "Application
+  Error" page (503, the underlying dyno is crashed) — the directory itself
+  is down, not just slow. **progressiveapp.store** returns "upstream connect
+  error or disconnect/reset before headers" (503 over HTTP, TLS connection
+  reset over HTTPS) — its backend is unreachable. Neither has a working
+  submit form to use. **Dropping this row for good**: these aren't
+  temporary outages worth re-checking, they're gone.
