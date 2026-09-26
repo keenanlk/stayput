@@ -25,13 +25,13 @@ const pdfs = tools.filter((t) => t.category === 'pdf');
         <ul>{pdfs.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
       </div>
       <div>
-        <h3>Conversions</h3>
-        <ul>{pairs.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}{presets.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}</ul>
-      </div>
-      <div>
         <h3><a href="/guides">Guides</a></h3>
         <ul>{guides.map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a></li>)}</ul>
       </div>
+    </div>
+    <div class="conversions">
+      <h3>Conversions</h3>
+      <ul>{pairs.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}{presets.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}</ul>
     </div>
     <div class="legal">
       <span>© {new Date().getFullYear()} Stayput</span>
