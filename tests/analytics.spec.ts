@@ -8,7 +8,7 @@ type Ev = { n: string; d: Record<string, string> };
 /** Every property an event may carry. Anything else is a privacy regression. */
 const ALLOWED = new Set([
   'tool', 'outcome', 'files', 'input', 'output', 'duration', 'attempt',
-  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap',
+  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to',
 ]);
 
 /** Replace Umami with a stub that keeps events in sessionStorage so they survive navigation. */
@@ -106,4 +106,37 @@ test('the referring site is reduced to a known name', async ({ page }) => {
   expect(sourceOf('https://someones-blog.example/post', 'stayput.dev')).toBe('other');
   expect(sourceOf('https://stayput.dev/guides', 'stayput.dev')).toBe('internal');
   void page;
+});
+
+/** Pin the experiment arm by fixing Math.random for the page (arm "on" below 0.5). */
+async function arm(page: Page, value: 'on' | 'off') {
+  await page.addInitScript((r) => {
+    Math.random = () => r;
+  }, value === 'on' ? 0.1 : 0.9);
+}
+
+test('E2 "on" arm shows next steps after a job and counts the click', async ({ page }) => {
+  await stub(page);
+  await arm(page, 'on');
+  await runTool(page, '/tools/strip-exif', 'photo.jpg');
+  const box = page.locator('#next-steps');
+  await expect(box).toBeVisible();
+  await expect(box.locator('a')).toHaveText(['Compress & Resize Images', 'Crop image']);
+  expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ tool: 'strip-exif', ns: 'on' });
+  await box.locator('a[data-to="compress-image"]').click();
+  await expect(page).toHaveURL(/\/tools\/compress-image$/);
+  const all = await events(page);
+  expect(all.find((e) => e.n === 'next_step')!.d).toEqual({ tool: 'strip-exif', to: 'compress-image', ns: 'on' });
+  // A new job hides the box until it finishes.
+  await expect(page.locator('#next-steps')).toBeHidden();
+  assertPrivate(all, ['photo.jpg']);
+});
+
+test('E2 "off" arm never shows next steps, and landing pages suggest by their base tool', async ({ page }) => {
+  await stub(page);
+  await arm(page, 'off');
+  await runTool(page, '/compress-jpg', 'big.jpg');
+  await expect(page.locator('#next-steps')).toBeHidden();
+  await expect(page.locator('#next-steps a')).toHaveText(['Remove EXIF Data', 'Image to PDF']);
+  expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ tool: 'compress-jpg', ns: 'off' });
 });

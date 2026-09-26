@@ -7,6 +7,7 @@ import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
 import { trackFilesAdded, trackToolRun } from './analytics';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
+import { mountNextSteps } from './next-steps';
 
 export interface ShellFile {
   id: number;
@@ -279,6 +280,8 @@ export function createShell(opts: ShellOptions) {
   }
   function hideResults() {
     results.classList.remove('is-active');
+    const next = document.getElementById('next-steps');
+    if (next) next.hidden = true;
     resultsList.innerHTML = '';
     for (const o of outputs) if (o.previewUrl) URL.revokeObjectURL(o.previewUrl);
     outputs = [];
@@ -452,6 +455,7 @@ export function createShell(opts: ShellOptions) {
   render();
   mountNetProof(root);
   mountInstallPrompt(root);
+  mountNextSteps(root);
   // Landing pages load the tool module on demand; this marks the shell as live.
   root.dataset.ready = 'true';
 

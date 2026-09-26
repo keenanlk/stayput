@@ -7,6 +7,7 @@ import { pairs } from '../data/pairs';
 import { presets } from '../data/presets';
 import { guidesFor } from '../data/guides';
 import { engineFor } from '../data/engine';
+import { nextSteps } from '../data/next-steps';
 
 interface Props {
   tool: Tool;
@@ -29,6 +30,7 @@ const presetLinks = presets
   .filter((p) => p.slug !== tool.slug && tools.find((t) => t.slug === p.base)?.category === tool.category)
   .sort((a, b) => Number(b.base === (base ?? tool.slug)) - Number(a.base === (base ?? tool.slug)))
   .slice(0, 8);
+const next = (nextSteps[base ?? tool.slug] ?? []).map((s) => tools.find((t) => t.slug === s)).filter((t): t is Tool => !!t);
 const guides = guidesFor([tool.slug, base ?? tool.slug]).slice(0, 4);
 const jsonLd = [
   {
@@ -105,6 +107,12 @@ const jsonLd = [
           </div>
         </div>
         <div id="results-list" class="file-list"></div>
+        {next.length > 0 && (
+          <nav class="next-steps" id="next-steps" aria-label="Next step" hidden>
+            <span class="muted small">Next step, also on your device:</span>
+            <ul class="chips">{next.map((t) => <li><a href={toolPath(t)} data-to={t.slug}>{t.name}</a></li>)}</ul>
+          </nav>
+        )}
       </div>
       <div class="install" id="install" hidden role="region" aria-label="Install Stayput">
         <div>

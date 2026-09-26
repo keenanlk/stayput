@@ -4,7 +4,7 @@
  *
  * - sessionStorage (this tab only, gone when it closes): the page the visit
  *   entered on, the referring site's name, the previous page on this site,
- *   and the last tool run in this tab.
+ *   the last tool run in this tab, and a random experiment arm.
  * - localStorage (this device only): the date of the last visit, the date of
  *   the last successful run, and which tools have been used.
  *
@@ -23,6 +23,8 @@ interface TabState {
   page: string;
   runs: number;
   lastTool?: string;
+  /** Experiment E2 arm for this visit: next-step suggestions shown or not. */
+  ns?: 'on' | 'off';
 }
 interface LocalState {
   lastVisit?: string;
@@ -41,6 +43,8 @@ export interface Journey {
   visit: string;
   /** True when this page load started a new visit (new tab session). */
   isNewVisit: boolean;
+  /** Experiment E2 arm, assigned at random once per visit. */
+  ns: 'on' | 'off';
 }
 
 const SOURCES: [RegExp, string][] = [
@@ -153,12 +157,13 @@ export function journey(): Journey {
   const state: TabState = tab ?? { landing: path, ref: sourceOf(document.referrer, location.hostname), page: path, runs: 0 };
   const from = isNewVisit ? '(none)' : state.page;
   state.page = path;
+  state.ns ??= Math.random() < 0.5 ? 'on' : 'off';
   write(session, TAB_KEY, state);
   if (isNewVisit) {
     write(session, TAB_KEY + ':visit', { visit });
     write(local, LOCAL_KEY, { ...saved, lastVisit: today });
   }
-  current = { landing: state.landing, ref: state.ref, from, visit, isNewVisit };
+  current = { landing: state.landing, ref: state.ref, from, visit, isNewVisit, ns: state.ns };
   return current;
 }
 

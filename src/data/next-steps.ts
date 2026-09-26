@@ -1,0 +1,22 @@
+/**
+ * What to suggest after a job finishes, per base tool (experiment E2 in
+ * stayput-ops company/experiments.md). Two tools each, most likely first:
+ * the job people typically do next with the same kind of file.
+ */
+export const nextSteps: Record<string, [string, string]> = {
+  'heic-to-jpg': ['strip-exif', 'compress-image'],
+  'convert-image': ['compress-image', 'strip-exif'],
+  'compress-image': ['strip-exif', 'image-to-pdf'],
+  'strip-exif': ['compress-image', 'crop-image'],
+  'crop-image': ['compress-image', 'strip-exif'],
+  'image-to-pdf': ['compress-pdf', 'merge-pdf'],
+  'pdf-to-image': ['compress-image', 'crop-image'],
+  'merge-pdf': ['compress-pdf', 'pdf-page-numbers'],
+  'split-pdf': ['compress-pdf', 'merge-pdf'],
+  'compress-pdf': ['merge-pdf', 'sign-pdf'],
+  'rotate-pdf': ['compress-pdf', 'merge-pdf'],
+  'reorder-pdf': ['compress-pdf', 'pdf-page-numbers'],
+  'sign-pdf': ['compress-pdf', 'merge-pdf'],
+  'pdf-page-numbers': ['compress-pdf', 'sign-pdf'],
+  'pdf-to-word': ['split-pdf', 'compress-pdf'],
+};
