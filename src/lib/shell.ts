@@ -4,7 +4,7 @@
  * function and read their options through the helpers below.
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
-import { trackFilesAdded, trackToolRun } from './analytics';
+import { classifyError, trackFilesAdded, trackToolRun } from './analytics';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
@@ -390,7 +390,7 @@ export function createShell(opts: ShellOptions) {
     } catch (e) {
       console.error(e);
       showError(e instanceof Error ? e.message : String(e));
-      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.() });
+      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e) });
     } finally {
       setBusy(false);
     }
