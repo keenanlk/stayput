@@ -1,0 +1,43 @@
+---
+/**
+ * The crop stage: the image drawn to a canvas with a draggable, resizable crop
+ * box on top. Shown once an image is dropped; driven by src/tools/crop-image.ts.
+ */
+---
+<div id="crop-panel" class="crop-panel" hidden>
+  <div class="crop-stage" id="crop-stage">
+    <canvas id="crop-canvas"></canvas>
+    <div class="crop-shade" aria-hidden="true"></div>
+    <div class="crop-box" id="crop-box" tabindex="0" role="application" aria-label="Crop area. Drag to move, drag the edges or corners to resize, or use the arrow keys.">
+      <i class="crop-grid" aria-hidden="true"></i>
+      {['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((h) => <b class={`crop-handle crop-handle-${h}`} data-handle={h} aria-hidden="true"></b>)}
+    </div>
+  </div>
+  <p class="muted small crop-hint"><span id="crop-size"></span> Drag the box to move it, drag a corner or edge to resize it. Arrow keys nudge it by one pixel (hold Shift for ten).</p>
+</div>
+<style is:global>
+  .crop-panel { display: grid; gap: 8px; }
+  .crop-stage { position: relative; display: inline-block; max-width: 100%; line-height: 0; user-select: none; -webkit-user-select: none; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); touch-action: none; overflow: hidden; justify-self: start; }
+  .crop-stage canvas { display: block; max-width: 100%; max-height: 65vh; width: auto; height: auto; }
+  .crop-shade { position: absolute; inset: 0; pointer-events: none; }
+  .crop-box { position: absolute; box-sizing: border-box; border: 1px solid #fff; outline: 1px solid rgba(0, 0, 0, 0.6); cursor: move; touch-action: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45); }
+  .crop-box:focus-visible { border-color: var(--accent); }
+  .crop-box.is-circle { border-radius: 50%; }
+  .crop-box.is-circle::after { content: ''; position: absolute; inset: -1px; border: 1px dashed rgba(255, 255, 255, 0.85); border-radius: 50%; pointer-events: none; }
+  .crop-grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.35) 1px, transparent 1px); background-size: 33.34% 33.34%; background-position: -1px -1px; }
+  .crop-handle { position: absolute; width: 14px; height: 14px; background: var(--accent); border: 2px solid #fff; border-radius: 3px; box-sizing: border-box; touch-action: none; }
+  .crop-handle-nw { left: -1px; top: -1px; cursor: nwse-resize; }
+  .crop-handle-ne { right: -1px; top: -1px; cursor: nesw-resize; }
+  .crop-handle-sw { left: -1px; bottom: -1px; cursor: nesw-resize; }
+  .crop-handle-se { right: -1px; bottom: -1px; cursor: nwse-resize; }
+  .crop-handle-n { left: calc(50% - 7px); top: -1px; cursor: ns-resize; }
+  .crop-handle-s { left: calc(50% - 7px); bottom: -1px; cursor: ns-resize; }
+  .crop-handle-w { left: -1px; top: calc(50% - 7px); cursor: ew-resize; }
+  .crop-handle-e { right: -1px; top: calc(50% - 7px); cursor: ew-resize; }
+  @media (pointer: coarse) { .crop-handle { width: 22px; height: 22px; } .crop-handle-n, .crop-handle-s { left: calc(50% - 11px); } .crop-handle-w, .crop-handle-e { top: calc(50% - 11px); } }
+  .crop-hint { margin: 0; }
+  .crop-hint span { font-weight: 600; color: var(--ink); }
+  .crop-fields { align-items: end; }
+  .crop-fields .field { flex: 1 1 100px; }
+  .crop-fields input[type="number"] { width: 100%; }
+</style>

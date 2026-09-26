@@ -30,6 +30,16 @@
       "permanent": true
     },
     {
+      "source": "/crop-image",
+      "destination": "/tools/crop-image",
+      "permanent": true
+    },
+    {
+      "source": "/crop-photo",
+      "destination": "/tools/crop-image",
+      "permanent": true
+    },
+    {
       "source": "/compress-image",
       "destination": "/tools/compress-image",
       "permanent": true

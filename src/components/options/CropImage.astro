@@ -1,0 +1,58 @@
+---
+/** Option controls for the crop tool, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const aspect = defaults.aspect ?? 'free';
+const shape = defaults.shape ?? 'rect';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const aspects = [
+  ['free', 'Free'],
+  ['1:1', 'Square (1:1)'],
+  ['4:5', 'Portrait post (4:5)'],
+  ['16:9', 'Widescreen (16:9)'],
+  ['9:16', 'Story (9:16)'],
+  ['3:2', 'Photo (3:2)'],
+  ['2:3', 'Photo portrait (2:3)'],
+  ['4:3', 'Classic (4:3)'],
+  ['3:4', 'Classic portrait (3:4)'],
+  ['7:9', 'Passport 35×45 mm (7:9)'],
+  ['original', 'Same as the image'],
+] as const;
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless, transparent)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field">
+  <label for="aspect">Aspect ratio</label>
+  <select id="aspect">
+    {aspects.map(([v, l]) => <option value={v} selected={v === aspect}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label>Shape</label>
+  <div class="segmented" role="radiogroup" aria-label="Crop shape">
+    <label><input type="radio" name="shape" value="rect" checked={shape === 'rect'} /><span>Rectangle</span></label>
+    <label><input type="radio" name="shape" value="circle" checked={shape === 'circle'} /><span>Circle</span></label>
+  </div>
+</div>
+<div class="field-row wide crop-fields">
+  <div class="field"><label for="crop-x">Left (px)</label><input type="number" id="crop-x" min="0" step="1" value="0" /></div>
+  <div class="field"><label for="crop-y">Top (px)</label><input type="number" id="crop-y" min="0" step="1" value="0" /></div>
+  <div class="field"><label for="crop-w">Width (px)</label><input type="number" id="crop-w" min="1" step="1" value="0" /></div>
+  <div class="field"><label for="crop-h">Height (px)</label><input type="number" id="crop-h" min="1" step="1" value="0" /></div>
+  <button class="btn btn-sm btn-ghost" type="button" id="crop-reset">Reset</button>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>

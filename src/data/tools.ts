@@ -557,6 +557,48 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'crop-image',
+    name: 'Crop image',
+    title: 'Crop Image Online, Free, No Upload | Stayput',
+    description:
+      'Crop a photo to any size, a square, 16:9, a passport photo or a circle in your browser. Drag the box, set exact pixels, download. Nothing is uploaded.',
+    heading: 'Crop an image',
+    tagline: 'Drag a box over the part you want, pick a ratio or a circle, and download the crop. The photo never leaves this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    multiple: false,
+    dropLabel: 'Drop an image to crop',
+    action: 'Crop',
+    keywords: ['crop image', 'crop photo', 'crop image online', 'crop picture', 'crop image to circle', 'crop image to square', 'photo cropper'],
+    steps: [
+      'Drop a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick one.',
+      'Drag the crop box into place and resize it from the corners, or pick a ratio such as square, 4:5 or 16:9 and type exact pixel values.',
+      'Choose rectangle or circle and the output format, then crop. The file downloads from your browser.',
+    ],
+    faq: [
+      {
+        q: 'Does cropping reduce the quality of the photo?',
+        a: 'Cropping only removes pixels outside the box; the pixels you keep are copied as they are. The file is then encoded once in the format you choose. Set JPG quality to 90 or higher, or pick PNG, to avoid any visible loss.',
+      },
+      {
+        q: 'How do I crop to exact dimensions like 1080 by 1080?',
+        a: 'Pick the aspect ratio you want, then type the width in the Width box; the height follows the ratio and the box stays inside the image. Left and Top set where the crop starts. The tool crops at the photo’s native resolution and never enlarges.',
+      },
+      {
+        q: 'How does the circle crop work?',
+        a: 'Choose Circle and the crop box becomes a circle (the ratio is set to square). Everything outside the circle becomes transparent, so the output is a PNG or WebP, ready for a profile picture or an avatar. JPG cannot hold transparency, which is why it is switched off for circles.',
+      },
+      {
+        q: 'Which sizes are built in?',
+        a: 'Free, square, 4:5 and 9:16 for Instagram and stories, 16:9 for covers and video thumbnails, 3:2 and 4:3 photo ratios in both orientations, and the 35 by 45 mm passport photo ratio used by most countries. For a US 2 by 2 inch passport photo use square.',
+      },
+      {
+        q: 'Is the photo uploaded?',
+        a: 'No. The image is decoded and cropped on a canvas inside your browser tab. You can load the page, switch off Wi-Fi and crop as many photos as you like.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
