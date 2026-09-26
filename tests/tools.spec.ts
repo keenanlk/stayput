@@ -371,7 +371,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -389,6 +389,22 @@ test('format-pair pages render, preset the converter and link a social image', a
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }
+});
+
+test('JFIF to JPG page renames and re-encodes a .jfif as .jpg', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/jfif-to-jpg');
+  const { downloads } = await run(page, ['download.jfif']);
+  expect(downloads[0]!.suggestedFilename()).toBe('download.jpg');
+  expect(sniffFormat(await bytesOf(downloads[0]!))).toBe('jpeg');
+});
+
+test('GIF to PNG page converts the first frame of an animated GIF', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/gif-to-png');
+  const { downloads } = await run(page, ['banner.gif']);
+  expect(downloads[0]!.suggestedFilename()).toBe('banner.png');
+  expect(sniffFormat(await bytesOf(downloads[0]!))).toBe('png');
 });
 
 test('WebP to PNG page converts with the preset format', async ({ page }) => {
@@ -602,6 +618,7 @@ test('preset landing pages render, run their base tool with the preset options a
     ['pdf-to-png', 'pdf-to-image', async () => expect(page.locator('#format')).toHaveValue('image/png')],
     ['combine-pdf', 'merge-pdf', async () => expect(page.locator('#run')).toHaveText('Combine')],
     ['extract-pages-from-pdf', 'split-pdf', async () => expect(page.locator('input[name="split-mode"][value="range"]')).toBeChecked()],
+    ['delete-pdf-pages', 'reorder-pdf', async () => expect(page.locator('#order')).toBeAttached()],
     ['resize-image', 'compress-image', async () => expect(page.locator('#max-width')).toHaveValue('1920')],
     ['compress-jpg', 'compress-image', async () => expect(page.locator('#quality')).toHaveValue('75')],
     ['remove-location-from-photos', 'strip-exif', async () => expect(page.locator('#keep-icc')).toBeChecked()],
@@ -651,6 +668,22 @@ test('PDF to JPG page renders pages as JPG with the preset format', async ({ pag
   expect(sniffFormat(zip['text-page-1.jpg']!)).toBe('jpeg');
 });
 
+test('Delete PDF pages page drops a page and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/delete-pdf-pages');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#page-grid .reorder-cell')).toHaveCount(3);
+  await page.getByLabel('Delete page 2').click();
+  await expect(page.locator('#order')).toHaveValue('1, 3');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  const out = await bytesOf(download);
+  expect((await PDFDocument.load(out)).getPageCount()).toBe(2);
+  expect((await textItems(out, 2)).map((t) => t.str).join(' ')).toContain('Page 3 of the fixture');
+  net.assertNothingLeft(['text.pdf']);
+});
+
 test('Remove location page reports GPS and strips it losslessly', async ({ page }) => {
   await stubAnalytics(page);
   await page.goto('/remove-location-from-photos');
@@ -696,6 +729,11 @@ test('tool pages link to related guides and preset landing pages', async ({ page
   await expect(page.locator('a[href="/guides/remove-location-data-from-photos"]').first()).toBeVisible();
   await page.goto('/tools/image-to-pdf');
   await expect(page.locator('a[href="/jpg-to-pdf"]').first()).toBeVisible();
+  await page.goto('/tools/reorder-pdf');
+  await expect(page.locator('a[href="/delete-pdf-pages"]').first()).toBeVisible();
+  await page.goto('/jfif-to-jpg');
+  // Pair pages list the pairs sharing a format first, ahead of the footer.
+  await expect(page.locator('main a[href="/jfif-to-png"]').first()).toBeVisible();
 });
 
 /* ------------------------------------------------------------------ */

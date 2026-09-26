@@ -51,4 +51,11 @@ heic.save(os.path.join(out, 'iphone.heic'), quality=80, exif=exif_with_gps(1).to
 
 # Big JPEG for compress tests (12 MP-ish)
 photo(4000, 3000, (90, 90, 140)).save(os.path.join(out, 'big.jpg'), quality=95)
+# A picture saved from the web on Windows: JPEG bytes with a .jfif name
+photo(640, 480, (200, 160, 40)).save(os.path.join(out, 'download.jfif'), format='JPEG', quality=85)
+
+# Two-frame animated GIF with a transparent colour
+frames = [photo(160, 120, (200, 40, 40)).convert('P'), photo(160, 120, (40, 40, 200)).convert('P')]
+frames[0].save(os.path.join(out, 'banner.gif'), save_all=True, append_images=frames[1:], duration=200, loop=0, transparency=0)
+
 print('fixtures written to', out)

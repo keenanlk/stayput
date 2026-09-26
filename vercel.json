@@ -91,11 +91,6 @@
       "permanent": true
     },
     {
-      "source": "/delete-pdf-pages",
-      "destination": "/tools/reorder-pdf",
-      "permanent": true
-    },
-    {
       "source": "/organize-pdf",
       "destination": "/tools/reorder-pdf",
       "permanent": true

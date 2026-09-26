@@ -1,0 +1,8 @@
+---
+/** Option controls for the reorder tool, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+---
+<div class="field wide">
+  <label for="order">Or type the order <span class="muted">(page numbers of the original, in the order you want; leave a page out to delete it)</span></label>
+  <input type="text" id="order" placeholder="e.g. 3, 1, 2, 5-8" autocomplete="off" />
+</div>

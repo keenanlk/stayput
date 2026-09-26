@@ -486,9 +486,9 @@ export const guides: Guide[] = [
     description: 'A practical guide to picking an image format: photos, screenshots, logos, transparency, web pages, email and archives, with the conversions to do it.',
     heading: 'JPG, PNG, WebP or HEIC: which image format to use',
     dek: 'A practical rule for each job, and the conversion to get there.',
-    keywords: ['jpg vs png', 'webp vs png', 'which image format to use', 'heic vs jpg', 'best image format for web', 'png or jpg for screenshots'],
-    updated: '2026-09-25',
-    tools: ['convert-image', 'png-to-jpg', 'jpg-to-webp', 'heic-to-jpg'],
+    keywords: ['jpg vs png', 'webp vs png', 'which image format to use', 'heic vs jpg', 'best image format for web', 'png or jpg for screenshots', 'what is a jfif file'],
+    updated: '2026-09-26',
+    tools: ['convert-image', 'png-to-jpg', 'jpg-to-webp', 'heic-to-jpg', 'jfif-to-jpg', 'gif-to-png', 'svg-to-jpg'],
     sections: [
       {
         h: 'The one-line rules',
@@ -529,6 +529,12 @@ export const guides: Guide[] = [
         h: 'AVIF and JPEG XL',
         p: [
           'AVIF is a newer web format, smaller again than WebP, supported by all current browsers and few other programs. JPEG XL is technically the best of the lot and supported almost nowhere except Safari. Both are formats you might receive, not ones to send: [AVIF to JPG](/avif-to-jpg), [AVIF to PNG](/avif-to-png), [JXL to JPG](/jxl-to-jpg) and [JXL to PNG](/jxl-to-png) turn them into something that opens.',
+        ],
+      },
+      {
+        h: 'JFIF, GIF and SVG',
+        p: [
+          'A **.jfif** file is a JPG with a different name, usually a picture saved from the web on Windows. Renaming it to .jpg works; for a batch use [JFIF to JPG](/jfif-to-jpg), or [JFIF to PNG](/jfif-to-png) for a copy you will keep editing. **GIF** is an old 256-colour format that survives in logos and animations; still GIFs are better as PNG ([GIF to PNG](/gif-to-png)), or as JPG when a form insists ([GIF to JPG](/gif-to-jpg)). **SVG** is a vector drawing, not pixels: keep it for websites and design tools, and export a copy with [SVG to PNG](/svg-to-png) or [SVG to JPG](/svg-to-jpg) when somewhere will only take an image.',
         ],
       },
     ],

@@ -1,0 +1,12 @@
+---
+/** Page grid for the reorder tool, shared by the tool page and its landing pages. */
+---
+<div id="pages" hidden>
+  <div class="field-row" style="margin-bottom:12px">
+    <span class="small" id="page-info" style="font-weight:600"></span>
+    <button class="btn btn-sm" type="button" id="reverse">Reverse order</button>
+    <button class="btn btn-sm" type="button" id="restore">Restore original</button>
+    <span class="muted small">Drag pages to move them. Click × to delete.</span>
+  </div>
+  <div class="thumb-grid reorder-grid" id="page-grid" role="list" aria-label="Pages in their new order"></div>
+</div>

@@ -24,7 +24,13 @@ const url = new URL(path, Astro.site).toString();
 const engine = engineFor(engineSlug ?? tool.slug);
 const related = tools.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 4);
 const isPair = path.startsWith('/') && !path.startsWith('/tools/');
-const conversions = pairs.filter((p) => p.slug !== tool.slug).slice(0, 10);
+// On a pair page, list the pairs sharing its source or target format first (JFIF to JPG shows JFIF to PNG).
+const [fromExt, toExt] = isPair ? tool.slug.split('-to-') : [];
+const shares = (slug: string) => Number(slug.startsWith(`${fromExt}-to-`)) + Number(slug.endsWith(`-to-${toExt}`));
+const conversions = pairs
+  .filter((p) => p.slug !== tool.slug)
+  .sort((a, b) => shares(b.slug) - shares(a.slug))
+  .slice(0, 10);
 // Landing pages that are presets of tools in this category, so "JPG to PDF" is reachable from the PDF tools.
 const presetLinks = presets
   .filter((p) => p.slug !== tool.slug && tools.find((t) => t.slug === p.base)?.category === tool.category)
