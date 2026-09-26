@@ -4,22 +4,22 @@ Times are US Eastern unless stated. Every "post" line waits for Keenan's
 explicit OK in the project and goes out from his account. Everything else
 Claude does.
 
-## Blocked until the site is live
+## Before launch (site is live since Sep 25)
 
-- [ ] Vercel import of keenanlk/stayput done and production deploy green (Keenan)
-- [ ] stayput.dev bought (stayput.app was taken) and attached in Vercel (Keenan)
-- [ ] `noindex` removed if present; `robots.txt` and sitemap verified at the live URL
-- [ ] Search Console property added, sitemap submitted (Keenan verifies with the DNS TXT record)
+- [x] Vercel import of keenanlk/stayput done and production deploy green (Keenan)
+- [x] stayput.dev bought (stayput.app was taken) and attached in Vercel (Keenan)
+- [x] `noindex` removed if present; `robots.txt` and sitemap verified at the live URL
+- [x] Search Console property added, sitemap submitted; Bing Webmaster set up; IndexNow pings Bing on each deploy
 - [x] GIF and five screenshots made (assets.md); re-check against the live site
 - [ ] GitHub Sponsors enabled so the footer link resolves (Keenan; optional for launch)
-- [ ] Repo made public (Keenan)
+- [x] Repo made public (Keenan)
 
 ## Soft launch, Tue Oct 20 to Sat Oct 24
 
 - [ ] Every tool run once on iOS Safari, Android Chrome, desktop Chrome and Firefox with real files (a 12 MP HEIC, a 40-page PDF, a 30 MB scan)
 - [ ] Lighthouse 95+ on the home page and three tool pages, mobile and desktop
 - [ ] All links in launch/ opened once from a phone and once from a desktop
-- [ ] Umami receiving events from the live domain; public share link working
+- [x] Umami receiving events from the live domain; public share link working
 - [ ] Dashboard shows "live" and the launch checklist progress
 - [ ] Share with a handful of people for bug reports; fix anything found before Tuesday
 - [ ] Directory PRs (nologin.tools, awesome-privacy, awesome-wasm) prepared as branches, not opened
