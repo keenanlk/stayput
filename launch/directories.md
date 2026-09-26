@@ -55,20 +55,30 @@ and records each URL in the ops work log under `launch-directories`. Rows 2, 5,
 ## Attempt log
 
 **2026-09-26 (moved up from Oct 27 by decision):** tried the 7 no-account
-rows (1, 3, 4, 8, 9, 13, 14) from a Claude cloud session. 0 of 7 completed:
+rows (1, 3, 4, 8, 9, 13, 14) from a Claude cloud session. 0 of 7 completed.
+Re-checked each one; they split into two different blockers, not the same
+one:
 
-- Rows 1, 3, 4 (nologin.tools, awesome-privacy, awesome-wasm): assumed a
-  GitHub PR, but the session's GitHub access only reaches keenanlk's own
-  repos, so forking a third-party repo is refused. nologin.tools also turned
-  out to review submissions through its own web form, not a PR, and its
-  domain is blocked by the sandbox's network egress.
-- Rows 8, 9 (opensourcealternative.to, openalternative.co): both domains are
-  blocked by the sandbox's egress proxy; their forms could not be reached at
-  all.
-- Rows 13, 14 (Astro showcase, PWA directories): both need a browser or a
-  GitHub Discussion post, neither of which this session can drive headlessly.
+- **Needs Keenan's own GitHub account OK before Claude does it** — rows 3
+  (awesome-privacy), 4 (awesome-wasm), 13 (Astro showcase), 14 (PWA
+  directories). Each is a PR or GitHub Discussion post to someone else's
+  repo, which would go out under Keenan's own GitHub identity, and the
+  decision card he approved was for anonymous no-account submissions, not
+  anything posted as him. Holding these until he says these specific ones
+  are OK to post as him (to be asked together with his other account-setup
+  items).
+- **Genuinely no account needed, but Claude has no way to submit the form
+  right now** — rows 1 (nologin.tools), 8 (opensourcealternative.to), 9
+  (openalternative.co). All three are plain web forms, no login or PR.
+  nologin.tools's own submission page is at nologin.tools/submit, not a
+  GitHub PR as first drafted. But: the cloud sandbox's network egress blocks
+  all three domains outright, so the forms can't even be loaded from there;
+  the Homelab connector only reports on the homelab's containers, hosts and
+  services and cannot fetch a URL or fill in a form; and starting a Remote
+  Control session on Keenan's device to use a real browser needs a message
+  from a person in this thread to anchor it, and this thread has none. So
+  these three stay unsubmitted until one of those paths opens up (a person
+  asks in this thread so Remote Control can start, or the sandbox's egress
+  allowlist covers these domains).
 
-Next attempt should run from a Remote Control session on Keenan's own
-device, with his real GitHub login (forking works there) and a normal
-browser (reaches the blocked sites). See company/experiments.md in
-stayput-ops for the full note.
+See company/experiments.md in stayput-ops for the fuller note.
