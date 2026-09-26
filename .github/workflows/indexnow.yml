@@ -1,0 +1,29 @@
+name: IndexNow
+
+# After Vercel finishes a production deploy, tell Bing and other IndexNow
+# engines to recrawl the site. Skipped when the deploy changed no site files.
+on:
+  deployment_status:
+  workflow_dispatch:
+
+jobs:
+  ping:
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || git diff --name-only HEAD~1 HEAD | grep -qE '^(src/|public/|astro\.config|vercel\.json)'; then
+            echo "site=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No site files changed; skipping."
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.changed.outputs.site == 'true'
+        with:
+          node-version: 22
+      - if: steps.changed.outputs.site == 'true'
+        run: node scripts/indexnow.mjs

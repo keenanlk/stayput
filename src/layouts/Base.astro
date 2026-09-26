@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { siteVerification } from '../data/site';
 
 interface Props {
   title: string;
@@ -11,8 +12,10 @@ interface Props {
   ogType?: string;
   /** Path of a 1200x630 social image. Defaults to the site-wide one. */
   ogImage?: string;
+  /** Keep the page out of search results (404). */
+  noindex?: boolean;
 }
-const { title, description, jsonLd = [], ogType = 'website', ogImage: ogPath = '/og.png' } = Astro.props;
+const { title, description, jsonLd = [], ogType = 'website', ogImage: ogPath = '/og.png', noindex = false } = Astro.props;
 // Astro builds `format: 'file'` pages as /x.html; the served URL is /x.
 const cleanPath = Astro.url.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
 const canonical = new URL(cleanPath, Astro.site);
@@ -25,7 +28,9 @@ const ogImage = new URL(ogPath, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {siteVerification.google && <meta name="google-site-verification" content={siteVerification.google} />}
+    {siteVerification.bing && <meta name="msvalidate.01" content={siteVerification.bing} />}
     <meta name="theme-color" content="#1f6f5f" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#121517" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

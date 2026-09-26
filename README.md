@@ -87,6 +87,8 @@ The site is a plain static export, so Vercel's Hobby plan (or any static host) i
 
 Every push to `main` redeploys; pull requests get preview URLs. `public/_headers` carries the same headers for Cloudflare Pages, so moving hosts is a DNS change.
 
+Search engines: put the Search Console (or Bing) HTML-tag token in `src/data/site.ts`. After each production deploy that touches site files, `.github/workflows/indexnow.yml` submits the live sitemap to IndexNow (Bing, Yandex and others) using the key file in `public/`. Run it by hand from the Actions tab, or locally with `node scripts/indexnow.mjs --dry-run`.
+
 ## Adding a tool
 
 1. Add an entry to `src/data/tools.ts` (slug, SEO copy, steps, FAQ) and a paragraph to `src/data/engine.ts` saying what actually runs in the tab. These feed the home page, footer, sitemap, service worker, structured data and social image.

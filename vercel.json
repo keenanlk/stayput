@@ -5,6 +5,17 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "stayput-nu.vercel.app"
+        }
+      ],
+      "destination": "https://stayput.dev/:path*",
+      "permanent": true
+    },
+    {
       "source": "/heic-to-jpg",
       "destination": "/tools/heic-to-jpg",
       "permanent": true
