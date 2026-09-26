@@ -11,7 +11,9 @@
  *   last run. tool, files, input, landing, ref, from, visit.
  * - tool_run: every run. The above plus outcome, output, duration, prev_tool,
  *   run_n, tools_used, run_gap, and attempt ("first-ok" on the first success
- *   since files_added, so completion rate = first-ok runs / files_added).
+ *   since files_added, so completion rate = first-ok runs / files_added),
+ *   and ns (experiment E2 arm, "on" or "off").
+ * - next_step: a click on a suggested next tool. tool, to, ns.
  */
 import { journey, recordRun } from './journey';
 declare global {
@@ -95,6 +97,7 @@ export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firs
       run_n: run.runN,
       tools_used: run.toolsUsed,
       run_gap: run.runGap,
+      ns: journey().ns,
     });
   } catch {
     // Analytics must never affect the tool.
