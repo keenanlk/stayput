@@ -8,7 +8,7 @@ type Ev = { n: string; d: Record<string, string> };
 /** Every property an event may carry. Anything else is a privacy regression. */
 const ALLOWED = new Set([
   'tool', 'outcome', 'files', 'input', 'output', 'duration', 'attempt',
-  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format',
+  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format', 'error_class',
 ]);
 
 /** Replace Umami with a stub that keeps events in sessionStorage so they survive navigation. */
@@ -188,4 +188,25 @@ test('the image converter reports the output format picked, and nothing about th
   const all = await events(page);
   expect(all.find((e) => e.n === 'tool_run')!.d.format).toBe('ico');
   assertPrivate(all, ['graphic.png']);
+});
+
+test('a failed run reports a bare error class, never the error message or file name', async ({ page }) => {
+  await stub(page);
+  await page.goto('/tools/merge-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const notReallyAPdf = {
+    name: 'definitely-not-a-real-pdf-secret-name.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('this is not pdf bytes'),
+  };
+  await page.locator('#file-input').setInputFiles([notReallyAPdf, notReallyAPdf]);
+  await page.locator('#run').click();
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+  const all = await events(page);
+  const run = all.find((e) => e.n === 'tool_run')!;
+  expect(run.d.outcome).toBe('error');
+  expect(run.d.error_class).toBeTruthy();
+  // A bare JS error name (e.g. "Error", "TypeError"), never a message or the file name.
+  expect(run.d.error_class).toMatch(/^[A-Za-z]+$/);
+  assertPrivate(all, ['definitely-not-a-real-pdf-secret-name.pdf']);
 });

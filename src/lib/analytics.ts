@@ -107,6 +107,13 @@ function context(): Record<string, string> {
   return { landing: j.landing, ref: j.ref, from: j.from, visit: j.visit };
 }
 
+/** Coarse error category for tool_run failures: the error's own name, never its message or stack. */
+export function classifyError(e: unknown): string {
+  if (e instanceof DOMException) return e.name || 'DOMException';
+  if (e instanceof Error) return e.name || 'Error';
+  return 'Unknown';
+}
+
 export function trackFilesAdded(data: { tool: string; files: number; inputBytes: number }): void {
   try {
     track('files_added', { tool: data.tool, files: countBucket(data.files), input: sizeBucket(data.inputBytes), ...context() });
@@ -115,7 +122,7 @@ export function trackFilesAdded(data: { tool: string; files: number; inputBytes:
   }
 }
 
-export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firstOk?: boolean; files: number; inputBytes: number; outputBytes?: number; ms: number; format?: string }): void {
+export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firstOk?: boolean; files: number; inputBytes: number; outputBytes?: number; ms: number; format?: string; errorClass?: string }): void {
   try {
     const run = recordRun(data.tool, data.outcome === 'ok');
     track('tool_run', {
@@ -127,6 +134,7 @@ export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firs
       duration: durationBucket(data.ms),
       ...(data.format ? { format: data.format } : {}),
       ...(data.outcome === 'ok' ? { attempt: data.firstOk ? 'first-ok' : 'repeat' } : {}),
+      ...(data.errorClass ? { error_class: data.errorClass } : {}),
       ...context(),
       prev_tool: run.prevTool,
       run_n: run.runN,
