@@ -16,8 +16,8 @@ export const engines: Record<string, Engine> = {
     versus: 'Upload-based HEIC converters send every photo, location data included, to a server you have never heard of, then cap you at a handful per day. Here a hundred photos convert in the time the first one would take to upload.',
   },
   'convert-image': {
-    how: 'Your browser already knows how to decode JPG, PNG, WebP, AVIF and SVG. Stayput draws each image onto an off-screen canvas and asks the browser to encode it again in the format you picked. HEIC input goes through the libheif WebAssembly decoder, and JPEG XL (or AVIF, in a browser without native support) through the Squoosh decoders compiled to WebAssembly, fetched once as program files and cached. Nothing here needs a server because nothing here is beyond what a browser can do on its own.',
-    versus: 'Online converters upload your image, convert it on their machine and hand it back through an ad-covered download page. This does the same conversion with the same codecs, on your device, in less time than the upload.',
+    how: 'Stayput first reads the opening bytes of each file, where every image format writes its signature, so it knows what the file really is whatever it is called. Your browser decodes JPG, PNG, WebP, GIF, BMP, AVIF and SVG itself; HEIC goes through the libheif WebAssembly decoder, and JPEG XL (or AVIF, in a browser without native support) through the Squoosh decoders, all served from this site and cached. The browser re-encodes JPG, PNG and WebP; PDF, ICO, GIF, BMP and TIFF files are written by small encoders in the page. Nothing here needs a server.',
+    versus: 'Online converters upload your image, convert it on their machine, keep it for hours and cap you at a few files a day. This does the same conversion on your device, for as many files as you like, in less time than the upload.',
   },
   'compress-image': {
     how: 'Resizing uses stepped downscaling on a canvas so text and edges stay sharp, and the browser encodes the result at the quality you choose. Everything happens in memory in your tab. Large batches are processed one image at a time so the page stays responsive on a phone.',

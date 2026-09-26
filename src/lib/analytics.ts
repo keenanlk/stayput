@@ -12,7 +12,8 @@
  * - tool_run: every run. The above plus outcome, output, duration, prev_tool,
  *   run_n, tools_used, run_gap, and attempt ("first-ok" on the first success
  *   since files_added, so completion rate = first-ok runs / files_added),
- *   and ns (experiment E2 arm, "on" or "off").
+ *   and ns (experiment E2 arm, "on" or "off"). The image converter adds
+ *   format, the output format picked ("ico"; never anything about the file).
  * - next_step: a click on a suggested next tool. tool, to, ns.
  */
 import { journey, recordRun } from './journey';
@@ -114,7 +115,7 @@ export function trackFilesAdded(data: { tool: string; files: number; inputBytes:
   }
 }
 
-export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firstOk?: boolean; files: number; inputBytes: number; outputBytes?: number; ms: number }): void {
+export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firstOk?: boolean; files: number; inputBytes: number; outputBytes?: number; ms: number; format?: string }): void {
   try {
     const run = recordRun(data.tool, data.outcome === 'ok');
     track('tool_run', {
@@ -124,6 +125,7 @@ export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firs
       input: sizeBucket(data.inputBytes),
       ...(data.outputBytes !== undefined ? { output: sizeBucket(data.outputBytes) } : {}),
       duration: durationBucket(data.ms),
+      ...(data.format ? { format: data.format } : {}),
       ...(data.outcome === 'ok' ? { attempt: data.firstOk ? 'first-ok' : 'repeat' } : {}),
       ...context(),
       prev_tool: run.prevTool,

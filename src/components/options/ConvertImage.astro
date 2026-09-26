@@ -1,19 +1,37 @@
 ---
-/** Option controls for the image converter, shared by the tool page and every format-pair landing page. */
+/**
+ * Option controls for the image converter, shared by the tool page and every format-pair landing page.
+ * The native <select id="format"> holds the choice (pair pages preset it). The script turns it into a
+ * searchable format picker and keeps it as the single source of truth.
+ */
+import { GROUPS, OUTPUT_FORMATS } from '../../lib/formats';
 interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
 const format = defaults.format ?? 'image/jpeg';
-const formats = [
-  ['image/jpeg', 'JPG'],
-  ['image/png', 'PNG'],
-  ['image/webp', 'WebP'],
-] as const;
 ---
-<div class="field">
-  <label for="format">Convert to</label>
+<p class="detected" id="detected" role="status" aria-live="polite" hidden></p>
+<div class="field format-field">
+  <label for="format" id="format-label">Convert to</label>
   <select id="format">
-    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+    {GROUPS.map((g) => (
+      <optgroup label={g}>
+        {OUTPUT_FORMATS.filter((f) => f.group === g).map((f) => <option value={f.type} selected={f.type === format}>{f.label}</option>)}
+      </optgroup>
+    ))}
   </select>
+  <div class="picker" id="picker" hidden>
+    <button type="button" class="picker-button" id="picker-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="format-label picker-button">
+      <span class="picker-value" id="picker-value"></span>
+      <span class="picker-ext" id="picker-ext"></span>
+      <svg class="picker-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="picker-pop" id="picker-pop" hidden>
+      <input type="text" id="picker-search" class="picker-search" role="combobox" aria-expanded="true" aria-controls="picker-list" aria-autocomplete="list" aria-label="Search output formats" placeholder="Search: jpeg, favicon, tif…" autocomplete="off" spellcheck="false" />
+      <ul class="picker-list" id="picker-list" role="listbox" aria-label="Output formats"></ul>
+      <p class="picker-empty" id="picker-empty" hidden>No format matches. Try a file extension like png or ico.</p>
+    </div>
+  </div>
+  <p class="picker-note" id="format-note"></p>
 </div>
 <div class="field" id="quality-field">
   <label for="quality">Quality <output id="quality-out">90</output></label>
@@ -26,3 +44,106 @@ const formats = [
 <div class="field" id="exif-field">
   <label class="check"><input type="checkbox" id="keep-exif" /> Keep EXIF metadata</label>
 </div>
+
+<style>
+  .detected {
+    grid-column: 1 / -1;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .detected :global(.kind) {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding: 1px 7px;
+  }
+  .detected :global(.renamed) { color: var(--warn); }
+
+  /* Once enhanced, the native select stays in the page (it holds the value) but out of sight and out of the tab order. */
+  :global(.format-field.is-enhanced) #format {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .format-field { position: relative; }
+  .picker { position: relative; }
+  .picker-button {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    min-height: 44px;
+    cursor: pointer;
+    text-align: left;
+  }
+  .picker-button:hover { border-color: var(--accent); }
+  .picker-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .picker-ext { font-family: var(--mono); font-size: 13px; font-weight: 400; color: var(--muted); }
+  .picker-chevron { width: 16px; height: 16px; margin-left: auto; align-self: center; color: var(--muted); transition: transform 0.15s; }
+  .picker-button[aria-expanded="true"] .picker-chevron { transform: rotate(180deg); }
+  .picker-pop {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    min-width: min(340px, calc(100vw - 32px));
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 8px;
+  }
+  .picker-search {
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--ground);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    min-height: 40px;
+  }
+  .picker-search:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+  .picker-list { list-style: none; margin: 6px 0 0; padding: 0; max-height: min(360px, 55vh); overflow-y: auto; overscroll-behavior: contain; }
+  .picker-list :global(.group) { font-size: 12px; color: var(--muted); padding: 10px 10px 4px; }
+  .picker-list :global([role="option"]) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+    align-items: baseline;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .picker-list :global([role="option"] .name) { font-weight: 600; color: var(--ink); }
+  .picker-list :global([role="option"] .ext) { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .picker-list :global([role="option"] .blurb) { grid-column: 1 / -1; font-size: 13px; color: var(--ink-2); line-height: 1.35; margin-top: 2px; }
+  .picker-list :global([role="option"] .flag) { grid-column: 1 / -1; font-size: 12px; color: var(--warn); margin-top: 3px; }
+  .picker-list :global([role="option"].is-active) { background: var(--accent-soft); }
+  .picker-list :global([role="option"][aria-selected="true"] .name::after) { content: " ✓"; color: var(--accent); }
+  .picker-list :global([role="option"][aria-disabled="true"]) { cursor: not-allowed; opacity: 0.55; }
+  .picker-empty { margin: 8px 10px; font-size: 14px; color: var(--muted); }
+  .picker-note { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); min-height: 1em; }
+  .picker-note:empty { display: none; }
+  @media (prefers-reduced-motion: reduce) { .picker-chevron { transition: none; } }
+</style>

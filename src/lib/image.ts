@@ -137,7 +137,7 @@ export function canvasToBlob(canvas: HTMLCanvasElement | OffscreenCanvas, type: 
   });
 }
 
-function makeCanvas(w: number, h: number): HTMLCanvasElement | OffscreenCanvas {
+export function makeCanvas(w: number, h: number): HTMLCanvasElement | OffscreenCanvas {
   if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
   const c = document.createElement('canvas');
   c.width = w;
