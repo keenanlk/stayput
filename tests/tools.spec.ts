@@ -1,6 +1,8 @@
 import { test, expect, type Page, type Download } from '@playwright/test';
-import { readFileSync, existsSync, writeFileSync } from 'node:fs';
-import { execSync } from 'node:child_process';
+import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync } from 'node:fs';
+import { execSync, execFileSync } from 'node:child_process';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
 import { PDFDocument, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees } from 'pdf-lib';
@@ -194,6 +196,110 @@ test('Image converter applies EXIF orientation and converts to PNG and WebP', as
   const zip = await zipAll(page);
   expect(Object.keys(zip).sort()).toEqual(['graphic.webp', 'plain.webp']);
   expect(sniffFormat(zip['graphic.webp']!)).toBe('webp');
+});
+
+/** Open an image with Pillow (installed for the fixtures) to prove other software reads our output. */
+function pillowReads(bytes: Uint8Array, ext: string): { format: string; size: [number, number]; frames?: number } {
+  const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+  const file = join(dir, `out.${ext}`);
+  writeFileSync(file, bytes);
+  const out = execFileSync('python3', ['-c', 'import sys,json;from PIL import Image;im=Image.open(sys.argv[1]);im.load();print(json.dumps({"format":im.format,"size":im.size,"sizes":sorted(im.info.get("sizes",[]))}))', file], { encoding: 'utf8' });
+  return JSON.parse(out);
+}
+
+test('Image converter detects the real format when the extension lies', async ({ page }) => {
+  const errors = await open(page, 'convert-image');
+  const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+  const renamed = join(dir, 'holiday.jpg');
+  copyFileSync(fx('iphone.heic'), renamed);
+  const { downloads } = await run(page, [renamed], async () => {
+    await expect(page.locator('#detected')).toContainText('HEIC');
+    await expect(page.locator('#detected')).toContainText('named .jpg, but it is really HEIC');
+    await page.locator('#format').selectOption('image/png');
+  });
+  const png = await bytesOf(downloads[0]!);
+  expect(sniffFormat(png)).toBe('png');
+  expect(pngSize(png)).toEqual({ width: 1200, height: 900 });
+  expect(errors).toEqual([]);
+});
+
+test('Image converter format picker searches aliases and works from the keyboard', async ({ page }) => {
+  await open(page, 'convert-image');
+  await expect(page.locator('#picker-button')).toBeVisible();
+  await expect(page.locator('#picker-button')).toContainText('JPG');
+  await page.locator('#picker-button').click();
+  await expect(page.locator('#picker-search')).toBeFocused();
+  await page.locator('#picker-search').fill('favicon');
+  await expect(page.locator('#picker-list [role="option"]')).toHaveCount(1);
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#format')).toHaveValue('image/x-icon');
+  await expect(page.locator('#picker-button')).toContainText('ICO');
+  await expect(page.locator('#picker-button')).toBeFocused();
+  await expect(page.locator('#quality-field')).toBeHidden();
+
+  // Typing on the closed picker starts a search; arrows move, Enter picks.
+  await page.keyboard.type('ti');
+  await expect(page.locator('#picker-search')).toHaveValue('ti');
+  await expect(page.locator('#picker-list [role="option"]').first()).toContainText('TIFF');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#format')).toHaveValue('image/tiff');
+
+  await page.locator('#picker-button').click();
+  await page.locator('#picker-search').fill('zzz');
+  await expect(page.locator('#picker-empty')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#picker-pop')).toBeHidden();
+  await expect(page.locator('#format')).toHaveValue('image/tiff');
+});
+
+test('Image converter writes PDF, ICO, GIF, BMP and TIFF that other software opens', async ({ page }) => {
+  const errors = await open(page, 'convert-image');
+  const net = watchNetwork(page);
+  const cases: [string, string, string, (r: ReturnType<typeof pillowReads>) => void][] = [
+    ['application/pdf', 'pdf', '', () => {}],
+    ['image/x-icon', 'ico', 'ICO', (r) => expect(r.size).toEqual([256, 256])],
+    ['image/gif', 'gif', 'GIF', (r) => expect(r.size).toEqual([800, 600])],
+    ['image/bmp', 'bmp', 'BMP', (r) => expect(r.size).toEqual([800, 600])],
+    ['image/tiff', 'tiff', 'TIFF', (r) => expect(r.size).toEqual([800, 600])],
+  ];
+  for (const [type, ext, pillowFormat, check] of cases) {
+    if (await page.locator('#clear').isVisible()) await page.locator('#clear').click();
+    const { downloads } = await run(page, ['plain.jpg'], async () => {
+      await page.locator('#format').selectOption(type);
+    });
+    const bytes = await bytesOf(downloads[0]!);
+    expect(downloads[0]!.suggestedFilename()).toBe(`plain.${ext}`);
+    if (ext === 'pdf') {
+      expect(new TextDecoder().decode(bytes.subarray(0, 5))).toBe('%PDF-');
+      const doc = await PDFDocument.load(bytes);
+      expect(doc.getPageCount()).toBe(1);
+      expect(doc.getPage(0).getSize()).toEqual({ width: 800, height: 600 });
+      continue;
+    }
+    const read = pillowReads(bytes, ext);
+    expect(read.format).toBe(pillowFormat);
+    check(read);
+  }
+  net.assertNothingLeft(['plain.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Image converter keeps transparency in ICO and TIFF', async ({ page }) => {
+  await open(page, 'convert-image');
+  // A 300x200 logo: opaque disc on a fully transparent background.
+  const logo = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'logo.png');
+  execFileSync('python3', ['-c', 'import sys;from PIL import Image,ImageDraw;im=Image.new("RGBA",(300,200),(0,0,0,0));ImageDraw.Draw(im).ellipse((50,0,250,200),fill=(30,110,90,255));im.save(sys.argv[1])', logo]);
+  for (const [type, ext] of [['image/x-icon', 'ico'], ['image/tiff', 'tiff']] as const) {
+    if (await page.locator('#clear').isVisible()) await page.locator('#clear').click();
+    const { downloads } = await run(page, [logo], async () => {
+      await page.locator('#format').selectOption(type);
+    });
+    const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+    const file = join(dir, `out.${ext}`);
+    writeFileSync(file, await bytesOf(downloads[0]!));
+    const alpha = execFileSync('python3', ['-c', 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGBA");print(im.getextrema()[3][0])', file], { encoding: 'utf8' }).trim();
+    expect(Number(alpha), `${ext} keeps transparent pixels`).toBe(0);
+  }
 });
 
 test('Compress and resize shrinks a large photo and records a bucketed event', async ({ page }) => {

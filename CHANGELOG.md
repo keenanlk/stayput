@@ -7,6 +7,7 @@ site will render this file.
 ## Unreleased
 
 ### Added
+- The Image Converter detects each file's real format from its bytes (and says when the extension is wrong), has a searchable format picker, and can now save PDF, ICO (favicon sizes 16 to 256), GIF, BMP and TIFF as well as JPG, PNG and WebP.
 - This changelog.
 
 ### Fixed

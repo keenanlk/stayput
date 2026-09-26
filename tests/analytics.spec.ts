@@ -8,7 +8,7 @@ type Ev = { n: string; d: Record<string, string> };
 /** Every property an event may carry. Anything else is a privacy regression. */
 const ALLOWED = new Set([
   'tool', 'outcome', 'files', 'input', 'output', 'duration', 'attempt',
-  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to',
+  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format',
 ]);
 
 /** Replace Umami with a stub that keeps events in sessionStorage so they survive navigation. */
@@ -174,4 +174,18 @@ test('#notrack opts this browser out and #track opts it back in', async ({ page 
   await page.goto('/#track');
   expect(await page.evaluate(() => localStorage.getItem('umami.disabled'))).toBeNull();
   await expect.poll(() => hits.length).toBeGreaterThan(0);
+});
+
+test('the image converter reports the output format picked, and nothing about the file', async ({ page }) => {
+  await stub(page);
+  await page.goto('/tools/convert-image');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#format').selectOption('image/x-icon');
+  await page.locator('#file-input').setInputFiles(fx('graphic.png'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+  const all = await events(page);
+  expect(all.find((e) => e.n === 'tool_run')!.d.format).toBe('ico');
+  assertPrivate(all, ['graphic.png']);
 });

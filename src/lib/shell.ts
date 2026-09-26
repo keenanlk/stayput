@@ -39,6 +39,8 @@ export interface ShellOptions {
   process: (files: ShellFile[], progress: Progress) => Promise<ProcessResult>;
   /** Title shown above the results. */
   resultsTitle?: (outputs: OutputFile[]) => string;
+  /** The output format picked, when a tool offers several; reported with tool_run. */
+  outputFormat?: () => string;
   /** Automatically download when there is exactly one output. Default true. */
   autoDownloadSingle?: boolean;
 }
@@ -383,12 +385,12 @@ export function createShell(opts: ShellOptions) {
           .join('; ');
         showError(`${skipped.length} of ${files.length} files ${skipped.length === 1 ? 'was' : 'were'} skipped: ${list}${skipped.length > 5 ? '; …' : ''}.`);
       }
-      trackToolRun({ tool, outcome: 'ok', firstOk, files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started });
+      trackToolRun({ tool, outcome: 'ok', firstOk, files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started, format: opts.outputFormat?.() });
       root.dispatchEvent(new CustomEvent('stayput:done'));
     } catch (e) {
       console.error(e);
       showError(e instanceof Error ? e.message : String(e));
-      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started });
+      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.() });
     } finally {
       setBusy(false);
     }

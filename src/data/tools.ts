@@ -82,26 +82,34 @@ export const tools: Tool[] = [
   {
     slug: 'convert-image',
     name: 'Image Converter',
-    title: 'Convert Images to JPG, PNG or WebP Online, Private | Stayput',
+    title: 'Free Image Converter, No Upload: JPG, PNG, WebP, PDF, ICO | Stayput',
     description:
-      'Convert PNG, JPG, WebP, GIF, BMP, AVIF, JPEG XL and HEIC images to JPG, PNG or WebP without uploading. Free, fast, works offline.',
+      'Drop any image and Stayput detects its real format. Convert to JPG, PNG, WebP, PDF, ICO, GIF, BMP or TIFF without uploading. Free, batches, works offline.',
     heading: 'Convert images between formats',
-    tagline: 'PNG, JPG, WebP, GIF, BMP, AVIF, JPEG XL, SVG and HEIC in. JPG, PNG or WebP out. Converted on your device.',
+    tagline: 'Drop any image, see what it really is, pick what you need. Converted on your device.',
     category: 'images',
     accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
     multiple: true,
     dropLabel: 'Drop images here',
     action: 'Convert',
-    keywords: ['png to jpg', 'webp to png', 'webp to jpg', 'jpg to png', 'avif to jpg', 'jxl to png', 'image converter'],
+    keywords: ['image converter', 'convert image', 'png to jpg', 'webp to png', 'png to ico', 'image to pdf', 'avif to jpg', 'jxl to png'],
     steps: [
-      'Drop any images onto the page.',
-      'Pick the output format and, for JPG and WebP, the quality.',
+      'Drop any images onto the page. Stayput reads each file and shows its real format, even if the extension is wrong.',
+      'Pick the output format: type to search, for example "ico" or "pdf". Set the quality for JPG, WebP and PDF.',
       'Download the results one by one or as a zip.',
     ],
     faq: [
       {
         q: 'Which formats can I convert from?',
         a: 'Anything your browser can display: JPG, PNG, WebP, GIF (first frame), BMP, SVG and AVIF. HEIC and HEIF photos are decoded with a WebAssembly build of libheif, and JPEG XL (and AVIF in older browsers) with the Squoosh decoders compiled to WebAssembly, so they work everywhere.',
+      },
+      {
+        q: 'Which formats can I convert to?',
+        a: 'JPG, PNG, WebP, PDF (one page per image), ICO (a favicon or Windows icon with every size from 16 to 256 pixels), GIF (a still image, 256 colours), BMP and TIFF. Formats that cannot hold transparency fill it with the background colour you pick.',
+      },
+      {
+        q: 'How does it know what format my file is?',
+        a: 'It reads the first bytes of the file, where every image format writes its own signature, instead of trusting the name. A photo called .jpg that is really HEIC, or a download called .png that is really WebP, is shown as what it is and converted correctly.',
       },
       {
         q: 'Why is WebP the smallest option?',
@@ -113,7 +121,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is anything uploaded?',
-        a: 'No. Decoding and encoding happen in the browser using the canvas API. This page works with your network switched off.',
+        a: 'No. Decoding and encoding happen in this browser tab. This page works with your network switched off.',
       },
     ],
   },
