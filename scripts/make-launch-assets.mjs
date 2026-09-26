@@ -1,7 +1,7 @@
 // Make the launch GIF frames and the gallery screenshots from a local build.
 // Usage: npm run build && node scripts/serve.mjs 4321 &  then  npm run launch-assets
 // (which runs make-launch-samples.mjs/.py, this file, then make-launch-gif.py).
-// Writes to launch/assets/. Set PLAYWRIGHT_CHROMIUM_PATH to use a preinstalled browser.
+// Writes to launch/assets/ (git-ignored). Set PLAYWRIGHT_CHROMIUM_PATH to use a preinstalled browser.
 // Set LAUNCH_FONT_DIR to a folder holding inter-400/600/700.woff2 to render with Inter
 // (the site uses the system UI font; a Linux sandbox would otherwise fall back to DejaVu).
 import { chromium } from '@playwright/test';

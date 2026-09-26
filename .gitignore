@@ -8,7 +8,6 @@ tests/fixtures/generated/
 *.log
 .DS_Store
 
-# launch asset intermediates
-launch/assets/frames/
-launch/assets/samples/
+# launch asset output (npm run launch-assets); kept outside this repo
+/launch/
 public/vendor/

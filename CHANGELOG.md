@@ -7,7 +7,7 @@ site will render this file.
 ## Unreleased
 
 ### Added
-- Marketing plan, content calendar and press kit under `launch/` (this changelog too).
+- This changelog.
 
 ### Fixed
 - Password-protected and owner-restricted PDFs now open in every PDF tool. They are unlocked in the tab by qpdf (WebAssembly); before, they produced blank or broken output.
@@ -23,7 +23,7 @@ site will render this file.
 ### Added
 - PDF to Word/text tool, PDF to text landing page and the growth backlog (#7).
 - Ten preset landing pages and ten how-to guides (#6).
-- Launch GIF and six screenshots in `launch/assets/` (#4).
+- Launch GIF and six screenshots (#4).
 - Launch kit drafts: Show HN, Product Hunt, directories, community posts, checklist (#3).
 - JPEG XL and AVIF support, Reorder and Delete Pages, Sign PDF, Add Page Numbers (#2).
 - Launch polish: request panel on every tool page, install prompt, offline support (#1).
