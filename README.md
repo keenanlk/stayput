@@ -1,16 +1,35 @@
+<div align="center">
+
+<a href="https://stayput.dev"><img src="public/favicon.svg" width="72" height="72" alt="Stayput logo"></a>
+
 # Stayput
 
-**Your files stay put.** Free, open-source tools that convert HEIC photos, merge and compress PDFs, shrink images and strip EXIF data, entirely inside your browser. Nothing is uploaded. There is no server that could receive your files. No accounts, no limits, no watermarks, and it works offline.
+**Your files stay put.**
 
-Live site: **https://stayput.dev**
+Free, open-source image and PDF tools that run entirely in your browser.<br>
+Nothing is uploaded, there are no accounts or limits, and it works offline.
+
+**[Open stayput.dev](https://stayput.dev)** · [Tools](#tools) · [Verify the claim](#open-the-network-tab-it-stays-empty) · [How it works](#how-it-works) · [Privacy](https://stayput.dev/privacy)
+
+[![CI](https://github.com/keenanlk/stayput/actions/workflows/ci.yml/badge.svg)](https://github.com/keenanlk/stayput/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-1f6f5f.svg)](LICENSE)
+[![No backend](https://img.shields.io/badge/backend-none-1f6f5f.svg)](#how-it-works)
+
+<a href="https://stayput.dev"><img src="docs/readme/home.png" width="800" alt="The Stayput home page: Your files stay put. Convert, compress and clean images and PDFs right here in your browser."></a>
+
+</div>
+
+Convert HEIC photos from an iPhone, merge, split, sign and compress PDFs, shrink images and strip GPS and EXIF data. Every tool is a static page and a bit of JavaScript and WebAssembly that does the work in your tab. There is no server that could receive your files.
 
 ## Open the network tab. It stays empty.
 
 That is the whole pitch, and you can check it in three ways:
 
-1. **Watch the network.** Open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, open any tool and drop a file. You will see requests for the page's own code, once for the HEIC decoder program on the HEIC pages, and one anonymous page count. You will never see a request carrying your file, because there is nowhere for it to go. Every tool page also counts its own requests after you add files and shows you the list.
+1. **Watch the network.** Open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, open any tool and drop a file. You will see requests for the page's own code, the site's own decoder files on the pages that need them, and one anonymous page count. You will never see a request carrying your file, because there is nowhere for it to go. Every tool page also counts its own requests after you add files and shows you the list.
 2. **Turn the network off.** Load a tool, switch to airplane mode, and use it. It keeps working, because after one visit the site is cached by a service worker and the work happens in your tab.
 3. **Read the code.** This repository is the site. It builds to static HTML, CSS and JavaScript with no backend; the deploy has no server-side code at all. The [privacy page](https://stayput.dev/privacy) lists every request the site makes.
+
+<p align="center"><img src="docs/readme/compress-image.png" width="640" alt="Compress Images: three 1.2 MB phone photos shrunk to about 190 KB each in the browser, with the panel reading: Open the network tab. It stays empty."></p>
 
 ## Tools
 
@@ -45,7 +64,7 @@ The site is a static [Astro](https://astro.build) build: one page per tool, a sh
 - **Zip downloads**: [fflate](https://github.com/101arrowz/fflate) in the tab when there is more than one output.
 - **Offline**: a service worker generated at build time (`src/pages/sw.js.ts`) caches every tool page, and `scripts/postbuild.mjs` writes the list of hashed assets and fonts into it so all tool code (including the on-demand pdf-lib and pdf.js chunks) is cached on the first visit. Pages are network-first so deploys show up immediately; assets are cache-first because their names are content-hashed, and assets from earlier deploys are pruned on activation.
 - **Security headers**: `vercel.json` ships a strict Content-Security-Policy. Scripts may load only from the site itself and the self-hosted analytics host; no third-party CDN is involved. `connect-src` is limited the same way, so even a bug could not send a file elsewhere.
-- **Analytics**: a self-hosted, cookie-free [Umami](https://umami.is) counter records page views and three anonymous events (visit start, files added, tool run) with coarse buckets: tool, outcome, file count, size and duration ranges, the entry page and previous page on the site, a named referrer, the previous tool in the tab, and days-since-last-visit ranges computed from a note kept in the browser's own storage. No identifier, and never file names, types or contents. Every property is listed in `src/lib/analytics.ts` and on /privacy, and `tests/analytics.spec.ts` fails if an event gains an unlisted property or names a file. It honours Do Not Track. The dashboard is public.
+- **Analytics**: a self-hosted, cookie-free [Umami](https://umami.is) counter records page views and three anonymous events (visit start, files added, tool run) with coarse buckets: tool, outcome, file count, size and duration ranges, the entry page and previous page on the site, a named referrer, the previous tool in the tab, and days-since-last-visit ranges computed from a note kept in the browser's own storage. No identifier, and never file names, types or contents. Every property is listed in `src/lib/analytics.ts` and on /privacy, and `tests/analytics.spec.ts` fails if an event gains an unlisted property or names a file. It honours Do Not Track. The numbers are kept private and used only to decide what to build next.
 
 There is no backend and no cookies. See [`/privacy`](https://stayput.dev/privacy) for the full statement.
 
