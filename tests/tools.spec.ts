@@ -70,6 +70,8 @@ test.beforeAll(() => {
 
 /** Replace the self-hosted Umami script with a stub that records events on window. */
 async function stubAnalytics(page: Page) {
+  // The site skips analytics in automated browsers; pretend to be a person so the stub loads.
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
   await page.route('https://stats.keenankaufman.com/**', (route) =>
     route.fulfill({
       contentType: 'text/javascript',

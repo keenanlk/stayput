@@ -45,6 +45,39 @@ export function durationBucket(ms: number): string {
   return '30s+';
 }
 
+const UMAMI_SRC = 'https://stats.keenankaufman.com/st.js';
+const UMAMI_WEBSITE = '52e5e00a-c867-497a-9f44-14c769361768';
+
+/**
+ * Add the Umami script unless this visit should not be counted:
+ * - automated browsers (Playwright, Puppeteer, Selenium set navigator.webdriver),
+ *   so our own tests, audits and checks never count as visitors;
+ * - browsers opted out with stayput.dev/#notrack (sets Umami's own
+ *   "umami.disabled" flag; #track undoes it).
+ * Umami itself also drops known bot user agents and honours Do Not Track.
+ */
+export function loadAnalytics(): void {
+  try {
+    if (location.hash === '#notrack' || location.hash === '#track') {
+      const off = location.hash === '#notrack';
+      if (off) localStorage.setItem('umami.disabled', '1');
+      else localStorage.removeItem('umami.disabled');
+      history.replaceState(null, '', location.pathname + location.search);
+      alert(off ? 'Visits from this browser will not be counted.' : 'Visits from this browser will be counted again.');
+    }
+    if (navigator.webdriver || localStorage.getItem('umami.disabled')) return;
+  } catch {
+    // Storage blocked: fall through and let Umami decide.
+  }
+  const s = document.createElement('script');
+  s.defer = true;
+  s.src = UMAMI_SRC;
+  s.dataset.websiteId = UMAMI_WEBSITE;
+  s.dataset.doNotTrack = 'true';
+  s.dataset.domains = 'stayput.dev';
+  document.head.append(s);
+}
+
 /** Send an event now, or once the deferred Umami script has loaded. */
 export function track(name: string, data: Record<string, string | number>): void {
   const send = () => {
