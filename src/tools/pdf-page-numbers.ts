@@ -93,6 +93,7 @@ createShell({
   async process(files, progress) {
     const entry = files[0]!;
     const source = bytes ?? new Uint8Array(await entry.file.arrayBuffer());
+    if (total === 0) await loadDocument(source);
     const o = options();
     if (o.firstPage >= total) throw new Error(`First page to number must be between 1 and ${total}.`);
     progress.set('Numbering pages', 0.1);

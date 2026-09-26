@@ -21,13 +21,9 @@ createShell({
     info.textContent = '';
     const f = files[0];
     if (!f) return;
-    try {
-      count = await pageCount(new Uint8Array(await f.file.arrayBuffer()));
-      info.textContent = `${count} page${count === 1 ? '' : 's'}`;
-      (document.getElementById('range') as HTMLInputElement).placeholder = count > 1 ? `e.g. 1-${Math.min(3, count)}, ${count}` : '1';
-    } catch (e) {
-      info.textContent = e instanceof Error ? e.message : String(e);
-    }
+    count = await pageCount(new Uint8Array(await f.file.arrayBuffer()));
+    info.textContent = `${count} page${count === 1 ? '' : 's'}`;
+    (document.getElementById('range') as HTMLInputElement).placeholder = count > 1 ? `e.g. 1-${Math.min(3, count)}, ${count}` : '1';
   },
   async process(files, progress) {
     const entry = files[0]!;

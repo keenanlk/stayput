@@ -73,6 +73,8 @@ createShell({
   },
   async process(files, progress) {
     const entry = files[0]!;
+    // If the file never loaded, loading it again raises the real error.
+    if (base.length === 0) await loadDocument(new Uint8Array(await entry.file.arrayBuffer()));
     if (delta.every((d) => d % 360 === 0)) throw new Error('Rotate at least one page first.');
     progress.set('Rotating pages', 0.3);
     const bytes = await rotatePages(new Uint8Array(await entry.file.arrayBuffer()), base.map((b, i) => b + (delta[i] ?? 0)));

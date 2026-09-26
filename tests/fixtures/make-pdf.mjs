@@ -63,3 +63,18 @@ for (let i = 0; i < 2; i++) {
 }
 await writeFile(new URL('scan.pdf', out), await scan.save());
 console.log('pdf fixtures written');
+
+// A page whose MediaBox does not start at 0,0 and a page with a CropBox smaller
+// than its MediaBox: placement maths must use the visible box, not 0,0 + size.
+{
+  const boxes = await PDFDocument.create();
+  const f = await boxes.embedFont(StandardFonts.Helvetica);
+  const offset = boxes.addPage([612, 792]);
+  offset.setMediaBox(100, 200, 612, 792);
+  offset.drawText('Offset MediaBox page', { x: 130, y: 900, size: 24, font: f });
+  const cropped = boxes.addPage([612, 792]);
+  cropped.setCropBox(50, 50, 400, 500);
+  cropped.drawText('Cropped page', { x: 80, y: 500, size: 24, font: f });
+  await writeFile(new URL('boxes.pdf', out), await boxes.save());
+}
+console.log('box fixture written');

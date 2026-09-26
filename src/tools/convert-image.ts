@@ -1,4 +1,4 @@
-import { createShell, bindRange, num, str, bool } from '../lib/shell';
+import { createShell, bindRange, num, str, bool, processEach } from '../lib/shell';
 import { decodeImage, encodeBitmap, extForType, supportsWebpEncoding, thumbnail, type EncodeType } from '../lib/image';
 import { extractExifTiff, jpegWithExif, withNormalOrientation } from '../lib/exif';
 import { replaceExt, type OutputFile } from '../lib/files';
@@ -30,9 +30,7 @@ createShell({
     const quality = num('quality', 90) / 100;
     const background = str('background', '#ffffff');
     const keepExif = bool('keep-exif') && type === 'image/jpeg';
-    const outs: OutputFile[] = [];
-    for (const [i, entry] of files.entries()) {
-      progress.set(`Converting ${entry.file.name} (${i + 1} of ${files.length})`, i / files.length);
+    return processEach(files, progress, 'Converting', async (entry) => {
       const decoded = await decodeImage(entry.file);
       let blob = await encodeBitmap(decoded.bitmap, { type, quality, background });
       if (keepExif) {
@@ -42,10 +40,9 @@ createShell({
           blob = new Blob([jpegWithExif(jpeg, withNormalOrientation(tiff)) as BlobPart], { type });
         }
       }
-      outs.push({ name: replaceExt(entry.file.name, extForType(type)), blob, originalSize: entry.file.size, previewUrl: await thumbnail(decoded.bitmap) });
+      const out: OutputFile = { name: replaceExt(entry.file.name, extForType(type)), blob, originalSize: entry.file.size, previewUrl: await thumbnail(decoded.bitmap) };
       decoded.bitmap.close();
-    }
-    progress.set('Done', 1);
-    return outs;
+      return out;
+    });
   },
 });

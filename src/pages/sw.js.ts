@@ -18,21 +18,41 @@ const VERSION = ${JSON.stringify(version)};
 const PAGE_CACHE = VERSION + '-pages';
 const ASSET_CACHE = 'stayput-assets';
 const PAGES = ${JSON.stringify(pages)};
+// Hashed scripts, styles and fonts; scripts/postbuild.mjs fills the list from dist/ so a tool
+// works offline even if its on-demand chunks (pdf-lib, pdf.js, the worker) were never fetched.
+const ASSETS = __STAYPUT_ASSETS__;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(PAGE_CACHE).then((cache) => Promise.allSettled(PAGES.map((p) => cache.add(p)))).then(() => self.skipWaiting()),
+    Promise.all([
+      caches.open(PAGE_CACHE).then((cache) => Promise.allSettled(PAGES.map((p) => cache.add(p)))),
+      caches.open(ASSET_CACHE).then(async (cache) => {
+        const missing = [];
+        for (const a of ASSETS) if (!(await cache.match(a))) missing.push(a);
+        await Promise.allSettled(missing.map((a) => cache.add(a)));
+      }),
+    ]).then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k.endsWith('-pages') && k !== PAGE_CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
+    Promise.all([
+      caches.keys().then((keys) => Promise.all(keys.filter((k) => k.endsWith('-pages') && k !== PAGE_CACHE).map((k) => caches.delete(k)))),
+      // Drop hashed assets from earlier deploys; decoder programs on the CDN are kept.
+      caches.open(ASSET_CACHE).then(async (cache) => {
+        const keep = new Set(ASSETS.map((a) => new URL(a, self.location.origin).href));
+        for (const req of await cache.keys()) {
+          const url = new URL(req.url);
+          if (url.origin === self.location.origin && !keep.has(url.href)) await cache.delete(req);
+        }
+      }),
+    ]).then(() => self.clients.claim()),
   );
 });
 
 const isImmutable = (url) =>
-  (url.origin === self.location.origin && url.pathname.startsWith('/_astro/')) ||
+  (url.origin === self.location.origin && (url.pathname.startsWith('/_astro/') || url.pathname.startsWith('/fonts/'))) ||
   (url.hostname === 'cdn.jsdelivr.net');
 
 self.addEventListener('fetch', (event) => {

@@ -5,6 +5,7 @@
 import type * as PdfLib from 'pdf-lib';
 import type * as PdfJs from 'pdfjs-dist';
 import { canvasToBlob } from './image';
+import { unlockPdf } from './unlock';
 
 let pdfLibPromise: Promise<typeof PdfLib> | undefined;
 export function loadPdfLib(): Promise<typeof PdfLib> {
@@ -31,7 +32,9 @@ const workers = new WeakMap<PdfJs.PDFDocumentProxy, { worker: PdfJs.PDFWorker; p
  * Open a PDF with pdf.js on its own dedicated web worker. Call `closePdfJs`
  * when done so the worker is terminated and memory is released.
  */
-export async function openWithPdfJs(bytes: Uint8Array): Promise<PdfJs.PDFDocumentProxy> {
+export async function openWithPdfJs(source: Uint8Array): Promise<PdfJs.PDFDocumentProxy> {
+  assertPdfHeader(source);
+  const { bytes } = await unlockPdf(source);
   const { lib, PdfWorker } = await loadPdfJs();
   const port = new PdfWorker();
   const worker = lib.PDFWorker.create({ port });
@@ -88,13 +91,51 @@ export async function pageThumbnail(doc: PdfJs.PDFDocumentProxy, pageNumber: num
   return canvas.toDataURL('image/png');
 }
 
-export async function loadDocument(bytes: Uint8Array): Promise<PdfLib.PDFDocument> {
+export async function loadDocument(source: Uint8Array): Promise<PdfLib.PDFDocument> {
+  assertPdfHeader(source);
+  // Encrypted files are decrypted in the tab first (see unlock.ts); pdf-lib
+  // cannot read encrypted streams and would otherwise write broken output.
+  const { bytes } = await unlockPdf(source);
   const { PDFDocument } = await loadPdfLib();
+  let doc: PdfLib.PDFDocument;
   try {
-    return await PDFDocument.load(bytes, { ignoreEncryption: true, updateMetadata: false });
+    doc = await PDFDocument.load(bytes, { ignoreEncryption: true, updateMetadata: false });
   } catch (e) {
-    throw new Error(`This file could not be read as a PDF${e instanceof Error && e.message ? ` (${e.message})` : ''}.`);
+    throw new Error(`This file could not be read as a PDF. It may be damaged${e instanceof Error && e.message ? ` (${e.message.split('\n')[0]})` : ''}.`);
   }
+  if (doc.isEncrypted) throw new Error('This PDF uses an encryption method that could not be removed in the browser.');
+  return doc;
+}
+
+function assertPdfHeader(bytes: Uint8Array): void {
+  if (bytes.length === 0) throw new Error('This file is empty.');
+  if (!isPdfHeader(bytes)) throw new Error('This file is not a PDF. It does not start with a PDF header.');
+}
+
+/** True when the first 1 KB contains "%PDF-" (some producers prepend junk). */
+export function isPdfHeader(bytes: Uint8Array): boolean {
+  const head = bytes.subarray(0, 1024);
+  for (let i = 0; i + 5 <= head.length; i++) {
+    if (head[i] === 0x25 && head[i + 1] === 0x50 && head[i + 2] === 0x44 && head[i + 3] === 0x46 && head[i + 4] === 0x2d) return true;
+  }
+  return false;
+}
+
+/**
+ * The area a viewer shows: the CropBox clipped to the MediaBox (what pdf.js
+ * renders), with its origin, which is not always 0,0. Placement maths must
+ * use this box, not `page.getSize()`, or content lands off the visible page
+ * on files whose boxes are offset or cropped.
+ */
+export function visibleBox(page: PdfLib.PDFPage): { x: number; y: number; width: number; height: number } {
+  const m = page.getMediaBox();
+  const c = page.getCropBox();
+  const x0 = Math.max(m.x, c.x);
+  const y0 = Math.max(m.y, c.y);
+  const x1 = Math.min(m.x + m.width, c.x + c.width);
+  const y1 = Math.min(m.y + m.height, c.y + c.height);
+  if (x1 - x0 <= 0 || y1 - y0 <= 0) return { x: m.x, y: m.y, width: m.width, height: m.height };
+  return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
 }
 
 export async function mergePdfs(sources: Uint8Array[], onProgress?: (done: number) => void): Promise<Uint8Array> {
@@ -460,7 +501,8 @@ function hexToRgb(hex: string): [number, number, number] {
  * displayed width/height measured from the bottom-left of the displayed page.
  */
 function displayedToUserSpace(page: PdfLib.PDFPage, fx: number, fy: number): { x: number; y: number; rotate: number; w: number; h: number } {
-  const { width, height } = page.getSize();
+  const box = visibleBox(page);
+  const { width, height } = box;
   const rot = ((page.getRotation().angle % 360) + 360) % 360;
   // Displayed size swaps for 90/270.
   const [dw, dh] = rot === 90 || rot === 270 ? [height, width] : [width, height];
@@ -469,14 +511,21 @@ function displayedToUserSpace(page: PdfLib.PDFPage, fx: number, fy: number): { x
   switch (rot) {
     case 90:
       // Displayed right is user-space up; displayed up is user-space left.
-      return { x: width - dy, y: dx, rotate: 90, w: dw, h: dh };
+      return { x: box.x + width - dy, y: box.y + dx, rotate: 90, w: dw, h: dh };
     case 180:
-      return { x: width - dx, y: height - dy, rotate: 180, w: dw, h: dh };
+      return { x: box.x + width - dx, y: box.y + height - dy, rotate: 180, w: dw, h: dh };
     case 270:
-      return { x: dy, y: height - dx, rotate: -90, w: dw, h: dh };
+      return { x: box.x + dy, y: box.y + height - dx, rotate: -90, w: dw, h: dh };
     default:
-      return { x: dx, y: dy, rotate: 0, w: dw, h: dh };
+      return { x: box.x + dx, y: box.y + dy, rotate: 0, w: dw, h: dh };
   }
+}
+
+/** Displayed page size in points (rotation applied), as a viewer shows it. */
+export function displayedSize(page: PdfLib.PDFPage): { w: number; h: number } {
+  const { width, height } = visibleBox(page);
+  const rot = ((page.getRotation().angle % 360) + 360) % 360;
+  return rot === 90 || rot === 270 ? { w: height, h: width } : { w: width, h: height };
 }
 
 export async function addPageNumbers(source: Uint8Array, opts: PageNumberOptions, onProgress?: (done: number, total: number) => void): Promise<{ bytes: Uint8Array; numbered: number }> {
@@ -495,9 +544,7 @@ export async function addPageNumbers(source: Uint8Array, opts: PageNumberOptions
     const n = opts.start + i;
     const text = opts.template.replace(/\{n\}/g, String(n)).replace(/\{total\}/g, String(opts.start + total - 1)).replace(/\{count\}/g, String(total));
     const textWidth = font.widthOfTextAtSize(text, size);
-    const rot = ((page.getRotation().angle % 360) + 360) % 360;
-    const { width, height } = page.getSize();
-    const [dw, dh] = rot === 90 || rot === 270 ? [height, width] : [width, height];
+    const { w: dw, h: dh } = displayedSize(page);
     // Position of the text's baseline-left corner in the displayed frame.
     const vertical = opts.position.startsWith('top') ? dh - opts.margin - size * 0.75 : opts.margin;
     const horizontal = opts.position.endsWith('left') ? opts.margin : opts.position.endsWith('right') ? dw - opts.margin - textWidth : (dw - textWidth) / 2;
@@ -535,9 +582,7 @@ export async function stampPdf(source: Uint8Array, stamps: Stamp[], onProgress?:
       cache.set(s.png, img);
     }
     // Preview coordinates are top-left based; PDF is bottom-left based.
-    const rot = ((page.getRotation().angle % 360) + 360) % 360;
-    const { width, height } = page.getSize();
-    const [dw, dh] = rot === 90 || rot === 270 ? [height, width] : [width, height];
+    const { w: dw, h: dh } = displayedSize(page);
     const w = s.width * dw;
     const h = s.height * dh;
     const fx = s.x;

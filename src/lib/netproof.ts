@@ -7,7 +7,7 @@
  * What never appears is a request carrying a file, because there is none.
  */
 const LABELS: [RegExp, string][] = [
-  [/^cdn\.jsdelivr\.net$/, 'decoder program (code only, cached)'],
+  [/^cdn\.jsdelivr\.net$/, 'decoder program or PDF unlocker (code only, cached)'],
   [/^stats\.keenankaufman\.com$/, 'anonymous usage count: tool name and size bucket, no file data'],
 ];
 
