@@ -17,7 +17,9 @@ import ImageToPdf from '../components/options/ImageToPdf.astro';
 import PdfToImage from '../components/options/PdfToImage.astro';
 import PdfToWord from '../components/options/PdfToWord.astro';
 import CropImage from '../components/options/CropImage.astro';
+import ReorderPdf from '../components/options/ReorderPdf.astro';
 import CropStage from '../components/CropStage.astro';
+import ReorderStage from '../components/ReorderStage.astro';
 
 export function getStaticPaths() {
   return [
@@ -36,6 +38,7 @@ const options = {
   'pdf-to-image': PdfToImage,
   'pdf-to-word': PdfToWord,
   'crop-image': CropImage,
+  'reorder-pdf': ReorderPdf,
 } as const;
 const Options = options[base as keyof typeof options];
 if (!Options) throw new Error(`Landing page ${tool.slug} has no options component for ${base}`);
@@ -43,6 +46,7 @@ if (!Options) throw new Error(`Landing page ${tool.slug} has no options componen
 <ToolLayout tool={tool} intro={intro} engineSlug={base} base={base}>
   {base === 'strip-exif' && <div slot="panel" id="meta-report" class="meta-report" hidden></div>}
   {base === 'crop-image' && <CropStage slot="panel" />}
+  {base === 'reorder-pdf' && <ReorderStage slot="panel" />}
   {base === 'pdf-to-word' && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options"><Options defaults={defaults} /></Fragment>
 </ToolLayout>

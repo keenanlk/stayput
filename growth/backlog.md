@@ -6,7 +6,9 @@ Console once it is connected. Demand figures are rough monthly global search
 volumes from public keyword-tool snapshots (September 2026) and are there for
 ordering, not precision. "Fit" is how well the job suits browser-only processing.
 
-Shipped so far: 14 tools, 12 format-pair pages, 11 preset landing pages, 10 guides.
+Shipped so far: 15 tools, 17 format-pair pages, 14 preset landing pages, 10 guides.
+
+Search-gap batch E3 (2026-09-26): `/delete-pdf-pages`, `/jfif-to-jpg`, `/jfif-to-png`, `/svg-to-jpg`, `/gif-to-png`, `/gif-to-jpg`. Ubersuggest US volumes/difficulty at the time: remove/delete pages from PDF 27.1k each (SD 38-41; "...document" SD 23), JFIF to JPG 12.1k (SD 17), GIF to PNG 8.1k (SD 31), JFIF to PNG 6.6k (SD 15), SVG to JPG 6.6k (SD 27), GIF to JPG 2.9k (SD 31). Read with E3 in stayput-ops.
 
 ## Next ten, in order
 
@@ -25,7 +27,9 @@ Shipped so far: 14 tools, 12 format-pair pages, 11 preset landing pages, 10 guid
 
 ## Also on the list (unranked)
 
-- Format pairs not yet covered: `bmp-to-jpg`, `tiff-to-jpg` (needs a TIFF decoder; UTIF.js), `gif-to-png`, `heic-to-webp`, `svg-to-jpg`, `png-to-ico` (favicon generator, "favicon generator" ~300k, high fit).
+- Format pairs not yet covered: `bmp-to-jpg` / `bmp-to-png` (browser decodes BMP natively, no new code; US ~0.9k and ~1k, SD ~30, add if E3 pairs earn impressions), `tiff-to-jpg` (needs a TIFF decoder; UTIF.js), `heic-to-webp`, `png-to-ico` (favicon generator, "favicon generator" ~300k, high fit).
+- Needs new tool code (from the E3 research): **GIF frame splitter** ("animated gif to png" 8.1k US, SD 55; "gif to png frames/sequence" ~0.5k): export every frame as PNG in a zip, needs a GIF frame decoder (ImageDecoder API where available, else gifuct-js). **Target file size** for compress image and compress PDF ("compress pdf to 1mb" 480, "compress image to 100kb" 210 US, but far larger in India): binary-search the quality until the output is under a chosen size. Both stay on hold with the other new tools.
+- Guide candidates from the E3 research: "convert HEIC to JPG on Mac" ("how to convert heic to jpg on macbook air" 2.9k, SD 9; Preview and Photos export, and our page for batches).
 - PDF: delete pages preset of reorder (`/delete-pdf-pages` exists as a redirect; make it a page), `/pdf-to-jpg-high-quality`, PDF metadata viewer and remover (title/author/producer, high privacy angle, small).
 - Images: EXIF viewer as its own page (`/exif-viewer`, "exif viewer" ~100k) reusing the strip-exif report panel; "remove background" is in demand (~2M) but needs a segmentation model, out of scope for now.
 - Site pages from the marketing plan: `/changelog` rendered from CHANGELOG.md, `/press` rendered from launch/press-kit.md, an IndexNow key file in `public/`, `public/.well-known/atproto-did` once Keenan pastes the Bluesky DID, hello@stayput.dev and the Bluesky handle in the footer, and the 20-second demo video (WebM via Playwright) embedded under the home hero.
