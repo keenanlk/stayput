@@ -63,7 +63,7 @@ The site is a static [Astro](https://astro.build) build: one page per tool, a sh
 - **EXIF removal**: a hand-written, lossless segment and chunk editor for JPEG, PNG and WebP in `src/lib/exif.ts`. It deletes only the metadata segments and writes the untouched image data back, so the pixels are identical and the file only gets smaller. It also extracts EXIF from HEIC containers so "keep metadata" works on HEIC conversions.
 - **Zip downloads**: [fflate](https://github.com/101arrowz/fflate) in the tab when there is more than one output.
 - **Offline**: a service worker generated at build time (`src/pages/sw.js.ts`) caches every tool page, and `scripts/postbuild.mjs` writes the list of hashed assets and fonts into it so all tool code (including the on-demand pdf-lib and pdf.js chunks) is cached on the first visit. Pages are network-first so deploys show up immediately; assets are cache-first because their names are content-hashed, and assets from earlier deploys are pruned on activation.
-- **Security headers**: `vercel.json` ships a strict Content-Security-Policy. Scripts may load only from the site itself and the self-hosted analytics host; no third-party CDN is involved. `connect-src` is limited the same way, so even a bug could not send a file elsewhere.
+- **Security headers**: the site ships a strict Content-Security-Policy. Scripts may load only from the site itself and the self-hosted analytics host; no third-party CDN is involved. `connect-src` is limited the same way, so even a bug could not send a file elsewhere.
 - **Analytics**: a self-hosted, cookie-free [Umami](https://umami.is) counter records page views and three anonymous events (visit start, files added, tool run) with coarse buckets: tool, outcome, file count, size and duration ranges, the entry page and previous page on the site, a named referrer, the previous tool in the tab, and days-since-last-visit ranges computed from a note kept in the browser's own storage. No identifier, and never file names, types or contents. Every property is listed in `src/lib/analytics.ts` and on /privacy, and `tests/analytics.spec.ts` fails if an event gains an unlisted property or names a file. It honours Do Not Track. The numbers are kept private and used only to decide what to build next.
 
 There is no backend and no cookies. See [`/privacy`](https://stayput.dev/privacy) for the full statement.
@@ -76,13 +76,13 @@ Requirements: Node 22+.
 npm install
 npm run dev              # http://localhost:4321
 npm run build            # static output in dist/
-node scripts/serve.mjs   # serve dist/ locally with Vercel-style clean URLs
+node scripts/serve.mjs   # serve dist/ locally with clean URLs and the production headers
 npm run check            # Astro and TypeScript checks
 ```
 
 ### Tests
 
-End-to-end tests drive every tool in headless Chromium with generated fixtures (JPEG with EXIF and GPS, PNG, WebP, HEIC, multi-page PDFs, plus static encrypted and offset-box PDFs under `tests/fixtures/static`), then check the downloaded outputs. One test also asserts the privacy claim directly: after files are added, no request leaves the page except the stubbed analytics call. The local server (`scripts/serve.mjs`) applies the headers from `vercel.json`, so tests run under the production Content-Security-Policy and a violation shows up as a console error.
+End-to-end tests drive every tool in headless Chromium with generated fixtures (JPEG with EXIF and GPS, PNG, WebP, HEIC, multi-page PDFs, plus static encrypted and offset-box PDFs under `tests/fixtures/static`), then check the downloaded outputs. One test also asserts the privacy claim directly: after files are added, no request leaves the page except the stubbed analytics call. The local server (`scripts/serve.mjs`) applies the site's production headers, so tests run under the production Content-Security-Policy and a violation shows up as a console error.
 
 ```bash
 pip install pillow pillow-heif            # once, for fixture generation
@@ -97,18 +97,6 @@ Set `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome` to use a preinstalled browser.
 
 `public/og.png` and `public/og/<slug>.png` are rendered from the page copy by `node scripts/make-og.mjs` (headless Chromium). Re-run it after changing a tool's heading or tagline and commit the result.
 
-## Deploying
-
-The site is a plain static export, so Vercel's Hobby plan (or any static host) is enough.
-
-1. In Vercel, **Add New Project** and import this repository. Vercel detects Astro: build command `npm run build`, output directory `dist`. No environment variables are needed.
-2. Deploy. `vercel.json` sets clean URLs, redirects for the short tool URLs, long-lived caching for hashed assets, and the security headers.
-3. Add the custom domain under **Settings, Domains**. If the domain is not `stayput.dev`, change `site` in `astro.config.mjs` and the `Sitemap:` line in `public/robots.txt`, then redeploy.
-
-Every push to `main` redeploys; pull requests get preview URLs. `public/_headers` carries the same headers for Cloudflare Pages, so moving hosts is a DNS change.
-
-Search engines: put the Search Console (or Bing) HTML-tag token in `src/data/site.ts`. After each production deploy that touches site files, `.github/workflows/indexnow.yml` submits the live sitemap to IndexNow (Bing, Yandex and others) using the key file in `public/`. Run it by hand from the Actions tab, or locally with `node scripts/indexnow.mjs --dry-run`.
-
 ## Adding a tool
 
 1. Add an entry to `src/data/tools.ts` (slug, SEO copy, steps, FAQ) and a paragraph to `src/data/engine.ts` saying what actually runs in the tab. These feed the home page, footer, sitemap, service worker, structured data and social image.
@@ -116,7 +104,7 @@ Search engines: put the Search Console (or Bing) HTML-tag token in `src/data/sit
 3. Create `src/tools/<slug>.ts`, call `createShell({ process })` from `src/lib/shell.ts`, and return the output files.
 4. Add a test to `tests/tools.spec.ts`, then run `node scripts/make-og.mjs`.
 
-A format-pair landing page ("WebP to PNG") is just an entry in `src/data/pairs.ts`; the page, its social image and its sitemap entry are generated. A preset landing page for any other tool ("JPG to PDF", "Combine PDF") is an entry in `src/data/presets.ts` naming the base tool and its option defaults; the base tool's option controls live in `src/components/options/` so the tool page and its presets share one copy. A guide is an entry in `src/data/guides.ts` (sections, FAQ, the tools it points to); copy supports `[text](/path)` links and `**bold**`. Run `node scripts/make-og.mjs` after adding any of these. The ranked list of pages and tools to build next is in `growth/backlog.md`.
+A format-pair landing page ("WebP to PNG") is just an entry in `src/data/pairs.ts`; the page, its social image and its sitemap entry are generated. A preset landing page for any other tool ("JPG to PDF", "Combine PDF") is an entry in `src/data/presets.ts` naming the base tool and its option defaults; the base tool's option controls live in `src/components/options/` so the tool page and its presets share one copy. A guide is an entry in `src/data/guides.ts` (sections, FAQ, the tools it points to); copy supports `[text](/path)` links and `**bold**`. Run `node scripts/make-og.mjs` after adding any of these.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the ground rules, the main one being that no change may make a file leave the browser.
 
