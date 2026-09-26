@@ -435,22 +435,36 @@ test('Image converter decodes JPEG XL and AVIF, with the JXL decoder fetched as 
   expect(errors).toEqual([]);
 });
 
-test('Decoders are fetched only by pages that can need them, from this site, and only when the browser lacks one', async ({ page }) => {
-  await stubAnalytics(page);
-  const vendor: string[] = [];
-  page.on('request', (r) => {
-    const url = new URL(r.url());
-    if (url.pathname.startsWith('/vendor/')) vendor.push(url.pathname);
+/** Paths in the service worker's asset cache. */
+function cachedPaths(page: Page) {
+  return page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).map((r) => new URL(r.url).pathname));
+}
+
+/** Wait for the page's report that the service worker holds its decoders ("none" when it needs none). */
+async function decoderCache(page: Page, expected: 'cached' | 'none') {
+  const state = () => page.evaluate(() => {
+    const d = document.documentElement.dataset;
+    return d.decoders === 'failed' ? `failed: ${d.decodersError}` : d.decoders;
   });
-  // A PDF tool never needs an image decoder, so a visit costs none of those bytes.
-  await page.goto('/tools/merge-pdf');
-  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-  await page.waitForTimeout(3000);
-  expect(vendor).toEqual([]);
-  // The image converter warms HEIC and JPEG XL; Chromium decodes AVIF itself, so that decoder is skipped.
-  await page.goto('/tools/convert-image');
-  await expect.poll(() => vendor.some((p) => p.endsWith('/jxl_dec.wasm')) && vendor.some((p) => p.endsWith('/heic-to.min.js')), { timeout: 15_000 }).toBe(true);
-  expect(vendor.filter((p) => p.includes('avif'))).toEqual([]);
+  await expect.poll(state, { timeout: 30_000 }).toBe(expected);
+}
+
+test.describe('decoder caching', () => {
+  test.use({ serviceWorkers: 'allow' });
+  test('Decoders are cached only by pages that can need them, from this site, and only when the browser lacks one', async ({ page }) => {
+    await stubAnalytics(page);
+    // A PDF tool never needs an image decoder, so a visit costs none of those bytes.
+    await page.goto('/tools/merge-pdf');
+    await decoderCache(page, 'none');
+    expect((await cachedPaths(page)).filter((p) => p.startsWith('/vendor/'))).toEqual([]);
+    // The image converter caches HEIC and JPEG XL; Chromium decodes AVIF itself, so that decoder is skipped.
+    await page.goto('/tools/convert-image');
+    await decoderCache(page, 'cached');
+    const vendor = (await cachedPaths(page)).filter((p) => p.startsWith('/vendor/'));
+    expect(vendor.some((p) => p.endsWith('/heic-to.min.js'))).toBe(true);
+    expect(vendor.some((p) => p.endsWith('/jxl_dec.wasm'))).toBe(true);
+    expect(vendor.filter((p) => p.includes('avif'))).toEqual([]);
+  });
 });
 
 test('JXL to PNG page converts with the preset format and lists the decoder in the network proof', async ({ page }) => {
@@ -1023,12 +1037,12 @@ test.describe('offline', () => {
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;
     });
-    // The page puts the decoders it may need into the offline cache once idle.
-    const cached = () => page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).map((r) => new URL(r.url).pathname));
-    for (const file of ['heic-to.min.js', 'jxl_dec.wasm', 'avif_dec.wasm']) {
-      await expect.poll(async () => (await cached()).some((p) => p.startsWith('/vendor/') && p.endsWith(file)), { message: file, timeout: 30_000 }).toBe(true);
-    }
-    await expect.poll(async () => (await cached()).length, { timeout: 30_000 }).toBeGreaterThan(20);
+    // The page asks the service worker to cache the decoders it may need and reports when they are in.
+    await decoderCache(page, 'cached');
+    const cached = await cachedPaths(page);
+    for (const file of ['heic-to.min.js', 'jxl_dec.wasm', 'avif_dec.wasm']) expect(cached.some((p) => p.startsWith('/vendor/') && p.endsWith(file)), file).toBe(true);
+    // navigator.serviceWorker.ready resolved before the decoders were requested, so install has cached the site's own code.
+    expect(cached.length).toBeGreaterThan(20);
     await context.setOffline(true);
     await page.goto('/tools/convert-image');
     const { items } = await run(page, ['iphone.heic', staticFx('checker.jxl'), staticFx('checker.avif')], async () => {

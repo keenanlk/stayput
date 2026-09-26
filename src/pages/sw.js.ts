@@ -12,7 +12,7 @@ import vendor from '../data/vendor.json';
  * immediately, and offline still works); hashed assets under /_astro/ and the
  * versioned decoders under /vendor/ are cache-first because their contents
  * never change. The decoders are not precached (see src/lib/vendor.ts): tool
- * pages that need one put it in ASSET_CACHE themselves.
+ * pages that may need one ask for it with a 'cache-decoders' message.
  */
 export const GET: APIRoute = () => {
   const pages = ['/', '/about', '/privacy', '/terms', ...tools.map((t) => `/tools/${t.slug}`), ...pairs.map((p) => `/${p.slug}`), ...presets.map((p) => `/${p.slug}`), '/guides', ...guides.map((g) => `/guides/${g.slug}`)];
@@ -57,6 +57,49 @@ self.addEventListener('activate', (event) => {
         }
       }),
     ]).then(() => self.clients.claim()),
+  );
+});
+
+// Tool pages ask for the decoders they may need (src/lib/vendor.ts). Downloading
+// here rather than in the page lets it finish after the visitor navigates away,
+// and each file is retried before the page is told it failed.
+const inflight = new Map();
+function cacheDecoder(cache, url) {
+  if (!inflight.has(url)) {
+    inflight.set(url, (async () => {
+      if (await cache.match(url)) return;
+      for (let attempt = 1; ; attempt++) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(url + ': HTTP ' + res.status);
+          await cache.put(url, res);
+          return;
+        } catch (err) {
+          if (attempt === 3) throw err;
+          await new Promise((r) => setTimeout(r, 1000 * attempt));
+        }
+      }
+    })().finally(() => inflight.delete(url)));
+  }
+  return inflight.get(url);
+}
+
+self.addEventListener('message', (event) => {
+  const data = event.data;
+  if (!data || data.type !== 'cache-decoders' || !Array.isArray(data.urls)) return;
+  const port = event.ports[0];
+  const urls = data.urls
+    .map((u) => new URL(u, self.location.origin))
+    .filter((u) => u.origin === self.location.origin && VENDOR_DIRS.some((d) => u.pathname.startsWith(d)))
+    .map((u) => u.pathname);
+  event.waitUntil(
+    caches
+      .open(ASSET_CACHE)
+      .then((cache) => Promise.all(urls.map((u) => cacheDecoder(cache, u))))
+      .then(
+        () => port && port.postMessage({ ok: true }),
+        (err) => port && port.postMessage({ ok: false, error: String((err && err.message) || err) }),
+      ),
   );
 });
 
