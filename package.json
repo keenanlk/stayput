@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && node scripts/postbuild.mjs",
+    "check-links": "node scripts/check-links.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "playwright test",

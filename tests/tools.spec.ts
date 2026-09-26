@@ -769,7 +769,8 @@ test('guide pages render with article structured data, a social image and tool l
     expect((await page.request.get(`/og/guide-${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
     // Every guide links to at least one tool, and every internal link resolves.
     expect(await page.locator('.guide-cta a.btn').count()).toBe(1);
-    const internal = await page.locator('article a[href^="/"]').evaluateAll((as) => [...new Set(as.map((a) => (a as HTMLAnchorElement).getAttribute('href')!))]);
+    // Covers the tool cards under the article too, which once pointed at /tools/<preset>.
+    const internal = await page.locator('main a[href^="/"]').evaluateAll((as) => [...new Set(as.map((a) => (a as HTMLAnchorElement).getAttribute('href')!))]);
     for (const l of internal) expect((await page.request.get(l)).status(), `${slug} links ${l}`).toBe(200);
     // No leftover markup from the inline formatter.
     expect(await page.locator('article').textContent()).not.toMatch(/\]\(|\*\*/);

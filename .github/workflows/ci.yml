@@ -20,6 +20,7 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit -p tsconfig.json
       - run: npm run build
+      - run: npm run check-links
       - run: pip install pillow pillow-heif
       - run: python3 tests/fixtures/make-fixtures.py && node tests/fixtures/make-pdf.mjs
       - run: npx playwright install --with-deps chromium
