@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Icon from '../components/Icon.astro';
 import ToolCard from '../components/ToolCard.astro';
 import { tools, categories } from '../data/tools';
 import { pairs } from '../data/pairs';
@@ -41,81 +40,77 @@ const jsonLd = [
 ];
 ---
 <Base title={title} description={description} jsonLd={jsonLd}>
-  <section class="home-hero wrap">
-    <h1>Your files stay put.</h1>
-    <p class="lede">
-      Convert, compress and clean images and PDFs right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off.
-    </p>
-    <div class="badges">
-      <span class="badge"><Icon name="shield" /> Nothing is uploaded</span>
-      <span class="badge"><Icon name="offline" /> Works offline</span>
-      <span class="badge"><Icon name="open" /> Open source (MIT)</span>
-      <span class="badge"><Icon name="check" /> Free, no account</span>
-    </div>
-  </section>
-
-  {categories.map((c) => (
-    <section class="wrap section" id={`${c.id === 'images' ? 'image' : 'pdf'}-tools`} style="margin-top:32px">
-      <h2>{c.label}</h2>
-      <p class="muted" style="margin-bottom:16px">{c.blurb}</p>
-      <div class="tool-grid">{tools.filter((t) => t.category === c.id).map((t) => <ToolCard tool={t} />)}</div>
-    </section>
-  ))}
-
-  <section class="wrap">
-    <div class="hook">
+  <section class="hero">
+    <div class="wrap hero-grid">
       <div>
-        <h2>Open the network tab. It stays empty.</h2>
-        <p>Every tool here is JavaScript and WebAssembly running in your tab. There is no server that could receive your files, so none does. Press F12, pick Network, drop a file, and watch: code and one anonymous page count, never your file.</p>
-        <p>Every tool page also counts its own requests after you add files and shows you the list, so you do not have to take our word for it.</p>
-        <div class="actions">
-          <a class="btn btn-primary" href="/tools/heic-to-jpg">Try it with a photo</a>
-          <a class="btn" href="https://github.com/keenanlk/stayput" rel="noopener">Read the source</a>
+        <h1>Your files stay put.</h1>
+        <p class="lede">
+          Convert, compress and clean images and PDFs right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-invert btn-lg" href="/tools/heic-to-jpg">Convert a HEIC photo</a>
+          <a class="hero-link" href="#tools">See all {tools.length} tools</a>
         </div>
       </div>
-      <div class="devtools" role="img" aria-label="A browser network panel after converting photos: requests for the site's code and the decoder, then no requests at all once the photos were added.">
-        <div class="tabs"><span>Elements</span><span>Console</span><span class="on">Network</span><span>Application</span></div>
-        <div class="rows">
-          <div class="row head"><span>Name</span><span>Status</span><span>Size</span></div>
-          <div class="row"><span>heic-to-jpg</span><span class="ok">200</span><span>9.1 kB</span></div>
-          <div class="row"><span>heic-to-jpg.a8f3.js</span><span class="ok">200</span><span>31 kB</span></div>
-          <div class="row"><span>heic-to.min.js (decoder)</span><span class="ok">200</span><span>1.6 MB</span></div>
-          <div class="drop">IMG_4021.HEIC, IMG_4022.HEIC, IMG_4023.HEIC added…</div>
-          <div class="empty"><b>0 requests</b>Your photos were converted here.</div>
+      <figure>
+        <div class="devtools" role="img" aria-label="A browser network panel after converting photos: requests for the site's code and the decoder, then no requests at all once the photos were added.">
+          <div class="tabs"><span>Elements</span><span>Console</span><span class="on">Network</span><span>Application</span></div>
+          <div class="rows">
+            <div class="row head"><span>Name</span><span>Status</span><span>Size</span></div>
+            <div class="row"><span>heic-to-jpg</span><span class="ok">200</span><span>9.1 kB</span></div>
+            <div class="row"><span>heic-to-jpg.a8f3.js</span><span class="ok">200</span><span>31 kB</span></div>
+            <div class="row"><span>heic-to.min.js (decoder)</span><span class="ok">200</span><span>1.6 MB</span></div>
+            <div class="drop">IMG_4021.HEIC, IMG_4022.HEIC, IMG_4023.HEIC added</div>
+            <div class="empty"><b><i>0</i> requests</b>Your photos were converted here.</div>
+          </div>
         </div>
-      </div>
+        <figcaption>What your browser's Network tab shows while three iPhone photos convert: the page and its code load, then nothing. Press F12 and try it.</figcaption>
+      </figure>
     </div>
   </section>
 
-  <section class="wrap section">
-    <h2>Popular conversions</h2>
+  <div class="wrap index" id="tools">
+    {categories.map((c) => (
+      <section id={`${c.id === 'images' ? 'image' : 'pdf'}-tools`} aria-labelledby={`${c.id}-h`}>
+        <div class="index-head">
+          <h2 id={`${c.id}-h`}>{c.label}</h2>
+          <p>{c.blurb}</p>
+        </div>
+        <div class="tool-grid">{tools.filter((t) => t.category === c.id).map((t) => <ToolCard tool={t} />)}</div>
+      </section>
+    ))}
+  </div>
+
+  <section class="wrap section split" aria-labelledby="spec-h">
+    <div class="spec-intro">
+      <h2 id="spec-h">Open the network tab. It stays empty.</h2>
+      <p style="margin-top:16px">Every tool here is JavaScript and WebAssembly running in your tab. There is no server that could receive your files, so none does.</p>
+      <p>Every tool page also counts its own requests after you add files and shows you the list, so you do not have to take our word for it.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/tools/heic-to-jpg">Try it with a photo</a>
+        <a class="btn" href="https://github.com/keenanlk/stayput" rel="noopener">Read the source</a>
+      </div>
+    </div>
+    <dl class="spec-sheet">
+      <div><dt>Uploads</dt><dd><b>None.</b> The site is static files; every conversion runs in your tab.</dd></div>
+      <div><dt>Limits</dt><dd><b>None.</b> No file size caps, no "two tasks per hour". Batch a hundred photos if your device can hold them.</dd></div>
+      <div><dt>Account</dt><dd><b>None.</b> No sign-up wall, no watermark.</dd></div>
+      <div><dt>Offline</dt><dd><b>Yes.</b> Open a tool once and it is cached. Install it as an app from your browser menu to keep it a tap away.</dd></div>
+      <div><dt>Tracking</dt><dd>An anonymous, cookie-free page count. Never file names or contents.</dd></div>
+      <div><dt>Source</dt><dd>MIT licensed and <a href="https://github.com/keenanlk/stayput" rel="noopener">on GitHub</a>. Read the code, report a bug, or host your own copy.</dd></div>
+    </dl>
+  </section>
+
+  <section class="wrap section split" aria-labelledby="conv-h">
+    <h2 id="conv-h">Popular conversions</h2>
     <ul class="chips">{pairs.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}{presets.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}</ul>
   </section>
 
-  <section class="wrap section">
-    <h2>Guides</h2>
-    <p class="muted" style="margin-bottom:16px">Straight answers to the questions behind the tools. <a href="/guides">All guides</a>.</p>
-    <ul class="guide-list guide-grid">{guides.slice(0, 6).map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}</ul>
-  </section>
-
-  <section class="wrap">
-    <div class="pillars">
-      <div class="pillar">
-        <h3>Private by construction</h3>
-        <p>There is no server to upload to. The site is static files; every conversion runs as JavaScript and WebAssembly in your tab. The only requests are for code and an anonymous, cookie-free page count.</p>
-      </div>
-      <div class="pillar">
-        <h3>No limits</h3>
-        <p>No file size caps, no "two tasks per hour", no sign-up wall, no watermark. Batch a hundred photos if your device can hold them.</p>
-      </div>
-      <div class="pillar">
-        <h3>Works offline</h3>
-        <p>Open a tool once and it is cached for offline use. Install it as an app from your browser menu to keep it a tap away.</p>
-      </div>
-      <div class="pillar">
-        <h3>Open source</h3>
-        <p>MIT licensed and <a href="https://github.com/keenanlk/stayput" rel="noopener">on GitHub</a>. Read the code, report a bug, or host your own copy.</p>
-      </div>
+  <section class="wrap section split" aria-labelledby="guides-h">
+    <div>
+      <h2 id="guides-h">Guides</h2>
+      <p class="muted" style="margin-top:12px">Straight answers to the questions behind the tools. <a href="/guides">All guides</a>.</p>
     </div>
+    <ul class="guide-list guide-grid">{guides.slice(0, 6).map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}</ul>
   </section>
 </Base>

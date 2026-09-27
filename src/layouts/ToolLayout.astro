@@ -75,12 +75,12 @@ const jsonLd = [
   <section class="tool-hero wrap">
     <h1>{tool.heading}</h1>
     <p class="tagline">{tool.tagline}</p>
-    <div class="badges">
-      <span class="badge"><Icon name="shield" /> Nothing is uploaded</span>
-      <span class="badge"><Icon name="offline" /> Works offline</span>
-      <span class="badge"><Icon name="open" /> Open source</span>
-      <span class="badge"><Icon name="check" /> No limits, no watermark</span>
-    </div>
+    <ul class="facts">
+      <li><Icon name="shield" /> Nothing is uploaded</li>
+      <li><Icon name="offline" /> Works offline</li>
+      <li><Icon name="open" /> Open source</li>
+      <li><Icon name="check" /> No limits, no watermark</li>
+    </ul>
   </section>
 
   <section class="wrap">
@@ -145,12 +145,12 @@ const jsonLd = [
     </section>
   )}
 
-  <section class="wrap section">
+  <section class="wrap section split">
     <h2>How it works</h2>
     <ol class="steps">{tool.steps.map((s) => <li>{s}</li>)}</ol>
   </section>
 
-  <section class="wrap section">
+  <section class="wrap section split">
     <h2>In your browser, not on a server</h2>
     <div class="engine">
       <p>{engine.how}</p>
@@ -159,7 +159,7 @@ const jsonLd = [
     </div>
   </section>
 
-  <section class="wrap section">
+  <section class="wrap section split">
     <h2>Questions</h2>
     <div class="faq">
       {tool.faq.map((f, i) => (
@@ -171,13 +171,13 @@ const jsonLd = [
     </div>
   </section>
 
-  <section class="wrap section">
+  <section class="wrap section split">
     <h2>More {tool.category === 'pdf' ? 'PDF' : 'image'} tools</h2>
     <div class="tool-grid">{related.map((t) => <ToolCard tool={t} />)}</div>
   </section>
 
   {(tool.category === 'images' || presetLinks.length > 0) && (
-    <section class="wrap section">
+    <section class="wrap section split">
       <h2>{isPair ? 'Other conversions' : 'Popular conversions'}</h2>
       <ul class="chips">
         {tool.category === 'images' && conversions.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}
@@ -187,7 +187,7 @@ const jsonLd = [
   )}
 
   {guides.length > 0 && (
-    <section class="wrap section">
+    <section class="wrap section split">
       <h2>Guides</h2>
       <ul class="guide-list">
         {guides.map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}

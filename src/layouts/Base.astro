@@ -33,6 +33,7 @@ const ogImage = new URL(ogPath, Astro.site);
     {siteVerification.bing && <meta name="msvalidate.01" content={siteVerification.bing} />}
     <meta name="theme-color" content="#1f6f5f" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#121517" media="(prefers-color-scheme: dark)" />
+    <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />

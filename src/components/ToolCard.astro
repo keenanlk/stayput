@@ -18,4 +18,5 @@ const icon = icons[tool.slug] ?? icons[presetBySlug(tool.slug)?.base ?? ''] ?? (
   <div class="icon"><Icon name={icon} /></div>
   <h3>{tool.name}</h3>
   <p>{tool.tagline}</p>
+  <Icon name="arrow" class="go" />
 </a>
