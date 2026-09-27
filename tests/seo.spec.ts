@@ -28,3 +28,20 @@ test('IndexNow key file serves its own key', async ({ request }) => {
   const body = await (await request.get(`/${keyFile}`)).text();
   expect(body.trim()).toBe(keyFile!.slice(0, -4));
 });
+
+test('press page offers every logo as SVG and PNG, and the files are served', async ({ page, request }) => {
+  await page.goto('/press');
+  const hrefs = await page.locator('.logo-tile .dl a').evaluateAll((as) => as.map((a) => a.getAttribute('href')!));
+  for (const name of ['wordmark-light', 'wordmark-dark', 'mark-light', 'mark-dark']) {
+    expect(hrefs).toContain(`/press/stayput-${name}.svg`);
+    expect(hrefs).toContain(`/press/stayput-${name}.png`);
+  }
+  for (const href of hrefs) {
+    const res = await request.get(href);
+    expect(res.status(), href).toBe(200);
+    expect(res.headers()['content-type'], href).toMatch(href.endsWith('.svg') ? /image\/svg\+xml/ : /image\/png/);
+    // Outlined text only, so the wordmark looks the same without the font installed.
+    if (href.endsWith('.svg')) expect(await res.text(), href).not.toContain('<text');
+  }
+  await expect(page.locator('footer a[href="/press"]')).toBeVisible();
+});

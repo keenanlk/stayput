@@ -4,11 +4,15 @@
 // Writes to launch/assets/ (git-ignored). Set PLAYWRIGHT_CHROMIUM_PATH to use a preinstalled browser.
 // Set LAUNCH_FONT_DIR to a folder holding inter-400/600/700.woff2 to render with Inter
 // (the site uses the system UI font; a Linux sandbox would otherwise fall back to DejaVu).
+// Set LAUNCH_SHOW_HOST=stayput.dev to load the local build under that origin, so the
+// request panel in the screenshots names the real host instead of localhost.
 import { chromium } from '@playwright/test';
 import { mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const base = process.env.BASE_URL ?? 'http://localhost:4321';
+const local = process.env.BASE_URL ?? 'http://localhost:4321';
+const showHost = process.env.LAUNCH_SHOW_HOST;
+const base = showHost ? `https://${showHost}` : local;
 const out = fileURLToPath(new URL('../launch/assets/', import.meta.url));
 const frames = out + 'frames/';
 const sample = (n) => fileURLToPath(new URL(`../launch/assets/samples/${n}`, import.meta.url));
@@ -21,7 +25,16 @@ mkdirSync(frames);
 const browser = await chromium.launch({
   executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
 });
-const ctx = await browser.newContext({ viewport: { width: 1270, height: 760 }, deviceScaleFactor: 1, colorScheme: 'light' });
+const ctx = await browser.newContext({
+  viewport: { width: 1270, height: 760 },
+  deviceScaleFactor: 1,
+  colorScheme: 'light',
+  // Routes do not see service worker fetches, so keep the worker out when faking the host.
+  serviceWorkers: showHost ? 'block' : 'allow',
+});
+if (showHost) {
+  await ctx.route(`${base}/**`, async (r) => r.fulfill({ response: await r.fetch({ url: r.request().url().replace(base, local) }) }));
+}
 // Same as the tests: analytics stubbed (the site serves its own decoders).
 await ctx.route('https://stats.keenankaufman.com/**', (r) =>
   r.fulfill({ contentType: 'text/javascript', body: 'window.umami={track(){}};' }),
