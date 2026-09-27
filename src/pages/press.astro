@@ -1,0 +1,193 @@
+---
+import Base from '../layouts/Base.astro';
+import { tools } from '../data/tools';
+
+const toolCount = tools.length;
+const oneLine = 'Free file tools that run in your browser. Nothing is uploaded.';
+const short = `Stayput is ${toolCount} free, open-source image and PDF tools that run entirely in the browser: HEIC to JPG, image conversion, EXIF removal, PDF merge, split, compress and sign. Nothing is uploaded.`;
+const paragraph = 'Stayput is a free, open-source toolkit for the file chores people search for every day: converting iPhone HEIC photos, converting, cropping and compressing images, removing location data from photos, and merging, splitting, compressing, rotating, reordering, signing and numbering PDFs. Every tool runs inside the browser tab using WebAssembly builds of well-known open-source libraries. There is no server doing the work, so files are never uploaded, there are no accounts, file limits or watermarks, and the site keeps working with the network off. The code is MIT-licensed on GitHub.';
+
+const logos = [
+  { file: 'stayput-wordmark-light', label: 'Wordmark, for light backgrounds', ground: 'light', wide: true },
+  { file: 'stayput-wordmark-dark', label: 'Wordmark, for dark backgrounds', ground: 'dark', wide: true },
+  { file: 'stayput-mark-light', label: 'Mark, for light backgrounds', ground: 'light' },
+  { file: 'stayput-mark-dark', label: 'Mark, for dark backgrounds', ground: 'dark' },
+];
+
+const shots = [
+  { file: 'screenshot-home.png', alt: 'The Stayput home page: "Your files stay put." above a grid of image tools.', caption: 'Home page' },
+  { file: 'screenshot-merge-pdf.png', alt: 'Merge PDF with three documents loaded and their pages shown in order.', caption: 'Merge PDF' },
+  { file: 'screenshot-sign-pdf.png', alt: 'Sign PDF with a typed signature placed on a contract.', caption: 'Sign PDF' },
+  { file: 'screenshot-strip-exif.png', alt: 'Remove EXIF Data listing the GPS location and camera found in three photos, then the cleaned files.', caption: 'Remove EXIF Data' },
+  { file: 'screenshot-network-proof.png', alt: 'The request panel on a tool page: one request to stayput.dev for code, none carrying the files.', caption: 'The request panel every tool shows' },
+];
+
+const colors = [
+  { name: 'Stayput green', hex: '#1f6f5f' },
+  { name: 'Green on dark', hex: '#4fb89f' },
+  { name: 'Ink', hex: '#1b1f23' },
+  { name: 'Paper', hex: '#f7f5ef' },
+];
+---
+<Base title="Press and brand assets | Stayput" description="Logos, screenshots, descriptions and facts for writing about Stayput, the free file tools that run in your browser.">
+  <article class="press wrap" style="padding-top:40px">
+    <header class="press-intro">
+      <h1>Press and brand</h1>
+      <p>Logos, screenshots and ready-to-paste descriptions for articles, directory listings and link previews. Use any of it without asking. For anything else, write to <a href="mailto:hello@stayput.dev">hello@stayput.dev</a>.</p>
+    </header>
+
+    <section aria-labelledby="logo">
+      <h2 id="logo">Logo</h2>
+      <div class="specimen">
+        {logos.map((l) => (
+          <figure class:list={['logo-tile', l.ground, { wide: l.wide }]}>
+            <div class="logo-art"><img src={`/press/${l.file}.svg`} alt="Stayput" /></div>
+            <figcaption>
+              <span>{l.label}</span>
+              <span class="dl"><a href={`/press/${l.file}.svg`} download>SVG</a><a href={`/press/${l.file}.png`} download>PNG</a></span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <div class="usage">
+        <ul>
+          <li>Write the name as one word with a capital S: Stayput.</li>
+          <li>Leave space around the logo at least half the width of the mark.</li>
+          <li>Keep the colors and proportions as they are. For one-color print there is a <a href="/press/stayput-pin-mono.svg" download>single-ink pin</a>.</li>
+        </ul>
+        <ul class="swatches" aria-label="Brand colors">
+          {colors.map((c) => (
+            <li><span class="chip" style={`background:${c.hex}`}></span><span>{c.name}</span><code>{c.hex}</code></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="describe" class="prose">
+      <h2 id="describe">Describing Stayput</h2>
+      <div class="copy-block">
+        <h3>One line</h3>
+        <p id="d-line">{oneLine}</p>
+        <button type="button" class="copy" data-copy="d-line">Copy</button>
+      </div>
+      <div class="copy-block">
+        <h3>Short</h3>
+        <p id="d-short">{short}</p>
+        <button type="button" class="copy" data-copy="d-short">Copy</button>
+      </div>
+      <div class="copy-block">
+        <h3>Paragraph</h3>
+        <p id="d-para">{paragraph}</p>
+        <button type="button" class="copy" data-copy="d-para">Copy</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="facts" class="prose">
+      <h2 id="facts">Facts</h2>
+      <dl class="facts">
+        <dt>Site</dt><dd><a href="https://stayput.dev">stayput.dev</a></dd>
+        <dt>Source code</dt><dd><a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>, MIT license</dd>
+        <dt>Tools</dt><dd>{toolCount} image and PDF tools, plus format-specific converters</dd>
+        <dt>Price</dt><dd>Free. No accounts, no ads, no paid tier, no file limits, no watermarks.</dd>
+        <dt>Offline</dt><dd>Works offline after the first visit and installs as an app.</dd>
+        <dt>How</dt><dd>A static site. The work happens in the browser with WebAssembly builds of libheif, pdf.js, pdf-lib and other open-source code.</dd>
+        <dt>Analytics</dt><dd>Self-hosted and cookie-free; never sees files or file names. Details on the <a href="/privacy">privacy page</a>.</dd>
+        <dt>Launched</dt><dd>2026</dd>
+        <dt>Contact</dt><dd><a href="mailto:hello@stayput.dev">hello@stayput.dev</a></dd>
+      </dl>
+    </section>
+
+    <section aria-labelledby="verify" class="prose">
+      <h2 id="verify">Check the claim yourself</h2>
+      <p>If you are writing about Stayput, please do not take "nothing is uploaded" on trust. Three ways to test it:</p>
+      <ol>
+        <li>Open your browser's developer tools on the Network tab and drop a file into any tool. The only requests are the page itself and, on some pages, a decoder program. None carries the file. Each tool page also lists its own requests after you add files.</li>
+        <li>Load a tool, switch on airplane mode and keep using it.</li>
+        <li>Read the Content-Security-Policy header the site sends. It lets pages connect only to the site itself and its own usage counter, so a file has nowhere else to go.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="shots">
+      <h2 id="shots">Screenshots</h2>
+      <p class="muted">1270 by 760 pixels. Click one to open the full image.</p>
+      <figure class="shot hero-shot">
+        <a href="/press/network-tab.gif"><img src="/press/network-tab.gif" alt="Three HEIC photos converting to JPG while the request panel stays empty of uploads." width="1270" height="760" loading="lazy" /></a>
+        <figcaption>Three iPhone photos converting while the request panel stays empty (animated GIF)</figcaption>
+      </figure>
+      <div class="shots">
+        {shots.map((s) => (
+          <figure class="shot">
+            <a href={`/press/${s.file}`}><img src={`/press/${s.file}`} alt={s.alt} width="1270" height="760" loading="lazy" /></a>
+            <figcaption>{s.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  </article>
+</Base>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('button.copy')) {
+    button.addEventListener('click', async () => {
+      const text = document.getElementById(button.dataset.copy ?? '')?.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(text.trim());
+        button.textContent = 'Copied';
+      } catch {
+        button.textContent = 'Select and copy';
+      }
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+  }
+</script>
+
+<style>
+  .press { padding-bottom: 64px; }
+  .press section { margin-top: 56px; }
+  .press-intro { max-width: 62ch; }
+  .press-intro p { color: var(--ink-2); font-size: 18px; margin-top: 12px; }
+  .press h2 { margin-bottom: 16px; }
+
+  /* Each logo sits on the ground it is made for, whatever the page theme. */
+  .specimen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .logo-tile { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); display: flex; flex-direction: column; }
+  .logo-tile.light { background: #f7f5ef; color: #1b1f23; }
+  .logo-tile.dark { background: #121517; color: #eceff1; border-color: #2e343a; }
+  .logo-art { flex: 1; display: grid; place-items: center; padding: 48px 24px; min-height: 200px; }
+  .logo-tile.wide .logo-art img { width: min(320px, 80%); height: auto; }
+  .logo-tile:not(.wide) .logo-art img { width: 96px; height: 96px; }
+  .logo-tile figcaption { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; font-size: 14px; border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent); }
+  .logo-tile .dl { display: flex; gap: 6px; }
+  .logo-tile .dl a { color: inherit; font-weight: 600; text-decoration: none; padding: 4px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+  .logo-tile .dl a:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+
+  .usage { display: grid; grid-template-columns: 3fr 2fr; gap: 32px; margin-top: 24px; }
+  .usage ul { margin: 0; padding-left: 20px; color: var(--ink-2); }
+  .usage li + li { margin-top: 6px; }
+  .swatches { list-style: none; padding: 0 !important; display: grid; gap: 10px; }
+  .swatches li { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 12px; margin: 0 !important; }
+  .chip { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--line); }
+
+  .copy-block { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px 12px; margin-bottom: 12px; }
+  .copy-block h3 { font-size: 14px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .copy-block p { margin: 0; padding-right: 72px; color: var(--ink); }
+  .copy { position: absolute; top: 10px; right: 10px; font: inherit; font-size: 13px; font-weight: 600; color: var(--accent-ink); background: var(--accent-soft); border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+  .copy:hover { background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent)); }
+
+  .facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 24px; margin: 0; }
+  .facts dt { font-weight: 600; }
+  .facts dd { margin: 0; color: var(--ink-2); }
+
+  .shot { margin: 0; }
+  .shot img { width: 100%; height: auto; border-radius: var(--radius-sm); border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .shot figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; }
+  .hero-shot { margin-top: 16px; }
+  .shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 24px; }
+
+  @media (max-width: 720px) {
+    .specimen, .shots, .usage { grid-template-columns: 1fr; }
+    .logo-art { min-height: 150px; padding: 32px 16px; }
+    .facts { grid-template-columns: 1fr; gap: 2px; }
+    .facts dd { margin-bottom: 10px; }
+  }
+</style>
