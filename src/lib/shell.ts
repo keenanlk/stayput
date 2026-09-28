@@ -129,6 +129,7 @@ export function createShell(opts: ShellOptions) {
   const progressText = $('progress-text');
   const progressBar = $('progress-bar');
   const error = $('error');
+  const hint = $('run-hint');
   const results = $('results');
   const resultsList = $('results-list');
   const resultsTitle = $('results-title');
@@ -359,6 +360,15 @@ export function createShell(opts: ShellOptions) {
     results.classList.add('is-active');
     results.dataset.count = String(outs.length);
     if (outs.length === 1 && (opts.autoDownloadSingle ?? true)) downloadBlob(outs[0]!.blob, outs[0]!.name);
+    // The run bar is pinned to the screen, so the results can land out of sight below it.
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    results.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  /** A line above the run button saying what is still needed before Run (empty hides it). */
+  function setHint(text = '') {
+    hint.textContent = text;
+    hint.hidden = !text;
   }
 
   async function execute() {
@@ -436,6 +446,7 @@ export function createShell(opts: ShellOptions) {
   clear.addEventListener('click', () => {
     files = [];
     attempt = undefined;
+    setHint();
     hideResults();
     hideError();
     render();
@@ -470,6 +481,7 @@ export function createShell(opts: ShellOptions) {
     execute,
     showError,
     hideError,
+    setHint,
     progress: progressApi,
     /** Expose for tests. */
     addFiles,

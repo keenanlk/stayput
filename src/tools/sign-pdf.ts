@@ -260,6 +260,7 @@ function paintStamps() {
   const n = placements.length;
   placementCount.textContent = n ? `${n} item${n === 1 ? '' : 's'} placed on ${new Set(placements.map((s) => s.page)).size} page${new Set(placements.map((s) => s.page)).size === 1 ? '' : 's'}` : '';
   shell.hideError();
+  shell.setHint(n ? '' : 'Next: draw or type your signature above, then press "Add signature to this page".');
 }
 
 function removePlacement(id: number) {
@@ -424,6 +425,7 @@ async function reset() {
   placements = [];
   layer.innerHTML = '';
   placementCount.textContent = '';
+  shell.setHint();
   if (pdf) {
     const old = pdf;
     pdf = undefined;

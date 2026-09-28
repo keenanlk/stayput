@@ -626,7 +626,8 @@ test('Sign PDF places a drawn and a typed signature on two pages and no bytes le
   await expect(page.locator('#error')).toHaveClass(/is-active/);
   // Draw a squiggle.
   const pad = page.locator('#sig-pad');
-  await pad.scrollIntoViewIfNeeded();
+  // Centre the pad so the pinned run bar at the bottom of the screen cannot sit over it.
+  await pad.evaluate((el) => el.scrollIntoView({ block: 'center' }));
   const box = (await pad.boundingBox())!;
   await page.mouse.move(box.x + 40, box.y + 80);
   await page.mouse.down();
@@ -1301,4 +1302,33 @@ test('PNG to ICO page writes a multi-size icon and links the favicon generator',
   expect(icoSizes(await bytesOf(downloads[0]!))).toEqual([16, 24, 32, 48, 64, 128, 256]);
   await expect(page.locator('.prose-wide a[href="/tools/favicon-generator"]')).toHaveText('favicon generator');
   net.assertNothingLeft(['graphic.png']);
+});
+
+test('Run stays on screen once a file is in, even when the tool panel is taller than a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [slug, file] of [['crop-image', 'plain.jpg'], ['strip-exif', 'plain.jpg'], ['sign-pdf', 'text.pdf']] as const) {
+    await open(page, slug);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await page.locator('#file-input').setInputFiles([fx(file)]);
+    await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+    await expect(page.locator('#run'), `${slug}: Run must be visible without scrolling`).toBeInViewport({ ratio: 1 });
+    // Still reachable halfway down the tool.
+    await page.evaluate(() => window.scrollTo(0, 300));
+    await expect(page.locator('#run'), `${slug}: Run must follow the scroll`).toBeInViewport({ ratio: 1 });
+  }
+});
+
+test('Sign PDF says what is needed before Run until a signature is placed', async ({ page }) => {
+  await open(page, 'sign-pdf');
+  await expect(page.locator('#run-hint')).toBeHidden();
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#run-hint')).toBeVisible();
+  await expect(page.locator('#run-hint')).toContainText('Add signature to this page');
+  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await page.locator('#sig-text').fill('Keenan Example');
+  await page.locator('#add-signature').click();
+  await expect(page.locator('.stamp-signature')).toHaveCount(1);
+  await expect(page.locator('#run-hint')).toBeHidden();
+  await page.locator('.stamp-signature .stamp-remove').dispatchEvent('click');
+  await expect(page.locator('#run-hint')).toBeVisible();
 });
