@@ -56,6 +56,8 @@ self.addEventListener('activate', (event) => {
           if (!current) await cache.delete(req);
         }
       }),
+      // Let the browser fetch pages itself while the worker starts (see the fetch handler).
+      self.registration.navigationPreload ? self.registration.navigationPreload.enable() : null,
     ]).then(() => self.clients.claim()),
   );
 });
@@ -123,26 +125,50 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   if (url.origin !== self.location.origin) return;
+  if (req.mode === 'navigate') {
+    event.respondWith(navigate(event));
+    return;
+  }
   event.respondWith(
     fetch(req)
       .then((res) => {
-        if (res.ok && (req.mode === 'navigate' || url.pathname === '/register-sw.js' || url.pathname === '/manifest.webmanifest' || url.pathname.startsWith('/icons/') || url.pathname === '/favicon.svg')) {
+        if (res.ok && (url.pathname === '/register-sw.js' || url.pathname === '/manifest.webmanifest' || url.pathname.startsWith('/icons/') || url.pathname === '/favicon.svg')) {
           const copy = res.clone();
           caches.open(PAGE_CACHE).then((cache) => cache.put(req, copy));
         }
         return res;
       })
-      .catch(async () => {
-        const hit = await caches.match(req, { ignoreSearch: true });
-        if (hit) return hit;
-        if (req.mode === 'navigate') {
-          const home = await caches.match('/');
-          if (home) return home;
-        }
-        return Response.error();
-      }),
+      .catch(async () => (await caches.match(req, { ignoreSearch: true })) || Response.error()),
   );
 });
+
+// Pages: network first, cache when offline. The page itself comes from the navigation
+// preload request, which the browser makes the same way it would with no service worker.
+// Re-fetching a navigation from inside the worker failed in Chrome for returning visitors
+// (ERR_FAILED on the first open of a page, fine after a refresh). A network error never
+// becomes an error page while a cached copy or a retry can still answer.
+async function navigate(event) {
+  const req = event.request;
+  let res;
+  try {
+    res = await event.preloadResponse;
+  } catch {}
+  if (!res) {
+    try {
+      res = await fetch(req.url, { credentials: 'same-origin' });
+    } catch {}
+  }
+  if (res) {
+    if (res.ok && !res.redirected) {
+      const copy = res.clone();
+      caches.open(PAGE_CACHE).then((cache) => cache.put(req.url, copy)).catch(() => {});
+    }
+    // A redirected response cannot answer a navigation; let the browser follow the redirect.
+    return res.redirected ? Response.redirect(res.url, 302) : res;
+  }
+  const hit = (await caches.match(req, { ignoreSearch: true })) || (await caches.match('/'));
+  return hit || Response.error();
+}
 `;
   return new Response(body.trimStart(), { headers: { 'Content-Type': 'application/javascript; charset=utf-8' } });
 };
