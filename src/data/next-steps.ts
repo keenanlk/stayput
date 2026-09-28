@@ -19,4 +19,5 @@ export const nextSteps: Record<string, [string, string]> = {
   'sign-pdf': ['compress-pdf', 'merge-pdf'],
   'pdf-page-numbers': ['compress-pdf', 'sign-pdf'],
   'pdf-to-word': ['split-pdf', 'compress-pdf'],
+  'favicon-generator': ['crop-image', 'compress-image'],
 };

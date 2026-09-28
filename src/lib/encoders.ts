@@ -110,10 +110,10 @@ export function writeTiff(img: ImageData): Uint8Array {
 
 export const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 
-/** Multi-size ICO with PNG entries (Windows Vista and later, every browser). The image is centred on a transparent square. */
-export async function writeIco(bitmap: ImageBitmap): Promise<Uint8Array> {
+/** Multi-size ICO with PNG entries (Windows Vista and later, every browser). The image is centred on a transparent square. `only` fixes the sizes; by default every size up to the source's is written. */
+export async function writeIco(bitmap: ImageBitmap, only?: number[]): Promise<Uint8Array> {
   const largest = Math.max(bitmap.width, bitmap.height);
-  const sizes = ICO_SIZES.filter((s) => s <= Math.max(16, largest));
+  const sizes = only ?? ICO_SIZES.filter((s) => s <= Math.max(16, largest));
   const pngs: Uint8Array[] = [];
   for (const s of sizes) {
     const fit = fitSize(bitmap.width, bitmap.height, { maxWidth: s, maxHeight: s, scale: largest < s ? s / largest : 1 });

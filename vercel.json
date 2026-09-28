@@ -41,6 +41,11 @@
       "permanent": true
     },
     {
+      "source": "/favicon-generator",
+      "destination": "/tools/favicon-generator",
+      "permanent": true
+    },
+    {
       "source": "/crop-image",
       "destination": "/tools/crop-image",
       "permanent": true

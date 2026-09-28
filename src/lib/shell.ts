@@ -317,7 +317,7 @@ export function createShell(opts: ShellOptions) {
       const thumb = document.createElement('div');
       thumb.className = 'thumb';
       if (o.previewUrl) thumb.innerHTML = `<img src="${o.previewUrl}" alt="">`;
-      else thumb.textContent = (o.name.split('.').pop() ?? '').slice(0, 4).toUpperCase();
+      else thumb.textContent = o.badge ?? (o.name.split('.').pop() ?? '').slice(0, 4).toUpperCase();
       const info = document.createElement('div');
       const name = document.createElement('div');
       name.className = 'name';

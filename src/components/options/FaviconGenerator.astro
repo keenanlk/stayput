@@ -1,0 +1,18 @@
+---
+/** Option controls for the favicon generator. */
+---
+<div class="field">
+  <label for="app-name">Site or app name</label>
+  <input type="text" id="app-name" placeholder="My website" autocomplete="off" maxlength="60" />
+</div>
+<div class="field">
+  <label for="padding">Padding <output id="padding-out">0%</output></label>
+  <input type="range" id="padding" min="0" max="25" value="0" />
+</div>
+<div class="field">
+  <label for="background">Home screen background</label>
+  <div class="field-row">
+    <input type="color" id="background" value="#ffffff" />
+    <label class="check"><input type="checkbox" id="fill-tab" /> Fill the browser tab icon too</label>
+  </div>
+</div>
