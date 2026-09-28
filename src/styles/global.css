@@ -397,6 +397,11 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
   .tool-hero { padding-top: 30px; }
   .tool-panel { padding: 10px; }
   #tool[data-count]:not([data-count="0"]) .run-dock { margin-inline: -10px; padding-inline: 18px; }
+  /* Pinned on a phone, Run and Clear share one row so the bar covers less of the tool. */
+  #tool[data-count]:not([data-count="0"]) .run-row { flex-wrap: nowrap; padding-top: 12px; }
+  #tool[data-count]:not([data-count="0"]) .run-row .btn-lg { width: auto; flex: 1; }
+  #tool[data-count]:not([data-count="0"]) .run-row .btn-ghost { flex: 0 0 auto; }
+  #tool.is-busy[data-count] .run-row { flex-wrap: wrap; }
   .btn-lg { width: 100%; justify-content: center; }
   .run-row .btn-ghost { flex: 1; justify-content: center; }
   .hero-actions .btn-lg { width: auto; }
