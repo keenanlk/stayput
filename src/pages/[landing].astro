@@ -23,11 +23,12 @@ import ReorderStage from '../components/ReorderStage.astro';
 
 export function getStaticPaths() {
   return [
-    ...pairs.map((p) => ({ params: { landing: p.slug }, props: { tool: pairAsTool(p), base: 'convert-image', intro: p.intro, defaults: { format: p.outputType } } })),
+    ...pairs.map((p) => ({ params: { landing: p.slug }, props: { tool: pairAsTool(p), base: 'convert-image', engine: p.outputType === 'image/x-icon' ? 'to-ico' : 'convert-image', intro: p.intro, defaults: { format: p.outputType } } })),
     ...presets.map((p) => ({ params: { landing: p.slug }, props: { tool: presetAsTool(p), base: p.base, intro: p.intro, defaults: p.defaults ?? {} } })),
   ];
 }
 const { tool, base, intro, defaults } = Astro.props;
+const engine: string = 'engine' in Astro.props ? (Astro.props.engine as string) : base;
 const options = {
   'convert-image': ConvertImage,
   'compress-image': CompressImage,
@@ -43,7 +44,7 @@ const options = {
 const Options = options[base as keyof typeof options];
 if (!Options) throw new Error(`Landing page ${tool.slug} has no options component for ${base}`);
 ---
-<ToolLayout tool={tool} intro={intro} engineSlug={base} base={base}>
+<ToolLayout tool={tool} intro={intro} engineSlug={engine} base={base}>
   {base === 'strip-exif' && <div slot="panel" id="meta-report" class="meta-report" hidden></div>}
   {base === 'crop-image' && <CropStage slot="panel" />}
   {base === 'reorder-pdf' && <ReorderStage slot="panel" />}

@@ -455,7 +455,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -469,7 +469,7 @@ test('format-pair pages render, preset the converter and link a social image', a
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');
-    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[to!];
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon' }[to!];
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }
@@ -1290,4 +1290,15 @@ test('Favicon generator keeps an SVG source as favicon.svg and links it', async 
   expect(pngSize(zip['icon-512.png']!)).toEqual({ width: 512, height: 512 });
   await expect(page.locator('#favicon-snippet pre code')).toContainText('<link rel="icon" href="/favicon.svg" type="image/svg+xml">');
   expect(errors).toEqual([]);
+});
+
+test('PNG to ICO page writes a multi-size icon and links the favicon generator', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/png-to-ico');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['graphic.png']);
+  expect(downloads[0]!.suggestedFilename()).toBe('graphic.ico');
+  expect(icoSizes(await bytesOf(downloads[0]!))).toEqual([16, 24, 32, 48, 64, 128, 256]);
+  await expect(page.locator('.prose-wide a[href="/tools/favicon-generator"]')).toHaveText('favicon generator');
+  net.assertNothingLeft(['graphic.png']);
 });
