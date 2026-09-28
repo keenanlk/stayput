@@ -225,8 +225,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
   margin-inline: -14px; padding: 0 22px max(14px, env(safe-area-inset-bottom));
   background: var(--surface);
 }
-/* Scrolling to something (focus, scrollIntoView) keeps it clear of the pinned run bar. */
-html:has(#tool[data-count]:not([data-count="0"])) { scroll-padding-bottom: 120px; }
 .run-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 18px; border-top: 1px solid var(--line); }
 .progress { display: none; align-items: center; gap: 10px; color: var(--ink-2); font-size: 14px; }
 .progress.is-active { display: flex; }
