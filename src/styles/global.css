@@ -214,6 +214,17 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .file-item .actions { display: flex; gap: 4px; }
 .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; padding: 4px 0 2px; }
 .options .wide { grid-column: 1 / -1; }
+.run-dock { display: grid; gap: 12px; }
+.run-dock .error { max-height: 30vh; overflow-y: auto; }
+.run-hint { font-size: 14px; color: var(--ink-2); }
+.run-hint[hidden] { display: none; }
+/* Once a file is in, the run bar sticks to the bottom of the screen while the
+   crop box, signing panel or options push it further down the page. */
+#tool[data-count]:not([data-count="0"]) .run-dock {
+  position: sticky; bottom: 0; z-index: 5;
+  margin-inline: -14px; padding: 0 22px max(14px, env(safe-area-inset-bottom));
+  background: var(--surface);
+}
 .run-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 18px; border-top: 1px solid var(--line); }
 .progress { display: none; align-items: center; gap: 10px; color: var(--ink-2); font-size: 14px; }
 .progress.is-active { display: flex; }
@@ -385,6 +396,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
   .nav a { white-space: nowrap; font-size: 14px; padding: 7px 9px; }
   .tool-hero { padding-top: 30px; }
   .tool-panel { padding: 10px; }
+  #tool[data-count]:not([data-count="0"]) .run-dock { margin-inline: -10px; padding-inline: 18px; }
   .btn-lg { width: 100%; justify-content: center; }
   .run-row .btn-ghost { flex: 1; justify-content: center; }
   .hero-actions .btn-lg { width: auto; }

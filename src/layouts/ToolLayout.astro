@@ -97,15 +97,19 @@ const jsonLd = [
       <div class="options" id="options">
         <slot name="options" />
       </div>
-      <div class="run-row">
-        <button class="btn btn-primary btn-lg" id="run" type="button" disabled>{tool.action}</button>
-        <button class="btn btn-ghost" id="clear" type="button" hidden>Clear</button>
-        <div class="progress" id="progress" aria-live="polite">
-          <span class="text" id="progress-text">Working…</span>
-          <div class="bar" aria-hidden="true"><i id="progress-bar"></i></div>
+      <!-- Pinned to the bottom of the screen once a file is in, so Run is never scrolled out of reach. -->
+      <div class="run-dock" id="run-dock">
+        <p class="run-hint" id="run-hint" aria-live="polite" hidden></p>
+        <div class="run-row">
+          <button class="btn btn-primary btn-lg" id="run" type="button" disabled>{tool.action}</button>
+          <button class="btn btn-ghost" id="clear" type="button" hidden>Clear</button>
+          <div class="progress" id="progress" aria-live="polite">
+            <span class="text" id="progress-text">Working…</span>
+            <div class="bar" aria-hidden="true"><i id="progress-bar"></i></div>
+          </div>
         </div>
+        <div class="error" id="error" role="alert"></div>
       </div>
-      <div class="error" id="error" role="alert"></div>
       <div class="results" id="results" aria-live="polite">
         <div class="results-head">
           <h2 id="results-title">Done</h2>
