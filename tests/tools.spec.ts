@@ -147,7 +147,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(15);
+  expect(await page.locator('.tool-card').count()).toBe(16);
   expect(errors).toEqual([]);
 });
 
@@ -443,7 +443,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -1237,4 +1237,57 @@ test('The drop zone is named by its visible text and footer links are large enou
   await expect(drop).toHaveAttribute('aria-describedby', 'drop-hint');
   const box = await page.locator('.site-footer .links a').first().boundingBox();
   expect(box!.height).toBeGreaterThanOrEqual(24);
+});
+
+/** Sizes of the PNG images inside an ICO, from its directory. */
+function icoSizes(b: Uint8Array): number[] {
+  const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  expect(dv.getUint16(2, true)).toBe(1);
+  return Array.from({ length: dv.getUint16(4, true) }, (_, i) => b[6 + i * 16] || 256);
+}
+
+test('Favicon generator builds the full icon set and manifest, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'favicon-generator');
+  const net = watchNetwork(page);
+  await page.locator('#app-name').fill('Test Site');
+  const { items } = await run(page, ['graphic.png']);
+  expect(items).toBe(8);
+  const zip = await zipAll(page);
+  expect(Object.keys(zip).sort()).toEqual([
+    'apple-touch-icon.png', 'favicon-16x16.png', 'favicon-32x32.png', 'favicon.ico',
+    'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'site.webmanifest',
+  ]);
+  expect(icoSizes(zip['favicon.ico']!)).toEqual([16, 32, 48]);
+  expect(pngSize(zip['favicon-16x16.png']!)).toEqual({ width: 16, height: 16 });
+  expect(pngSize(zip['favicon-32x32.png']!)).toEqual({ width: 32, height: 32 });
+  expect(pngSize(zip['apple-touch-icon.png']!)).toEqual({ width: 180, height: 180 });
+  expect(pngSize(zip['icon-192.png']!)).toEqual({ width: 192, height: 192 });
+  expect(pngSize(zip['icon-512.png']!)).toEqual({ width: 512, height: 512 });
+  expect(pngSize(zip['icon-maskable-512.png']!)).toEqual({ width: 512, height: 512 });
+  const manifest = JSON.parse(new TextDecoder().decode(zip['site.webmanifest']!));
+  expect(manifest.name).toBe('Test Site');
+  expect(manifest.icons.map((i: { src: string; sizes: string; purpose?: string }) => `${i.src} ${i.sizes} ${i.purpose ?? 'any'}`)).toEqual([
+    '/icon-192.png 192x192 any', '/icon-512.png 512x512 any', '/icon-maskable-512.png 512x512 maskable',
+  ]);
+  const snippet = page.locator('#favicon-snippet pre code');
+  await expect(snippet).toContainText('<link rel="icon" href="/favicon.ico" sizes="32x32">');
+  await expect(snippet).toContainText('<link rel="apple-touch-icon" href="/apple-touch-icon.png">');
+  await expect(snippet).toContainText('<link rel="manifest" href="/site.webmanifest">');
+  await expect(snippet).not.toContainText('favicon.svg');
+  net.assertNothingLeft(['graphic.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Favicon generator keeps an SVG source as favicon.svg and links it', async ({ page }) => {
+  const errors = await open(page, 'favicon-generator');
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#1f6f5f"/></svg>';
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([{ name: 'logo.svg', mimeType: 'image/svg+xml', buffer: Buffer.from(svg) }]);
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  const zip = await zipAll(page);
+  expect(new TextDecoder().decode(zip['favicon.svg']!)).toBe(svg);
+  expect(pngSize(zip['icon-512.png']!)).toEqual({ width: 512, height: 512 });
+  await expect(page.locator('#favicon-snippet pre code')).toContainText('<link rel="icon" href="/favicon.svg" type="image/svg+xml">');
+  expect(errors).toEqual([]);
 });

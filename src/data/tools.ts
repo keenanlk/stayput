@@ -607,6 +607,48 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'favicon-generator',
+    name: 'Favicon generator',
+    title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
+    description:
+      'Make favicon.ico, apple-touch-icon, Android and maskable icons and a site.webmanifest from one PNG, JPG or SVG. Free, in your browser, nothing uploaded.',
+    heading: 'Favicon generator',
+    tagline: 'Drop in your logo and get every icon a website needs, plus the HTML to paste. Unreleased logos stay on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    multiple: false,
+    dropLabel: 'Drop your logo or icon here',
+    action: 'Generate icons',
+    keywords: ['favicon generator', 'favicon maker', 'png to favicon', 'apple touch icon', 'web manifest icons', 'favicon.ico generator', 'pwa icon generator'],
+    steps: [
+      'Drop a square logo, ideally a 512px or larger PNG or an SVG, or tap to pick one.',
+      'Optionally name your site, add padding and pick the background used on phone home screens.',
+      'Download the icons in one zip, put them in your site’s root folder and paste the HTML into your page’s head.',
+    ],
+    faq: [
+      {
+        q: 'Which files do I get?',
+        a: 'favicon.ico with 16, 32 and 48 pixel images for browser tabs and old browsers, favicon-16x16.png and favicon-32x32.png, a 180 pixel apple-touch-icon.png for iPhone and iPad home screens, 192 and 512 pixel icons plus a maskable 512 icon for Android and installed web apps, and a site.webmanifest that lists them. If you start from an SVG you also get favicon.svg, which modern browsers prefer because it stays sharp at every size.',
+      },
+      {
+        q: 'What size should my source image be?',
+        a: 'Square and at least 512 by 512 pixels, or an SVG. Smaller images still work but are enlarged for the 512 pixel icons and look soft; the result list tells you when that happened. A non-square image is centred on a transparent square rather than stretched.',
+      },
+      {
+        q: 'What is a maskable icon?',
+        a: 'Android crops home screen icons into circles, squircles or rounded squares depending on the phone. A maskable icon keeps the logo inside the central safe zone on a solid background, so nothing important is cut off whatever the shape. The manifest marks it with purpose "maskable" so Android uses it for installed apps.',
+      },
+      {
+        q: 'Why does the Apple icon have a background?',
+        a: 'iOS fills transparent parts of a home screen icon with black. The apple-touch-icon and the Android icons are drawn on the background colour you choose (white by default) so your logo looks right. The browser tab icons stay transparent unless you tick the fill option.',
+      },
+      {
+        q: 'Is my logo uploaded?',
+        a: 'No. The image is decoded and resized on a canvas in your browser tab, and the ICO file is written by a small encoder in the page. Logos for a rebrand or an unannounced product never leave your device. You can load the page, go offline and generate icons as often as you like.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);

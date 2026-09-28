@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import FaviconGenerator from '../../components/options/FaviconGenerator.astro';
+const tool = toolBySlug('favicon-generator')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><FaviconGenerator /></Fragment>
+</ToolLayout>
+<script src="../../tools/favicon-generator.ts"></script>

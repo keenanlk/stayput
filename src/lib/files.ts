@@ -62,6 +62,8 @@ export interface OutputFile {
   originalSize?: number;
   /** Optional preview image. */
   previewUrl?: string;
+  /** Short label shown when there is no preview; defaults to the extension. */
+  badge?: string;
   note?: string;
 }
 
