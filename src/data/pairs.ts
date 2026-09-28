@@ -11,7 +11,7 @@ export interface Pair {
   from: string;
   to: string;
   /** Output MIME type preset in the converter. */
-  outputType: 'image/jpeg' | 'image/png' | 'image/webp';
+  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon';
   accept: string;
   title: string;
   description: string;
@@ -37,6 +37,12 @@ const webpSteps = (from: string) => [
   `Drop your ${from} files onto the page, or tap to pick them. Batches are fine.`,
   'Pick a quality. 80 to 90 is a good range for photos; go higher for screenshots with text.',
   'Download each WebP, or all of them as one zip.',
+];
+
+const icoSteps = (from: string) => [
+  `Drop your ${from} files onto the page, or tap to pick them. Square images give the cleanest icons.`,
+  'Nothing to set: every ICO gets the standard sizes from 16 to 256 pixels, up to the size of your image.',
+  'Download each .ico file, or all of them as one zip.',
 ];
 
 export const pairs: Pair[] = [
@@ -402,13 +408,60 @@ export const pairs: Pair[] = [
       { q: 'Are the files uploaded?', a: 'No. There is no server in this process; the conversion runs in your browser tab.' },
     ],
   },
+  {
+    slug: 'png-to-ico',
+    from: 'PNG',
+    to: 'ICO',
+    outputType: 'image/x-icon',
+    accept: 'image/png,.png',
+    title: 'PNG to ICO Converter, Multi-Size, No Upload | Stayput',
+    description: 'Convert PNG to ICO with 16 to 256 px sizes in one file. Transparency kept, for favicons and Windows icons. Free, in your browser, nothing uploaded.',
+    heading: 'Convert PNG to ICO',
+    tagline: 'One .ico with every size Windows and browsers ask for, transparency intact, made on your device.',
+    keywords: ['png to ico', 'png to ico converter', 'convert png to ico', 'png to ico file', 'change png to ico'],
+    intro: [
+      'An ICO file is not one picture but a small bundle of them. Windows picks the 16 pixel image for a title bar, 32 or 48 for a desktop shortcut and 256 for large icon view, and browsers read the 16 and 32 pixel entries of a favicon.ico. Renaming a .png to .ico does not create that bundle, which is why a renamed file often shows up blank or blurry.',
+      'This page reads your PNG, scales it to 16, 24, 32, 48, 64, 128 and 256 pixels (never larger than the original) and writes each size as a PNG entry inside one ICO, the layout Windows Vista and every current browser understand. The alpha channel is kept, so a logo with a transparent background stays transparent. A rectangular PNG is centred on a clear square instead of being stretched.',
+      'Building a website icon rather than a Windows one? The [favicon generator](/tools/favicon-generator) makes favicon.ico together with the Apple touch icon, Android icons and a web manifest from the same PNG.',
+      'Detail survives shrinking badly. A logo with thin strokes or small lettering turns to mush at 16 pixels, which is why many brands ship a simplified mark for their icon: just the initial, the symbol, or a thicker outline. If the 16 and 32 pixel versions look muddy, try a bolder crop of your logo rather than the full wordmark.',
+    ],
+    faq: [
+      { q: 'What size should the PNG be?', a: 'At least 256 by 256 pixels and square. Smaller PNGs still convert, but the ICO only contains sizes up to the original, so a 64 pixel PNG gives 16 to 64 pixel entries and looks soft in large icon view.' },
+      { q: 'Will the transparent background stay transparent?', a: 'Yes. Each size is stored as a 32-bit PNG inside the ICO, alpha channel included, which Windows and browsers draw without a box around the icon.' },
+      { q: 'Is a renamed .png the same as a real .ico?', a: 'No. Some programs sniff the bytes and cope, but Windows Explorer, the shortcut icon picker and older browsers expect the ICO header and directory of sizes. A real ICO also lets each size be drawn separately, which is what keeps the small versions crisp.' },
+      { q: 'How do I use the .ico as a folder or shortcut icon in Windows?', a: 'Right-click the shortcut or folder, open Properties, then Change Icon (for a folder, the Customize tab first), browse to the .ico and pick it. Keep the file somewhere permanent: Windows reads it from that path every time it draws the icon.' },
+    ],
+  },
+  {
+    slug: 'jpg-to-ico',
+    from: 'JPG',
+    to: 'ICO',
+    outputType: 'image/x-icon',
+    accept: 'image/jpeg,.jpg,.jpeg,.jfif',
+    title: 'JPG to ICO Converter, Free, No Upload | Stayput',
+    description: 'Turn a JPG photo or logo into a multi-size ICO icon for Windows or a favicon. Converted in your browser; your image is never uploaded.',
+    heading: 'Convert JPG to ICO',
+    tagline: 'Make a Windows or website icon from any JPG photo, without sending it anywhere.',
+    keywords: ['jpg to ico', 'jpg to ico converter', 'convert jpg to ico', 'jpeg to ico', 'change jpg to ico'],
+    intro: [
+      'JPG is a photo format and has no transparency, so an icon made from a JPG keeps its background: a logo on white becomes a white tile. That is fine for a photo of a person or a pet used as a profile or folder icon. For a logo that should float on any background, start from a PNG with a transparent background if you have one, or use [PNG to ICO](/png-to-ico).',
+      'Icons are square and tiny, so what matters most is the crop. A wide holiday photo shrunk to 32 pixels shows mostly sky. Crop the subject to a square first with [Crop image](/tools/crop-image), then drop the result here. The converter scales it to every standard size from 16 to 256 pixels and packs them into a single .ico, entirely inside this tab.',
+      'Faces and pets work well because they read at any size; landscapes and group shots rarely do. At 16 pixels an icon is a handful of dots, so pick a picture with one clear subject and strong contrast against its background. Heavy JPG compression artefacts also get more visible once the photo is scaled down, so start from the best-quality copy you have.',
+    ],
+    faq: [
+      { q: 'Why does my icon have a white or coloured box around it?', a: 'JPG cannot store transparency, so the background of the photo is part of the image. To get a transparent icon you need a source image with a transparent background, such as a PNG exported from your logo file.' },
+      { q: 'My photo is not square. What happens?', a: 'It is scaled to fit inside a square and centred, and the empty strips on either side are left transparent. For a full-bleed icon, crop the photo to a square before converting.' },
+      { q: 'Which sizes end up in the file?', a: 'Every standard size from 16 up to 256 pixels that is not bigger than your photo: 16, 24, 32, 48, 64, 128 and 256. Windows and browsers pick the one closest to what they need, so one file covers title bars, taskbars, desktops and tabs.' },
+      { q: 'Can I use the ICO as a website favicon?', a: 'Yes: put it at the root of your site as favicon.ico and browsers pick it up. For the Apple and Android home screen icons as well, use Stayput’s favicon generator, which makes the whole set from one image.' },
+    ],
+  },
 ];
 
 export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => p.slug === slug);
 
 /** A Pair expressed as a Tool so it can use the shared tool layout. */
 export function pairAsTool(p: Pair): Tool {
-  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : jpgSteps(p.from);
+  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : jpgSteps(p.from);
   return {
     slug: p.slug,
     path: `/${p.slug}`,

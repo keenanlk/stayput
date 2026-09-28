@@ -8,6 +8,7 @@ import { presets } from '../data/presets';
 import { guidesFor } from '../data/guides';
 import { engineFor } from '../data/engine';
 import { nextSteps } from '../data/next-steps';
+import { inline } from '../lib/inline';
 
 interface Props {
   tool: Tool;
@@ -141,7 +142,7 @@ const jsonLd = [
 
   {intro.length > 0 && (
     <section class="wrap section prose-wide">
-      {intro.map((p) => <p>{p}</p>)}
+      {intro.map((p) => (/\[|\*\*/.test(p) ? <p set:html={inline(p)} /> : <p>{p}</p>))}
     </section>
   )}
 
