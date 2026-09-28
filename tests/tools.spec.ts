@@ -626,7 +626,8 @@ test('Sign PDF places a drawn and a typed signature on two pages and no bytes le
   await expect(page.locator('#error')).toHaveClass(/is-active/);
   // Draw a squiggle.
   const pad = page.locator('#sig-pad');
-  await pad.scrollIntoViewIfNeeded();
+  // Centre the pad so the pinned run bar at the bottom of the screen cannot sit over it.
+  await pad.evaluate((el) => el.scrollIntoView({ block: 'center' }));
   const box = (await pad.boundingBox())!;
   await page.mouse.move(box.x + 40, box.y + 80);
   await page.mouse.down();
@@ -1328,6 +1329,6 @@ test('Sign PDF says what is needed before Run until a signature is placed', asyn
   await page.locator('#add-signature').click();
   await expect(page.locator('.stamp-signature')).toHaveCount(1);
   await expect(page.locator('#run-hint')).toBeHidden();
-  await page.locator('.stamp-signature .stamp-remove').click({ force: true });
+  await page.locator('.stamp-signature .stamp-remove').dispatchEvent('click');
   await expect(page.locator('#run-hint')).toBeVisible();
 });
