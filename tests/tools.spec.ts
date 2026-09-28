@@ -1150,6 +1150,27 @@ test('A file that cannot be opened shows an error as soon as it is added', async
 
 test.describe('offline', () => {
   test.use({ serviceWorkers: 'allow' });
+  test('Returning visitors get pages from the browser\'s own request, and missing pages still 404', async ({ page }) => {
+    // The worker used to re-fetch every page itself, and Chrome showed ERR_FAILED on
+    // the first open of each page for returning visitors. Navigation preload hands the
+    // page request back to the browser.
+    await stubAnalytics(page);
+    await page.goto('/');
+    const preload = await page.evaluate(async () => {
+      const reg = await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) await new Promise((r) => navigator.serviceWorker.addEventListener('controllerchange', r, { once: true }));
+      return (await reg.navigationPreload.getState()).enabled;
+    });
+    expect(preload).toBe(true);
+    for (const path of ['/tools/image-to-pdf', '/tools/merge-pdf', '/']) {
+      const res = await page.goto(path);
+      expect(res?.status(), path).toBe(200);
+      expect(res?.fromServiceWorker(), path).toBe(true);
+    }
+    const missing = await page.goto('/no-such-page');
+    expect(missing?.status()).toBe(404);
+  });
+
   test('After one visit every tool works offline, including code it never loaded online', async ({ page, context }) => {
     // Before the fix the service worker cached only chunks the visit happened to
     // load, so a first-time visitor who went offline could not run a PDF tool.
