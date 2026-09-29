@@ -2359,6 +2359,180 @@ export const guides: Guide[] = [
       { q: 'Is watermarking free?', a: 'Yes, both the built-in Markup tools on iPhone and Mac, and a browser-based watermarking tool, are free; some online watermarking services add their own logo unless you pay, which a tool that doesn\'t do that avoids.' },
     ],
   },
+  {
+    slug: 'how-to-rotate-a-pdf',
+    title: 'How to Rotate a PDF (and Save It That Way)',
+    description: 'Most PDF viewers can rotate a page temporarily just to read it, but that view resets the next time it opens. Making a rotation permanent is a different, less obvious step. Here is how.',
+    heading: 'How to rotate a PDF',
+    dek: 'Rotating a PDF to read it and rotating it permanently are two different things. Here is how to make the fix stick.',
+    keywords: ['how to rotate a pdf', 'rotate pdf permanently', 'fix sideways pdf pages', 'rotate a scanned pdf', 'rotate pdf and save'],
+    updated: '2026-09-29',
+    tools: ['rotate-pdf'],
+    sections: [
+      {
+        h: 'Why the rotation doesn\'t save',
+        p: [
+          'Most PDF readers, including the ones built into iPhone, Android, Mac and Windows, let you rotate the current view with a button or gesture so a sideways page reads right-side up. That rotation is just how the viewer is displaying the page in that session; it is not written back into the file, so the page opens sideways again next time, and anyone else who opens the PDF sees it unrotated too.',
+        ],
+      },
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview can rotate a page and save it that way: select the page in the sidebar, use the rotate buttons in the toolbar (or **Tools, Rotate Left/Right**), then save the file. This is one of the few built-in viewers that actually writes the rotation into the saved PDF rather than only changing the display.',
+        ],
+      },
+      {
+        h: 'On Windows, iPhone or Android',
+        p: [
+          'None of the default PDF viewers on these platforms (Edge\'s reader, or the Files/Photos apps on iPhone and Android) save a rotation permanently; whatever rotate control they offer only affects that viewing session. This is a genuine gap, not a hidden setting, which is why the fix tends to come up as a repeated search across every platform except Mac.',
+        ],
+      },
+      {
+        h: 'A tool that rotates and saves it for good',
+        p: [
+          'Stayput\'s [rotate PDF](/tools/rotate-pdf) tool rotates all pages or just the ones you select by 90, 180 or 270 degrees and saves the change permanently into a new file, directly in the browser without uploading the document. It works the same way on any device, including Windows, iPhone and Android where there is no built-in equivalent.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why does my PDF keep opening sideways even after I rotate it?', a: 'Most viewers only rotate the on-screen display for that session; the rotation is not saved into the file unless the tool specifically supports saving it, like Preview on a Mac or a dedicated rotate tool.' },
+      { q: 'Can I rotate just one page instead of the whole document?', a: 'Yes, both Preview and a dedicated PDF rotation tool let you select individual pages to rotate rather than applying it to every page.' },
+      { q: 'Does rotating a PDF affect its text or image quality?', a: 'No, rotation only changes the page\'s orientation; the underlying text and images are unchanged.' },
+      { q: 'Why are scanned PDFs so often sideways in the first place?', a: 'A scanner or phone camera can capture a page in whatever orientation it was fed or held, and the scanning software doesn\'t always auto-correct it, leaving the saved PDF rotated.' },
+    ],
+  },
+  {
+    slug: 'how-to-slow-down-or-speed-up-a-video',
+    title: 'How to Slow Down or Speed Up a Video',
+    description: 'Changing how fast a video plays, permanently, in the saved file, is different from adjusting playback speed in a player. Here is what phones and computers can do, and a browser tool with proper pitch correction.',
+    heading: 'How to slow down or speed up a video',
+    dek: 'This changes the saved file itself, not just how a player plays it back. Here is what actually works, including keeping the audio in tune.',
+    keywords: ['how to slow down a video', 'how to speed up a video', 'change video speed', 'slow motion video editor free', 'speed up video without app'],
+    updated: '2026-09-29',
+    tools: ['video-speed'],
+    sections: [
+      {
+        h: 'Playback speed versus the actual file',
+        p: [
+          'Many video players, including YouTube and some phone players, let you change playback speed while watching, but that setting only affects how that player shows the video to you; the file itself, and how it plays for anyone else or on any other app, is unchanged. Actually speeding up or slowing down a video means re-encoding a new file at the different speed.',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The Photos app has no built-in speed control for existing videos. iMovie (free on iPhone) can do it: add the clip to a project, select it, and use the speed slider to make it faster or slower, then export. Apple\'s own Slo-Mo camera mode only works for footage recorded that way from the start, not for slowing down existing regular video.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Most Android phones\' default Gallery or Photos apps don\'t include a speed editor. Google Photos\' basic editor also doesn\'t offer this; changing speed typically means a separate video editor app.',
+        ],
+      },
+      {
+        h: 'On a Mac or Windows',
+        p: [
+          'iMovie on Mac works the same way as on iPhone: select the clip, drag the speed slider, export. Windows\' Clipchamp (built into recent versions of Windows) includes a similar speed control on its timeline. Both are full editors for what is otherwise a single adjustment.',
+        ],
+      },
+      {
+        h: 'A direct speed changer with pitch correction',
+        p: [
+          'Stayput\'s [change video speed](/tools/video-speed) tool speeds a video up to 2x, 4x or 8x, or slows it to 0.5x or 0.25x, directly in the browser, and keeps the audio\'s pitch correct rather than letting it sound chipmunk-high or slowed to a growl, which is a common side effect of naive speed changes. Nothing is uploaded to do it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does changing video speed also change the audio pitch?', a: 'It can, unless the tool specifically corrects for it; naive speed changes raise the pitch when sped up and lower it when slowed down, while pitch-correct tools keep the voice or music sounding natural.' },
+      { q: 'Is changing playback speed in a video player the same as actually speeding up the file?', a: 'No, a player\'s speed control only affects how that app plays the video back; the saved file, and how it plays anywhere else, stays at its original speed.' },
+      { q: 'Can I slow down only part of a video, not the whole thing?', a: 'Trim the clip to just the section you want first, then apply the speed change to that shorter clip, since most tools change the speed of the whole file by default.' },
+      { q: 'Why would I want to slow down a video that wasn\'t recorded in slow motion?', a: 'Slowing down regular footage can create a slow-motion effect after the fact, useful when the moment wasn\'t recorded with a slow-motion camera setting to begin with, though it looks less smooth than footage recorded at a genuinely higher frame rate.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-a-watermark-to-a-pdf',
+    title: 'How to Add a Watermark to a PDF (Confidential, Draft, or Copy Number)',
+    description: 'Marking every page of a PDF as confidential, a draft or a numbered copy is not something built-in PDF viewers can do; it usually needs the original document or a dedicated tool. Here is how.',
+    heading: 'How to add a watermark to a PDF',
+    dek: 'Stamping "confidential" or "draft" across every page needs either the original document or a tool built for it. Here is how.',
+    keywords: ['how to add a watermark to a pdf', 'stamp confidential on pdf', 'add draft watermark to pdf', 'pdf watermark free online', 'watermark every page of a pdf'],
+    updated: '2026-09-29',
+    tools: ['watermark-pdf'],
+    sections: [
+      {
+        h: 'What a PDF watermark is for',
+        p: [
+          'A PDF watermark stamps repeated text, such as CONFIDENTIAL, DRAFT, or a recipient\'s name as a copy marker, across every page, usually as a diagonal, semi-transparent overlay that doesn\'t block reading the content underneath. It is meant to discourage a document from being redistributed as if it were final, or to trace which copy went to whom.',
+        ],
+      },
+      {
+        h: 'If you still have the original document',
+        p: [
+          'Word has a built-in watermark feature (**Design, Watermark**) that adds text before exporting to PDF, and it is the easiest path when the source file is still available. This does not help once the document only exists as a PDF, which is the more common situation.',
+        ],
+      },
+      {
+        h: 'On a Mac, Windows, iPhone or Android',
+        p: [
+          'None of the built-in PDF viewers on any platform, Preview included, can stamp a watermark across an existing PDF\'s pages; Preview\'s Markup tool can add text to one page at a time, but not automatically repeat it across every page of a multi-page document.',
+        ],
+      },
+      {
+        h: 'A tool that stamps every page at once',
+        p: [
+          'Stayput\'s [watermark PDF](/tools/watermark-pdf) tool stamps text across every page in one step, diagonally, repeated, or in a corner, directly in the browser, whether or not the original document still exists. It works on a PDF from any source, including a scan or one someone else sent you.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I watermark a PDF I no longer have the original document for?', a: 'Yes, a tool that stamps the watermark directly onto the existing PDF pages works regardless of what created the file or whether the source document still exists.' },
+      { q: 'Does a watermark block someone from reading the document?', a: 'No, a proper watermark is semi-transparent and placed so it doesn\'t obscure the text; its purpose is visibility as a marker, not blocking access to the content.' },
+      { q: 'Can I put a different watermark on each copy, like a recipient\'s name?', a: 'Yes, since the watermark text is set per file, each copy sent to a different person can carry that person\'s name or a unique copy number, useful for tracing which copy leaked if a document is redistributed.' },
+      { q: 'Does watermarking a PDF change its other content?', a: 'No, it adds a new layer of text on top of each page without altering the existing text, images or layout underneath.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-a-gif-to-mp4',
+    title: 'How to Convert a GIF to MP4',
+    description: 'A GIF is often far larger than the equivalent video, and some places do not accept it at all. Converting to MP4 shrinks the file and makes it playable everywhere. Here is how.',
+    heading: 'How to convert a GIF to MP4',
+    dek: 'A GIF of the same clip is usually much bigger than an MP4, and some platforms will not accept a GIF at all. Here is how to convert it.',
+    keywords: ['how to convert a gif to mp4', 'gif to video converter', 'gif to mp4 free', 'shrink a gif file', 'convert animated gif to video'],
+    updated: '2026-09-29',
+    tools: ['gif-to-mp4'],
+    sections: [
+      {
+        h: 'Why convert a GIF to MP4 at all',
+        p: [
+          'GIF stores every frame with limited color compression, which makes an animated GIF file far larger than a video of the same clip using modern video compression. Some platforms and messaging apps also handle a GIF differently from a video, or don\'t accept one at all in certain upload spots, which is the other common reason to convert.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Photos app has a built-in GIF-to-video converter; a GIF saved to the camera roll stays a GIF unless something converts it. Some messaging apps automatically convert a GIF to a short video internally when sending it, but that conversion isn\'t something you control or can save as your own file.',
+        ],
+      },
+      {
+        h: 'On a Mac or Windows',
+        p: [
+          'There is no built-in converter in Preview, Photos, or File Explorer on either platform for turning a GIF into a video file; both mainly treat a GIF as an image that happens to animate, not as source video to re-encode.',
+        ],
+      },
+      {
+        h: 'A direct converter to MP4',
+        p: [
+          'Stayput\'s [GIF to MP4](/tools/gif-to-mp4) tool converts animated GIFs to MP4 video directly in the browser, in a batch, without uploading the files. The resulting MP4 is typically a fraction of the original GIF\'s size and plays correctly as a video on Instagram, WhatsApp, X and in slide decks where a GIF sometimes doesn\'t behave as expected.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why is a GIF so much bigger than the same clip as MP4?', a: 'GIF uses an older, less efficient compression scheme with a limited color palette per frame; MP4 uses modern video compression designed specifically to keep motion video small.' },
+      { q: 'Does converting a GIF to MP4 lose the animation loop?', a: 'A converted MP4 can be set to loop the same way a GIF does in most players and platforms, though the setting to loop it depends on where it is played, not the file itself.' },
+      { q: 'Will an MP4 look the same quality as the original GIF?', a: 'Generally as good or better, since MP4\'s compression preserves more color detail than GIF\'s limited palette, while also producing a smaller file.' },
+      { q: 'Can I convert several GIFs to MP4 at once?', a: 'Yes, a browser-based batch converter can process multiple GIF files in one go rather than one at a time.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
