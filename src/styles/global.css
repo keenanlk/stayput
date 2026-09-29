@@ -299,6 +299,10 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 
 .index { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 56px; margin-top: 88px; }
 .index .tool-grid { grid-template-columns: 1fr; }
+/* Image and video tools stack in the left column, PDF tools fill the right, so no row leaves a hole. */
+.index #image-tools { grid-column: 1; grid-row: 1; }
+.index #media-tools { grid-column: 1; grid-row: 2; }
+.index #pdf-tools { grid-column: 2; grid-row: 1 / span 2; }
 .index-head { display: grid; gap: 6px; margin-bottom: 20px; }
 .index-head p { margin: 0; color: var(--muted); font-size: 15px; }
 
@@ -326,6 +330,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
   .site-footer .conversions ul { column-count: 3; }
   .hero-grid { grid-template-columns: 1fr; gap: 44px; padding: 56px 0 64px; }
   .index { grid-template-columns: 1fr; gap: 56px; }
+  .index #image-tools, .index #media-tools, .index #pdf-tools { grid-column: auto; grid-row: auto; }
   .split { grid-template-columns: 1fr; }
 }
 
