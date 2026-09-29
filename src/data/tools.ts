@@ -1708,6 +1708,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'mic-test',
+    name: 'Mic test',
+    title: 'Mic Test: Check Your Microphone Online, Private | Stayput',
+    description:
+      'Test your microphone in the browser: a live level meter, a plain verdict, and a five-second record and play back. Nothing is recorded to a server.',
+    heading: 'Test your microphone',
+    tagline: 'See whether your microphone works and how loud it is, and hear yourself back, before a call or a recording.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your microphone',
+    action: 'Test',
+    keywords: ['mic test', 'microphone test', 'test my mic', 'online mic test', 'is my mic working', 'check microphone', 'mic checker'],
+    steps: [
+      'Press Test my microphone and allow it when your browser asks. Choose another microphone from the list if you have several.',
+      'Speak. The bar moves with your voice, and the verdict says whether the level is right, too quiet or clipping.',
+      'Press Record 5 seconds and play back to hear exactly how you sound, then press Stop using the microphone.',
+    ],
+    faq: [
+      {
+        q: 'Is my voice recorded or uploaded?',
+        a: 'No. The level is measured by code in this page from the live input, and nothing is recorded unless you press the play-back button. That recording stays in this tab’s memory, is never sent anywhere, and disappears when you close the page.',
+      },
+      {
+        q: 'The bar does not move. What is wrong?',
+        a: 'Check the microphone is not muted (many headsets and laptops have a mute key or switch), that the right microphone is chosen in the list, and that no other app such as Zoom or Teams is holding it. On a Mac, allow the browser under System Settings, Privacy and Security, Microphone; on Windows, under Settings, Privacy, Microphone.',
+      },
+      {
+        q: 'What level should I aim for?',
+        a: 'When you speak normally, the average should sit around the middle of the bar (about −30 to −15 dB) and the peak marker should stay clear of the right end. A peak at the end means the sound is clipping, which sounds harsh; turn the input volume down.',
+      },
+      {
+        q: 'Why does it sound different in calls?',
+        a: 'This test turns off the browser’s noise suppression, echo cancellation and automatic gain, so you hear what the microphone really picks up. Call apps apply their own clean-up, which usually makes voices quieter in the background and more even.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
