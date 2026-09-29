@@ -23,6 +23,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install root deps (make-pdf.mjs needs pdf-lib)
+        run: npm ci
+
       - name: Generate site fixtures (mcp tests reuse them)
         run: |
           pip install pillow pillow-heif
