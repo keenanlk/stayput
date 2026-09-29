@@ -80,6 +80,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Image to SVG](https://stayput.dev/tools/image-to-svg) (trace PNG or JPG into vector shapes; black and white, logo or detailed) | |
 | [Transcribe audio to text](https://stayput.dev/tools/transcribe) (Whisper on your device; text, SRT or WebVTT; 16+ languages) | |
 | [Add subtitles to video](https://stayput.dev/tools/add-subtitles-to-video) (captions from the speech or your SRT, burned into the picture) | |
+| [Vocal remover](https://stayput.dev/tools/vocal-remover) (karaoke instrumental or acapella, AI model on your device) | |
 | [Remove silence](https://stayput.dev/tools/remove-silence) (shorten pauses, trim quiet ends) | |
 | [Remove background noise](https://stayput.dev/tools/remove-noise) (hiss, hum, fans and traffic out of voice recordings and videos) | |
 | [Blur faces in video](https://stayput.dev/tools/blur-face-video) (automatic, frame by frame; blur, pixelate, box or emoji) | |

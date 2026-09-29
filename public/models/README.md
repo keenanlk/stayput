@@ -28,6 +28,17 @@ in all. The transcribe tool loads it on the first file and runs it in a web
 worker through Transformers.js (Apache-2.0) and onnxruntime-web, served from
 /vendor/.
 
+`uvr-mdx-net-inst-hq-3.onnx` is UVR-MDX-NET-Inst_HQ_3, an MDX-Net
+instrumental model released by the Ultimate Vocal Remover project
+(https://github.com/Anjok07/ultimatevocalremovergui, MIT License) and
+distributed through its model repository; this copy is the unmodified 67 MB
+ONNX file as mirrored at
+https://huggingface.co/spaces/next-playground/Ultimate-Vocal-Remover-WebUI.
+It reads a [1, 4, 3072, 256] spectrogram (n_fft 6144, hop 1024) and predicts
+the instrumental; UVR scales that by 1.022. The vocal remover loads it on the
+first song and runs it in a web worker through onnxruntime-web, on WebGPU
+when the browser has it and WebAssembly otherwise, both served from /vendor/.
+
 Files here are served with a one-year immutable cache and cached by the service
 worker, so a changed model must get a new file name.
 
