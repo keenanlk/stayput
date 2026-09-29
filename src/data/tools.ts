@@ -1765,6 +1765,98 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'watermark-image',
+    name: 'Watermark image',
+    title: 'Add Watermark to Photo, Free, No Upload | Stayput',
+    description:
+      'Add a text watermark to photos in your browser: your name, a copyright line or a website, in a corner, across the middle or repeated. No upload, no sign-up.',
+    heading: 'Add a watermark to images',
+    tagline: 'Put your name or a copyright notice on photos before you share them, at full resolution, on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos to watermark',
+    action: 'Add watermark',
+    keywords: ['watermark image', 'add watermark to photo', 'watermark photos', 'copyright watermark', 'add text to image', 'photo watermark free', 'batch watermark'],
+    steps: [
+      'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
+      'Type the text, choose where it goes, and set the size, opacity and colour while watching the preview.',
+      'Download each watermarked photo at full size, or all of them in one zip.',
+    ],
+    faq: [
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. Each photo is decoded, drawn with the watermark and saved inside your browser tab. Nothing is sent to a server, so unpublished work, client photos and pictures of your home stay on your device. The page works with Wi-Fi off once it has loaded.',
+      },
+      {
+        q: 'Which placement should I use?',
+        a: 'Corner is the usual choice for photographers and shops: a small, readable credit that leaves the picture alone. Across the middle is harder to remove and suits proofs you send before payment. Repeated covers the whole photo in a pattern, so it cannot be cropped or cloned away; use it for images you are worried about being reused, such as ID documents sent to a landlord.',
+      },
+      {
+        q: 'Can I watermark many photos at once?',
+        a: 'Yes. Drop as many as you like; the same text, placement and style go on every one, scaled to each photo’s size, so a portrait and a panorama both look right. Download them one by one or as a zip.',
+      },
+      {
+        q: 'Does it reduce the quality?',
+        a: 'The photo keeps its full resolution. PNG saves are lossless; JPG and WebP are saved at high quality (92), which is visually the same as the original for almost all photos. Choose Save as PNG if you need it untouched apart from the watermark.',
+      },
+      {
+        q: 'Can I add a copyright symbol or emoji?',
+        a: 'Yes. Type or paste any text, including ©, ®, ™, emoji and non-Latin scripts; it is drawn with your device’s own fonts. On a phone the © symbol is usually on the symbols keyboard, or copy it from the default text.',
+      },
+      {
+        q: 'Should I watermark an ID before sending it?',
+        a: 'It is a good habit. A repeated watermark such as “For flat rental at 12 High St only, May 2026” across a passport or driving licence scan makes the copy useless for anything else if it leaks. Doing it here means the ID is not uploaded to yet another website in the process.',
+      },
+    ],
+  },
+  {
+    slug: 'watermark-pdf',
+    name: 'Watermark PDF',
+    title: 'Add Watermark to PDF, Free, No Upload | Stayput',
+    description:
+      'Stamp CONFIDENTIAL, DRAFT or any text on every page of a PDF, diagonally, repeated or in a corner. Runs in your browser; the document is never uploaded.',
+    heading: 'Add a watermark to a PDF',
+    tagline: 'Mark every page as a draft, confidential or a copy for one person, without sending the document anywhere.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to watermark',
+    action: 'Add watermark',
+    keywords: ['watermark pdf', 'add watermark to pdf', 'pdf watermark', 'confidential watermark pdf', 'draft watermark pdf', 'stamp pdf', 'watermark pdf free'],
+    steps: [
+      'Drop one or more PDFs, or tap to pick them.',
+      'Type the text, such as CONFIDENTIAL or DRAFT, and pick the placement, size, opacity and colour, checking the preview of page 1.',
+      'Download the watermarked PDF. Every page gets the mark, sized to that page.',
+    ],
+    faq: [
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The PDF is opened, stamped and saved by code running in your browser tab. The documents people watermark are usually the sensitive ones, such as contracts, bank statements, pay slips and scans of IDs, and here they never reach a server.',
+      },
+      {
+        q: 'Can the watermark be removed?',
+        a: 'It is added to each page as an image layered over the content, so it cannot be selected and deleted like text in most PDF readers. Someone with a PDF editor can still find and delete the image. For a copy that cannot be cleaned, choose Repeated and then flatten the PDF with the compress tool’s Flatten option, which turns each page into a single picture.',
+      },
+      {
+        q: 'Does it change the rest of the document?',
+        a: 'No. Text stays selectable and searchable, links and form fields keep working, and page sizes are unchanged. Only the watermark layer is added on top of each page.',
+      },
+      {
+        q: 'Which placement should I use?',
+        a: 'Across the middle is the classic diagonal CONFIDENTIAL or DRAFT stamp. Repeated tiles the text over the whole page, which is the safest for a copy of an ID or a statement you have to send to someone. Corner adds a small, quiet mark, such as a name and date, that does not get in the way of reading.',
+      },
+      {
+        q: 'Does it work on scanned and password-protected PDFs?',
+        a: 'Scanned PDFs work like any other. A PDF that only needs a password to change (not to open) is handled automatically. If it asks for a password to open, remove it first with the unlock PDF tool, using the password you know.',
+      },
+      {
+        q: 'What about landscape or mixed-size pages?',
+        a: 'Each page gets its own watermark sized to it, so a landscape page or an A3 drawing in the middle of an A4 document is covered the same way, and rotated pages come out the right way up.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);

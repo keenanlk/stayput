@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(44);
+  expect(await page.locator('.tool-card').count()).toBe(46);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -968,6 +968,8 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['2x2-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('us')],
     ['35x45-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('eu')],
+    ['confidential-watermark', 'watermark-pdf', async () => expect(page.locator('#wm-text')).toHaveValue('CONFIDENTIAL')],
+    ['watermark-id-copy', 'watermark-image', async () => expect(page.locator('input[name="layout"][value="tiled"]')).toBeChecked()],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
     ['hex-color-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
     ['gif-to-video', 'gif-to-mp4', async () => expect(page.locator('#repeat')).toHaveValue('auto')],
@@ -3255,6 +3257,79 @@ test('Remove background keeps a whole pet and drops background specks', async ({
   const more = await cut('pug.jpg', '1');
   expect(await alpha(more, 330, 310)).toBeGreaterThan(240);
   expect(await specks(more, 200)).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('Watermark image draws the text over the whole photo at full size, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'watermark-image');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['photo.jpg'], async () => {
+    await expect(page.locator('#wm-panel')).toBeVisible();
+    await page.locator('#wm-text').fill('SAMPLE');
+    await choose(page.locator('input[name="layout"][value="tiled"]'));
+    await page.locator('#wm-opacity').fill('100');
+    await page.locator('#wm-color').evaluate((el: HTMLInputElement) => {
+      el.value = '#ff0000';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await page.locator('#format').selectOption('image/png');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('photo-watermarked.png');
+  const png = await bytesOf(downloads[0]!);
+  // Full size, turned upright by the photo's orientation tag.
+  expect(pngSize(png)).toEqual({ width: 1200, height: 1600 });
+  // Pure red text is spread over every quarter of the photo.
+  const quarters = await page.evaluate(async (b64) => {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([arr]));
+    const c = document.createElement('canvas');
+    c.width = bmp.width;
+    c.height = bmp.height;
+    const g = c.getContext('2d')!;
+    g.drawImage(bmp, 0, 0);
+    const d = g.getImageData(0, 0, c.width, c.height).data;
+    const q = [0, 0, 0, 0];
+    for (let y = 0; y < c.height; y++) {
+      for (let x = 0; x < c.width; x++) {
+        const i = (y * c.width + x) * 4;
+        if (d[i]! > 240 && d[i + 1]! < 20 && d[i + 2]! < 20) q[(y < c.height / 2 ? 0 : 2) + (x < c.width / 2 ? 0 : 1)]!++;
+      }
+    }
+    return q.map((n) => n / ((c.width * c.height) / 4));
+  }, Buffer.from(png).toString('base64'));
+  for (const share of quarters) expect(share).toBeGreaterThan(0.01);
+  net.assertNothingLeft(['photo.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Watermark PDF stamps every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'watermark-pdf');
+  const net = watchNetwork(page);
+  const source = readFileSync(fx('rotated.pdf'));
+  const before = await PDFDocument.load(source);
+  const { downloads } = await run(page, ['rotated.pdf'], async () => {
+    await expect(page.locator('#wm-panel')).toBeVisible();
+    await expect(page.locator('#wm-hint')).toContainText(`all ${before.getPageCount()} page`);
+    await page.locator('#wm-text').fill('DRAFT');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('rotated-watermarked.pdf');
+  const out = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(out);
+  expect(doc.getPageCount()).toBe(before.getPageCount());
+  for (const [i, p] of doc.getPages().entries()) {
+    // Same size and rotation, and one more image than before on every page.
+    expect(p.getSize()).toEqual(before.getPage(i).getSize());
+    expect(p.getRotation().angle).toBe(before.getPage(i).getRotation().angle);
+    const xobjects = (pg: typeof p) => (pg.node.Resources()?.lookupMaybe(PDFName.of('XObject'), Object as never) as { keys(): unknown[] } | undefined)?.keys().length ?? 0;
+    expect(xobjects(p)).toBe(xobjects(before.getPage(i)) + 1);
+  }
+  // The original text is still there to select and search.
+  const was = (await textItems(new Uint8Array(source), 1)).map((t) => t.str).join('');
+  const now = (await textItems(out, 1)).map((t) => t.str).join('');
+  expect(now).toBe(was);
+  net.assertNothingLeft(['rotated.pdf']);
   expect(errors).toEqual([]);
 });
 

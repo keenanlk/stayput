@@ -41,6 +41,8 @@ const modules: Record<string, () => Promise<unknown>> = {
   'color-picker': () => import('./color-picker'),
   'remove-background': () => import('./remove-background'),
   'passport-photo': () => import('./passport-photo'),
+  'watermark-image': () => import('./watermark-image'),
+  'watermark-pdf': () => import('./watermark-pdf'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';
