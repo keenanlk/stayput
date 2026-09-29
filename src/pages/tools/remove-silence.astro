@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RemoveSilence from '../../components/options/RemoveSilence.astro';
+const tool = toolBySlug('remove-silence')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><RemoveSilence /></Fragment>
+</ToolLayout>
+<script src="../../tools/remove-silence.ts"></script>
