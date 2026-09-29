@@ -21,7 +21,7 @@ Nothing is uploaded, there are no accounts or limits, and it works offline.
 
 Convert HEIC photos from an iPhone, merge, split, sign and compress PDFs, shrink images and strip GPS and EXIF data. Every tool is a static page and a bit of JavaScript and WebAssembly that does the work in your tab. There is no server that could receive your files.
 
-## Open the network tab. It stays empty.
+## Open the network tab. Your files never appear in it.
 
 That is the whole pitch, and you can check it in three ways:
 
@@ -29,7 +29,7 @@ That is the whole pitch, and you can check it in three ways:
 2. **Turn the network off.** Load a tool, switch to airplane mode, and use it. It keeps working, because after one visit the site is cached by a service worker and the work happens in your tab.
 3. **Read the code.** This repository is the site. It builds to static HTML, CSS and JavaScript with no backend; the deploy has no server-side code at all. The [privacy page](https://stayput.dev/privacy) lists every request the site makes.
 
-<p align="center"><img src="docs/readme/compress-image.png" width="640" alt="Compress Images: three 1.2 MB phone photos shrunk to about 190 KB each in the browser, with the panel reading: Open the network tab. It stays empty."></p>
+<p align="center"><img src="docs/readme/compress-image.png" width="640" alt="Compress Images: three 1.2 MB phone photos shrunk to about 190 KB each in the browser, with the panel reading: Open the network tab. Your files never appear in it."></p>
 
 ## Tools
 
