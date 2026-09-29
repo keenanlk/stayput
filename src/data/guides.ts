@@ -2713,6 +2713,178 @@ export const guides: Guide[] = [
       { q: 'Can I get a full palette of colors from an image, not just one pixel?', a: 'Yes, a tool that extracts the main colors from an image gives a small palette representing its dominant shades, useful for matching a design to a photo\'s overall look.' },
     ],
   },
+  {
+    slug: 'smallpdf-alternative',
+    title: 'A Free Smallpdf Alternative With No Daily Limit',
+    description: 'Smallpdf\'s free plan caps you at two tasks a day; unlimited use needs a paid plan. Here is what that free limit actually looks like, and a browser-based alternative with no cap and no upload.',
+    heading: 'A free Smallpdf alternative with no daily limit',
+    dek: 'Smallpdf\'s free plan is genuinely limited, not just ad-supported. Here is what that limit looks like, and a way around it that never uploads your files at all.',
+    keywords: ['smallpdf alternative', 'free smallpdf alternative', 'smallpdf alternative no limit', 'smallpdf free plan limit', 'smallpdf without sign up'],
+    updated: '2026-09-29',
+    tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'unlock-pdf', 'protect-pdf', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf', 'pdf-page-numbers', 'pdf-to-word'],
+    sections: [
+      {
+        h: 'What Smallpdf does well',
+        p: [
+          'Smallpdf is a large, well-run PDF service with over 30 tools covering merging, splitting, compressing, converting, signing and more, plus a desktop and mobile app and team features for businesses. It is a legitimate, established product, not something to avoid on principle.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'The free plan is capped: as of when this page was checked, Smallpdf limited free accounts to around two tasks a day, with unlimited use requiring a paid Pro plan (its pricing page listed Pro Personal starting around $15 a month). For an occasional user, hitting that daily cap mid-task, or being asked to subscribe just to merge a second PDF that day, is the usual reason to look elsewhere.',
+          'The other factor is the upload itself: every Smallpdf tool sends your file to its servers to process it, however briefly it keeps it afterward. For details on Smallpdf\'s own file retention and privacy practices, see [Is Smallpdf safe?](/guides/is-smallpdf-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s PDF tools run entirely inside the browser tab, so there is no server-side task to count and nothing to upload: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [sign PDF](/tools/sign-pdf), [unlock PDF](/tools/unlock-pdf), [protect PDF](/tools/protect-pdf) with AES-256 encryption, [rotate PDF](/tools/rotate-pdf), [reorder and delete pages](/tools/reorder-pdf), [watermark PDF](/tools/watermark-pdf), [add page numbers](/tools/pdf-page-numbers) and [PDF to Word](/tools/pdf-to-word). There is no daily limit, no account, and no subscription, because processing a tenth PDF costs nothing more than processing the first.',
+        ],
+      },
+      {
+        h: 'Where Smallpdf still has the edge',
+        p: [
+          'Smallpdf\'s OCR-heavy conversions, its e-signature workflow with audit trails for legally binding signatures, team workspaces and some Office document conversions go beyond what a browser can currently do unassisted. If you need those specifically, Smallpdf (or its desktop app, which also avoids uploading) remains the more complete tool. For the everyday jobs above, a local tool with no limit is usually the simpler choice.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is there a free Smallpdf alternative with no daily task limit?', a: 'Yes. A tool that processes PDFs entirely in the browser, like Stayput, has no per-day task count to hit, since there is no server-side job being metered.' },
+      { q: 'Do I need to sign up to use a Smallpdf alternative?', a: 'Not for a browser-based tool: there is no account system because there is nothing stored on a server to attach an account to.' },
+      { q: 'Does a no-upload PDF tool do everything Smallpdf does?', a: 'Not quite; heavier OCR conversions, legally binding e-signature workflows and team features are still easier on a service like Smallpdf, but merging, splitting, compressing, signing, unlocking, protecting, rotating, reordering, watermarking and numbering pages are covered.' },
+      { q: 'Is a browser-based PDF tool actually free, or does it have hidden limits?', a: 'A tool that runs locally has no meaningful marginal cost per file, so there is no natural reason to cap daily use the way a server-based service, which pays for the compute, typically does.' },
+    ],
+  },
+  {
+    slug: 'ilovepdf-alternative',
+    title: 'A Free iLovePDF Alternative With No Task Limits or Ads',
+    description: 'iLovePDF\'s free tier limits document size and batch processing and shows ads; Premium removes both for a monthly fee. Here is a browser-based alternative with neither restriction.',
+    heading: 'A free iLovePDF alternative with no task limits or ads',
+    dek: 'iLovePDF\'s free tier works, but with limits on file size and batches, plus ads. Here is what changes with a tool that never uploads the file at all.',
+    keywords: ['ilovepdf alternative', 'free ilovepdf alternative', 'ilovepdf alternative no ads', 'ilovepdf without limits', 'ilovepdf premium alternative free'],
+    updated: '2026-09-29',
+    tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'unlock-pdf', 'protect-pdf', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf', 'pdf-page-numbers'],
+    sections: [
+      {
+        h: 'What iLovePDF does well',
+        p: [
+          'iLovePDF is one of the most popular PDF sites on the web, with a wide toolset covering merging, splitting, compressing, converting, signing and OCR, along with desktop and mobile apps. It is a legitimate, widely used service.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'iLovePDF\'s free tier, as of when this page was checked, limited document size, batch processing and showed banner ads; removing those limits and the ads meant subscribing to Premium, listed on its pricing page at around €5 a month billed annually or €9 a month billed monthly. For someone who needs to merge or compress a PDF once in a while, paying a recurring fee just to skip a size cap or an ad is a common reason to look elsewhere.',
+          'As with any upload-based service, there is also the file itself to consider: iLovePDF processes documents on its servers. Its own retention and security practices are covered separately in [Is iLovePDF safe?](/guides/is-ilovepdf-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s PDF tools run inside the browser tab rather than on a server, so there is no file-size tier, no batch cap and no ads to work around: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [sign PDF](/tools/sign-pdf), [unlock PDF](/tools/unlock-pdf), [protect PDF](/tools/protect-pdf), [rotate PDF](/tools/rotate-pdf), [reorder and delete pages](/tools/reorder-pdf), [watermark PDF](/tools/watermark-pdf) and [add page numbers](/tools/pdf-page-numbers) are all free with no daily count and no subscription.',
+        ],
+      },
+      {
+        h: 'Where iLovePDF still has the edge',
+        p: [
+          'iLovePDF\'s OCR, Office document conversion and legally binding e-signature workflow are more capable than what runs client-side today, and its desktop app is a reasonable private option if you need those specifically. For everyday merging, splitting, compressing, signing and organizing PDFs, a browser tool with no limits covers most of what people actually search for iLovePDF to do.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is there a completely free iLovePDF alternative?', a: 'Yes. A browser-based PDF tool has no server-side task to limit or advertising to fund, so it can be free without a daily cap or a Premium tier.' },
+      { q: 'Does a no-upload PDF tool have file size limits like iLovePDF\'s free plan?', a: 'Since the file is processed on your own device rather than a server with fixed resources, there is no per-plan file size ceiling to hit.' },
+      { q: 'What does iLovePDF do that a browser tool cannot?', a: 'OCR-heavy conversions, Office document conversion and legally binding e-signature workflows remain more capable on a full service like iLovePDF; ordinary merging, splitting, compressing and signing are well covered locally.' },
+      { q: 'Are there ads on a browser-based PDF tool?', a: 'A tool that costs nothing to run per file has less need to fund itself with advertising the way a free tier on a server-based service typically does.' },
+    ],
+  },
+  {
+    slug: 'cloudconvert-alternative',
+    title: 'A Free CloudConvert Alternative for Everyday Files',
+    description: 'CloudConvert\'s free plan is metered in conversion minutes per day, not files, which can run out unpredictably. Here is a browser-based alternative for common formats with no metering at all.',
+    heading: 'A free CloudConvert alternative for everyday files',
+    dek: 'CloudConvert measures its free tier in minutes, not files, which makes it hard to predict when you will hit the limit. Here is an alternative with nothing to meter.',
+    keywords: ['cloudconvert alternative', 'free cloudconvert alternative', 'cloudconvert alternative no limit', 'cloudconvert free plan limit', 'cloudconvert without upload'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'video-to-gif', 'audio-converter'],
+    sections: [
+      {
+        h: 'What CloudConvert does well',
+        p: [
+          'CloudConvert supports an unusually wide range of formats, including many document, e-book, CAD and professional video and audio formats that a browser cannot decode on its own. It is a legitimate, established converter used by developers as well as everyday users, including through an API.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'CloudConvert\'s free plan, as of when this page was checked, was metered in conversion minutes per day (around 25) rather than a simple file count, so the point at which you hit the limit depends on how long each conversion takes to run, not how many files you have converted. That makes the free tier harder to predict than a flat daily count, and paid usage is sold as packages or subscriptions of conversion minutes.',
+          'It is also, like any converter of this kind, an upload-based service: your file is sent to its servers to be processed. Its stated retention and security practices are covered in [Is CloudConvert safe?](/guides/is-cloudconvert-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'For the formats browsers can already decode and encode, a local tool has nothing to meter: Stayput\'s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and more, [HEIC to JPG](/tools/heic-to-jpg) covers iPhone photos, the [audio converter](/tools/audio-converter) handles MP3, WAV, FLAC, M4A and OGG, [Video to MP3](/tools/video-to-mp3) pulls sound out of a video, and [Video to GIF](/tools/video-to-gif) turns a clip into an animation. None of it counts against a daily minute budget, because there is no server-side conversion running at all.',
+        ],
+      },
+      {
+        h: 'Where CloudConvert still has the edge',
+        p: [
+          'CloudConvert\'s format coverage is genuinely broader: office documents, e-books, CAD files, and professional video and audio codecs that browsers cannot handle natively still need a server-based converter. For the common image, audio and video formats most people convert day to day, a browser tool avoids the minute-based limit entirely.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why does CloudConvert\'s free plan run out at different times for different files?', a: 'Because its free tier is measured in conversion minutes rather than a file count, so a longer or more complex conversion uses up more of the daily allowance than a quick one.' },
+      { q: 'Is there a free alternative to CloudConvert with no minute limit?', a: 'Yes, for common formats. A browser-based converter processes the file on your device, so there is no server time being metered against a daily budget.' },
+      { q: 'Does a browser converter support as many formats as CloudConvert?', a: 'No, CloudConvert supports far more formats, including many document, e-book and professional media formats a browser cannot decode; for common image, audio and video formats, a browser tool covers the same ground with no limit.' },
+      { q: 'Can I convert files without uploading them at all?', a: 'Yes, for formats the browser itself can read and write. Stayput\'s converters process the file on your device, and you can confirm it by switching on airplane mode after the page loads.' },
+    ],
+  },
+  {
+    slug: 'remove-bg-alternative',
+    title: 'A Free remove.bg Alternative With No Resolution Cap',
+    description: 'remove.bg\'s free tier only gives you a low-resolution result; full resolution needs paid credits. Here is a browser-based background remover with no resolution limit at all.',
+    heading: 'A free remove.bg alternative with no resolution cap',
+    dek: 'remove.bg\'s free result is capped at low resolution; the full-size image needs a paid credit. Here is a way to remove a background at full size for free.',
+    keywords: ['remove.bg alternative', 'free remove.bg alternative', 'remove.bg alternative full resolution', 'remove.bg free high resolution', 'background remover no upload'],
+    updated: '2026-09-29',
+    tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
+    sections: [
+      {
+        h: 'What remove.bg does well',
+        p: [
+          'remove.bg, owned by Canva, popularized instant AI background removal and produces clean cutouts on a wide range of photos, including tricky subjects like hair and fur. It is a legitimate, widely used tool.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'The free result on remove.bg\'s website, as of when this page was checked, was capped at a low resolution (up to about 0.25 megapixels, roughly 625 by 400 pixels) for personal use; getting the full-resolution cutout back requires a paid credit, sold individually or through a monthly subscription. For anything beyond a small web thumbnail, such as a print, a listing photo or a portrait for a profile, the free tier\'s output is usually too small to use directly.',
+          'Every remove.bg request also uploads the photo to its servers to run the cutout model. Its stated retention practices, including a detail about account uploads being used for AI training, are covered in [Is remove.bg safe?](/guides/is-remove-bg-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, so the output comes back at the photo\'s original resolution with no paid tier gating it, and the photo is never uploaded to produce the result. [Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it.',
+        ],
+      },
+      {
+        h: 'Where remove.bg still has the edge',
+        p: [
+          'remove.bg\'s model has been refined over years on a very large dataset and can handle some especially difficult edge cases (fine hair strands, motion blur, very low contrast subjects) more reliably than a smaller model that runs entirely in a browser tab. For most everyday product photos, portraits and pet pictures, a full-resolution local cutout with no fee is the more practical choice.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is there a free way to remove a background at full resolution?', a: 'Yes. A background remover that runs the cutout model in your own browser has no reason to gate resolution behind a paid tier, since there is no server cost per image to recover.' },
+      { q: 'Why does remove.bg give me a small image for free?', a: 'Its free tier on the website is limited to a low resolution for personal use; the full-size result requires a paid credit or subscription, according to its pricing page.' },
+      { q: 'Does a browser-based background remover work as well as remove.bg?', a: 'For most everyday photos, yes; remove.bg\'s model can have an edge on especially difficult cases like very fine hair or low-contrast subjects, refined over a larger dataset.' },
+      { q: 'Is my photo uploaded to remove a background locally?', a: 'No. A tool that runs the cutout model in the browser processes the image on your device; you can confirm this with the browser\'s network panel or by trying it in airplane mode after the page loads.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
