@@ -1670,6 +1670,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'merge-audio',
+    name: 'Merge audio',
+    title: 'Merge Audio Files Online: Join MP3 and WAV, No Upload | Stayput',
+    description:
+      'Join two or more audio files into one MP3 or WAV in your browser, in the order you choose, with silence or a crossfade between them. No upload, no limits.',
+    heading: 'Merge audio files',
+    tagline: 'Combine songs, voice notes or podcast segments into one file. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac,.webm,.mp4',
+    multiple: true,
+    dropLabel: 'Drop the audio files to join',
+    action: 'Merge audio',
+    keywords: ['merge audio', 'merge mp3', 'combine audio files', 'join mp3', 'audio joiner', 'combine mp3 files', 'mp3 merger'],
+    steps: [
+      'Drop two or more audio files (MP3, WAV, M4A, OGG, FLAC, or the sound of a video), or tap to pick them. Use the arrows to put them in order.',
+      'Choose what goes between them: nothing, a moment of silence, or a crossfade that blends one into the next.',
+      'Merge. The files are joined and written as one MP3 or WAV, which downloads straight away.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Nothing is sent to a server, there is no size limit, and the page works offline once loaded.',
+      },
+      {
+        q: 'Can I mix different formats?',
+        a: 'Yes. An MP3, a WAV from a recorder and an M4A voice memo can be joined together; everything is converted to 44.1 kHz on the way. If any file is stereo, mono files are played in both ears.',
+      },
+      {
+        q: 'Does merging lower the quality?',
+        a: 'Saving as WAV keeps every sample. MP3 is re-encoded once at the quality you choose; at 192 kbps or more the difference from the originals is very hard to hear.',
+      },
+      {
+        q: 'Can I cut the files before joining them?',
+        a: 'Use Trim audio on each file first to cut the start or end, then merge the trimmed files here.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
