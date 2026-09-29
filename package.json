@@ -36,12 +36,14 @@
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.3.289",
     "tesseract.js": "7.0.0",
+    "upng-js": "2.1.0",
     "utif2": "4.1.0",
     "wasm-media-encoders": "0.7.0"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "@types/node": "26.6.2",
+    "@types/upng-js": "2.1.5",
     "typescript": "7.0.2"
   }
 }

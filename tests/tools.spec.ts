@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(28);
+  expect(await page.locator('.tool-card').count()).toBe(29);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -973,6 +973,8 @@ test('preset landing pages render, run their base tool with the preset options a
         expect(await page.locator('#file-input').getAttribute('accept')).toContain(`.${ext}`);
       }],
     ),
+    ['png-compressor', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
+    ['reduce-png-size', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -2417,4 +2419,53 @@ test('Video to MP4 re-encodes a WebM recording, copies a stream that is already 
   expect(copied).toHaveLength(1);
   expect(copied[0]!.codec).toBe(tracks[0]!.codec);
   expect(errors).toEqual([]);
+});
+
+/** Pillow's view of a PNG: its mode (P for palette) and whether its pixels equal another PNG's. */
+function pngCompare(a: Uint8Array, b: string): { mode: string; same: boolean } {
+  const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+  const file = join(dir, 'out.png');
+  writeFileSync(file, a);
+  const script = 'import sys,json;from PIL import Image,ImageChops;x=Image.open(sys.argv[1]);m=x.mode;x=x.convert("RGBA");y=Image.open(sys.argv[2]).convert("RGBA");print(json.dumps({"mode":m,"same":ImageChops.difference(x,y).getbbox() is None}))';
+  return JSON.parse(execFileSync('python3', ['-c', script, file, b], { encoding: 'utf8' }));
+}
+
+test('Compress PNG cuts a PNG down with a palette, keeps transparency, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'compress-png');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['gradient.png']);
+  expect(downloads[0]!.suggestedFilename()).toBe('gradient-compressed.png');
+  const png = await bytesOf(downloads[0]!);
+  expect(pillowReads(png, 'png')).toMatchObject({ format: 'PNG', size: [600, 400] });
+  expect(png.length).toBeLessThan(readFileSync(fx('gradient.png')).length * 0.5);
+  expect(pngCompare(png, fx('gradient.png')).mode).toBe('P');
+  // The transparent corner stays transparent, a flat shape keeps its colour, and the half-transparent ellipse stays half transparent.
+  expect((await pixelAt(page, png, 5, 5))[3]).toBe(0);
+  const navy = await pixelAt(page, png, 400, 100);
+  expect(Math.abs(navy[0]! - 29) + Math.abs(navy[1]! - 53) + Math.abs(navy[2]! - 87)).toBeLessThan(12);
+  expect(navy[3]).toBe(255);
+  const ellipseAlpha = (await pixelAt(page, png, 450, 300))[3]!;
+  expect(ellipseAlpha).toBeGreaterThan(180);
+  expect(ellipseAlpha).toBeLessThan(220);
+  await expect(page.locator('#results-list .result-item')).toContainText('256 colours');
+  net.assertNothingLeft(['gradient.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Compress PNG lossless keeps every pixel, and a JPG gets a clear error', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/reduce-png-size');
+  await expect(page.locator('#tool')).toBeVisible();
+  const { downloads } = await run(page, ['gradient.png'], async () => {
+    await page.locator('#colors').selectOption('0');
+  });
+  const png = await bytesOf(downloads[0]!);
+  expect(pngCompare(png, fx('gradient.png')).same).toBe(true);
+  expect(png.length).toBeLessThanOrEqual(readFileSync(fx('gradient.png')).length);
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: readFileSync(fx('photo.jpg')) });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  await expect(page.locator('#error')).toContainText('This file is not a PNG.');
 });

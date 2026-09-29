@@ -1724,6 +1724,58 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'png-compressor',
+    base: 'compress-png',
+    name: 'PNG compressor',
+    title: 'PNG Compressor, Free TinyPNG Alternative, No Upload | Stayput',
+    description: 'Free PNG compressor that runs in your browser. Cut PNG file size by up to 80% and keep transparency. No upload, no 5 MB cap, no daily limit.',
+    heading: 'Free PNG compressor',
+    tagline: 'TinyPNG-style compression without sending your images anywhere, and without a limit on how many you do.',
+    keywords: ['png compressor', 'tinypng alternative', 'png optimizer', 'compress png online', 'png compressor free', 'optimize png'],
+    dropLabel: 'Drop PNG files to compress',
+    intro: [
+      'Web pages, apps and design systems are full of PNGs that are three or four times bigger than they need to be. A PNG saved from a design tool or a screenshot stores every pixel in full 24-bit colour plus transparency, even when the image only uses a few hundred colours. A PNG compressor rewrites it with a palette of the colours that matter, and the file usually drops by 60 to 80 percent with no difference you can see.',
+      'Popular compressors upload each image to their server, cap free use at a handful of files and 5 MB each, and ask you to pay for more. This page does the same job in your browser tab: the colour reduction and the PNG encoding run in JavaScript on your device. Drop a whole folder of exports and they are compressed one after another and downloaded as a zip.',
+      'Pick Best quality for most images. Flat graphics, icons and diagrams can go down to 64 colours; photographic PNGs are better converted to JPG or WebP. If a file would not get smaller, you get the original back untouched.',
+    ],
+    steps: [
+      'Drop PNG files, or tap to pick them. Batches are fine.',
+      'Keep Best quality, or pick fewer colours for smaller files. Lossless keeps every pixel.',
+      'Compress and compare the savings in the results.',
+    ],
+    faq: [
+      { q: 'Is this as good as TinyPNG?', a: 'It uses the same technique, reducing the image to a smart palette of up to 256 colours with full transparency, and typically lands within a few percent of it. The difference is that nothing is uploaded and there is no limit.' },
+      { q: 'Will my images look different?', a: 'On screenshots, logos, icons and illustrations, almost never at 256 colours. Smooth gradients and photos can show slight banding; use Lossless or keep more colours for those.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'reduce-png-size',
+    base: 'compress-png',
+    name: 'Reduce PNG size',
+    title: 'Reduce PNG File Size Without Losing Transparency | Stayput',
+    description: 'Reduce the file size of a PNG in your browser while keeping it a PNG with transparency. Great for screenshots, logos and email images. No upload.',
+    heading: 'Reduce PNG file size',
+    tagline: 'Make a PNG small enough for an email, a form or a web page, still as a PNG with a transparent background.',
+    keywords: ['reduce png size', 'reduce png file size', 'make png smaller', 'shrink png', 'png size reducer', 'reduce size of png without losing quality'],
+    dropLabel: 'Drop PNG files to make smaller',
+    intro: [
+      'Upload forms, email newsletters, app stores and CMSs often cap image sizes at 1 or 2 MB, and a retina screenshot or a logo exported at full size easily passes that. Converting to JPG would shrink it, but loses the transparent background and blurs text and sharp edges. Reducing the colours in the PNG keeps both.',
+      'This page rewrites the PNG with a palette of up to 256 colours picked for that image. Text, UI screenshots, charts and logos look the same and are typically a quarter to a third of the size. If you need smaller still, lower the colours to 128 or 64, or reduce the pixel dimensions first with the Resize image tool.',
+      'Your PNGs are processed in your browser and never uploaded, so screenshots of dashboards, invoices or unreleased designs stay private.',
+    ],
+    steps: [
+      'Drop the PNG, or tap to pick it. Several at once is fine.',
+      'Keep Best quality, or pick fewer colours for a smaller file.',
+      'Compress, check the new size, and download.',
+    ],
+    faq: [
+      { q: 'Can I reduce PNG size without losing quality?', a: 'Choose Lossless: every pixel stays identical and the file is stored more efficiently, usually 5 to 30 percent smaller. The colour palette options save far more, with changes most people cannot see.' },
+      { q: 'Should I just convert to JPG?', a: 'For photos, yes: JPG or WebP is much smaller. For screenshots, text, logos and anything with a transparent background, a compressed PNG looks sharper and keeps the transparency.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
