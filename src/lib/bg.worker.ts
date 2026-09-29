@@ -8,7 +8,7 @@
 import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
 
-export const MODEL_URL = '/models/isnet-general-use-uint8.onnx';
+export const MODEL_URL = '/models/isnet-general-use-int8w.onnx';
 export const SIZE = 1024;
 
 export type Request = { id: number; type: 'mask'; pixels: Float32Array };

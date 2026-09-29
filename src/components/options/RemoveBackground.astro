@@ -6,6 +6,12 @@ const bg = defaults.bg ?? 'transparent';
 const color = defaults['bg-color'] ?? '#ffffff';
 const format = defaults.format ?? 'image/png';
 const strength = defaults.strength ?? '5';
+const keep = defaults.keep ?? '0';
+const keeps = [
+  ['-1', 'Less'],
+  ['0', 'Normal'],
+  ['1', 'More'],
+] as const;
 const backgrounds = [
   ['transparent', 'Transparent'],
   ['white', 'White'],
@@ -33,13 +39,19 @@ const formats = [
   <input type="range" id="strength" min="1" max="10" value={strength} />
 </div>
 <div class="field">
+  <label>Keep around the edges</label>
+  <div class="segmented" role="radiogroup" aria-label="Keep around the edges">
+    {keeps.map(([v, l]) => <label><input type="radio" name="keep" value={v} checked={v === keep} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field">
   <label for="format">Save as</label>
   <select id="format">
     {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
   </select>
 </div>
 <p class="field wide model-note" id="model-note">
-  The first photo downloads the cut-out model (about 46 MB, once). After that it is cached and works offline.
+  The first photo downloads the cut-out model (about 46 MB, once). After that it is cached and works offline. If part of the subject goes missing, try Keep more; if bits of background stay, try Keep less.
 </p>
 
 <style>
