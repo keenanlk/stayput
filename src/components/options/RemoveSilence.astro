@@ -1,0 +1,44 @@
+---
+/** Option controls for Remove silence, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const threshold = defaults.threshold ?? '-40';
+const min = defaults.min ?? '0.5';
+const keep = defaults.keep ?? '0.25';
+const format = defaults.format ?? 'same';
+const formats = [
+  ['same', 'Same as the original'],
+  ['mp3', 'MP3'],
+  ['wav', 'WAV'],
+  ['flac', 'FLAC'],
+  ['m4a', 'M4A (AAC)'],
+  ['ogg', 'OGG (Opus)'],
+] as const;
+---
+<div class="field">
+  <label for="threshold">Count as silence</label>
+  <select id="threshold">
+    <option value="-50" selected={threshold === '-50'}>Only near-total silence (−50 dB, studio or quiet room)</option>
+    <option value="-40" selected={threshold === '-40'}>Quiet (−40 dB, most recordings)</option>
+    <option value="-32" selected={threshold === '-32'}>Quiet with background hum (−32 dB, noisy room or phone)</option>
+  </select>
+</div>
+<div class="field">
+  <label for="min-silence">Shorten pauses longer than</label>
+  <select id="min-silence">
+    {['0.3', '0.5', '0.75', '1', '2'].map((v) => <option value={v} selected={v === min}>{v} seconds</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="keep">Leave a pause of</label>
+  <select id="keep">
+    <option value="0" selected={keep === '0'}>None (join the sound straight up)</option>
+    {['0.1', '0.25', '0.5'].map((v) => <option value={v} selected={v === keep}>{v} seconds</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(71);
+  expect(await page.locator('.index .tool-card').count()).toBe(72);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -497,7 +497,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4938,4 +4938,56 @@ test('Blur faces in video finds the face in every frame and covers it, leaves th
   net.assertNothingLeft(['interview.webm']);
   // MediaPipe reports its CPU delegate on the error console; that is not a failure.
   expect(errors.filter((e) => !e.startsWith('INFO:'))).toEqual([]);
+});
+
+/** A 16-bit mono WAV of tone and silence in turn: [seconds, loud?]. */
+function toneAndSilenceWav(parts: [number, boolean][], rate = 44100): string {
+  const n = parts.reduce((t, [s]) => t + Math.round(s * rate), 0);
+  const buf = Buffer.alloc(44 + n * 2);
+  buf.write('RIFF', 0);
+  buf.writeUInt32LE(36 + n * 2, 4);
+  buf.write('WAVEfmt ', 8);
+  buf.writeUInt32LE(16, 16);
+  buf.writeUInt16LE(1, 20);
+  buf.writeUInt16LE(1, 22);
+  buf.writeUInt32LE(rate, 24);
+  buf.writeUInt32LE(rate * 2, 28);
+  buf.writeUInt16LE(2, 32);
+  buf.writeUInt16LE(16, 34);
+  buf.write('data', 36);
+  buf.writeUInt32LE(n * 2, 40);
+  let at = 0;
+  for (const [s, loud] of parts) {
+    const k = Math.round(s * rate);
+    for (let i = 0; i < k; i++) buf.writeInt16LE(loud ? Math.round(9000 * Math.sin((2 * Math.PI * 330 * i) / rate)) : 0, 44 + (at + i) * 2);
+    at += k;
+  }
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'lecture.wav');
+  writeFileSync(file, buf);
+  return file;
+}
+
+test('Remove silence shortens a long pause, trims the quiet ends, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'remove-silence');
+  const net = watchNetwork(page);
+  const file = toneAndSilenceWav([[0.5, false], [1, true], [2, false], [1, true], [0.5, false]]);
+  const { downloads } = await run(page, [file]);
+  expect(downloads[0]!.suggestedFilename()).toBe('lecture-no-silence.wav');
+  await expect(page.locator('#results-list')).toContainText(/5\.0 s to 2\.[23] s/);
+  await expect(page.locator('#results-list')).toContainText('of silence removed from 3 pauses');
+  const sound = await soundOf(page, await bytesOf(downloads[0]!));
+  // 1 s of tone, a 0.25 s pause, 1 s of tone.
+  expect(sound.seconds).toBeGreaterThan(2.2);
+  expect(sound.seconds).toBeLessThan(2.3);
+  net.assertNothingLeft(['lecture.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('Remove silence says so when there is no pause long enough', async ({ page }) => {
+  await open(page, 'remove-silence');
+  const file = toneAndSilenceWav([[1, true], [0.3, false], [1, true]]);
+  await run(page, [file], async () => {
+    await page.locator('#format').selectOption('mp3');
+  });
+  await expect(page.locator('#results-list')).toContainText('no pauses long enough to shorten');
 });

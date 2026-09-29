@@ -364,6 +364,11 @@
       "source": "/blur-face-video",
       "destination": "/tools/blur-face-video",
       "permanent": true
+    },
+    {
+      "source": "/remove-silence",
+      "destination": "/tools/remove-silence",
+      "permanent": true
     }
   ],
   "headers": [

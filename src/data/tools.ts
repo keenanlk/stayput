@@ -2352,6 +2352,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'remove-silence',
+    name: 'Remove silence',
+    title: 'Remove Silence from Audio Online, No Upload | Stayput',
+    description:
+      'Cut the long pauses out of a podcast, lecture or voice memo, and trim quiet starts and ends. MP3, WAV, M4A and more. The recording never leaves your device.',
+    heading: 'Remove silence from audio',
+    tagline: 'Shorter recordings without the dead air, made on your own device. Interviews and lectures stay private.',
+    category: 'media',
+    accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.webm',
+    multiple: true,
+    dropLabel: 'Drop recordings to take the silence out',
+    action: 'Remove silence',
+    keywords: ['remove silence from audio', 'cut silence from mp3', 'trim silence', 'remove pauses from audio', 'shorten pauses', 'remove dead air', 'silence remover'],
+    steps: [
+      'Drop one or more recordings.',
+      'Choose what counts as silence, how long a pause must be before it is shortened, and how much pause to leave.',
+      'Run it. The note says how much was taken out; listen through before you publish.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. The sound is decoded, measured and written again by code in this tab. Lectures, interviews, therapy notes and calls stay on your device.',
+      },
+      {
+        q: 'Which silence setting should I use?',
+        a: 'Quiet (−40 dB) suits most recordings made with a headset or a phone held close. If the pauses carry a hum from a fan or traffic and nothing is removed, choose the noisy-room setting. For a studio recording with a very clean background, the near-total silence setting avoids clipping soft word endings.',
+      },
+      {
+        q: 'Will it cut off quiet words or breaths?',
+        a: 'Only pauses longer than the length you choose are touched, and the pause left behind is split evenly around the join, so word endings keep their tail. A short fade at each join stops clicks. If soft syllables get clipped, pick the near-total silence setting or leave a longer pause.',
+      },
+      {
+        q: 'Can it do a video?',
+        a: 'Not yet: this page works on sound. Take the sound out of a video with Video to MP3, then remove the silence from that.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
