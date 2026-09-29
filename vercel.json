@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/crop-pdf",
+      "destination": "/tools/crop-pdf",
+      "permanent": true
+    },
+    {
       "source": "/redact-pdf",
       "destination": "/tools/redact-pdf",
       "permanent": true

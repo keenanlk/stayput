@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(55);
+  expect(await page.locator('.tool-card').count()).toBe(56);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'webcam-test'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3829,6 +3829,61 @@ test('Increase video volume copies the picture and turns up the sound', async ({
   expect(tracks.video).not.toBeNull();
   await expect(page.locator('#results-list .result-item')).toContainText('picture copied');
   net.assertNothingLeft(['talk.webm']);
+});
+
+test('Crop PDF trims white margins page by page and crops to a drawn box, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'crop-pdf');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  // Running before choosing anything is an error, not a silent copy.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  await page.locator('#auto-trim').click();
+  await expect(page.locator('#crop-result')).toContainText('Trimmed the white margins on 3 pages');
+  await expect(page.locator('.crop-box')).toHaveCount(1);
+  let [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect(download.suggestedFilename()).toBe('text-cropped.pdf');
+  let doc = await PDFDocument.load(await bytesOf(download));
+  expect(doc.getPageCount()).toBe(3);
+  // Each fixture page holds a heading at y 700 and a box from x 60, y 100, 250 to 350 pt wide:
+  // the crop hugs them with a small margin, so it differs page by page.
+  for (const [i, p] of doc.getPages().entries()) {
+    const c = p.getCropBox();
+    expect(c.x).toBeGreaterThan(40);
+    expect(c.x).toBeLessThan(60);
+    expect(c.y).toBeGreaterThan(80);
+    expect(c.y).toBeLessThan(100);
+    expect(c.y + c.height).toBeLessThan(750);
+    expect(c.x + c.width).toBeGreaterThan(Math.max(260 + (i + 1) * 50, 380));
+    expect(c.x + c.width).toBeLessThan(480);
+    expect(p.getMediaBox()).toEqual(c);
+  }
+  // The text inside the box is untouched.
+  expect((await textItems(await bytesOf(download), 2)).map((t) => t.str).join(' ')).toContain('Page 2 of the fixture');
+
+  // A drawn box on one page only.
+  await page.locator('#crop-reset').click();
+  await expect(page.locator('.crop-box')).toHaveCount(0);
+  await choose(page.locator('input[name="crop-scope"][value="page"]'));
+  await page.locator('#stage').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const s = (await page.locator('#stage').boundingBox())!;
+  await page.mouse.move(s.x + s.width * 0.25, s.y + s.height * 0.25);
+  await page.mouse.down();
+  await page.mouse.move(s.x + s.width * 0.75, s.y + s.height * 0.5, { steps: 6 });
+  await page.mouse.up();
+  await expect(page.locator('#crop-count')).toContainText('1 page cropped');
+  [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  doc = await PDFDocument.load(await bytesOf(download));
+  const c = doc.getPage(0).getCropBox();
+  expect(Math.abs(c.width - 612 * 0.5)).toBeLessThan(8);
+  expect(Math.abs(c.height - 792 * 0.25)).toBeLessThan(8);
+  expect(Math.abs(c.y - 792 * 0.5)).toBeLessThan(8);
+  expect(doc.getPage(1).getCropBox().height).toBe(792);
+  net.assertNothingLeft(['text.pdf']);
+  expect(errors.filter((e) => !e.includes('Choose what to keep first'))).toEqual([]);
 });
 
 test('Merge audio joins files of different formats in order, with silence between, and no bytes leave the tab', async ({ page }) => {

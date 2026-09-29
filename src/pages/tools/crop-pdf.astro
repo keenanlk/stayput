@@ -1,0 +1,11 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import CropPdfStage from '../../components/CropPdfStage.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('crop-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <CropPdfStage slot="panel" />
+  <Fragment slot="options"></Fragment>
+</ToolLayout>
+<script src="../../tools/crop-pdf.ts"></script>
