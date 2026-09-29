@@ -45,7 +45,6 @@ createShell({
     const out: OutputFile = {
       name: `merged.${fmt}`,
       blob,
-      originalSize: files.reduce((n, f) => n + f.file.size, 0),
       note: [`${files.length} files joined`, formatDuration(seconds), how, fmt === 'mp3' ? `MP3 ${bitrate} kbps` : '16-bit WAV', joined.length === 1 ? 'mono' : ''].filter(Boolean).join(', '),
     };
     return [out];
