@@ -106,8 +106,11 @@ export function search(index: SearchEntry[], query: string): SearchEntry[] {
   });
 
   const matches = scored.filter((s) => s.hits === q.length);
+  // A guide names its task word for word ("How to remove a password from a PDF"),
+  // so it would outscore the tool that does the job; guides go after matching tools.
+  const late = (s: { p: Prepared }) => (s.p.e.k === 'guide' ? 1 : 0);
   return matches
-    .sort((a, b) => b.score - a.score || a.p.order - b.p.order)
+    .sort((a, b) => late(a) - late(b) || b.score - a.score || a.p.order - b.p.order)
     .slice(0, LIMIT)
     .map((s) => s.p.e);
 }
