@@ -15,7 +15,7 @@ import vendor from '../data/vendor.json';
  * pages that may need one ask for it with a 'cache-decoders' message.
  */
 export const GET: APIRoute = () => {
-  const pages = ['/', '/about', '/privacy', '/terms', ...tools.map((t) => `/tools/${t.slug}`), ...pairs.map((p) => `/${p.slug}`), ...presets.map((p) => `/${p.slug}`), '/guides', ...guides.map((g) => `/guides/${g.slug}`)];
+  const pages = ['/', '/about', '/privacy', '/terms', ...tools.map((t) => `/tools/${t.slug}`), ...pairs.map((p) => `/${p.slug}`), ...presets.map((p) => `/${p.slug}`), '/guides', ...guides.map((g) => `/guides/${g.slug}`), '/search-index.json'];
   const version = `stayput-${Date.now().toString(36)}`;
   const vendorDirs = (Object.keys(vendor) as VendorLib[]).map(vendorDir);
   const body = `
@@ -132,7 +132,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(req)
       .then((res) => {
-        if (res.ok && (url.pathname === '/register-sw.js' || url.pathname === '/manifest.webmanifest' || url.pathname.startsWith('/icons/') || url.pathname === '/favicon.svg')) {
+        if (res.ok && (url.pathname === '/register-sw.js' || url.pathname === '/manifest.webmanifest' || url.pathname === '/search-index.json' || url.pathname.startsWith('/icons/') || url.pathname === '/favicon.svg')) {
           const copy = res.clone();
           caches.open(PAGE_CACHE).then((cache) => cache.put(req, copy));
         }

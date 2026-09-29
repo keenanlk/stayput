@@ -7,6 +7,7 @@ site will render this file.
 ## Unreleased
 
 ### Added
+- Search in the header: press / or Ctrl+K (Cmd+K on a Mac), or tap the search icon on a phone, to find any tool, conversion page or guide. Everyday words work ("shrink a PDF", "iPhone photo", "remove password"). Matching happens on the page; nothing you type is sent anywhere.
 - The Image Converter detects each file's real format from its bytes (and says when the extension is wrong), has a searchable format picker, and can now save PDF, ICO (favicon sizes 16 to 256), GIF, BMP and TIFF as well as JPG, PNG and WebP.
 - This changelog.
 

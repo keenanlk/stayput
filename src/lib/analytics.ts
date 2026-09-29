@@ -15,6 +15,10 @@
  *   and ns (experiment E2 arm, "on" or "off"). The image converter adds
  *   format, the output format picked ("ico"; never anything about the file).
  * - next_step: a click on a suggested next tool. tool, to, ns.
+ * - search_open: the header search was opened. page.
+ * - search_pick: a header search result was opened. to (a site path), kind
+ *   (tool, page or guide), rank. Never the words typed, which stay on the page.
+ *   files_added and tool_run on the page it opens carry via=search (E18).
  */
 import { journey, recordRun } from './journey';
 declare global {
@@ -104,7 +108,7 @@ export function trackPageContext(): void {
 
 function context(): Record<string, string> {
   const j = journey();
-  return { landing: j.landing, ref: j.ref, from: j.from, visit: j.visit };
+  return { landing: j.landing, ref: j.ref, from: j.from, visit: j.visit, ...(j.via ? { via: j.via } : {}) };
 }
 
 /** Coarse error category for tool_run failures: the error's own name, never its message or stack. */
