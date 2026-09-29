@@ -115,3 +115,8 @@ wd = ImageDraw.Draw(swatches)
 wd.rectangle([200, 0, 399, 99], fill=(0x1D, 0x35, 0x57))
 wd.rectangle([200, 100, 399, 199], fill=(0xA8, 0xDA, 0xDC))
 swatches.save(os.path.join(out, 'swatches.png'))
+
+# 121x81 animated GIF for GIF to MP4: red for 200 ms, green for 300 ms, blue
+# for 500 ms, looping. Odd sides, so the video must round them to even.
+anim = [Image.new('RGB', (121, 81), c) for c in [(230, 20, 20), (20, 200, 40), (20, 40, 230)]]
+anim[0].save(os.path.join(out, 'anim.gif'), save_all=True, append_images=anim[1:], duration=[200, 300, 500], loop=0)
