@@ -2710,6 +2710,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-background-remover',
+    name: 'Video background remover',
+    title: 'Remove or Blur a Video Background, Free, No Upload | Stayput',
+    description:
+      'Remove the background behind the person in a video: blur it, fill it with a colour or green screen, or put a picture behind them. An AI person finder runs on your device; no upload, no watermark.',
+    heading: 'Remove the background from a video',
+    tagline: 'The person stays, the room goes: blurred, a flat colour or a picture of your choice, done frame by frame on your own device.',
+    category: 'media',
+    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp',
+    multiple: true,
+    dropLabel: 'Drop a video, and a picture if you want it behind you',
+    action: 'Replace background',
+    keywords: ['remove background from video', 'video background remover', 'blur video background', 'change video background', 'green screen video', 'replace video background', 'virtual background video'],
+    steps: [
+      'Drop a video of a person. For a picture behind them, drop the JPG or PNG with it.',
+      'Choose Blur, a Colour (green is ready for keying in an editor) or Picture.',
+      'Press Replace background. The first run downloads the person finder once; each frame is then redrawn and the new video downloads.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Each frame is examined and redrawn in this tab, and the video is encoded by your browser. Recordings of your home, your children or your office never leave your device.',
+      },
+      {
+        q: 'What kind of video works best?',
+        a: 'One or two people, facing the camera, lit from the front: video calls, talking-head clips, presentations, dance videos. The person finder is built for people, so pets and objects are treated as background, and fine hair or fast hand movements can blur at the edge.',
+      },
+      {
+        q: 'Can I get a transparent background?',
+        a: 'Not directly, since MP4 has no transparency. Choose Colour and keep the green, then use the chroma key effect in Premiere, DaVinci Resolve, CapCut or OBS to make it transparent there.',
+      },
+      {
+        q: 'Is the sound kept?',
+        a: 'Yes. Only the picture is redrawn; the soundtrack is copied into the new video.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'Every frame is examined and encoded again, so it depends on the length and resolution of the video and on your device. Keep the tab open while it works; the progress bar shows how far it has got.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

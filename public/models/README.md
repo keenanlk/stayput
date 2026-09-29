@@ -39,6 +39,13 @@ the instrumental; UVR scales that by 1.022. The vocal remover loads it on the
 first song and runs it in a web worker through onnxruntime-web, on WebGPU
 when the browser has it and WebAssembly otherwise, both served from /vendor/.
 
+`selfie_multiclass_256x256.tflite` is Google's MediaPipe selfie multiclass
+segmenter (float32, Apache License 2.0; see the MediaPipe image segmenter
+model card), from
+https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite
+The video background remover loads it on the first video and runs it through
+@mediapipe/tasks-vision, served from /vendor/; only its background channel is used.
+
 Files here are served with a one-year immutable cache and cached by the service
 worker, so a changed model must get a new file name.
 
