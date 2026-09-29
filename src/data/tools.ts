@@ -1628,6 +1628,90 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'qr-code-generator',
+    name: 'QR code generator',
+    title: 'Free QR Code Generator: Never Expires, No Sign-up | Stayput',
+    description:
+      'Make a QR code for a link, Wi-Fi, a contact card, an email or a phone number. Static codes that never expire, PNG or SVG, no sign-up, no tracking.',
+    heading: 'Make a QR code',
+    tagline: 'For a link, your Wi-Fi, a contact card, an email or a phone number. The code is made on this page and works forever.',
+    category: 'images',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Make a QR code',
+    action: 'Download',
+    keywords: ['qr code generator', 'free qr code generator', 'qr code generator free no sign up', 'wifi qr code', 'qr code for link', 'vcard qr code', 'qr code that never expires', 'static qr code'],
+    steps: [
+      'Choose what the code holds: a link or any text, Wi-Fi details, a contact card, an email or a phone number, and fill it in. The preview updates as you type.',
+      'Optionally change the colours, the size and the error correction under "Colours, size and error correction". Keep the code dark on a light background.',
+      'Download a PNG for documents and screens, or an SVG for print, which stays sharp at any size. Scan the preview with your phone to check it first.',
+    ],
+    faq: [
+      {
+        q: 'Will my QR code stop working?',
+        a: 'No. The code holds your link or text itself (a "static" code), so there is nothing to expire and no account to keep paying for. Many QR generators make "dynamic" codes that point at their own short link, which stop working or show an ad page when a free trial ends.',
+      },
+      {
+        q: 'Is my Wi-Fi password sent anywhere?',
+        a: 'No. The code is built by code in this page from what you type, and nothing is sent to a server, not even a usage count of what you typed. You can load the page, turn off your internet connection, and it still works.',
+      },
+      {
+        q: 'Do you track who scans my code?',
+        a: 'No, and we cannot: a static code sends the phone straight to your link, with nothing of ours in between. If you need scan counts, add a campaign tag such as ?utm_source=qr to your link and read it in your own analytics.',
+      },
+      {
+        q: 'PNG or SVG?',
+        a: 'PNG for documents, slides, websites and social posts. SVG for print, signage and design tools such as Figma, Illustrator, Canva or InDesign: it is made of shapes, so it stays crisp at any size.',
+      },
+      {
+        q: 'What is error correction?',
+        a: 'Extra data that lets a camera read the code when part of it is scratched, dirty or covered by a logo. Medium suits most uses; choose Quartile or High for outdoor prints, or if you will place a logo over the middle. More correction makes the code denser.',
+      },
+    ],
+  },
+  {
+    slug: 'screen-recorder',
+    name: 'Screen recorder',
+    title: 'Free Online Screen Recorder, No Upload or Watermark | Stayput',
+    description:
+      'Record your screen, a window or a browser tab with sound and your microphone, right in the browser. No install, no sign-up, no watermark, no time limit.',
+    heading: 'Record your screen',
+    tagline: 'Capture your screen, one window or a tab, with its sound and your voice. The video is made in this tab and never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.webm',
+    multiple: false,
+    dropLabel: 'Record your screen',
+    action: 'Save recording',
+    keywords: ['screen recorder', 'online screen recorder', 'record screen', 'screen recorder with audio', 'free screen recorder', 'screen recorder no watermark', 'record my screen'],
+    steps: [
+      'Choose whether to record the sound from the screen, your microphone or both, then press Start recording.',
+      'Your browser asks what to share: the entire screen, one window or one tab. Pick it and press Share. To include the sound of a tab or the whole screen, tick "Share audio" in that picker.',
+      'Pause and resume as needed, then press Stop and save (or the browser\'s own Stop sharing). Watch the recording on the page and download it as MP4 or WebM.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. Your browser records the screen and writes the video in this tab, and the file goes straight to your downloads. There is no account, no server, no watermark and no time limit, and nobody else ever sees what you recorded.',
+      },
+      {
+        q: 'Why is there no sound in my recording?',
+        a: 'The sound is only captured when you share it. In Chrome and Edge, tick "Share audio" (or "Also share tab audio") in the browser\'s picker; a single window cannot share its sound, so share the tab or the entire screen instead. Firefox and Safari do not share screen sound at all, so tick "My microphone" to narrate instead.',
+      },
+      {
+        q: 'Is the video MP4 or WebM?',
+        a: 'It depends on the browser. Recent Chrome and Edge and Safari record MP4, which plays everywhere; Firefox records WebM. To turn a WebM into MP4, use Video to MP4 afterwards, and to make the file smaller, use Compress video.',
+      },
+      {
+        q: 'Can I record on my phone?',
+        a: 'Not in a web page: phone and tablet browsers do not let websites capture the screen. Use the recorder built into the phone instead (Screen Recording in the iPhone Control Centre, or Screen record in Android\'s quick settings), then trim or compress the video here.',
+      },
+      {
+        q: 'Is there a time limit?',
+        a: 'No. The recording is held in your computer\'s memory until you save it, so very long recordings at 60 frames per second need a fair amount of free memory. An hour at 30 frames per second is usually a few hundred megabytes to a couple of gigabytes, depending on how much moves on screen.',
+      },
+    ],
+  },
+  {
     slug: 'voice-recorder',
     name: 'Voice recorder',
     title: 'Online Voice Recorder: Record to MP3, No Upload | Stayput',

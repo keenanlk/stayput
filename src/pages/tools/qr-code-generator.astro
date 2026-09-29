@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import QrStage from '../../components/QrStage.astro';
+const tool = toolBySlug('qr-code-generator')!;
+---
+<ToolLayout tool={tool}>
+  <QrStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/qr-code-generator.ts"></script>

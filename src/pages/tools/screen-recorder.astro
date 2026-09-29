@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RecordStage from '../../components/RecordStage.astro';
+const tool = toolBySlug('screen-recorder')!;
+---
+<ToolLayout tool={tool}>
+  <RecordStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/screen-recorder.ts"></script>

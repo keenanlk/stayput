@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(58);
+  expect(await page.locator('.tool-card').count()).toBe(60);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3648,6 +3648,151 @@ test('WAV to FLAC opens with FLAC chosen', async ({ page }) => {
   await page.goto('/wav-to-flac');
   await expect(page.locator('#format')).toHaveValue('flac');
   await expect(page.locator('#format-note')).toContainText('keeps every sample');
+});
+
+test('QR code generator draws a code as you type and downloads PNG and SVG, and nothing typed leaves the tab', async ({ page }) => {
+  const errors = await open(page, 'qr-code-generator');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#qr-png')).toBeDisabled();
+  await page.locator('#qr-text').fill('https://www.example.com/menu');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-state', 'ready');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-version', '3');
+  await expect(page.locator('#qr-info')).toContainText('29 × 29 squares');
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-png').click()]);
+  expect(png.suggestedFilename()).toBe('example-com-qr-code.png');
+  const bytes = await bytesOf(png);
+  expect(pngSize(bytes)).toEqual({ width: 1024, height: 1024 });
+  // 29 squares plus a 4-square border each side: the top-left finder's corner is dark, the border light.
+  const unit = 1024 / 37;
+  expect(await pixelAt(page, bytes, Math.round(unit * 4.5), Math.round(unit * 4.5))).toEqual([0, 0, 0, 255]);
+  expect(await pixelAt(page, bytes, Math.round(unit * 2), Math.round(unit * 2))).toEqual([255, 255, 255, 255]);
+  await page.locator('.qr-look summary').click();
+  await page.locator('#qr-clear').check();
+  const [svg] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-svg').click()]);
+  expect(svg.suggestedFilename()).toBe('example-com-qr-code.svg');
+  const text = Buffer.from(await bytesOf(svg)).toString();
+  expect(text).toContain('viewBox="0 0 37 37"');
+  expect(text).not.toContain('<rect');
+  // Swapping the colours so the code is lighter than its background warns.
+  await page.locator('#qr-clear').uncheck();
+  await page.locator('#qr-dark').fill('#ffffff');
+  await page.locator('#qr-light').fill('#000000');
+  await expect(page.locator('#qr-info')).toContainText('lighter than its background');
+  net.assertNothingLeft(['example.com']);
+  expect(errors).toEqual([]);
+});
+
+test('Wi-Fi QR code page opens on Wi-Fi and keeps the password in the page', async ({ page }) => {
+  await stubAnalytics(page);
+  const net = watchNetwork(page);
+  await page.goto('/wifi-qr-code-generator');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('input[name="qr-kind"][value="wifi"]')).toBeChecked();
+  await expect(page.locator('#qr-ssid')).toBeVisible();
+  await expect(page.locator('#qr-text')).toBeHidden();
+  await page.locator('#qr-ssid').fill('Guest Net');
+  await page.locator('#qr-pass').fill('hunter2-secret');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-state', 'ready');
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-png').click()]);
+  expect(png.suggestedFilename()).toBe('wifi-qr-code.png');
+  // The usage ping says a Wi-Fi code was made, never what is in it.
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run').length)).toBe(1);
+  const run = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.find((e) => e.n === 'tool_run')!.d);
+  expect(run.tool).toBe('wifi-qr-code-generator');
+  expect(run.format).toBe('wifi-png');
+  expect(JSON.stringify(run)).not.toContain('hunter2');
+  net.assertNothingLeft(['hunter2-secret', 'Guest Net']);
+});
+
+/**
+ * Stand in for the browser's screen picker: a moving canvas, and optionally a
+ * tone as the shared sound, the way getDisplayMedia hands back a tab with audio.
+ */
+async function fakeScreen(page: Page, opts: { sound: boolean }) {
+  await page.addInitScript((sound) => {
+    navigator.mediaDevices.getDisplayMedia = async (constraints?: DisplayMediaStreamOptions) => {
+      (window as unknown as { __asked: unknown }).__asked = constraints;
+      const c = document.createElement('canvas');
+      c.width = 640;
+      c.height = 360;
+      const ctx = c.getContext('2d')!;
+      let t = 0;
+      setInterval(() => {
+        ctx.fillStyle = `hsl(${(t += 7) % 360},70%,50%)`;
+        ctx.fillRect(0, 0, 640, 360);
+      }, 30);
+      const tracks: MediaStreamTrack[] = [...c.captureStream(30).getVideoTracks()];
+      if (sound && constraints?.audio) {
+        const ac = new AudioContext();
+        const osc = ac.createOscillator();
+        const dest = ac.createMediaStreamDestination();
+        osc.connect(dest);
+        osc.start();
+        tracks.push(...dest.stream.getAudioTracks());
+      }
+      return new MediaStream(tracks);
+    };
+  }, opts.sound);
+}
+
+test('Screen recorder records the shared screen with its sound, and no bytes leave the tab', async ({ page }) => {
+  await fakeScreen(page, { sound: true });
+  const errors = await open(page, 'screen-recorder');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#rec-start').click();
+  await expect(page.locator('#rec-screen')).toHaveAttribute('data-state', 'live');
+  await expect(page.locator('#rec-stop')).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { __asked: DisplayMediaStreamOptions }).__asked.audio)).toBe(true);
+  // Pause for a moment: the clock stops while paused.
+  await page.waitForTimeout(1200);
+  await page.locator('#rec-pause').click();
+  await expect(page.locator('#rec-screen')).toHaveAttribute('data-state', 'paused');
+  const paused = await page.locator('#rec-time').textContent();
+  await page.waitForTimeout(1200);
+  await expect(page.locator('#rec-time')).toHaveText(paused!);
+  await page.locator('#rec-pause').click();
+  await page.waitForTimeout(1000);
+  await page.locator('#rec-stop').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 30_000 });
+  await expect(page.locator('#rec-screen')).toHaveAttribute('data-state', 'done');
+  await expect(page.locator('#rec-start')).toHaveText('Record again');
+  const item = page.locator('#results-list .result-item');
+  await expect(item).toHaveCount(1);
+  await expect(item.locator('.name')).toHaveText(/^screen-recording-\d{4}-\d{2}-\d{2}-\d{4}\.(mp4|webm)$/);
+  const [download] = await Promise.all([page.waitForEvent('download'), item.getByRole('button', { name: 'Download' }).click()]);
+  const bytes = await bytesOf(download);
+  const tracks = await videoTracks(bytes);
+  expect(tracks.video).toMatchObject({ width: 640, height: 360 });
+  expect(tracks.audio).toBe(1);
+  // The length is written, so the file can be seeked; paused time is left out.
+  const seconds = await videoSeconds(bytes);
+  expect(seconds).toBeGreaterThan(1.5);
+  expect(seconds).toBeLessThan(3.2);
+  // The recording plays back on the page.
+  await expect(page.locator('#rec-preview')).toHaveAttribute('src', /^blob:/);
+  net.assertNothingLeft(['screen-recording']);
+  expect(errors).toEqual([]);
+});
+
+test('Screen recorder says when no sound was shared, and the with-audio page ticks the microphone', async ({ page }) => {
+  await fakeScreen(page, { sound: false });
+  await page.context().grantPermissions(['microphone']);
+  await stubAnalytics(page);
+  await page.goto('/screen-recorder-with-audio');
+  await expect(page.locator('#rec-mic')).toBeChecked();
+  await expect(page.locator('#rec-system')).toBeChecked();
+  await page.locator('#rec-mic').uncheck();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#rec-start').click();
+  await expect(page.locator('#rec-note')).toContainText('No sound was shared');
+  await page.waitForTimeout(800);
+  await page.locator('#rec-stop').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 30_000 });
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#results-list .result-item').getByRole('button', { name: 'Download' }).click()]);
+  expect((await videoTracks(await bytesOf(download))).audio).toBe(0);
 });
 
 test('Voice recorder records the microphone to an MP3 that keeps the pitch, and no bytes leave the tab', async ({ page }) => {
