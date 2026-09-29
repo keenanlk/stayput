@@ -83,5 +83,11 @@
       "ort-wasm-simd-threaded.wasm": "dist/ort-wasm-simd-threaded.wasm",
       "ort-wasm-simd-threaded.mjs": "dist/ort-wasm-simd-threaded.mjs"
     }
+  },
+  "rnnoise": {
+    "package": "@shiguredo/rnnoise-wasm",
+    "version": "2025.1.5",
+    "entry": "rnnoise.js",
+    "files": { "rnnoise.js": "dist/rnnoise.js", "LICENSE": "LICENSE" }
   }
 }
