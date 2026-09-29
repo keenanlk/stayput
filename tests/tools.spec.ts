@@ -508,7 +508,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'webp-to-gif'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'webp-to-gif', 'png-to-gif', 'jpg-to-gif', 'jpg-to-tiff', 'png-to-tiff'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -522,10 +522,33 @@ test('format-pair pages render, preset the converter and link a social image', a
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');
-    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp', gif: 'image/gif' }[to!];
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp', gif: 'image/gif', tiff: 'image/tiff' }[to!];
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }
+});
+
+test('PNG to TIFF, JPG to TIFF and PNG to GIF pages write files other software opens, and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  const net = watchNetwork(page);
+  for (const [slug, file, ext, format] of [['png-to-tiff', 'graphic.png', 'tiff', 'TIFF'], ['jpg-to-tiff', 'plain.jpg', 'tiff', 'TIFF'], ['png-to-gif', 'graphic.png', 'gif', 'GIF'], ['jpg-to-gif', 'plain.jpg', 'gif', 'GIF']] as const) {
+    await page.goto(`/${slug}`);
+    const { downloads } = await run(page, [file]);
+    expect(downloads[0]!.suggestedFilename(), slug).toBe(`${file.split('.')[0]}.${ext}`);
+    const read = pillowReads(await bytesOf(downloads[0]!), ext);
+    expect(read.format, slug).toBe(format);
+  }
+  net.assertNothingLeft(['graphic.png', 'plain.jpg']);
+});
+
+test('Screenshot to PDF page puts each screenshot on its own page at its own size', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/screenshot-to-pdf');
+  const { downloads } = await run(page, ['stripes.png', 'graphic.png']);
+  const doc = await PDFDocument.load(await bytesOf(downloads[0]!));
+  expect(doc.getPageCount()).toBe(2);
+  // Fit to each image with no margin: one point per pixel.
+  expect([0, 1].map((i) => doc.getPage(i).getSize())).toEqual([{ width: 400, height: 300 }, { width: 640, height: 480 }]);
 });
 
 test('JFIF to JPG page renames and re-encodes a .jfif as .jpg', async ({ page }) => {
@@ -891,6 +914,11 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#file-input')).toHaveAttribute('accept', /mkv/);
     }],
     ['aac-to-mp3', 'video-to-mp3', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /aac/)],
+    ['screenshot-to-pdf', 'image-to-pdf', async () => {
+      await expect(page.locator('#page-size')).toHaveValue('fit');
+      await expect(page.locator('#margin')).toHaveValue('0');
+      await expect(page.locator('#file-input')).toHaveAttribute('accept', /heic/);
+    }],
     ['webm-to-gif', 'video-to-gif', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /webm/)],
     ['blur-text-in-image', 'blur-image', async () => {
       await expect(page.locator('input[name="area"][value="areas"]')).toBeChecked();

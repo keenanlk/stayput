@@ -1501,6 +1501,37 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'screenshot-to-pdf',
+    base: 'image-to-pdf',
+    name: 'Screenshot to PDF',
+    title: 'Screenshot to PDF: Combine Screenshots Into One PDF, No Upload | Stayput',
+    description: 'Turn screenshots into one PDF in your browser, text kept pixel-sharp. For receipts, chats, bookings and evidence. Reorder pages, nothing uploaded.',
+    heading: 'Convert screenshots to PDF',
+    tagline: 'Combine phone or desktop screenshots into a single, sharp PDF, in the order you choose, without uploading them.',
+    keywords: ['screenshot to pdf', 'convert screenshot to pdf', 'screenshots to pdf', 'combine screenshots into pdf', 'png screenshot to pdf', 'iphone screenshot to pdf'],
+    accept: 'image/png,image/jpeg,image/webp,image/heic,image/heif,.png,.jpg,.jpeg,.webp,.heic,.heif',
+    dropLabel: 'Drop screenshots here',
+    defaults: { 'page-size': 'fit', margin: '0' },
+    intro: [
+      'Screenshots end up as PDFs when someone needs a record: an order confirmation or receipt for an expense claim, a boarding pass, a chat thread for a landlord dispute, HR or a lawyer, error messages for a support ticket, a bank transfer confirmation, or a set of app screens for a client. A single PDF keeps them in order, opens on anything, and attaches to a form that takes one file.',
+      'Screenshots are mostly text and flat colour, which JPG compression smears. This page keeps PNG screenshots as PNG inside the PDF, so letters stay pixel-sharp at any zoom. JPG and WebP screenshots are embedded as they are, and iPhone screenshots saved as HEIC are decoded in the browser first. Each screenshot gets its own page at its own size, with no margin, so the PDF looks like the screens themselves.',
+      'Long scrolling screenshots of a web page or chat come out as one tall page. Acrobat and some older viewers cap page length at 200 inches, about 14,400 pixels at this page’s scale; browsers and phone viewers show taller pages fine. For printing, pick A4 or US Letter, which scales each screenshot to fit a page.',
+      'Screenshots are often the most private images on a phone: bank balances, messages, medical portals, addresses. Nothing here leaves your device. The PDF is assembled by pdf-lib in this tab, and the page keeps working with the network off once it has loaded.',
+    ],
+    steps: [
+      'Drop your screenshots, or tap to pick them from your photos. Reorder them with the arrows.',
+      'Keep “Fit to each image” so every page matches its screenshot, or choose A4 or Letter for printing.',
+      'Convert. The PDF downloads with one screenshot per page.',
+    ],
+    faq: [
+      { q: 'How do I turn iPhone screenshots into a PDF?', a: 'Open this page in Safari, tap the drop zone and choose Photo Library, then select the screenshots in order. The PDF is saved to Downloads in the Files app, ready to attach or share.' },
+      { q: 'Will the text in my screenshots stay sharp?', a: 'Yes. PNG screenshots are stored losslessly inside the PDF, pixel for pixel, and JPG ones are embedded unchanged. Nothing is re-compressed.' },
+      { q: 'Can I search or copy the text in the PDF?', a: 'Not directly: the pages are pictures of text. To get the words out, run the screenshots through Image to text first, which reads them in your browser.' },
+      { q: 'Can I redact something before making the PDF?', a: 'Yes. Cover account numbers or names with a solid box on Blur text in image first, then add the edited screenshots here. A black box cannot be reversed; blur on small text sometimes can.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
