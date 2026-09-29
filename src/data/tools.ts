@@ -1906,6 +1906,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'audio-to-video',
+    name: 'Audio to video',
+    title: 'Audio to Video: Turn MP3 into MP4 with a Picture | Stayput',
+    description:
+      'Make a video from a song, podcast or voice note and a cover picture, for YouTube, Instagram or TikTok. 16:9, square or 9:16. In your browser, no upload.',
+    heading: 'Turn audio into a video',
+    tagline: 'Put a song, a podcast episode or a voice note on a still picture, ready for YouTube or social apps. Made on this device.',
+    category: 'media',
+    accept: 'audio/*,image/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac,.jpg,.jpeg,.png,.webp,.heic',
+    multiple: true,
+    dropLabel: 'Drop a sound file and a picture',
+    action: 'Make video',
+    keywords: ['audio to video', 'mp3 to mp4', 'convert mp3 to video', 'add picture to mp3', 'mp3 to video with image', 'audio to mp4', 'podcast to video'],
+    steps: [
+      'Drop a sound file (MP3, WAV, M4A, FLAC or OGG) and a picture such as the album cover, or tap to pick them. Without a picture, the video shows the title on a plain background.',
+      'Choose the shape: 16:9 for YouTube, square for feeds, or 9:16 for Shorts, Reels and TikTok. The picture is shown whole, over a blurred copy of itself or plain black or white.',
+      'Make the video. It is written as an MP4 in your browser and downloads when it is ready.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound and writes the video with its own encoders, in this tab. There is no size or length limit and no watermark, and nothing is sent anywhere.',
+      },
+      {
+        q: 'Why is the video file so small?',
+        a: 'The picture does not change, so the video part is a single still frame repeated once a second, which costs almost nothing. Nearly all of the file is the sound, at 192 kbps.',
+      },
+      {
+        q: 'Can I make videos for a whole album at once?',
+        a: 'Yes. Drop all the tracks and one cover picture: each track becomes its own video with the same picture.',
+      },
+      {
+        q: 'Will YouTube accept it?',
+        a: 'Yes. It is a standard MP4 at 1920×1080 (or 1080×1080, or 1080×1920 for Shorts). In Chrome, Edge and Safari the picture is H.264 and the sound AAC, which play everywhere.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
