@@ -11,7 +11,7 @@ export interface Pair {
   from: string;
   to: string;
   /** Output MIME type preset in the converter. */
-  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon' | 'image/bmp';
+  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon' | 'image/bmp' | 'image/gif';
   accept: string;
   title: string;
   description: string;
@@ -49,6 +49,12 @@ const bmpSteps = (from: string) => [
   `Drop your ${from} files onto the page, or tap to pick them. Batches are fine.`,
   'Pick a background colour for any transparent areas, since BMP here is 24-bit with no alpha channel.',
   'Download each BMP, or all of them as one zip.',
+];
+
+const gifSteps = (from: string) => [
+  `Drop your ${from} files onto the page, or tap to pick them. Animated or still, batches are fine.`,
+  'Nothing to set: animations keep every frame, their timing and their loop, and still images become a single-frame GIF.',
+  'Download each GIF, or all of them as one zip.',
 ];
 
 export const pairs: Pair[] = [
@@ -601,13 +607,39 @@ export const pairs: Pair[] = [
       { q: 'Is the file uploaded?', a: 'No. Everything happens in this tab; you can disconnect from the internet after the page loads and it still converts.' },
     ],
   },
+  {
+    slug: 'webp-to-gif',
+    from: 'WebP',
+    to: 'GIF',
+    outputType: 'image/gif',
+    accept: 'image/webp,.webp',
+    title: 'WebP to GIF Converter, Keeps Animation, No Upload | Stayput',
+    description: 'Convert animated WebP stickers and clips to GIF with every frame and its timing kept. Still WebPs work too. Free, in your browser, nothing uploaded.',
+    heading: 'Convert WebP to GIF',
+    tagline: 'Animated WebPs stay animated: every frame, its timing and its loop, turned into a GIF on your device.',
+    keywords: ['webp to gif', 'animated webp to gif', 'convert webp to gif', 'webp to gif converter', 'webp sticker to gif'],
+    intro: [
+      'Most people converting WebP to GIF have an animation: a sticker saved from WhatsApp or Telegram, a reaction clip from a website, a loop from Giphy or Tenor that downloaded as .webp instead of .gif. Many places still only play GIFs, including older chat apps, forum software, email signatures, slide decks and a lot of content management systems. Drop the WebP in one of those and you get a frozen first frame, or an upload error.',
+      'A lot of converters make the same mistake, because browsers only expose the first frame of an animated WebP to a web page. This one reads the WebP file itself: it walks the animation frame by frame, decodes each frame with your browser’s WebP decoder, lays it onto the canvas using the blend and disposal rules stored in the file, and writes each finished frame into the GIF with its original delay. The loop setting carries over too, so a forever-looping sticker still loops forever.',
+      'GIF is an old format with two limits worth knowing. Each frame holds at most 256 colours, so gradients and photographic clips can show some banding or speckle; flat stickers, emoji and cartoons look the same as the original. And GIF transparency is on or off per pixel, so soft, semi-transparent edges become hard ones. That is why a GIF is often two to five times larger than the WebP it came from.',
+      'Every step happens in this tab. Stickers and clips from private chats never leave your device, there is no queue, and the page keeps working with the network switched off once it has loaded.',
+    ],
+    faq: [
+      { q: 'Will my animated WebP stay animated?', a: 'Yes. Every frame is converted, with the same timing and loop count as the original. The result note shows how many frames went into the GIF.' },
+      { q: 'Why is the GIF bigger than the WebP?', a: 'WebP compresses animation far better than GIF, which dates from 1987. A GIF of the same clip is usually two to five times the size. For long or large clips, check your destination’s size limit; many chat apps stop at 8 or 10 MB for GIFs.' },
+      { q: 'The colours look slightly grainy. Can I fix that?', a: 'That is the 256-colour limit of GIF at work, and it shows mostly on gradients and filmed footage. Cartoon stickers and flat graphics come through cleanly. If the destination accepts WebP or MP4, keep the original instead.' },
+      { q: 'What about a still WebP?', a: 'It becomes a single-frame GIF. For still images, PNG or JPG are usually better choices: [WebP to PNG](/webp-to-png) keeps full colour and transparency.' },
+      { q: 'How do I save a WhatsApp or Telegram sticker as a WebP first?', a: 'On desktop, stickers are saved as .webp when you right-click and save them, or when you export the chat media. Drop that file here. Stickers in Telegram’s .tgs or .webm formats are a different kind of animation and are not supported.' },
+      { q: 'Is anything uploaded?', a: 'No. The file is read, decoded and re-encoded in this browser tab. Nothing is sent to a server.' },
+    ],
+  },
 ];
 
 export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => p.slug === slug);
 
 /** A Pair expressed as a Tool so it can use the shared tool layout. */
 export function pairAsTool(p: Pair): Tool {
-  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : p.outputType === 'image/bmp' ? bmpSteps(p.from) : jpgSteps(p.from);
+  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : p.outputType === 'image/bmp' ? bmpSteps(p.from) : p.outputType === 'image/gif' ? gifSteps(p.from) : jpgSteps(p.from);
   return {
     slug: p.slug,
     path: `/${p.slug}`,

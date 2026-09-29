@@ -455,7 +455,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'webp-to-gif'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -469,7 +469,7 @@ test('format-pair pages render, preset the converter and link a social image', a
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');
-    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp' }[to!];
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp', gif: 'image/gif' }[to!];
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }
@@ -861,6 +861,38 @@ test('TIFF to JPG and TIFF to PNG decode TIFFs the browser cannot open', async (
       return [bmp.width, bmp.height];
     }, [Array.from(bytes), type] as const);
     expect(dims, slug).toEqual([800, 1000]);
+  }
+});
+
+test('WebP to GIF keeps every frame, the timing and the compositing of animated WebPs', async ({ page }) => {
+  for (const file of ['anim.webp', 'anim-lossless.webp']) {
+    await stubAnalytics(page);
+    await page.goto('/webp-to-gif');
+    const net = watchNetwork(page);
+    const { downloads } = await run(page, [file]);
+    await expect(page.locator('#results')).toContainText('4 frames');
+    const bytes = await bytesOf(downloads[0]!);
+    const frames = await page.evaluate(async (b) => {
+      const dec = new ImageDecoder({ data: new Uint8Array(b), type: 'image/gif' });
+      await dec.tracks.ready;
+      const out: { red: boolean; clearBehind: boolean; ms: number }[] = [];
+      for (let i = 0; i < dec.tracks.selectedTrack!.frameCount; i++) {
+        const { image } = await dec.decode({ frameIndex: i });
+        const c = new OffscreenCanvas(image.displayWidth, image.displayHeight);
+        const ctx = c.getContext('2d')!;
+        ctx.drawImage(image, 0, 0);
+        // Centre of this frame's dot, and where the first frame's dot was.
+        const [r, , , a] = ctx.getImageData(30 + i * 30, 40, 1, 1).data;
+        const behind = ctx.getImageData(30, 40, 1, 1).data[3]!;
+        out.push({ red: r! > 180 && a! > 200, clearBehind: i === 0 || behind === 0, ms: (image.duration ?? 0) / 1000 });
+        image.close();
+      }
+      return out;
+    }, Array.from(bytes));
+    expect(frames.length, file).toBe(4);
+    expect(frames.every((f) => f.red && f.clearBehind), file).toBe(true);
+    if (file === 'anim.webp') expect(frames.map((f) => f.ms)).toEqual([100, 150, 200, 250]);
+    net.assertNothingLeft([file]);
   }
 });
 

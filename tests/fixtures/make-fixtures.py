@@ -66,3 +66,13 @@ pages[0].save(os.path.join(out, 'scan.tiff'), save_all=True, append_images=pages
 fax = Image.new('1', (1728, 600), 1)
 ImageDraw.Draw(fax).rectangle([100, 100, 900, 300], fill=0)
 fax.save(os.path.join(out, 'fax.tif'), compression='group4')
+
+# Animated WebPs: a red dot moving over a transparent background, lossy (with
+# a separate alpha chunk) and lossless, four frames of different lengths
+anim = []
+for i in range(4):
+    f = Image.new('RGBA', (160, 80), (0, 0, 0, 0))
+    ImageDraw.Draw(f).ellipse([10 + i * 30, 20, 50 + i * 30, 60], fill=(220, 40, 40, 255))
+    anim.append(f)
+anim[0].save(os.path.join(out, 'anim.webp'), save_all=True, append_images=anim[1:], duration=[100, 150, 200, 250], loop=0, quality=90)
+anim[0].save(os.path.join(out, 'anim-lossless.webp'), save_all=True, append_images=anim[1:], duration=100, loop=0, lossless=True)
