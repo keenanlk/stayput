@@ -954,16 +954,16 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['color-picker-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
     ['make-background-transparent', 'remove-background', async () => {
-    ['blur-background', 'remove-background', async () => {
-      await expect(page.locator('input[name="bg"][value="blur"]')).toBeChecked();
-      await expect(page.locator('#strength-field')).toBeVisible();
-      await expect(page.locator('#format')).toHaveValue('image/jpeg');
-    }],
       await expect(page.locator('input[name="bg"][value="transparent"]')).toBeChecked();
       await expect(page.locator('#format')).toHaveValue('image/png');
     }],
     ['white-background', 'remove-background', async () => {
       await expect(page.locator('input[name="bg"][value="white"]')).toBeChecked();
+      await expect(page.locator('#format')).toHaveValue('image/jpeg');
+    }],
+    ['blur-background', 'remove-background', async () => {
+      await expect(page.locator('input[name="bg"][value="blur"]')).toBeChecked();
+      await expect(page.locator('#strength-field')).toBeVisible();
       await expect(page.locator('#format')).toHaveValue('image/jpeg');
     }],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
