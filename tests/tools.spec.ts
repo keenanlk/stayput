@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(41);
+  expect(await page.locator('.tool-card').count()).toBe(42);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3144,4 +3144,48 @@ test('Remove background cuts out the subject at full size with a model served by
   expect(requested.filter((u) => u.endsWith('.onnx')).length).toBe(before);
   net.assertNothingLeft(['face.jpg']);
   expect(errors).toEqual([]);
+});
+
+test('Trim audio shows the waveform and cuts the chosen part to a WAV, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'trim-audio');
+  const net = watchNetwork(page);
+  const song = staticFx('song.flac');
+  const { downloads } = await run(page, [song], async () => {
+    await expect(page.locator('#au-panel')).toBeVisible();
+    await expect(page.locator('#au-panel')).toHaveAttribute('data-duration', /^1(\.0)?$/);
+    await page.locator('#au-start').fill('0.2');
+    await page.locator('#au-end').fill('0.8');
+    await expect(page.locator('#au-estimate')).toContainText('Keeps 0:00.6');
+    await page.locator('#format').selectOption('wav');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('song-trimmed.wav');
+  const wav = await bytesOf(downloads[0]!);
+  const dv = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+  const channels = dv.getUint16(22, true);
+  const rate = dv.getUint32(24, true);
+  const seconds = dv.getUint32(40, true) / (channels * 2 * rate);
+  expect(seconds).toBeCloseTo(0.6, 2);
+  // The waveform was drawn.
+  expect(await page.locator('#au-wave').evaluate((c: HTMLCanvasElement) => c.width)).toBeGreaterThan(0);
+  net.assertNothingLeft(['song.flac']);
+  expect(errors).toEqual([]);
+});
+
+test('MP3 cutter saves an MP3 of the chosen part, faded out by default', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/mp3-cutter');
+  await expect(page.locator('#fade-out')).toBeChecked();
+  const song = staticFx('song.mp3');
+  const before = await soundOf(page, readFileSync(song));
+  const { downloads } = await run(page, [song], async () => {
+    await expect(page.locator('#au-panel')).toBeVisible();
+    await page.locator('#au-end').fill('0.5');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('song-trimmed.mp3');
+  const after = await soundOf(page, await bytesOf(downloads[0]!));
+  // MP3 frames pad the end by up to a few hundredths of a second.
+  expect(after.seconds).toBeGreaterThan(0.48);
+  expect(after.seconds).toBeLessThan(0.58);
+  expect(Math.abs(after.hz - before.hz)).toBeLessThan(before.hz * 0.05);
+  await expect(page.locator('#results-list .result-item')).toContainText('fade out');
 });

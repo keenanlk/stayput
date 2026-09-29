@@ -1552,6 +1552,40 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'trim-audio',
+    name: 'Trim audio',
+    title: 'Trim Audio Online: Cut MP3, WAV or M4A, No Upload | Stayput',
+    description:
+      'Cut the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, in your browser. See the waveform, add fades, save as MP3 or WAV. No upload.',
+    heading: 'Trim audio',
+    tagline: 'Cut a song, a voice memo or a podcast down to the part you want, with fades if you like. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac,.mp4,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a sound file to trim',
+    action: 'Trim audio',
+    keywords: ['trim audio', 'cut audio', 'audio cutter', 'trim mp3', 'cut mp3', 'audio trimmer online', 'cut a song'],
+    steps: [
+      'Drop a sound file (MP3, WAV, M4A, OGG, FLAC) or a video, or tap to pick one.',
+      'Play it or click the waveform, and set the start and end. Add a fade in or out if you want.',
+      'Trim. The part you chose is saved as an MP3 or a WAV.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. Your browser decodes the sound, cuts it and writes the new file in this tab. Voice memos and interviews stay on your device. There is no size limit and no sign-up.',
+      },
+      {
+        q: 'Which format should I save as?',
+        a: 'MP3 at 192 kbps plays on every phone, car and computer and is about a tenth the size of WAV. Choose WAV to keep the sound exactly as decoded, for example to edit it further.',
+      },
+      {
+        q: 'Can I cut the sound out of a video?',
+        a: 'Yes. Drop the video and its sound track is loaded; the part you choose is saved as audio only.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
