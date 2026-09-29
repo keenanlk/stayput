@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(58);
+  expect(await page.locator('.tool-card').count()).toBe(59);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3636,6 +3636,61 @@ test('WAV to FLAC opens with FLAC chosen', async ({ page }) => {
   await page.goto('/wav-to-flac');
   await expect(page.locator('#format')).toHaveValue('flac');
   await expect(page.locator('#format-note')).toContainText('keeps every sample');
+});
+
+test('QR code generator draws a code as you type and downloads PNG and SVG, and nothing typed leaves the tab', async ({ page }) => {
+  const errors = await open(page, 'qr-code-generator');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#qr-png')).toBeDisabled();
+  await page.locator('#qr-text').fill('https://www.example.com/menu');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-state', 'ready');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-version', '3');
+  await expect(page.locator('#qr-info')).toContainText('29 × 29 squares');
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-png').click()]);
+  expect(png.suggestedFilename()).toBe('example-com-qr-code.png');
+  const bytes = await bytesOf(png);
+  expect(pngSize(bytes)).toEqual({ width: 1024, height: 1024 });
+  // 29 squares plus a 4-square border each side: the top-left finder's corner is dark, the border light.
+  const unit = 1024 / 37;
+  expect(await pixelAt(page, bytes, Math.round(unit * 4.5), Math.round(unit * 4.5))).toEqual([0, 0, 0, 255]);
+  expect(await pixelAt(page, bytes, Math.round(unit * 2), Math.round(unit * 2))).toEqual([255, 255, 255, 255]);
+  await page.locator('.qr-look summary').click();
+  await page.locator('#qr-clear').check();
+  const [svg] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-svg').click()]);
+  expect(svg.suggestedFilename()).toBe('example-com-qr-code.svg');
+  const text = Buffer.from(await bytesOf(svg)).toString();
+  expect(text).toContain('viewBox="0 0 37 37"');
+  expect(text).not.toContain('<rect');
+  // Swapping the colours so the code is lighter than its background warns.
+  await page.locator('#qr-clear').uncheck();
+  await page.locator('#qr-dark').fill('#ffffff');
+  await page.locator('#qr-light').fill('#000000');
+  await expect(page.locator('#qr-info')).toContainText('lighter than its background');
+  net.assertNothingLeft(['example.com']);
+  expect(errors).toEqual([]);
+});
+
+test('Wi-Fi QR code page opens on Wi-Fi and keeps the password in the page', async ({ page }) => {
+  await stubAnalytics(page);
+  const net = watchNetwork(page);
+  await page.goto('/wifi-qr-code-generator');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('input[name="qr-kind"][value="wifi"]')).toBeChecked();
+  await expect(page.locator('#qr-ssid')).toBeVisible();
+  await expect(page.locator('#qr-text')).toBeHidden();
+  await page.locator('#qr-ssid').fill('Guest Net');
+  await page.locator('#qr-pass').fill('hunter2-secret');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-state', 'ready');
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-png').click()]);
+  expect(png.suggestedFilename()).toBe('wifi-qr-code.png');
+  // The usage ping says a Wi-Fi code was made, never what is in it.
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run').length)).toBe(1);
+  const run = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.find((e) => e.n === 'tool_run')!.d);
+  expect(run.tool).toBe('wifi-qr-code-generator');
+  expect(run.format).toBe('wifi-png');
+  expect(JSON.stringify(run)).not.toContain('hunter2');
+  net.assertNothingLeft(['hunter2-secret', 'Guest Net']);
 });
 
 /**
