@@ -1,0 +1,69 @@
+---
+/**
+ * The recorder for Screen recorder: a preview of what is being captured, the
+ * start, pause and stop buttons, and the sound and frame rate choices. It
+ * replaces the drop zone, since the file is made here rather than dropped.
+ * Driven by src/tools/screen-recorder.ts.
+ */
+import Icon from './Icon.astro';
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const fps = defaults.fps ?? '30';
+---
+<div id="rec-panel" class="rec-panel">
+  <div class="rec-screen" id="rec-screen" data-state="idle">
+    <video id="rec-preview" class="rec-preview" playsinline muted hidden></video>
+    <div class="rec-idle" id="rec-idle">
+      <Icon name="record" />
+      <strong>Record your screen, a window or one tab</strong>
+      <span>Your browser asks what to share. The recording stays on this device.</span>
+    </div>
+    <span class="rec-live" id="rec-live" hidden><span class="rec-dot" aria-hidden="true"></span><span id="rec-time">0:00</span></span>
+  </div>
+  <div class="rec-controls">
+    <button type="button" class="btn btn-primary btn-lg" id="rec-start">Start recording</button>
+    <button type="button" class="btn btn-lg" id="rec-pause" hidden>Pause</button>
+    <button type="button" class="btn btn-lg" id="rec-stop" hidden>Stop and save</button>
+  </div>
+  <div class="rec-options">
+    <div class="field" role="group" aria-labelledby="rec-sound">
+      <span class="rec-label" id="rec-sound">Sound</span>
+      <label class="check"><input type="checkbox" id="rec-system" checked={defaults.system !== 'false'} /> Sound from the screen or tab</label>
+      <label class="check"><input type="checkbox" id="rec-mic" checked={defaults.mic === 'true'} /> My microphone</label>
+    </div>
+    <div class="field">
+      <label for="rec-fps">Frame rate</label>
+      <select id="rec-fps">
+        <option value="30" selected={fps === '30'}>30 per second (smaller file)</option>
+        <option value="60" selected={fps === '60'}>60 per second (smoother motion)</option>
+      </select>
+    </div>
+  </div>
+  <p class="muted small rec-note" id="rec-note" aria-live="polite"></p>
+</div>
+<style is:global>
+  /* The recording is made here, so there is no drop zone or file list; the run bar saves it again. */
+  .tool-panel:has(#rec-panel) #drop,
+  .tool-panel:has(#rec-panel) #file-list { display: none; }
+  /* Nothing to save until something is recorded. */
+  #tool[data-count='0']:has(#rec-panel) .run-dock { display: none; }
+  .rec-panel { display: grid; gap: 16px; }
+  .rec-screen { position: relative; min-height: 200px; background: var(--surface-2); border: 1px dashed var(--line-strong); border-radius: var(--radius); display: grid; place-items: center; overflow: hidden; }
+  .rec-screen[data-state='live'], .rec-screen[data-state='done'] { border-style: solid; background: #000; }
+  .rec-screen:not([data-state='idle']) { aspect-ratio: 16 / 9; }
+  .rec-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .rec-idle { display: grid; justify-items: center; gap: 6px; padding: 20px; text-align: center; color: var(--muted); }
+  .rec-idle strong { color: var(--ink); font-size: 1.05rem; }
+  .rec-idle svg { width: 36px; height: 36px; color: var(--accent); }
+  .rec-live { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 999px; background: rgb(0 0 0 / 0.65); color: #fff; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 0.9rem; }
+  .rec-dot { width: 10px; height: 10px; border-radius: 50%; background: #e5484d; }
+  .rec-screen[data-state='live'] .rec-dot { animation: rec-blink 1.2s steps(2, jump-none) infinite; }
+  .rec-screen[data-state='paused'] .rec-dot { background: #aaa; }
+  @keyframes rec-blink { 50% { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { .rec-screen[data-state='live'] .rec-dot { animation: none; } }
+  .rec-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+  .rec-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; }
+  .rec-label { font-size: 14px; font-weight: 620; color: var(--ink-2); }
+  .rec-note { margin: 0; }
+  .rec-note.is-warn { color: var(--warn); font-weight: 600; }
+</style>
