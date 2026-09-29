@@ -3,8 +3,8 @@ import Icon from './Icon.astro';
 import { toolPath, type Tool } from '../data/tools';
 import { presetBySlug } from '../data/presets';
 import { pairBySlug } from '../data/pairs';
-interface Props { tool: Tool }
-const { tool } = Astro.props;
+interface Props { tool: Tool; compact?: boolean }
+const { tool, compact = false } = Astro.props;
 const icons: Record<string, string> = {
   'heic-to-jpg': 'image', 'convert-image': 'convert', 'compress-image': 'resize', 'strip-exif': 'eye', 'exif-viewer': 'search',
   'merge-pdf': 'merge', 'split-pdf': 'split', 'compress-pdf': 'compress', 'rotate-pdf': 'rotate',
@@ -16,9 +16,16 @@ const icons: Record<string, string> = {
 // Preset and format-pair landing pages borrow their base tool's icon.
 const icon = icons[tool.slug] ?? icons[presetBySlug(tool.slug)?.base ?? ''] ?? (pairBySlug(tool.slug) ? 'convert' : 'pdf');
 ---
-<a class="tool-card" href={toolPath(tool)}>
-  <div class="icon"><Icon name={icon} /></div>
-  <h3>{tool.name}</h3>
-  <p>{tool.tagline}</p>
-  <Icon name="arrow" class="go" />
-</a>
+{compact ? (
+  <a class="tool-card compact" href={toolPath(tool)} title={tool.tagline}>
+    <div class="icon"><Icon name={icon} /></div>
+    <h3>{tool.name}</h3>
+  </a>
+) : (
+  <a class="tool-card" href={toolPath(tool)}>
+    <div class="icon"><Icon name={icon} /></div>
+    <h3>{tool.name}</h3>
+    <p>{tool.tagline}</p>
+    <Icon name="arrow" class="go" />
+  </a>
+)}

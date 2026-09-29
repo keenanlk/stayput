@@ -2653,6 +2653,6 @@ export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => 
 
 export const categories: { id: Category; label: string; blurb: string }[] = [
   { id: 'images', label: 'Image tools', blurb: 'Convert, shrink and clean photos.' },
-  { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress, reorder, sign and number documents.' },
-  { id: 'media', label: 'Video and audio tools', blurb: 'Pull the sound out of a video, convert audio, make GIFs.' },
+  { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress, sign and convert.' },
+  { id: 'media', label: 'Video and audio tools', blurb: 'Trim, compress and convert clips, make GIFs.' },
 ];
