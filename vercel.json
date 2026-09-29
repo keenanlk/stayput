@@ -369,6 +369,11 @@
       "source": "/remove-silence",
       "destination": "/tools/remove-silence",
       "permanent": true
+    },
+    {
+      "source": "/image-to-svg",
+      "destination": "/tools/image-to-svg",
+      "permanent": true
     }
   ],
   "headers": [

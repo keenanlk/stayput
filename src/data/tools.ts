@@ -2390,6 +2390,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'image-to-svg',
+    name: 'Image to SVG',
+    title: 'Image to SVG Converter: Vectorize PNG and JPG, No Upload | Stayput',
+    description:
+      'Trace a PNG or JPG into a real vector SVG of filled shapes, in black and white, a few flat colours or full detail. Preview before you download. Nothing is uploaded.',
+    heading: 'Convert an image to SVG',
+    tagline: 'Logos, drawings and signatures traced into shapes that scale to any size, on your own device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop images to trace into SVG',
+    action: 'Convert to SVG',
+    keywords: ['image to svg', 'convert image to svg', 'vectorize image', 'image to vector', 'raster to vector', 'bitmap to svg', 'trace image to svg'],
+    steps: [
+      'Drop one or more images. The first one is traced straight away, next to the original.',
+      'Pick a style: black and white for cutting and stencils, few colours for logos, many colours for illustrations. Tick “Leave out white” for a transparent background.',
+      'Press Convert to SVG and download the files.',
+    ],
+    faq: [
+      {
+        q: 'Is it a real vector, or a picture inside an SVG?',
+        a: 'A real vector. Every area of colour is traced into a path of lines and curves, so it stays sharp at any size and can be edited node by node in Inkscape, Illustrator, Figma or Cricut Design Space. Some converters only wrap the original pixels in an SVG file, which is still blurry when enlarged.',
+      },
+      {
+        q: 'Which images trace well?',
+        a: 'Flat artwork with clear edges: logos, icons, line drawings, signatures, text and clip art. A photo can be traced with the Detailed style, but the result is a poster-like image made of thousands of shapes and is usually far larger than the JPG. Use the biggest, cleanest copy of the image you have; a small, blurry or heavily compressed JPG gives wobbly edges.',
+      },
+      {
+        q: 'Are my images uploaded?',
+        a: 'No. The image is decoded and traced by code running in this tab, in a background worker so the page stays responsive. Unreleased logos and client artwork stay on your device.',
+      },
+      {
+        q: 'Can I change the number of colours?',
+        a: 'Pick the style closest to what you need: Black and white uses exactly two, Logo reduces the image to at most 8 colours, and Detailed to at most 32. For a logo with a colour or two too many, try Logo first; the traced colours are averaged from your image, not picked from a fixed palette.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

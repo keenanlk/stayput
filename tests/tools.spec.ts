@@ -1,6 +1,7 @@
 import { test, expect, type Page, type Download, type Locator } from '@playwright/test';
 import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync } from 'node:fs';
 import { execSync, execFileSync } from 'node:child_process';
+import { deflateSync } from 'node:zlib';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -157,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(72);
+  expect(await page.locator('.index .tool-card').count()).toBe(73);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -497,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -974,6 +975,14 @@ test('preset landing pages render, run their base tool with the preset options a
     ['pdf-metadata-viewer', 'remove-pdf-metadata', async () => expect(page.locator('#run')).toContainText('Remove metadata')],
     ['black-and-white-pdf', 'grayscale-pdf', async () => expect(page.locator('#run')).toContainText('Make black and white')],
     ['sepia-filter', 'black-and-white-image', async () => expect(page.locator('input[name="mode"][value="sepia"]')).toBeChecked()],
+    ['png-to-svg', 'image-to-svg', async () => {
+      await expect(page.locator('input[name="mode"][value="logo"]')).toBeChecked();
+      await expect(page.locator('#drop-white')).not.toBeChecked();
+    }],
+    ['jpg-to-svg', 'image-to-svg', async () => {
+      await expect(page.locator('input[name="mode"][value="bw"]')).toBeChecked();
+      await expect(page.locator('#drop-white')).toBeChecked();
+    }],
     ['confidential-watermark', 'watermark-pdf', async () => expect(page.locator('#wm-text')).toHaveValue('CONFIDENTIAL')],
     ['watermark-id-copy', 'watermark-image', async () => expect(page.locator('input[name="layout"][value="tiled"]')).toBeChecked()],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
@@ -4990,4 +4999,105 @@ test('Remove silence says so when there is no pause long enough', async ({ page 
     await page.locator('#format').selectOption('mp3');
   });
   await expect(page.locator('#results-list')).toContainText('no pauses long enough to shorten');
+});
+
+/** A 200×200 PNG logo on a transparent background: a black disc above a red bar. */
+function logoPng(): string {
+  const size = 200;
+  const raw = Buffer.alloc(size * (size * 4 + 1));
+  for (let y = 0; y < size; y++) {
+    raw[y * (size * 4 + 1)] = 0;
+    for (let x = 0; x < size; x++) {
+      const i = y * (size * 4 + 1) + 1 + x * 4;
+      const disc = (x - 100) ** 2 + (y - 80) ** 2 < 50 ** 2;
+      const bar = y >= 150 && y < 180 && x >= 30 && x < 170;
+      if (disc) raw.set([0, 0, 0, 255], i);
+      else if (bar) raw.set([220, 30, 30, 255], i);
+    }
+  }
+  const crcTable = Array.from({ length: 256 }, (_, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    return c >>> 0;
+  });
+  const crc = (b: Buffer) => {
+    let c = 0xffffffff;
+    for (const v of b) c = crcTable[(c ^ v) & 0xff]! ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const chunk = (type: string, data: Buffer) => {
+    const len = Buffer.alloc(4);
+    len.writeUInt32BE(data.length);
+    const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+    const sum = Buffer.alloc(4);
+    sum.writeUInt32BE(crc(body));
+    return Buffer.concat([len, body, sum]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(size, 0);
+  ihdr.writeUInt32BE(size, 4);
+  ihdr.set([8, 6, 0, 0, 0], 8);
+  const png = Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', ihdr),
+    chunk('IDAT', deflateSync(raw)),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'logo.png');
+  writeFileSync(file, png);
+  return file;
+}
+
+/** Draw an SVG in the page and read the colour at a few points. */
+async function svgPixels(page: Page, svg: string, points: [number, number][]): Promise<number[][]> {
+  return page.evaluate(
+    async ([text, pts]) => {
+      const url = URL.createObjectURL(new Blob([text], { type: 'image/svg+xml' }));
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+      return pts.map(([x, y]) => Array.from(ctx.getImageData(x, y, 1, 1).data));
+    },
+    [svg, points] as const,
+  );
+}
+
+test('Image to SVG previews the trace, writes real vector paths at the image size, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'image-to-svg');
+  const net = watchNetwork(page);
+  const file = logoPng();
+  const { downloads } = await run(page, [file], async () => {
+    await expect(page.locator('#svg-panel')).toBeVisible();
+    await expect(page.locator('#svg-caption')).toContainText(/SVG preview: \d+ shapes? in 2 colours/);
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('logo.svg');
+  await expect(page.locator('#results-list')).toContainText(/200×200, \d+ shapes? in 2 colours/);
+  let svg = Buffer.from(await bytesOf(downloads[0]!)).toString('utf8');
+  expect(svg).toMatch(/^<svg [^>]*width="200" height="200"/);
+  expect(svg).not.toContain('<image');
+  expect(svg).toContain('<path');
+  // Inside the disc is black, the bar red, and the transparent corner stays transparent.
+  let [disc, bar, corner] = await svgPixels(page, svg, [[100, 80], [100, 165], [5, 5]]);
+  expect(disc!.slice(0, 3).every((v) => v < 40)).toBe(true);
+  expect(bar![0]).toBeGreaterThan(180);
+  expect(bar![1]).toBeLessThan(80);
+  expect(corner![3]).toBe(0);
+
+  await choose(page.locator('input[name="mode"][value="bw"]'));
+  await choose(page.locator('#drop-white'));
+  await expect(page.locator('#svg-caption')).toContainText('in 1 colour,');
+  const d = (await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]))[0];
+  svg = Buffer.from(await bytesOf(d)).toString('utf8');
+  const fills = new Set([...svg.matchAll(/fill="([^"]+)"/g)].map((m) => m[1]));
+  expect([...fills]).toEqual(['rgb(0,0,0)']);
+  [disc, bar, corner] = await svgPixels(page, svg, [[100, 80], [100, 165], [5, 5]]);
+  expect(bar!.slice(0, 3).every((v) => v < 40)).toBe(true);
+  expect(corner![3]).toBe(0);
+  net.assertNothingLeft(['logo.png']);
+  expect(errors).toEqual([]);
 });

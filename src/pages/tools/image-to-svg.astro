@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ImageToSvg from '../../components/options/ImageToSvg.astro';
+import SvgStage from '../../components/SvgStage.astro';
+const tool = toolBySlug('image-to-svg')!;
+---
+<ToolLayout tool={tool}>
+  <SvgStage slot="panel" />
+  <Fragment slot="options"><ImageToSvg /></Fragment>
+</ToolLayout>
+<script src="../../tools/image-to-svg.ts"></script>
