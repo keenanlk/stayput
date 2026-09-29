@@ -508,7 +508,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'webp-to-gif', 'png-to-gif', 'jpg-to-gif', 'jpg-to-tiff', 'png-to-tiff'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'webp-to-gif', 'png-to-gif', 'jpg-to-gif', 'jpg-to-tiff', 'png-to-tiff', 'ico-to-png'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -539,6 +539,23 @@ test('PNG to TIFF, JPG to TIFF and PNG to GIF pages write files other software o
     expect(read.format, slug).toBe(format);
   }
   net.assertNothingLeft(['graphic.png', 'plain.jpg']);
+});
+
+test('ICO to PNG page takes the largest image in a multi-size icon and keeps transparency', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/ico-to-png');
+  // app.ico holds 16, 32, 48 and 256 pixel versions of a circle on a transparent square.
+  const { downloads } = await run(page, [staticFx('app.ico')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('app.png');
+  const [w, h, cornerAlpha] = await page.evaluate(async (b) => {
+    const bm = await createImageBitmap(new Blob([new Uint8Array(b)], { type: 'image/png' }));
+    const c = new OffscreenCanvas(bm.width, bm.height);
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(bm, 0, 0);
+    return [bm.width, bm.height, ctx.getImageData(0, 0, 1, 1).data[3]];
+  }, [...(await bytesOf(downloads[0]!))]);
+  expect([w, h]).toEqual([256, 256]);
+  expect(cornerAlpha).toBe(0);
 });
 
 test('Screenshot to PDF page puts each screenshot on its own page at its own size', async ({ page }) => {
@@ -918,6 +935,10 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#page-size')).toHaveValue('fit');
       await expect(page.locator('#margin')).toHaveValue('0');
       await expect(page.locator('#file-input')).toHaveAttribute('accept', /heic/);
+    }],
+    ['mov-to-wav', 'video-to-mp3', async () => {
+      await expect(page.locator('#format')).toHaveValue('wav');
+      await expect(page.locator('#file-input')).toHaveAttribute('accept', /mov/);
     }],
     ['webm-to-gif', 'video-to-gif', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /webm/)],
     ['blur-text-in-image', 'blur-image', async () => {
@@ -2015,6 +2036,19 @@ test('OGG, Opus, FLAC, MP3 and MKV landing pages turn real files into MP3 and WA
     expect(info.rms, `${slug} is not silent`).toBeGreaterThan(0.05);
   }
   net.assertNothingLeft(['song.ogg', 'voice.opus', 'song.flac', 'song.mp3', 'show.mkv']);
+});
+
+test('Surround audio is mixed down to stereo with the centre channel kept', async ({ page }) => {
+  // A 5.1 WAV with a tone on the centre channel only: taking just the front
+  // left and right channels would give silence.
+  await stubAnalytics(page);
+  await page.goto('/mp4-to-wav');
+  const { downloads } = await run(page, [staticFx('film-5.1.wav')]);
+  const wav = await bytesOf(downloads[0]!);
+  expect(new DataView(wav.buffer, wav.byteOffset).getUint16(22, true)).toBe(2);
+  const info = await audioInfo(page, wav);
+  expect(info.channels).toBe(2);
+  expect(info.rms).toBeGreaterThan(0.05);
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {
