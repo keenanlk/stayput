@@ -62,6 +62,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Video to JPG](https://stayput.dev/tools/video-to-jpg) (save frames as JPG or PNG) | |
 | [Trim audio](https://stayput.dev/tools/trim-audio) (cut MP3, WAV, M4A with a waveform) | |
 | [Screen recorder](https://stayput.dev/tools/screen-recorder) (screen, window or tab, with sound and microphone) | |
+| [Split image](https://stayput.dev/tools/split-image) (Instagram grids and carousels) | |
 | [Add text to image](https://stayput.dev/tools/add-text-to-image) (captions, memes, watermarks) | |
 | [Compress audio](https://stayput.dev/tools/compress-audio) (smaller MP3 or OGG, or fit a size limit) | |
 | [Volume booster](https://stayput.dev/tools/volume-booster) (louder, quieter or normalized audio and video) | |

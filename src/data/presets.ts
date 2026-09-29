@@ -2876,6 +2876,57 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'instagram-grid-maker',
+    base: 'split-image',
+    name: 'Instagram grid maker',
+    title: 'Instagram Grid Maker: Split a Photo into 3×3, No Upload | Stayput',
+    description: 'Split one photo into a 3×3 or 3×2 Instagram grid of 4:5 tiles, numbered in posting order, in your browser. No upload, no watermark, no app.',
+    heading: 'Instagram grid maker',
+    tagline: 'Turn one picture into a profile grid of tiles to post in order, on your own device.',
+    keywords: ['instagram grid maker', 'grid maker for instagram', 'instagram puzzle grid', 'split photo for instagram grid', '3x3 grid instagram'],
+    dropLabel: 'Drop a photo to split into a grid',
+    defaults: { layout: '3x3', shape: 'portrait', order: 'post' },
+    intro: [
+      'A profile grid spreads one big picture across several posts, so the top of your profile reads as a single image. Instagram shows three posts across and, on current profiles, crops each to a 4:5 portrait. This page cuts your photo into 4:5 tiles and numbers them in posting order: post tile 1 first and the last one completes the picture at the top left.',
+      'Grid apps usually want your camera roll and add a watermark unless you pay. Here the photo never leaves your device, and every tile is an exact, full-resolution piece of it.',
+    ],
+    steps: [
+      'Drop a photo, or tap to pick one.',
+      '3 × 3 with 4:5 tiles in posting order is already set. The preview shows the cut lines.',
+      'Split, then post the tiles one at a time, starting with number 1.',
+    ],
+    faq: [
+      { q: 'Why 4:5 and not square?', a: 'Since 2025 Instagram profiles show posts as 4:5 portraits, so square tiles get their sides cut off on the grid. If your profile still shows squares, choose Square 1:1.' },
+      { q: 'Can I split several photos?', a: 'Yes. Each photo is cut the same way and all the tiles come in one zip, named after their photo.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'instagram-carousel-splitter',
+    base: 'split-image',
+    name: 'Instagram carousel splitter',
+    title: 'Seamless Instagram Carousel: Split a Panorama, No Upload | Stayput',
+    description: 'Split a wide photo or panorama into a seamless Instagram carousel of 4:5 or square slides in your browser. No upload, no watermark.',
+    heading: 'Split a panorama for an Instagram carousel',
+    tagline: 'Cut a wide picture into slides that swipe as one, on your own device.',
+    keywords: ['instagram carousel splitter', 'seamless carousel instagram', 'split panorama for instagram', 'instagram panorama', 'swipeable panorama'],
+    dropLabel: 'Drop a wide photo to split',
+    defaults: { layout: '3x1', shape: 'portrait' },
+    intro: [
+      'A seamless carousel is one wide image cut into slides, so each swipe continues the picture. Instagram carousels are 4:5 or square, so a panorama is trimmed to fit the slides exactly, and the preview shows how much of the top and bottom goes.',
+      'The photo is cut in your browser and never uploaded. Each slide is a full-resolution piece of it, numbered in the order to add them to the post.',
+    ],
+    steps: [
+      'Drop a wide photo or panorama, or tap to pick one.',
+      '3 across with 4:5 slides is set. Use 2 across for a less wide photo, or Square 1:1.',
+      'Split, then add the slides to one post in number order.',
+    ],
+    faq: [
+      { q: 'How many slides should I use?', a: 'Divide the photo’s width by its height and multiply by 1.25 for 4:5 slides (or by 1 for square). A 3:1 panorama fits about four 4:5 slides.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

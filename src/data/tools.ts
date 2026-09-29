@@ -2024,6 +2024,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'split-image',
+    name: 'Split image',
+    title: 'Split Image into Grid: Instagram Grid Maker, No Upload | Stayput',
+    description:
+      'Cut a picture into a 3×3 grid, a 3-across carousel or any rows and columns in your browser, with square or 4:5 tiles for Instagram. No upload, no watermark.',
+    heading: 'Split an image into tiles',
+    tagline: 'Cut one picture into a grid or a seamless carousel. Done on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop an image to split',
+    action: 'Split image',
+    keywords: ['split image', 'image splitter', 'instagram grid maker', 'split image into grid', 'cut image into pieces', 'grid maker for instagram', 'instagram panorama carousel'],
+    steps: [
+      'Drop a picture (JPG, PNG, WebP, HEIC and more), or tap to pick one.',
+      'Pick a grid: 3 across for a carousel, 3 × 3 for a profile grid, or any rows and columns. Choose square or 4:5 tiles for Instagram; the preview shows the cut lines and dims anything trimmed.',
+      'Split. The tiles download together as a zip, numbered left to right or in the order to post them.',
+    ],
+    faq: [
+      {
+        q: 'Is my picture uploaded?',
+        a: 'No. Your browser decodes the image and cuts the tiles on a canvas in the page. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Which grid for an Instagram profile?',
+        a: 'Instagram shows profiles three posts across, and newer profiles show each post as a 4:5 portrait. Choose 3 × 3 (or 3 × 2) with Portrait 4:5 tiles and In posting order, then post tile 1 first: the last one you post lands top left and completes the picture.',
+      },
+      {
+        q: 'How do I make a seamless carousel?',
+        a: 'Choose 3 across (or 2 across) with Portrait 4:5 or Square tiles and post the tiles as one carousel, in number order. Swiping reveals one wide picture.',
+      },
+      {
+        q: 'Is quality lost?',
+        a: 'No resizing happens: each tile is an exact piece of the original, saved once. Pick PNG for a lossless file, or keep the original format.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

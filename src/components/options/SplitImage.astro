@@ -1,0 +1,76 @@
+---
+/** Option controls for split image, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const layout = defaults.layout ?? '3x3';
+const shape = defaults.shape ?? 'original';
+const order = defaults.order ?? 'reading';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const layouts = [
+  ['2x1', '2 across'],
+  ['3x1', '3 across (carousel)'],
+  ['3x2', '3 × 2'],
+  ['3x3', '3 × 3 (grid)'],
+  ['2x2', '2 × 2'],
+  ['4x4', '4 × 4'],
+  ['1x2', '2 down'],
+  ['1x3', '3 down'],
+] as const;
+const shapes = [
+  ['original', 'Keep the picture’s shape'],
+  ['portrait', 'Portrait 4:5 (Instagram)'],
+  ['square', 'Square 1:1'],
+] as const;
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field">
+  <label for="layout">Grid</label>
+  <select id="layout">
+    {layouts.map(([v, l]) => <option value={v} selected={v === layout}>{l}</option>)}
+  </select>
+</div>
+<div class="field-row split-custom">
+  <div class="field">
+    <label for="cols">Columns</label>
+    <input type="number" id="cols" min="1" max="10" value={layout.split('x')[0]} inputmode="numeric" />
+  </div>
+  <div class="field">
+    <label for="rows">Rows</label>
+    <input type="number" id="rows" min="1" max="10" value={layout.split('x')[1]} inputmode="numeric" />
+  </div>
+</div>
+<div class="field">
+  <label for="shape">Tile shape</label>
+  <select id="shape">
+    {shapes.map(([v, l]) => <option value={v} selected={v === shape}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label>Number the tiles</label>
+  <div class="segmented" role="radiogroup" aria-label="Number the tiles">
+    <label><input type="radio" name="order" value="reading" checked={order === 'reading'} /><span>Left to right</span></label>
+    <label><input type="radio" name="order" value="post" checked={order === 'post'} /><span>In posting order</span></label>
+  </div>
+  <p class="muted small">Posting order numbers the bottom-right tile 1, so posting 1, 2, 3… builds the grid on an Instagram profile.</p>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>
+<style>
+  .split-custom { gap: 12px; }
+  .split-custom .field { flex: 1 1 100px; }
+  .split-custom input { width: 100%; }
+</style>

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(62);
+  expect(await page.locator('.tool-card').count()).toBe(63);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4340,4 +4340,43 @@ test('Add text to image refuses to run with no text', async ({ page }) => {
   await page.locator('#text1').fill('');
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('Type some text first');
+});
+
+test('Split image cuts a picture into a 2×2 grid of exact tiles, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'split-image');
+  const net = watchNetwork(page);
+  // swatches.png: flat colour blocks, lossless, so tiles can be checked pixel for pixel.
+  const { items } = await run(page, ['swatches.png'], async () => {
+    await expect(page.locator('#grid-panel')).toBeVisible();
+    await page.locator('#layout').selectOption('2x2');
+    await expect(page.locator('#cols')).toHaveValue('2');
+    await expect(page.locator('#grid-hint')).toContainText('4 tiles of 200 × 100 px');
+  });
+  expect(items).toBe(4);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['swatches-1.png', 'swatches-2.png', 'swatches-3.png', 'swatches-4.png']);
+  for (const f of Object.values(files)) expect(pngSize(f)).toEqual({ width: 200, height: 100 });
+  // Tile 2 is the top right quarter: its top left pixel is the source's pixel at (200, 0).
+  const src = readFileSync(fx('swatches.png'));
+  expect(await pixelAt(page, files['swatches-2.png']!, 5, 5)).toEqual(await pixelAt(page, src, 205, 5));
+  expect(await pixelAt(page, files['swatches-3.png']!, 5, 5)).toEqual(await pixelAt(page, src, 5, 105));
+  net.assertNothingLeft(['swatches.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Instagram grid maker makes 4:5 tiles numbered in posting order', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/instagram-grid-maker');
+  await expect(page.locator('#shape')).toHaveValue('portrait');
+  // photo.jpg shows as 1200 × 1600 (EXIF turns it): nine 4:5 tiles of 400 × 500 from the middle 1200 × 1500.
+  const { items } = await run(page, ['photo.jpg']);
+  expect(items).toBe(9);
+  const files = await zipAll(page);
+  const names = Object.keys(files).sort();
+  expect(names).toHaveLength(9);
+  const size = jpegSize(files[names[0]!]!);
+  expect(size).toEqual({ width: 400, height: 500 });
+  // Tile 1 (post first) is the bottom right piece.
+  await expect(page.locator('#results-list')).toContainText('row 3, column 3');
+  await expect(page.locator('#results-list .result-item').first()).toContainText('post first');
 });

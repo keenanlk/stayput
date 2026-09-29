@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import SplitImage from '../../components/options/SplitImage.astro';
+import GridStage from '../../components/GridStage.astro';
+const tool = toolBySlug('split-image')!;
+---
+<ToolLayout tool={tool}>
+  <GridStage slot="panel" />
+  <Fragment slot="options"><SplitImage /></Fragment>
+</ToolLayout>
+<script src="../../tools/split-image.ts"></script>
