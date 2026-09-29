@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import BlackAndWhite from '../../components/options/BlackAndWhite.astro';
+import MonoStage from '../../components/MonoStage.astro';
+const tool = toolBySlug('black-and-white-image')!;
+---
+<ToolLayout tool={tool}>
+  <MonoStage slot="panel" />
+  <Fragment slot="options"><BlackAndWhite /></Fragment>
+</ToolLayout>
+<script src="../../tools/black-and-white-image.ts"></script>

@@ -1,0 +1,36 @@
+---
+/** Option controls for the black and white tool, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const mode = defaults.mode ?? 'gray';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const modes = [
+  ['gray', 'Grayscale'],
+  ['contrast', 'High contrast'],
+  ['bw', 'Pure black and white'],
+  ['sepia', 'Sepia'],
+] as const;
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field wide">
+  <label>Look</label>
+  <div class="segmented" role="radiogroup" aria-label="Look">
+    {modes.map(([v, l]) => <label><input type="radio" name="mode" value={v} checked={v === mode} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>
