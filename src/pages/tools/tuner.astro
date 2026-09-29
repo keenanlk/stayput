@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import TunerStage from '../../components/TunerStage.astro';
+const tool = toolBySlug('tuner')!;
+---
+<ToolLayout tool={tool}>
+  <TunerStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/tuner.ts"></script>

@@ -72,6 +72,7 @@ That is the whole pitch, and you can check it in three ways:
 | [QR code generator](https://stayput.dev/tools/qr-code-generator) (link, Wi-Fi, contact, email, phone; PNG or SVG) | |
 | [Voice recorder](https://stayput.dev/tools/voice-recorder) (microphone to MP3, WAV or M4A) | |
 | [Merge audio](https://stayput.dev/tools/merge-audio) (join MP3, WAV, M4A with silence or crossfades) | |
+| [Online tuner](https://stayput.dev/tools/tuner) (guitar, bass, ukulele, violin, chromatic; reference notes) | |
 | [Mic test](https://stayput.dev/tools/mic-test) (level meter, verdict, record and play back) | |
 | [Webcam test](https://stayput.dev/tools/webcam-test) (preview, real resolution and frame rate, snapshot) | |
 | [Audio to video](https://stayput.dev/tools/audio-to-video) (MP3 plus a cover picture to MP4; 16:9, square, 9:16) | |

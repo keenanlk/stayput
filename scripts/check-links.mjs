@@ -14,7 +14,17 @@ const dist = join(root, 'dist');
 const site = 'https://stayput.dev';
 const checkExternal = process.argv.includes('--external');
 
-const redirects = JSON.parse(await readFile(join(root, 'vercel.json'), 'utf8')).redirects ?? [];
+const vercelText = await readFile(join(root, 'vercel.json'), 'utf8');
+const vercel = JSON.parse(vercelText);
+const redirects = vercel.redirects ?? [];
+// JSON.parse keeps only the last of two keys with one name, so a merge that
+// fuses two redirect entries into one object silently drops a redirect.
+const sourcesWritten = vercelText.match(/"source"\s*:/g)?.length ?? 0;
+const sourcesParsed = ['redirects', 'rewrites', 'headers'].reduce((n, k) => n + (vercel[k] ?? []).filter((r) => 'source' in r).length, 0);
+if (sourcesWritten !== sourcesParsed) {
+  console.error(`vercel.json has ${sourcesWritten} "source" keys but ${sourcesParsed} entries: two entries are fused into one object.`);
+  process.exit(1);
+}
 const redirected = new Map(redirects.filter((r) => !r.has && !r.source.includes(':')).map((r) => [r.source, r.destination]));
 
 async function walk(dir) {
