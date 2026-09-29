@@ -733,7 +733,7 @@ export const tools: Tool[] = [
     keywords: ['blur image', 'pixelate image', 'blur face', 'blur face in photo', 'censor image', 'blur image online', 'redact image', 'blur license plate'],
     steps: [
       'Drop a photo or screenshot (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick one.',
-      'Drag across each face, plate or line of text to hide, or choose "Whole image". Pick blur, pixelate or black box and set the strength; the preview updates as you go.',
+      'Press Find faces, or drag across each face, plate or line of text to hide, or choose "Whole image". Pick blur, pixelate or black box and set the strength; the preview updates as you go.',
       'Save the image. It is written at full resolution in your browser and downloads straight away.',
     ],
     faq: [
@@ -751,7 +751,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I blur several faces at once?',
-        a: 'Yes. Drag a box over each one; every box gets the same effect. Tap the × on a box to remove it, or use Undo. There is no limit on the number of areas.',
+        a: 'Yes. Press Find faces to have a face detector running in your browser mark them all, or drag a box over each one; every box gets the same effect. Tap the × on a box to remove it, or use Undo. Check the preview for any face the detector missed.',
       },
       {
         q: 'How do I blur the whole picture?',

@@ -13,6 +13,7 @@
   <div class="blur-bar">
     <p class="muted small blur-hint" id="blur-hint">Drag across each face, plate or line of text to hide it.</p>
     <span class="blur-actions">
+      <button class="btn btn-sm" type="button" id="blur-find" title="Runs a small face detector in this tab. Nothing is uploaded.">Find faces</button>
       <button class="btn btn-sm btn-ghost" type="button" id="blur-undo" disabled>Undo</button>
       <button class="btn btn-sm btn-ghost" type="button" id="blur-clear" disabled>Clear areas</button>
     </span>
@@ -32,5 +33,5 @@
   @media (pointer: coarse) { .blur-area button { width: 28px; height: 28px; top: -14px; right: -14px; } }
   .blur-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
   .blur-hint { margin: 0; flex: 1 1 220px; }
-  .blur-actions { display: flex; gap: 4px; margin-left: auto; }
+  .blur-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
 </style>
