@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(55);
+  expect(await page.locator('.tool-card').count()).toBe(56);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'grayscale-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -971,6 +971,7 @@ test('preset landing pages render, run their base tool with the preset options a
     ['linkedin-profile-picture', 'profile-picture-maker', async () => expect(page.locator('input[name="shape"][value="square"]')).toBeChecked()],
     ['whatsapp-sticker-maker', 'sticker-maker', async () => expect(page.locator('#size')).toHaveValue('512')],
     ['pdf-metadata-viewer', 'remove-pdf-metadata', async () => expect(page.locator('#run')).toContainText('Remove metadata')],
+    ['black-and-white-pdf', 'grayscale-pdf', async () => expect(page.locator('#run')).toContainText('Make black and white')],
     ['confidential-watermark', 'watermark-pdf', async () => expect(page.locator('#wm-text')).toHaveValue('CONFIDENTIAL')],
     ['watermark-id-copy', 'watermark-image', async () => expect(page.locator('input[name="layout"][value="tiled"]')).toBeChecked()],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
@@ -3965,5 +3966,36 @@ test('Mic test shows the level and a verdict, plays back a short recording, and 
   expect(runs).toHaveLength(1);
   expect(runs[0]!.d.format).toBe('mic');
   net.assertNothingLeft([]);
+  expect(errors).toEqual([]);
+});
+
+test('Grayscale PDF lays a saturation blend over every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'grayscale-pdf');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [fx('text.pdf')]);
+  const download = downloads[0]!;
+  expect(download.suggestedFilename()).toBe('text-grayscale.pdf');
+  const out = await bytesOf(download);
+  const doc = await PDFDocument.load(out);
+  expect(doc.getPageCount()).toBe(3);
+  for (const p of doc.getPages()) {
+    const gs = p.node.Resources()!.lookup(PDFName.of('ExtGState')) as unknown as { values(): Parameters<typeof doc.context.lookup>[0][] };
+    const modes = gs.values().map((v) => String(doc.context.lookup(v)));
+    expect(modes.some((m) => m.includes('/BM /Saturation'))).toBe(true);
+  }
+  expect((await textItems(out, 2)).map((t) => t.str).join(' ')).toContain('Page 2 of the fixture');
+  // The green box on the page now renders grey: draw the result in the crop tool's preview and read a pixel.
+  const file = join(mkdtempSync(join(tmpdir(), 'gray-')), 'gray.pdf');
+  writeFileSync(file, out);
+  await page.goto('/tools/crop-pdf');
+  await page.locator('#file-input').setInputFiles([file]);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  const px = await page.locator('#page-canvas').evaluate((c: HTMLCanvasElement) => {
+    const d = c.getContext('2d')!.getImageData(Math.round(c.width * 0.3), Math.round(c.height * 0.68), 1, 1).data;
+    return [d[0]!, d[1]!, d[2]!];
+  });
+  expect(Math.max(...px) - Math.min(...px)).toBeLessThan(6);
+  expect(px[0]).toBeLessThan(200);
+  net.assertNothingLeft(['text.pdf']);
   expect(errors).toEqual([]);
 });
