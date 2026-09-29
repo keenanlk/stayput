@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(80);
+  expect(await page.locator('.index .tool-card').count()).toBe(81);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'add-subtitles-to-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -5531,4 +5531,86 @@ test('Add subtitles to video writes captions from the speech and can save them a
   expect(frame.bottom).toBe(0);
   net.assertNothingLeft(['speech.webm']);
   expect(errors).toEqual([]);
+});
+
+/** A 400×300 PNG: a smooth blue-to-green gradient with a red 60×60 square in the middle. */
+function redSquarePng(): string {
+  const file = join(mkdtempSync(join(tmpdir(), 'erase-')), 'square.png');
+  execFileSync('python3', ['-c', `
+from PIL import Image
+im = Image.new('RGB', (400, 300))
+px = im.load()
+for y in range(300):
+    for x in range(400):
+        px[x, y] = (40, 90 + y // 3, 200 - x // 4)
+for y in range(120, 180):
+    for x in range(170, 230):
+        px[x, y] = (230, 20, 20)
+im.save(${JSON.stringify(file)})
+`]);
+  return file;
+}
+
+/** Paint a stroke across the erase stage, between fractions of its width and height. */
+async function paint(page: Page, points: [number, number][]) {
+  const canvas = page.locator('#erase-canvas');
+  await canvas.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const b = (await canvas.boundingBox())!;
+  await page.mouse.move(b.x + b.width * points[0]![0], b.y + b.height * points[0]![1]);
+  await page.mouse.down();
+  for (const [x, y] of points.slice(1)) await page.mouse.move(b.x + b.width * x, b.y + b.height * y, { steps: 4 });
+  await page.mouse.up();
+}
+
+test('Remove object erases a painted red square into the gradient around it, keeps the rest, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(120_000);
+  const errors = await open(page, 'remove-object');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([redSquarePng()]);
+  await expect(page.locator('#erase-panel')).toBeVisible();
+  // Saving before painting explains what to do.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Paint over the thing to remove first');
+  // A big brush, zig-zagging over the square (x 170..230, y 120..180 of 400×300).
+  await page.locator('#brush').fill('120');
+  await paint(page, [[0.4, 0.37], [0.6, 0.37], [0.4, 0.5], [0.6, 0.5], [0.4, 0.63], [0.6, 0.63]]);
+  await expect(page.locator('#erase-panel')).toHaveAttribute('data-strokes', '1');
+  await page.locator('#erase-go').click();
+  await expect(page.locator('#erase-panel')).toHaveAttribute('data-edits', '1', { timeout: 90_000 });
+  await expect(page.locator('#erase-hint')).toContainText('1 area erased');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('square-erased.png');
+  await expect(page.locator('#results-list')).toContainText('1 area erased');
+  const out = await pixelsOf(page, await bytesOf(download), [[200, 150], [180, 130], [220, 170], [10, 10], [390, 290]]);
+  expect([out.width, out.height]).toEqual([400, 300]);
+  // No red left where the square was: the fill is close to the gradient's blue-green.
+  for (const p of out.px.slice(0, 3)) {
+    expect(p[0], `fill ${p}`).toBeLessThan(120);
+    expect(p[2]! + p[1]!, `fill ${p}`).toBeGreaterThan(200);
+  }
+  // Pixels away from the paint are untouched.
+  expect(out.px[3]!.slice(0, 3)).toEqual([40, 93, 198]);
+  expect(out.px[4]!.slice(0, 3)).toEqual([40, 186, 103]);
+  // Undo brings the square back.
+  await page.locator('#erase-undo').click();
+  await expect(page.locator('#erase-panel')).toHaveAttribute('data-edits', '0');
+  net.assertNothingLeft(['square.png']);
+  // The shell logs the expected "paint first" message as an error.
+  expect(errors.filter((e) => !e.includes('Paint over the thing to remove first'))).toEqual([]);
+});
+
+test('Remove text from image opens with a small brush and saves after painting without pressing Erase', async ({ page }) => {
+  test.setTimeout(120_000);
+  await stubAnalytics(page);
+  await page.goto('/remove-text-from-image');
+  await expect(page.locator('#brush')).toHaveValue('24');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([redSquarePng()]);
+  await expect(page.locator('#erase-panel')).toBeVisible();
+  await page.locator('#format').selectOption('image/jpeg');
+  await paint(page, [[0.45, 0.45], [0.55, 0.55]]);
+  const [download] = await Promise.all([page.waitForEvent('download', { timeout: 90_000 }), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('square-erased.jpg');
+  await expect(page.locator('#erase-panel')).toHaveAttribute('data-edits', '1');
 });

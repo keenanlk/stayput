@@ -65,6 +65,8 @@ import StickerMaker from '../components/options/StickerMaker.astro';
 import ProfilePicture from '../components/options/ProfilePicture.astro';
 import BlackAndWhite from '../components/options/BlackAndWhite.astro';
 import UpscaleImage from '../components/options/UpscaleImage.astro';
+import RemoveObject from '../components/options/RemoveObject.astro';
+import EraseStage from '../components/EraseStage.astro';
 import ImageToSvg from '../components/options/ImageToSvg.astro';
 import GifMaker from '../components/options/GifMaker.astro';
 import ResizePdf from '../components/options/ResizePdf.astro';
@@ -148,6 +150,7 @@ const options = {
   'profile-picture-maker': ProfilePicture,
   'black-and-white-image': BlackAndWhite,
   'upscale-image': UpscaleImage,
+  'remove-object': RemoveObject,
   'image-to-svg': ImageToSvg,
   'gif-maker': GifMaker,
   'resize-pdf': ResizePdf,
@@ -174,6 +177,7 @@ const Options = options[base as keyof typeof options];
   {base === 'qr-code-generator' && <QrStage slot="panel" defaults={defaults} />}
   {base === 'screen-recorder' && <RecordStage slot="panel" defaults={defaults} />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
+  {base === 'remove-object' && <EraseStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {base === 'black-and-white-image' && <MonoStage slot="panel" />}
   {base === 'image-to-svg' && <SvgStage slot="panel" />}
