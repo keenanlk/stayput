@@ -1,0 +1,38 @@
+---
+/** Page stage for Redact PDF: find text, draw boxes, page through the document. */
+---
+<div id="redact-panel" class="sign-panel" hidden>
+  <div class="sign-maker">
+    <form class="field-row" id="find-form">
+      <input type="search" id="find-text" class="sig-text" placeholder="Text to redact, such as a name" aria-label="Text to find and redact" autocomplete="off" />
+      <button class="btn btn-primary" type="submit">Redact all matches</button>
+    </form>
+    <div class="field-row">
+      <span class="small muted">Or find every:</span>
+      <button class="btn btn-sm" type="button" data-pattern="email">Email address</button>
+      <button class="btn btn-sm" type="button" data-pattern="phone">Phone number</button>
+      <button class="btn btn-sm" type="button" data-pattern="number">Long number</button>
+    </div>
+    <p class="muted small" id="find-result" role="status"></p>
+    <p class="muted small">Drag on the page to black out any area by hand: a signature, a photo, a line the search missed. Tap a box to remove it.</p>
+  </div>
+  <div class="pdf-stage-wrap">
+    <div class="field-row pager">
+      <button class="btn btn-sm" type="button" id="prev-page" aria-label="Previous page">←</button>
+      <span id="page-label" class="small" style="font-weight:600">Page 1 of 1</span>
+      <button class="btn btn-sm" type="button" id="next-page" aria-label="Next page">→</button>
+      <span class="muted small" id="box-count"></span>
+      <button class="btn btn-sm btn-ghost" type="button" id="clear-page">Clear this page</button>
+    </div>
+    <div class="pdf-stage" id="stage">
+      <canvas id="page-canvas"></canvas>
+      <div class="redact-layer" id="redact-layer" aria-label="Page. Drag to draw a redaction box."></div>
+    </div>
+  </div>
+</div>
+<style is:global>
+  .redact-layer { position: absolute; inset: 0; cursor: crosshair; touch-action: none; }
+  .redact-box { position: absolute; background: rgba(0, 0, 0, 0.82); outline: 1px solid #000; cursor: pointer; padding: 0; border: 0; }
+  .redact-box:hover, .redact-box:focus-visible { background: rgba(0, 0, 0, 0.6); outline: 2px solid var(--accent); }
+  .redact-box.is-drawing { background: rgba(0, 0, 0, 0.5); pointer-events: none; }
+</style>
