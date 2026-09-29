@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(34);
+  expect(await page.locator('.tool-card').count()).toBe(36);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2811,4 +2811,108 @@ test('Compress GIF hands back a GIF that is already tight unchanged', async ({ p
   expect(out.length).toBeLessThanOrEqual(original.length);
   expect(gifCompare(out, fx('anim.gif'), 2)).toMatchObject({ frames: 3, duration: 1000 });
   if (out.length === original.length) await expect(page.locator('#results-list .result-item')).toContainText('original kept');
+});
+
+test('Crop video cuts the picture to the box, snaps to 9:16 on the TikTok page, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'crop-video');
+  const clip = await halvesClip(page);
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(clip);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  // The whole frame is not a crop.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('covers the whole video');
+  // The top left quarter: red, with the white mark in its corner.
+  for (const [id, v] of [['crop-w', '320'], ['crop-h', '180']] as const) {
+    await page.locator(`#${id}`).fill(v);
+    await page.locator(`#${id}`).dispatchEvent('change');
+  }
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '0,0,320,180');
+  const [download] = await Promise.all([page.waitForEvent('download', { timeout: 60_000 }), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('halves-cropped.mp4');
+  const quarter = await frameColours(page, await bytesOf(download), [[0.1, 0.1], [0.5, 0.7], [0.95, 0.9]]);
+  expect(quarter).toMatchObject({ width: 320, height: 180, at: ['white', 'red', 'red'] });
+  net.assertNothingLeft(['halves.webm']);
+
+  await stubAnalytics(page);
+  await page.goto('/crop-video-for-tiktok');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(clip);
+  // The tallest 9:16 box, centred: 203 wide from x 219, across the red and blue halves.
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '219,0,203,360');
+  const [tall] = await Promise.all([page.waitForEvent('download', { timeout: 60_000 }), page.locator('#run').click()]);
+  const vertical = await frameColours(page, await bytesOf(tall), [[0.1, 0.5], [0.9, 0.5]]);
+  expect(vertical).toMatchObject({ width: 204, height: 360, at: ['red', 'blue'] });
+  expect(errors.filter((e) => !e.includes('covers the whole video'))).toEqual([]);
+});
+
+/** How long the picture lasts (end of the last video packet), which can differ from the sound in a recording. */
+async function videoSeconds(bytes: Uint8Array): Promise<number> {
+  const { Input, BufferSource, ALL_FORMATS, EncodedPacketSink } = await import('mediabunny');
+  const input = new Input({ source: new BufferSource(bytes), formats: ALL_FORMATS });
+  const track = (await input.getPrimaryVideoTrack())!;
+  const first = await track.getFirstTimestamp();
+  let end = 0;
+  for await (const p of new EncodedPacketSink(track).packets()) end = Math.max(end, p.timestamp + p.duration);
+  return end - first;
+}
+
+/** Length and main pitch (by zero crossings) of a file's sound, decoded in the page. */
+async function soundOf(page: Page, bytes: Uint8Array): Promise<{ seconds: number; hz: number }> {
+  // Base64, not a number array: a 3 MB clip as JSON numbers takes tens of seconds to pass in.
+  return page.evaluate(async (b64) => {
+    const data = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const ctx = new OfflineAudioContext(1, 1, 48000);
+    const buf = await ctx.decodeAudioData(data.buffer);
+    const ch = buf.getChannelData(0);
+    // Skip the edges, where encoders fade in and out.
+    const a = Math.floor(ch.length * 0.2);
+    const b = Math.floor(ch.length * 0.8);
+    let crossings = 0;
+    for (let i = a + 1; i < b; i++) if (ch[i - 1]! < 0 && ch[i]! >= 0) crossings++;
+    return { seconds: buf.duration, hz: crossings / ((b - a) / buf.sampleRate) };
+  }, Buffer.from(bytes).toString('base64'));
+}
+
+test('Change video speed halves the length at 2×, keeps the pitch of the sound, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'video-speed');
+  const clip = await recordClip(page);
+  const before = await soundOf(page, readFileSync(clip));
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('recording-2x.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(mp4);
+  expect(tracks.video).toMatchObject({ width: 1280, height: 720 });
+  expect(tracks.audio).toBe(1);
+  // Headless recordings can hold fewer seconds of picture than of sound; each is checked against its own.
+  const pictureBefore = await videoSeconds(readFileSync(clip));
+  const picture = await videoSeconds(mp4);
+  expect(picture).toBeGreaterThan(pictureBefore / 2 - 0.1);
+  expect(picture).toBeLessThan(pictureBefore / 2 + 0.1);
+  const after = await soundOf(page, mp4);
+  expect(after.seconds).toBeGreaterThan(before.seconds / 2 - 0.25);
+  expect(after.seconds).toBeLessThan(before.seconds / 2 + 0.25);
+  // Same note, not an octave up.
+  expect(Math.abs(after.hz - before.hz)).toBeLessThan(before.hz * 0.05);
+  await expect(page.locator('#results-list .result-item')).toContainText('2× speed');
+  net.assertNothingLeft(['recording.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Slow down video doubles the length at 0.5× and can drop the sound', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/slow-down-video');
+  await expect(page.locator('#speed')).toHaveValue('0.5');
+  const clip = await recordClip(page);
+  const { downloads } = await run(page, [clip], async () => {
+    await choose(page.locator('#mute'));
+  });
+  const mp4 = await bytesOf(downloads[0]!);
+  expect((await videoTracks(mp4)).audio).toBe(0);
+  const pictureBefore = await videoSeconds(readFileSync(clip));
+  const picture = await videoSeconds(mp4);
+  expect(picture).toBeGreaterThan(pictureBefore * 2 - 0.15);
+  expect(picture).toBeLessThan(pictureBefore * 2 + 0.15);
 });

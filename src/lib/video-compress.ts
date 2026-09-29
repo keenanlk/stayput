@@ -53,7 +53,7 @@ export interface CompressResult {
 }
 
 const QUALITY: Record<Exclude<CompressMode, 'size'>, Quality> = { small: QUALITY_LOW, balanced: QUALITY_MEDIUM, high: QUALITY_HIGH };
-export const CODEC_NAMES: Record<string, string> = { avc: 'H.264', vp9: 'VP9', av1: 'AV1', hevc: 'HEVC', aac: 'AAC', opus: 'Opus' };
+export const CODEC_NAMES: Record<string, string> = { avc: 'H.264', vp8: 'VP8', vp9: 'VP9', av1: 'AV1', hevc: 'HEVC', aac: 'AAC', opus: 'Opus' };
 /** Short sides tried, largest first, when a target size needs a smaller picture to look decent. */
 const STEPS = [2160, 1440, 1080, 720, 540, 480, 360, 240];
 /** Below roughly this many bits per pixel per frame, video turns to mush; drop the resolution instead. */

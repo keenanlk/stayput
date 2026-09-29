@@ -31,6 +31,8 @@ import TrimVideo from '../components/options/TrimVideo.astro';
 import MuteVideo from '../components/options/MuteVideo.astro';
 import ResizeVideo from '../components/options/ResizeVideo.astro';
 import RotateVideo from '../components/options/RotateVideo.astro';
+import CropVideo from '../components/options/CropVideo.astro';
+import VideoSpeed from '../components/options/VideoSpeed.astro';
 import ImageToText from '../components/options/ImageToText.astro';
 import ColorPicker from '../components/options/ColorPicker.astro';
 import ColorStage from '../components/ColorStage.astro';
@@ -73,6 +75,8 @@ const options = {
   'mute-video': MuteVideo,
   'resize-video': ResizeVideo,
   'rotate-video': RotateVideo,
+  'crop-video': CropVideo,
+  'video-speed': VideoSpeed,
   'image-to-text': ImageToText,
   'color-picker': ColorPicker,
   // Sign PDF has no option controls; everything happens on the stage.
@@ -83,7 +87,7 @@ const Options = options[base as keyof typeof options];
 ---
 <ToolLayout tool={tool} intro={intro} engineSlug={engine} base={base}>
   {base === 'strip-exif' && <div slot="panel" id="meta-report" class="meta-report" hidden></div>}
-  {base === 'crop-image' && <CropStage slot="panel" />}
+  {(base === 'crop-image' || base === 'crop-video') && <CropStage slot="panel" />}
   {base === 'reorder-pdf' && <ReorderStage slot="panel" />}
   {base === 'sign-pdf' && <SignStage slot="panel" />}
   {(base === 'video-to-gif' || base === 'trim-video') && <VideoStage slot="panel" />}

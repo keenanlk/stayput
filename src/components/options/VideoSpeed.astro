@@ -1,0 +1,27 @@
+---
+/** Option controls for change video speed, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const speed = defaults.speed ?? '2';
+const speeds = [
+  ['0.25', '0.25× (4 times slower)'],
+  ['0.5', '0.5× (half speed)'],
+  ['0.75', '0.75×'],
+  ['1.25', '1.25×'],
+  ['1.5', '1.5×'],
+  ['2', '2× (twice as fast)'],
+  ['3', '3×'],
+  ['4', '4×'],
+  ['8', '8× (timelapse)'],
+] as const;
+---
+<div class="field">
+  <label for="speed">Speed</label>
+  <select id="speed">
+    {speeds.map(([v, l]) => <option value={v} selected={v === speed}>{l}</option>)}
+  </select>
+  <p class="muted small">The sound keeps its pitch, so voices do not turn into chipmunks or growls.</p>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>
