@@ -24,20 +24,32 @@ const { tool, intro = [], engineSlug, base } = Astro.props;
 const path = toolPath(tool);
 const url = new URL(path, Astro.site).toString();
 const engine = engineFor(engineSlug ?? tool.slug);
-const related = tools.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 4);
+// The tool this page runs first (on landing pages), then its neighbours in the category, wrapping around,
+// so every tool is linked from several pages rather than only the first four in the list.
+const sameCategory = tools.filter((t) => t.category === tool.category);
+const home = sameCategory.findIndex((t) => t.slug === (base ?? tool.slug));
+const neighbours = sameCategory.map((_, i) => sameCategory[(home + 1 + i) % sameCategory.length]!).filter((t) => t.slug !== tool.slug);
+const baseTool = base ? tools.find((t) => t.slug === base) : undefined;
+const related = [...(baseTool ? [baseTool] : []), ...neighbours.filter((t) => t !== baseTool)].slice(0, 4);
 const isPair = path.startsWith('/') && !path.startsWith('/tools/');
 // On a pair page, list the pairs sharing its source or target format first (JFIF to JPG shows JFIF to PNG).
 const [fromExt, toExt] = isPair ? tool.slug.split('-to-') : [];
 const shares = (slug: string) => Number(slug.startsWith(`${fromExt}-to-`)) + Number(slug.endsWith(`-to-${toExt}`));
+// Format words in this page's slug ("ogg", "mp3" for /ogg-to-mp3), so sibling pages about the same formats link each other.
+const formatWords = new Set(tool.slug.includes('-to-') ? tool.slug.split('-to-').map((part) => part.split('-').pop()!) : []);
+const sharesFormat = (slug: string) => (slug.includes('-to-') ? slug.split('-to-').filter((part) => formatWords.has(part.split('-').pop()!)).length : 0);
+// Image pages list the format pairs; any other page lists only the pairs sharing a format with it (WebP to PDF shows WebP to PNG).
 const conversions = pairs
-  .filter((p) => p.slug !== tool.slug)
-  .sort((a, b) => shares(b.slug) - shares(a.slug))
+  .filter((p) => p.slug !== tool.slug && (tool.category === 'images' || sharesFormat(p.slug) > 0))
+  .sort((a, b) => shares(b.slug) - shares(a.slug) || sharesFormat(b.slug) - sharesFormat(a.slug))
   .slice(0, 10);
 // Landing pages that are presets of tools in this category, so "JPG to PDF" is reachable from the PDF tools.
+// Presets of the same tool come first, then those sharing a format with this page.
+const presetScore = (p: (typeof presets)[number]) => 2 * Number(p.base === (base ?? tool.slug)) + sharesFormat(p.slug);
 const presetLinks = presets
-  .filter((p) => p.slug !== tool.slug && tools.find((t) => t.slug === p.base)?.category === tool.category)
-  .sort((a, b) => Number(b.base === (base ?? tool.slug)) - Number(a.base === (base ?? tool.slug)))
-  .slice(0, 8);
+  .filter((p) => p.slug !== tool.slug && (tools.find((t) => t.slug === p.base)?.category === tool.category || sharesFormat(p.slug) > 0))
+  .sort((a, b) => presetScore(b) - presetScore(a))
+  .slice(0, 12);
 // File labels for the upload-vs-local diagram: the format pair when the slug names one, else the category's usual file.
 const labels: Record<string, string> = { jpg: 'JPG', jpeg: 'JPG', png: 'PNG', webp: 'WebP', heic: 'HEIC', avif: 'AVIF', svg: 'SVG', jxl: 'JXL', jfif: 'JFIF', gif: 'GIF', ico: 'ICO', bmp: 'BMP', tiff: 'TIFF', pdf: 'PDF', mp4: 'MP4', mov: 'MOV', mp3: 'MP3', m4a: 'M4A', wav: 'WAV', text: 'TXT', word: 'DOCX', image: 'Photo', picture: 'Photo', screenshot: 'PNG', video: 'Video' };
 const fallback = tool.category === 'pdf' ? 'PDF' : tool.category === 'media' ? 'Video' : 'Photo';
@@ -191,11 +203,11 @@ const jsonLd = [
     <div class="tool-grid">{related.map((t) => <ToolCard tool={t} />)}</div>
   </section>
 
-  {(tool.category === 'images' || presetLinks.length > 0) && (
+  {(conversions.length > 0 || presetLinks.length > 0) && (
     <section class="wrap section split">
       <h2>{isPair ? 'Other conversions' : 'Popular conversions'}</h2>
       <ul class="chips">
-        {tool.category === 'images' && conversions.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}
+        {conversions.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}
         {presetLinks.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}
       </ul>
     </section>
