@@ -1982,6 +1982,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'add-text-to-image',
+    name: 'Add text to image',
+    title: 'Add Text to Image Online, Free, No Upload | Stayput',
+    description:
+      'Put text on a photo in your browser: drag it into place, pick a font, colour, outline or box, and save full size. Batch for captions or watermarks. No upload.',
+    heading: 'Add text to an image',
+    tagline: 'Write on a photo, a screenshot or a meme and drag the words where you want them. Done on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop images to add text to',
+    action: 'Add text',
+    keywords: ['add text to image', 'add text to photo', 'write on picture', 'put text on image', 'text on photo online', 'caption photo', 'add words to picture'],
+    steps: [
+      'Drop a photo or screenshot (JPG, PNG, WebP, HEIC and more), or several to caption them all the same way.',
+      'Type your text, then drag it on the preview to place it. Pick a font, colour, size and an outline, shadow or box so it reads on any background. Add a second text for a caption at the other end.',
+      'Save. The text is drawn onto the full-size image; one file downloads straight away, several as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. Your browser decodes the image, draws your text onto it on a canvas in the page, and saves the result. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Does the text stay sharp on a big photo?',
+        a: 'Yes. The preview is scaled down to fit your screen, but the saved file is drawn at the photo’s full size, and the text size is a share of the photo, so it looks the same as the preview.',
+      },
+      {
+        q: 'Can I add the same text to many images?',
+        a: 'Yes. Drop them all at once and the text goes in the same place on each, which is how to caption a set of photos or put your name on them as a watermark. The preview shows the first image.',
+      },
+      {
+        q: 'How do I make text readable on a busy photo?',
+        a: 'Use Outline for bold meme-style letters, Shadow for a softer look, or Box to put the text on a dark or light panel. White with an outline reads on almost anything.',
+      },
+      {
+        q: 'Can I edit the text later?',
+        a: 'Not in the saved image: the text becomes part of the picture. Keep your original, which is never changed, and run it again with new text.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

@@ -2850,6 +2850,58 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'meme-generator',
+    base: 'add-text-to-image',
+    name: 'Meme generator',
+    title: 'Meme Generator: Top and Bottom Text, No Watermark | Stayput',
+    description: 'Make a meme from your own picture in your browser: classic white Impact text with a black outline, top and bottom. No watermark, no upload.',
+    heading: 'Meme generator',
+    tagline: 'Put classic top and bottom text on any picture, on your own device.',
+    keywords: ['meme generator', 'meme maker', 'make a meme', 'meme generator no watermark', 'custom meme', 'add meme text to image'],
+    dropLabel: 'Drop a picture to make a meme',
+    defaults: { font: 'impact', upper: 'true', effect: 'outline', color: '#ffffff', size: '11', text1: 'Top text', text2: 'Bottom text', pos1: '0.5,0.1', pos2: '0.5,0.9' },
+    intro: [
+      'The classic meme look is white Impact capitals with a black outline, one line at the top and one at the bottom. This page sets that up on any picture you drop in: type over the top and bottom text, drag either to move it, and save a full-size image with no watermark.',
+      'The picture never leaves your device, so a screenshot from a group chat or a photo of a friend is not handed to a meme site. Impact comes with Windows and Mac; elsewhere the closest bold font on your device is used.',
+    ],
+    steps: [
+      'Drop a picture, or tap to pick one.',
+      'Replace Top text and Bottom text. Drag them to move, or change the size.',
+      'Save the meme. It downloads straight away as a full-size image.',
+    ],
+    faq: [
+      { q: 'Is there a watermark?', a: 'No. The saved image has only your picture and your text.' },
+      { q: 'Can I use just one line?', a: 'Yes. Clear the second text and only the first is drawn.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'add-watermark-to-photo',
+    base: 'add-text-to-image',
+    name: 'Add watermark to photo',
+    title: 'Add Watermark to Photos Free, Batch, No Upload | Stayput',
+    description: 'Put your name or © notice on a batch of photos in your browser: semi-transparent text in the corner, same place on every image. No upload.',
+    heading: 'Add a watermark to photos',
+    tagline: 'Stamp your name on a whole set of photos at once, on your own device.',
+    keywords: ['add watermark to photo', 'watermark photos', 'watermark photos free', 'batch watermark', 'add copyright to photo', 'text watermark online'],
+    dropLabel: 'Drop photos to watermark',
+    defaults: { text1: '© Your name', size: '3.5', opacity: '65', effect: 'shadow', color: '#ffffff', pos1: '0.84,0.94' },
+    intro: [
+      'A small, semi-transparent name in the corner tells people where a photo came from and discourages reposting without credit. This page puts the same text in the same place on every photo you drop in, drawn at full size, so a whole shoot is watermarked in one go.',
+      'Your photos are never uploaded, which matters most for client work and unreleased shots: watermarking sites receive the clean originals you are trying to protect. Change the text, drag it anywhere, and raise the opacity for a stronger mark.',
+    ],
+    steps: [
+      'Drop one or more photos, or tap to pick them.',
+      'Replace “Your name”, then drag the text or use Corner, and set the size and opacity.',
+      'Save. One photo downloads straight away; several come as a zip.',
+    ],
+    faq: [
+      { q: 'Can I add a logo instead of text?', a: 'Not yet: this tool adds text. A © symbol and your name or website is the most common watermark.' },
+      { q: 'Does it work on portrait and landscape photos together?', a: 'Yes. The position and size are a share of each photo, so the mark sits in the same corner at the same relative size on both.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

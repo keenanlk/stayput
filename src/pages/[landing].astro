@@ -42,6 +42,8 @@ import AudioToVideo from '../components/options/AudioToVideo.astro';
 import QrStage from '../components/QrStage.astro';
 import RecordStage from '../components/RecordStage.astro';
 import MergeAudio from '../components/options/MergeAudio.astro';
+import AddText from '../components/options/AddText.astro';
+import TextStage from '../components/TextStage.astro';
 import CompressAudio from '../components/options/CompressAudio.astro';
 import VolumeBooster from '../components/options/VolumeBooster.astro';
 import AudioConverter from '../components/options/AudioConverter.astro';
@@ -104,6 +106,7 @@ const options = {
   'trim-audio': TrimAudio,
   'audio-to-video': AudioToVideo,
   'merge-audio': MergeAudio,
+  'add-text-to-image': AddText,
   'compress-audio': CompressAudio,
   'volume-booster': VolumeBooster,
   'audio-converter': AudioConverter,
@@ -139,6 +142,7 @@ const Options = options[base as keyof typeof options];
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}
+  {base === 'add-text-to-image' && <TextStage slot="panel" />}
   {base === 'color-picker' && <ColorStage slot="panel" />}
   {base === 'pdf-to-word' && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>

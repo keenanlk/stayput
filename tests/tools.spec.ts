@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(61);
+  expect(await page.locator('.tool-card').count()).toBe(62);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4274,4 +4274,70 @@ test('Compress audio hands back an MP3 it cannot make smaller', async ({ page })
   expect(downloads[0]!.suggestedFilename()).toBe('song.mp3');
   expect((await bytesOf(downloads[0]!)).length).toBe(readFileSync(staticFx('song.mp3')).length);
   await expect(page.locator('#results-list')).toContainText('kept as it was');
+});
+
+test('Add text to image draws the text at full size where it was dragged, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'add-text-to-image');
+  const net = watchNetwork(page);
+  // plain.jpg: 800x600 of flat red (200, 80, 80).
+  const { downloads } = await run(page, ['plain.jpg'], async () => {
+    await expect(page.locator('#text-panel')).toBeVisible();
+    await page.locator('#text1').fill('HELLO');
+    await page.locator('#effect').selectOption('none');
+    await page.locator('#size').fill('20');
+    await page.locator('#size').dispatchEvent('input');
+    // Drag the text from the middle to the top left quarter.
+    await page.locator('#text-canvas').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const box = (await page.locator('#text-canvas').boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3, { steps: 5 });
+    await page.mouse.up();
+    await expect(page.locator('#pos1')).toHaveValue(/^0\.3\d*,0\.3\d*$/);
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('plain-text.jpg');
+  const out = await bytesOf(downloads[0]!);
+  expect(jpegSize(out)).toEqual({ width: 800, height: 600 });
+  // White letters near the new spot, untouched red far from it.
+  const boxes = JSON.parse((await page.locator('#text-panel').getAttribute('data-boxes'))!) as number[][];
+  const [bx, by, bw, bh] = boxes[0]!;
+  expect(bx! + bw! / 2).toBeCloseTo(0.3, 1);
+  expect(by! + bh! / 2).toBeCloseTo(0.3, 1);
+  let white = 0;
+  for (let i = 0; i < 40; i++) {
+    const [r, g, b] = await pixelAt(page, out, Math.round((bx! + (bw! * i) / 40) * 800), Math.round((by! + bh! / 2) * 600));
+    if (r! > 230 && g! > 230 && b! > 230) white++;
+  }
+  expect(white).toBeGreaterThan(3);
+  const far = await pixelAt(page, out, 700, 550);
+  expect(Math.abs(far[0]! - 200) + Math.abs(far[1]! - 80) + Math.abs(far[2]! - 80)).toBeLessThan(30);
+  net.assertNothingLeft(['plain.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Meme generator opens with top and bottom text in caps and saves both on every image', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/meme-generator');
+  await expect(page.locator('#font')).toHaveValue('impact');
+  await expect(page.locator('#upper')).toBeChecked();
+  const { items } = await run(page, ['plain.jpg', 'photo.jpg'], async () => {
+    await page.locator('#text1').fill('when the build');
+    await page.locator('#text2').fill('is green');
+  });
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['photo-text.jpg', 'plain-text.jpg']);
+  const boxes = JSON.parse((await page.locator('#text-panel').getAttribute('data-boxes'))!) as number[][];
+  // One block near the top, one near the bottom.
+  expect(boxes[0]![1]!).toBeLessThan(0.2);
+  expect(boxes[1]![1]! + boxes[1]![3]!).toBeGreaterThan(0.85);
+});
+
+test('Add text to image refuses to run with no text', async ({ page }) => {
+  await open(page, 'add-text-to-image');
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg')]);
+  await expect(page.locator('#text-panel')).toBeVisible();
+  await page.locator('#text1').fill('');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Type some text first');
 });
