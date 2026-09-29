@@ -55,6 +55,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'remove-pdf-metadata': ['protect-pdf', 'compress-pdf'],
   'redact-pdf': ['remove-pdf-metadata', 'protect-pdf'],
   'crop-pdf': ['compress-pdf', 'merge-pdf'],
+  'grayscale-pdf': ['compress-pdf', 'pdf-page-numbers'],
   'sticker-maker': ['remove-background', 'compress-image'],
   'profile-picture-maker': ['compress-image', 'strip-exif'],
   'watermark-pdf': ['protect-pdf', 'compress-pdf'],
