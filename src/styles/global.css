@@ -248,6 +248,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .result-item .meta { font-size: 13px; color: var(--muted); }
 .result-item .saving { color: var(--ok); font-weight: 650; }
 .result-item .grew { color: var(--warn); font-weight: 650; }
+.result-item .actions { display: flex; gap: 6px; }
+.result-item .result-text { grid-column: 1 / -1; width: 100%; resize: vertical; font: 15px/1.55 var(--font); color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; }
 .privacy-note { font-size: 13.5px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
 .privacy-note svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--accent); }
 

@@ -1,0 +1,14 @@
+---
+/** Option controls for image to text (OCR), shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const lines = defaults.lines ?? 'keep';
+---
+<div class="field">
+  <label>Line breaks</label>
+  <div class="segmented" role="radiogroup" aria-label="Line breaks">
+    <label><input type="radio" name="lines" value="keep" checked={lines === 'keep'} /><span>Keep as in the image</span></label>
+    <label><input type="radio" name="lines" value="join" checked={lines === 'join'} /><span>Join into paragraphs</span></label>
+  </div>
+</div>
+<p class="muted small">Reads printed English text. The first run downloads the text reader (about 6 MB) from this site; after that it works offline.</p>

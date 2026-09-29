@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ImageToText from '../../components/options/ImageToText.astro';
+const tool = toolBySlug('image-to-text')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ImageToText /></Fragment>
+</ToolLayout>
+<script src="../../tools/image-to-text.ts"></script>

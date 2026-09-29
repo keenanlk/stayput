@@ -22,6 +22,7 @@ import VideoToGif from '../components/options/VideoToGif.astro';
 import BlurImage from '../components/options/BlurImage.astro';
 import RotateImage from '../components/options/RotateImage.astro';
 import VideoToMp3 from '../components/options/VideoToMp3.astro';
+import ImageToText from '../components/options/ImageToText.astro';
 import CropStage from '../components/CropStage.astro';
 import ReorderStage from '../components/ReorderStage.astro';
 import SignStage from '../components/SignStage.astro';
@@ -52,6 +53,7 @@ const options = {
   'blur-image': BlurImage,
   'rotate-image': RotateImage,
   'video-to-mp3': VideoToMp3,
+  'image-to-text': ImageToText,
   // Sign PDF has no option controls; everything happens on the stage.
   'sign-pdf': null,
 } as const;

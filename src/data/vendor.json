@@ -51,5 +51,28 @@
     "version": "0.7.0",
     "entry": "mp3.wasm",
     "files": { "mp3.wasm": "wasm/mp3.wasm", "LICENSE": "LICENSE" }
+  },
+  "tesseract": {
+    "package": "tesseract.js",
+    "version": "7.0.0",
+    "entry": "worker.min.js",
+    "files": { "worker.min.js": "dist/worker.min.js", "LICENSE": "LICENSE.md" }
+  },
+  "tesseractCore": {
+    "package": "tesseract.js-core",
+    "version": "7.0.0",
+    "entry": "tesseract-core-simd-lstm.wasm.js",
+    "files": {
+      "tesseract-core-lstm.wasm.js": "tesseract-core-lstm.wasm.js",
+      "tesseract-core-simd-lstm.wasm.js": "tesseract-core-simd-lstm.wasm.js",
+      "tesseract-core-relaxedsimd-lstm.wasm.js": "tesseract-core-relaxedsimd-lstm.wasm.js",
+      "LICENSE": "LICENSE"
+    }
+  },
+  "tesseractEng": {
+    "package": "@tesseract.js-data/eng",
+    "version": "1.0.0",
+    "entry": "eng.traineddata.gz",
+    "files": { "eng.traineddata.gz": "4.0.0_best_int/eng.traineddata.gz" }
   }
 }

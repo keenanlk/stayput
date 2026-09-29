@@ -65,6 +65,8 @@ export interface OutputFile {
   /** Short label shown when there is no preview; defaults to the extension. */
   badge?: string;
   note?: string;
+  /** Text to show on the page with a Copy button (OCR output, say). */
+  text?: string;
 }
 
 export async function zipFiles(files: OutputFile[]): Promise<Blob> {

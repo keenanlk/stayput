@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(23);
+  expect(await page.locator('.tool-card').count()).toBe(24);
   expect(errors).toEqual([]);
 });
 
@@ -869,6 +869,9 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#format')).toHaveValue('wav');
       await expect(page.locator('#bitrate-field')).toBeHidden();
     }],
+    ...['extract-text-from-image', 'picture-to-text', 'screenshot-to-text', 'jpg-to-text', 'png-to-text'].map(
+      (slug): [string, string, () => Promise<void>] => [slug, 'image-to-text', async () => expect(page.locator('input[name="lines"][value="keep"]')).toBeChecked()],
+    ),
     ['flip-image', 'rotate-image', async () => {
       await expect(page.locator('input[name="rotate"][value="0"]')).toBeChecked();
       await expect(page.locator('#flip-h')).toBeChecked();
@@ -1850,4 +1853,57 @@ test('MP4 to WAV page writes a 44.1 kHz WAV, mono on request, and a video withou
   await page.locator('#file-input').setInputFiles([staticFx('clip.webm')]);
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('No audio could be read from this file');
+});
+
+test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  const errors = await open(page, 'image-to-text');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('ocr-note.png'), staticFx('ocr-letter.jpg')]);
+  await page.locator('#run').click();
+  // The first run loads the OCR engine and English model from /vendor/.
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 90_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  const texts = page.locator('#results-list .result-text');
+  await expect(texts).toHaveCount(2);
+  const note = await texts.nth(0).inputValue();
+  expect(note).toContain('Stayput reads text on your device.');
+  expect(note).toContain('Invoice number 48213');
+  expect(note).toContain('Total due: $1,250.00');
+  // Kept line breaks: one line per line of the image.
+  expect(note.split('\n')).toHaveLength(3);
+  expect(await texts.nth(1).inputValue()).toContain('quick brown fox');
+  await page.locator('#results-list .result-item').first().getByRole('button', { name: 'Copy text' }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(note);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['ocr-letter.txt', 'ocr-note.txt']);
+  expect(new TextDecoder().decode(files['ocr-note.txt'])).toBe(note + '\n');
+  net.assertNothingLeft(['ocr-note.png', 'ocr-letter.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Extract text page joins lines into paragraphs, and an image without text gets a clear error', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/extract-text-from-image');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(staticFx('ocr-letter.jpg'));
+  await choose(page.locator('input[name="lines"][value="join"]'));
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 90_000 });
+  const text = await page.locator('#results-list .result-text').inputValue();
+  const paragraphs = text.split('\n\n');
+  expect(paragraphs).toHaveLength(2);
+  expect(paragraphs[0]).toMatch(/^The quick brown fox jumps over the lazy dog while the wind carries leaves across the quiet morning field\.$/);
+  expect(paragraphs[1]).toBe('A second paragraph starts here.');
+  // The text is shown to copy; nothing downloads until asked.
+  expect(downloads).toBe(0);
+
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fx('plain.jpg'));
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('No text was found', { timeout: 60_000 });
 });

@@ -25,6 +25,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'blur-image': ['compress-image', 'crop-image'],
   'rotate-image': ['crop-image', 'compress-image'],
   'video-to-mp3': ['video-to-gif', 'compress-image'],
+  'image-to-text': ['blur-image', 'image-to-pdf'],
   'unlock-pdf': ['merge-pdf', 'compress-pdf'],
   'protect-pdf': ['compress-pdf', 'sign-pdf'],
 };

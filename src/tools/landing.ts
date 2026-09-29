@@ -20,6 +20,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'blur-image': () => import('./blur-image'),
   'rotate-image': () => import('./rotate-image'),
   'video-to-mp3': () => import('./video-to-mp3'),
+  'image-to-text': () => import('./image-to-text'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';
