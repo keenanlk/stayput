@@ -21,6 +21,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'rotate-image': () => import('./rotate-image'),
   'video-to-mp3': () => import('./video-to-mp3'),
   'gif-to-mp4': () => import('./gif-to-mp4'),
+  'compress-video': () => import('./compress-video'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
 };

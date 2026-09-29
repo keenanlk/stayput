@@ -1016,6 +1016,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'compress-video',
+    name: 'Compress video',
+    title: 'Video Compressor, Compress MP4 Without Uploading | Stayput',
+    description:
+      'Compress MP4, MOV and WebM videos in your browser: make a video small enough for Discord, email or WhatsApp. No upload, no size limit, no watermark.',
+    heading: 'Compress a video',
+    tagline: 'Make a video a fraction of the size, or fit it under a limit like 10 MB for Discord or 25 MB for email. It is compressed on this device and never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to compress',
+    action: 'Compress',
+    keywords: ['video compressor', 'compress video', 'compress mp4', 'reduce video size', 'video compressor for discord', 'compress video for email', 'make video smaller'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Choose how hard to compress, or Fit a file size and pick a limit such as 10 MB for Discord. Lower the resolution or remove the sound for even smaller files.',
+      'Compress. Each video is re-encoded in your browser and saved as MP4; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for, no size limit and no copy left on someone else’s computer. You can load the page, switch off Wi-Fi and it still works.',
+      },
+      {
+        q: 'How much smaller will it get?',
+        a: 'Phone videos usually shrink to between a quarter and a tenth of their size on Balanced with little visible difference, because phones record at a very high bitrate to save battery. A video that was already compressed for the web will not shrink much, and the result then tells you it grew.',
+      },
+      {
+        q: 'How do I get a video under 10 MB for Discord?',
+        a: 'Choose Fit a file size and pick 10 MB. The page works out the bitrate from the length of the video and lowers the resolution if it needs to. About 1 minute fits at 720p; longer videos come out at lower resolutions, and very long ones are refused with how long a clip will fit.',
+      },
+      {
+        q: 'Which formats can I compress?',
+        a: 'MP4, M4V and MOV (from phones, cameras and screen recorders), WebM and MKV, as long as your browser can decode the video inside. iPhone videos in HEVC need Safari, or Chrome or Edge on a Mac or recent Windows. The result is always an MP4, with H.264 video where your browser can write it.',
+      },
+      {
+        q: 'Why does it take a while?',
+        a: 'Every frame is decoded and encoded again, which is real work: on a recent laptop expect roughly real time or faster for 1080p, slower on a phone. Keep the tab open until it finishes. Lowering the resolution also makes it faster.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

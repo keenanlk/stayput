@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CompressVideo from '../../components/options/CompressVideo.astro';
+const tool = toolBySlug('compress-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><CompressVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/compress-video.ts"></script>

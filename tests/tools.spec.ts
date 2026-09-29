@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(26);
+  expect(await page.locator('.tool-card').count()).toBe(27);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -898,6 +898,16 @@ test('preset landing pages render, run their base tool with the preset options a
     ['hex-color-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
     ['gif-to-video', 'gif-to-mp4', async () => expect(page.locator('#repeat')).toHaveValue('auto')],
     ['animated-gif-to-mp4', 'gif-to-mp4', async () => expect(page.locator('#repeat')).toHaveValue('1')],
+    ['video-compressor', 'compress-video', async () => {
+      await expect(page.locator('#mode')).toHaveValue('balanced');
+      await expect(page.locator('#size-field')).toBeHidden();
+    }],
+    ['compress-video-for-discord', 'compress-video', async () => {
+      await expect(page.locator('#mode')).toHaveValue('size');
+      await expect(page.locator('#size')).toHaveValue('10');
+      await expect(page.locator('#size-field')).toBeVisible();
+    }],
+    ['compress-video-for-email', 'compress-video', async () => expect(page.locator('#size')).toHaveValue('25')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -2138,4 +2148,127 @@ test('Animated GIF to MP4 page plays once, and a file that is not a GIF gets a c
   await page.locator('#run').click();
   await expect(page.locator('#error')).toHaveClass(/is-active/);
   await expect(page.locator('#error')).toContainText('This file is not a GIF.');
+});
+
+/** Every track in an MP4: its sample entry (avc1, vp09, mp4a, Opus...) and, for video, its size. */
+function mp4Tracks(b: Uint8Array) {
+  const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  const type = (o: number) => String.fromCharCode(b[o + 4]!, b[o + 5]!, b[o + 6]!, b[o + 7]!);
+  const tracks: { codec: string; width: number; height: number }[] = [];
+  const walk = (start: number, end: number) => {
+    for (let o = start; o + 8 <= end; ) {
+      const size = v.getUint32(o);
+      const t = type(o);
+      if (size < 8) break;
+      if (t === 'trak') tracks.push({ codec: '', width: 0, height: 0 });
+      if (['moov', 'trak', 'mdia', 'minf', 'stbl'].includes(t)) walk(o + 8, o + size);
+      const track = tracks[tracks.length - 1];
+      if (t === 'tkhd' && track) {
+        const off = o + 8 + (b[o + 8] === 1 ? 88 : 76);
+        track.width = v.getUint32(off) >>> 16;
+        track.height = v.getUint32(off + 4) >>> 16;
+      }
+      if (t === 'stsd' && track) track.codec = type(o + 16);
+      o += size;
+    }
+  };
+  walk(0, b.length);
+  return tracks;
+}
+
+/**
+ * A 3 second 1280x720 WebM with a tone, recorded in the page at 8 Mbps: busy
+ * enough that a real compressor has something to save, and made the way
+ * browser screen recorders make files (no duration in the header).
+ */
+let recorded: string | undefined;
+async function recordClip(page: Page): Promise<string> {
+  if (recorded) return recorded;
+  const bytes = await page.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = 1280;
+    c.height = 720;
+    const ctx = c.getContext('2d')!;
+    const ac = new AudioContext();
+    const osc = ac.createOscillator();
+    const dest = ac.createMediaStreamDestination();
+    osc.connect(dest);
+    osc.start();
+    const stream = new MediaStream([...c.captureStream(30).getVideoTracks(), ...dest.stream.getAudioTracks()]);
+    const rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8,opus', videoBitsPerSecond: 8e6 });
+    const chunks: Blob[] = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    rec.start();
+    const t0 = performance.now();
+    let seed = 7;
+    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    await new Promise<void>((done) => {
+      const frame = () => {
+        const t = performance.now() - t0;
+        for (let i = 0; i < 40; i++) {
+          ctx.fillStyle = `hsl(${(i * 37 + t / 5) % 360},80%,${30 + ((i * 13) % 50)}%)`;
+          ctx.fillRect((i * 97 + t / 3) % 1280, (i * 53) % 720, 200, 120);
+        }
+        ctx.fillStyle = '#000';
+        for (let k = 0; k < 300; k++) ctx.fillRect(rand() * 1280, rand() * 720, 3, 3);
+        if (t < 3000) requestAnimationFrame(frame);
+        else done();
+      };
+      frame();
+    });
+    rec.stop();
+    await new Promise((r) => (rec.onstop = r));
+    return [...new Uint8Array(await new Blob(chunks).arrayBuffer())];
+  });
+  recorded = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'recording.webm');
+  writeFileSync(recorded, Buffer.from(bytes));
+  return recorded;
+}
+
+test('Compress video shrinks a recording to an MP4 with picture and sound, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'compress-video');
+  const clip = await recordClip(page);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('recording-compressed.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  expect(mp4.length).toBeLessThan(readFileSync(clip).length / 2);
+  const tracks = mp4Tracks(mp4);
+  expect(tracks).toHaveLength(2);
+  expect(['avc1', 'vp09', 'av01']).toContain(tracks[0]!.codec);
+  expect(tracks[0]).toMatchObject({ width: 1280, height: 720 });
+  expect(['mp4a', 'Opus']).toContain(tracks[1]!.codec);
+  await expect(page.locator('#results-list .result-item')).toContainText('smaller');
+  const probe = await videoProbe(page, mp4, [1.5]);
+  expect(probe.duration).toBeGreaterThan(2.5);
+  expect(probe.width).toBe(1280);
+  net.assertNothingLeft(['recording.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Compress video fits a size limit by lowering the resolution, drops the sound on request, and refuses a limit it cannot meet', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/compress-video-for-discord');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const clip = await recordClip(page);
+  // The page offers 8 MB and up; a 3 second clip needs a tiny limit to show the squeeze.
+  await page.locator('#size').evaluate((el: HTMLSelectElement) => el.add(new Option('0.3 MB', '0.3')));
+  const { downloads } = await run(page, [clip], async () => {
+    await page.locator('#size').selectOption('0.3');
+    await choose(page.locator('#mute'));
+  });
+  const mp4 = await bytesOf(downloads[0]!);
+  expect(mp4.length).toBeLessThanOrEqual(300_000);
+  const tracks = mp4Tracks(mp4);
+  expect(tracks).toHaveLength(1);
+  // About 720 kbps cannot fill 720p with detail, so the picture steps down.
+  expect(tracks[0]!.height).toBeLessThan(720);
+  expect(tracks[0]!.width / tracks[0]!.height).toBeCloseTo(16 / 9, 1);
+  await expect(page.locator('#results-list .result-item')).toContainText('no sound');
+
+  await page.locator('#size').evaluate((el: HTMLSelectElement) => el.add(new Option('0.01 MB', '0.01')));
+  await page.locator('#size').selectOption('0.01');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  await expect(page.locator('#error')).toContainText('too long to fit in 0.01 MB');
 });
