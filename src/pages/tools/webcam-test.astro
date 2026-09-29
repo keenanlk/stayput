@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CamStage from '../../components/CamStage.astro';
+const tool = toolBySlug('webcam-test')!;
+---
+<ToolLayout tool={tool}>
+  <CamStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/webcam-test.ts"></script>
