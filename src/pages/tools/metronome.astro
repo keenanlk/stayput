@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import MetronomeStage from '../../components/MetronomeStage.astro';
+const tool = toolBySlug('metronome')!;
+---
+<ToolLayout tool={tool}>
+  <MetronomeStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/metronome.ts"></script>

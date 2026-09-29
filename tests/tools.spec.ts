@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(68);
+  expect(await page.locator('.index .tool-card').count()).toBe(69);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -497,7 +497,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4652,4 +4652,101 @@ test('Ukulele tuner page starts on ukulele, reads a chromatic note on A4 = 432, 
   await page.locator('#tuner-start').click();
   await expect(page.locator('#tuner-message')).toContainText('microphone is blocked');
   await expect(page.locator('#tuner-message')).toContainText('press a string');
+});
+
+/** Record when each metronome click is scheduled to sound, on the audio clock. */
+async function recordClicks(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __clicks: { t: number; hz: number }[] };
+    w.__clicks = [];
+    const start = OscillatorNode.prototype.start;
+    OscillatorNode.prototype.start = function (this: OscillatorNode, when?: number) {
+      w.__clicks.push({ t: when ?? 0, hz: this.frequency.value });
+      return start.call(this, when);
+    };
+  });
+}
+
+test('Metronome clicks evenly at the set tempo, accents beat one, adds triplets, and sends nothing', async ({ page }) => {
+  await recordClicks(page);
+  const errors = await open(page, 'metronome');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#bpm').fill('150');
+  await expect(page.locator('#metro-bpm')).toHaveText('150');
+  await expect(page.locator('#metro-name')).toHaveText('Allegro');
+  await page.locator('#beats').selectOption('3');
+  await expect(page.locator('.metro-light')).toHaveCount(3);
+  await page.locator('#metro-start').click();
+  await expect(page.locator('#metro-panel')).toHaveAttribute('data-beat', /[1-3]/);
+  await page.waitForTimeout(1500);
+  await page.locator('#metro-start').click();
+  await expect(page.locator('#metro-start')).toHaveText('Start');
+  const clicks = await page.evaluate(() => (window as unknown as { __clicks: { t: number; hz: number }[] }).__clicks);
+  expect(clicks.length).toBeGreaterThan(4);
+  // 150 BPM: 0.4 s apart, to the microsecond, with every third click (beat one) higher.
+  for (let i = 1; i < clicks.length; i++) expect(clicks[i]!.t - clicks[i - 1]!.t).toBeCloseTo(0.4, 5);
+  expect(clicks.map((c) => c.hz).slice(0, 4)).toEqual([1500, 1000, 1000, 1500]);
+
+  // Triplets: three clicks per beat.
+  await page.evaluate(() => ((window as unknown as { __clicks: unknown[] }).__clicks.length = 0));
+  await page.locator('#subdivision').selectOption('triplets');
+  await page.locator('#bpm').fill('60');
+  await page.locator('#metro-start').click();
+  await page.waitForTimeout(1300);
+  await page.locator('#metro-start').click();
+  const trip = await page.evaluate(() => (window as unknown as { __clicks: { t: number; hz: number }[] }).__clicks);
+  expect(trip.length).toBeGreaterThan(3);
+  expect(trip[1]!.t - trip[0]!.t).toBeCloseTo(1 / 3, 5);
+  expect(trip[1]!.hz).toBe(800);
+
+  // The space bar starts and stops it.
+  await page.locator('body').click({ position: { x: 5, y: 5 } });
+  await page.keyboard.press('Space');
+  await expect(page.locator('#metro-panel')).toHaveAttribute('data-state', 'running');
+  await page.keyboard.press('Space');
+  await expect(page.locator('#metro-panel')).toHaveAttribute('data-state', 'stopped');
+
+  const runs = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run'));
+  expect(runs).toHaveLength(1);
+  net.assertNothingLeft([]);
+  expect(errors).toEqual([]);
+});
+
+test('Metronome keeps the next beat on time and the bar count when the tempo changes mid-play', async ({ page }) => {
+  await recordClicks(page);
+  await open(page, 'metronome');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#bpm').fill('120');
+  await page.locator('#metro-start').click();
+  await page.waitForTimeout(1100);
+  const before = await page.evaluate(() => (window as unknown as { __clicks: { t: number }[] }).__clicks.length);
+  await page.locator('#metro-up').click();
+  await page.waitForTimeout(1200);
+  await page.locator('#metro-start').click();
+  const clicks = await page.evaluate(() => (window as unknown as { __clicks: { t: number; hz: number }[] }).__clicks);
+  const gaps = clicks.slice(1).map((c, i) => c.t - clicks[i]!.t);
+  // Every gap is either the old beat (0.5 s) or the new one (60/121 s): no double or skipped click at the change.
+  for (const g of gaps) expect(Math.min(Math.abs(g - 0.5), Math.abs(g - 60 / 121))).toBeLessThan(1e-6);
+  expect(gaps.slice(0, before - 1).every((g) => Math.abs(g - 0.5) < 1e-6)).toBe(true);
+  // Beat one stays every fourth click across the change.
+  clicks.forEach((c, i) => expect(c.hz).toBe(i % 4 === 0 ? 1500 : 1000));
+});
+
+test('Tap tempo page leads with the tap button and reads the tempo from steady taps', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/tap-tempo');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('.metro-controls .btn').first()).toHaveText('Tap tempo');
+  await page.clock.install();
+  // Freeze the page clock so only runFor moves it between taps.
+  await page.clock.pauseAt(Date.now() + 1000);
+  for (let i = 0; i < 6; i++) {
+    await page.locator('#metro-tap').click();
+    await page.clock.runFor(480);
+  }
+  await expect(page.locator('#metro-bpm')).toHaveText('125');
+  await expect(page.locator('#metro-tap-note')).toContainText('125 BPM from 6 taps');
+  await expect(page.locator('#metro-name')).toHaveText('Allegro');
 });
