@@ -741,6 +741,35 @@ export const pairs: Pair[] = [
       { q: 'Is anything uploaded?', a: 'No. The PNG is decoded and the TIFF is written in this browser tab. Nothing is sent to a server.' },
     ],
   },
+  {
+    slug: 'ico-to-png',
+    from: 'ICO',
+    to: 'PNG',
+    outputType: 'image/png',
+    accept: 'image/x-icon,image/vnd.microsoft.icon,.ico,.cur',
+    title: 'ICO to PNG Converter, Largest Size, Transparent | Stayput',
+    description: 'Convert ICO icons and favicons to transparent PNG in your browser, taking the largest size inside the file. Batch, free, nothing uploaded.',
+    heading: 'Convert ICO to PNG',
+    tagline: 'Get a clean, transparent PNG out of any Windows icon or favicon, at the biggest size it holds.',
+    keywords: ['ico to png', 'convert ico to png', 'ico to png converter', 'favicon to png', 'ico to png transparent'],
+    intro: [
+      'An ICO file is a small bundle of images, not one picture: the same icon drawn at several sizes, typically 16, 32, 48 and 256 pixels, so Windows and browsers can pick the one that fits. People convert ICO to PNG to reuse a favicon in a slide deck or README, to edit an app icon in software that cannot open ICO, to upload a site icon to a platform that wants PNG, or to recover the artwork of an old desktop icon.',
+      'Your browser’s icon decoder opens the file and hands over the largest image inside it, usually the 256 × 256 version, and the converter saves that as a PNG. Transparency is kept exactly: ICO and PNG both store a full alpha channel, so rounded corners and soft shadows stay see-through. The smaller sizes in the bundle are not exported separately.',
+      'Many favicon.ico files only go up to 32 or 48 pixels. The PNG then comes out that small, since there is no larger artwork to take. Enlarging it will look blurry; for a crisp large version, look for the site’s apple-touch-icon (often 180 × 180) or its logo instead.',
+      'Very old icons from Windows 95 to XP sometimes use 16- or 256-colour images with a separate one-bit transparency mask. Those decode too, with the mask applied as transparency. Cursor files (.cur) share the ICO format and convert the same way, minus their hotspot position, which PNG has nowhere to store.',
+      'Windows keeps most program icons inside .exe and .dll files rather than as loose .ico files. To convert one of those, pull the icon out first with a resource tool such as Resource Hacker, IconViewer or 7-Zip, which save it as an .ico, and then drop that here. On a Mac, application icons are .icns files; open one in Preview and export it as PNG instead.',
+      'Since Windows Vista, the 256-pixel image inside most icons is itself stored as a compressed PNG, while the small sizes are stored as bitmaps. Either way the pixels are decoded and written out losslessly, so the PNG you download is a faithful copy of the icon’s largest artwork, ready for a Slack or Discord emoji, a GitHub README, a documentation page or an app store listing draft.',
+    ],
+    faq: [
+      { q: 'Which size do I get from a multi-size ICO?', a: 'The largest one in the file, usually 256 × 256 for application icons and 32 or 48 pixels for older favicons.' },
+      { q: 'Will the PNG keep its transparent background?', a: 'Yes. The ICO’s alpha channel, or its older one-bit mask, becomes the PNG’s transparency.' },
+      { q: 'How do I get a website’s favicon to convert?', a: 'Open the site, add /favicon.ico after the domain in the address bar, and save the image that appears. Then drop the file here. Many sites also offer a larger PNG icon, linked in the page source as apple-touch-icon.' },
+      { q: 'Why is my PNG only 16 or 32 pixels?', a: 'The ICO did not contain anything bigger. Favicons made before high-resolution screens often stop at 32 × 32. The converter never upscales, so you get the true largest size rather than a blurry enlargement.' },
+      { q: 'Can I extract a program’s icon from its .exe?', a: 'Not directly. Windows stores those icons as resources inside the program file. Use a free resource extractor to save the icon as an .ico first, then convert that file here.' },
+      { q: 'Can I go the other way and make an ICO?', a: 'Yes. PNG to ICO builds a multi-size icon from a PNG, and the Favicon generator makes the full set of icons a website needs.' },
+      { q: 'Is anything uploaded?', a: 'No. The icon is decoded and the PNG is written in this browser tab. Nothing is sent to a server.' },
+    ],
+  },
 ];
 
 export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => p.slug === slug);

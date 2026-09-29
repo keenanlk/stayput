@@ -1532,6 +1532,37 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'mov-to-wav',
+    base: 'video-to-mp3',
+    name: 'MOV to WAV',
+    title: 'MOV to WAV Converter, iPhone Video to WAV, No Upload | Stayput',
+    description: 'Extract the sound from MOV videos, including iPhone clips, as an uncompressed WAV in your browser. For editing, transcription and music. No upload.',
+    heading: 'Convert MOV to WAV',
+    tagline: 'Pull an uncompressed WAV out of iPhone and QuickTime videos, for editing, syncing or transcription, on your own device.',
+    keywords: ['mov to wav', 'convert mov to wav', 'mov to wav converter', 'iphone video to wav', 'quicktime to wav', 'extract audio from mov'],
+    dropLabel: 'Drop MOV videos to convert to WAV',
+    accept: 'video/quicktime,.mov,.qt,video/*,audio/*',
+    action: 'Convert to WAV',
+    defaults: { format: 'wav' },
+    intro: [
+      'MOV is Apple’s QuickTime container, and it is what an iPhone, a Mac screen recording and many cameras save. The sound inside is usually AAC, sometimes uncompressed PCM from pro cameras and recorders. People want it as WAV to line up a phone recording with a separate microphone in an editor, to clean up a performance or rehearsal in Audacity or a DAW, to feed a transcription or subtitling service, or to sample a sound from a clip.',
+      'This page reads the MOV’s sound track with your browser’s own decoder and writes a 16-bit, 44.1 kHz PCM WAV. iPhone video audio is recorded at 48 kHz, which is resampled to 44.1 kHz; if you need the WAV to stay at 48 kHz to match a video timeline, a desktop editor that exports at the project rate is the better route. Stereo stays stereo, or pick mono to halve the size. The video frames are never decoded, so even long 4K clips convert quickly.',
+      'iPhones recording spatial audio store extra channels; surround sound is mixed down to stereo with the centre channel kept, so voices stay clear. MOV files from pro cameras with several separate microphone tracks give you the first track only. Screen recordings made with the Mac’s built-in recorder often have no audio track at all unless the microphone was switched on, and the page tells you when no sound could be found.',
+      'Home videos and recorded calls are private. The MOV is read from your disk in this tab and the WAV is written straight back, without either passing through a server.',
+    ],
+    steps: [
+      'Drop one or more MOV files, or tap to pick videos from your photo library on an iPhone.',
+      'WAV is already chosen. Pick mono for a single voice to halve the file size.',
+      'Convert. The WAV downloads; several videos come back as a zip.',
+    ],
+    faq: [
+      { q: 'Does this work with iPhone videos?', a: 'Yes, in Safari, Chrome and Edge. Tap the drop zone, choose Photo Library, and pick the video. The WAV is saved to Downloads in the Files app. HEVC video does not matter, because only the sound track is read.' },
+      { q: 'Why is the WAV so large?', a: 'WAV stores sound uncompressed: about 10 MB per minute in stereo at 44.1 kHz, and half that in mono. The AAC track in the MOV is roughly a tenth of that size.' },
+      { q: 'Will the WAV stay in sync with the video?', a: 'It starts at the same moment and runs the same length, so it lines up in an editor. Resampling from 48 to 44.1 kHz does not shift timing; editors play both rates at the correct speed.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

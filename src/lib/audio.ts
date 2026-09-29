@@ -14,11 +14,27 @@ export const SAMPLE_RATE = 44100;
 export async function decodeAudio(file: File): Promise<AudioBuffer> {
   const bytes = await file.arrayBuffer();
   const ctx = new OfflineAudioContext(2, 1, SAMPLE_RATE);
+  let buffer: AudioBuffer;
   try {
-    return await ctx.decodeAudioData(bytes);
+    buffer = await ctx.decodeAudioData(bytes);
   } catch {
     throw new Error('No audio could be read from this file. It may have no sound track, or use an audio format this browser cannot decode.');
   }
+  return buffer.numberOfChannels > 2 ? downmixToStereo(buffer) : buffer;
+}
+
+/**
+ * Surround (5.1, quad, spatial) down to stereo with the Web Audio speaker
+ * rules, so the centre channel, where film dialogue lives, is kept.
+ */
+async function downmixToStereo(buffer: AudioBuffer): Promise<AudioBuffer> {
+  const ctx = new OfflineAudioContext(2, buffer.length, buffer.sampleRate);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.channelInterpretation = 'speakers';
+  source.connect(ctx.destination);
+  source.start();
+  return ctx.startRendering();
 }
 
 /** The buffer's channels, mixed down to one when `mono` is set (and a mono source stays mono). */
