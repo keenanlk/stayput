@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import BlurFaceVideo from '../../components/options/BlurFaceVideo.astro';
+const tool = toolBySlug('blur-face-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><BlurFaceVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/blur-face-video.ts"></script>

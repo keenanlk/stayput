@@ -2310,6 +2310,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'blur-face-video',
+    name: 'Blur faces in video',
+    title: 'Blur Faces in a Video Automatically, No Upload | Stayput',
+    description:
+      'Blur or pixelate every face in a video automatically, frame by frame, before you post it. MP4, MOV, WebM. The video never leaves your device.',
+    heading: 'Blur faces in a video',
+    tagline: 'Every face found and covered, frame by frame, on your own device. For children, bystanders and anyone who did not agree to be filmed.',
+    category: 'media',
+    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to hide the faces in',
+    action: 'Blur faces',
+    keywords: ['blur face in video', 'blur faces in video online', 'anonymize video', 'pixelate face in video', 'hide faces in video', 'face blur video', 'blur people in video'],
+    steps: [
+      'Drop one or more videos from your phone or camera.',
+      'Choose how to cover the faces: blur, pixelate, a black box or an emoji, and how strong.',
+      'Run it. Every frame is scanned for faces and covered; then watch the result through before you share it.',
+    ],
+    faq: [
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. The video is decoded, scanned and written again by code in this tab, with a face detector that runs on your device. That matters most for exactly the videos you would blur: children, a protest, a witness, people at work.',
+      },
+      {
+        q: 'Will it catch every face?',
+        a: 'It finds faces that look towards the camera, including small ones, about ten times a second, and keeps each one covered for half a second after it was last seen. Faces in profile, turned away, very small or behind glasses and masks can be missed for a moment, so always watch the result before you share it. The note under the result says how many frames had a face covered.',
+      },
+      {
+        q: 'Blur, pixelate or black box: which hides best?',
+        a: 'A black box or an emoji hides a face completely. Blur and pixelate at a high strength make a face unrecognisable to people, and look softer, but at a low strength someone who knows the person may still recognise them.',
+      },
+      {
+        q: 'Does it keep the sound?',
+        a: 'Yes, unless you tick Remove the sound. Voices, names said aloud and background noises can identify people too, so consider removing it for sensitive footage.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'Every frame is decoded, scanned and encoded again, so on a laptop a one-minute clip takes roughly one to a few minutes, depending on its resolution. Phones are slower. Keep the tab open until it finishes.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

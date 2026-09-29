@@ -36,6 +36,11 @@ export interface EditOptions {
   flipVertical?: boolean;
   /** Region to keep, in pixels of the upright picture (after rotate and flip). */
   crop?: { left: number; top: number; width: number; height: number };
+  /**
+   * Paint over each frame after the other edits, for example to cover faces.
+   * Gets the frame on a canvas and its time in seconds.
+   */
+  paint?: (ctx: CanvasRenderingContext2D, seconds: number) => void | Promise<void>;
   /** Output size. With only one side set, the other follows the aspect ratio. */
   width?: number;
   height?: number;
@@ -85,7 +90,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     const quarter = opts.rotate === 90 || opts.rotate === 270;
     const turnedW = quarter ? video.displayHeight : video.displayWidth;
     const turnedH = quarter ? video.displayWidth : video.displayHeight;
-    const reencode = !!(opts.rotate || opts.flip || opts.flipVertical || opts.crop || opts.width || opts.height);
+    const reencode = !!(opts.rotate || opts.flip || opts.flipVertical || opts.crop || opts.width || opts.height || opts.paint);
 
     if (!reencode) {
       // Only the sound changes: copy the picture as it is, into the same kind of file.
@@ -149,6 +154,15 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       flip = !flip;
     }
 
+    const paint = opts.paint;
+    let frame: CanvasRenderingContext2D | undefined;
+    if (paint) {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      frame = canvas.getContext('2d', { willReadFrequently: true }) ?? undefined;
+      if (!frame) throw new Error('Canvas is not available in this browser.');
+    }
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
     const conversion = await Conversion.init({
       input,
@@ -166,6 +180,14 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
         forceTranscode: true,
         // Bake the rotation and flip into the pixels so every player shows the result the same way.
         allowTransformationMetadata: false,
+        process:
+          paint && frame
+            ? async (sample) => {
+                sample.draw(frame!, 0, 0, width, height);
+                await paint(frame!, sample.timestamp);
+                return frame!.canvas;
+              }
+            : undefined,
       },
       audio: opts.mute ? { discard: true } : {},
     });

@@ -1,0 +1,36 @@
+---
+/** Option controls for Blur faces in video. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const effect = defaults.effect ?? 'blur';
+const strength = defaults.strength ?? '6';
+const emoji = defaults.emoji ?? '🙂';
+const picks = ['🙂', '😎', '😇', '🥸', '🐱', '⭐'];
+---
+<div class="field">
+  <label>Cover each face with</label>
+  <div class="segmented" role="radiogroup" aria-label="Effect">
+    <label><input type="radio" name="effect" value="blur" checked={effect === 'blur'} /><span>Blur</span></label>
+    <label><input type="radio" name="effect" value="pixelate" checked={effect === 'pixelate'} /><span>Pixelate</span></label>
+    <label><input type="radio" name="effect" value="box" checked={effect === 'box'} /><span>Black box</span></label>
+    <label><input type="radio" name="effect" value="emoji" checked={effect === 'emoji'} /><span>Emoji</span></label>
+  </div>
+</div>
+<div class="field" id="emoji-field" hidden={effect !== 'emoji'}>
+  <label for="emoji">Emoji</label>
+  <div class="emoji-picks" role="group" aria-label="Emoji to cover faces with">
+    <input type="text" id="emoji" value={emoji} maxlength="16" autocomplete="off" spellcheck="false" aria-label="Emoji to cover each face with" />
+    {picks.map((e) => <button type="button" class="emoji-pick" data-emoji={e} aria-label={`Use ${e}`}>{e}</button>)}
+  </div>
+</div>
+<div class="field" id="strength-field" hidden={effect === 'box' || effect === 'emoji'}>
+  <label for="strength">Strength <output id="strength-out">{strength}</output></label>
+  <input type="range" id="strength" min="1" max="10" step="1" value={strength} />
+</div>
+<label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound too (voices can identify people)</label>
+<style>
+  .emoji-picks { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  #emoji { width: 4.5em; font-size: 22px; text-align: center; padding: 4px 8px; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", var(--font); }
+  .emoji-pick { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", var(--font); font-size: 22px; line-height: 1; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
+  .emoji-pick:hover { border-color: var(--line-strong); }
+</style>

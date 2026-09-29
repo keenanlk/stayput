@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(70);
+  expect(await page.locator('.index .tool-card').count()).toBe(71);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -497,7 +497,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4851,4 +4851,91 @@ test('Fill PDF form can lock the answers into the page, keeps non-Latin answers 
   await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
   await expect(page.locator('#form-empty')).toBeVisible();
   await expect(page.locator('#form-empty a')).toHaveAttribute('href', '/tools/sign-pdf');
+});
+
+test('Blur faces in video finds the face in every frame and covers it, leaves the rest, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(180_000);
+  const errors = await open(page, 'blur-face-video');
+  const net = watchNetwork(page);
+  // A 1.5 s clip of the portrait on a grey background, recorded in the page.
+  const face = readFileSync(staticFx('face.jpg')).toString('base64');
+  const clip = await page.evaluate(async (b64) => {
+    const img = await createImageBitmap(new Blob([Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))], { type: 'image/jpeg' }));
+    const c = document.createElement('canvas');
+    c.width = 640;
+    c.height = 360;
+    const ctx = c.getContext('2d')!;
+    const stream = c.captureStream(0);
+    const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack;
+    const rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 2e6 });
+    const chunks: Blob[] = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    const paint = () => {
+      ctx.fillStyle = 'rgb(128,128,128)';
+      ctx.fillRect(0, 0, 640, 360);
+      ctx.drawImage(img, 176, 0, 288, 360);
+      track.requestFrame();
+    };
+    paint();
+    rec.start();
+    const t0 = performance.now();
+    await new Promise<void>((done) => {
+      const frame = () => {
+        paint();
+        if (performance.now() - t0 < 1500) setTimeout(frame, 33);
+        else done();
+      };
+      frame();
+    });
+    rec.stop();
+    await new Promise((r) => (rec.onstop = r));
+    return [...new Uint8Array(await new Blob(chunks).arrayBuffer())];
+  }, face);
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'interview.webm');
+  writeFileSync(file, Buffer.from(clip));
+  const { downloads } = await run(page, [file], async () => {
+    await page.locator('input[name="effect"][value="box"]').check({ force: true });
+    await expect(page.locator('#strength-field')).toBeHidden();
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('interview-faces-hidden.mp4');
+  await expect(page.locator('#results-list')).toContainText(/faces covered in (9\d|100)% of frames, up to 1 at once/, { timeout: 120_000 });
+  const out = await bytesOf(downloads[0]!);
+  // Read the middle of the face and a patch of background from frames early and late in the result.
+  const samples = await page.evaluate(async (b64) => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))], { type: 'video/mp4' }));
+    await new Promise((ok, bad) => ((v.onloadeddata = ok), (v.onerror = bad)));
+    const c = document.createElement('canvas');
+    c.width = 640;
+    c.height = 360;
+    const ctx = c.getContext('2d', { willReadFrequently: true })!;
+    const mean = (x: number, y: number) => {
+      const d = ctx.getImageData(x - 3, y - 3, 7, 7).data;
+      let s = 0;
+      for (let i = 0; i < d.length; i += 4) s += (d[i]! + d[i + 1]! + d[i + 2]!) / 3;
+      return s / (d.length / 4);
+    };
+    const out: { face: number; bg: number }[] = [];
+    for (const t of [0.1, 0.7, 1.2]) {
+      await new Promise<void>((ok) => {
+        v.onseeked = () => ok();
+        v.currentTime = t;
+      });
+      await new Promise<void>((ok) => {
+        v.requestVideoFrameCallback(() => ok());
+        setTimeout(ok, 300);
+      });
+      ctx.drawImage(v, 0, 0, 640, 360);
+      out.push({ face: mean(317, 80), bg: mean(40, 300) });
+    }
+    return out;
+  }, Buffer.from(out).toString('base64'));
+  for (const s of samples) {
+    expect(s.face).toBeLessThan(30);
+    expect(Math.abs(s.bg - 128)).toBeLessThan(12);
+  }
+  net.assertNothingLeft(['interview.webm']);
+  // MediaPipe reports its CPU delegate on the error console; that is not a failure.
+  expect(errors.filter((e) => !e.startsWith('INFO:'))).toEqual([]);
 });

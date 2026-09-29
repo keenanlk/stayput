@@ -92,7 +92,12 @@ function tiles(width: number, height: number, size: number): Rect[] {
  * first call downloads the detector (about 4 MB compressed); `onProgress`
  * hears when that is done and scanning starts.
  */
-export async function findFaces(bitmap: ImageBitmap, onProgress?: (stage: 'loading' | 'scanning') => void): Promise<Rect[]> {
+export async function findFaces(
+  bitmap: ImageBitmap | HTMLCanvasElement,
+  onProgress?: (stage: 'loading' | 'scanning') => void,
+  /** Tile sizes, as shares of the shorter side, scanned after the whole picture. Fewer is faster. */
+  tiers: number[] = [0.5, 0.25],
+): Promise<Rect[]> {
   onProgress?.('loading');
   const fd = await load();
   onProgress?.('scanning');
@@ -101,7 +106,7 @@ export async function findFaces(bitmap: ImageBitmap, onProgress?: (stage: 'loadi
   const short = Math.min(W, H);
   const regions: Rect[] = [{ x: 0, y: 0, w: W, h: H }];
   // Halves and quarters of the shorter side catch faces down to about 1/20 of it.
-  for (const f of [0.5, 0.25]) if (short * f >= 96) regions.push(...tiles(W, H, Math.round(short * f)));
+  for (const f of tiers) if (short * f >= 96) regions.push(...tiles(W, H, Math.round(short * f)));
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
   const found: Scored[] = [];
