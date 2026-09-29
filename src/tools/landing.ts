@@ -37,6 +37,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'video-to-jpg': () => import('./video-to-jpg'),
   'trim-audio': () => import('./trim-audio'),
   'qr-code-generator': () => import('./qr-code-generator'),
+  'screen-recorder': () => import('./screen-recorder'),
   'merge-audio': () => import('./merge-audio'),
   'volume-booster': () => import('./volume-booster'),
   'audio-converter': () => import('./audio-converter'),

@@ -1670,6 +1670,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'screen-recorder',
+    name: 'Screen recorder',
+    title: 'Free Online Screen Recorder, No Upload or Watermark | Stayput',
+    description:
+      'Record your screen, a window or a browser tab with sound and your microphone, right in the browser. No install, no sign-up, no watermark, no time limit.',
+    heading: 'Record your screen',
+    tagline: 'Capture your screen, one window or a tab, with its sound and your voice. The video is made in this tab and never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.webm',
+    multiple: false,
+    dropLabel: 'Record your screen',
+    action: 'Save recording',
+    keywords: ['screen recorder', 'online screen recorder', 'record screen', 'screen recorder with audio', 'free screen recorder', 'screen recorder no watermark', 'record my screen'],
+    steps: [
+      'Choose whether to record the sound from the screen, your microphone or both, then press Start recording.',
+      'Your browser asks what to share: the entire screen, one window or one tab. Pick it and press Share. To include the sound of a tab or the whole screen, tick "Share audio" in that picker.',
+      'Pause and resume as needed, then press Stop and save (or the browser\'s own Stop sharing). Watch the recording on the page and download it as MP4 or WebM.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. Your browser records the screen and writes the video in this tab, and the file goes straight to your downloads. There is no account, no server, no watermark and no time limit, and nobody else ever sees what you recorded.',
+      },
+      {
+        q: 'Why is there no sound in my recording?',
+        a: 'The sound is only captured when you share it. In Chrome and Edge, tick "Share audio" (or "Also share tab audio") in the browser\'s picker; a single window cannot share its sound, so share the tab or the entire screen instead. Firefox and Safari do not share screen sound at all, so tick "My microphone" to narrate instead.',
+      },
+      {
+        q: 'Is the video MP4 or WebM?',
+        a: 'It depends on the browser. Recent Chrome and Edge and Safari record MP4, which plays everywhere; Firefox records WebM. To turn a WebM into MP4, use Video to MP4 afterwards, and to make the file smaller, use Compress video.',
+      },
+      {
+        q: 'Can I record on my phone?',
+        a: 'Not in a web page: phone and tablet browsers do not let websites capture the screen. Use the recorder built into the phone instead (Screen Recording in the iPhone Control Centre, or Screen record in Android\'s quick settings), then trim or compress the video here.',
+      },
+      {
+        q: 'Is there a time limit?',
+        a: 'No. The recording is held in your computer\'s memory until you save it, so very long recordings at 60 frames per second need a fair amount of free memory. An hour at 30 frames per second is usually a few hundred megabytes to a couple of gigabytes, depending on how much moves on screen.',
+      },
+    ],
+  },
+  {
     slug: 'voice-recorder',
     name: 'Voice recorder',
     title: 'Online Voice Recorder: Record to MP3, No Upload | Stayput',

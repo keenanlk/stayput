@@ -163,6 +163,10 @@ export const engines: Record<string, Engine> = {
     how: 'A QR encoder written for this site (byte mode, versions 1 to 40, Reed–Solomon error correction and the standard’s mask scoring) turns your text into the grid of squares in your tab. The PNG is drawn on a canvas by your browser and the SVG is written as one path, so both are exact, with no blur.',
     versus: 'Most QR code sites make you sign up, send your link and Wi-Fi password to their servers, and hand out “dynamic” codes that redirect through their domain, so they can count scans and switch your code off when a trial ends. Here the code holds your text directly, never expires, and nothing you type leaves your device.',
   },
+  'screen-recorder': {
+    how: 'Your browser’s own screen picker (getDisplayMedia) lets you choose what to share, and its built-in recorder (MediaRecorder) writes the video in your tab, as MP4 in Chrome, Edge and Safari or WebM in Firefox. When you stop, Mediabunny (MPL-2.0) copies the video into a fresh file without re-encoding so its length is written and players can seek it.',
+    versus: 'Online screen recorders make you install an extension or desktop app, sign up, stamp a watermark on free recordings, cap them at a few minutes, and upload the video to their servers to share it. Screens show emails, chats, dashboards and customer data. Here the recording never leaves your device.',
+  },
   'voice-recorder': {
     how: 'Your browser records the microphone with its built-in recorder (MediaRecorder), with its own noise and echo reduction if you leave it on. When you stop, the sound is decoded and written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, or M4A by the browser’s AAC encoder.',
     versus: 'Online voice recorders upload the recording to their servers to convert it, show ads around the download, and some keep your recordings in an account. Voice memos, interviews and dictation are private. Here the sound never leaves your device.',

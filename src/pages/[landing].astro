@@ -39,6 +39,7 @@ import ReverseVideo from '../components/options/ReverseVideo.astro';
 import VideoToJpg from '../components/options/VideoToJpg.astro';
 import TrimAudio from '../components/options/TrimAudio.astro';
 import QrStage from '../components/QrStage.astro';
+import RecordStage from '../components/RecordStage.astro';
 import MergeAudio from '../components/options/MergeAudio.astro';
 import VolumeBooster from '../components/options/VolumeBooster.astro';
 import AudioConverter from '../components/options/AudioConverter.astro';
@@ -114,9 +115,10 @@ const options = {
   'grayscale-pdf': null,
   'sticker-maker': StickerMaker,
   'profile-picture-maker': ProfilePicture,
-  // Sign PDF and the QR code generator have no option controls outside their stages.
+  // Sign PDF, the QR code generator and the screen recorder have no option controls outside their stages.
   'sign-pdf': null,
   'qr-code-generator': null,
+  'screen-recorder': null,
 } as const;
 if (!(base in options)) throw new Error(`Landing page ${tool.slug} has no options component for ${base}`);
 const Options = options[base as keyof typeof options];
@@ -129,6 +131,7 @@ const Options = options[base as keyof typeof options];
   {(base === 'video-to-gif' || base === 'trim-video') && <VideoStage slot="panel" />}
   {base === 'trim-audio' && <AudioStage slot="panel" />}
   {base === 'qr-code-generator' && <QrStage slot="panel" defaults={defaults} />}
+  {base === 'screen-recorder' && <RecordStage slot="panel" defaults={defaults} />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}
