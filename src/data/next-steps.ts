@@ -38,6 +38,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'reverse-video': ['merge-videos', 'video-to-gif'],
   'video-to-jpg': ['compress-image', 'image-to-pdf'],
   'audio-converter': ['trim-audio', 'add-audio-to-video'],
+  'voice-recorder': ['trim-audio', 'add-audio-to-video'],
   'trim-audio': ['add-audio-to-video', 'video-to-mp3'],
   'blur-image': ['compress-image', 'crop-image'],
   'rotate-image': ['crop-image', 'compress-image'],
