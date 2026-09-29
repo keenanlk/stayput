@@ -930,7 +930,7 @@ export const presets: Preset[] = [
     slug: 'screenshot-to-text',
     base: 'image-to-text',
     name: 'Screenshot to text',
-    title: 'Screenshot to Text, Copy Text from a Screenshot, No Upload | Stayput',
+    title: 'Screenshot to Text, Copy Text Without Uploading | Stayput',
     description: 'Copy the text out of a screenshot in your browser. Free OCR for screenshots from phones, Windows and Mac. Nothing is uploaded.',
     heading: 'Copy text from a screenshot',
     tagline: 'Get the words out of a screenshot, a chat, an error message or a slide, ready to paste.',
