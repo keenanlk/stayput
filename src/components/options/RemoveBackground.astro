@@ -5,15 +5,17 @@ const { defaults = {} } = Astro.props;
 const bg = defaults.bg ?? 'transparent';
 const color = defaults['bg-color'] ?? '#ffffff';
 const format = defaults.format ?? 'image/png';
+const strength = defaults.strength ?? '5';
 const backgrounds = [
   ['transparent', 'Transparent'],
   ['white', 'White'],
   ['color', 'Colour'],
+  ['blur', 'Blur'],
 ] as const;
 const formats = [
   ['image/png', 'PNG'],
   ['image/webp', 'WebP (smaller)'],
-  ['image/jpeg', 'JPG (needs a background)'],
+  ['image/jpeg', 'JPG (not for transparent)'],
 ] as const;
 ---
 <div class="field wide">
@@ -25,6 +27,10 @@ const formats = [
 <div class="field" id="bg-color-field" hidden={bg !== 'color'}>
   <label for="bg-color">Background colour</label>
   <input type="color" id="bg-color" value={color} />
+</div>
+<div class="field" id="strength-field" hidden={bg !== 'blur'}>
+  <label for="strength">Blur strength <output id="strength-out">{strength}</output></label>
+  <input type="range" id="strength" min="1" max="10" value={strength} />
 </div>
 <div class="field">
   <label for="format">Save as</label>

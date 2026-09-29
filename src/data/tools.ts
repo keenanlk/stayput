@@ -1643,7 +1643,7 @@ export const tools: Tool[] = [
     keywords: ['remove background', 'background remover', 'remove background from image', 'transparent background', 'make background transparent', 'remove bg', 'cut out image', 'white background'],
     steps: [
       'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
-      'Choose a transparent, white or coloured background and the file type. The first photo downloads the cut-out model once; after that it is cached.',
+      'Choose a transparent, white or coloured background, or keep the scene and blur it, and the file type. The first photo downloads the cut-out model once; after that it is cached.',
       'Download the cut-out at the photo’s full size, or all of them in one zip.',
     ],
     faq: [
@@ -1666,6 +1666,10 @@ export const tools: Tool[] = [
       {
         q: 'How do I get a white background for a product photo?',
         a: 'Choose White (or Colour for any other shade) and save as JPG or PNG. Marketplaces such as Amazon ask for a pure white background, which is exactly what this fills in, at the original resolution.',
+      },
+      {
+        q: 'Can I blur the background instead of removing it?',
+        a: 'Yes. Choose Blur and set the strength: the subject stays sharp and the scene behind softens, like the portrait mode on a phone camera. It works on photos taken with any camera, including ones that were never shot in portrait mode.',
       },
       {
         q: 'Which model does this use?',

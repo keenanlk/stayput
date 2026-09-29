@@ -7,6 +7,7 @@
  * the model and runtime is ever fetched.
  */
 import { makeCanvas } from './image';
+import { blur as boxBlur } from './blur';
 
 const SIZE = 1024;
 /** ISNet expects RGB scaled to 0..1 with the ImageNet mean subtracted (std 1). */
@@ -94,6 +95,34 @@ export function cutout(bitmap: ImageBitmap, mask: Uint8ClampedArray, opts: Cutou
     ctx.fillRect(0, 0, width, height);
   }
   ctx.globalCompositeOperation = 'source-over';
+  return canvas;
+}
+
+/** Longest side the background is blurred at; the blur is scaled up afterwards, which also softens it further. */
+const BLUR_WORK = 800;
+
+/**
+ * The photo at full size with its background blurred, like a phone's portrait
+ * mode. `strength` is 1 to 10, relative to the photo's size. The blur is done
+ * at a small size and scaled up, so it costs the same on a 48 megapixel photo.
+ */
+export function blurBackground(bitmap: ImageBitmap, mask: Uint8ClampedArray, strength: number): HTMLCanvasElement | OffscreenCanvas {
+  const { width, height } = bitmap;
+  const scale = Math.min(1, BLUR_WORK / Math.max(width, height));
+  const sw = Math.max(1, Math.round(width * scale));
+  const sh = Math.max(1, Math.round(height * scale));
+  const small = makeCanvas(sw, sh);
+  const sctx = small.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  sctx.drawImage(bitmap, 0, 0, sw, sh);
+  const s = Math.min(10, Math.max(1, strength));
+  boxBlur(sctx, { x: 0, y: 0, w: sw, h: sh }, Math.max(2, Math.round(Math.min(sw, sh) * s * 0.012)));
+
+  const canvas = makeCanvas(width, height);
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(small, 0, 0, width, height);
+  ctx.drawImage(cutout(bitmap, mask), 0, 0);
   return canvas;
 }
 
