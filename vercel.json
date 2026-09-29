@@ -359,6 +359,11 @@
       "source": "/fill-pdf-form",
       "destination": "/tools/fill-pdf-form",
       "permanent": true
+    },
+    {
+      "source": "/blur-face-video",
+      "destination": "/tools/blur-face-video",
+      "permanent": true
     }
   ],
   "headers": [

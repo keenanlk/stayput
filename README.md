@@ -73,6 +73,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Voice recorder](https://stayput.dev/tools/voice-recorder) (microphone to MP3, WAV or M4A) | |
 | [Merge audio](https://stayput.dev/tools/merge-audio) (join MP3, WAV, M4A with silence or crossfades) | |
 | [Metronome](https://stayput.dev/tools/metronome) (any time signature, subdivisions, tap tempo) | |
+| [Blur faces in video](https://stayput.dev/tools/blur-face-video) (automatic, frame by frame; blur, pixelate, box or emoji) | |
 | [Fill PDF form](https://stayput.dev/tools/fill-pdf-form) (type into fillable fields, tick boxes, optional flatten) | |
 | [Online tuner](https://stayput.dev/tools/tuner) (guitar, bass, ukulele, violin, chromatic; reference notes) | |
 | [Mic test](https://stayput.dev/tools/mic-test) (level meter, verdict, record and play back) | |

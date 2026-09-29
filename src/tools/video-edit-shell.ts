@@ -25,6 +25,8 @@ export function videoEditShell(config: {
   verb: string;
   /** Read the options for one file (some depend on the video's own size). */
   options: (file: File) => Promise<Omit<EditOptions, 'onProgress'>> | Omit<EditOptions, 'onProgress'>;
+  /** More to say about the file just made, after the size and codec. */
+  note?: () => string | undefined;
 }) {
   return createShell({
     async process(files, progress) {
@@ -41,7 +43,7 @@ export function videoEditShell(config: {
           name: suffixName(entry.file.name, config.suffix, r.ext),
           blob: r.blob,
           originalSize: entry.file.size,
-          note: describeEdit(r),
+          note: [describeEdit(r), config.note?.()].filter(Boolean).join(', '),
         };
         return out;
       });
