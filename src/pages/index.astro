@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import ToolCard from '../components/ToolCard.astro';
+import ConversionMap from '../components/ConversionMap.astro';
 import { tools, categories } from '../data/tools';
 import { pairs } from '../data/pairs';
 import { presets } from '../data/presets';
@@ -102,7 +103,11 @@ const jsonLd = [
   </section>
 
   <section class="wrap section split" aria-labelledby="conv-h">
-    <h2 id="conv-h">Popular conversions</h2>
+    <div class="conv-intro">
+      <h2 id="conv-h">Popular conversions</h2>
+      <p class="muted">{pairs.length + presets.length} conversions, each with its own page. Every one runs in this tab.</p>
+      <ConversionMap />
+    </div>
     <ul class="chips">{pairs.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}{presets.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}</ul>
   </section>
 
