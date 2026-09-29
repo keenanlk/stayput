@@ -4,7 +4,7 @@ import ToolCard from '../components/ToolCard.astro';
 import { tools, toolBySlug, toolPath, type Tool } from '../data/tools';
 import { pairBySlug, pairAsTool } from '../data/pairs';
 import { presetBySlug, presetAsTool } from '../data/presets';
-import { guides, type Guide } from '../data/guides';
+import { relatedGuides, isSafetyGuide, type Guide } from '../data/guides';
 import { inline, plain } from '../lib/inline';
 
 interface Props { guide: Guide }
@@ -22,7 +22,7 @@ const resolve = (slug: string): Tool | undefined => {
 };
 const linked = guide.tools.map(resolve).filter((t): t is Tool => !!t);
 const primary = linked[0];
-const more = guides.filter((g) => g.slug !== guide.slug).slice(0, 4);
+const more = relatedGuides(guide, isSafetyGuide(guide) ? 8 : 4);
 const wordCount = guide.sections.reduce((n, s) => n + [...s.p, ...(s.list ?? []), ...(s.after ?? [])].join(' ').split(/\s+/).length, 0);
 
 const jsonLd = [
@@ -107,7 +107,7 @@ const updated = new Date(guide.updated + 'T00:00:00Z').toLocaleDateString('en-GB
   )}
 
   <section class="wrap section">
-    <h2>More guides</h2>
+    <h2>{isSafetyGuide(guide) ? 'Other services, checked the same way' : 'More guides'}</h2>
     <ul class="guide-list">
       {more.map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}
     </ul>
