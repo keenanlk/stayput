@@ -1,15 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { pairs } from '../../data/pairs';
-import { presets } from '../../data/presets';
-
-const items = [
-  ...pairs.map((p) => ({ slug: p.slug, label: `${p.from} to ${p.to}`, tagline: p.tagline })),
-  ...presets.map((p) => ({ slug: p.slug, label: p.name, tagline: p.tagline })),
-];
+import HubGroups from '../../components/HubGroups.astro';
+import { conversions, conversionGroups } from '../../data/hubs';
 
 const title = 'All File Conversions | Stayput';
-const description = `Every conversion Stayput runs in your browser, from one page: ${items.length} formats and presets, each with its own tool. Nothing uploaded.`;
+const description = `Every conversion Stayput runs in your browser, from one page: ${conversions.length} formats and presets, each with its own tool. Nothing uploaded.`;
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -17,21 +12,15 @@ const jsonLd = [
     name: 'Stayput conversions',
     url: new URL('/conversions', Astro.site).toString(),
     description,
-    hasPart: items.map((i) => ({ '@type': 'WebPage', name: i.label, url: new URL(`/${i.slug}`, Astro.site).toString() })),
+    hasPart: conversions.map((i) => ({ '@type': 'WebPage', name: i.label, url: new URL(`/${i.slug}`, Astro.site).toString() })),
   },
 ];
+const groups = conversionGroups.map((g) => ({ ...g, items: g.items.map((i) => ({ href: `/${i.slug}`, label: i.label, sub: i.tagline })) }));
 ---
 <Base title={title} description={description} jsonLd={jsonLd}>
   <section class="wrap guide page guides-index">
     <h1>All conversions</h1>
-    <p class="dek">{items.length} conversions, each with its own page. Every one runs in your browser tab, with nothing uploaded.</p>
-    <ul class="guide-list guide-grid guide-index">
-      {items.map((i) => (
-        <li>
-          <a href={`/${i.slug}`}>{i.label}</a>
-          <span class="muted">{i.tagline}</span>
-        </li>
-      ))}
-    </ul>
+    <p class="dek">{conversions.length} conversions, each with its own page. Every one runs in your browser tab, with nothing uploaded.</p>
+    <HubGroups groups={groups} dense />
   </section>
 </Base>
