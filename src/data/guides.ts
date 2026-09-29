@@ -710,6 +710,230 @@ export const guides: Guide[] = [
     ],
   },
 
+  {
+    slug: 'is-cloudconvert-safe',
+    title: 'Is CloudConvert Safe? What Happens to Your Files, and When to Keep Them Local',
+    description: 'CloudConvert is a reputable German service with ISO 27001 certification and 24-hour deletion. What that covers, what any upload still means, and how to convert without uploading.',
+    heading: 'Is CloudConvert safe?',
+    dek: 'For most files, yes: it is an established, certified service. The real question is whether a given file should leave your computer at all.',
+    keywords: ['is cloudconvert safe', 'cloudconvert safe', 'cloudconvert privacy', 'is cloudconvert legit', 'cloudconvert security', 'cloudconvert alternative no upload'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'video-to-mp3', 'heic-to-jpg', 'video-to-gif'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'CloudConvert is a long-running file conversion service from Lunaweb GmbH in Munich, Germany, and it is legitimate. By the standards of upload-based converters its published practices are strong. If you are converting a holiday video or a logo, it is a reasonable choice.',
+          'What no upload service can change is the basic fact of an upload: for a while, a complete copy of your file is on someone else’s computer. For a contract, a scanned passport, medical records or anything under a confidentiality agreement, the safest converter is one where the file never leaves your device. That is the question this page helps you answer.',
+        ],
+      },
+      {
+        h: 'What CloudConvert says it does with your files',
+        p: ['From CloudConvert’s own security page and privacy policy, as checked on 29 September 2026:'],
+        list: [
+          '**Deletion.** Files are deleted when you press the delete (×) button, and automatically after 24 hours at the latest. It offers no permanent storage.',
+          '**Isolation.** Each conversion runs in its own isolated container, and the company says its staff cannot technically access your files.',
+          '**Encryption.** Transfers to and from the service use SSL/TLS.',
+          '**Location and law.** Processing happens in the region you select, on ISO 27001 certified cloud providers including AWS, and the company is bound by German and EU data protection law (GDPR).',
+          '**Certification.** Its own information security management system is ISO 27001 certified by TÜV Süd.',
+        ],
+        after: ['Those are good practices. They describe how a well-run server handles your file, which is the part you have to take on trust.'],
+      },
+      {
+        h: 'What any upload still means',
+        p: [
+          'None of the following is specific to CloudConvert; it applies to every service that converts on a server. Your file travels over the internet, sits on a machine you cannot inspect for up to a day, and is covered by the company’s policies and the law where it is processed. Deletion promises are about the file store; you cannot audit logs, backups or the conversion workers yourself.',
+          'For many people and most files, that trade is fine. It becomes a problem when a rule says the file must not leave your control: an employer’s data policy, a client NDA, legal privilege, patient data under HIPAA, or simply a document you would not email to a stranger.',
+        ],
+      },
+      {
+        h: 'Converting the same files without uploading',
+        p: [
+          'Browsers can now do much of this work themselves. Stayput runs conversions in the page, on your own device, so there is no upload to trust: images between JPG, PNG, WebP, HEIC, AVIF, TIFF and more with the [image converter](/tools/convert-image), iPhone photos with [HEIC to JPG](/tools/heic-to-jpg), sound out of videos with [Video to MP3](/tools/video-to-mp3), and clips to animations with [Video to GIF](/tools/video-to-gif).',
+          'CloudConvert handles far more formats than a browser can, including office documents, e-books, CAD files and professional video codecs, so it remains the right tool for many jobs. A good rule of thumb: private file in a common format, convert it locally; unusual format and nothing sensitive, an established service like CloudConvert is fine.',
+        ],
+      },
+      {
+        h: 'How to check any converter yourself',
+        p: [
+          'Whatever a site says, you can see whether it uploads. Open your browser’s network panel, add a file and watch for an outgoing request the size of your file; or load the page, switch on airplane mode and try it. Our guide [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks in five minutes.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is CloudConvert legit?', a: 'Yes. It is run by Lunaweb GmbH in Munich, Germany, has been operating for years, publishes its security practices and holds ISO 27001 certification.' },
+      { q: 'How long does CloudConvert keep my files?', a: 'According to its privacy policy, until you delete them with the × button, and automatically after 24 hours at the latest.' },
+      { q: 'Can CloudConvert staff see my files?', a: 'Its security page says conversions run in isolated containers and that staff cannot technically access your files; for support cases it asks you to send files manually.' },
+      { q: 'Is there a way to convert without uploading anything?', a: 'Yes, for common formats. Tools that run in the browser, such as Stayput’s image, audio and video converters, process the file on your device. You can confirm it with airplane mode: they keep working offline.' },
+    ],
+  },
+  {
+    slug: 'is-freeconvert-safe',
+    title: 'Is FreeConvert Safe? Its File Policy Explained, and a No-Upload Option',
+    description: 'FreeConvert stores uploads on AWS in Ireland and deletes them after 8 hours. What that means for private files, and how to convert common formats without uploading.',
+    heading: 'Is FreeConvert safe?',
+    dek: 'FreeConvert is a legitimate service with a clear deletion policy. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
+    keywords: ['is freeconvert safe', 'freeconvert safe', 'is freeconvert.com safe', 'freeconvert privacy', 'is freeconvert legit', 'freeconvert virus'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'FreeConvert.com is a real, widely used converter, owned by TRMedia Inc., a Canadian software company. Files you convert there are not malware by virtue of passing through it, and its privacy policy sets out a clear retention period. For everyday files it is a reasonable choice.',
+          'Like every upload-based converter, it works by sending your file to its servers. So the practical question is not whether FreeConvert is trustworthy in general, but whether the file in front of you is one you are comfortable storing on a third party’s cloud for a few hours.',
+        ],
+      },
+      {
+        h: 'What FreeConvert’s policy says',
+        p: ['From FreeConvert’s privacy policy and about page, as checked on 29 September 2026:'],
+        list: [
+          '**Deletion.** Uploaded files are automatically and permanently deleted after 8 hours, and you can delete them yourself sooner.',
+          '**Storage.** Files are stored with Amazon Web Services in Ireland.',
+          '**Access.** The company says it does not access or view your files without your written consent, unless legally required, and does not sell or share them. You keep ownership of your files.',
+          '**Encryption.** Communication between your device and its systems is encrypted with SSL/TLS.',
+          '**Analytics.** The site uses Google Analytics, Sentry and similar services to measure use and errors; the policy says these do not collect your file contents.',
+        ],
+      },
+      {
+        h: 'Where the risk actually sits',
+        p: [
+          'An eight-hour window on a major cloud provider is a normal design for a free converter. The exposure is not a secret flaw; it is the upload itself. During that window your document exists outside your control, under Canadian and EU-hosted terms, and deletion is something you trust rather than verify.',
+          'FreeConvert is also an ad-supported site. Ads are not a file risk, but they are where people sometimes click the wrong download button. Use the button inside the conversion result, not a large button in an ad slot.',
+        ],
+      },
+      {
+        h: 'Converting without uploading',
+        p: [
+          'For the formats people convert most, a browser can do the work locally. Stayput’s tools run inside the page: [convert images](/tools/convert-image) between JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF, [compress images](/tools/compress-image), turn clips into GIFs with [Video to GIF](/tools/video-to-gif), and pull audio out of video with [Video to MP3](/tools/video-to-mp3). Nothing is sent to a server, there are no file size caps from a pricing plan, and the pages keep working with the network switched off.',
+          'FreeConvert covers many more formats, such as documents, e-books and archives, and adds features like cloud imports. Choose by the file: sensitive and common, stay local; obscure and harmless, an upload service is the practical option.',
+        ],
+      },
+      {
+        h: 'Verify, don’t trust',
+        p: [
+          'Any site can say “your files are safe”. Only a network check shows where a file goes. Our guide [Does this website upload my files?](/guides/does-this-website-upload-my-files) shows how to confirm it in your browser in a few minutes, on FreeConvert, on Stayput, or anywhere else.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is FreeConvert legit?', a: 'Yes. It is operated by TRMedia Inc., a Canadian company, and publishes a privacy policy with a fixed deletion period.' },
+      { q: 'How long does FreeConvert keep my files?', a: 'Its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
+      { q: 'Where are FreeConvert files stored?', a: 'On Amazon Web Services in Ireland, according to its privacy policy.' },
+      { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; switch on airplane mode after the page loads and they still work.' },
+    ],
+  },
+  {
+    slug: 'is-ilovepdf-safe',
+    title: 'Is iLovePDF Safe? How It Handles Your PDFs, and How to Keep Them Local',
+    description: 'iLovePDF is a Barcelona-based, ISO 27001 certified PDF service that deletes files within two hours. What that covers, and how to merge, split or compress PDFs without uploading.',
+    heading: 'Is iLovePDF safe?',
+    dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
+    keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
+    updated: '2026-09-29',
+    tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'iLovePDF is one of the most popular PDF websites, run by a company based in Barcelona, Spain. It is legitimate, holds ISO/IEC 27001 certification and operates under the EU’s GDPR. For ordinary PDFs it is a sensible choice.',
+          'Its tools work by uploading your PDF to its servers, processing it there and handing the result back. That means the document spends up to two hours outside your control. For payslips, bank statements, identity documents, medical or legal files, you may prefer tools that never send the file anywhere.',
+        ],
+      },
+      {
+        h: 'What iLovePDF says it does with your PDFs',
+        p: ['From iLovePDF’s security policy and FAQ, as checked on 29 September 2026:'],
+        list: [
+          '**Deletion.** Processed files are automatically and permanently deleted within two hours; you can also delete them from the download screen straight away.',
+          '**Signatures.** Documents signed through its e-signature service are kept for up to five years, for legal compliance.',
+          '**Encryption.** Data is protected with HTTPS in transit, and the company says it is also encrypted at rest.',
+          '**Certification and law.** ISO/IEC 27001 certified, GDPR compliant, and a Europe-based company.',
+          '**Offline option.** iLovePDF Desktop for Windows and Mac can process files offline, on your own computer.',
+        ],
+      },
+      {
+        h: 'What that means in practice',
+        p: [
+          'Two-hour deletion and a certified security programme are good practice for a web PDF service. The limit is that deletion and access controls are promises about a server you cannot inspect. That is true of every upload-based tool, not a criticism of iLovePDF in particular.',
+          'Many workplaces and professions set the rule for you: client files, HR records and patient data may not be uploaded to unapproved third-party services, however reputable. If that applies to you, an offline or in-browser tool is the way to stay within policy.',
+        ],
+      },
+      {
+        h: 'Merge, split and compress PDFs without uploading',
+        p: [
+          'Stayput’s PDF tools run entirely in your browser tab. [Merge PDF](/tools/merge-pdf) joins files in the order you choose, [Split PDF](/tools/split-pdf) extracts pages or splits every page, [Compress PDF](/tools/compress-pdf) shrinks scanned documents, and [Sign PDF](/tools/sign-pdf) places a drawn or typed signature. The PDF is read from your disk and the result is written back; there is no upload, no account and no daily limit.',
+          'iLovePDF offers a wider set of tools, such as Office conversion, OCR, and legally binding e-signature workflows. If you need those, its desktop app keeps files on your machine; for the common jobs, a browser tool does the same without installing anything.',
+        ],
+      },
+      {
+        h: 'Check it yourself',
+        p: [
+          'You can verify where your PDF goes on any site with the browser’s network panel or a quick airplane-mode test. [Our five-minute guide](/guides/does-this-website-upload-my-files) shows how, and [Is it safe to merge PDFs online?](/guides/is-it-safe-to-merge-pdfs-online) covers the general risks of uploading documents.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is iLovePDF legit?', a: 'Yes. It is an established service run from Barcelona, Spain, with ISO/IEC 27001 certification and GDPR compliance.' },
+      { q: 'How long does iLovePDF keep my files?', a: 'Its security policy says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
+      { q: 'Does iLovePDF have an offline version?', a: 'Yes. iLovePDF Desktop for Windows and Mac works offline. Browser tools like Stayput’s are another option that needs no installation.' },
+      { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after it loads, it keeps working with the network switched off.' },
+    ],
+  },
+  {
+    slug: 'is-smallpdf-safe',
+    title: 'Is Smallpdf Safe? File Retention, Storage and a No-Upload Option',
+    description: 'Smallpdf deletes uploads after one hour, keeps shared files 14 days and stores files in your account if you choose. What that means, and how to edit PDFs without uploading.',
+    heading: 'Is Smallpdf safe?',
+    dek: 'Smallpdf is a reputable Swiss company with ISO 27001 certification. What changes the answer for you is which of its storage rules applies to your file.',
+    keywords: ['is smallpdf safe', 'smallpdf safe', 'is smallpdf legit', 'smallpdf privacy', 'smallpdf security', 'smallpdf alternative'],
+    updated: '2026-09-29',
+    tools: ['compress-pdf', 'merge-pdf', 'pdf-to-word', 'sign-pdf'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'Smallpdf is a large, established PDF service run by Smallpdf AG in Zurich, Switzerland. It holds ISO 27001 certification and publishes clear retention rules. For everyday PDFs, it is a legitimate and reasonable choice.',
+          'Like other web PDF services it processes files on its servers, and how long your file stays there depends on what you do with it. Knowing those rules, and knowing that you can avoid the upload entirely for common tasks, is what makes the answer useful.',
+        ],
+      },
+      {
+        h: 'Smallpdf’s three retention rules',
+        p: ['From Smallpdf’s own help and trust pages, as checked on 29 September 2026:'],
+        list: [
+          '**One hour** for ordinary processing: an uploaded file is deleted automatically an hour after processing.',
+          '**14 days** if you share the result by email or link, or send it for signature with its e-sign feature.',
+          '**Until you delete it** if you have an account and use document storage, which can be turned off in your settings.',
+        ],
+        after: ['Transfers use TLS encryption, and the company is ISO 27001 certified.'],
+      },
+      {
+        h: 'Reading those rules for your file',
+        p: [
+          'The one-hour window is short, and that is a well-designed default. The account storage option is the one to watch: it is convenient, but it means your documents live in a cloud account, protected by your password, until you remove them. If you signed up to try a feature, check whether storage is on.',
+          'The general caveat is the same for every upload service: deletion and access controls are commitments about a server you cannot see. For files your job, a client agreement or health privacy law says must stay under your control, choose a tool that does not upload.',
+        ],
+      },
+      {
+        h: 'Common PDF jobs without uploading',
+        p: [
+          'Stayput’s PDF tools run in your browser, so the PDF stays on your device: [Compress PDF](/tools/compress-pdf) for oversized scans, [Merge PDF](/tools/merge-pdf) to combine documents, [PDF to Word](/tools/pdf-to-word) to get editable text into a .docx, and [Sign PDF](/tools/sign-pdf) to add a signature and date. There is no account and no storage to switch off, because nothing is ever stored.',
+          'Smallpdf does things a browser tool cannot, including OCR-heavy conversions, team workspaces and e-signature requests with audit trails. If you rely on those, its retention settings are worth a two-minute review; for one-off edits of private documents, local tools avoid the question.',
+        ],
+      },
+      {
+        h: 'How to see where a file goes',
+        p: [
+          'You do not have to take any site’s word, including ours. [This guide](/guides/does-this-website-upload-my-files) shows how to watch the browser’s network panel for an upload, and how the airplane-mode test tells you in seconds whether a tool works locally.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is Smallpdf legit?', a: 'Yes. It is operated by Smallpdf AG in Zurich, Switzerland, is ISO 27001 certified, and is one of the most widely used PDF services.' },
+      { q: 'How long does Smallpdf keep my files?', a: 'One hour after processing by default; 14 days if you share the file or send it for e-signature; and indefinitely if you store it in an account, until you delete it or turn storage off.' },
+      { q: 'How do I stop Smallpdf storing my documents?', a: 'Signed-in users can turn off document storage in their Smallpdf settings, and delete files already stored there.' },
+      { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so the PDF never leaves your device. It keeps working with the network off once the page has loaded.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
