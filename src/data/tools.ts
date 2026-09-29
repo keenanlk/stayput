@@ -1058,6 +1058,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-to-mp4',
+    name: 'Video to MP4',
+    title: 'Convert Video to MP4: MOV, MKV, WebM to MP4, No Upload | Stayput',
+    description:
+      'Convert MOV, MKV and WebM videos to MP4 in your browser. H.264 files convert in seconds with no quality loss. Batch, no size limit, nothing uploaded.',
+    heading: 'Convert video to MP4',
+    tagline: 'Turn MOV, MKV and WebM files into MP4s that play everywhere. Converted on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mov,.mkv,.webm,.m4v,.mp4,.qt',
+    multiple: true,
+    dropLabel: 'Drop videos to convert to MP4',
+    action: 'Convert to MP4',
+    keywords: ['mov to mp4', 'mkv to mp4', 'webm to mp4', 'convert video to mp4', 'mp4 converter', 'convert mov to mp4'],
+    steps: [
+      'Drop one or more videos (MOV, MKV, WebM or MP4), or tap to pick them.',
+      'Tick Remove the sound if you want a silent video. There is nothing else to set.',
+      'Convert. H.264 videos are rewrapped in seconds; others are re-encoded in your browser. One downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process, so there is no upload, no size limit and no copy left anywhere. The page works with Wi-Fi off.',
+      },
+      {
+        q: 'Why was my file converted so fast?',
+        a: 'MOV and MKV files often already contain H.264 video and AAC sound, the same streams an MP4 holds. Those are copied into the MP4 as they are, which only takes as long as reading the file, and the picture is exactly the same as before. The result says "copied, no quality loss" when that happens.',
+      },
+      {
+        q: 'What about iPhone videos in HEVC?',
+        a: 'Browsers that can decode HEVC (Safari, and Chrome or Edge on a Mac or recent Windows) re-encode it to H.264, which plays everywhere. Elsewhere the HEVC stream is copied into the MP4 unchanged, which plays on iPhones, Macs, Android and Windows 10 or later with the free HEVC extension.',
+      },
+      {
+        q: 'Which formats can I convert?',
+        a: 'MOV (iPhone, Mac screen recordings, cameras), MKV (OBS recordings, downloads), WebM (browser and screen recordings) and MP4 itself. AVI, WMV and FLV are not supported, because browsers cannot read the video inside them.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
