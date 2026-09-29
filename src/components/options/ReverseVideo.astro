@@ -1,0 +1,8 @@
+---
+/** Option controls for reverse video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound (otherwise it plays backwards too)</label>
+</div>

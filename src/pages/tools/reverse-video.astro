@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ReverseVideo from '../../components/options/ReverseVideo.astro';
+const tool = toolBySlug('reverse-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ReverseVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/reverse-video.ts"></script>
