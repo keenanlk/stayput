@@ -2038,6 +2038,52 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'crop-pdf',
+    name: 'Crop PDF',
+    title: 'Crop PDF Pages and Trim Margins, Free, No Upload | Stayput',
+    description:
+      'Crop PDF pages to the area you draw, or trim white margins from every page in one click. Text stays sharp and selectable. Runs in your browser, no upload.',
+    heading: 'Crop a PDF',
+    tagline: 'Cut PDF pages down to what matters: draw the area to keep, or trim the white margins automatically.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF to crop',
+    action: 'Download cropped PDF',
+    keywords: ['crop pdf', 'crop pdf pages', 'trim pdf margins', 'remove white margins from pdf', 'cut pdf page', 'resize pdf page', 'crop pdf online free'],
+    steps: [
+      'Drop the PDF. Its pages appear here, drawn in your browser.',
+      'Press Trim white margins to crop each page to its content, or drag on a page to draw the area to keep, for every page or just that one.',
+      'Download the cropped PDF. Text, links and images inside the area stay exactly as they were.',
+    ],
+    faq: [
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The pages are drawn and the crop is written by code running in your browser tab, so the document never leaves your device, and the page works offline once it has loaded.',
+      },
+      {
+        q: 'Does cropping lower the quality?',
+        a: 'No. The pages are not turned into pictures: the tool changes the page boxes that tell every viewer and printer which part of the page to show. Text stays sharp at any zoom and can still be selected and searched.',
+      },
+      {
+        q: 'Is the cropped-off part deleted?',
+        a: 'No, it is hidden. Every PDF viewer and printer shows only the cropped area, but the content outside it is still in the file and a PDF editor can bring it back. To remove something for good, such as an account number in a margin, use the redact PDF tool instead.',
+      },
+      {
+        q: 'What does Trim white margins do?',
+        a: 'It looks at each page on its own and crops it to the smallest box that holds all its text and images, plus a small margin, so a page with a wide border becomes easier to read on a phone or e-reader. Pages that are already full are left alone.',
+      },
+      {
+        q: 'Can I crop pages to different sizes?',
+        a: 'Yes. Choose This page before you draw and the box applies only to the page you are looking at. Trim white margins always works page by page. Go to another page and draw again to crop it differently.',
+      },
+      {
+        q: 'Why is the file almost the same size?',
+        a: 'Because nothing is removed from the pages, only hidden. If you need a smaller file, run the cropped PDF through the compress PDF tool.',
+      },
+    ],
+  },
+  {
     slug: 'redact-pdf',
     name: 'Redact PDF',
     title: 'Redact PDF Free, Text Really Removed, No Upload | Stayput',

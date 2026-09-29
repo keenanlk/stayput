@@ -500,7 +500,7 @@ function hexToRgb(hex: string): [number, number, number] {
  * drawn text or images to appear upright. `x`/`y` are fractions 0..1 of the
  * displayed width/height measured from the bottom-left of the displayed page.
  */
-function displayedToUserSpace(page: PdfLib.PDFPage, fx: number, fy: number): { x: number; y: number; rotate: number; w: number; h: number } {
+export function displayedToUserSpace(page: PdfLib.PDFPage, fx: number, fy: number): { x: number; y: number; rotate: number; w: number; h: number } {
   const box = visibleBox(page);
   const { width, height } = box;
   const rot = ((page.getRotation().angle % 360) + 360) % 360;
