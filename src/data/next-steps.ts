@@ -42,6 +42,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'screen-recorder': ['trim-video', 'compress-video'],
   'voice-recorder': ['trim-audio', 'add-audio-to-video'],
   'volume-booster': ['trim-audio', 'audio-converter'],
+  'pitch-changer': ['trim-audio', 'volume-booster'],
   'merge-audio': ['trim-audio', 'add-audio-to-video'],
   'mic-test': ['merge-audio', 'audio-converter'],
   'webcam-test': ['mic-test', 'compress-image'],

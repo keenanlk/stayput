@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(66);
+  expect(await page.locator('.index .tool-card').count()).toBe(67);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -497,7 +497,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4518,4 +4518,56 @@ test('Extract images from PDF explains when a PDF holds no pictures', async ({ p
   await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('No pictures are stored in these pages');
+});
+
+/** Seconds and the left channel's frequency (from rising zero crossings in the middle). */
+async function pitchOf(page: Page, bytes: Uint8Array): Promise<{ seconds: number; hz: number }> {
+  return page.evaluate(async (b64) => {
+    const data = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const buf = await new OfflineAudioContext(1, 1, 48000).decodeAudioData(data.buffer);
+    const ch = buf.getChannelData(0);
+    const a = Math.floor(ch.length * 0.2);
+    const b = Math.floor(ch.length * 0.8);
+    let n = 0;
+    for (let i = a + 1; i < b; i++) if (ch[i - 1]! < 0 && ch[i]! >= 0) n++;
+    return { seconds: buf.duration, hz: n / ((b - a) / buf.sampleRate) };
+  }, Buffer.from(bytes).toString('base64'));
+}
+
+test('Pitch changer moves a tone up three semitones, keeps its length, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'pitch-changer');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['tone.wav'], async () => {
+    await page.locator('#semitones').fill('3');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('tone-up3.wav');
+  const out = await pitchOf(page, await bytesOf(downloads[0]!));
+  expect(out.seconds).toBeCloseTo(1.5, 1);
+  expect(Math.abs(out.hz - 440 * 2 ** (3 / 12))).toBeLessThan(8);
+  await expect(page.locator('#results-list .result-item')).toContainText('+3 semitones');
+  net.assertNothingLeft(['tone.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('Speed up audio page makes a faster copy at the same pitch; the record option raises the pitch too', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/speed-up-audio');
+  await expect(page.locator('#speed')).toHaveValue('1.25');
+  const { downloads } = await run(page, ['tone.wav']);
+  expect(downloads[0]!.suggestedFilename()).toBe('tone-faster.wav');
+  const same = await pitchOf(page, await bytesOf(downloads[0]!));
+  expect(same.seconds).toBeCloseTo(1.2, 1);
+  expect(Math.abs(same.hz - 440)).toBeLessThan(8);
+  await page.locator('#tape').check({ force: true });
+  const [d2] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  const tape = await pitchOf(page, await bytesOf(d2));
+  expect(Math.abs(tape.hz - 550)).toBeLessThan(10);
+});
+
+test('Pitch changer refuses to run when nothing would change', async ({ page }) => {
+  await open(page, 'pitch-changer');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('tone.wav')]);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Choose a pitch or a speed');
 });
