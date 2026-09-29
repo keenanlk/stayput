@@ -1484,6 +1484,40 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'reverse-video',
+    name: 'Reverse video',
+    title: 'Reverse Video Online: Play a Clip Backwards, No Upload | Stayput',
+    description:
+      'Play a video backwards in your browser, with the sound reversed or removed. MP4, MOV, WebM or MKV in, MP4 out. No upload, no watermark, no sign-up.',
+    heading: 'Reverse a video',
+    tagline: 'Make a clip play backwards, for a rewind effect, a boomerang or a laugh. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to reverse',
+    action: 'Reverse',
+    keywords: ['reverse video', 'reverse video online', 'play video backwards', 'rewind video', 'backwards video maker', 'video reverser'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Keep the sound to hear it backwards too, or tick Remove the sound.',
+      'Reverse. Each video is decoded from the end to the start and saved as an MP4.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes the video, puts its frames in the opposite order and encodes it again in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Why does reversing take longer than other video tools?',
+        a: 'Videos are stored so they can only be decoded forwards. To play one backwards, the page decodes it in short pieces starting from the end, which means some frames are decoded twice. It still runs as fast as your device can decode and encode.',
+      },
+      {
+        q: 'Does it work on long videos?',
+        a: 'Yes. Only a second or so of frames is held in memory at a time, so a long video takes longer but does not run out of memory. For a quick boomerang, trim the clip first with Trim video.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

@@ -2076,6 +2076,28 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'play-video-backwards',
+    base: 'reverse-video',
+    name: 'Play video backwards',
+    title: 'Play a Video Backwards: Rewind Effect Maker, No Upload | Stayput',
+    description: 'Make any clip play backwards for a rewind or boomerang effect, in your browser. Reversed sound or silent. MP4 out, nothing uploaded, no watermark.',
+    heading: 'Play a video backwards',
+    tagline: 'Water jumping back into a glass, a dive out of the pool: make any clip run in reverse, without uploading it.',
+    keywords: ['play video backwards', 'rewind video effect', 'backwards video', 'reverse clip', 'boomerang video', 'video in reverse'],
+    dropLabel: 'Drop a clip to play backwards',
+    defaults: { mute: 'true' },
+    intro: [
+      'Played backwards, everyday clips turn into small magic tricks: spilled milk flows back into the carton, a jump lands on the diving board, a messy room tidies itself. The rewind effect is a classic on TikTok and Reels.',
+      'Drop the clip and press Reverse. Reversed speech sounds like gibberish, so the sound is removed here by default; untick Remove the sound to keep it.',
+      'The video is reversed on your device. Nothing is uploaded, and there is no watermark or length limit.',
+    ],
+    steps: ['Drop a clip.', 'Keep Remove the sound ticked, or untick it for backwards sound.', 'Press Reverse and save the MP4.'],
+    faq: [
+      { q: 'How do I make a boomerang (forwards then backwards)?', a: 'Reverse the clip here, then join the original and the reversed copy with Merge videos. For a loop that plays forever, turn the result into a GIF with Video to GIF.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
