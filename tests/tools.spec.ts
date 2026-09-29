@@ -966,6 +966,8 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#strength-field')).toBeVisible();
       await expect(page.locator('#format')).toHaveValue('image/jpeg');
     }],
+    ['2x2-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('us')],
+    ['35x45-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('eu')],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
     ['hex-color-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
     ['gif-to-video', 'gif-to-mp4', async () => expect(page.locator('#repeat')).toHaveValue('auto')],
