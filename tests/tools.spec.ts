@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(43);
+  expect(await page.locator('.tool-card').count()).toBe(44);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3289,4 +3289,75 @@ test('Blur background keeps the subject sharp and softens the scene behind it', 
   // Every pixel is opaque: a blurred scene, not a hole.
   expect((await pixelAt(page, out, 8, 8))[3]).toBe(255);
   net.assertNothingLeft(['face.jpg']);
+});
+
+test('Audio converter writes lossless FLAC at the source sample rate, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'audio-converter');
+  const net = watchNetwork(page);
+  // tone.wav: 1.5 s of stereo 16-bit 48 kHz.
+  const { items } = await run(page, ['tone.wav', staticFx('song.mp3')], async () => {
+    await page.locator('#format').selectOption('flac');
+    await expect(page.locator('#bitrate-field')).toBeHidden();
+  });
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['song.flac', 'tone.flac']);
+  const flac = files['tone.flac']!;
+  expect(Buffer.from(flac.subarray(0, 4)).toString()).toBe('fLaC');
+  // STREAMINFO: 20-bit sample rate at byte 18, then 3 bits of channels - 1.
+  expect((flac[18]! << 12) | (flac[19]! << 4) | (flac[20]! >> 4)).toBe(48000);
+  expect(((flac[20]! >> 1) & 7) + 1).toBe(2);
+  const wav = readFileSync(fx('tone.wav'));
+  expect(flac.length).toBeLessThan(wav.length);
+  // Decoded, the FLAC holds the same samples as the WAV.
+  const diff = await page.evaluate(
+    async ([a, b]) => {
+      const dec = async (b64: string) => new OfflineAudioContext(2, 1, 48000).decodeAudioData(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer);
+      const [x, y] = await Promise.all([dec(a as string), dec(b as string)]);
+      if (x.length !== y.length) return `length ${x.length} vs ${y.length}`;
+      let worst = 0;
+      for (let c = 0; c < 2; c++) {
+        const p = x.getChannelData(c);
+        const q = y.getChannelData(c);
+        for (let i = 0; i < p.length; i++) worst = Math.max(worst, Math.abs(p[i]! - q[i]!));
+      }
+      return worst;
+    },
+    [Buffer.from(flac).toString('base64'), Buffer.from(wav).toString('base64')],
+  );
+  expect(diff).toBeLessThan(1 / 16000);
+  const song = await soundOf(page, files['song.flac']!);
+  expect(song.seconds).toBeGreaterThan(0.9);
+  net.assertNothingLeft(['tone.wav', 'song.mp3']);
+  expect(errors).toEqual([]);
+});
+
+test('Audio converter writes OGG Opus that keeps the pitch, and explains when M4A is not available', async ({ page }) => {
+  const errors = await open(page, 'audio-converter');
+  const before = await soundOf(page, readFileSync(staticFx('song.mp3')));
+  const { downloads } = await run(page, [staticFx('song.mp3')], async () => {
+    await page.locator('#format').selectOption('ogg');
+    await expect(page.locator('#bitrate-field')).toBeVisible();
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('song.ogg');
+  const ogg = await bytesOf(downloads[0]!);
+  expect(Buffer.from(ogg.subarray(0, 4)).toString()).toBe('OggS');
+  expect(Buffer.from(ogg).includes(Buffer.from('OpusHead'))).toBe(true);
+  const after = await soundOf(page, ogg);
+  expect(Math.abs(after.seconds - before.seconds)).toBeLessThan(0.05);
+  expect(Math.abs(after.hz - before.hz)).toBeLessThan(before.hz * 0.05);
+  await expect(page.locator('#results-list .result-item')).toContainText('OGG (Opus), 192 kbps');
+  // This test browser has no AAC encoder, so choosing M4A says so up front.
+  const aac = await page.evaluate(() => AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 }).then((r) => !!r.supported));
+  await page.locator('#format').selectOption('m4a');
+  if (aac) await expect(page.locator('#format-note')).toBeHidden();
+  else await expect(page.locator('#format-note')).toContainText('cannot write M4A');
+  expect(errors).toEqual([]);
+});
+
+test('WAV to FLAC opens with FLAC chosen', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/wav-to-flac');
+  await expect(page.locator('#format')).toHaveValue('flac');
+  await expect(page.locator('#format-note')).toContainText('keeps every sample');
 });
