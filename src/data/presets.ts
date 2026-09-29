@@ -3326,6 +3326,36 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'tap-tempo',
+    base: 'metronome',
+    name: 'Tap tempo',
+    title: 'Tap Tempo: Find the BPM of a Song by Tapping | Stayput',
+    description: 'Tap along to any song to find its BPM, then hear it back on a metronome. The median of your last eight taps keeps one stray tap from skewing it.',
+    heading: 'Tap tempo BPM counter',
+    tagline: 'Tap along to the beat and read the tempo, then check it against a click.',
+    keywords: ['tap tempo', 'bpm tapper', 'tap bpm', 'bpm counter', 'find bpm of a song', 'tap for bpm', 'beats per minute calculator'],
+    action: 'Tap',
+    defaults: { mode: 'tap' },
+    intro: [
+      'Play the song, then tap the Tap tempo button (or click it with the mouse) on every beat: the kick drum, a foot tap, or the pulse you would clap along to. After two taps you get a reading, and it settles as you keep going. Eight steady taps are usually enough.',
+      'A worked example: you tap along to a song and the gaps between your taps are 470, 480, 520, 475 and 480 milliseconds. One tap came late, but the reading uses the middle gap of your last eight rather than the average, so it lands on 480 ms, which is 125 BPM. Pause for more than two seconds and the next tap starts a fresh count, so you can measure the next song without reloading.',
+      'Then press Start to hear a click at that tempo against the music. If the click drifts ahead of the song, nudge the tempo down with the minus button; if it falls behind, nudge it up. When the click and the kick stay together for a whole verse, you have the exact BPM.',
+      'Songs are often counted at half or double the tempo you tap. A track you tap at 70 BPM may be listed as 140 BPM if the snare hits on 2 and 4 of a fast bar. DJs and producers usually quote the faster figure for dance music, 120 to 130 BPM for house and around 170 for drum and bass.',
+    ],
+    steps: [
+      'Play the song and tap Tap tempo on every beat.',
+      'Read the BPM once it stops changing, after about eight taps.',
+      'Press Start to check it against a click, and fine-tune with minus and plus.',
+    ],
+    faq: [
+      { q: 'How accurate is tapping?', a: 'Within about one BPM after eight or so steady taps. A single tap can be tens of milliseconds early or late, which is why the tempo comes from the middle gap of your recent taps rather than the last one.' },
+      { q: 'Why is my reading half or double what a website says?', a: 'Both are the same pulse counted differently. Tap the snare on 2 and 4 of a fast song and you get half; tap every hi-hat and you get double. Pick whichever matches how the beat feels, or whichever figure your DJ software or DAW expects.' },
+      { q: 'Can I use the keyboard?', a: 'Yes. Press Tab until the Tap tempo button is focused, then tap Enter or the space bar in time with the music.' },
+      { q: 'Can it detect the BPM from a file automatically?', a: 'Not on this page: it counts your taps. Tapping works for any song you can hear, from any app or speaker, and nothing about the song is sent anywhere because this page never listens to it.' },
+      { q: 'Does it work offline?', a: 'Yes. After one visit the page opens and runs with no connection.' },
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

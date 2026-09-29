@@ -2226,6 +2226,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'metronome',
+    name: 'Metronome',
+    title: 'Online Metronome with Tap Tempo, Free, No Ads | Stayput',
+    description:
+      'A steady online metronome: 20 to 300 BPM, any time signature, accented downbeat, eighths, triplets and sixteenths, and tap tempo. Works offline.',
+    heading: 'Online metronome',
+    tagline: 'A steady click at any tempo, with the bar, the subdivisions and tap tempo, running on your device.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Start the metronome',
+    action: 'Start',
+    keywords: ['metronome', 'online metronome', 'metronome online', 'free metronome', 'metronome with tap tempo', 'bpm metronome', 'click track'],
+    steps: [
+      'Set the tempo with the slider, the minus and plus buttons, or by tapping Tap tempo along with a song.',
+      'Choose the beats per bar (4 for most pop and rock, 3 for a waltz, 6 for a 6/8 jig) and whether to click the eighths, triplets or sixteenths too.',
+      'Press Start or the space bar. The lights show where you are in the bar, and the first beat is accented.',
+    ],
+    faq: [
+      {
+        q: 'Does the click drift or stutter?',
+        a: 'No. The clicks are scheduled a moment ahead on the sound card’s own clock (the Web Audio clock), not on page timers, so the beat stays steady even when the browser is busy. Changing the tempo while it plays keeps the next beat on time and carries on counting the bar.',
+      },
+      {
+        q: 'How do I set a time signature like 6/8 or 7/8?',
+        a: 'Set Beats per bar to the top number: 6 for 6/8, 7 for 7/8. For 6/8 many players prefer 2 beats per bar with Triplets, which gives the same six clicks with the stress on 1 and 4.',
+      },
+      {
+        q: 'Will it keep running with the screen off or in another tab?',
+        a: 'On a computer it usually keeps going in a background tab, because browsers do not slow down a page that is playing sound. On phones the browser may pause sound when the screen locks, so keep the screen on while you practise.',
+      },
+      {
+        q: 'Does it work offline?',
+        a: 'Yes. After one visit the page is stored by your browser, so the metronome opens and runs with no connection, in a practice room or on a plane.',
+      },
+      {
+        q: 'Is anything recorded?',
+        a: 'No. The metronome only plays sound; it never uses the microphone. Nothing about your practice is stored or sent.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

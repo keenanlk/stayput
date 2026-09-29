@@ -73,6 +73,7 @@ import BlurStage from '../components/BlurStage.astro';
 import RotateStage from '../components/RotateStage.astro';
 import MonoStage from '../components/MonoStage.astro';
 import TunerStage from '../components/TunerStage.astro';
+import MetronomeStage from '../components/MetronomeStage.astro';
 
 export function getStaticPaths() {
   return [
@@ -142,6 +143,7 @@ const options = {
   'screen-recorder': null,
   // The tuner keeps its instrument and A4 controls in its stage.
   'tuner': null,
+  'metronome': null,
 } as const;
 if (!(base in options)) throw new Error(`Landing page ${tool.slug} has no options component for ${base}`);
 const Options = options[base as keyof typeof options];
@@ -159,6 +161,7 @@ const Options = options[base as keyof typeof options];
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {base === 'black-and-white-image' && <MonoStage slot="panel" />}
   {base === 'tuner' && <TunerStage slot="panel" defaults={defaults} />}
+  {base === 'metronome' && <MetronomeStage slot="panel" defaults={defaults} />}
   {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}
   {base === 'collage-maker' && <CollageStage slot="panel" />}
   {base === 'split-image' && <GridStage slot="panel" />}

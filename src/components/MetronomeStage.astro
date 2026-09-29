@@ -1,0 +1,85 @@
+---
+/**
+ * The metronome: the tempo in large figures with its Italian name, a light
+ * per beat of the bar, start and tap-tempo buttons, and the bar settings. It
+ * replaces the drop zone. Driven by src/tools/metronome.ts.
+ */
+import { MAX_BPM, MIN_BPM, tempoName } from '../lib/metronome';
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const bpm = defaults.bpm ?? '100';
+const beats = defaults.beats ?? '4';
+// The tap tempo page leads with the tap button.
+const tapFirst = defaults.mode === 'tap';
+---
+<div id="metro-panel" class="metro-panel" data-state="stopped">
+  <div class="metro-deck">
+    <div class="metro-tempo">
+      <button type="button" class="metro-step" id="metro-down" aria-label="One beat per minute slower">−</button>
+      <p class="metro-bpm"><output id="metro-bpm" for="bpm">{bpm}</output><span>BPM</span></p>
+      <button type="button" class="metro-step" id="metro-up" aria-label="One beat per minute faster">+</button>
+    </div>
+    <p class="metro-name" id="metro-name">{tempoName(Number(bpm))}</p>
+    <input id="bpm" class="metro-slider" type="range" min={MIN_BPM} max={MAX_BPM} step="1" value={bpm} aria-label="Tempo in beats per minute" />
+    <div class="metro-lights" id="metro-lights" aria-hidden="true"></div>
+    <p class="muted small metro-tap-note" id="metro-tap-note" aria-live="polite"></p>
+  </div>
+  <div class="metro-controls">
+    {tapFirst && <button type="button" class="btn btn-primary btn-lg metro-tap-first" id="metro-tap">Tap tempo</button>}
+    <button type="button" class:list={['btn btn-lg', !tapFirst && 'btn-primary']} id="metro-start">Start</button>
+    {!tapFirst && <button type="button" class="btn btn-lg" id="metro-tap">Tap tempo</button>}
+  </div>
+  <div class="metro-options">
+    <div class="field">
+      <label for="beats">Beats per bar</label>
+      <select id="beats">
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => <option value={String(n)} selected={String(n) === beats}>{n === 1 ? '1 (no bar accent)' : `${n}`}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="subdivision">Clicks in each beat</label>
+      <select id="subdivision">
+        <option value="none" selected={!defaults.subdivision || defaults.subdivision === 'none'}>Beats only</option>
+        <option value="eighths" selected={defaults.subdivision === 'eighths'}>Eighth notes (2)</option>
+        <option value="triplets" selected={defaults.subdivision === 'triplets'}>Triplets (3)</option>
+        <option value="sixteenths" selected={defaults.subdivision === 'sixteenths'}>Sixteenth notes (4)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="sound">Sound</label>
+      <select id="sound">
+        <option value="click">Click</option>
+        <option value="wood">Woodblock</option>
+        <option value="beep">Beep</option>
+      </select>
+    </div>
+    <label class="check"><input type="checkbox" id="accent" checked={defaults.accent !== 'false'} /> Accent the first beat of each bar</label>
+  </div>
+  <p class="muted small">Press the space bar to start and stop.</p>
+</div>
+<style is:global>
+  .tool-panel:has(#metro-panel) #drop,
+  .tool-panel:has(#metro-panel) #file-list,
+  .tool-panel:has(#metro-panel) .run-dock { display: none; }
+  .metro-panel { display: grid; gap: 16px; }
+  .metro-deck { background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius); display: grid; justify-items: center; gap: 10px; padding: 22px 20px 18px; }
+  .metro-tempo { display: flex; align-items: center; gap: clamp(12px, 4vw, 32px); }
+  .metro-bpm { margin: 0; display: grid; justify-items: center; line-height: 1; }
+  .metro-bpm output { font-size: clamp(4rem, 15vw, 6.5rem); font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 3ch; text-align: center; }
+  .metro-bpm span { font-size: 0.85rem; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
+  .metro-step { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font: inherit; font-size: 1.6rem; line-height: 1; cursor: pointer; }
+  .metro-step:hover { border-color: var(--accent); }
+  .metro-step:focus-visible, .metro-slider:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .metro-name { margin: 0; font-weight: 700; color: var(--ink-2); font-style: italic; }
+  .metro-slider { width: 100%; max-width: 520px; accent-color: var(--accent); }
+  .metro-lights { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; min-height: 28px; padding-top: 6px; }
+  .metro-light { width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--line-strong); }
+  .metro-light.is-first { width: 26px; height: 26px; }
+  .metro-light.is-on { background: var(--ink); border-color: var(--ink); }
+  .metro-light.is-first.is-on { background: var(--accent); border-color: var(--accent); }
+  .metro-tap-note { margin: 0; min-height: 1.4em; text-align: center; font-variant-numeric: tabular-nums; }
+  .metro-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+  .metro-controls .btn { flex: 1 1 160px; }
+  .metro-controls .metro-tap-first { flex-grow: 3; min-height: 72px; font-size: 1.25rem; }
+  .metro-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px 28px; align-items: end; }
+</style>

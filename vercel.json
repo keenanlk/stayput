@@ -349,6 +349,11 @@
       "source": "/pitch-changer",
       "destination": "/tools/pitch-changer",
       "permanent": true
+    },
+    {
+      "source": "/metronome",
+      "destination": "/tools/metronome",
+      "permanent": true
     }
   ],
   "headers": [
