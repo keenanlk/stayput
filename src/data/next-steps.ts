@@ -43,6 +43,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'rotate-image': ['crop-image', 'compress-image'],
   'video-to-mp3': ['video-to-gif', 'compress-image'],
   'image-to-text': ['blur-image', 'image-to-pdf'],
+  'qr-code-generator': ['image-to-pdf', 'compress-png'],
   'color-picker': ['crop-image', 'compress-image'],
   'remove-background': ['crop-image', 'compress-image'],
   'watermark-image': ['compress-image', 'strip-exif'],

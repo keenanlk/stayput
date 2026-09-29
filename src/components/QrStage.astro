@@ -1,0 +1,153 @@
+---
+/**
+ * The QR code maker: what the code holds (a link, Wi-Fi, a contact, an email
+ * or a phone number), how it looks, and a live preview with PNG and SVG
+ * downloads. It replaces the drop zone, since nothing is dropped. Driven by
+ * src/tools/qr-code-generator.ts; the code is drawn by src/lib/qr.ts.
+ */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const kind = defaults.kind ?? 'text';
+const kinds = [
+  ['text', 'Link or text'],
+  ['wifi', 'Wi-Fi'],
+  ['contact', 'Contact'],
+  ['email', 'Email'],
+  ['phone', 'Phone'],
+] as const;
+---
+<div id="qr-panel" class="qr-panel">
+  <div class="qr-form">
+    <div class="segmented qr-kinds" role="radiogroup" aria-label="What the code holds">
+      {kinds.map(([value, label]) => <label><input type="radio" name="qr-kind" value={value} checked={kind === value} /><span>{label}</span></label>)}
+    </div>
+
+    <div class="qr-fields" data-kind="text">
+      <div class="field">
+        <label for="qr-text">Link or text</label>
+        <textarea id="qr-text" rows="3" placeholder="https://example.com" spellcheck="false">{defaults.text ?? ''}</textarea>
+      </div>
+    </div>
+
+    <div class="qr-fields" data-kind="wifi">
+      <div class="field">
+        <label for="qr-ssid">Network name</label>
+        <input type="text" id="qr-ssid" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="field">
+        <label for="qr-pass">Password</label>
+        <input type="text" id="qr-pass" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="field">
+        <label for="qr-security">Security</label>
+        <select id="qr-security">
+          <option value="WPA" selected>WPA, WPA2 or WPA3</option>
+          <option value="WEP">WEP (old routers)</option>
+          <option value="nopass">None (open network)</option>
+        </select>
+      </div>
+      <label class="check"><input type="checkbox" id="qr-hidden" /> Hidden network</label>
+    </div>
+
+    <div class="qr-fields qr-grid" data-kind="contact">
+      <div class="field"><label for="qr-first">First name</label><input type="text" id="qr-first" autocomplete="off" /></div>
+      <div class="field"><label for="qr-last">Last name</label><input type="text" id="qr-last" autocomplete="off" /></div>
+      <div class="field"><label for="qr-tel">Phone</label><input type="text" id="qr-tel" inputmode="tel" autocomplete="off" /></div>
+      <div class="field"><label for="qr-mail">Email</label><input type="text" id="qr-mail" inputmode="email" autocomplete="off" /></div>
+      <div class="field"><label for="qr-org">Company</label><input type="text" id="qr-org" autocomplete="off" /></div>
+      <div class="field"><label for="qr-role">Job title</label><input type="text" id="qr-role" autocomplete="off" /></div>
+      <div class="field qr-wide"><label for="qr-site">Website</label><input type="text" id="qr-site" inputmode="url" autocomplete="off" /></div>
+    </div>
+
+    <div class="qr-fields" data-kind="email">
+      <div class="field"><label for="qr-to">Send to</label><input type="text" id="qr-to" inputmode="email" autocomplete="off" /></div>
+      <div class="field"><label for="qr-subject">Subject</label><input type="text" id="qr-subject" autocomplete="off" /></div>
+      <div class="field"><label for="qr-body">Message</label><textarea id="qr-body" rows="3"></textarea></div>
+    </div>
+
+    <div class="qr-fields" data-kind="phone">
+      <div class="field"><label for="qr-number">Phone number</label><input type="text" id="qr-number" inputmode="tel" autocomplete="off" placeholder="+1 555 010 0000" /></div>
+    </div>
+
+    <details class="qr-look">
+      <summary>Colours, size and error correction</summary>
+      <div class="qr-grid">
+        <div class="field">
+          <label for="qr-dark">Code colour</label>
+          <input type="color" id="qr-dark" value={defaults.dark ?? '#000000'} />
+        </div>
+        <div class="field">
+          <label for="qr-light">Background</label>
+          <input type="color" id="qr-light" value={defaults.light ?? '#ffffff'} />
+          <label class="check"><input type="checkbox" id="qr-clear" /> Transparent</label>
+        </div>
+        <div class="field">
+          <label for="qr-px">PNG size</label>
+          <select id="qr-px">
+            <option value="512">512 × 512 px</option>
+            <option value="1024" selected>1024 × 1024 px</option>
+            <option value="2048">2048 × 2048 px (print)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="qr-ecc">Error correction</label>
+          <select id="qr-ecc">
+            <option value="L">Low (smallest code)</option>
+            <option value="M" selected>Medium (recommended)</option>
+            <option value="Q">Quartile (outdoor, worn prints)</option>
+            <option value="H">High (up to 30% can be damaged)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="qr-margin">Quiet border</label>
+          <select id="qr-margin">
+            <option value="4" selected>Standard (4 squares)</option>
+            <option value="2">Narrow (2 squares)</option>
+            <option value="0">None (add your own)</option>
+          </select>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="qr-out">
+    <div class="qr-frame" id="qr-frame" data-state="empty">
+      <canvas id="qr-canvas" width="512" height="512" role="img" aria-label="QR code preview"></canvas>
+      <p class="qr-empty" id="qr-empty">Type above and the code appears here.</p>
+    </div>
+    <p class="muted small qr-info" id="qr-info" aria-live="polite"></p>
+    <div class="qr-actions">
+      <button type="button" class="btn btn-primary" id="qr-png" disabled>Download PNG</button>
+      <button type="button" class="btn" id="qr-svg" disabled>Download SVG</button>
+    </div>
+  </div>
+</div>
+<style is:global>
+  .tool-panel:has(#qr-panel) #drop,
+  .tool-panel:has(#qr-panel) .run-dock,
+  .tool-panel:has(#qr-panel) #file-list { display: none; }
+  .qr-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 340px); gap: 28px; align-items: start; }
+  .qr-form { display: grid; gap: 18px; min-width: 0; }
+  .qr-fields { display: grid; gap: 14px; }
+  .qr-fields:not(.is-active) { display: none; }
+  .qr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px 20px; }
+  .qr-wide { grid-column: 1 / -1; }
+  .qr-form textarea { font: inherit; font-size: 15px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 8px 10px; resize: vertical; width: 100%; }
+  .qr-form input[type='text'] { width: 100%; min-width: 0; }
+  .qr-look summary { cursor: pointer; font-size: 14px; font-weight: 620; color: var(--ink-2); }
+  .qr-look[open] summary { margin-bottom: 14px; }
+  .qr-out { display: grid; gap: 10px; position: sticky; top: 84px; }
+  .qr-frame { position: relative; aspect-ratio: 1; border: 1px solid var(--line); border-radius: var(--radius); display: grid; place-items: center; padding: 14px;
+    background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 50% / 16px 16px; }
+  .qr-frame canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+  .qr-frame[data-state='empty'] canvas { visibility: hidden; }
+  .qr-frame:not([data-state='empty']) .qr-empty { display: none; }
+  .qr-empty { position: absolute; margin: 0; padding: 24px; text-align: center; color: var(--muted); }
+  .qr-info { margin: 0; }
+  .qr-info.is-warn { color: var(--warn); font-weight: 600; }
+  .qr-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  @media (max-width: 720px) {
+    .qr-panel { grid-template-columns: 1fr; }
+    .qr-out { position: static; max-width: 360px; width: 100%; justify-self: center; }
+  }
+</style>
