@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ExtractPdfImages from '../../components/options/ExtractPdfImages.astro';
+const tool = toolBySlug('extract-pdf-images')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ExtractPdfImages /></Fragment>
+</ToolLayout>
+<script src="../../tools/extract-pdf-images.ts"></script>

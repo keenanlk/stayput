@@ -47,7 +47,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Video or audio to MP3](https://stayput.dev/tools/video-to-mp3) (MP4, MOV, M4A, WAV; or to WAV) | [PDF to Word or text](https://stayput.dev/tools/pdf-to-word) (paragraphs and headings, not layout) |
 | [Image to text (OCR)](https://stayput.dev/tools/image-to-text) (photos, screenshots, scans; copy or .txt) | [Unlock PDF](https://stayput.dev/tools/unlock-pdf) (remove a password you know, or print/copy restrictions) |
 | [Color picker from image](https://stayput.dev/tools/color-picker) (HEX, RGB, HSL; main-colour palette) | [Password protect PDF](https://stayput.dev/tools/protect-pdf) (AES-256) |
-| [GIF to MP4](https://stayput.dev/tools/gif-to-mp4) (animated GIF to video, up to 90% smaller) | |
+| [GIF to MP4](https://stayput.dev/tools/gif-to-mp4) (animated GIF to video, up to 90% smaller) | [Extract images from PDF](https://stayput.dev/tools/extract-pdf-images) (every picture at its stored size) |
 | [Compress video](https://stayput.dev/tools/compress-video) (MP4, MOV, WebM; fit 10 MB for Discord or 25 MB for email) | |
 | [Video to MP4](https://stayput.dev/tools/video-to-mp4) (MOV, MKV, WebM; H.264 copied with no quality loss) | |
 | [Trim video](https://stayput.dev/tools/trim-video) (cut a clip without re-encoding) | |

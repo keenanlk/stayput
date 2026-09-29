@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(64);
+  expect(await page.locator('.tool-card').count()).toBe(65);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4424,4 +4424,52 @@ test('Collage maker makes a grid with spacing on a background colour, and needs 
   expect(Math.max(...corner.slice(0, 3))).toBeLessThan(30);
   const inside = await pixelAt(page, jpg, 400, 300);
   expect(inside[0]).toBeGreaterThan(170);
+});
+
+test('Extract images from PDF saves each stored picture at full size, once, and no bytes leave the tab', async ({ page }) => {
+  // A PDF holding a JPEG photo on two pages, a transparent PNG drawn small, and a 1-pixel spacer.
+  const doc = await PDFDocument.create();
+  const photo = await doc.embedJpg(readFileSync(fx('photo.jpg')));
+  const gradient = await doc.embedPng(readFileSync(fx('gradient.png')));
+  const dot = await doc.embedPng(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC', 'base64'));
+  const p1 = doc.addPage([612, 792]);
+  p1.drawImage(photo, { x: 50, y: 400, width: 320, height: 240 });
+  p1.drawImage(dot, { x: 50, y: 380, width: 500, height: 1 });
+  const p2 = doc.addPage([612, 792]);
+  p2.drawImage(photo, { x: 50, y: 400, width: 160, height: 120 });
+  p2.drawImage(gradient, { x: 50, y: 100, width: 120, height: 80 });
+  const file = join(mkdtempSync(join(tmpdir(), 'pics-')), 'brochure.pdf');
+  writeFileSync(file, await doc.save());
+
+  const errors = await open(page, 'extract-pdf-images');
+  const net = watchNetwork(page);
+  const { items } = await run(page, [file]);
+  expect(items).toBe(2);
+  await expect(page.locator('#results-list')).toContainText('1600×1200, page 1');
+  await expect(page.locator('#results-list')).toContainText('600×400, page 2');
+  const zip = await zipAll(page);
+  expect(Object.keys(zip).sort()).toEqual(['brochure-image-1.png', 'brochure-image-2.png']);
+  expect(pngSize(zip['brochure-image-1.png']!)).toEqual({ width: 1600, height: 1200 });
+  const centre = await pixelAt(page, zip['brochure-image-1.png']!, 800, 600);
+  expect(Math.abs(centre[0]! - 239) + Math.abs(centre[1]! - 200) + Math.abs(centre[2]! - 60)).toBeLessThan(30);
+  // The PNG's transparency survives.
+  expect((await pixelAt(page, zip['brochure-image-2.png']!, 0, 0))[3]).toBe(0);
+  expect((await pixelAt(page, zip['brochure-image-2.png']!, 300, 200))[3]).toBe(255);
+
+  // With both filters off, the repeat and the spacer come out too.
+  await page.locator('#skip-small').uncheck({ force: true });
+  await page.locator('#dedupe').uncheck({ force: true });
+  await page.locator('#run').click();
+  await expect(page.locator('#results-list .result-item')).toHaveCount(4);
+  await expect(page.locator('#results-list')).toContainText('1×1, page 1');
+  net.assertNothingLeft(['brochure.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Extract images from PDF explains when a PDF holds no pictures', async ({ page }) => {
+  await open(page, 'extract-pdf-images');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('No pictures are stored in these pages');
 });

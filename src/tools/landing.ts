@@ -12,6 +12,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'split-pdf': () => import('./split-pdf'),
   'image-to-pdf': () => import('./image-to-pdf'),
   'pdf-to-image': () => import('./pdf-to-image'),
+  'extract-pdf-images': () => import('./extract-pdf-images'),
   'pdf-to-word': () => import('./pdf-to-word'),
   'crop-image': () => import('./crop-image'),
   'reorder-pdf': () => import('./reorder-pdf'),

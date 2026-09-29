@@ -2100,6 +2100,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'extract-pdf-images',
+    name: 'Extract Images from PDF',
+    title: 'Extract Images from PDF at Full Resolution, No Upload | Stayput',
+    description:
+      'Save every photo and picture inside a PDF as PNG or JPG, at the resolution it was stored. Runs in your browser: the PDF is not uploaded. Free, no limits.',
+    heading: 'Extract images from a PDF',
+    tagline: 'Every picture in the file, at its real size, without screenshots and without uploading the PDF.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF here',
+    action: 'Extract images',
+    keywords: ['extract images from pdf', 'pdf image extractor', 'save images from pdf', 'get pictures from pdf', 'export images from pdf', 'pdf to images extract', 'download images from pdf'],
+    steps: [
+      'Drop a PDF.',
+      'Choose all pages or some, PNG or JPG, and whether to leave out icons and repeats.',
+      'Download the pictures one by one or all together as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Are the images at full quality?',
+        a: 'Yes. Each picture comes out at the pixel size it is stored at inside the PDF, which is usually larger than it looks on the page. Choose PNG to keep every pixel exactly; JPG makes smaller files for photos.',
+      },
+      {
+        q: 'How is this different from PDF to Image?',
+        a: 'PDF to Image saves whole pages, text and all, as pictures. This tool pulls out only the photos and pictures placed in the pages, each as its own file, without the text around them.',
+      },
+      {
+        q: 'Why did it find no images?',
+        a: 'Some PDFs have no stored pictures: charts and logos are often drawn as vector shapes, and some scanners store each page as one image. For a scan you get one picture per page. For vector drawings, use PDF to Image to save the page instead.',
+      },
+      {
+        q: 'What about password-protected PDFs?',
+        a: 'A PDF that opens without a password but blocks copying works as normal. If it needs a password to open, remove it first with Unlock PDF, which also runs in your browser.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The file is read by pdf.js running in this tab and the pictures are saved from memory. Nothing is sent to a server, and the page keeps working with the network off once it has loaded.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
