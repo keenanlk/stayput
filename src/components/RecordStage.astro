@@ -42,7 +42,9 @@ const fps = defaults.fps ?? '30';
   <p class="muted small rec-note" id="rec-note" aria-live="polite"></p>
 </div>
 <style is:global>
-  .tool-panel:has(#rec-panel) #drop { display: none; }
+  /* The recording is made here, so there is no drop zone or file list; the run bar saves it again. */
+  .tool-panel:has(#rec-panel) #drop,
+  .tool-panel:has(#rec-panel) #file-list { display: none; }
   /* Nothing to save until something is recorded. */
   #tool[data-count='0']:has(#rec-panel) .run-dock { display: none; }
   .rec-panel { display: grid; gap: 16px; }
