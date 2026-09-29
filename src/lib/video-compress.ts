@@ -53,7 +53,7 @@ export interface CompressResult {
 }
 
 const QUALITY: Record<Exclude<CompressMode, 'size'>, Quality> = { small: QUALITY_LOW, balanced: QUALITY_MEDIUM, high: QUALITY_HIGH };
-const CODEC_NAMES: Record<string, string> = { avc: 'H.264', vp9: 'VP9', av1: 'AV1', hevc: 'HEVC', aac: 'AAC', opus: 'Opus' };
+export const CODEC_NAMES: Record<string, string> = { avc: 'H.264', vp9: 'VP9', av1: 'AV1', hevc: 'HEVC', aac: 'AAC', opus: 'Opus' };
 /** Short sides tried, largest first, when a target size needs a smaller picture to look decent. */
 const STEPS = [2160, 1440, 1080, 720, 540, 480, 360, 240];
 /** Below roughly this many bits per pixel per frame, video turns to mush; drop the resolution instead. */
@@ -61,7 +61,7 @@ const MIN_BPP = 0.05;
 
 const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 
-function unplayable(): string {
+export function unplayable(): string {
   return 'This browser cannot decode this video. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux cannot read: try Safari, or set the iPhone camera to "Most Compatible".';
 }
 

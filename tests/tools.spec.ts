@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(27);
+  expect(await page.locator('.tool-card').count()).toBe(28);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -967,6 +967,12 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#size-field')).toBeVisible();
     }],
     ['compress-video-for-email', 'compress-video', async () => expect(page.locator('#size')).toHaveValue('25')],
+    ...(['mov', 'mkv', 'webm'] as const).map(
+      (ext): [string, string, () => Promise<void>] => [`${ext}-to-mp4`, 'video-to-mp4', async () => {
+        await expect(page.locator('#mute')).not.toBeChecked();
+        expect(await page.locator('#file-input').getAttribute('accept')).toContain(`.${ext}`);
+      }],
+    ),
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -2201,7 +2207,21 @@ async function videoProbe(page: Page, bytes: Uint8Array, times: number[]) {
     const ctx = c.getContext('2d')!;
     const colours: number[][] = [];
     for (const t of times) {
-      await new Promise((ok) => { v.onseeked = ok; v.currentTime = t; });
+      // 'seeked' can fire before the new frame is on screen, and drawing then reads the
+      // previous frame. Wait for both 'seeked' and the frame callback for the new frame.
+      await new Promise<void>((ok) => {
+        let seeked = false;
+        let presented = false;
+        const done = () => seeked && presented && ok();
+        v.requestVideoFrameCallback(() => ((presented = true), done()));
+        v.onseeked = () => {
+          seeked = true;
+          // A seek that lands on the frame already shown presents nothing new.
+          setTimeout(() => ((presented = true), done()), 1000);
+          done();
+        };
+        v.currentTime = t;
+      });
       ctx.drawImage(v, 0, 0);
       colours.push([...ctx.getImageData(c.width >> 1, c.height >> 1, 1, 1).data].slice(0, 3));
     }
@@ -2366,4 +2386,35 @@ test('Compress video fits a size limit by lowering the resolution, drops the sou
   await page.locator('#run').click();
   await expect(page.locator('#error')).toHaveClass(/is-active/);
   await expect(page.locator('#error')).toContainText('too long to fit in 0.01 MB');
+});
+
+test('Video to MP4 re-encodes a WebM recording, copies a stream that is already right, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'video-to-mp4');
+  const clip = await recordClip(page);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('recording.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  const tracks = mp4Tracks(mp4);
+  expect(tracks).toHaveLength(2);
+  expect(['avc1', 'vp09', 'av01']).toContain(tracks[0]!.codec);
+  expect(tracks[0]).toMatchObject({ width: 1280, height: 720 });
+  await expect(page.locator('#results-list .result-item')).toContainText('re-encoded to');
+  // The recording had no length in its header; the MP4 has the real one.
+  const probe = await videoProbe(page, mp4, [1]);
+  expect(probe.duration).toBeGreaterThan(2.5);
+  expect(probe.duration).toBeLessThan(4);
+  net.assertNothingLeft(['recording.webm']);
+
+  // Feed the MP4 back in: its video is already in the best codec this browser writes, so it is copied.
+  const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+  writeFileSync(join(dir, 'again.mp4'), mp4);
+  await page.reload();
+  await choose(page.locator('#mute'));
+  const second = await run(page, [join(dir, 'again.mp4')]);
+  await expect(page.locator('#results-list .result-item')).toContainText('copied, no quality loss');
+  const copied = mp4Tracks(await bytesOf(second.downloads[0]!));
+  expect(copied).toHaveLength(1);
+  expect(copied[0]!.codec).toBe(tracks[0]!.codec);
+  expect(errors).toEqual([]);
 });

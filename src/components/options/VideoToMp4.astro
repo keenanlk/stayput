@@ -1,0 +1,9 @@
+---
+/** Option controls for video to MP4, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+  <p class="muted small">H.264 video and AAC sound are copied as they are, so those files convert in seconds with no quality loss. Other formats are re-encoded.</p>
+</div>
