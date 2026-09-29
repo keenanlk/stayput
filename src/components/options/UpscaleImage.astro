@@ -1,0 +1,31 @@
+---
+/** Option controls for the image upscaler, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const scale = defaults.scale ?? '4';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/jpeg', 'JPG'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field wide">
+  <label>Enlarge</label>
+  <div class="segmented" role="radiogroup" aria-label="Enlarge">
+    {['2', '3', '4'].map((v) => <label><input type="radio" name="scale" value={v} checked={v === scale} /><span>{v}×</span></label>)}
+  </div>
+  <p class="muted small">Pictures are held under 16 megapixels, the most every browser can save.</p>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>

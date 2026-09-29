@@ -2910,6 +2910,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'upscale-image',
+    name: 'AI image upscaler',
+    title: 'AI Image Upscaler: Enlarge Photos 2×, 3×, 4×, No Upload | Stayput',
+    description:
+      'Make a small or blurry picture 2, 3 or 4 times bigger with an AI upscaler that runs in your browser. Sharper edges, fewer JPEG blocks. Nothing uploaded.',
+    heading: 'Upscale an image with AI',
+    tagline: 'Make a small picture bigger and sharper with a neural network that runs on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop pictures to upscale',
+    action: 'Upscale',
+    keywords: ['ai image upscaler', 'upscale image', 'image upscaler', 'increase image resolution', 'enlarge image without losing quality', 'photo enhancer', 'upscale photo', 'make image bigger'],
+    steps: [
+      'Drop one or more pictures (JPG, PNG, WebP, HEIC, AVIF or JPEG XL).',
+      'Pick 2×, 3× or 4×, and keep the format or choose PNG, JPG or WebP.',
+      'Run it. The upscaling model downloads once (4.9 MB), then each picture is enlarged in your tab.',
+    ],
+    faq: [
+      {
+        q: 'Are my pictures uploaded?',
+        a: 'No. The upscaler is a neural network that runs as WebAssembly inside this page, in a background thread. Your pictures are decoded, enlarged and saved in your tab. The model file is the only thing downloaded, once, from this site.',
+      },
+      {
+        q: 'How is this different from resizing?',
+        a: 'Resizing spreads the same pixels further apart, so a small picture gets soft and blocky. The upscaler is Real-ESRGAN, a network trained on pairs of sharp and degraded photos, so it draws crisp edges and removes JPEG blocks and blur while it enlarges.',
+      },
+      {
+        q: 'Can it recover a face or text that is not in the picture?',
+        a: 'No. It sharpens what is there and fills in plausible fine texture, but it cannot restore detail that was never captured. Tiny faces and small print come out cleaner, not readable if they were not readable before.',
+      },
+      {
+        q: 'How big can the result be?',
+        a: 'Up to 16 megapixels, about 4900 × 3300, because that is the most every browser, including Safari on iPhone, can hold as one image. A larger request is held to that size and the result says so.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'Time grows with the size of the result. A 4× enlargement to about 2000 × 1500 takes around half a minute on a recent laptop and longer on a phone. The page stays usable while it works, and several pictures run one after another.',
+      },
+    ],
+  },
+  {
     slug: 'black-and-white-image',
     name: 'Black and white photo',
     title: 'Make a Photo Black and White, Free, No Upload | Stayput',
