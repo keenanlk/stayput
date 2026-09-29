@@ -1,0 +1,35 @@
+---
+/** Option controls for video and audio to MP3, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'mp3';
+const bitrate = defaults.bitrate ?? '192';
+const channels = defaults.channels ?? 'stereo';
+const bitrates = [
+  ['96', '96 kbps (speech, smallest)'],
+  ['128', '128 kbps'],
+  ['192', '192 kbps (good default)'],
+  ['256', '256 kbps'],
+  ['320', '320 kbps (highest)'],
+] as const;
+---
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    <option value="mp3" selected={format === 'mp3'}>MP3 (plays everywhere)</option>
+    <option value="wav" selected={format === 'wav'}>WAV (uncompressed, for editing)</option>
+  </select>
+</div>
+<div class="field" id="bitrate-field">
+  <label for="bitrate">MP3 quality</label>
+  <select id="bitrate">
+    {bitrates.map(([v, l]) => <option value={v} selected={v === bitrate}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label>Channels</label>
+  <div class="segmented" role="radiogroup" aria-label="Channels">
+    <label><input type="radio" name="channels" value="stereo" checked={channels === 'stereo'} /><span>Stereo</span></label>
+    <label><input type="radio" name="channels" value="mono" checked={channels === 'mono'} /><span>Mono (half the size)</span></label>
+  </div>
+</div>

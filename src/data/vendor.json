@@ -45,5 +45,11 @@
       "vision_wasm_nosimd_internal.js": "wasm/vision_wasm_nosimd_internal.js",
       "vision_wasm_nosimd_internal.wasm": "wasm/vision_wasm_nosimd_internal.wasm"
     }
+  },
+  "lame": {
+    "package": "wasm-media-encoders",
+    "version": "0.7.0",
+    "entry": "mp3.wasm",
+    "files": { "mp3.wasm": "wasm/mp3.wasm", "LICENSE": "LICENSE" }
   }
 }

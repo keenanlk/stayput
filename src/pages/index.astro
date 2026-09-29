@@ -71,7 +71,7 @@ const jsonLd = [
 
   <div class="wrap index" id="tools">
     {categories.map((c) => (
-      <section id={`${c.id === 'images' ? 'image' : 'pdf'}-tools`} aria-labelledby={`${c.id}-h`}>
+      <section id={`${c.id === 'images' ? 'image' : c.id}-tools`} aria-labelledby={`${c.id}-h`}>
         <div class="index-head">
           <h2 id={`${c.id}-h`}>{c.label}</h2>
           <p>{c.blurb}</p>

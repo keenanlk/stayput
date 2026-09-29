@@ -1,4 +1,4 @@
-export type Category = 'images' | 'pdf';
+export type Category = 'images' | 'pdf' | 'media';
 
 export interface Faq {
   q: string;
@@ -802,6 +802,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-to-mp3',
+    name: 'Video to MP3',
+    title: 'Video to MP3 Converter, MP4 to MP3, No Upload | Stayput',
+    description:
+      'Convert MP4, MOV, M4A, WAV and other video or audio files to MP3 (or WAV) in your browser. Batch, no size limit, no upload, no sign-up.',
+    heading: 'Convert video or audio to MP3',
+    tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
+    category: 'media',
+    accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
+    multiple: true,
+    dropLabel: 'Drop videos or audio files to convert',
+    action: 'Convert',
+    keywords: ['video to mp3', 'mp4 to mp3', 'extract audio from video', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
+    steps: [
+      'Drop one or more videos or audio files (MP4, MOV, WebM, M4A, WAV, FLAC and more), or tap to pick them.',
+      'Choose MP3 or WAV. For MP3 pick a quality: 192 kbps suits music, 96 kbps is plenty for speech. Choose mono to halve the size of a voice recording.',
+      'Convert. Each file is decoded and encoded in your browser; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser reads the sound track with its own decoders, and an MP3 encoder (LAME, compiled to WebAssembly) runs inside the page to write the file. There is no server in the process, so there is no upload to wait for and no size cap. You can load the page, switch off Wi-Fi and it still works.',
+      },
+      {
+        q: 'Which files can I convert?',
+        a: 'Anything with a sound track your browser can play: MP4, M4V and MOV (from phones, cameras and screen recorders), WebM and MKV, and audio files such as M4A voice memos, WAV, FLAC, OGG, Opus and MP3 itself. If a file will not open, try it in another browser: Safari reads a few Apple formats that others do not.',
+      },
+      {
+        q: 'What MP3 quality should I choose?',
+        a: '192 kbps is transparent for most music and is the default. Use 320 kbps if the MP3 will be your only copy of a high-quality recording, 128 kbps for podcasts and lectures, and 96 kbps mono for a voice memo you want small. Converting to MP3 can never add quality the source did not have.',
+      },
+      {
+        q: 'Is there a length or size limit?',
+        a: 'No fixed limit. The whole file is read into your device’s memory, so a feature-length film works on a laptop but may be too much for an older phone. The MP3 of an hour of audio at 192 kbps is about 85 MB.',
+      },
+      {
+        q: 'Can I get a WAV instead?',
+        a: 'Yes. Choose WAV and you get uncompressed 16-bit, 44.1 kHz audio, the format audio editors and some upload forms ask for. It is about ten times the size of an MP3.',
+      },
+    ],
+  },
+  {
     slug: 'video-to-gif',
     name: 'Video to GIF',
     title: 'Video to GIF Converter, MP4 to GIF, No Upload | Stayput',
@@ -809,7 +851,7 @@ export const tools: Tool[] = [
       'Turn an MP4, MOV or WebM clip into an animated GIF in your browser. Trim it, pick the size and frame rate. No upload, no watermark, no sign-up.',
     heading: 'Convert video to GIF',
     tagline: 'Trim a clip, pick a size and frame rate, and get a looping GIF. The video is decoded by your browser and never leaves this device.',
-    category: 'images',
+    category: 'media',
     accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
     multiple: false,
     dropLabel: 'Drop a video to turn into a GIF',
@@ -892,4 +934,5 @@ export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => 
 export const categories: { id: Category; label: string; blurb: string }[] = [
   { id: 'images', label: 'Image tools', blurb: 'Convert, shrink and clean photos.' },
   { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress, reorder, sign and number documents.' },
+  { id: 'media', label: 'Video and audio tools', blurb: 'Pull the sound out of a video, convert audio, make GIFs.' },
 ];
