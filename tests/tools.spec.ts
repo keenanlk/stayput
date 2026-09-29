@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(63);
+  expect(await page.locator('.tool-card').count()).toBe(64);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4379,4 +4379,49 @@ test('Instagram grid maker makes 4:5 tiles numbered in posting order', async ({ 
   // Tile 1 (post first) is the bottom right piece.
   await expect(page.locator('#results-list')).toContainText('row 3, column 3');
   await expect(page.locator('#results-list .result-item').first()).toContainText('post first');
+});
+
+test('Collage maker puts pictures side by side at a shared height, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'collage-maker');
+  const net = watchNetwork(page);
+  // swatches.png is 400 × 200 and graphic.png 640 × 480: side by side at the median height (480).
+  const { downloads } = await run(page, ['swatches.png', 'graphic.png'], async () => {
+    await expect(page.locator('#collage-panel')).toBeVisible();
+    await choose(page.locator('input[name="layout"][value="row"]'));
+    await page.locator('#gap').fill('0');
+    await page.locator('#gap').dispatchEvent('input');
+    await page.locator('#format').selectOption('image/png');
+    await expect(page.locator('#grid-fields')).toBeHidden();
+    await expect(page.locator('#collage-hint')).toContainText('2 pictures, 1600 × 480 px');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('collage.png');
+  const png = await bytesOf(downloads[0]!);
+  expect(pngSize(png)).toEqual({ width: 1600, height: 480 });
+  // The left picture is the swatches scaled 2.4×; the right picture starts at x = 960.
+  const src = readFileSync(fx('swatches.png'));
+  expect(await pixelAt(page, png, 24, 24)).toEqual(await pixelAt(page, src, 10, 10));
+  expect(await pixelAt(page, png, 1280, 240)).toEqual(await pixelAt(page, readFileSync(fx('graphic.png')), 320, 240));
+  net.assertNothingLeft(['swatches.png', 'graphic.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Collage maker makes a grid with spacing on a background colour, and needs two pictures', async ({ page }) => {
+  await open(page, 'collage-maker');
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg')]);
+  await expect(page.locator('#collage-hint')).toContainText('Add at least one more picture');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('at least two pictures');
+  // Files are added to the list, so this makes three.
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg'), fx('plain.jpg')]);
+  await expect(page.locator('#collage-hint')).toContainText('3 pictures');
+  await page.locator('#background').fill('#000000');
+  const [d] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('collage.jpg');
+  const jpg = await bytesOf(d);
+  // Two columns of 800 × 600 cells with 2% (16 px) gaps; the last picture is centred.
+  expect(jpegSize(jpg)).toEqual({ width: 1648, height: 1248 });
+  const corner = await pixelAt(page, jpg, 4, 4);
+  expect(Math.max(...corner.slice(0, 3))).toBeLessThan(30);
+  const inside = await pixelAt(page, jpg, 400, 300);
+  expect(inside[0]).toBeGreaterThan(170);
 });

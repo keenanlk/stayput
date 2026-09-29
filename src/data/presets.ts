@@ -2927,6 +2927,56 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'combine-images',
+    base: 'collage-maker',
+    name: 'Combine images',
+    title: 'Combine Images Side by Side into One, No Upload | Stayput',
+    description: 'Put two or more pictures side by side or on top of each other in one image, in your browser. Before and after shots, comparisons, screenshots. No upload.',
+    heading: 'Combine images into one',
+    tagline: 'Join pictures side by side or stacked, on your own device.',
+    keywords: ['combine images', 'merge images', 'put two pictures side by side', 'combine images side by side', 'join images', 'combine two photos into one'],
+    dropLabel: 'Drop the pictures to combine',
+    defaults: { layout: 'row', gap: '0' },
+    intro: [
+      'Two pictures side by side are how people show a before and after, compare two products, or send two screenshots as one. This page joins them in a row with a shared height, or in a stack with a shared width for tall screenshots, so nothing is cropped.',
+      'Everything happens in your browser: the pictures are never uploaded and the result carries no watermark. Add a little spacing and a background colour if you want a gap between them.',
+    ],
+    steps: [
+      'Drop two or more pictures, or tap to pick them. Use the arrows to set the order.',
+      'Side by side is already chosen. Pick Stacked for one above the other.',
+      'Combine. The image downloads straight away.',
+    ],
+    faq: [
+      { q: 'What if the pictures are different sizes?', a: 'Side by side, each is scaled to the same height; stacked, to the same width. Nothing is cropped or stretched.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'stitch-screenshots',
+    base: 'collage-maker',
+    name: 'Stitch screenshots',
+    title: 'Stitch Screenshots Together into One Long Image | Stayput',
+    description: 'Join phone screenshots into one long image, one under another, in your browser. Share a whole chat or article as a single picture. No upload.',
+    heading: 'Stitch screenshots together',
+    tagline: 'Stack screenshots into one tall image, on your own device.',
+    keywords: ['stitch screenshots', 'combine screenshots', 'merge screenshots vertically', 'long screenshot', 'join screenshots'],
+    dropLabel: 'Drop screenshots to stitch',
+    defaults: { layout: 'column', gap: '0', format: 'image/png', size: '4000' },
+    intro: [
+      'A long chat, a recipe or a thread rarely fits on one screen. This page stacks screenshots one under another at the same width into one tall image, so you can share them as a single picture, in the order you set with the arrows.',
+      'Screenshots are often private: messages, bank apps, work tools. They are joined in your browser and never uploaded. PNG keeps text crisp.',
+    ],
+    steps: [
+      'Drop your screenshots, or tap to pick them. Use the arrows to put them in order.',
+      'Stacked, no spacing and PNG are already set.',
+      'Stitch. The long image downloads straight away.',
+    ],
+    faq: [
+      { q: 'Does it remove the overlap between screenshots?', a: 'No. They are placed end to end. Crop overlapping parts first with the crop tool if you need a seamless result.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

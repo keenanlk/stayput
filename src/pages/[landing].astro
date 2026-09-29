@@ -42,6 +42,8 @@ import AudioToVideo from '../components/options/AudioToVideo.astro';
 import QrStage from '../components/QrStage.astro';
 import RecordStage from '../components/RecordStage.astro';
 import MergeAudio from '../components/options/MergeAudio.astro';
+import CollageMaker from '../components/options/CollageMaker.astro';
+import CollageStage from '../components/CollageStage.astro';
 import SplitImage from '../components/options/SplitImage.astro';
 import GridStage from '../components/GridStage.astro';
 import AddText from '../components/options/AddText.astro';
@@ -108,6 +110,7 @@ const options = {
   'trim-audio': TrimAudio,
   'audio-to-video': AudioToVideo,
   'merge-audio': MergeAudio,
+  'collage-maker': CollageMaker,
   'split-image': SplitImage,
   'add-text-to-image': AddText,
   'compress-audio': CompressAudio,
@@ -145,6 +148,7 @@ const Options = options[base as keyof typeof options];
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}
+  {base === 'collage-maker' && <CollageStage slot="panel" />}
   {base === 'split-image' && <GridStage slot="panel" />}
   {base === 'add-text-to-image' && <TextStage slot="panel" />}
   {base === 'color-picker' && <ColorStage slot="panel" />}

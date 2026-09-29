@@ -48,6 +48,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'compress-audio': ['trim-audio', 'audio-converter'],
   'add-text-to-image': ['watermark-image', 'compress-image'],
   'split-image': ['crop-image', 'compress-image'],
+  'collage-maker': ['compress-image', 'add-text-to-image'],
   'trim-audio': ['add-audio-to-video', 'video-to-mp3'],
   'blur-image': ['compress-image', 'crop-image'],
   'rotate-image': ['crop-image', 'compress-image'],

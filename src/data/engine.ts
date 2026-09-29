@@ -203,6 +203,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser decodes the picture (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL). When the tiles must be square or 4:5, the middle of the picture is kept at the right proportions. Each tile is then copied pixel for pixel from the original onto its own canvas, without scaling, and encoded once in the format you chose.',
     versus: 'Grid and carousel apps ask for your whole photo library, add a watermark unless you subscribe, and web versions upload the picture. Here it never leaves your device and the tiles carry no mark.',
   },
+  'collage-maker': {
+    how: 'Your browser decodes each picture (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL). The layout is worked out with plain arithmetic: pictures in a row share a height, in a stack share a width, and in a grid get equal cells, cropped from the middle or fitted whole. Each picture is then drawn once at its place on a single canvas in your tab with high-quality scaling, and the collage is encoded in the format you chose.',
+    versus: 'Collage apps and websites upload every photo, lock layouts behind a subscription and often add their logo to the result. Here the photos never leave your device and the collage carries no mark.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',

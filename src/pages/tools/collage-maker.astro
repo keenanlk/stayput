@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CollageMaker from '../../components/options/CollageMaker.astro';
+import CollageStage from '../../components/CollageStage.astro';
+const tool = toolBySlug('collage-maker')!;
+---
+<ToolLayout tool={tool}>
+  <CollageStage slot="panel" />
+  <Fragment slot="options"><CollageMaker /></Fragment>
+</ToolLayout>
+<script src="../../tools/collage-maker.ts"></script>

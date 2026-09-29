@@ -2062,6 +2062,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'collage-maker',
+    name: 'Collage maker',
+    title: 'Photo Collage Maker: Combine Images, Free, No Upload | Stayput',
+    description:
+      'Combine photos into one image in your browser: a grid, side by side or stacked, with spacing and a background colour. No upload, no watermark, no sign-up.',
+    heading: 'Make a photo collage',
+    tagline: 'Put several pictures into one: a grid, a row or a stack. Done on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop two or more pictures to combine',
+    action: 'Make collage',
+    keywords: ['collage maker', 'photo collage', 'combine images', 'merge images', 'put pictures side by side', 'combine photos into one', 'image grid maker'],
+    steps: [
+      'Drop two or more pictures (JPG, PNG, WebP, HEIC and more), or tap to pick them. Use the arrows in the list to change the order.',
+      'Choose a grid, side by side or stacked. Set the spacing, the background colour and how big the collage should be; the preview updates as you go.',
+      'Make the collage. It downloads straight away as one image.',
+    ],
+    faq: [
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. Your browser decodes the pictures and draws the collage on a canvas in the page. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Are the pictures cropped?',
+        a: 'Side by side and stacked keep each whole picture, scaled to a shared height or width. A grid gives every picture the same cell: Fill each cell crops the edges to fit, Show whole picture keeps it all with the background around it.',
+      },
+      {
+        q: 'How big is the collage?',
+        a: 'Its longest side is 2400 px by default, enough for sharing and a phone screen. Choose 4000 px for printing, or 1200 px for a small file to send in a message.',
+      },
+      {
+        q: 'Is there a watermark or a limit?',
+        a: 'No watermark, and no limit on the number of pictures beyond your device’s memory.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
