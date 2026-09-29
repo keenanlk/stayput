@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/remove-background",
+      "destination": "/tools/remove-background",
+      "permanent": true
+    },
+    {
       "source": "/heic-to-jpg",
       "destination": "/tools/heic-to-jpg",
       "permanent": true
