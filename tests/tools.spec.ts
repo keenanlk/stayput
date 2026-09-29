@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(53);
+  expect(await page.locator('.tool-card').count()).toBe(54);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'webcam-test'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3870,6 +3870,46 @@ test('Mic test shows the level and a verdict, plays back a short recording, and 
   const runs = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run'));
   expect(runs).toHaveLength(1);
   expect(runs[0]!.d.format).toBe('mic');
+  net.assertNothingLeft([]);
+  expect(errors).toEqual([]);
+});
+
+test('Webcam test shows the camera with its real resolution and frame rate, and saves a mirrored snapshot', async ({ page }) => {
+  // Stand in for the camera: a 1280x720 canvas, red on the left half and blue on the right.
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      const c = document.createElement('canvas');
+      c.width = 1280;
+      c.height = 720;
+      const g = c.getContext('2d')!;
+      setInterval(() => {
+        g.fillStyle = '#ff0000';
+        g.fillRect(0, 0, 640, 720);
+        g.fillStyle = '#0000ff';
+        g.fillRect(640, 0, 640, 720);
+      }, 33);
+      return c.captureStream(30);
+    };
+  });
+  const errors = await open(page, 'webcam-test');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#cam-start').click();
+  await expect(page.locator('#cam-panel')).toHaveAttribute('data-state', 'live');
+  await expect(page.locator('#cam-res')).toHaveText('1280 × 720 (720p)');
+  await expect(page.locator('#cam-aspect')).toHaveText('16:9');
+  await expect(page.locator('#cam-fps')).toContainText('measured', { timeout: 10_000 });
+  const [shot] = await Promise.all([page.waitForEvent('download'), page.locator('#cam-snap').click()]);
+  expect(shot.suggestedFilename()).toMatch(/^webcam-\d{4}-\d{2}-\d{2}-\d{6}\.jpg$/);
+  const jpg = await bytesOf(shot);
+  expect(jpegSize(jpg)).toEqual({ width: 1280, height: 720 });
+  // Mirrored like the preview: blue now on the left.
+  const left = await pixelAt(page, jpg, 100, 360);
+  expect(left[2]!).toBeGreaterThan(200);
+  expect(left[0]!).toBeLessThan(60);
+  await page.locator('#cam-stop').click();
+  await expect(page.locator('#cam-start')).toBeVisible();
   net.assertNothingLeft([]);
   expect(errors).toEqual([]);
 });
