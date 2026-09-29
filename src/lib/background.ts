@@ -1,0 +1,105 @@
+/**
+ * Background removal in the browser. ISNet general-use (DIS, Apache-2.0),
+ * quantised to 8-bit weights, finds the foreground at 1024×1024; the mask is
+ * scaled back to the photo's own size and used as its alpha channel, so the
+ * cut-out keeps full resolution. The model runs in a web worker
+ * (bg.worker.ts). Nothing is fetched until the first photo, and nothing but
+ * the model and runtime is ever fetched.
+ */
+import { makeCanvas } from './image';
+
+const SIZE = 1024;
+/** ISNet expects RGB scaled to 0..1 with the ImageNet mean subtracted (std 1). */
+const MEAN = [0.485, 0.456, 0.406] as const;
+
+let worker: Worker | undefined;
+let nextId = 0;
+
+function getWorker(): Worker {
+  worker ??= new Worker(new URL('./bg.worker.ts', import.meta.url), { type: 'module' });
+  return worker;
+}
+
+function toTensor(bitmap: ImageBitmap): Float32Array {
+  const canvas = makeCanvas(SIZE, SIZE);
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bitmap, 0, 0, SIZE, SIZE);
+  const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
+  const plane = SIZE * SIZE;
+  const out = new Float32Array(3 * plane);
+  for (let i = 0; i < plane; i++) {
+    out[i] = data[i * 4]! / 255 - MEAN[0];
+    out[plane + i] = data[i * 4 + 1]! / 255 - MEAN[1];
+    out[2 * plane + i] = data[i * 4 + 2]! / 255 - MEAN[2];
+  }
+  return out;
+}
+
+/** The foreground mask for a photo, 1024×1024, 0 (background) to 255 (subject). */
+export function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) => void): Promise<Uint8ClampedArray> {
+  const id = nextId++;
+  const pixels = toTensor(bitmap);
+  const w = getWorker();
+  return new Promise((resolve, reject) => {
+    const onMessage = (e: MessageEvent) => {
+      const msg = e.data as { id: number; type: string; fraction?: number; mask?: Uint8ClampedArray; message?: string };
+      if (msg.id !== id) return;
+      if (msg.type === 'loading') return onLoading?.(msg.fraction ?? 0);
+      w.removeEventListener('message', onMessage);
+      w.removeEventListener('error', onError);
+      if (msg.type === 'mask') resolve(msg.mask!);
+      else reject(new Error(msg.message ?? 'Background removal failed.'));
+    };
+    const onError = (e: ErrorEvent) => {
+      w.removeEventListener('message', onMessage);
+      w.removeEventListener('error', onError);
+      worker = undefined;
+      reject(new Error(e.message || 'The background remover could not start in this browser.'));
+    };
+    w.addEventListener('message', onMessage);
+    w.addEventListener('error', onError);
+    w.postMessage({ id, type: 'mask', pixels }, [pixels.buffer]);
+  });
+}
+
+export interface CutoutOptions {
+  /** A CSS colour to put behind the subject, or undefined for transparency. */
+  background?: string;
+}
+
+/**
+ * The photo at full size with the mask applied as transparency, optionally
+ * over a solid colour. Compositing does the scaling, so a 48 megapixel photo
+ * never needs a full-size pixel copy in JavaScript.
+ */
+export function cutout(bitmap: ImageBitmap, mask: Uint8ClampedArray, opts: CutoutOptions = {}): HTMLCanvasElement | OffscreenCanvas {
+  const m = makeCanvas(SIZE, SIZE);
+  const mctx = m.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  const img = mctx.createImageData(SIZE, SIZE);
+  for (let i = 0; i < mask.length; i++) img.data[i * 4 + 3] = mask[i]!;
+  mctx.putImageData(img, 0, 0);
+
+  const { width, height } = bitmap;
+  const canvas = makeCanvas(width, height);
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  ctx.drawImage(bitmap, 0, 0);
+  ctx.globalCompositeOperation = 'destination-in';
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(m, 0, 0, width, height);
+  if (opts.background) {
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = opts.background;
+    ctx.fillRect(0, 0, width, height);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  return canvas;
+}
+
+/** Share of the frame the subject covers, 0..1, to catch photos where nothing was found. */
+export function coverage(mask: Uint8ClampedArray): number {
+  let sum = 0;
+  for (const v of mask) sum += v;
+  return sum / (mask.length * 255);
+}

@@ -74,5 +74,14 @@
     "version": "1.0.0",
     "entry": "eng.traineddata.gz",
     "files": { "eng.traineddata.gz": "4.0.0_best_int/eng.traineddata.gz" }
+  },
+  "ort": {
+    "package": "onnxruntime-web",
+    "version": "1.30.0",
+    "entry": "ort-wasm-simd-threaded.wasm",
+    "files": {
+      "ort-wasm-simd-threaded.wasm": "dist/ort-wasm-simd-threaded.wasm",
+      "ort-wasm-simd-threaded.mjs": "dist/ort-wasm-simd-threaded.mjs"
+    }
   }
 }

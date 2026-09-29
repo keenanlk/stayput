@@ -37,6 +37,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'video-to-jpg': () => import('./video-to-jpg'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
+  'remove-background': () => import('./remove-background'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(40);
+  expect(await page.locator('.tool-card').count()).toBe(41);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -953,6 +953,14 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#flip-h')).toBeChecked();
     }],
     ['color-picker-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
+    ['make-background-transparent', 'remove-background', async () => {
+      await expect(page.locator('input[name="bg"][value="transparent"]')).toBeChecked();
+      await expect(page.locator('#format')).toHaveValue('image/png');
+    }],
+    ['white-background', 'remove-background', async () => {
+      await expect(page.locator('input[name="bg"][value="white"]')).toBeChecked();
+      await expect(page.locator('#format')).toHaveValue('image/jpeg');
+    }],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
     ['hex-color-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
     ['gif-to-video', 'gif-to-mp4', async () => expect(page.locator('#repeat')).toHaveValue('auto')],
@@ -3092,4 +3100,48 @@ test('Extract frames from video can save every frame, and Video to PNG saves PNG
   expect(png.items).toBe(10);
   const files = await zipAll(page);
   expect([...files['clip-0001.png']!.subarray(1, 4)].map((c) => String.fromCharCode(c)).join('')).toBe('PNG');
+});
+
+test('Remove background cuts out the subject at full size with a model served by the site', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'remove-background');
+  const net = watchNetwork(page);
+  const requested: string[] = [];
+  page.on('request', (r) => requested.push(new URL(r.url()).pathname));
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  // JPG has no transparency, so it is only offered with a background colour.
+  await expect(page.locator('#format option[value="image/jpeg"]')).toBeDisabled();
+  await page.locator('#file-input').setInputFiles([staticFx('face.jpg')]);
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 180_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  await expect.poll(() => downloads.length, { timeout: 10_000 }).toBe(1);
+  expect(downloads[0]!.suggestedFilename()).toBe('face-no-bg.png');
+  const png = await bytesOf(downloads[0]!);
+  // The portrait is 410x512: the cut-out keeps its size.
+  expect(pngSize(png)).toEqual({ width: 410, height: 512 });
+  // Curtains and flags in the corners are gone; the suit and face are kept.
+  expect((await pixelAt(page, png, 8, 8))[3]).toBe(0);
+  expect((await pixelAt(page, png, 400, 60))[3]).toBe(0);
+  expect((await pixelAt(page, png, 200, 350))[3]).toBe(255);
+  expect((await pixelAt(page, png, 205, 110))[3]).toBe(255);
+  // The model and runtime come from this site, and nothing carries the photo out.
+  expect(requested).toContain('/models/isnet-general-use-uint8.onnx');
+  expect(requested.some((u) => u.startsWith('/vendor/onnxruntime-web@') && u.endsWith('.wasm'))).toBe(true);
+
+  // On white, saved as JPG: the corners are white and the model is not fetched again.
+  await choose(page.locator('input[name="bg"][value="white"]'));
+  await expect(page.locator('#format option[value="image/jpeg"]')).toBeEnabled();
+  await page.locator('#format').selectOption('image/jpeg');
+  const before = requested.filter((u) => u.endsWith('.onnx')).length;
+  const [white] = await Promise.all([page.waitForEvent('download', { timeout: 120_000 }), page.locator('#run').click()]);
+  expect(white.suggestedFilename()).toBe('face-no-bg.jpg');
+  const jpg = await bytesOf(white);
+  const corner = await pixelAt(page, jpg, 8, 8);
+  expect(Math.min(...corner.slice(0, 3))).toBeGreaterThan(245);
+  expect(requested.filter((u) => u.endsWith('.onnx')).length).toBe(before);
+  net.assertNothingLeft(['face.jpg']);
+  expect(errors).toEqual([]);
 });

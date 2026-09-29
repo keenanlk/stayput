@@ -1,0 +1,45 @@
+---
+/** Option controls for the background remover, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const bg = defaults.bg ?? 'transparent';
+const color = defaults['bg-color'] ?? '#ffffff';
+const format = defaults.format ?? 'image/png';
+const backgrounds = [
+  ['transparent', 'Transparent'],
+  ['white', 'White'],
+  ['color', 'Colour'],
+] as const;
+const formats = [
+  ['image/png', 'PNG'],
+  ['image/webp', 'WebP (smaller)'],
+  ['image/jpeg', 'JPG (needs a background)'],
+] as const;
+---
+<div class="field wide">
+  <label>New background</label>
+  <div class="segmented" role="radiogroup" aria-label="New background">
+    {backgrounds.map(([v, l]) => <label><input type="radio" name="bg" value={v} checked={v === bg} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field" id="bg-color-field" hidden={bg !== 'color'}>
+  <label for="bg-color">Background colour</label>
+  <input type="color" id="bg-color" value={color} />
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<p class="field wide model-note" id="model-note">
+  The first photo downloads the cut-out model (about 46 MB, once). After that it is cached and works offline.
+</p>
+
+<style>
+  .model-note {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+</style>

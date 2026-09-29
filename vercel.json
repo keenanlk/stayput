@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/remove-background",
+      "destination": "/tools/remove-background",
+      "permanent": true
+    },
+    {
       "source": "/heic-to-jpg",
       "destination": "/tools/heic-to-jpg",
       "permanent": true
@@ -313,6 +318,15 @@
     },
     {
       "source": "/vendor/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/models/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
