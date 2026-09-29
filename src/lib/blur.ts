@@ -4,7 +4,7 @@
  * output, so what you see is what you download. No dependency: the blur is
  * three passes of a running-sum box blur, which is close to a Gaussian.
  */
-export type Effect = 'pixelate' | 'blur' | 'box';
+export type Effect = 'pixelate' | 'blur' | 'box' | 'emoji';
 
 export interface Rect {
   x: number;
@@ -126,8 +126,82 @@ export function box(ctx: Ctx, rect: Rect): void {
   ctx.fillRect(r.x, r.y, r.w, r.h);
 }
 
-export function apply(ctx: Ctx, effect: Effect, rect: Rect, size: number): void {
+/** The colour emoji font of each platform; the saved image looks like the emoji of the device that made it. */
+const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+
+const glyphs = new Map<string, HTMLCanvasElement>();
+
+/**
+ * The emoji drawn once at 160 px and cropped to its visible pixels. Emoji
+ * fonts report text metrics that do not match the picture they draw (colour
+ * bitmaps are scaled from a fixed size), so the tight box is found from the
+ * pixels themselves.
+ */
+function glyph(char: string): HTMLCanvasElement | undefined {
+  const cached = glyphs.get(char);
+  if (cached) return cached;
+  const size = 320;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const g = c.getContext('2d', { willReadFrequently: true })!;
+  g.font = `160px ${EMOJI_FONT}`;
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillText(char, size / 2, size / 2);
+  const { data } = g.getImageData(0, 0, size, size);
+  let x0 = size, y0 = size, x1 = -1, y1 = -1;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (data[(y * size + x) * 4 + 3]! > 16) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+    }
+  }
+  if (x1 < 0) return undefined; // Nothing drawn: not a character this device can show.
+  const out = document.createElement('canvas');
+  out.width = x1 - x0 + 1;
+  out.height = y1 - y0 + 1;
+  out.getContext('2d')!.drawImage(c, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+  glyphs.set(char, out);
+  return out;
+}
+
+/**
+ * Cover the area with an emoji. The area is blurred first, so a wide or tall
+ * box whose corners the round emoji leaves uncovered still hides what is
+ * there; the emoji is then scaled so its longer side spans the box's longer
+ * side, centred on it.
+ */
+export function emoji(ctx: Ctx, rect: Rect, char: string, radius: number): void {
+  blur(ctx, rect, radius);
+  const img = glyph(char);
+  if (!img) return;
+  const scale = Math.max(rect.w, rect.h) / Math.max(img.width, img.height);
+  const w = img.width * scale;
+  const h = img.height * scale;
+  ctx.save();
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, rect.x + (rect.w - w) / 2, rect.y + (rect.h - h) / 2, w, h);
+  ctx.restore();
+}
+
+/** The first emoji (or other single character) of what was typed or pasted. */
+export function firstGrapheme(text: string): string {
+  const t = text.trim();
+  if (!t) return '';
+  if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
+    const first = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(t)[Symbol.iterator]().next();
+    return first.done ? '' : first.value.segment;
+  }
+  return Array.from(t)[0] ?? '';
+}
+
+export function apply(ctx: Ctx, effect: Effect, rect: Rect, size: number, char = '🙂'): void {
   if (effect === 'pixelate') pixelate(ctx, rect, size);
   else if (effect === 'blur') blur(ctx, rect, size);
+  else if (effect === 'emoji') emoji(ctx, rect, char, size);
   else box(ctx, rect);
 }

@@ -757,6 +757,10 @@ export const tools: Tool[] = [
         q: 'How do I blur the whole picture?',
         a: 'Choose "Whole image" and set the strength. Strength is relative to the size of the photo, so the same setting looks the same on a small screenshot and a 48 megapixel photo. At high strength pixelate gives the big-block mosaic look.',
       },
+      {
+        q: 'Can I cover faces with an emoji?',
+        a: 'Yes. Choose Emoji as the effect, tap one of the common picks or type or paste any emoji, and every area gets it, sized to the box. The area is blurred underneath too, so nothing shows round the edges. The emoji is drawn in your device’s own emoji style, so it looks slightly different on an iPhone, Android or Windows PC.',
+      },
     ],
   },
   {

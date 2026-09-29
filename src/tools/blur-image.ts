@@ -1,7 +1,7 @@
 import { createShell, bindRange, num, str, radio } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
-import { apply, effectSize, type Effect, type Rect } from '../lib/blur';
+import { apply, effectSize, firstGrapheme, type Effect, type Rect } from '../lib/blur';
 import { findFaces } from '../lib/faces';
 
 /* ------------------------------------------------------------------ */
@@ -17,6 +17,8 @@ const undoBtn = $<HTMLButtonElement>('blur-undo');
 const clearBtn = $<HTMLButtonElement>('blur-clear');
 const findBtn = $<HTMLButtonElement>('blur-find');
 const strengthField = $('strength-field');
+const emojiField = $('emoji-field');
+const emojiInput = $<HTMLInputElement>('emoji');
 
 bindRange('quality', 'quality-out');
 bindRange('strength', 'strength-out');
@@ -41,6 +43,8 @@ let notice: string | undefined;
 
 const effect = () => radio('effect', 'blur') as Effect;
 const whole = () => radio('area', 'areas') === 'whole';
+/** The emoji to cover each area with: the first one typed or pasted, or a smiley. */
+const emojiChar = () => firstGrapheme(emojiInput.value) || '🙂';
 
 /** Where every area and the drawing box go on screen, in displayed pixels. */
 function displayScale(): number {
@@ -67,7 +71,8 @@ function render(ctx: CanvasRenderingContext2D, scale: number, rects: Rect[], bac
   ctx.drawImage(bitmap!, 0, 0, w, h);
   const size = effectSize(num('strength', 5), srcW, srcH) * scale;
   const e = effect();
-  for (const r of rects) apply(ctx, e, { x: r.x * scale, y: r.y * scale, w: r.w * scale, h: r.h * scale }, size);
+  const char = emojiChar();
+  for (const r of rects) apply(ctx, e, { x: r.x * scale, y: r.y * scale, w: r.w * scale, h: r.h * scale }, size, char);
 }
 
 let frame = 0;
@@ -123,6 +128,8 @@ function layout() {
       ? 'Drag across each face, plate or line of text to hide it.'
       : `${areas.length} ${areas.length === 1 ? 'area' : 'areas'} marked. Drag to add another, or tap × to remove one.`;
   strengthField.hidden = effect() === 'box';
+  emojiField.hidden = effect() !== 'emoji';
+  for (const b of document.querySelectorAll<HTMLButtonElement>('.emoji-pick')) b.setAttribute('aria-pressed', String(b.dataset.emoji === emojiChar()));
   panel.dataset.areas = areas.map((r) => `${r.x},${r.y},${r.w},${r.h}`).join(';');
 }
 
@@ -241,6 +248,18 @@ clearBtn.addEventListener('click', () => {
 });
 for (const el of document.querySelectorAll<HTMLInputElement>('input[name="area"], input[name="effect"]')) el.addEventListener('change', redraw);
 $('strength').addEventListener('input', redraw);
+emojiInput.addEventListener('input', redraw);
+// Keep only the first emoji once the field loses focus, so what is shown is what gets drawn.
+emojiInput.addEventListener('change', () => {
+  emojiInput.value = emojiChar();
+  redraw();
+});
+for (const b of document.querySelectorAll<HTMLButtonElement>('.emoji-pick')) {
+  b.addEventListener('click', () => {
+    emojiInput.value = b.dataset.emoji ?? '🙂';
+    redraw();
+  });
+}
 
 /* ------------------------------------------------------------------ */
 /* Shell                                                               */
@@ -252,7 +271,7 @@ function outputType(file: File, choice: string): EncodeType {
   return 'image/jpeg';
 }
 
-const suffix: Record<Effect, string> = { blur: '-blurred', pixelate: '-pixelated', box: '-redacted' };
+const suffix: Record<Effect, string> = { blur: '-blurred', pixelate: '-pixelated', box: '-redacted', emoji: '-emoji' };
 
 const shell = createShell({
   async onFilesChanged(files) {
@@ -273,7 +292,7 @@ const shell = createShell({
     }
     const type = outputType(entry.file, str('format', 'keep'));
     const quality = num('quality', 92) / 100;
-    progress.set(effect() === 'box' ? 'Covering…' : effect() === 'pixelate' ? 'Pixelating…' : 'Blurring…', 0.3);
+    progress.set(effect() === 'box' || effect() === 'emoji' ? 'Covering…' : effect() === 'pixelate' ? 'Pixelating…' : 'Blurring…', 0.3);
     const out = document.createElement('canvas');
     out.width = srcW;
     out.height = srcH;
@@ -291,7 +310,7 @@ const shell = createShell({
         blob,
         originalSize: entry.file.size,
         previewUrl: await thumbnail(preview),
-        note: `${effect() === 'box' ? 'black box' : effect()}, ${n}`,
+        note: `${effect() === 'box' ? 'black box' : effect() === 'emoji' ? `emoji ${emojiChar()}` : effect()}, ${n}`,
       },
     ];
     preview.close();
