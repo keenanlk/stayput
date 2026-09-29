@@ -1446,6 +1446,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'add-audio-to-video',
+    name: 'Add audio to video',
+    title: 'Add Audio or Music to Video Online, No Upload | Stayput',
+    description:
+      'Put an MP3, WAV or M4A on a video, or swap in the sound of another clip, in your browser. Replace or mix, loop and fade. Picture copied untouched, nothing uploaded.',
+    heading: 'Add audio to a video',
+    tagline: 'Put music or a voice-over on a video, or replace its sound. The picture is copied as it is, and nothing is uploaded.',
+    category: 'media',
+    accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac',
+    multiple: true,
+    dropLabel: 'Drop a video and a sound file',
+    action: 'Add audio',
+    keywords: ['add audio to video', 'add music to video', 'put music on video', 'replace audio in video', 'add mp3 to video', 'add sound to video'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV) and a sound file (MP3, WAV, M4A, or another video).',
+      'Choose whether the new sound replaces the video’s own sound or plays quietly underneath it.',
+      'Add audio. The picture is copied without re-encoding and the new sound is laid under it, looped or cut to fit.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound, fits it to the video and writes a new file in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Does the video lose quality?',
+        a: 'No. The picture is copied packet by packet, exactly as it was, so it takes seconds and nothing changes. Only the sound is encoded again, as AAC in an MP4 (or Opus in a WebM for VP8 videos).',
+      },
+      {
+        q: 'What if the song is longer or shorter than the video?',
+        a: 'A longer sound is cut at the end of the video and faded out. A shorter one is repeated until the video ends, or, with Loop unticked, the rest of the video is silent.',
+      },
+      {
+        q: 'Can I keep the original sound and add music under it?',
+        a: 'Yes. Choose Keep it, with the new sound quieter underneath: the music plays at half volume under the voices in the video.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
