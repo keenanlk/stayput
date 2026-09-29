@@ -1,0 +1,28 @@
+---
+/** Live preview for the image to SVG tool: the first image beside its traced SVG. Driven by src/tools/image-to-svg.ts. */
+---
+<div id="svg-panel" class="rotate-panel" hidden>
+  <div class="svg-compare">
+    <figure>
+      <div class="rotate-stage"><canvas id="svg-original" aria-label="The original image"></canvas></div>
+      <figcaption class="muted small">Original</figcaption>
+    </figure>
+    <figure>
+      <div class="rotate-stage"><img id="svg-preview" alt="Preview of the traced SVG" /></div>
+      <figcaption class="muted small" id="svg-caption">SVG</figcaption>
+    </figure>
+  </div>
+  <p class="muted small rotate-hint" id="svg-hint" aria-live="polite"></p>
+</div>
+<style is:global>
+  .rotate-panel { display: grid; gap: 8px; }
+  .rotate-stage { line-height: 0; justify-self: start; max-width: 100%; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .rotate-stage canvas { display: block; max-width: 100%; max-height: 55vh; width: auto; height: auto; }
+  .rotate-hint { margin: 0; }
+  .svg-compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: start; }
+  .svg-compare figure { margin: 0; display: grid; gap: 6px; min-width: 0; }
+  .svg-compare .rotate-stage canvas, .svg-compare .rotate-stage img { display: block; width: 100%; height: auto; max-height: 45vh; object-fit: contain; }
+  .svg-compare figcaption { margin: 0; }
+  #svg-preview:not([src]) { visibility: hidden; min-height: 120px; }
+  #svg-panel[data-busy] #svg-preview { opacity: 0.45; transition: opacity 0.2s; }
+</style>

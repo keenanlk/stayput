@@ -63,6 +63,7 @@ import WatermarkPdf from '../components/options/WatermarkPdf.astro';
 import StickerMaker from '../components/options/StickerMaker.astro';
 import ProfilePicture from '../components/options/ProfilePicture.astro';
 import BlackAndWhite from '../components/options/BlackAndWhite.astro';
+import ImageToSvg from '../components/options/ImageToSvg.astro';
 import WatermarkStage from '../components/WatermarkStage.astro';
 import ColorStage from '../components/ColorStage.astro';
 import CropStage from '../components/CropStage.astro';
@@ -72,6 +73,7 @@ import VideoStage from '../components/VideoStage.astro';
 import BlurStage from '../components/BlurStage.astro';
 import RotateStage from '../components/RotateStage.astro';
 import MonoStage from '../components/MonoStage.astro';
+import SvgStage from '../components/SvgStage.astro';
 import TunerStage from '../components/TunerStage.astro';
 import MetronomeStage from '../components/MetronomeStage.astro';
 
@@ -137,6 +139,7 @@ const options = {
   'sticker-maker': StickerMaker,
   'profile-picture-maker': ProfilePicture,
   'black-and-white-image': BlackAndWhite,
+  'image-to-svg': ImageToSvg,
   // Sign PDF, the QR code generator and the screen recorder have no option controls outside their stages.
   'sign-pdf': null,
   'qr-code-generator': null,
@@ -160,6 +163,7 @@ const Options = options[base as keyof typeof options];
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {base === 'black-and-white-image' && <MonoStage slot="panel" />}
+  {base === 'image-to-svg' && <SvgStage slot="panel" />}
   {base === 'tuner' && <TunerStage slot="panel" defaults={defaults} />}
   {base === 'metronome' && <MetronomeStage slot="panel" defaults={defaults} />}
   {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}

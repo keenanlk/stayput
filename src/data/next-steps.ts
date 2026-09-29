@@ -47,6 +47,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'merge-audio': ['trim-audio', 'add-audio-to-video'],
   'blur-face-video': ['compress-video', 'trim-video'],
   'remove-silence': ['compress-audio', 'trim-audio'],
+  'image-to-svg': ['remove-background', 'favicon-generator'],
   'metronome': ['tuner', 'voice-recorder'],
   'tuner': ['metronome', 'pitch-changer'],
   'mic-test': ['merge-audio', 'audio-converter'],

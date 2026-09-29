@@ -59,6 +59,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'remove-pdf-metadata': () => import('./remove-pdf-metadata'),
   'grayscale-pdf': () => import('./grayscale-pdf'),
   'black-and-white-image': () => import('./black-and-white-image'),
+  'image-to-svg': () => import('./image-to-svg'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

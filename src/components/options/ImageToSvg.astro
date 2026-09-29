@@ -1,0 +1,21 @@
+---
+/** Option controls for the image to SVG tool, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const mode = defaults.mode ?? 'logo';
+const dropWhite = (defaults['drop-white'] ?? 'false') === 'true';
+const modes = [
+  ['bw', 'Black and white'],
+  ['logo', 'Logo, few colours'],
+  ['detailed', 'Detailed, many colours'],
+] as const;
+---
+<div class="field wide">
+  <label>Style</label>
+  <div class="segmented" role="radiogroup" aria-label="Style">
+    {modes.map(([v, l]) => <label><input type="radio" name="mode" value={v} checked={v === mode} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="drop-white" checked={dropWhite} /> Leave out white, for a transparent background</label>
+</div>
