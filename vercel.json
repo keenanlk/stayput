@@ -404,6 +404,11 @@
       "source": "/resize-pdf",
       "destination": "/tools/resize-pdf",
       "permanent": true
+    },
+    {
+      "source": "/transcribe",
+      "destination": "/tools/transcribe",
+      "permanent": true
     }
   ],
   "headers": [
