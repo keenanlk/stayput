@@ -11,7 +11,7 @@ export interface Pair {
   from: string;
   to: string;
   /** Output MIME type preset in the converter. */
-  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon' | 'image/bmp' | 'image/gif';
+  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon' | 'image/bmp' | 'image/gif' | 'image/tiff';
   accept: string;
   title: string;
   description: string;
@@ -55,6 +55,12 @@ const gifSteps = (from: string) => [
   `Drop your ${from} files onto the page, or tap to pick them. Animated or still, batches are fine.`,
   'Nothing to set: animations keep every frame, their timing and their loop, and still images become a single-frame GIF.',
   'Download each GIF, or all of them as one zip.',
+];
+
+const tiffSteps = (from: string) => [
+  `Drop your ${from} files onto the page, or tap to pick them. Batches are fine.`,
+  'Nothing to set: every TIFF is written uncompressed at full resolution, with an alpha channel.',
+  'Download each TIFF, or all of them as one zip.',
 ];
 
 export const pairs: Pair[] = [
@@ -633,13 +639,144 @@ export const pairs: Pair[] = [
       { q: 'Is anything uploaded?', a: 'No. The file is read, decoded and re-encoded in this browser tab. Nothing is sent to a server.' },
     ],
   },
+  {
+    slug: 'png-to-gif',
+    from: 'PNG',
+    to: 'GIF',
+    outputType: 'image/gif',
+    accept: 'image/png,.png',
+    title: 'PNG to GIF Converter, Keeps Transparency, No Upload | Stayput',
+    description: 'Convert PNG images to GIF in your browser, with transparent areas kept. For forums, email signatures and old software. Batch, free, nothing uploaded.',
+    heading: 'Convert PNG to GIF',
+    tagline: 'Turn PNG logos, icons and graphics into GIFs for the places that still only take GIF, on your own device.',
+    keywords: ['png to gif', 'convert png to gif', 'png to gif converter', 'png to gif transparent', 'png to gif free'],
+    intro: [
+      'GIF lingers in places that never updated: forum avatars and signatures, email signatures in older Outlook versions, some learning platforms and CMS themes, embroidery and sign-cutting software, and legacy desktop apps whose image picker lists only GIF, JPG and BMP. When the logo or icon you have is a PNG, those places reject it or show it without its transparency.',
+      'The converter reduces the PNG to a 256-colour palette, the most a GIF can hold, picking the colours that matter most in your image. Logos, icons, line art, pixel art and flat illustrations usually have far fewer colours than that and come through looking identical. Photos and soft gradients are where the limit shows, as banding across smooth areas like skies or shadows.',
+      'PNG transparency is kept, with one difference. A PNG can be partly transparent, so the edge of a round logo fades smoothly into whatever is behind it. GIF has only on or off: each pixel here becomes fully transparent if it was less than half opaque, and fully solid otherwise. On a white page the result looks the same; on a dark background, antialiased edges may show a thin light fringe from the colour they were blended against.',
+      'The PNG is a still image, so the GIF is a single frame. To make an animated GIF, start from a video on the Video to GIF page, or from an animated WebP on the WebP to GIF page.',
+    ],
+    faq: [
+      { q: 'Will my transparent background stay transparent?', a: 'Yes. Fully transparent areas stay transparent. Semi-transparent pixels, such as soft shadows and the smoothed edges of text, are rounded to either fully see-through or fully solid, because GIF has no partial transparency.' },
+      { q: 'Why does my photo look blotchy as a GIF?', a: 'GIF allows 256 colours per image, and a photo has tens of thousands. Smooth gradients break into visible bands. For photos, PNG or JPG is the better format; GIF suits logos, icons and simple graphics.' },
+      { q: 'Is the GIF smaller than the PNG?', a: 'Often, for simple graphics with few colours, since both use lossless compression and the palette is small. For detailed images the GIF can be larger, because GIF’s LZW compression is older and weaker than PNG’s.' },
+      { q: 'Can I combine several PNGs into an animated GIF?', a: 'Not on this page: each PNG becomes its own single-frame GIF. For animation, make the frames into a short video and use Video to GIF.' },
+      { q: 'Is anything uploaded?', a: 'No. The PNG is decoded, reduced to a palette and written as a GIF in this browser tab. Nothing is sent to a server.' },
+    ],
+  },
+  {
+    slug: 'jpg-to-gif',
+    from: 'JPG',
+    to: 'GIF',
+    outputType: 'image/gif',
+    accept: 'image/jpeg,.jpg,.jpeg,.jfif',
+    title: 'JPG to GIF Converter, Free, No Upload | Stayput',
+    description: 'Convert JPG photos and images to GIF in your browser for sites and apps that only accept GIF. Batch, free, no sign-up. Nothing is uploaded.',
+    heading: 'Convert JPG to GIF',
+    tagline: 'Make a GIF from any JPG for the forms, forums and old programs that insist on GIF, without uploading it.',
+    keywords: ['jpg to gif', 'jpeg to gif', 'convert jpg to gif', 'jpg to gif converter', 'jpg to gif free'],
+    intro: [
+      'The usual reason to turn a JPG into a GIF is a gatekeeper: a forum avatar field, a legacy intranet, an e-learning or quiz builder, a CAD, embroidery or label program, or an old email template that accepts GIF and nothing else. The photo is fine; the software is from another decade.',
+      'JPG is built for photographs and can show millions of colours. GIF can hold 256. The converter picks the 256 colours that best cover your photo and maps every pixel to the nearest one, without dithering, so faces, skin, sky and shadows can show visible steps or blotches. Screenshots, scanned documents, diagrams and logos saved as JPG convert far more cleanly, because they use few colours to begin with.',
+      'GIF is lossless within its palette, so the file often ends up bigger than the JPG for a detailed photo, sometimes two or three times bigger. If the destination has a size limit, shrink the picture first with Resize image. A JPG has no transparency, so neither does the GIF: white stays white.',
+      'Camera and phone JPGs carry EXIF data such as the date, camera model and often GPS location. GIF has no place for it, so the GIF you download carries none of it. The rotation stored in the JPG is applied first, so the GIF comes out the right way up.',
+    ],
+    faq: [
+      { q: 'Can I make an animated GIF from several JPGs?', a: 'Not here. Each JPG becomes a single-frame GIF. To animate, put the photos into a short video (most phone gallery apps can) and turn it into a GIF on the Video to GIF page.' },
+      { q: 'Why does my photo look worse as a GIF?', a: 'GIF is limited to 256 colours, and photos use many more. Gradients and skin tones show banding. It is a limit of the GIF format, not of this converter; keep the JPG wherever it is accepted.' },
+      { q: 'Why is the GIF bigger than the JPG?', a: 'JPG compresses photos by discarding detail the eye barely notices. GIF compresses without discarding anything, which works well for flat graphics but poorly for photos. Resize the image first if you need a smaller GIF.' },
+      { q: 'Is my photo uploaded anywhere?', a: 'No. It is decoded and re-encoded as a GIF inside this tab, so private photos and scanned documents never leave your device.' },
+    ],
+  },
+  {
+    slug: 'jpg-to-tiff',
+    from: 'JPG',
+    to: 'TIFF',
+    outputType: 'image/tiff',
+    accept: 'image/jpeg,.jpg,.jpeg,.jfif',
+    title: 'JPG to TIFF Converter, Free, No Upload | Stayput',
+    description: 'Convert JPG photos to uncompressed TIFF in your browser, for print shops, archives, scanning workflows and publishers that ask for TIFF. Free, nothing uploaded.',
+    heading: 'Convert JPG to TIFF',
+    tagline: 'Hand the print shop, publisher or archive the TIFF they asked for, made from your JPG on your own device.',
+    keywords: ['jpg to tiff', 'jpeg to tiff', 'convert jpg to tiff', 'jpg to tif', 'jpg to tiff converter'],
+    intro: [
+      'TIFF is the format print, publishing and archiving still run on. Print shops and photo labs ask for it, journals and publishers want figures as TIFF, patent and court filing systems take TIFF, and document management and fax-era software often reads nothing else. If the only copy of your image is a JPG, converting gives them the file type they require.',
+      'Each TIFF here is written uncompressed: 8 bits per channel, red, green, blue and an alpha channel, at the JPG’s full pixel size. That is the most widely readable kind of TIFF, and it also means large files: about 4 bytes per pixel, so a 12-megapixel phone photo becomes a TIFF of around 48 MB. Converting cannot add detail the JPG compression removed, but it guarantees nothing more is lost when the file is edited and saved again.',
+      'The TIFF is tagged at 72 pixels per inch. That tag does not change a single pixel; it is only a hint for the printed size. If a printer asks for 300 dpi, what matters is having enough pixels (about 3000 × 2100 for an A4 or Letter page at 300 dpi), and they can set the dpi value in their layout software, or you can in any image editor.',
+      'JPG camera metadata (EXIF, including date, camera and GPS location) is not copied into the TIFF, and colour profiles are not embedded; the TIFF holds plain sRGB-style pixels. The JPG’s rotation flag is applied, so the TIFF is upright.',
+      'Several JPGs make several TIFFs, one per photo, downloaded together as a zip. Files are saved with the .tiff extension; .tif is the same format under its older three-letter name, so a system that asks for .tif accepts these once renamed. Scanner and document systems that expect one multi-page TIFF per document are better served by a PDF: the JPG to PDF page puts many photos into one file.',
+    ],
+    faq: [
+      { q: 'Will the TIFF be better quality than the JPG?', a: 'It will look exactly the same. TIFF stores the decoded pixels without compression, which stops further loss, but it cannot restore detail the JPG already threw away.' },
+      { q: 'Why is the TIFF file so large?', a: 'It is uncompressed: every pixel is stored as four bytes. A 4000 × 3000 photo is 48 MB. That is normal for print-ready TIFFs; zip them, or use a file-transfer service, if email refuses them.' },
+      { q: 'Can I get a CMYK TIFF for printing?', a: 'No. The TIFF is RGB. Most print shops convert RGB to CMYK themselves with their own press profiles; ask them if they require CMYK, and use a desktop editor if they do.' },
+      { q: 'Does the TIFF keep the JPG’s EXIF data?', a: 'No. Date, camera and location data are not carried over, which is also a quick way to hand over an image without its GPS location.' },
+      { q: 'Is anything uploaded?', a: 'No. The JPG is decoded and the TIFF is written in this browser tab. Nothing is sent to a server.' },
+    ],
+  },
+  {
+    slug: 'png-to-tiff',
+    from: 'PNG',
+    to: 'TIFF',
+    outputType: 'image/tiff',
+    accept: 'image/png,.png',
+    title: 'PNG to TIFF Converter, Keeps Transparency, No Upload | Stayput',
+    description: 'Convert PNG images to lossless TIFF with transparency kept, for print, publishing, OCR and archive systems. Free, in your browser, nothing uploaded.',
+    heading: 'Convert PNG to TIFF',
+    tagline: 'Lossless in, lossless out: PNG graphics, scans and screenshots turned into TIFF on your own device.',
+    keywords: ['png to tiff', 'png to tif', 'convert png to tiff', 'png to tiff converter', 'png to tiff transparent'],
+    intro: [
+      'PNG and TIFF are both lossless, so this is one of the few conversions where nothing about the picture changes. People need it because a system on the other end reads TIFF only: journal and thesis submission portals that want figures as TIFF, print and sign shops, archival and records systems, scanning and OCR software, and GIS or scientific tools that treat TIFF as their native image type.',
+      'Every pixel of the PNG is copied into the TIFF exactly, at the same size, as 8-bit red, green, blue and alpha. Transparent areas stay transparent: the TIFF’s alpha channel is written as unassociated (straight) alpha, which Photoshop, GIMP, Affinity and most publishing software read correctly. Some older viewers ignore TIFF alpha and show transparent areas as black or white; the pixels underneath are unchanged either way.',
+      'The TIFF is uncompressed. PNG compresses losslessly, so the TIFF is usually several times larger: 4 bytes per pixel, around 8 MB for a 1920 × 1080 screenshot. That is expected, and it is the most compatible form of TIFF, since every TIFF reader supports uncompressed strips.',
+      'The resolution tag is set to 72 pixels per inch. For print, what counts is the pixel size; a publisher who needs 300 or 600 dpi figures checks that the pixel dimensions are large enough and changes the tag in their layout software. PNG text chunks and colour profiles are not copied over.',
+      'Charts and diagrams exported from Excel, matplotlib, R or PowerPoint as PNG are the most common reason for this conversion, since many journals list TIFF as the figure format. Export the PNG at the size the journal asks for (their guidelines give a width in pixels or inches at a given dpi), then convert it here; line art and text stay exactly as crisp as in the PNG.',
+    ],
+    faq: [
+      { q: 'Is PNG to TIFF lossless?', a: 'Yes. Both formats are lossless, and every pixel, including its transparency, is copied unchanged.' },
+      { q: 'Does the TIFF keep my transparent background?', a: 'Yes, as an alpha channel. Editors such as Photoshop, GIMP and Affinity show it as transparency. A few basic viewers ignore TIFF alpha and show a solid background instead, but the transparency is still in the file.' },
+      { q: 'Why is the TIFF bigger than the PNG?', a: 'The TIFF is stored uncompressed for maximum compatibility, while PNG compresses without loss. Expect three to ten times the size, depending on the image.' },
+      { q: 'Can I make a TIFF from a screenshot for OCR or fax software?', a: 'Yes. Screenshots and scanned pages saved as PNG convert without any loss, so text edges stay sharp for OCR. Fax and document systems that need black-and-white Group 4 TIFFs are the exception; this page writes colour TIFFs only.' },
+      { q: 'My publisher wants 300 dpi. Is this TIFF usable?', a: 'The dpi tag here says 72, but that is only a label. If your image has enough pixels for the printed size (for example 2100 pixels wide for 7 inches at 300 dpi), the publisher can relabel it without resampling.' },
+      { q: 'Is anything uploaded?', a: 'No. The PNG is decoded and the TIFF is written in this browser tab. Nothing is sent to a server.' },
+    ],
+  },
+  {
+    slug: 'ico-to-png',
+    from: 'ICO',
+    to: 'PNG',
+    outputType: 'image/png',
+    accept: 'image/x-icon,image/vnd.microsoft.icon,.ico,.cur',
+    title: 'ICO to PNG Converter, Largest Size, Transparent | Stayput',
+    description: 'Convert ICO icons and favicons to transparent PNG in your browser, taking the largest size inside the file. Batch, free, nothing uploaded.',
+    heading: 'Convert ICO to PNG',
+    tagline: 'Get a clean, transparent PNG out of any Windows icon or favicon, at the biggest size it holds.',
+    keywords: ['ico to png', 'convert ico to png', 'ico to png converter', 'favicon to png', 'ico to png transparent'],
+    intro: [
+      'An ICO file is a small bundle of images, not one picture: the same icon drawn at several sizes, typically 16, 32, 48 and 256 pixels, so Windows and browsers can pick the one that fits. People convert ICO to PNG to reuse a favicon in a slide deck or README, to edit an app icon in software that cannot open ICO, to upload a site icon to a platform that wants PNG, or to recover the artwork of an old desktop icon.',
+      'Your browser’s icon decoder opens the file and hands over the largest image inside it, usually the 256 × 256 version, and the converter saves that as a PNG. Transparency is kept exactly: ICO and PNG both store a full alpha channel, so rounded corners and soft shadows stay see-through. The smaller sizes in the bundle are not exported separately.',
+      'Many favicon.ico files only go up to 32 or 48 pixels. The PNG then comes out that small, since there is no larger artwork to take. Enlarging it will look blurry; for a crisp large version, look for the site’s apple-touch-icon (often 180 × 180) or its logo instead.',
+      'Very old icons from Windows 95 to XP sometimes use 16- or 256-colour images with a separate one-bit transparency mask. Those decode too, with the mask applied as transparency. Cursor files (.cur) share the ICO format and convert the same way, minus their hotspot position, which PNG has nowhere to store.',
+      'Windows keeps most program icons inside .exe and .dll files rather than as loose .ico files. To convert one of those, pull the icon out first with a resource tool such as Resource Hacker, IconViewer or 7-Zip, which save it as an .ico, and then drop that here. On a Mac, application icons are .icns files; open one in Preview and export it as PNG instead.',
+      'Since Windows Vista, the 256-pixel image inside most icons is itself stored as a compressed PNG, while the small sizes are stored as bitmaps. Either way the pixels are decoded and written out losslessly, so the PNG you download is a faithful copy of the icon’s largest artwork, ready for a Slack or Discord emoji, a GitHub README, a documentation page or an app store listing draft.',
+    ],
+    faq: [
+      { q: 'Which size do I get from a multi-size ICO?', a: 'The largest one in the file, usually 256 × 256 for application icons and 32 or 48 pixels for older favicons.' },
+      { q: 'Will the PNG keep its transparent background?', a: 'Yes. The ICO’s alpha channel, or its older one-bit mask, becomes the PNG’s transparency.' },
+      { q: 'How do I get a website’s favicon to convert?', a: 'Open the site, add /favicon.ico after the domain in the address bar, and save the image that appears. Then drop the file here. Many sites also offer a larger PNG icon, linked in the page source as apple-touch-icon.' },
+      { q: 'Why is my PNG only 16 or 32 pixels?', a: 'The ICO did not contain anything bigger. Favicons made before high-resolution screens often stop at 32 × 32. The converter never upscales, so you get the true largest size rather than a blurry enlargement.' },
+      { q: 'Can I extract a program’s icon from its .exe?', a: 'Not directly. Windows stores those icons as resources inside the program file. Use a free resource extractor to save the icon as an .ico first, then convert that file here.' },
+      { q: 'Can I go the other way and make an ICO?', a: 'Yes. PNG to ICO builds a multi-size icon from a PNG, and the Favicon generator makes the full set of icons a website needs.' },
+      { q: 'Is anything uploaded?', a: 'No. The icon is decoded and the PNG is written in this browser tab. Nothing is sent to a server.' },
+    ],
+  },
 ];
 
 export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => p.slug === slug);
 
 /** A Pair expressed as a Tool so it can use the shared tool layout. */
 export function pairAsTool(p: Pair): Tool {
-  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : p.outputType === 'image/bmp' ? bmpSteps(p.from) : p.outputType === 'image/gif' ? gifSteps(p.from) : jpgSteps(p.from);
+  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : p.outputType === 'image/bmp' ? bmpSteps(p.from) : p.outputType === 'image/gif' ? gifSteps(p.from) : p.outputType === 'image/tiff' ? tiffSteps(p.from) : jpgSteps(p.from);
   return {
     slug: p.slug,
     path: `/${p.slug}`,

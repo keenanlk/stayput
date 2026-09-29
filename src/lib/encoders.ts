@@ -186,7 +186,8 @@ export async function writeImage(bitmap: ImageBitmap, type: OutputType, opts: Wr
     case 'image/jpeg':
     case 'image/png':
     case 'image/webp':
-      return encodeBitmap(bitmap, { type, quality: opts.quality, background: opts.background });
+      // Only JPG needs the fill; PNG and WebP keep transparent pixels transparent.
+      return encodeBitmap(bitmap, { type, quality: opts.quality, background: type === 'image/jpeg' ? opts.background : undefined });
     case 'image/bmp':
       return blob(writeBmp(pixels(bitmap, undefined, undefined, opts.background)));
     case 'image/tiff':
