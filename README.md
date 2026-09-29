@@ -63,6 +63,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Trim audio](https://stayput.dev/tools/trim-audio) (cut MP3, WAV, M4A with a waveform) | |
 | [Volume booster](https://stayput.dev/tools/volume-booster) (louder, quieter or normalized audio and video) | |
 | [Audio converter](https://stayput.dev/tools/audio-converter) (MP3, WAV, FLAC, M4A, OGG) | |
+| [Voice recorder](https://stayput.dev/tools/voice-recorder) (microphone to MP3, WAV or M4A) | |
 | [Merge audio](https://stayput.dev/tools/merge-audio) (join MP3, WAV, M4A with silence or crossfades) | |
 | [Mic test](https://stayput.dev/tools/mic-test) (level meter, verdict, record and play back) | |
 

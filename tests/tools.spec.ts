@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(53);
+  expect(await page.locator('.tool-card').count()).toBe(54);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3635,6 +3635,45 @@ test('WAV to FLAC opens with FLAC chosen', async ({ page }) => {
   await page.goto('/wav-to-flac');
   await expect(page.locator('#format')).toHaveValue('flac');
   await expect(page.locator('#format-note')).toContainText('keeps every sample');
+});
+
+test('Voice recorder records the microphone to an MP3 that keeps the pitch, and no bytes leave the tab', async ({ page }) => {
+  // Stand in for the microphone: a 440 Hz tone.
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async (constraints?: MediaStreamConstraints) => {
+      (window as unknown as { __asked: unknown }).__asked = constraints;
+      const ac = new AudioContext();
+      const osc = ac.createOscillator();
+      osc.frequency.value = 440;
+      const dest = ac.createMediaStreamDestination();
+      osc.connect(dest);
+      osc.start();
+      return dest.stream;
+    };
+  });
+  const errors = await open(page, 'voice-recorder');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#vr-start').click();
+  await expect(page.locator('#vr-deck')).toHaveAttribute('data-state', 'live');
+  const asked = await page.evaluate(() => (window as unknown as { __asked: { audio: MediaTrackConstraints } }).__asked.audio);
+  expect(asked.noiseSuppression).toBe(true);
+  await page.waitForTimeout(1500);
+  await page.locator('#vr-stop').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 30_000 });
+  await expect(page.locator('#vr-audio')).toBeVisible();
+  const item = page.locator('#results-list .result-item');
+  await expect(item.locator('.name')).toHaveText(/^voice-recording-\d{4}-\d{2}-\d{2}-\d{4}\.mp3$/);
+  await expect(item).toContainText('mono');
+  const [download] = await Promise.all([page.waitForEvent('download'), item.getByRole('button', { name: 'Download' }).click()]);
+  const mp3 = await bytesOf(download);
+  const sound = await soundOf(page, mp3);
+  expect(sound.seconds).toBeGreaterThan(1.1);
+  expect(sound.seconds).toBeLessThan(2.2);
+  expect(Math.abs(sound.hz - 440)).toBeLessThan(22);
+  net.assertNothingLeft(['voice-recording']);
+  expect(errors).toEqual([]);
 });
 
 test('Redact PDF removes the text under the boxes, keeps other pages, and no bytes leave the tab', async ({ page }) => {
