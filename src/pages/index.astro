@@ -54,7 +54,7 @@ const jsonLd = [
         </div>
       </div>
       <figure>
-        <div class="devtools" role="img" aria-label="A browser network panel after converting photos: requests for the site's code and the decoder, then no requests at all once the photos were added.">
+        <div class="devtools" role="img" aria-label="A browser network panel after converting photos: requests for the site's code and the decoder, then one small anonymous usage-count request. None of them carry the photos.">
           <div class="tabs"><span>Elements</span><span>Console</span><span class="on">Network</span><span>Application</span></div>
           <div class="rows">
             <div class="row head"><span>Name</span><span>Status</span><span>Size</span></div>
@@ -62,10 +62,11 @@ const jsonLd = [
             <div class="row"><span>heic-to-jpg.a8f3.js</span><span class="ok">200</span><span>31 kB</span></div>
             <div class="row"><span>heic-to.min.js (decoder)</span><span class="ok">200</span><span>1.6 MB</span></div>
             <div class="drop">IMG_4021.HEIC, IMG_4022.HEIC, IMG_4023.HEIC added</div>
-            <div class="empty"><b><i>0</i> requests</b>Your photos were converted here.</div>
+            <div class="row"><span>e (usage count)</span><span class="ok">200</span><span>0.3 kB</span></div>
+            <div class="empty"><b>No</b> request carried your photos.</div>
           </div>
         </div>
-        <figcaption>What your browser's Network tab shows while three iPhone photos convert: the page and its code load, then nothing. Press F12 and try it.</figcaption>
+        <figcaption>What your browser's Network tab shows while three iPhone photos convert: the page and its code load, then one small anonymous usage-count request. No request carries your photos. Press F12 and try it.</figcaption>
       </figure>
     </div>
   </section>
@@ -84,8 +85,8 @@ const jsonLd = [
 
   <section class="wrap section split" aria-labelledby="spec-h">
     <div class="spec-intro">
-      <h2 id="spec-h">Open the network tab. It stays empty.</h2>
-      <p style="margin-top:16px">Every tool here is JavaScript and WebAssembly running in your tab. There is no server that could receive your files, so none does.</p>
+      <h2 id="spec-h">Open the network tab. Your files never appear in it.</h2>
+      <p style="margin-top:16px">Every tool here is JavaScript and WebAssembly running in your tab. There is no server that could receive your files, so none does. You will see a small anonymous usage-count request; it carries a tool name and a size bucket, never your file.</p>
       <p>Every tool page also counts its own requests after you add files and shows you the list, so you do not have to take our word for it.</p>
       <div class="actions">
         <a class="btn btn-primary" href="/tools/heic-to-jpg">Try it with a photo</a>
