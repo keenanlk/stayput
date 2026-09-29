@@ -35,6 +35,7 @@ import CropVideo from '../components/options/CropVideo.astro';
 import VideoSpeed from '../components/options/VideoSpeed.astro';
 import ImageToText from '../components/options/ImageToText.astro';
 import ColorPicker from '../components/options/ColorPicker.astro';
+import RemoveBackground from '../components/options/RemoveBackground.astro';
 import ColorStage from '../components/ColorStage.astro';
 import CropStage from '../components/CropStage.astro';
 import ReorderStage from '../components/ReorderStage.astro';
@@ -79,6 +80,7 @@ const options = {
   'video-speed': VideoSpeed,
   'image-to-text': ImageToText,
   'color-picker': ColorPicker,
+  'remove-background': RemoveBackground,
   // Sign PDF has no option controls; everything happens on the stage.
   'sign-pdf': null,
 } as const;

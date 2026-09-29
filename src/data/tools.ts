@@ -1449,6 +1449,52 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'remove-background',
+    name: 'Remove background',
+    title: 'Remove Background from Image, Free, No Upload | Stayput',
+    description:
+      'Remove the background from a photo in your browser. Get a transparent PNG or a white or coloured background, at full resolution. Nothing is uploaded.',
+    heading: 'Remove the background from an image',
+    tagline: 'Cut out people, pets and products at full resolution. The photo never leaves this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos to remove the background',
+    action: 'Remove background',
+    keywords: ['remove background', 'background remover', 'remove background from image', 'transparent background', 'make background transparent', 'remove bg', 'cut out image', 'white background'],
+    steps: [
+      'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
+      'Choose a transparent, white or coloured background and the file type. The first photo downloads the cut-out model once; after that it is cached.',
+      'Download the cut-out at the photo’s full size, or all of them in one zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only download is the model itself, fetched from this site the first time. You can load the page, use it once, turn off Wi-Fi and it keeps working.',
+      },
+      {
+        q: 'Why is the first photo slow?',
+        a: 'The first time, the page downloads the model (about 46 MB) and the WebAssembly runtime that runs it, and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
+      },
+      {
+        q: 'What resolution is the result?',
+        a: 'The same as your photo. The model finds the outline at 1024 × 1024, and that outline is scaled back up and applied to your original pixels, so a 12 megapixel photo gives a 12 megapixel cut-out. There is no low-resolution preview tier and no watermark.',
+      },
+      {
+        q: 'What works best?',
+        a: 'A clear subject that stands out from its background: a person, a pet, a product on a table, a car, a logo on a plain wall. Fine hair and fur are kept as soft edges. Busy scenes where the subject blends into the background, or several overlapping subjects, may need a second try with a different photo.',
+      },
+      {
+        q: 'How do I get a white background for a product photo?',
+        a: 'Choose White (or Colour for any other shade) and save as JPG or PNG. Marketplaces such as Amazon ask for a pure white background, which is exactly what this fills in, at the original resolution.',
+      },
+      {
+        q: 'Which model does this use?',
+        a: 'ISNet general-use from the DIS research project, released under the Apache 2.0 licence, converted to 8-bit weights so it downloads faster. It runs with onnxruntime-web, Microsoft’s open-source runtime for machine learning models in the browser.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
