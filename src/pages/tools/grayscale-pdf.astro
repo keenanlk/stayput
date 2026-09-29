@@ -1,0 +1,7 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('grayscale-pdf')!;
+---
+<ToolLayout tool={tool} />
+<script src="../../tools/grayscale-pdf.ts"></script>
