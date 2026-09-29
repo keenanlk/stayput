@@ -324,7 +324,7 @@ export const guides: Guide[] = [
   {
     slug: 'reduce-image-size-for-email-and-uploads',
     title: 'How to Reduce Image File Size for Email, Forms and Websites',
-    description: 'The two settings that make a photo small (dimensions and quality), typical targets for email, job applications, listings and websites, and how to do it in your browser.',
+    description: 'The two settings that make a photo small, typical size targets for email, job applications and listings, and how to shrink one in your browser.',
     heading: 'How to reduce an image\'s file size',
     dek: 'Two settings do almost all the work. Here are the numbers to use for email, forms, listings and websites.',
     keywords: ['reduce image file size', 'make image smaller for email', 'compress image for upload', 'image too large to upload', 'reduce photo size to 1mb', 'shrink photo size'],
@@ -382,7 +382,7 @@ export const guides: Guide[] = [
   {
     slug: 'does-this-website-upload-my-files',
     title: 'How to Tell Whether a Website Uploads Your Files: A Network Tab Guide',
-    description: 'A five-minute check anyone can do: open the browser\'s network panel, add a file to a tool, and see whether it leaves your computer. What uploads look like and what "processed locally" should look like.',
+    description: 'A five-minute check anyone can do: open the browser\'s network panel, add a file to a tool, and see whether it leaves your computer.',
     heading: 'Does this website upload my files? How to check',
     dek: 'A five-minute check with tools already in your browser. No trust required.',
     keywords: ['does this website upload my files', 'check if website uploads files', 'browser network tab file upload', 'client side processing verify', 'is this online tool private'],
@@ -449,7 +449,7 @@ export const guides: Guide[] = [
   {
     slug: 'sign-a-pdf-without-adobe',
     title: 'How to Sign a PDF Without Adobe Acrobat (Free, No Upload)',
-    description: 'Draw or type a signature and place it on a PDF in your browser, without Acrobat, an account, or uploading the contract anywhere. Plus the built-in options on Mac, iPhone, Android and Windows.',
+    description: 'Draw or type a signature and place it on a PDF in your browser, without Acrobat, an account, or uploading the contract. Plus built-in options on each device.',
     heading: 'How to sign a PDF without Adobe Acrobat',
     dek: 'Sign a contract in your browser in a minute, with nothing uploaded, and the built-in options on every platform.',
     keywords: ['sign pdf without adobe', 'how to sign a pdf', 'sign pdf free', 'add signature to pdf', 'sign pdf online safe', 'electronic signature pdf free'],
@@ -562,7 +562,7 @@ export const guides: Guide[] = [
   {
     slug: 'convert-files-without-uploading',
     title: 'How to Convert and Edit Files Without Uploading Them Anywhere',
-    description: 'Most everyday file jobs (HEIC to JPG, merge PDF, compress images, remove metadata) can run entirely in your browser. What that means, why it works, and a list of tools that do it.',
+    description: 'Everyday file jobs like HEIC to JPG, merging PDFs and compressing images can run entirely in your browser. How that works, and tools that do it.',
     heading: 'How to convert and edit files without uploading them',
     dek: 'Browsers can do most file jobs themselves. What runs locally, why it is enough, and which tools to use.',
     keywords: ['convert files without uploading', 'offline file converter', 'browser based file tools', 'local file conversion', 'privacy file converter', 'no upload pdf tools'],
@@ -723,7 +723,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-cloudconvert-safe',
     title: 'Is CloudConvert Safe? What Happens to Your Files, and When to Keep Them Local',
-    description: 'CloudConvert is a reputable German service with ISO 27001 certification and 24-hour deletion. What that covers, what any upload still means, and how to convert without uploading.',
+    description: 'CloudConvert is a reputable German service with ISO 27001 certification and 24-hour deletion. What that covers, and how to convert without uploading.',
     heading: 'Is CloudConvert safe?',
     dek: 'For most files, yes: it is an established, certified service. The real question is whether a given file should leave your computer at all.',
     keywords: ['is cloudconvert safe', 'cloudconvert safe', 'cloudconvert privacy', 'is cloudconvert legit', 'cloudconvert security', 'cloudconvert alternative no upload'],
@@ -836,7 +836,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-ilovepdf-safe',
     title: 'Is iLovePDF Safe? How It Handles Your PDFs, and How to Keep Them Local',
-    description: 'iLovePDF is a Barcelona-based, ISO 27001 certified PDF service that deletes files within two hours. What that covers, and how to merge, split or compress PDFs without uploading.',
+    description: 'iLovePDF is a Barcelona-based, ISO 27001 certified PDF service that deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
     heading: 'Is iLovePDF safe?',
     dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
     keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
@@ -892,7 +892,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-smallpdf-safe',
     title: 'Is Smallpdf Safe? File Retention, Storage and a No-Upload Option',
-    description: 'Smallpdf deletes uploads after one hour, keeps shared files 14 days and stores files in your account if you choose. What that means, and how to edit PDFs without uploading.',
+    description: 'Smallpdf deletes uploads after one hour and keeps shared files for 14 days. What that means for private files, and how to edit PDFs without uploading.',
     heading: 'Is Smallpdf safe?',
     dek: 'Smallpdf is a reputable Swiss company with ISO 27001 certification. What changes the answer for you is which of its storage rules applies to your file.',
     keywords: ['is smallpdf safe', 'smallpdf safe', 'is smallpdf legit', 'smallpdf privacy', 'smallpdf security', 'smallpdf alternative'],
@@ -947,7 +947,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-ezgif-safe',
     title: 'Is Ezgif Safe? What Happens to Your Uploads, and a No-Upload GIF Maker',
-    description: 'Ezgif is a long-running GIF editor from Latvia that deletes uploads an hour after last use. What its policy covers, why the ads matter, and how to make GIFs without uploading.',
+    description: 'Ezgif is a long-running GIF editor from Latvia that deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
     heading: 'Is ezgif safe?',
     dek: 'Ezgif is a legitimate, popular GIF tool with a short deletion window. The file you are about to drop in decides whether uploading it is fine.',
     keywords: ['is ezgif safe', 'ezgif safe', 'is ezgif legit', 'is ezgif.com safe', 'ezgif privacy', 'ezgif virus', 'ezgif alternative'],
@@ -1003,7 +1003,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-pdf24-safe',
     title: 'Is PDF24 Safe? Online Tools vs PDF24 Creator, and a No-Install Option',
-    description: 'PDF24 is run by Geek Software GmbH in Germany and deletes online uploads after one hour. How its online and desktop versions differ, and how to edit PDFs in the browser without uploading.',
+    description: 'PDF24 is run by Geek Software GmbH in Germany and deletes online uploads after one hour. How its versions differ, and how to edit PDFs without uploading.',
     heading: 'Is PDF24 safe?',
     dek: 'PDF24 is a long-standing German project, and it tells you itself that its offline app is the more private option. Here is how to choose between the two, and a third way.',
     keywords: ['is pdf24 safe', 'pdf24 safe', 'is pdf24 legit', 'is pdf24 tools safe', 'pdf24 privacy', 'pdf24 creator safe'],
@@ -1059,7 +1059,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-convertio-safe',
     title: 'Is Convertio Safe? Its File Deletion Rules, and Converting Without Uploading',
-    description: 'Convertio is run by Convertio Limited in Cyprus, keeps files in the EU and deletes outputs within 24 hours. What that covers, the ads caveat, and how to convert common formats locally.',
+    description: 'Convertio is run from Cyprus, keeps files in the EU and deletes outputs within 24 hours. What that covers, and how to convert common formats locally.',
     heading: 'Is Convertio safe?',
     dek: 'Convertio is a well-known converter with a published deletion policy. For private files, the safer choice is a converter that never receives them.',
     keywords: ['is convertio safe', 'convertio safe', 'is convertio legit', 'is convertio.co safe', 'convertio privacy', 'convertio virus'],
@@ -1116,7 +1116,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-zamzar-safe',
     title: 'Is Zamzar Safe? Seven-Day Storage, Email Links and a Local Alternative',
-    description: 'Zamzar is a UK converter that keeps free conversions for up to seven days and can email download links. What that means for private files, and how to convert without uploading.',
+    description: 'Zamzar is a UK converter that keeps free conversions for up to seven days. What that means for private files, and how to convert without uploading.',
     heading: 'Is Zamzar safe?',
     dek: 'Zamzar is one of the oldest online converters and runs without third-party ads. Its storage window is longer than most, which is the detail worth knowing.',
     keywords: ['is zamzar safe', 'zamzar safe', 'is zamzar legit', 'is zamzar.com safe', 'zamzar privacy', 'zamzar virus'],
@@ -1173,7 +1173,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-remove-bg-safe',
     title: 'Is remove.bg Safe? Uploads, AI Training and a No-Upload Option',
-    description: 'remove.bg is run by Canva Austria GmbH and deletes uploads shortly after processing, but its policy allows account uploads to train AI. What that means, and how to cut out photos locally.',
+    description: 'remove.bg deletes uploads shortly after processing, but its policy lets account uploads train AI. What that means, and how to cut out photos locally.',
     heading: 'Is remove.bg safe?',
     dek: 'remove.bg is a legitimate Canva-owned service. Two details in its privacy policy matter more than the usual deletion promise: training and preview-only free downloads.',
     keywords: ['is remove.bg safe', 'remove.bg safe', 'is remove bg safe', 'is remove.bg legit', 'remove.bg privacy', 'remove.bg alternative no upload'],
