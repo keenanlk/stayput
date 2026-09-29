@@ -1981,6 +1981,198 @@ export const guides: Guide[] = [
       { q: 'Can I scan a paper document into a PDF, not just convert an existing photo?', a: 'Yes: the iPhone\'s Notes app and Android\'s Google Drive both have a document-scanning mode that photographs and auto-crops a physical page directly into a PDF, which is more reliable for a document than photographing it manually.' },
     ],
   },
+  {
+    slug: 'how-to-password-protect-a-pdf',
+    title: 'How to Password Protect a PDF (Windows, Mac, Browser)',
+    description: 'A few PDF readers can add a password themselves, but most people need a separate tool with real encryption. Here is what your computer can already do, and a browser tool that encrypts the file with AES-256 without uploading it.',
+    heading: 'How to password protect a PDF',
+    dek: 'Unlike removing a password, adding real encryption usually needs a dedicated tool rather than a built-in export option. Here is what works.',
+    keywords: ['how to password protect a pdf', 'add password to pdf', 'encrypt pdf', 'lock a pdf with a password', 'pdf password protection free'],
+    updated: '2026-09-29',
+    tools: ['protect-pdf'],
+    sections: [
+      {
+        h: 'Why this is harder than removing a password',
+        p: [
+          'Removing a password from a PDF you can already open is often a save-or-print trick, because the reader has already decrypted the content and just needs to re-save it. Adding a password means encrypting the file from scratch with a real cipher, which most everyday apps, including Preview on a Mac and the Photos or Files apps on Windows, simply do not offer as a built-in feature.',
+        ],
+      },
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview can add a password: open the PDF, choose File, **Export**, check **Encrypt**, and set a password. This uses standard PDF encryption and is the one common exception to "your OS can\'t do this natively" below, but it is Mac-only.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no equivalent built into File Explorer, the Photos app, or Edge\'s PDF viewer. Microsoft Word can save a document as a password-protected PDF (File, **Save As**, PDF, then **Options, Encrypt the document with a password**), but only if the PDF started as a Word file; it cannot add a password to a PDF you did not create in Word.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform has a native way to add a password to an existing PDF. The Files app on iPhone and most Android file managers can only view and organize PDFs, not encrypt them.',
+        ],
+      },
+      {
+        h: 'A browser tool that actually encrypts the file',
+        p: [
+          'Stayput\'s [protect PDF](/tools/protect-pdf) tool sets a real password with AES-256 encryption directly in the browser: the file is encrypted on your device before it is ever saved, so the unprotected version never leaves your computer or gets uploaded anywhere to be locked. It works on any device, including Windows and Android where there is no built-in option, and handles several PDFs in one batch.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is browser-based PDF encryption actually secure?', a: 'Yes, when the tool uses a standard, real cipher like AES-256 rather than just hiding the content. The key difference versus an online converter is whether the file is uploaded to add the password; if it is not, the plain file never leaves your device.' },
+      { q: 'Can I password protect a PDF for free?', a: 'Yes, both Preview\'s built-in export on Mac and a browser-based tool that runs locally are free, unlike some online converters that charge or limit file size.' },
+      { q: 'What is the difference between an open password and a permissions password?', a: 'An open password is required just to view the file at all. A permissions (or owner) password lets anyone view it but is meant to block printing, copying or editing, though many readers do not strictly enforce that restriction.' },
+      { q: 'Will adding a password change the PDF\'s content or formatting?', a: 'No. Password protection encrypts the existing file; it does not alter the text, images or layout, only who can open or use it.' },
+    ],
+  },
+  {
+    slug: 'how-to-split-a-pdf',
+    title: 'How to Split a PDF Into Separate Pages',
+    description: 'Splitting a PDF means extracting a page range or breaking it into individual files, something most built-in PDF viewers cannot do. Here is what actually works, on desktop and in the browser.',
+    heading: 'How to split a PDF into separate pages',
+    dek: 'Most built-in PDF viewers can reorder or delete pages, but not split a document into separate files. Here is what does the job.',
+    keywords: ['how to split a pdf', 'extract pages from pdf', 'split pdf into separate files', 'pdf splitter free', 'pull one page out of a pdf'],
+    updated: '2026-09-29',
+    tools: ['split-pdf'],
+    sections: [
+      {
+        h: 'What "splitting" usually means',
+        p: [
+          'Splitting a PDF covers a few different jobs: pulling out one page range as its own file (say, pages 3 to 5 of a 20-page report), or breaking every page into its own separate document. Deleting pages you don\'t want, which some readers support, is a different operation and doesn\'t produce the extracted pages as their own file.',
+        ],
+      },
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview\'s sidebar lets you drag individual page thumbnails out onto the desktop, which saves each dragged page as its own single-page PDF. There is no built-in way to extract a multi-page range as one file without repeating this per page, or without dragging a multi-page selection (shift-click a range first, then drag).',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'The built-in PDF viewer in Edge does not support splitting or extracting pages. Print-to-PDF can print a chosen page range (in the print dialog\'s page range field) to a new PDF, which handles extracting one range but not breaking a document into many separate files at once.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Files app or PDF viewer supports splitting a document. A print-to-PDF with a page range, from the share sheet, works the same way as the Windows trick above for pulling out one range.',
+        ],
+      },
+      {
+        h: 'A dedicated splitter for pages or ranges',
+        p: [
+          'Stayput\'s [split PDF](/tools/split-pdf) tool extracts a specific page range, or breaks the whole document into individual single-page PDFs, in one step, directly in the browser. It works the same way on a phone or a computer and does not upload the document to do it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I split a PDF without installing software?', a: 'Yes, a browser-based splitter needs no install and works the same on any device, unlike Preview\'s drag-out method which is Mac-only.' },
+      { q: 'What is the difference between splitting and deleting pages?', a: 'Deleting removes pages from the existing document and leaves the rest; splitting produces the removed (or selected) pages as their own separate file, keeping both parts usable.' },
+      { q: 'Can I extract just one page from a PDF?', a: 'Yes, that\'s the simplest case of a page range, whether by dragging a single page out in Preview, printing that one page to a new PDF, or using a dedicated split tool.' },
+      { q: 'Does splitting a PDF reduce its quality?', a: 'No, splitting copies the existing pages into new files without re-rendering them, so text and images stay exactly as they were.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-a-video-to-mp3',
+    title: 'How to Convert a Video to MP3',
+    description: 'Pulling the audio out of a video and saving it as an MP3 is different from just muting the video, and most phones and computers have no built-in way to do it. Here is what actually works.',
+    heading: 'How to convert a video to MP3',
+    dek: 'This is different from muting a video: you want the sound saved as its own file. Most devices have no built-in way to do that.',
+    keywords: ['how to convert a video to mp3', 'mp4 to mp3', 'extract audio from video', 'save video sound as mp3', 'video to audio converter'],
+    updated: '2026-09-29',
+    tools: ['video-to-mp3'],
+    sections: [
+      {
+        h: 'Converting versus muting',
+        p: [
+          'Muting a video, or removing its audio track, gets rid of the sound and keeps the silent video. Converting a video to MP3 is closer to the opposite: keep the sound, discard the video frames, and save the audio as a standalone file you can put on a music player or send separately. They are two different operations even though both involve separating audio from video.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither the Photos app nor the built-in camera roll has a way to export just the audio track of a video. Voice Memos and similar apps only record new audio; they don\'t extract it from an existing video file. This is one of the more common "how do I" gaps on mobile, since it is a fairly specific, less common task.',
+        ],
+      },
+      {
+        h: 'On a Mac with QuickTime',
+        p: [
+          'QuickTime Player can export audio only: open the video, choose File, **Export As**, and pick **Audio Only**. This saves an M4A file, not an MP3 directly, so a follow-up conversion step is needed if MP3 specifically is required (many devices and players accept M4A just as well, so check whether that\'s actually necessary first).',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no built-in equivalent in the Movies & TV or Photos apps for extracting audio from a video as a separate file. This is a task Windows genuinely has no native tool for, which is why most people search for a converter rather than a menu option.',
+        ],
+      },
+      {
+        h: 'A direct converter to MP3',
+        p: [
+          'Stayput\'s [video to MP3](/tools/video-to-mp3) tool does this directly, on any device: drop in a video (or several, in a batch) and it extracts the audio and saves it as an MP3 or WAV, in the browser, without uploading the file. It skips the extra M4A-to-MP3 conversion step that QuickTime\'s export leaves you with.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is converting a video to MP3 the same as muting the video?', a: 'No. Muting removes the audio and keeps the silent video; converting to MP3 keeps the audio as its own file and discards the video.' },
+      { q: 'Why does QuickTime save an M4A instead of an MP3?', a: 'M4A is Apple\'s preferred audio format and what QuickTime\'s "Audio Only" export produces by default; it is not the same file extension as MP3 even though both are compressed audio, so some further conversion or a different tool is needed for MP3 specifically.' },
+      { q: 'Does the audio quality change when converting to MP3?', a: 'MP3 is a compressed format, so there is some quality loss versus the original video\'s audio track, though it is usually not noticeable for speech or typical video soundtracks at a reasonable bitrate.' },
+      { q: 'Can I convert just part of a video to MP3?', a: 'Trim the video to the part you want first (or trim the resulting audio file afterward), since most converters, including a browser-based one, convert the whole file by default.' },
+    ],
+  },
+  {
+    slug: 'how-to-trim-an-mp3-file',
+    title: 'How to Trim an MP3 File (Cut a Song, Voice Memo or Podcast)',
+    description: 'Cutting an MP3 or other audio file down to just the part you want usually needs a waveform to see what you are cutting, which most phones and computers do not show by default. Here is what works.',
+    heading: 'How to trim an MP3 file',
+    dek: 'Cutting audio precisely needs to see the waveform, which most built-in apps do not show. Here is what actually works.',
+    keywords: ['how to trim an mp3', 'cut a song online', 'trim audio file', 'mp3 cutter free', 'cut a voice memo'],
+    updated: '2026-09-29',
+    tools: ['trim-audio'],
+    sections: [
+      {
+        h: 'Why this is fiddlier than trimming a video',
+        p: [
+          'Most phones show a visible timeline with a video preview when trimming, which makes it easy to see roughly where to cut. Audio has no picture, only sound, so trimming accurately without seeing a waveform means guessing based on playback position alone, which is slow and imprecise for anything more exact than "somewhere near the start."',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The Voice Memos app can trim a recording it made itself: tap the recording, tap the options icon, **Edit Recording**, then drag the trim handles at the top of the waveform. This only works for recordings made in Voice Memos, not for an MP3 or other audio file already on the phone from somewhere else.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'There is no universal built-in audio trimmer across Android phones; some manufacturers\' own Sound Recorder apps include one for their own recordings, similar to Voice Memos, but it doesn\'t handle an arbitrary MP3 file already saved to the phone.',
+        ],
+      },
+      {
+        h: 'On a Mac with GarageBand',
+        p: [
+          'GarageBand can trim any audio file: import it as a track, drag its edges to the length you want, and export with **Share, Export Song to Disk**. This works for any MP3, not just recordings made in the app, but it is a full music app for a simple cut, and exporting adds a few extra steps compared to a purpose-built trimmer.',
+        ],
+      },
+      {
+        h: 'A waveform-based trimmer built for exactly this',
+        p: [
+          'Stayput\'s [trim audio](/tools/trim-audio) tool shows the waveform so you can see exactly where to cut, works on any MP3, WAV, M4A or other audio file (or the sound from a video), adds fades if you want them, and exports as MP3 or WAV, all in the browser with nothing uploaded. It works the same way on a phone or a computer, unlike Voice Memos or GarageBand which each only cover one device.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I trim an MP3 without installing an app?', a: 'Yes, a browser-based trimmer with a visible waveform works on a phone or computer without installing anything, and handles any MP3 rather than only recordings made in a specific app.' },
+      { q: 'Why do I need to see a waveform to trim audio accurately?', a: 'A waveform shows where the sound actually starts and stops, including silences and peaks, which makes it possible to cut precisely instead of guessing from playback position alone.' },
+      { q: 'Does trimming an MP3 reduce its quality?', a: 'Trimming itself doesn\'t re-encode the audio content, only shortens it; quality loss only happens if the tool re-compresses the file at a lower bitrate during export.' },
+      { q: 'Can I add a fade-in or fade-out when trimming?', a: 'Some tools support this, including Stayput\'s trim audio tool; a plain trim without a fade can sound abrupt at the cut points, especially for music or speech.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
