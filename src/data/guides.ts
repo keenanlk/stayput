@@ -9,6 +9,10 @@ export interface GuideSection {
   p: string[];
   /** Optional bullet list after the paragraphs. */
   list?: string[];
+  /** Optional code excerpt after the paragraphs (and list), shown verbatim. */
+  code?: string;
+  /** Optional paragraphs after the code excerpt. */
+  after?: string[];
 }
 
 export interface Guide {
@@ -156,8 +160,8 @@ export const guides: Guide[] = [
     heading: 'What is EXIF data, and what does a photo reveal?',
     dek: 'The information stored inside a photo file, what it can give away, and how to see and remove it.',
     keywords: ['what is exif data', 'exif metadata', 'photo metadata', 'what information is in a photo', 'exif viewer', 'remove exif data'],
-    updated: '2026-09-25',
-    tools: ['strip-exif', 'remove-location-from-photos', 'convert-image'],
+    updated: '2026-09-29',
+    tools: ['strip-exif', 'exif-viewer', 'remove-location-from-photos'],
     sections: [
       {
         h: 'The short version',
@@ -189,7 +193,7 @@ export const guides: Guide[] = [
       {
         h: 'How to see what a photo contains',
         p: [
-          'Drop it on the [metadata remover](/tools/strip-exif). Before anything is changed, it lists what the file carries: which metadata kinds, their size, whether there is a GPS location, the camera, the date and the software. The file is read inside your browser and is not uploaded, so checking a sensitive photo does not itself leak it.',
+          'Drop it on the [EXIF viewer](/tools/exif-viewer). It shows where the photo was taken, when, on which device, any serial number or owner name, and every other field, grouped and in plain words. The file is read inside your browser and is not uploaded, so checking a sensitive photo does not itself leak it. The [guide to viewing photo metadata](/guides/how-to-view-photo-metadata) covers the built-in panels on each phone and computer too.',
         ],
       },
       {
@@ -598,6 +602,114 @@ export const guides: Guide[] = [
       { q: 'How do I know the code does what it says?', a: 'It is open source under the MIT licence. The repository is linked in the footer of every page, and the network tab shows what the page does while you use it.' },
     ],
   },
+  {
+    slug: "how-to-view-photo-metadata",
+    title: "How to View Photo Metadata (EXIF) on iPhone, Android, Windows and Mac",
+    description: "See the hidden data in a photo: location, date, camera and more. The built-in way on every phone and computer, what each one hides, and how to check any photo without uploading it.",
+    heading: "How to view photo metadata on any device",
+    dek: "Every phone and computer can show some of a photo's EXIF data. Here is where to look, what each one leaves out, and how to see all of it.",
+    keywords: ["how to view photo metadata", "view photo metadata", "view photo metadata iphone", "how to view photo metadata on android", "exif viewer", "check photo location"],
+    updated: "2026-09-29",
+    tools: ["exif-viewer", "strip-exif", "remove-location-from-photos"],
+    sections: [
+      {
+        h: "The quickest way, on any device",
+        p: ["Open the [EXIF viewer](/tools/exif-viewer) in any browser and drop the photo on it. It reads the file on your device and shows where the photo was taken, when, on which phone or camera, any serial number or owner name, and every other EXIF field in plain words. It reads JPG, PNG, WebP, HEIC from iPhones and TIFF or DNG files, and nothing is uploaded, which matters when the reason you are checking is that the photo might be private.", "The built-in panels below are fine for a quick look. They each show a subset, and none of them tells you about the embedded thumbnail, the camera serial number or the XMP and IPTC blocks that editors add."],
+      },
+      {
+        h: "iPhone and iPad",
+        p: ["Open the photo in **Photos** and swipe up, or tap the **ⓘ** button. You get the date and time, the camera and lens, the resolution and file size, the exposure settings and, if the photo has a location, a small map. Tap **Adjust** next to the date or the map to change or remove them for that photo.", "This view is of the photo in your library, not necessarily the file someone receives. When you share, the **Options** link at the top of the share sheet has a **Location** switch; turned off, the copy you send has no GPS. Photos saved from a website or AirDropped to you show whatever the file itself carries."],
+      },
+      {
+        h: "Android",
+        p: ["In **Google Photos**, open the photo and swipe up (or tap the three-dot menu, then **Details**). You see the date, the device, the file name and size, the camera settings and a map if a location is stored. Samsung **Gallery** shows the same under the **ⓘ** button or **Details**.", "Google Photos can also estimate a location from your Location History when the file has none. That estimate lives in your Google account, not in the file, so the photo you send may carry less than the panel suggests. The only reliable check of the file is to read the file."],
+      },
+      {
+        h: "Windows",
+        p: ["Right-click the photo in File Explorer, choose **Properties** and open the **Details** tab. It lists the date taken, camera maker and model, exposure settings, and a **GPS** section with latitude and longitude when present. The **Remove Properties and Personal Information** link at the bottom can clear some of them.", "Explorer only lists fields it knows how to edit. Maker notes, serial numbers, XMP history and the embedded thumbnail are not shown, and for HEIC files you need the HEIF extension installed before any of it appears."],
+      },
+      {
+        h: "Mac",
+        p: ["In **Preview**, open the photo and choose **Tools → Show Inspector** (Cmd-I), then the **ⓘ** tab. The **EXIF** and **GPS** sub-tabs show most fields, and the GPS tab has a **Remove Location Info** button. In **Finder**, **Get Info** (Cmd-I) shows the dimensions, the device and the date under **More Info**, but no location. In the **Photos** app, the ⓘ button shows the same summary as on an iPhone.", "For everything, the terminal command `mdls photo.jpg` lists what Spotlight indexed, and `sips -g all photo.jpg` prints the basic properties."],
+      },
+      {
+        h: "What to look for",
+        p: ["When you check a photo before sharing it, these are the fields that identify someone or somewhere:"],
+        list: ["**Latitude and longitude.** Paste them into a map and you have the street, often the house.", "**Date and time taken**, with the time zone on newer phones. Combined with location, it is a timeline.", "**Camera serial number, camera owner, artist and unique image ID.** Serial numbers link photos taken with the same camera across sites; owner and artist are often a full name.", "**Embedded thumbnail.** A small preview written when the photo was taken. Some editors crop the picture and leave the old thumbnail behind.", "**Software and host computer.** Which app edited it, sometimes the name of the computer."],
+      },
+      {
+        h: "Check again after you remove it",
+        p: ["To remove all of it without changing the picture, use the [EXIF remover](/tools/strip-exif): it deletes the metadata blocks and copies the image data byte for byte, so the photo looks exactly the same. Then drop the cleaned copy on the [viewer](/tools/exif-viewer); it should say \"None stored\" for location and list no fields. The [location guide](/guides/remove-location-data-from-photos) covers the phone settings that stop new photos from recording location in the first place."],
+      },
+    ],
+    faq: [
+      { q: "Is it safe to use an online EXIF viewer?", a: "Only if it reads the photo in your browser. Most EXIF viewer sites upload the photo to their server and read it there, which gives them the location and everything else you were checking for. The [Stayput viewer](/tools/exif-viewer) reads it in the tab; you can confirm by watching the network tab while you drop a photo." },
+      { q: "Why does the photo I received show no location?", a: "Messaging apps like WhatsApp, Signal, iMessage for some settings, and most social networks remove EXIF when a photo is sent or posted. Email, cloud links, AirDrop and file transfers usually do not." },
+      { q: "Can I see photo metadata from a link or a website?", a: "Only after downloading the file. Most sites that host images strip the metadata on upload, so a downloaded image from a social network is usually empty. Images on smaller sites, forums and cloud shares often keep it." },
+      { q: "Do screenshots have metadata?", a: "Some. A screenshot has no GPS or camera data, but it can carry the device model, the software and the date. PNG screenshots from some tools add a text block too." },
+    ],
+  },
+  {
+    slug: "strip-exif-without-re-encoding",
+    title: "Stripping EXIF Without Re-encoding the Image: How a Lossless Remover Works",
+    description: "How to remove EXIF, GPS and other metadata from JPEG, PNG and WebP by editing the file structure instead of re-saving the pixels. The segments, the chunks, the gotchas and the code.",
+    heading: "Stripping EXIF without re-encoding the JPEG",
+    dek: "How Stayput removes location and camera data from photos in the browser, byte for byte, in about 600 lines of TypeScript and no library.",
+    keywords: ["strip exif without re-encoding", "lossless exif removal", "remove exif javascript", "jpeg app1 segment", "remove metadata without losing quality", "exif remover how it works"],
+    updated: "2026-09-29",
+    tools: ["strip-exif", "exif-viewer", "heic-to-jpg"],
+    sections: [
+      {
+        h: "The problem with the usual answers",
+        p: ["There are two common ways to remove EXIF data from a photo, and both have a cost. The first is to re-save it: open it in an editor or pass it through a canvas, then export a new JPEG. The metadata is gone because the encoder never writes it, but the picture has been decoded and compressed again, so it loses a little quality and often grows in size. The second is to upload it to a website that does the same on a server, which removes the location from the file by handing it to someone else first.", "There is a third way. A photo file is a container: a sequence of labelled blocks, one of which holds the compressed picture and others that hold metadata. If you can read the container, you can copy every block except the metadata ones. The picture bytes are never decoded, so the result is pixel-identical and slightly smaller. That is how the [Stayput EXIF remover](/tools/strip-exif) works, entirely in the browser, and this page walks through it."],
+      },
+      {
+        h: "What is actually in the file",
+        p: ["Each of the three common web formats is a different container, but the idea is the same in all of them:"],
+        list: ["**JPEG** is a list of segments, each starting with a 0xFF marker byte. APP1 (0xFFE1) holds EXIF when its payload starts with \"Exif\\0\\0\", or XMP when it starts with Adobe's namespace URL. APP2 holds the ICC colour profile, APP13 holds IPTC, and 0xFFFE is a comment. The picture itself follows the start-of-scan marker (0xFFDA) and runs to the end of the file.", "**PNG** is an eight-byte signature followed by chunks, each with a length, a four-letter type, the data and a CRC. Metadata lives in eXIf, tEXt, zTXt, iTXt (where XMP goes) and tIME; the colour profile is iCCP; the picture is in IDAT.", "**WebP** is a RIFF file: \"RIFF\", a total size, \"WEBP\", then chunks. EXIF, \"XMP \" and ICCP chunks hold metadata. An extended VP8X header chunk carries flag bits announcing which of them are present."],
+      },
+      {
+        h: "The approach, for JPEG",
+        p: ["Walk the segments from the start of the file until the start-of-scan marker. For each one, read its two-byte big-endian length, classify it by marker and the first bytes of its payload, and decide whether to keep it. Then copy the kept segments and everything from the scan onward into a new file."],
+        after: ["JFIF and Adobe segments stay because decoders use them to interpret colour. The ICC profile stays by default for the same reason: it holds no personal data, and dropping it can make a wide-gamut phone photo look washed out. The test suite checks the last 2,000 bytes of the output against the input to prove the scan data is byte-identical."],
+        code: "for (const s of segments) {\n  const kind = segKind(b, s); // 'EXIF', 'XMP', 'ICC', 'IPTC', 'Comment', 'JFIF'...\n  const isMeta = kind !== undefined && kind !== 'JFIF' && kind !== 'Adobe';\n  const drop = isMeta && (kind !== 'ICC' || !keepIcc);\n  if (drop) {\n    removed += s.end - s.start;\n    continue;\n  }\n  parts.push(b.subarray(s.start, s.end));\n}\nparts.push(b.subarray(scanStart)); // the compressed picture, untouched",
+      },
+      {
+        h: "PNG and WebP",
+        p: ["PNG is simpler still: every chunk carries its own length and CRC, so dropping a chunk needs no fix-ups anywhere else. Copy the signature, then every chunk that is not eXIf, tEXt, zTXt, iTXt or tIME (and iCCP, if you asked for the profile to go).", "WebP needs two fix-ups. The RIFF header at the start stores the size of everything after it, so it has to be rewritten once the chunks are dropped. And if the file has a VP8X header, its flags byte still claims the EXIF and XMP chunks exist, which some decoders reject. Clear those bits:"],
+        code: "if (c.fourcc === 'VP8X') {\n  const chunk = b.slice(c.start, c.end);\n  let flags = chunk[8]!;\n  flags &= ~0x08 & ~0x04;          // EXIF and XMP present\n  if (!keepIcc) flags &= ~0x20;    // ICC present\n  chunk[8] = flags;\n  body.push(chunk);\n}\n// ...then a new header: \"RIFF\", payload.length + 4, \"WEBP\"",
+      },
+      {
+        h: "The gotchas",
+        p: ["Most of the work is in the cases that break the simple version:"],
+        list: ["**Orientation.** Phones usually store a portrait photo sideways and set an EXIF orientation tag telling viewers to rotate it. Delete EXIF and the photo displays on its side. The remover reads the tag first and offers a choice: bake the rotation into the pixels (the one path that does re-encode) or keep the file lossless and accept the sideways display.", "**Padding and fill bytes.** JPEG allows any number of 0xFF fill bytes between segments, and standalone markers (restart markers, SOI) have no length field. Treat them as lengths and you walk off into the image data.", "**RIFF padding.** WebP chunks with an odd length are followed by a zero pad byte that is not counted in the chunk's length. Miss it and the next chunk header is read one byte early.", "**XMP in PNG.** XMP arrives as an iTXt chunk with the keyword \"XML:com.adobe.xmp\", so it is dropped along with the other text chunks rather than needing its own rule.", "**Thumbnails.** The EXIF block can embed a small JPEG preview in its second directory. Editors that crop the photo sometimes leave the old thumbnail, so a \"cropped\" photo still carries the uncropped picture. Dropping the whole EXIF segment takes the thumbnail with it."],
+      },
+      {
+        h: "Reading EXIF, for the report and the viewer",
+        p: ["Before removing anything, the tool shows what the photo carries, which means parsing the EXIF block itself. It is a small TIFF file: a byte-order mark (\"II\" for little-endian, \"MM\" for big), the number 42, and the offset of the first directory. Each directory is a count followed by 12-byte entries: tag, type, count, and either the value or an offset to it. Tag 0x8769 points to the camera settings directory and 0x8825 to the GPS one, whose latitude and longitude are three rationals each for degrees, minutes and seconds."],
+        after: ["The same walker, extended to name about 80 tags, powers the [EXIF viewer](/tools/exif-viewer). It guards every offset against the block length and remembers which directories it has visited, because a malformed or hostile file can point a directory at itself."],
+        code: "const lat = d + m / 60 + s / 3600;\nreturn ref === 'S' ? -lat : lat; // same for longitude with 'W'",
+      },
+      {
+        h: "The HEIC twist",
+        p: ["iPhone photos are HEIC, an ISOBMFF container of nested boxes rather than segments. The EXIF block is an item listed in the meta box's iinf and located by iloc, which gives its offset and length in the file. The remover cannot rewrite HEIC losslessly yet, but reading the EXIF item out lets the [HEIC to JPG converter](/tools/heic-to-jpg) either drop the metadata or carry it over into the JPEG's APP1 segment, with the orientation tag reset because the decoder has already rotated the pixels."],
+      },
+      {
+        h: "Testing it",
+        p: ["The Playwright suite generates fixture photos with known EXIF, GPS, comments and orientation using Pillow, drops them into the page, and parses the outputs: no metadata kinds left, no GPS, a smaller file, identical scan bytes. Another check records every request the tab makes after files are added and fails if any carries a body or goes anywhere but the site itself and the anonymous usage counter. That second check is the one that matters for a privacy tool, because it is the claim users cannot see."],
+      },
+      {
+        h: "Code and tool",
+        p: ["The whole thing is in `src/lib/exif.ts` (the stripper) and `src/lib/exif-read.ts` (the viewer's field reader) in the [Stayput repository](https://github.com/keenanlk/stayput), MIT licensed. To try it on your own photos, open the [EXIF remover](/tools/strip-exif), then drop the cleaned copy on the [EXIF viewer](/tools/exif-viewer) to see that nothing is left."],
+      },
+    ],
+    faq: [
+      { q: "Does removing EXIF this way reduce quality?", a: "No. The compressed picture data is copied byte for byte and never decoded. The only exception is when you ask the tool to apply the orientation tag to a sideways photo, which has to re-encode." },
+      { q: "Why not just draw the image on a canvas and export it?", a: "That works and is simpler, but it re-compresses the photo, loses some quality, discards the colour profile and usually makes a phone photo larger. It also takes more memory for big images." },
+      { q: "Is this safe to run in the browser?", a: "Yes. The file is read with the File API into memory in your tab and the cleaned copy is handed to your browser's download. No request carries the file, which you can verify in the network tab." },
+    ],
+  },
+
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);

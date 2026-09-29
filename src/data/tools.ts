@@ -1,4 +1,4 @@
-export type Category = 'images' | 'pdf';
+export type Category = 'images' | 'pdf' | 'media';
 
 export interface Faq {
   q: string;
@@ -198,6 +198,48 @@ export const tools: Tool[] = [
       {
         q: 'What about orientation?',
         a: 'Phones often store photos sideways with an EXIF orientation tag telling viewers to rotate them. If you remove EXIF, that hint disappears. Leave "Apply orientation" on to bake the rotation into the pixels first, which does re-encode the image; turn it off for a purely lossless strip.',
+      },
+    ],
+  },
+  {
+    slug: 'exif-viewer',
+    name: 'EXIF Viewer',
+    title: 'EXIF Viewer: See Photo Metadata and GPS, No Upload | Stayput',
+    description:
+      'View the EXIF data in a photo: GPS location, camera, date, serial numbers and every other field. Reads JPG, PNG, WebP, HEIC and TIFF in your browser. Nothing uploaded.',
+    heading: 'EXIF viewer: see what a photo reveals',
+    tagline: 'Drop a photo to read its metadata, including the location it was taken. The file is read on this device, so checking a private photo does not share it.',
+    category: 'images',
+    accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif,image/tiff,.jpg,.jpeg,.png,.webp,.heic,.heif,.tif,.tiff,.dng',
+    multiple: true,
+    dropLabel: 'Drop photos here',
+    action: 'Save report as CSV',
+    keywords: ['exif viewer', 'exif data viewer', 'exif viewer online', 'view photo metadata', 'photo location viewer', 'exif reader'],
+    steps: [
+      'Drop one or more photos. Each one is read the moment it is added.',
+      'Check the summary: where it was taken, when, and on which device. Open "All fields" for everything else.',
+      'Save the report as a CSV if you need a record, or remove the metadata with the EXIF remover.',
+    ],
+    faq: [
+      {
+        q: 'Is it safe to check a photo here?',
+        a: 'Yes. The page reads the file with JavaScript in your tab and never sends it anywhere, so you can check a photo you would not want to upload. Most online EXIF viewers upload the photo to their server first, which hands them the very location you are trying to check. Open the network tab while you drop a photo and it stays empty.',
+      },
+      {
+        q: 'Which files can it read?',
+        a: 'JPG, PNG, WebP, HEIC and HEIF (iPhone photos), and TIFF-based files including DNG raw files. It reads the EXIF block, including the GPS block and the embedded thumbnail, and lists which other metadata (XMP, IPTC, color profile, comments) the file carries.',
+      },
+      {
+        q: 'Why does my photo show no location?',
+        a: 'Either location was off in the camera app, or the photo went through something that removed it. Most messaging apps and social networks strip EXIF when you send or post a photo, and iPhones remove location when you turn off Location in the share sheet options. A screenshot never has GPS data.',
+      },
+      {
+        q: 'Can I see where the photo was taken on a map?',
+        a: 'The coordinates are shown as numbers you can copy. The "Open map" link opens OpenStreetMap in a new tab with the point marked; only the coordinates go to OpenStreetMap, and only if you click it.',
+      },
+      {
+        q: 'How do I remove what it found?',
+        a: 'Use the Remove EXIF Data tool (linked under the report). It deletes EXIF, GPS, XMP and IPTC without re-encoding, so the picture is unchanged. Drop the cleaned copy back here to confirm nothing is left.',
       },
     ],
   },
@@ -676,6 +718,174 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'blur-image',
+    name: 'Blur & pixelate image',
+    title: 'Blur Image or Pixelate Faces Online, No Upload | Stayput',
+    description:
+      'Blur or pixelate faces, number plates and text in a photo, or black them out, in your browser. Mark the areas, download. Nothing is uploaded.',
+    heading: 'Blur or pixelate an image',
+    tagline: 'Hide faces, plates, addresses and account numbers before you share a photo. The photo never leaves this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: false,
+    dropLabel: 'Drop an image to blur',
+    action: 'Save image',
+    keywords: ['blur image', 'pixelate image', 'blur face', 'blur face in photo', 'censor image', 'blur image online', 'redact image', 'blur license plate'],
+    steps: [
+      'Drop a photo or screenshot (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick one.',
+      'Press Find faces, or drag across each face, plate or line of text to hide, or choose "Whole image". Pick blur, pixelate or black box and set the strength; the preview updates as you go.',
+      'Save the image. It is written at full resolution in your browser and downloads straight away.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. The photo is decoded and edited on a canvas inside your browser tab, and the new file is written there too. That matters most for exactly the photos people blur: children, other people’s faces, ID cards, bank screenshots. You can load the page, turn off Wi-Fi and it still works.',
+      },
+      {
+        q: 'Should I blur, pixelate or use a black box?',
+        a: 'Blur and pixelate are fine for faces, bodies and backgrounds. For text such as card numbers, addresses, names or passwords, use Black box. Research tools have recovered text from light pixelation and blur by trying likely words until the blurred result matches, and a solid box leaves nothing to recover.',
+      },
+      {
+        q: 'Can someone unblur the image I save?',
+        a: 'Not from the file itself. The saved image contains only the blurred or pixelated pixels; the originals are not hidden underneath in a layer and the editing steps are not stored. Location and camera metadata are dropped too, because the file is written fresh from the canvas.',
+      },
+      {
+        q: 'Can I blur several faces at once?',
+        a: 'Yes. Press Find faces to have a face detector running in your browser mark them all, or drag a box over each one; every box gets the same effect. Tap the × on a box to remove it, or use Undo. Check the preview for any face the detector missed.',
+      },
+      {
+        q: 'How do I blur the whole picture?',
+        a: 'Choose "Whole image" and set the strength. Strength is relative to the size of the photo, so the same setting looks the same on a small screenshot and a 48 megapixel photo. At high strength pixelate gives the big-block mosaic look.',
+      },
+    ],
+  },
+  {
+    slug: 'rotate-image',
+    name: 'Rotate & flip image',
+    title: 'Rotate or Flip Image Online, Free, No Upload | Stayput',
+    description:
+      'Rotate photos 90 or 180 degrees and flip or mirror them in your browser. One image or a whole batch, with a live preview. Nothing is uploaded.',
+    heading: 'Rotate or flip an image',
+    tagline: 'Fix a sideways photo, a mirrored selfie or an upside-down scan. One image or a batch, and none of them leave this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop images to rotate or flip',
+    action: 'Rotate',
+    keywords: ['rotate image', 'flip image', 'rotate photo', 'flip photo', 'mirror image', 'rotate image online', 'flip image horizontally', 'rotate image 90 degrees'],
+    steps: [
+      'Drop one or more images (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
+      'Choose a quarter turn right or left or 180°, and tick flip horizontally or vertically if you need a mirror. The preview shows the first image as it will come out.',
+      'Rotate. One image downloads straight away; a batch downloads one by one or as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Why does my photo show sideways on one device and upright on another?',
+        a: 'Phones save photos in the sensor’s orientation and add a note in the EXIF data saying which way is up. Most apps read that note; some older software, email clients and upload forms ignore it and show the photo sideways. This tool applies the orientation, turns the pixels themselves and writes the file without the note, so it looks the same everywhere.',
+      },
+      {
+        q: 'How do I un-mirror a selfie?',
+        a: 'Tick "Flip horizontally" and set Rotate to None. Front cameras often save selfies as a mirror image, which is why text on a T-shirt reads backwards. Flipping horizontally puts it the right way round.',
+      },
+      {
+        q: 'Does rotating reduce the quality?',
+        a: 'PNG stays lossless. A JPG is re-encoded once at the quality you set (92 by default), which is not visible on screen; set 100 for the closest copy. Rotating the same JPG many times over is what slowly softens it, so rotate from the original.',
+      },
+      {
+        q: 'Can I rotate many photos at once?',
+        a: 'Yes. Drop as many as you like; the same turn and flip apply to all of them. They are processed one after another in your browser and can be downloaded together as a zip.',
+      },
+      {
+        q: 'Is anything uploaded?',
+        a: 'No. Each image is decoded and redrawn on a canvas inside your browser tab, then saved from there. You can load the page, turn off Wi-Fi and it still works.',
+      },
+    ],
+  },
+  {
+    slug: 'video-to-mp3',
+    name: 'Video to MP3',
+    title: 'Video to MP3 Converter, MP4 to MP3, No Upload | Stayput',
+    description:
+      'Convert MP4, MOV, M4A, WAV and other video or audio files to MP3 (or WAV) in your browser. Batch, no size limit, no upload, no sign-up.',
+    heading: 'Convert video or audio to MP3',
+    tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
+    category: 'media',
+    accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
+    multiple: true,
+    dropLabel: 'Drop videos or audio files to convert',
+    action: 'Convert',
+    keywords: ['video to mp3', 'mp4 to mp3', 'extract audio from video', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
+    steps: [
+      'Drop one or more videos or audio files (MP4, MOV, WebM, M4A, WAV, FLAC and more), or tap to pick them.',
+      'Choose MP3 or WAV. For MP3 pick a quality: 192 kbps suits music, 96 kbps is plenty for speech. Choose mono to halve the size of a voice recording.',
+      'Convert. Each file is decoded and encoded in your browser; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser reads the sound track with its own decoders, and an MP3 encoder (LAME, compiled to WebAssembly) runs inside the page to write the file. There is no server in the process, so there is no upload to wait for and no size cap. You can load the page, switch off Wi-Fi and it still works.',
+      },
+      {
+        q: 'Which files can I convert?',
+        a: 'Anything with a sound track your browser can play: MP4, M4V and MOV (from phones, cameras and screen recorders), WebM and MKV, and audio files such as M4A voice memos, WAV, FLAC, OGG, Opus and MP3 itself. If a file will not open, try it in another browser: Safari reads a few Apple formats that others do not.',
+      },
+      {
+        q: 'What MP3 quality should I choose?',
+        a: '192 kbps is transparent for most music and is the default. Use 320 kbps if the MP3 will be your only copy of a high-quality recording, 128 kbps for podcasts and lectures, and 96 kbps mono for a voice memo you want small. Converting to MP3 can never add quality the source did not have.',
+      },
+      {
+        q: 'Is there a length or size limit?',
+        a: 'No fixed limit. The whole file is read into your device’s memory, so a feature-length film works on a laptop but may be too much for an older phone. The MP3 of an hour of audio at 192 kbps is about 85 MB.',
+      },
+      {
+        q: 'Can I get a WAV instead?',
+        a: 'Yes. Choose WAV and you get uncompressed 16-bit, 44.1 kHz audio, the format audio editors and some upload forms ask for. It is about ten times the size of an MP3.',
+      },
+    ],
+  },
+  {
+    slug: 'video-to-gif',
+    name: 'Video to GIF',
+    title: 'Video to GIF Converter, MP4 to GIF, No Upload | Stayput',
+    description:
+      'Turn an MP4, MOV or WebM clip into an animated GIF in your browser. Trim it, pick the size and frame rate. No upload, no watermark, no sign-up.',
+    heading: 'Convert video to GIF',
+    tagline: 'Trim a clip, pick a size and frame rate, and get a looping GIF. The video is decoded by your browser and never leaves this device.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a video to turn into a GIF',
+    action: 'Make GIF',
+    keywords: ['video to gif', 'mp4 to gif', 'mov to gif', 'webm to gif', 'convert video to gif', 'gif maker', 'make a gif from a video'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV), or tap to pick one. It opens in a player on the page.',
+      'Play or scrub to the moment you want and press "Set start" and "Set end", or type the times. Pick a width and a frame rate.',
+      'Make the GIF. It is built frame by frame in your browser and downloads when it is done.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser plays the video from the file on your device, Stayput copies the frames you asked for onto a canvas, and a small GIF encoder in the page writes the file. There is no server in the process; you can load the page, turn off Wi-Fi and it still works.',
+      },
+      {
+        q: 'How long can the GIF be?',
+        a: 'Up to 600 frames, which is 60 seconds at 10 frames per second or 30 seconds at 20. GIF is an old format with no real video compression, so a long or large GIF quickly runs to tens of megabytes. For sharing, a clip of 2 to 10 seconds at 480 pixels wide and 10 to 15 frames per second is the sweet spot.',
+      },
+      {
+        q: 'Why will my iPhone video not open?',
+        a: 'iPhones record in HEVC (H.265) by default. Safari and most Macs play it; Chrome and Firefox on Windows or Linux often cannot, and this tool can only use the decoders your browser has. Open the page in Safari, or set Camera, Formats to Most Compatible on the iPhone so new videos are saved as H.264.',
+      },
+      {
+        q: 'Why does the GIF look grainier than the video?',
+        a: 'A GIF frame can hold at most 256 colours, while a video frame has millions. Stayput picks the best 256 for each frame, which keeps screen recordings and cartoons crisp but can band smooth gradients such as skies. A smaller width and a lower frame rate make a much smaller file with little visible loss.',
+      },
+      {
+        q: 'Is there a watermark or a file size limit?',
+        a: 'No watermark and no upload limit. The only limit is your device’s memory: a long 4K video works, because only the frames you pick are decoded, but the GIF itself is capped at 600 frames.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
@@ -724,4 +934,5 @@ export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => 
 export const categories: { id: Category; label: string; blurb: string }[] = [
   { id: 'images', label: 'Image tools', blurb: 'Convert, shrink and clean photos.' },
   { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress, reorder, sign and number documents.' },
+  { id: 'media', label: 'Video and audio tools', blurb: 'Pull the sound out of a video, convert audio, make GIFs.' },
 ];

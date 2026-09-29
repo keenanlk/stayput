@@ -1,0 +1,62 @@
+---
+/** Option controls for video to GIF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const width = defaults.width ?? '480';
+const fps = defaults.fps ?? '10';
+const loop = defaults.loop ?? 'forever';
+const widths = [
+  ['240', '240 px (tiny, for chat)'],
+  ['320', '320 px'],
+  ['480', '480 px (good default)'],
+  ['640', '640 px'],
+  ['800', '800 px (large file)'],
+  ['original', 'Same as the video'],
+] as const;
+const rates = [
+  ['5', '5 fps (slideshow)'],
+  ['10', '10 fps (smallest smooth)'],
+  ['15', '15 fps'],
+  ['20', '20 fps'],
+  ['25', '25 fps (smoothest, largest)'],
+] as const;
+---
+<div class="field-row wide vg-trim">
+  <div class="field">
+    <label for="vg-start">Start (seconds)</label>
+    <div class="vg-time"><input type="number" id="vg-start" min="0" step="0.1" value="0" inputmode="decimal" /><button class="btn btn-sm btn-ghost" type="button" id="vg-set-start">Set start</button></div>
+  </div>
+  <div class="field">
+    <label for="vg-end">End (seconds)</label>
+    <div class="vg-time"><input type="number" id="vg-end" min="0" step="0.1" value="0" inputmode="decimal" /><button class="btn btn-sm btn-ghost" type="button" id="vg-set-end">Set end</button></div>
+  </div>
+</div>
+<div class="field">
+  <label for="width">Width</label>
+  <select id="width">
+    {widths.map(([v, l]) => <option value={v} selected={v === width}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="fps">Frame rate</label>
+  <select id="fps">
+    {rates.map(([v, l]) => <option value={v} selected={v === fps}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label>Loop</label>
+  <div class="segmented" role="radiogroup" aria-label="Loop">
+    <label><input type="radio" name="loop" value="forever" checked={loop === 'forever'} /><span>Forever</span></label>
+    <label><input type="radio" name="loop" value="once" checked={loop === 'once'} /><span>Play once</span></label>
+  </div>
+</div>
+<p class="muted small vg-estimate" id="vg-estimate" aria-live="polite"></p>
+<style is:global>
+  .vg-trim { align-items: end; }
+  .vg-trim .field { flex: 1 1 180px; }
+  .vg-time { display: flex; gap: 6px; }
+  .vg-time input { width: 100%; min-width: 0; }
+  .vg-time .btn { white-space: nowrap; }
+  .vg-estimate { margin: 0; grid-column: 1 / -1; }
+  .vg-estimate.is-over { color: var(--warn); font-weight: 600; }
+</style>

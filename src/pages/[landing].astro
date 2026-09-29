@@ -18,9 +18,16 @@ import PdfToImage from '../components/options/PdfToImage.astro';
 import PdfToWord from '../components/options/PdfToWord.astro';
 import CropImage from '../components/options/CropImage.astro';
 import ReorderPdf from '../components/options/ReorderPdf.astro';
+import VideoToGif from '../components/options/VideoToGif.astro';
+import BlurImage from '../components/options/BlurImage.astro';
+import RotateImage from '../components/options/RotateImage.astro';
+import VideoToMp3 from '../components/options/VideoToMp3.astro';
 import CropStage from '../components/CropStage.astro';
 import ReorderStage from '../components/ReorderStage.astro';
 import SignStage from '../components/SignStage.astro';
+import VideoStage from '../components/VideoStage.astro';
+import BlurStage from '../components/BlurStage.astro';
+import RotateStage from '../components/RotateStage.astro';
 
 export function getStaticPaths() {
   return [
@@ -41,6 +48,10 @@ const options = {
   'pdf-to-word': PdfToWord,
   'crop-image': CropImage,
   'reorder-pdf': ReorderPdf,
+  'video-to-gif': VideoToGif,
+  'blur-image': BlurImage,
+  'rotate-image': RotateImage,
+  'video-to-mp3': VideoToMp3,
   // Sign PDF has no option controls; everything happens on the stage.
   'sign-pdf': null,
 } as const;
@@ -52,6 +63,9 @@ const Options = options[base as keyof typeof options];
   {base === 'crop-image' && <CropStage slot="panel" />}
   {base === 'reorder-pdf' && <ReorderStage slot="panel" />}
   {base === 'sign-pdf' && <SignStage slot="panel" />}
+  {base === 'video-to-gif' && <VideoStage slot="panel" />}
+  {base === 'blur-image' && <BlurStage slot="panel" />}
+  {base === 'rotate-image' && <RotateStage slot="panel" />}
   {base === 'pdf-to-word' && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>
 </ToolLayout>

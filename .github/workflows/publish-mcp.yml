@@ -1,0 +1,60 @@
+name: Publish MCP server
+
+on:
+  push:
+    tags: ["mcp-v*"] # e.g. mcp-v0.1.0
+  workflow_dispatch: {} # manual trigger, e.g. when pushing a tag isn't possible
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC auth to the MCP Registry, proves ownership of io.github.keenanlk
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org" # writes ~/.npmrc so NODE_AUTH_TOKEN is actually used
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install root deps (make-pdf.mjs needs pdf-lib)
+        run: npm ci
+
+      - name: Generate site fixtures (mcp tests reuse them)
+        run: |
+          pip install pillow pillow-heif
+          python3 tests/fixtures/make-fixtures.py
+          node tests/fixtures/make-pdf.mjs
+
+      - name: Install, typecheck, test (test also builds)
+        working-directory: mcp
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+
+      - name: Publish package to npm
+        working-directory: mcp
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install mcp-publisher
+        working-directory: mcp
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Authenticate to MCP Registry
+        working-directory: mcp
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish server to MCP Registry
+        working-directory: mcp
+        run: ./mcp-publisher publish

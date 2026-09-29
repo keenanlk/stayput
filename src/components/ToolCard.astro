@@ -6,10 +6,12 @@ import { pairBySlug } from '../data/pairs';
 interface Props { tool: Tool }
 const { tool } = Astro.props;
 const icons: Record<string, string> = {
-  'heic-to-jpg': 'image', 'convert-image': 'convert', 'compress-image': 'resize', 'strip-exif': 'eye',
+  'heic-to-jpg': 'image', 'convert-image': 'convert', 'compress-image': 'resize', 'strip-exif': 'eye', 'exif-viewer': 'search',
   'merge-pdf': 'merge', 'split-pdf': 'split', 'compress-pdf': 'compress', 'rotate-pdf': 'rotate',
   'image-to-pdf': 'pdf', 'pdf-to-image': 'image',
   'reorder-pdf': 'grid', 'sign-pdf': 'pen', 'pdf-page-numbers': 'hash', 'pdf-to-word': 'convert',
+  'crop-image': 'crop', 'favicon-generator': 'image', 'blur-image': 'blur', 'rotate-image': 'rotate',
+  'video-to-gif': 'video', 'video-to-mp3': 'audio',
 };
 // Preset and format-pair landing pages borrow their base tool's icon.
 const icon = icons[tool.slug] ?? icons[presetBySlug(tool.slug)?.base ?? ''] ?? (pairBySlug(tool.slug) ? 'convert' : 'pdf');

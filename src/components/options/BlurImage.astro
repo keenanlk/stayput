@@ -1,0 +1,46 @@
+---
+/** Option controls for the blur and pixelate tool, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const area = defaults.area ?? 'areas';
+const effect = defaults.effect ?? 'blur';
+const strength = defaults.strength ?? '5';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field">
+  <label>Hide</label>
+  <div class="segmented" role="radiogroup" aria-label="What to hide">
+    <label><input type="radio" name="area" value="areas" checked={area === 'areas'} /><span>Areas I mark</span></label>
+    <label><input type="radio" name="area" value="whole" checked={area === 'whole'} /><span>Whole image</span></label>
+  </div>
+</div>
+<div class="field">
+  <label>Effect</label>
+  <div class="segmented" role="radiogroup" aria-label="Effect">
+    <label><input type="radio" name="effect" value="blur" checked={effect === 'blur'} /><span>Blur</span></label>
+    <label><input type="radio" name="effect" value="pixelate" checked={effect === 'pixelate'} /><span>Pixelate</span></label>
+    <label><input type="radio" name="effect" value="box" checked={effect === 'box'} /><span>Black box</span></label>
+  </div>
+</div>
+<div class="field" id="strength-field">
+  <label for="strength">Strength <output id="strength-out">{strength}</output></label>
+  <input type="range" id="strength" min="1" max="10" step="1" value={strength} />
+</div>
+<p class="muted small" id="effect-note">For text such as card numbers or addresses, use Black box: blurred or pixelated text can sometimes be read back.</p>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>

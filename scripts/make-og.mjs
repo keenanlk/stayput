@@ -43,7 +43,7 @@ const html = ({ heading, tagline, category }) => `<!doctype html>
 </style></head><body>
   <div class="glow"></div>
   <div class="brand"><svg viewBox="0 0 32 32"><rect x="2" y="2" width="28" height="28" rx="8" fill="#1f6f5f"/><path d="M16 8.5c-3.6 0-6 2.6-6 5.9 0 4.2 6 9.6 6 9.6s6-5.4 6-9.6c0-3.3-2.4-5.9-6-5.9z" fill="#fff"/><circle cx="16" cy="14.3" r="2.3" fill="#1f6f5f"/></svg>Stayput</div>
-  <div class="kicker">${category === 'pdf' ? 'PDF tool' : category === 'images' ? 'Image tool' : category === 'guide' ? 'Guide' : 'Free file tools, in your browser'}</div>
+  <div class="kicker">${category === 'pdf' ? 'PDF tool' : category === 'media' ? 'Video and audio tool' : category === 'images' ? 'Image tool' : category === 'guide' ? 'Guide' : 'Free file tools, in your browser'}</div>
   <h1>${esc(heading)}</h1>
   <p>${esc(tagline)}</p>
   <div class="bar"><span>Nothing is uploaded</span><span>Works offline</span><span>Open source</span><span class="url">stayput.dev</span></div>

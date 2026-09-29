@@ -66,3 +66,43 @@ pages[0].save(os.path.join(out, 'scan.tiff'), save_all=True, append_images=pages
 fax = Image.new('1', (1728, 600), 1)
 ImageDraw.Draw(fax).rectangle([100, 100, 900, 300], fill=0)
 fax.save(os.path.join(out, 'fax.tif'), compression='group4')
+
+# Animated WebPs: a red dot moving over a transparent background, lossy (with
+# a separate alpha chunk) and lossless, four frames of different lengths
+anim = []
+for i in range(4):
+    f = Image.new('RGBA', (160, 80), (0, 0, 0, 0))
+    ImageDraw.Draw(f).ellipse([10 + i * 30, 20, 50 + i * 30, 60], fill=(220, 40, 40, 255))
+    anim.append(f)
+anim[0].save(os.path.join(out, 'anim.webp'), save_all=True, append_images=anim[1:], duration=[100, 150, 200, 250], loop=0, quality=90)
+anim[0].save(os.path.join(out, 'anim-lossless.webp'), save_all=True, append_images=anim[1:], duration=100, loop=0, lossless=True)
+
+# 400x300 PNG of 1 px black and white vertical stripes: any blur or pixelation
+# turns it mid-grey, while untouched pixels stay pure black or white.
+stripes = Image.new('RGB', (400, 300), (255, 255, 255))
+sd = ImageDraw.Draw(stripes)
+for x in range(0, 400, 2):
+    sd.line([(x, 0), (x, 299)], fill=(0, 0, 0))
+stripes.save(os.path.join(out, 'stripes.png'))
+
+# A 2400x1600 "group photo": four small copies of the face fixture (a public
+# domain White House portrait, also used in MediaPipe's own tests), so each
+# face is under 1/20 of the frame and needs the tiled scan to be found.
+face = Image.open(os.path.join(os.path.dirname(__file__), 'static', 'face.jpg')).convert('RGB').resize((205, 256))
+group = Image.new('RGB', (2400, 1600), (90, 110, 130))
+for x, y in [(150, 200), (800, 1100), (1400, 300), (2000, 1150)]:
+    group.paste(face, (x, y))
+group.save(os.path.join(out, 'group.jpg'), quality=80)
+
+# 1.5 s stereo WAV at 48 kHz: a 440 Hz tone on the left, 880 Hz on the right.
+import wave, math
+with wave.open(os.path.join(out, 'tone.wav'), 'wb') as w:
+    w.setnchannels(2)
+    w.setsampwidth(2)
+    w.setframerate(48000)
+    frames = bytearray()
+    for i in range(72000):
+        l = int(12000 * math.sin(2 * math.pi * 440 * i / 48000))
+        r = int(12000 * math.sin(2 * math.pi * 880 * i / 48000))
+        frames += struct.pack('<hh', l, r)
+    w.writeframes(bytes(frames))

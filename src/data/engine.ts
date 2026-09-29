@@ -27,6 +27,10 @@ export const engines: Record<string, Engine> = {
     how: 'This tool does not re-encode your photo at all. It reads the JPG, PNG or WebP container byte by byte and removes only the metadata segments (EXIF, XMP, ICC, IPTC), writing the untouched image data back out. That is why the output is pixel-identical and the file only gets smaller.',
     versus: 'Sending a photo to a website to remove its location data is a contradiction: the site has the location the moment you upload it. Here the GPS block is deleted on your device and never travels anywhere.',
   },
+  'exif-viewer': {
+    how: 'The viewer reads the bytes of the photo in your tab and walks its container by hand: JPEG segments, PNG chunks, WebP RIFF chunks, HEIC boxes or the TIFF header of a DNG. It finds the EXIF block, follows its directories (camera, shot settings, GPS, thumbnail) and turns each field into plain words. It is the same parser the EXIF remover uses, a few hundred lines of TypeScript with no library behind it.',
+    versus: 'An online EXIF viewer that uploads your photo has read the location before it shows it to you. Checking a photo for private data by sending it to a stranger defeats the point; here the file is never part of any request.',
+  },
   'merge-pdf': {
     how: 'pdf-lib, an open-source PDF library written in TypeScript, opens each document in your tab and copies its pages into a new PDF, preserving text, vector graphics, links and images as they are. The merged file is assembled in memory and handed to your browser’s download. Password-protected PDFs are unlocked first by qpdf, compiled to WebAssembly and loaded only when needed; the password is checked in your tab and the result is saved without encryption.',
     versus: 'Upload-based mergers cap the number of files, the total size, or the number of merges per day. This one is bound only by your device’s memory, and your contracts, statements and scans are never copied to anyone’s server.',
@@ -82,6 +86,22 @@ export const engines: Record<string, Engine> = {
   'to-ico': {
     how: 'Your browser decodes the picture, then Stayput draws it on a transparent square canvas once for every icon size, halving the resolution step by step so the small sizes stay crisp. Each size is saved as a PNG and a small encoder in the page writes the ICO header and size directory around them. The whole file is assembled in memory in your tab.',
     versus: 'Icon converters that upload your image often hand back a single 32 pixel frame or a blurry resize, and keep a copy of your logo on their server. Here every size is drawn locally from your original, and nothing leaves the device.',
+  },
+  'video-to-gif': {
+    how: 'Your browser opens the video with its own built-in decoder, the same one that plays it in the player above. Stayput seeks to each moment you asked for, copies that frame onto a canvas at the width you chose, and gifenc (MIT) picks the best 256 colours for it and compresses it. The GIF is assembled frame by frame in memory in your tab.',
+    versus: 'Online GIF makers upload the whole video to trim a few seconds of it, cap the file size, and often stamp a watermark on the result. Personal clips of family, pets or a screen with your inbox on it are exactly what should not sit on a stranger’s server. Here the video never leaves your device, whatever its size.',
+  },
+  'blur-image': {
+    how: 'Your browser decodes the photo (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab. Each area you mark is pixelated by averaging blocks of pixels, blurred by three passes of a box blur that reads the pixels around the area so the edge blends in, or filled with solid black. The same code draws the preview and the full-size file, which is encoded once in the format you chose. Find faces runs Google’s MediaPipe face detector (Apache-2.0) as WebAssembly in your tab, loaded from this site only when you press the button.',
+    versus: 'The photos people blur are the ones that should not be uploaded: a child’s face, a car’s number plate, a bank screenshot, an ID card. Online blur tools and editors take the unblurred original onto their server first, and several ask for an account before the download. Here the original never leaves your device.',
+  },
+  'rotate-image': {
+    how: 'Your browser decodes each image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL), applying the EXIF orientation so the starting point is what you see. Stayput then draws it onto a canvas turned by a quarter, a half or three quarters and mirrored if you asked, which moves every pixel exactly without resampling, and encodes the result once in the format you chose.',
+    versus: 'Rotating a photo is a one-second job that upload-based sites turn into a transfer of the whole file to their server, and design apps into a sign-up. Here a batch of phone photos is turned on your device, and the originals are never copied anywhere.',
+  },
+  'video-to-mp3': {
+    how: 'Your browser decodes the sound track with the same audio decoders it uses to play media on any website (AAC for MP4, MOV and M4A; Opus or Vorbis for WebM; FLAC, WAV and MP3). The samples are resampled to 44.1 kHz and handed to LAME, the reference MP3 encoder, compiled to WebAssembly and served by this site. WAV files are written directly by a few lines of code in the page. Everything happens in memory in your tab.',
+    versus: 'Online converters upload the whole video just to keep its sound, cap free files at a few hundred megabytes, and make you wait in a queue. Home videos, lectures and voice memos are personal. Here the file never leaves your device, so a 2 GB video converts as fast as your computer can read it.',
   },
   'favicon-generator': {
     how: 'Your browser decodes the logo (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and Stayput centres it on a 512 pixel square canvas, with your padding and background. Every icon is resized from that square with stepped downscaling so small sizes stay crisp. favicon.ico is written byte by byte by a small encoder in the page, and the manifest and HTML are plain text built in your tab.',

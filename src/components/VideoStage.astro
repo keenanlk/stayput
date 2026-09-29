@@ -1,0 +1,16 @@
+---
+/**
+ * The video player for video to GIF: shown once a clip is dropped so the
+ * user can scrub to the start and end of the part they want. Driven by
+ * src/tools/video-to-gif.ts. The video plays from a blob: URL of the local file.
+ */
+---
+<div id="vg-panel" class="vg-panel" hidden>
+  <video id="vg-video" class="vg-video" controls muted playsinline preload="auto"></video>
+  <p class="muted small vg-info" id="vg-info"></p>
+</div>
+<style is:global>
+  .vg-panel { display: grid; gap: 8px; }
+  .vg-video { display: block; width: 100%; max-height: 60vh; background: #000; border-radius: var(--radius-sm); border: 1px solid var(--line); }
+  .vg-info { margin: 0; }
+</style>

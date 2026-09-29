@@ -34,5 +34,22 @@
     "version": "0.3.0",
     "entry": "qpdf.js",
     "files": { "qpdf.js": "dist/qpdf.js", "qpdf.wasm": "dist/qpdf.wasm" }
+  },
+  "mediapipe": {
+    "package": "@mediapipe/tasks-vision",
+    "version": "1.0.1",
+    "entry": "vision_wasm_internal.js",
+    "files": {
+      "vision_wasm_internal.js": "wasm/vision_wasm_internal.js",
+      "vision_wasm_internal.wasm": "wasm/vision_wasm_internal.wasm",
+      "vision_wasm_nosimd_internal.js": "wasm/vision_wasm_nosimd_internal.js",
+      "vision_wasm_nosimd_internal.wasm": "wasm/vision_wasm_nosimd_internal.wasm"
+    }
+  },
+  "lame": {
+    "package": "wasm-media-encoders",
+    "version": "0.7.0",
+    "entry": "mp3.wasm",
+    "files": { "mp3.wasm": "wasm/mp3.wasm", "LICENSE": "LICENSE" }
   }
 }

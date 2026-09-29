@@ -5,6 +5,7 @@ import { presets } from '../data/presets';
 import { guides } from '../data/guides';
 const images = tools.filter((t) => t.category === 'images');
 const pdfs = tools.filter((t) => t.category === 'pdf');
+const media = tools.filter((t) => t.category === 'media');
 ---
 <footer class="site-footer">
   <div class="wrap">
@@ -19,6 +20,8 @@ const pdfs = tools.filter((t) => t.category === 'pdf');
       <div>
         <h3>Image tools</h3>
         <ul>{images.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
+        <h3>Video and audio</h3>
+        <ul>{media.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
       </div>
       <div>
         <h3>PDF tools</h3>

@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Download } from '@playwright/test';
+import { test, expect, type Page, type Download, type Locator } from '@playwright/test';
 import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync } from 'node:fs';
 import { execSync, execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -91,6 +91,16 @@ async function run(page: Page, files: string[], configure?: () => Promise<void>)
   return { downloads, items };
 }
 
+/**
+ * Tick a visually hidden radio or checkbox. Once a file is in, the Run bar is
+ * pinned over the bottom of the screen; scrolling the input to the middle first
+ * keeps the forced click from landing on the bar instead.
+ */
+async function choose(input: Locator) {
+  await input.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  await input.check({ force: true });
+}
+
 async function bytesOf(d: Download): Promise<Uint8Array> {
   const p = await d.path();
   return new Uint8Array(readFileSync(p!));
@@ -147,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(18);
+  expect(await page.locator('.tool-card').count()).toBe(23);
   expect(errors).toEqual([]);
 });
 
@@ -171,7 +181,7 @@ test('HEIC to JPG converts and can keep EXIF with GPS', async ({ page }) => {
 test('HEIC to PNG without EXIF', async ({ page }) => {
   await open(page, 'heic-to-jpg');
   const { downloads } = await run(page, ['iphone.heic'], async () => {
-    await page.locator('input[name="format"][value="png"]').check({ force: true });
+    await choose(page.locator('input[name="format"][value="png"]'));
   });
   const png = await bytesOf(downloads[0]!);
   expect(sniffFormat(png)).toBe('png');
@@ -350,6 +360,49 @@ test('EXIF remover bakes orientation when asked', async ({ page }) => {
   await expect(page.locator('.result-item .meta')).toContainText('rotation applied');
 });
 
+test('EXIF viewer shows location, device and every field without sending the photo', async ({ page }) => {
+  await open(page, 'exif-viewer');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  const names = ['photo.jpg', 'graphic.png', 'picture.webp', 'iphone.heic', 'plain.jpg'];
+  await page.locator('#file-input').setInputFiles(names.map(fx));
+  const cards = page.locator('#exif-report .exif-card');
+  await expect(cards).toHaveCount(5);
+  for (const i of [0, 1, 2, 3]) {
+    await expect(cards.nth(i).locator('.exif-facts')).toContainText('40.446111, -79.982222');
+    await expect(cards.nth(i).locator('.exif-facts')).toContainText('TestCam Model X');
+  }
+  await expect(cards.nth(0).locator('.exif-facts')).toContainText('25 Sep 2026, 12:00:00');
+  await expect(cards.nth(0).locator('.exif-table')).toContainText('Rotated 90° right');
+  await expect(cards.nth(0).locator('header')).toContainText('Comment');
+  await expect(cards.nth(4).locator('.exif-facts')).toContainText('None stored');
+  await expect(cards.nth(4).locator('.exif-facts')).toContainText('carries no metadata');
+  const map = cards.nth(0).getByRole('link', { name: 'Open map' });
+  await expect(map).toHaveAttribute('href', /mlat=40\.446111&mlon=-79\.982222/);
+
+  const download = page.waitForEvent('download');
+  await page.locator('#run').click();
+  const csv = Buffer.from(await bytesOf(await download)).toString();
+  expect(csv.split('\r\n')[0]).toBe('file,group,field,value');
+  expect(csv).toContain('photo.jpg,Location,Latitude,40.446111');
+  expect(csv).toContain('iphone.heic,Camera,Model,Model X');
+  expect(csv).toContain('plain.jpg,,,no EXIF data');
+  net.assertNothingLeft(names);
+});
+
+test('EXIF viewer reads a stripped photo as clean', async ({ page }) => {
+  await open(page, 'strip-exif');
+  await page.locator('#apply-orientation').uncheck();
+  const { downloads } = await run(page, ['photo.jpg']);
+  const cleaned = join(mkdtempSync(join(tmpdir(), 'exif-')), 'cleaned.jpg');
+  writeFileSync(cleaned, await bytesOf(downloads[0]!));
+  await open(page, 'exif-viewer');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([cleaned]);
+  await expect(page.locator('.exif-facts')).toContainText('None stored');
+  await expect(page.locator('.exif-facts')).toContainText('carries no metadata');
+});
+
 test('Merge PDF combines files in order', async ({ page }) => {
   await open(page, 'merge-pdf');
   const { downloads } = await run(page, ['text.pdf', 'scan.pdf']);
@@ -368,7 +421,7 @@ test('Split PDF extracts a range and splits every page', async ({ page }) => {
   expect(doc.getPageCount()).toBe(2);
   expect(downloads[0]!.suggestedFilename()).toBe('text-pages-3,1.pdf');
 
-  await page.locator('input[name="split-mode"][value="each"]').check({ force: true });
+  await choose(page.locator('input[name="split-mode"][value="each"]'));
   await page.locator('#run').click();
   await expect(page.locator('#results')).toHaveClass(/is-active/);
   expect(await page.locator('#results-list .result-item').count()).toBe(3);
@@ -386,7 +439,7 @@ test('Compress PDF recompresses images, cleans losslessly and flattens', async (
   const doc = await PDFDocument.load(out);
   expect(doc.getPageCount()).toBe(2);
 
-  await page.locator('input[name="mode"][value="lossless"]').check({ force: true });
+  await choose(page.locator('input[name="mode"][value="lossless"]'));
   const downloads: Download[] = [];
   page.on('download', (d) => downloads.push(d));
   await page.locator('#run').click();
@@ -394,7 +447,7 @@ test('Compress PDF recompresses images, cleans losslessly and flattens', async (
   await expect.poll(() => downloads.length).toBe(1);
   expect((await PDFDocument.load(await bytesOf(downloads[0]!))).getPageCount()).toBe(2);
 
-  await page.locator('input[name="mode"][value="flatten"]').check({ force: true });
+  await choose(page.locator('input[name="mode"][value="flatten"]'));
   await page.locator('#run').click();
   await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
   await expect.poll(() => downloads.length).toBe(2);
@@ -432,7 +485,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
   await open(page, 'pdf-to-image');
   const { items } = await run(page, ['text.pdf'], async () => {
     await expect(page.locator('#page-info')).toHaveText('3 pages');
-    await page.locator('input[name="pages"][value="range"]').check({ force: true });
+    await choose(page.locator('input[name="pages"][value="range"]'));
     await page.locator('#range').fill('1-2');
     await page.locator('#dpi').selectOption('72');
   });
@@ -443,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -455,7 +508,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'webp-to-gif'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -469,7 +522,7 @@ test('format-pair pages render, preset the converter and link a social image', a
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');
-    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp' }[to!];
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp', gif: 'image/gif' }[to!];
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }
@@ -651,7 +704,7 @@ test('Sign PDF places a drawn and a typed signature on two pages and no bytes le
   await page.locator('#next-page').click();
   await expect(page.locator('#page-label')).toHaveText('Page 2 of 3');
   await expect(page.locator('.stamp')).toHaveCount(0);
-  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
   await page.locator('#sig-text').fill('Keenan Example');
   await page.locator('#add-signature').click();
   await page.locator('#add-date').click();
@@ -712,7 +765,7 @@ test('Sign PDF draw pad and typed preview stay paper-bright and legible in dark 
   }
 
   // Typed preview: same paper background, and the chosen ink stays legible on it.
-  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
   await page.locator('#sig-text').fill('Keenan Example');
   const previewBg = await page.locator('#sig-preview').evaluate((el) => getComputedStyle(el).backgroundColor);
   expect(luminance(previewBg)).toBeGreaterThan(0.6);
@@ -801,6 +854,25 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#aspect')).toHaveValue('4:5');
       await expect(page.locator('#format')).toHaveValue('image/jpeg');
     }],
+    ['mp4-to-gif', 'video-to-gif', async () => expect(page.locator('#vg-panel')).toBeAttached()],
+    ['mov-to-gif', 'video-to-gif', async () => expect(page.locator('#fps')).toHaveValue('10')],
+    ['pixelate-image', 'blur-image', async () => {
+      await expect(page.locator('input[name="area"][value="whole"]')).toBeChecked();
+      await expect(page.locator('input[name="effect"][value="pixelate"]')).toBeChecked();
+    }],
+    ['blur-face', 'blur-image', async () => expect(page.locator('#strength')).toHaveValue('6')],
+    ['mp4-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('192')],
+    ['m4a-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('128')],
+    ['wav-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('256')],
+    ['mov-to-mp3', 'video-to-mp3', async () => expect(page.locator('#format')).toHaveValue('mp3')],
+    ['mp4-to-wav', 'video-to-mp3', async () => {
+      await expect(page.locator('#format')).toHaveValue('wav');
+      await expect(page.locator('#bitrate-field')).toBeHidden();
+    }],
+    ['flip-image', 'rotate-image', async () => {
+      await expect(page.locator('input[name="rotate"][value="0"]')).toBeChecked();
+      await expect(page.locator('#flip-h')).toBeChecked();
+    }],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -825,7 +897,7 @@ test('Add signature landing page loads the signing stage and signs a PDF', async
   const net = watchNetwork(page);
   await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
   await expect(page.locator('#sign-panel')).toBeVisible();
-  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
   await page.locator('#sig-text').fill('Ada Lovelace');
   await page.locator('#add-signature').click();
   await expect(page.locator('.stamp-signature')).toHaveCount(1);
@@ -861,6 +933,38 @@ test('TIFF to JPG and TIFF to PNG decode TIFFs the browser cannot open', async (
       return [bmp.width, bmp.height];
     }, [Array.from(bytes), type] as const);
     expect(dims, slug).toEqual([800, 1000]);
+  }
+});
+
+test('WebP to GIF keeps every frame, the timing and the compositing of animated WebPs', async ({ page }) => {
+  for (const file of ['anim.webp', 'anim-lossless.webp']) {
+    await stubAnalytics(page);
+    await page.goto('/webp-to-gif');
+    const net = watchNetwork(page);
+    const { downloads } = await run(page, [file]);
+    await expect(page.locator('#results')).toContainText('4 frames');
+    const bytes = await bytesOf(downloads[0]!);
+    const frames = await page.evaluate(async (b) => {
+      const dec = new ImageDecoder({ data: new Uint8Array(b), type: 'image/gif' });
+      await dec.tracks.ready;
+      const out: { red: boolean; clearBehind: boolean; ms: number }[] = [];
+      for (let i = 0; i < dec.tracks.selectedTrack!.frameCount; i++) {
+        const { image } = await dec.decode({ frameIndex: i });
+        const c = new OffscreenCanvas(image.displayWidth, image.displayHeight);
+        const ctx = c.getContext('2d')!;
+        ctx.drawImage(image, 0, 0);
+        // Centre of this frame's dot, and where the first frame's dot was.
+        const [r, , , a] = ctx.getImageData(30 + i * 30, 40, 1, 1).data;
+        const behind = ctx.getImageData(30, 40, 1, 1).data[3]!;
+        out.push({ red: r! > 180 && a! > 200, clearBehind: i === 0 || behind === 0, ms: (image.duration ?? 0) / 1000 });
+        image.close();
+      }
+      return out;
+    }, Array.from(bytes));
+    expect(frames.length, file).toBe(4);
+    expect(frames.every((f) => f.red && f.clearBehind), file).toBe(true);
+    if (file === 'anim.webp') expect(frames.map((f) => f.ms)).toEqual([100, 150, 200, 250]);
+    net.assertNothingLeft([file]);
   }
 });
 
@@ -1146,7 +1250,7 @@ test('Page numbers and signatures land inside pages whose MediaBox is offset or 
   await page.goto('/tools/sign-pdf');
   const signed = await run(page, ['boxes.pdf'], async () => {
     await expect(page.locator('#page-label')).toHaveText('Page 1 of 2');
-    await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+    await choose(page.locator('input[name="sig-mode"][value="type"]'));
     await page.locator('#sig-text').fill('Keenan');
     await page.locator('#add-signature').click();
   });
@@ -1382,7 +1486,7 @@ test('Sign PDF says what is needed before Run until a signature is placed', asyn
   await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
   await expect(page.locator('#run-hint')).toBeVisible();
   await expect(page.locator('#run-hint')).toContainText('Add signature to this page');
-  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
   await page.locator('#sig-text').fill('Keenan Example');
   await page.locator('#add-signature').click();
   await expect(page.locator('.stamp-signature')).toHaveCount(1);
@@ -1447,4 +1551,303 @@ test('Protect PDF encrypts with AES-256 so the file needs the password to open',
   expect(doc.numPages).toBe(3);
   net.assertNothingLeft(['text.pdf']);
   expect(errors).toEqual([]);
+});
+
+/** Frame count, size and loop flag of a GIF, walked block by block. */
+function gifInfo(b: Uint8Array) {
+  expect(new TextDecoder().decode(b.slice(0, 6))).toBe('GIF89a');
+  const width = b[6]! | (b[7]! << 8);
+  const height = b[8]! | (b[9]! << 8);
+  let i = 13 + (b[10]! & 0x80 ? 3 * (2 << (b[10]! & 7)) : 0);
+  let frames = 0;
+  let loops = false;
+  const skipSubBlocks = () => {
+    while (b[i]! !== 0) i += b[i]! + 1;
+    i++;
+  };
+  while (i < b.length && b[i] !== 0x3b) {
+    if (b[i] === 0x21) {
+      if (b[i + 1] === 0xff && new TextDecoder().decode(b.slice(i + 3, i + 14)) === 'NETSCAPE2.0') loops = true;
+      i += 2;
+      skipSubBlocks();
+    } else if (b[i] === 0x2c) {
+      frames++;
+      const packed = b[i + 9]!;
+      i += 10 + (packed & 0x80 ? 3 * (2 << (packed & 7)) : 0);
+      i++; // LZW minimum code size
+      skipSubBlocks();
+    } else throw new Error(`bad GIF block 0x${b[i]!.toString(16)} at ${i}`);
+  }
+  return { width, height, frames, loops };
+}
+
+test('Video to GIF trims a clip into an animated GIF, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'video-to-gif');
+  const net = watchNetwork(page);
+  // A 3 second 320x240 WebM recorded by MediaRecorder: red, then green, then blue,
+  // one second each. Such files store no duration, which the tool has to find.
+  const { downloads } = await run(page, [staticFx('clip.webm')], async () => {
+    await expect(page.locator('#vg-panel')).toBeVisible();
+    await expect.poll(async () => Number(await page.locator('#vg-panel').getAttribute('data-duration'))).toBeGreaterThan(2.5);
+    await page.locator('#vg-start').fill('0.4');
+    await page.locator('#vg-end').fill('2.4');
+    await page.locator('#fps').selectOption('10');
+    await page.locator('#width').selectOption('640');
+    await expect(page.locator('#vg-estimate')).toContainText('320 × 240 GIF, 20 frames');
+    await choose(page.locator('input[name="loop"][value="forever"]'));
+  });
+  expect(downloads).toHaveLength(1);
+  expect(downloads[0]!.suggestedFilename()).toBe('clip.gif');
+  const gif = await bytesOf(downloads[0]!);
+  expect(gifInfo(gif)).toEqual({ width: 320, height: 240, frames: 20, loops: true });
+  // The first frame is from the red second and the last from the blue one.
+  const colours = await page.evaluate(async (bytes) => {
+    const dec = new ImageDecoder({ data: new Uint8Array(bytes), type: 'image/gif' });
+    await dec.tracks.ready;
+    const pick = async (frameIndex: number) => {
+      const { image } = await dec.decode({ frameIndex });
+      const c = new OffscreenCanvas(image.displayWidth, image.displayHeight);
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(image, 0, 0);
+      image.close();
+      return Array.from(ctx.getImageData(20, 20, 1, 1).data.slice(0, 3));
+    };
+    return [await pick(0), await pick(19)];
+  }, Array.from(gif));
+  const [first, last] = colours as [number[], number[]];
+  expect(first[0]).toBeGreaterThan(180);
+  expect(first[2]).toBeLessThan(80);
+  expect(last[2]).toBeGreaterThan(180);
+  expect(last[0]).toBeLessThan(80);
+  net.assertNothingLeft(['clip.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Video to GIF refuses an end time before the start with a clear message', async ({ page }) => {
+  await open(page, 'video-to-gif');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('clip.webm')]);
+  await expect(page.locator('#vg-panel')).toBeVisible();
+  await page.locator('#vg-end').fill('0');
+  await expect(page.locator('#vg-estimate')).toHaveText('The end must come after the start.');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('end time must come after the start');
+});
+
+/** Drag across the blur stage between two points given as fractions of the image. */
+async function markArea(page: Page, from: [number, number], to: [number, number]) {
+  const canvas = page.locator('#blur-canvas');
+  // Keep the whole image clear of the Run bar pinned to the bottom of the screen.
+  await canvas.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const b = (await canvas.boundingBox())!;
+  await page.mouse.move(b.x + b.width * from[0], b.y + b.height * from[1]);
+  await page.mouse.down();
+  await page.mouse.move(b.x + b.width * to[0], b.y + b.height * to[1], { steps: 5 });
+  await page.mouse.up();
+}
+
+test('Blur image hides only the marked areas, per effect, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'blur-image');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('stripes.png')]);
+  await expect(page.locator('#blur-panel')).toBeVisible();
+  // Running with no area marked explains what to do instead of saving an unchanged copy.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Mark at least one area');
+  // Two areas on the 400x300 stripes: left quarter and bottom-right corner; a tap adds nothing.
+  await markArea(page, [0.05, 0.1], [0.25, 0.5]);
+  await markArea(page, [0.6, 0.6], [0.9, 0.9]);
+  await markArea(page, [0.5, 0.2], [0.5, 0.2]);
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(2);
+  // Undo drops the last area; draw it again.
+  await page.locator('#blur-undo').click();
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(1);
+  await markArea(page, [0.6, 0.6], [0.9, 0.9]);
+  // Outlines redraw on the next frame, so wait for the recorded areas themselves.
+  await expect.poll(async () => (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(';').length).toBe(2);
+  const areas = (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(';').map((a) => a.split(',').map(Number));
+  expect(areas).toHaveLength(2);
+  const [ax, ay, aw, ah] = areas[0]!;
+  const inside: [number, number] = [Math.round(ax! + aw! / 2), Math.round(ay! + ah! / 2)];
+  const outside: [number, number] = [200, 20];
+
+  const grey = (px: number[]) => px[0]! > 90 && px[0]! < 165;
+  const pure = (px: number[]) => px[0]! < 10 || px[0]! > 245;
+  for (const [effect, name, check] of [
+    ['blur', 'stripes-blurred.png', grey],
+    ['pixelate', 'stripes-pixelated.png', grey],
+    ['box', 'stripes-redacted.png', (px: number[]) => px[0] === 0 && px[1] === 0 && px[2] === 0],
+  ] as const) {
+    await choose(page.locator(`input[name="effect"][value="${effect}"]`));
+    const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+    expect(download.suggestedFilename()).toBe(name);
+    const png = await bytesOf(download);
+    expect(pngSize(png)).toEqual({ width: 400, height: 300 });
+    expect(check(await pixelAt(page, png, ...inside)), `${effect} inside`).toBe(true);
+    expect(pure(await pixelAt(page, png, ...outside)), `${effect} outside`).toBe(true);
+  }
+  net.assertNothingLeft(['stripes.png']);
+  // The shell logs failed runs; the only one here is the deliberate run with no area.
+  expect(errors.filter((e) => !e.includes('Mark at least one area'))).toEqual([]);
+});
+
+test('Pixelate image page pixelates the whole picture into blocks', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/pixelate-image');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['stripes.png']);
+  expect(downloads[0]!.suggestedFilename()).toBe('stripes-pixelated.png');
+  const png = await bytesOf(downloads[0]!);
+  // Every block averages black and white stripes to grey, at the edges too.
+  for (const [x, y] of [[0, 0], [199, 150], [399, 299]] as const) {
+    const px = await pixelAt(page, png, x, y);
+    expect(px[0]).toBeGreaterThan(90);
+    expect(px[0]).toBeLessThan(165);
+  }
+  net.assertNothingLeft(['stripes.png']);
+});
+
+const dark = (px: number[]) => px[0]! < 70 && px[1]! < 70 && px[2]! < 70;
+
+test('Rotate image turns a batch a quarter right, keeps the preview in step, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'rotate-image');
+  const net = watchNetwork(page);
+  // plain.jpg is 800x600 with a dark block in its top-left corner.
+  const { items } = await run(page, ['plain.jpg', 'graphic.png'], async () => {
+    await expect(page.locator('#rotate-panel')).toBeVisible();
+    await expect(page.locator('#rotate-panel')).toHaveAttribute('data-transform', '90,');
+    // The quick buttons drive the same options: left then right is back to 90.
+    await page.locator('#rotate-left').click();
+    await expect(page.locator('#rotate-panel')).toHaveAttribute('data-transform', '0,');
+    await page.locator('#rotate-right').click();
+    await expect(page.locator('#rotate-panel')).toHaveAttribute('data-transform', '90,');
+    await expect(page.locator('#rotate-hint')).toContainText('all 2 images');
+  });
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['graphic-rotated.png', 'plain-rotated.jpg']);
+  const jpg = files['plain-rotated.jpg']!;
+  expect(jpegSize(jpg)).toEqual({ width: 600, height: 800 });
+  // A quarter turn right carries the top-left corner to the top-right.
+  expect(dark(await pixelAt(page, jpg, 590, 10))).toBe(true);
+  expect(dark(await pixelAt(page, jpg, 10, 10))).toBe(false);
+  expect(pngSize(files['graphic-rotated.png']!)).toEqual({ width: 480, height: 640 });
+  net.assertNothingLeft(['plain.jpg', 'graphic.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Flip image page mirrors left to right, and a no-op is refused', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/flip-image');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['plain.jpg']);
+  expect(downloads[0]!.suggestedFilename()).toBe('plain-flipped.jpg');
+  const jpg = await bytesOf(downloads[0]!);
+  expect(jpegSize(jpg)).toEqual({ width: 800, height: 600 });
+  expect(dark(await pixelAt(page, jpg, 790, 10))).toBe(true);
+  expect(dark(await pixelAt(page, jpg, 10, 10))).toBe(false);
+  net.assertNothingLeft(['plain.jpg']);
+  // Untick the flip: nothing would change, so the tool says so instead of saving a copy.
+  await choose(page.locator('#flip-h'));
+  await page.locator('#flip-h').uncheck({ force: true });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Pick a rotation or a flip first');
+});
+
+test('Find faces marks every face, even small ones in a group, with a detector served by the site', async ({ page }) => {
+  const errors = await open(page, 'blur-image');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  // Four small copies of one face on a 2400x1600 canvas, at known places.
+  await page.locator('#file-input').setInputFiles([fx('group.jpg')]);
+  await expect(page.locator('#blur-panel')).toBeVisible();
+  await page.locator('#blur-find').click();
+  await expect(page.locator('#blur-panel')).toHaveAttribute('data-faces', '4', { timeout: 60_000 });
+  await expect(page.locator('#blur-hint')).toContainText('Found 4 faces');
+  const areas = (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(';').map((a) => a.split(',').map(Number));
+  // Each pasted face is 205x256 with the face itself around (65..145, 20..110) inside it.
+  for (const [x, y] of [[150, 200], [800, 1100], [1400, 300], [2000, 1150]] as const) {
+    const cx = x + 105;
+    const cy = y + 70;
+    expect(areas.some(([ax, ay, aw, ah]) => ax! <= cx && cx <= ax! + aw! && ay! <= cy && cy <= ay! + ah!), `face at ${x},${y}`).toBe(true);
+  }
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('group-blurred.jpg');
+
+  // A single portrait: one face, and no hand or fabric mistaken for another.
+  await page.locator('#file-input').setInputFiles([staticFx('face.jpg')]);
+  await expect(page.locator('#blur-panel')).not.toHaveAttribute('data-faces', '4');
+  await page.locator('#blur-find').click();
+  await expect(page.locator('#blur-panel')).toHaveAttribute('data-faces', '1', { timeout: 60_000 });
+  net.assertNothingLeft(['group.jpg', 'face.jpg']);
+  // MediaPipe logs its CPU delegate start-up as a console error; that line is expected.
+  expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+});
+
+/** Decode audio bytes in the page: duration, channel count and loudness (RMS of the first channel). */
+async function audioInfo(page: Page, bytes: Uint8Array) {
+  return page.evaluate(async (arr) => {
+    const ctx = new OfflineAudioContext(2, 1, 44100);
+    const buf = await ctx.decodeAudioData(new Uint8Array(arr).buffer);
+    const d = buf.getChannelData(0);
+    let sum = 0;
+    for (let i = 0; i < d.length; i++) sum += d[i]! * d[i]!;
+    return { duration: buf.duration, channels: buf.numberOfChannels, rms: Math.sqrt(sum / d.length) };
+  }, Array.from(bytes));
+}
+
+test('Video to MP3 converts a video and a WAV in one batch, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'video-to-mp3');
+  const net = watchNetwork(page);
+  // A 2.2 s WebM with a 440 Hz Opus sound track, and a 1.5 s stereo 48 kHz WAV.
+  const { items } = await run(page, [staticFx('talk.webm'), 'tone.wav']);
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['talk.mp3', 'tone.mp3']);
+  for (const [name, seconds] of [['talk.mp3', 2.2], ['tone.mp3', 1.5]] as const) {
+    const mp3 = files[name]!;
+    // An MP3 starts with a frame sync (11 set bits); this encoder writes no ID3 tag.
+    expect(mp3[0]).toBe(0xff);
+    expect(mp3[1]! & 0xe0).toBe(0xe0);
+    const info = await audioInfo(page, mp3);
+    expect(info.channels).toBe(2);
+    expect(info.duration).toBeGreaterThan(seconds - 0.4);
+    expect(info.duration).toBeLessThan(seconds + 0.4);
+    expect(info.rms, `${name} is not silent`).toBeGreaterThan(0.05);
+  }
+  net.assertNothingLeft(['talk.webm', 'tone.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('MP4 to WAV page writes a 44.1 kHz WAV, mono on request, and a video without sound gets a clear error', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/mp4-to-wav');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [staticFx('talk.webm')], async () => {
+    await choose(page.locator('input[name="channels"][value="mono"]'));
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('talk.wav');
+  const wav = await bytesOf(downloads[0]!);
+  const dv = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+  expect(new TextDecoder().decode(wav.slice(0, 4))).toBe('RIFF');
+  expect(new TextDecoder().decode(wav.slice(8, 12))).toBe('WAVE');
+  expect(dv.getUint16(22, true)).toBe(1); // mono
+  expect(dv.getUint32(24, true)).toBe(44100);
+  expect(dv.getUint16(34, true)).toBe(16);
+  const info = await audioInfo(page, wav);
+  expect(info.duration).toBeGreaterThan(1.8);
+  expect(info.rms).toBeGreaterThan(0.05);
+  net.assertNothingLeft(['talk.webm']);
+
+  // clip.webm has video only.
+  await page.goto('/tools/video-to-mp3');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('clip.webm')]);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('No audio could be read from this file');
 });

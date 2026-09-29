@@ -1,0 +1,37 @@
+---
+/**
+ * The blur stage: the image drawn to a canvas with the chosen effect already
+ * applied, and a box per area on top. Drag on the image to add an area. Shown
+ * once an image is dropped; driven by src/tools/blur-image.ts.
+ */
+---
+<div id="blur-panel" class="blur-panel" hidden>
+  <div class="blur-stage" id="blur-stage" role="application" aria-label="Image preview. Drag across the image to mark an area to hide.">
+    <canvas id="blur-canvas"></canvas>
+    <div id="blur-areas" class="blur-areas"></div>
+  </div>
+  <div class="blur-bar">
+    <p class="muted small blur-hint" id="blur-hint">Drag across each face, plate or line of text to hide it.</p>
+    <span class="blur-actions">
+      <button class="btn btn-sm" type="button" id="blur-find" title="Runs a small face detector in this tab. Nothing is uploaded.">Find faces</button>
+      <button class="btn btn-sm btn-ghost" type="button" id="blur-undo" disabled>Undo</button>
+      <button class="btn btn-sm btn-ghost" type="button" id="blur-clear" disabled>Clear areas</button>
+    </span>
+  </div>
+</div>
+<style is:global>
+  .blur-panel { display: grid; gap: 8px; }
+  .blur-stage { position: relative; display: inline-block; max-width: 100%; line-height: 0; user-select: none; -webkit-user-select: none; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); touch-action: none; overflow: hidden; justify-self: start; cursor: crosshair; }
+  .blur-stage.is-whole { cursor: default; }
+  .blur-stage canvas { display: block; max-width: 100%; max-height: 65vh; width: auto; height: auto; }
+  .blur-areas { position: absolute; inset: 0; }
+  .blur-area { position: absolute; box-sizing: border-box; border: 1.5px dashed #fff; outline: 1px solid rgba(0, 0, 0, 0.55); }
+  .blur-area.is-drawing { border-style: solid; border-color: var(--accent); }
+  .blur-area button { position: absolute; top: -11px; right: -11px; width: 22px; height: 22px; padding: 0; border-radius: 50%; border: 2px solid #fff; background: #111418; color: #fff; font: 700 14px/1 system-ui, sans-serif; cursor: pointer; display: grid; place-items: center; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
+  .blur-area button:hover { background: #c62828; }
+  .blur-area button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  @media (pointer: coarse) { .blur-area button { width: 28px; height: 28px; top: -14px; right: -14px; } }
+  .blur-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .blur-hint { margin: 0; flex: 1 1 220px; }
+  .blur-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
+</style>

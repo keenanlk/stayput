@@ -8,6 +8,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'convert-image': ['compress-image', 'strip-exif'],
   'compress-image': ['strip-exif', 'image-to-pdf'],
   'strip-exif': ['compress-image', 'crop-image'],
+  'exif-viewer': ['strip-exif', 'compress-image'],
   'crop-image': ['compress-image', 'strip-exif'],
   'image-to-pdf': ['compress-pdf', 'merge-pdf'],
   'pdf-to-image': ['compress-image', 'crop-image'],
@@ -20,6 +21,10 @@ export const nextSteps: Record<string, [string, string]> = {
   'pdf-page-numbers': ['compress-pdf', 'sign-pdf'],
   'pdf-to-word': ['split-pdf', 'compress-pdf'],
   'favicon-generator': ['crop-image', 'compress-image'],
+  'video-to-gif': ['compress-image', 'crop-image'],
+  'blur-image': ['compress-image', 'crop-image'],
+  'rotate-image': ['crop-image', 'compress-image'],
+  'video-to-mp3': ['video-to-gif', 'compress-image'],
   'unlock-pdf': ['merge-pdf', 'compress-pdf'],
   'protect-pdf': ['compress-pdf', 'sign-pdf'],
 };
