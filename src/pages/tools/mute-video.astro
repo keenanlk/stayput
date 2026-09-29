@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import MuteVideo from '../../components/options/MuteVideo.astro';
+const tool = toolBySlug('mute-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><MuteVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/mute-video.ts"></script>

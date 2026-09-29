@@ -1,0 +1,26 @@
+---
+/** Option controls for rotate and flip video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const rotate = defaults.rotate ?? '90';
+const turns = [
+  ['0', 'None'],
+  ['90', '90° right'],
+  ['180', '180°'],
+  ['270', '90° left'],
+] as const;
+---
+<div class="field">
+  <label>Rotate</label>
+  <div class="segmented" role="radiogroup" aria-label="Rotate">
+    {turns.map(([v, l]) => <label><input type="radio" name="rotate" value={v} checked={v === rotate} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field">
+  <label>Flip</label>
+  <label class="check"><input type="checkbox" id="flip-h" checked={defaults['flip-h'] === 'true'} /> Flip horizontally (mirror left to right)</label>
+  <label class="check"><input type="checkbox" id="flip-v" checked={defaults['flip-v'] === 'true'} /> Flip vertically (upside down mirror)</label>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>

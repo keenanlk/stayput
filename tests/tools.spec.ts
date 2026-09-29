@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(30);
+  expect(await page.locator('.tool-card').count()).toBe(33);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2565,4 +2565,138 @@ test('PDF to TIFF writes every page into one multi-page TIFF that Pillow reads, 
     expect(p.dark).toBeGreaterThan(100);
   }
   net.assertNothingLeft(['text.pdf']);
+});
+
+/** The tracks in any video file, read in Node with the same library the page uses. */
+async function videoTracks(bytes: Uint8Array): Promise<{ video: { codec: string | null; width: number; height: number } | null; audio: number }> {
+  const { Input, BufferSource, ALL_FORMATS } = await import('mediabunny');
+  const input = new Input({ source: new BufferSource(bytes), formats: ALL_FORMATS });
+  const v = await input.getPrimaryVideoTrack();
+  const audio = (await input.getAudioTracks()).length;
+  return { video: v ? { codec: v.codec, width: v.displayWidth, height: v.displayHeight } : null, audio };
+}
+
+/** A 1 second 640x360 WebM, red on the left half and blue on the right, so turns and flips can be told apart. */
+async function halvesClip(page: Page): Promise<string> {
+  const bytes = await page.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = 640;
+    c.height = 360;
+    const ctx = c.getContext('2d')!;
+    const rec = new MediaRecorder(c.captureStream(30), { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 2e6 });
+    const chunks: Blob[] = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    rec.start();
+    const t0 = performance.now();
+    await new Promise<void>((done) => {
+      const frame = () => {
+        ctx.fillStyle = '#e00000';
+        ctx.fillRect(0, 0, 320, 360);
+        ctx.fillStyle = '#0000e0';
+        ctx.fillRect(320, 0, 320, 360);
+        // A small white mark in the top left corner tells a vertical flip from a turn.
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 80, 60);
+        if (performance.now() - t0 < 1000) requestAnimationFrame(frame);
+        else done();
+      };
+      frame();
+    });
+    rec.stop();
+    await new Promise((r) => (rec.onstop = r));
+    return [...new Uint8Array(await new Blob(chunks).arrayBuffer())];
+  });
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'halves.webm');
+  writeFileSync(file, Buffer.from(bytes));
+  return file;
+}
+
+/** Colours at points given as fractions of the frame, half a second in. */
+async function frameColours(page: Page, bytes: Uint8Array, points: [number, number][]) {
+  return page.evaluate(async ({ data, points }) => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
+    await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
+    await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); v.currentTime = 0.5; });
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(v, 0, 0);
+    const name = ([r, g, b]: number[]) => (r! > 180 && g! > 180 && b! > 180 ? 'white' : r! > 150 && b! < 90 ? 'red' : b! > 150 && r! < 90 ? 'blue' : `rgb(${r},${g},${b})`);
+    return { width: v.videoWidth, height: v.videoHeight, at: points.map(([x, y]) => name([...ctx.getImageData(Math.floor(x * c.width), Math.floor(y * c.height), 1, 1).data])) };
+  }, { data: [...bytes], points });
+}
+
+test('Mute video copies the picture into the same format without its sound, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'mute-video');
+  const clip = await recordClip(page);
+  const before = await videoTracks(readFileSync(clip));
+  expect(before.audio).toBe(1);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('recording-muted.webm');
+  const out = await bytesOf(downloads[0]!);
+  const after = await videoTracks(out);
+  expect(after.audio).toBe(0);
+  // Still VP8, which this page never encodes: the picture was copied, not re-encoded.
+  expect(after.video).toMatchObject({ codec: 'vp8', width: 1280, height: 720 });
+  await expect(page.locator('#results-list .result-item')).toContainText('copied, no quality loss');
+  await expect(page.locator('#results-list .result-item')).toContainText('no sound');
+  net.assertNothingLeft(['recording.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Resize video sets the short side, keeps the sound, and takes a custom width', async ({ page }) => {
+  const errors = await open(page, 'resize-video');
+  const clip = await recordClip(page);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip], async () => {
+    await page.locator('#size').selectOption('360');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('recording-resized.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(mp4);
+  expect(tracks.video).toMatchObject({ width: 640, height: 360 });
+  expect(tracks.audio).toBe(1);
+  await expect(page.locator('#results-list .result-item')).toContainText('640×360');
+  net.assertNothingLeft(['recording.webm']);
+
+  await page.reload();
+  const second = await run(page, [clip], async () => {
+    await page.locator('#size').selectOption('custom');
+    await expect(page.locator('#custom-size')).toBeVisible();
+    await page.locator('#width').fill('320');
+  });
+  expect((await videoTracks(await bytesOf(second.downloads[0]!))).video).toMatchObject({ width: 320, height: 180 });
+  expect(errors).toEqual([]);
+});
+
+test('Rotate video turns and flips the picture itself, and the flip page starts on a mirror', async ({ page }) => {
+  const errors = await open(page, 'rotate-video');
+  const clip = await halvesClip(page);
+  const net = watchNetwork(page);
+  // 90° right: the left (red) half ends up on top, and the white corner at the top right.
+  const { downloads } = await run(page, [clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('halves-rotated.mp4');
+  const turned = await frameColours(page, await bytesOf(downloads[0]!), [[0.5, 0.3], [0.5, 0.7], [0.95, 0.03]]);
+  expect(turned).toMatchObject({ width: 360, height: 640, at: ['red', 'blue', 'white'] });
+  net.assertNothingLeft(['halves.webm']);
+
+  await stubAnalytics(page);
+  await page.goto('/flip-video');
+  await expect(page.locator('#flip-h')).toBeChecked();
+  const flipped = await run(page, [clip]);
+  const mirror = await frameColours(page, await bytesOf(flipped.downloads[0]!), [[0.25, 0.5], [0.75, 0.5], [0.95, 0.05]]);
+  expect(mirror).toMatchObject({ width: 640, height: 360, at: ['blue', 'red', 'white'] });
+  expect(errors).toEqual([]);
+
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(clip);
+  await page.locator('input[name="rotate"][value="0"]').check({ force: true });
+  await page.locator('#flip-h').uncheck({ force: true });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Choose a rotation or a flip first.');
 });

@@ -1176,6 +1176,120 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'mute-video',
+    name: 'Mute video',
+    title: 'Remove Audio from Video: Mute MP4, MOV, No Upload | Stayput',
+    description:
+      'Remove the sound from a video in your browser. The picture is copied untouched, so it takes seconds with no quality loss. MP4, MOV, WebM, MKV. No upload.',
+    heading: 'Remove audio from a video',
+    tagline: 'Take the sound out of a video, in seconds and without re-encoding. The video never leaves this device.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to mute',
+    action: 'Remove sound',
+    keywords: ['remove audio from video', 'mute video', 'remove sound from video', 'mute video online', 'silent video', 'remove audio from mp4'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'There is nothing to set.',
+      'Remove sound. Each video is rewritten without its sound track, in the same format, and downloads straight away (several download as a zip).',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The file is read and rewritten by code in this page. There is no server in the process, so there is no upload, no size limit and no copy left anywhere. The page works with Wi-Fi off.',
+      },
+      {
+        q: 'Does removing the sound lower the quality?',
+        a: 'No. The video track is copied packet by packet into the new file, exactly as it was. Only the sound track is left out, which is also why a long video is done in seconds.',
+      },
+      {
+        q: 'What format is the result?',
+        a: 'The same as the video you dropped: an MP4 stays an MP4, a MOV stays a MOV, and WebM and MKV stay WebM and MKV.',
+      },
+      {
+        q: 'Can I remove only part of the sound, or replace it?',
+        a: 'This tool removes the whole sound track. To keep the sound on its own instead, use Video to MP3.',
+      },
+    ],
+  },
+  {
+    slug: 'resize-video',
+    name: 'Resize video',
+    title: 'Resize Video: Change Resolution to 1080p, 720p, No Upload | Stayput',
+    description:
+      'Resize a video in your browser: 4K to 1080p, 1080p to 720p, half size or any width and height. MP4, MOV, WebM in, MP4 out. No upload, no watermark.',
+    heading: 'Resize a video',
+    tagline: 'Change a video’s resolution, from 4K down to 240p or to an exact width and height. Resized on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to resize',
+    action: 'Resize',
+    keywords: ['resize video', 'change video resolution', 'video resizer', 'resize mp4', '4k to 1080p', 'reduce video resolution'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Choose a new size: 1080p, 720p and so on, a percentage, or a custom width and height.',
+      'Resize. Each video is re-encoded at the new size into an MP4 and downloads straight away.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes and re-encodes the video with its own video encoder, in this tab. There is no server in the process, so there is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'What does 720p mean for a vertical phone video?',
+        a: 'The p number sets the short side. A landscape 1920×1080 video at 720p becomes 1280×720, and a portrait 1080×1920 one becomes 720×1280, so tall videos stay tall.',
+      },
+      {
+        q: 'Will the aspect ratio change?',
+        a: 'Not with the preset sizes, which keep the shape of the picture. With a custom size, fill in only the width or only the height to keep the shape; fill in both and the picture is stretched to fit exactly.',
+      },
+      {
+        q: 'Does making a video smaller also make the file smaller?',
+        a: 'Usually, because there are fewer pixels to store. To aim for a particular file size, such as 10 MB for Discord, use Compress video instead.',
+      },
+    ],
+  },
+  {
+    slug: 'rotate-video',
+    name: 'Rotate video',
+    title: 'Rotate Video 90 or 180 Degrees, Flip Video, No Upload | Stayput',
+    description:
+      'Rotate a video 90° or 180°, or flip it to mirror it, in your browser. Fix sideways phone videos. MP4, MOV, WebM in, MP4 out. No upload, no watermark.',
+    heading: 'Rotate or flip a video',
+    tagline: 'Turn a sideways or upside-down video the right way up, or mirror it. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to rotate',
+    action: 'Rotate',
+    keywords: ['rotate video', 'flip video', 'rotate video 90 degrees', 'mirror video', 'rotate mp4', 'fix sideways video'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Choose how far to turn them, and tick a flip if you want a mirror image.',
+      'Rotate. Each video is re-encoded the right way up into an MP4 and downloads straight away.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes the video, turns each frame and encodes it again with its own video encoder, all in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Will the rotation show everywhere?',
+        a: 'Yes. Some tools only set a rotation flag that certain players ignore. Here the turn is built into the picture itself, so the video looks the same in every player, editor and upload form.',
+      },
+      {
+        q: 'Which way is 90° right?',
+        a: 'Clockwise. A video filmed with the phone turned left, that plays lying on its side, usually needs 90° right; if it ends up upside down, choose 90° left instead.',
+      },
+      {
+        q: 'Does rotating lower the quality?',
+        a: 'Turning the picture means encoding it again. That is done at high quality, so the result is close to the original, and the sound is copied as it is.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

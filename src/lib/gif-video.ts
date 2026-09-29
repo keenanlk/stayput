@@ -68,7 +68,7 @@ const CANDIDATES: Candidate[] = [
 ];
 
 /** The encoder configs this browser says it can do at this size, best first. */
-async function supportedCodecs(width: number, height: number, bitrate: number, framerate: number): Promise<{ config: VideoEncoderConfig; candidate: Candidate }[]> {
+export async function supportedCodecs(width: number, height: number, bitrate: number, framerate: number): Promise<{ config: VideoEncoderConfig; candidate: Candidate }[]> {
   if (typeof VideoEncoder === 'undefined') {
     throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
   }

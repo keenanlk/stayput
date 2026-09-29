@@ -25,6 +25,9 @@ const modules: Record<string, () => Promise<unknown>> = {
   'video-to-mp4': () => import('./video-to-mp4'),
   'compress-png': () => import('./compress-png'),
   'trim-video': () => import('./trim-video'),
+  'mute-video': () => import('./mute-video'),
+  'resize-video': () => import('./resize-video'),
+  'rotate-video': () => import('./rotate-video'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
 };

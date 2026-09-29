@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ResizeVideo from '../../components/options/ResizeVideo.astro';
+const tool = toolBySlug('resize-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ResizeVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/resize-video.ts"></script>
