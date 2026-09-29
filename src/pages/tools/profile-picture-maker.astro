@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ProfilePicture from '../../components/options/ProfilePicture.astro';
+const tool = toolBySlug('profile-picture-maker')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ProfilePicture /></Fragment>
+</ToolLayout>
+<script src="../../tools/profile-picture.ts"></script>

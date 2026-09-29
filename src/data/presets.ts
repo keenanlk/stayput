@@ -2545,6 +2545,36 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'linkedin-profile-picture',
+    base: 'profile-picture-maker',
+    name: 'LinkedIn profile picture',
+    title: 'LinkedIn Profile Picture Maker, No Upload | Stayput',
+    description: 'Make a clean LinkedIn profile photo from a selfie: background replaced with a soft colour, face centred, 1024 px square. Made in your browser; nothing is uploaded.',
+    heading: 'Make a LinkedIn profile picture',
+    tagline: 'A professional-looking headshot from the photo you already have, made on your device.',
+    keywords: ['linkedin profile picture', 'linkedin photo maker', 'linkedin headshot', 'professional profile picture', 'linkedin profile photo background'],
+    dropLabel: 'Drop a photo of yourself',
+    action: 'Make LinkedIn picture',
+    defaults: { bg: '#dce6f0', shape: 'square', format: 'image/jpeg' },
+    intro: [
+      'LinkedIn says profiles with a photo get far more views, and recruiters look at the picture before anything else. It does not need a studio: a clear, well-lit photo of your face, framed as a headshot, on a calm background reads as professional. What usually lets a home photo down is what is behind you, such as a kitchen, a car interior or a crowd.',
+      'This page replaces that background with a soft blue-grey, frames the picture around your face the way a photographer would, with your face about 40% of the width and your eyes just above the middle, and saves it as a 1024 pixel square. LinkedIn shows profile pictures at 400 × 400 and crops them to a circle, so a larger square stays sharp and nothing important sits in the corners.',
+      'AI headshot services ask you to upload a dozen selfies and often keep them. Here the photo you drop never leaves your browser, and there is nothing to pay.',
+    ],
+    steps: [
+      'Take or pick a photo facing the camera in daylight from a window, shoulders in frame, with a natural expression.',
+      'Drop it here. Keep the soft blue-grey or pick another colour.',
+      'Download the JPG and upload it on LinkedIn: Me, View profile, then the camera icon on your picture.',
+    ],
+    faq: [
+      { q: 'What makes a good LinkedIn photo?', a: 'Your face filling a good part of the frame, looking at the camera, in soft even light, dressed as you would for work in your field. Recent, so people recognise you when they meet you. A plain background keeps the attention on your face, which is what this page adds.' },
+      { q: 'Which background colour is most professional?', a: 'Soft, cool tones such as light blue-grey, pale grey or off-white look calm and work with most skin tones and clothes. Strong brand colours can work for designers and founders who want to stand out; avoid colours close to your hair or clothing so the edges stay clear.' },
+      { q: 'Can I use the same picture on other sites?', a: 'Yes. The 1024 pixel square works for Slack, Teams, Google, Zoom, GitHub and conference badges. Most crop to a circle, which this framing allows for.' },
+      { q: 'Should I also update my LinkedIn banner?', a: 'The banner is a separate 1584 × 396 image. Keep it simple and not too busy, so it does not fight with the profile picture that sits over its bottom-left corner.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

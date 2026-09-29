@@ -199,6 +199,10 @@ export const engines: Record<string, Engine> = {
     how: 'The same open segmentation model as the background remover (ISNet, Apache 2.0, running on onnxruntime-web in a web worker) marks the subject. The cut-out is trimmed to the subject’s bounds, and the border is drawn by stamping a tinted silhouette of it in rings around the edge on a canvas, so it follows every curve. The canvas is saved as PNG or WebP by your browser.',
     versus: 'Sticker apps and sites upload your photos of people and pets to a server to cut them out, and many add a watermark or ask for a subscription. Here the photo never leaves your device and the sticker is yours at full size.',
   },
+  'profile-picture-maker': {
+    how: 'Two open models run in your tab: MediaPipe’s BlazeFace (Apache 2.0) finds your face and eyes, and ISNet (Apache 2.0) on onnxruntime-web cuts you out of the photo. The cut-out is scaled and placed so the face sits in the standard headshot position, over a solid colour, clipped to a circle if you choose, and saved at 1024 × 1024 by your browser.',
+    versus: 'Profile picture and AI headshot apps upload your face, often keep it to train models, and charge for the full-size file. Here your photo is processed on your device, and the result is yours at full size with no watermark.',
+  },
   'color-picker': {
     how: 'Your browser decodes the image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab. The colour under the cursor is read straight from that canvas, one pixel at a time, at up to 4096 pixels across, so a pick matches the file exactly. The main colours come from k-means clustering over a sample of about 20,000 pixels, run in the page with a fixed seed so the same image always gives the same palette.',
     versus: 'Colour pickers online upload the picture to show it back to you, which is a strange trade for a screenshot of a client’s unreleased design or a photo from your phone. Browser extensions that pick colours can read every page you visit. Here the image never leaves your device, and there is nothing to install.',

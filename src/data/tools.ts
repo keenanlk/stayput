@@ -1949,6 +1949,52 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'profile-picture-maker',
+    name: 'Profile picture maker',
+    title: 'Profile Picture Maker: Cut Out, Colour, Circle | Stayput',
+    description:
+      'Turn a photo into a profile picture: background removed, your face centred on a colour, as a circle or square at 1024 px. Made in your browser; nothing is uploaded.',
+    heading: 'Make a profile picture',
+    tagline: 'A clean headshot on a colour of your choice, framed around your face, made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop a photo of yourself',
+    action: 'Make profile picture',
+    keywords: ['profile picture maker', 'pfp maker', 'profile photo maker', 'avatar maker from photo', 'linkedin profile picture', 'headshot background', 'circle profile picture'],
+    steps: [
+      'Drop a photo where your face is clear and well lit; a selfie works.',
+      'Pick a background colour and a circle or square.',
+      'Download the 1024 × 1024 picture and upload it to LinkedIn, Slack, Discord, Instagram or anywhere else.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. A face detector and a cut-out model run inside your browser tab, and the picture is drawn there. Your face does not go to a server, which is more than most avatar and headshot apps can say.',
+      },
+      {
+        q: 'How is the picture framed?',
+        a: 'Around your face: the face fills about 40% of the width with the eyes a little above the middle, the usual headshot framing that still looks right when a site crops it to a circle. If no face is found, for a pet or an object, the whole subject is fitted in instead.',
+      },
+      {
+        q: 'Which background colour works best?',
+        a: 'A colour that contrasts with your hair and clothes and stays recognisable at thumbnail size. Soft, light colours read as professional on LinkedIn; bright ones stand out in Slack and Discord member lists. Using the same colour everywhere makes you easier to spot.',
+      },
+      {
+        q: 'Why 1024 × 1024?',
+        a: 'It is larger than any site displays, so every site can scale it down sharply: LinkedIn shows 400 × 400, Slack and Discord show much smaller. Uploading a bigger square than needed avoids the blur you get when a site enlarges a small one.',
+      },
+      {
+        q: 'Should I choose circle or square?',
+        a: 'Most sites crop to a circle themselves, so a square with a colour background works everywhere. Choose Circle when the picture will be shown as-is on a page, in a slide or an email signature, where a square would look boxy; the corners are transparent, so it is saved as PNG.',
+      },
+      {
+        q: 'My hair looks cut off at the edges.',
+        a: 'Fine, flyaway hair against a busy background is the hardest case for the cut-out. A photo against a plain wall works best. You can also run the photo through the background remover first, adjusting Keep around the edges, and drop the PNG it gives you here.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);

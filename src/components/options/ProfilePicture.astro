@@ -1,0 +1,62 @@
+---
+/** Option controls for the profile picture maker, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const shape = defaults.shape ?? 'circle';
+const bg = defaults.bg ?? '#f2c14e';
+const format = defaults.format ?? 'image/png';
+const swatches = [
+  ['#f2c14e', 'Yellow'],
+  ['#8ecae6', 'Sky'],
+  ['#f4a3a8', 'Pink'],
+  ['#9bd4a8', 'Mint'],
+  ['#1d3557', 'Navy'],
+  ['#ffffff', 'White'],
+] as const;
+const shapes = [
+  ['circle', 'Circle'],
+  ['square', 'Square'],
+] as const;
+---
+<div class="field wide">
+  <label>Background colour</label>
+  <div class="swatches" role="radiogroup" aria-label="Background colour">
+    {swatches.map(([v, l]) => (
+      <label class="swatch" title={l}>
+        <input type="radio" name="bg" value={v} checked={v === bg} />
+        <span style={`background:${v}`} aria-label={l}></span>
+      </label>
+    ))}
+    <label class="swatch custom" title="Any colour">
+      <input type="radio" name="bg" value="custom" checked={!swatches.some(([v]) => v === bg)} />
+      <input type="color" id="bg-color" value={swatches.some(([v]) => v === bg) ? '#b388eb' : bg} aria-label="Pick any colour" />
+    </label>
+  </div>
+</div>
+<div class="field">
+  <label>Shape</label>
+  <div class="segmented" role="radiogroup" aria-label="Shape">
+    {shapes.map(([v, l]) => <label><input type="radio" name="shape" value={v} checked={v === shape} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="image/png" selected={format === 'image/png'}>PNG</option>
+    <option value="image/jpeg" selected={format === 'image/jpeg'}>JPG (square only)</option>
+  </select>
+</div>
+<p class="field wide model-note">
+  Saved at 1024 × 1024, which every site scales down cleanly. The first photo downloads the face finder and cut-out model once (about 50 MB).
+</p>
+
+<style>
+  .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+  .swatch { position: relative; display: inline-flex; }
+  .swatch input[type='radio'] { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .swatch span, .swatch input[type='color'] { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); display: block; }
+  .swatch input[type='color'] { padding: 0; background: none; cursor: pointer; }
+  .swatch input[type='radio']:checked + span, .swatch input[type='radio']:checked + input[type='color'] { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .swatch input[type='radio']:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .model-note { margin: 0; font-size: 14px; color: var(--ink-2); }
+</style>
