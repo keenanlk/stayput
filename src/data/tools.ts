@@ -1628,6 +1628,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'qr-code-generator',
+    name: 'QR code generator',
+    title: 'Free QR Code Generator: Never Expires, No Sign-up | Stayput',
+    description:
+      'Make a QR code for a link, Wi-Fi, a contact card, an email or a phone number. Static codes that never expire, PNG or SVG, no sign-up, no tracking.',
+    heading: 'Make a QR code',
+    tagline: 'For a link, your Wi-Fi, a contact card, an email or a phone number. The code is made on this page and works forever.',
+    category: 'images',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Make a QR code',
+    action: 'Download',
+    keywords: ['qr code generator', 'free qr code generator', 'qr code generator free no sign up', 'wifi qr code', 'qr code for link', 'vcard qr code', 'qr code that never expires', 'static qr code'],
+    steps: [
+      'Choose what the code holds: a link or any text, Wi-Fi details, a contact card, an email or a phone number, and fill it in. The preview updates as you type.',
+      'Optionally change the colours, the size and the error correction under "Colours, size and error correction". Keep the code dark on a light background.',
+      'Download a PNG for documents and screens, or an SVG for print, which stays sharp at any size. Scan the preview with your phone to check it first.',
+    ],
+    faq: [
+      {
+        q: 'Will my QR code stop working?',
+        a: 'No. The code holds your link or text itself (a "static" code), so there is nothing to expire and no account to keep paying for. Many QR generators make "dynamic" codes that point at their own short link, which stop working or show an ad page when a free trial ends.',
+      },
+      {
+        q: 'Is my Wi-Fi password sent anywhere?',
+        a: 'No. The code is built by code in this page from what you type, and nothing is sent to a server, not even a usage count of what you typed. You can load the page, turn off your internet connection, and it still works.',
+      },
+      {
+        q: 'Do you track who scans my code?',
+        a: 'No, and we cannot: a static code sends the phone straight to your link, with nothing of ours in between. If you need scan counts, add a campaign tag such as ?utm_source=qr to your link and read it in your own analytics.',
+      },
+      {
+        q: 'PNG or SVG?',
+        a: 'PNG for documents, slides, websites and social posts. SVG for print, signage and design tools such as Figma, Illustrator, Canva or InDesign: it is made of shapes, so it stays crisp at any size.',
+      },
+      {
+        q: 'What is error correction?',
+        a: 'Extra data that lets a camera read the code when part of it is scratched, dirty or covered by a logo. Medium suits most uses; choose Quartile or High for outdoor prints, or if you will place a logo over the middle. More correction makes the code denser.',
+      },
+    ],
+  },
+  {
     slug: 'screen-recorder',
     name: 'Screen recorder',
     title: 'Free Online Screen Recorder, No Upload or Watermark | Stayput',
