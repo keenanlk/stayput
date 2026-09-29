@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(60);
+  expect(await page.locator('.tool-card').count()).toBe(61);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'black-and-white-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'black-and-white-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3007,18 +3007,27 @@ async function fadeClip(page: Page): Promise<string> {
     c.width = 320;
     c.height = 180;
     const ctx = c.getContext('2d')!;
-    const rec = new MediaRecorder(c.captureStream(30), { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 1e6 });
+    // Frames are pushed by hand and the clip holds black at the start and white at the end,
+    // so a busy CI machine that drops frames still records a dark first and a bright last frame.
+    const stream = c.captureStream(0);
+    const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack;
+    const rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 1e6 });
     const chunks: Blob[] = [];
     rec.ondataavailable = (e) => chunks.push(e.data);
+    const paint = (v: number) => {
+      ctx.fillStyle = `rgb(${v},${v},${v})`;
+      ctx.fillRect(0, 0, 320, 180);
+      track.requestFrame();
+    };
+    paint(0);
     rec.start();
     const t0 = performance.now();
     await new Promise<void>((done) => {
       const frame = () => {
-        const f = Math.min(1, (performance.now() - t0) / 1500);
-        const v = Math.round(255 * f);
-        ctx.fillStyle = `rgb(${v},${v},${v})`;
-        ctx.fillRect(0, 0, 320, 180);
-        if (f < 1) requestAnimationFrame(frame);
+        const t = performance.now() - t0;
+        // 250 ms black, a 1 s fade, then 250 ms white.
+        paint(Math.round(255 * Math.min(1, Math.max(0, (t - 250) / 1000))));
+        if (t < 1500) setTimeout(frame, 33);
         else done();
       };
       frame();
@@ -3050,7 +3059,10 @@ async function firstAndLastBrightness(page: Page, bytes: Uint8Array, type: strin
     c.height = v.videoHeight;
     const ctx = c.getContext('2d')!;
     const at = async (t: number) => {
+      // 'seeked' can fire before the new frame is painted, so also wait for the frame itself
+      // (or a short timeout when the seek lands on the frame already shown).
       await new Promise<void>((ok) => { v.onseeked = () => ok(); v.currentTime = t; });
+      await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); setTimeout(ok, 300); });
       ctx.drawImage(v, 0, 0);
       return ctx.getImageData(c.width >> 1, c.height >> 1, 1, 1).data[0]!;
     };
@@ -4227,4 +4239,40 @@ test('Black and white photo previews and converts to grayscale, two-tone and sep
   expect(p.warm).toBeGreaterThan(100);
   net.assertNothingLeft(['pug.jpg']);
   expect(errors).toEqual([]);
+});
+
+test('Audio to video makes an MP4 of the sound with the picture, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'audio-to-video');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['tone.wav', 'swatches.png']);
+  expect(downloads[0]!.suggestedFilename()).toBe('tone.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(mp4);
+  expect(tracks.video).toMatchObject({ width: 1920, height: 1080 });
+  expect(tracks.audio).toBe(1);
+  expect(await videoSeconds(mp4)).toBeCloseTo(1.5, 1);
+  const sound = await soundOf(page, mp4);
+  expect(sound.seconds).toBeCloseTo(1.5, 1);
+  net.assertNothingLeft(['tone.wav', 'swatches.png']);
+  expect(errors).toEqual([]);
+});
+
+test('MP3 to MP4 makes a square video of each MP3, with the title when there is no picture', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/mp3-to-mp4');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await choose(page.locator('input[name="shape"][value="square"]'));
+  const { downloads } = await run(page, [staticFx('song.mp3')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('song.mp4');
+  const tracks = await videoTracks(await bytesOf(downloads[0]!));
+  expect(tracks.video).toMatchObject({ width: 1080, height: 1080 });
+  await expect(page.locator('#results-list .result-item')).toContainText('title on plain background');
+});
+
+test('Audio to video refuses two pictures and says why', async ({ page }) => {
+  await open(page, 'audio-to-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('tone.wav'), fx('swatches.png'), fx('plain.jpg')]);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Add one picture');
 });

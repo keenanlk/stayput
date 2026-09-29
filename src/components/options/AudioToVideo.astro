@@ -1,0 +1,24 @@
+---
+/** Option controls for audio to video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const shape = defaults.shape ?? 'landscape';
+const backdrop = defaults.backdrop ?? 'blur';
+---
+<p class="small muted wide" style="margin:0">Add a picture (album cover, photo, logo) with the sound, or leave it out for a plain background with the title. Several sound files make one video each. Wide suits YouTube; tall suits Shorts, Reels and TikTok.</p>
+<div class="field">
+  <label>Shape</label>
+  <div class="segmented" role="radiogroup" aria-label="Shape">
+    <label><input type="radio" name="shape" value="landscape" checked={shape === 'landscape'} /><span>Wide 16:9</span></label>
+    <label><input type="radio" name="shape" value="square" checked={shape === 'square'} /><span>Square</span></label>
+    <label><input type="radio" name="shape" value="portrait" checked={shape === 'portrait'} /><span>Tall 9:16</span></label>
+  </div>
+</div>
+<div class="field">
+  <label for="backdrop">Around the picture</label>
+  <select id="backdrop">
+    <option value="blur" selected={backdrop === 'blur'}>Blurred copy of the picture</option>
+    <option value="black" selected={backdrop === 'black'}>Black</option>
+    <option value="white" selected={backdrop === 'white'}>White</option>
+  </select>
+</div>
