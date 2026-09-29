@@ -2075,6 +2075,52 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'redact-pdf',
+    name: 'Redact PDF',
+    title: 'Redact PDF Free, Text Really Removed, No Upload | Stayput',
+    description:
+      'Black out names, numbers and addresses in a PDF so the text underneath is gone, not just covered. Search or draw boxes; the PDF never leaves your browser.',
+    heading: 'Redact a PDF',
+    tagline: 'Find a name or number and black it out for good, or draw boxes by hand. The document stays on this device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF to redact',
+    action: 'Download redacted PDF',
+    keywords: ['redact pdf', 'redact pdf free', 'black out text in pdf', 'pdf redaction tool', 'censor pdf', 'hide text in pdf', 'remove sensitive information from pdf'],
+    steps: [
+      'Drop the PDF. Its pages show up here, drawn in your browser.',
+      'Type a name, account number or address and press Redact all matches, or use the email, phone and long-number buttons. Drag on a page to black out anything else, such as a signature or a photo.',
+      'Download the redacted PDF. Pages with a box become flat images with the text removed; the other pages stay as they were.',
+    ],
+    faq: [
+      {
+        q: 'Is the text really gone, or just covered?',
+        a: 'Gone. Each page you redact is redrawn as an image with the black boxes painted into it, and the page’s original text, fonts, links, comments and form values are deleted from the file. Copy and paste, search and text extractors find nothing under the boxes. That is the difference from drawing a black rectangle in a PDF editor, which leaves the words underneath for anyone to select.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The pages are drawn, searched and rewritten by code running in your browser tab, so a bank statement, medical record, court filing or HR document never leaves your device. The page works with Wi-Fi off once it has loaded.',
+      },
+      {
+        q: 'Why can I no longer select text on the redacted pages?',
+        a: 'Because the whole page became an image, which is what makes the redaction safe. Pages without boxes keep their selectable text. If you need the rest of a redacted page searchable, run the result through the image to text tool, or redact as few pages as you can.',
+      },
+      {
+        q: 'Does the search find everything?',
+        a: 'It finds text the PDF stores as text, on every page at once, ignoring upper and lower case. It cannot read words that are part of a picture, such as a scanned page or a photo of an ID, and a match that is split across two lines is missed. Look through each page before you download, and draw boxes over anything left.',
+      },
+      {
+        q: 'What else is removed?',
+        a: 'The document’s metadata (author, title, creating software, dates, XMP and file ID), because the author is often the very name you are redacting, and the accessibility tags, which can repeat page text. Bookmarks and links on the pages you did not redact keep working.',
+      },
+      {
+        q: 'Does it work on scanned or password-protected PDFs?',
+        a: 'Scans work: draw the boxes by hand, since a scan has no text to search. A PDF that only needs a password to edit is handled automatically. If it asks for a password to open, you are prompted for it, and the result is saved without the password.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);

@@ -2,6 +2,7 @@
 interface Props { name: string; class?: string }
 const { name, class: cls } = Astro.props;
 const paths: Record<string, string> = {
+  redact: '<path d="M6 2h8l6 6v14H6z"/><path d="M14 2v6h6"/><rect x="8.5" y="11" width="8" height="2.6" fill="currentColor"/><rect x="8.5" y="16" width="5" height="2.6" fill="currentColor"/>',
   shield: '<path d="M12 2.5 4 5.5v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10v-6l-8-3z"/><path d="m9 12 2 2 4-4"/>',
   offline: '<path d="M5 12.5a7 7 0 0 1 14 0"/><path d="M8.5 15.5a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/><path d="m3 3 18 18"/>',
   open: '<path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/><path d="m13 4-2 16"/>',

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(51);
+  expect(await page.locator('.tool-card').count()).toBe(52);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'merge-audio'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3635,6 +3635,80 @@ test('WAV to FLAC opens with FLAC chosen', async ({ page }) => {
   await page.goto('/wav-to-flac');
   await expect(page.locator('#format')).toHaveValue('flac');
   await expect(page.locator('#format-note')).toContainText('keeps every sample');
+});
+
+test('Redact PDF removes the text under the boxes, keeps other pages, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'redact-pdf');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#redact-panel')).toBeVisible();
+  await expect(page.locator('#page-label')).toHaveText('Page 1 of 3');
+  // Search jumps to the first page with a match and marks it.
+  await page.locator('#find-text').fill('page 2');
+  await page.locator('#find-form button[type="submit"]').click();
+  await expect(page.locator('#find-result')).toContainText('Marked 1 match');
+  await expect(page.locator('#page-label')).toHaveText('Page 2 of 3');
+  await expect(page.locator('.redact-box')).toHaveCount(1);
+  // The box sits over the heading, near the top of the page.
+  const stageBox = (await page.locator('#stage').boundingBox())!;
+  const hit = (await page.locator('.redact-box').boundingBox())!;
+  expect(hit.y - stageBox.y).toBeLessThan(stageBox.height * 0.2);
+  expect(hit.width).toBeGreaterThan(20);
+  // Draw a second box by hand.
+  await page.locator('#stage').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const s = (await page.locator('#stage').boundingBox())!;
+  await page.mouse.move(s.x + s.width * 0.5, s.y + s.height * 0.3);
+  await page.mouse.down();
+  await page.mouse.move(s.x + s.width * 0.9, s.y + s.height * 0.4, { steps: 6 });
+  await page.mouse.up();
+  await expect(page.locator('.redact-box')).toHaveCount(2);
+  await expect(page.locator('#box-count')).toHaveText('2 boxes on 1 page');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect(download.suggestedFilename()).toBe('text-redacted.pdf');
+  const out = await bytesOf(download);
+  // Page 2 has no text left; pages 1 and 3 are untouched.
+  expect(await textItems(out, 2)).toEqual([]);
+  expect((await textItems(out, 1)).map((t) => t.str).join(' ')).toContain('Page 1 of the fixture');
+  expect((await textItems(out, 3)).map((t) => t.str).join(' ')).toContain('Page 3 of the fixture');
+  // The old page 2 content is not left behind in the file as an orphan object.
+  const doc = await PDFDocument.load(out, { updateMetadata: false });
+  expect(doc.getPageCount()).toBe(3);
+  const streams = doc.context
+    .enumerateIndirectObjects()
+    .filter(([, o]) => o instanceof PDFRawStream && o.dict.get(PDFName.of('Filter')) !== PDFName.of('DCTDecode'))
+    .map(([, o]) => Buffer.from(decodePDFRawStream(o as PDFRawStream).decode()).toString('latin1').toLowerCase());
+  const hex = (t: string) => Buffer.from(t, 'latin1').toString('hex');
+  expect(streams.some((c) => c.includes(hex('Page 1')))).toBe(true);
+  expect(streams.some((c) => c.includes(hex('Page 2')) || c.includes('page 2'))).toBe(false);
+  expect(doc.context.trailerInfo.Info).toBeUndefined();
+  net.assertNothingLeft(['text.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Redact PDF finds email addresses and long numbers', async ({ page }) => {
+  await open(page, 'redact-pdf');
+  const src = await PDFDocument.create();
+  const font = await src.embedFont('Helvetica');
+  const p = src.addPage([612, 792]);
+  p.drawText('Contact: jane.doe@example.com', { x: 72, y: 700, size: 12, font });
+  p.drawText('Account 1234 5678 9012 3456', { x: 72, y: 680, size: 12, font });
+  p.drawText('Nothing to see on this line', { x: 72, y: 660, size: 12, font });
+  const file = join(mkdtempSync(join(tmpdir(), 'redact-')), 'statement.pdf');
+  writeFileSync(file, await src.save());
+  await page.locator('#file-input').setInputFiles([file]);
+  await expect(page.locator('#redact-panel')).toBeVisible();
+  await page.locator('[data-pattern="email"]').click();
+  await expect(page.locator('#find-result')).toContainText('Marked 1 match for email addresses');
+  await page.locator('[data-pattern="number"]').click();
+  await expect(page.locator('#find-result')).toContainText('Marked 1 match for long numbers');
+  // Searching again adds nothing new.
+  await page.locator('[data-pattern="email"]').click();
+  await expect(page.locator('#find-result')).toContainText('No text matching email addresses');
+  await expect(page.locator('.redact-box')).toHaveCount(2);
+  // Tapping a box removes it.
+  await page.locator('.redact-box').first().click();
+  await expect(page.locator('.redact-box')).toHaveCount(1);
 });
 
 async function levels(page: Page, bytes: Uint8Array): Promise<{ seconds: number; peak: number; rms: number }> {
