@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ResizePdf from '../../components/options/ResizePdf.astro';
+const tool = toolBySlug('resize-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ResizePdf /></Fragment>
+</ToolLayout>
+<script src="../../tools/resize-pdf.ts"></script>

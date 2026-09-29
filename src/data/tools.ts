@@ -2504,6 +2504,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'resize-pdf',
+    name: 'Resize PDF pages',
+    title: 'Resize PDF Page Size: A4, Letter, Legal, A3, No Upload | Stayput',
+    description:
+      'Change the page size of a PDF to A4, US Letter, Legal, A3, A5 or Tabloid, with the content scaled to fit and centred. Text stays sharp and links keep working. No upload.',
+    heading: 'Change the page size of a PDF',
+    tagline: 'Every page moved onto new paper, the content scaled to fit, on your own device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to resize',
+    action: 'Resize PDF',
+    keywords: ['resize pdf', 'change pdf page size', 'pdf page size', 'scale pdf', 'resize pdf pages', 'pdf to a4', 'pdf to letter size'],
+    steps: [
+      'Drop one or more PDFs.',
+      'Pick the new page size, the orientation and an optional margin.',
+      'Press Resize PDF. The note says how much the content was scaled.',
+    ],
+    faq: [
+      {
+        q: 'Does resizing make the text blurry?',
+        a: 'No. The pages are not turned into pictures: the same text and drawings are placed on the new page with a scale, so they stay sharp at any zoom and can still be selected and searched.',
+      },
+      {
+        q: 'Will the content be stretched?',
+        a: 'Never. It keeps its proportions and is scaled to the largest size that fits, then centred. When the new paper has a different shape, the leftover space becomes a white band at the sides or at the top and bottom.',
+      },
+      {
+        q: 'What happens to links, form fields and comments?',
+        a: 'They move and scale with the content, so a link still sits over its words and a form can still be filled in.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. pdf-lib rewrites the page sizes in this tab, so contracts, CVs and statements stay on your device.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

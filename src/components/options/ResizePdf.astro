@@ -1,0 +1,39 @@
+---
+/** Option controls for Resize PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const size = defaults.size ?? 'letter';
+const orientation = defaults.orientation ?? 'auto';
+const margin = defaults.margin ?? '0';
+const sizes = [
+  ['letter', 'US Letter (8.5 × 11 in)'],
+  ['a4', 'A4 (210 × 297 mm)'],
+  ['legal', 'US Legal (8.5 × 14 in)'],
+  ['a3', 'A3 (297 × 420 mm)'],
+  ['a5', 'A5 (148 × 210 mm)'],
+  ['tabloid', 'Tabloid (11 × 17 in)'],
+] as const;
+---
+<div class="field">
+  <label for="size">New page size</label>
+  <select id="size">
+    {sizes.map(([v, l]) => <option value={v} selected={v === size}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="orientation">Orientation</label>
+  <select id="orientation">
+    <option value="auto" selected={orientation === 'auto'}>Same as each page</option>
+    <option value="portrait" selected={orientation === 'portrait'}>Portrait</option>
+    <option value="landscape" selected={orientation === 'landscape'}>Landscape</option>
+  </select>
+</div>
+<div class="field">
+  <label for="margin">Margin</label>
+  <select id="margin">
+    <option value="0" selected={margin === '0'}>None, fill the page</option>
+    <option value="5" selected={margin === '5'}>5 mm</option>
+    <option value="10" selected={margin === '10'}>10 mm</option>
+    <option value="20" selected={margin === '20'}>20 mm</option>
+  </select>
+</div>

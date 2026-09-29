@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(75);
+  expect(await page.locator('.index .tool-card').count()).toBe(76);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -979,6 +979,8 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#delay')).toHaveValue('1');
       await expect(page.locator('#width')).toHaveValue('640');
     }],
+    ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
+    ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
     ['png-to-svg', 'image-to-svg', async () => {
       await expect(page.locator('input[name="mode"][value="logo"]')).toBeChecked();
       await expect(page.locator('#drop-white')).not.toBeChecked();
@@ -5248,4 +5250,34 @@ test('Flatten PDF can turn whole pages into images with no text left', async ({ 
   expect(doc.getPageCount()).toBe(1);
   expect(doc.getPage(0).getSize()).toEqual({ width: 600, height: 800 });
   expect(await textItems(bytes, 1)).toEqual([]);
+});
+
+test('Resize PDF moves A4 pages onto Letter, scales the content and its link, keeps the text, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'resize-pdf');
+  const net = watchNetwork(page);
+  const src = await PDFDocument.create();
+  const font = await src.embedFont('Helvetica');
+  for (const n of [1, 2]) src.addPage([595.28, 841.89]).drawText(`Page ${n} of the CV`, { x: 72, y: 760, size: 14, font });
+  const ctx = src.context;
+  src.getPage(0).node.set(PDFName.of('Annots'), ctx.obj([ctx.register(ctx.obj({ Type: 'Annot', Subtype: 'Link', Rect: [72, 700, 272, 720], A: { S: 'URI', URI: ctx.obj('https://example.com') } }))]));
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'cv.pdf');
+  writeFileSync(file, await src.save());
+  const { downloads } = await run(page, [file]);
+  expect(downloads[0]!.suggestedFilename()).toBe('cv-letter.pdf');
+  await expect(page.locator('#results-list')).toContainText('2 pages on US Letter, content at 94%');
+  const bytes = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(bytes);
+  for (const p of doc.getPages()) expect(p.getSize()).toEqual({ width: 612, height: 792 });
+  // The link moved with the content: scaled by 792/841.89 and centred.
+  const k = 792 / 841.89;
+  const dx = (612 - 595.28 * k) / 2;
+  const link = doc.context.lookup(doc.getPage(0).node.Annots()!.get(0)) as import('pdf-lib').PDFDict;
+  const rect = (link.lookup(PDFName.of('Rect')) as import('pdf-lib').PDFArray).asArray().map((n) => Number(n.toString()));
+  expect(rect[0]).toBeCloseTo(72 * k + dx, 1);
+  expect(rect[1]).toBeCloseTo(700 * k, 1);
+  const text = await textItems(bytes, 2);
+  expect(text.map((t) => t.str).join(' ')).toContain('Page 2 of the CV');
+  expect(text[0]!.x).toBeCloseTo(72 * k + dx, 0);
+  net.assertNothingLeft(['cv.pdf']);
+  expect(errors).toEqual([]);
 });
