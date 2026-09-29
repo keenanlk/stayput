@@ -26,7 +26,8 @@
   .blur-areas { position: absolute; inset: 0; }
   .blur-area { position: absolute; box-sizing: border-box; border: 1.5px dashed #fff; outline: 1px solid rgba(0, 0, 0, 0.55); }
   .blur-area.is-drawing { border-style: solid; border-color: var(--accent); }
-  .blur-area button { position: absolute; top: -11px; right: -11px; width: 22px; height: 22px; padding: 0; border-radius: 50%; border: 2px solid #fff; background: var(--ink); color: #fff; font: 700 13px/1 system-ui, sans-serif; cursor: pointer; display: grid; place-items: center; }
+  .blur-area button { position: absolute; top: -11px; right: -11px; width: 22px; height: 22px; padding: 0; border-radius: 50%; border: 2px solid #fff; background: #111418; color: #fff; font: 700 14px/1 system-ui, sans-serif; cursor: pointer; display: grid; place-items: center; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
+  .blur-area button:hover { background: #c62828; }
   .blur-area button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   @media (pointer: coarse) { .blur-area button { width: 28px; height: 28px; top: -14px; right: -14px; } }
   .blur-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
