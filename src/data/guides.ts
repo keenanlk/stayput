@@ -428,6 +428,15 @@ export const guides: Guide[] = [
           'On any Stayput tool you will see the page and its scripts load, on the HEIC and JPEG XL pages one larger GET for the decoder program, and one small anonymous page-count request. After you add files: nothing, apart from that same small count when a tool finishes, which names the tool and a size bucket and never a file name. Each tool page also runs this count for you and lists the requests under "Open the network tab. It stays empty." The site is [open source](https://github.com/keenanlk/stayput), so the third check is reading the code.',
         ],
       },
+      {
+        h: 'What popular upload-based services say they do',
+        p: ['The check tells you whether a file leaves; a service’s own policy tells you what happens to it after. We have summarised the published policies of the most searched-for converters, with deletion times, storage location and ads, from their own pages:'],
+        list: [
+          '[CloudConvert](/guides/is-cloudconvert-safe), [FreeConvert](/guides/is-freeconvert-safe), [Convertio](/guides/is-convertio-safe) and [Zamzar](/guides/is-zamzar-safe) for general file conversion.',
+          '[iLovePDF](/guides/is-ilovepdf-safe), [Smallpdf](/guides/is-smallpdf-safe) and [PDF24](/guides/is-pdf24-safe) for PDFs.',
+          '[Ezgif](/guides/is-ezgif-safe) for GIFs and short video edits.',
+        ],
+      },
     ],
     faq: [
       { q: 'What if the site uses a web worker or WebAssembly?', a: 'Both run inside your browser and show nothing in the network list except the one-time download of their code. They are how local processing is done, not a way to hide an upload.' },
@@ -1163,6 +1172,24 @@ export const guides: Guide[] = [
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
+
+/** "Is <service> safe?" guides, which read as a set. */
+export const isSafetyGuide = (g: Guide): boolean => /^is-.+-safe$/.test(g.slug);
+
+/**
+ * Guides to suggest under another guide: other safety guides first when the
+ * reader is on one, then the guides sharing the most tools, in list order on ties.
+ */
+export function relatedGuides(guide: Guide, count = 4): Guide[] {
+  const safety = isSafetyGuide(guide);
+  const score = (g: Guide) => g.tools.filter((t) => guide.tools.includes(t)).length + (safety && isSafetyGuide(g) ? 10 : 0);
+  return guides
+    .filter((g) => g.slug !== guide.slug)
+    .map((g, i) => ({ g, i, s: score(g) }))
+    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .slice(0, count)
+    .map((x) => x.g);
+}
 
 /** Guides that point at a tool or landing page, for the "Guides" section on tool pages. */
 export const guidesFor = (slugs: string[]): Guide[] => guides.filter((g) => g.tools.some((t) => slugs.includes(t)));
