@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(56);
+  expect(await page.locator('.tool-card').count()).toBe(57);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'audio-to-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4006,4 +4006,40 @@ test('Webcam test shows the camera with its real resolution and frame rate, and 
   await expect(page.locator('#cam-start')).toBeVisible();
   net.assertNothingLeft([]);
   expect(errors).toEqual([]);
+});
+
+test('Audio to video makes an MP4 of the sound with the picture, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'audio-to-video');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['tone.wav', 'swatches.png']);
+  expect(downloads[0]!.suggestedFilename()).toBe('tone.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(mp4);
+  expect(tracks.video).toMatchObject({ width: 1920, height: 1080 });
+  expect(tracks.audio).toBe(1);
+  expect(await videoSeconds(mp4)).toBeCloseTo(1.5, 1);
+  const sound = await soundOf(page, mp4);
+  expect(sound.seconds).toBeCloseTo(1.5, 1);
+  net.assertNothingLeft(['tone.wav', 'swatches.png']);
+  expect(errors).toEqual([]);
+});
+
+test('MP3 to MP4 makes a square video of each MP3, with the title when there is no picture', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/mp3-to-mp4');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await choose(page.locator('input[name="shape"][value="square"]'));
+  const { downloads } = await run(page, [staticFx('song.mp3')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('song.mp4');
+  const tracks = await videoTracks(await bytesOf(downloads[0]!));
+  expect(tracks.video).toMatchObject({ width: 1080, height: 1080 });
+  await expect(page.locator('#results-list .result-item')).toContainText('title on plain background');
+});
+
+test('Audio to video refuses two pictures and says why', async ({ page }) => {
+  await open(page, 'audio-to-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('tone.wav'), fx('swatches.png'), fx('plain.jpg')]);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Add one picture');
 });

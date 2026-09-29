@@ -2656,6 +2656,35 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'mp3-to-mp4',
+    base: 'audio-to-video',
+    name: 'MP3 to MP4',
+    title: 'MP3 to MP4: Convert Music to Video with a Cover | Stayput',
+    description: 'Convert an MP3 to an MP4 video with a cover picture, for YouTube or social apps that only take video. In your browser: no upload, no watermark.',
+    heading: 'Convert MP3 to MP4',
+    tagline: 'An MP3 is sound only; this makes it a video by adding a picture, so YouTube, Instagram and TikTok accept it.',
+    keywords: ['mp3 to mp4', 'convert mp3 to mp4', 'mp3 to mp4 converter', 'mp3 to video', 'change mp3 to mp4', 'mp3 to mp4 with image'],
+    dropLabel: 'Drop an MP3 and a cover picture',
+    action: 'Convert to MP4',
+    defaults: { shape: 'landscape', backdrop: 'blur' },
+    intro: [
+      'MP3 and MP4 are different kinds of file: an MP3 holds only sound, and an MP4 is a video. Sites that “convert MP3 to MP4” are adding a picture track, because video sites and most social apps refuse sound-only uploads.',
+      'This page does that honestly: drop the MP3 with an album cover, photo or logo, pick the shape for where it is going, and the MP4 is written in your browser with the picture held for the whole song. Without a picture, the video shows the song’s title.',
+      'If you have an MP4 video and want its sound as an MP3, that is the other direction: use Video to MP3.',
+    ],
+    steps: [
+      'Drop the MP3 and a picture, or tap to pick them. Drop several MP3s to make a video of each.',
+      'Choose 16:9 for YouTube, square for feeds, or 9:16 for Shorts, Reels and TikTok.',
+      'Convert, and upload the MP4 wherever you need it.',
+    ],
+    faq: [
+      { q: 'Does converting lower the sound quality?', a: 'Slightly: the sound is re-encoded as AAC (or Opus) at 192 kbps, which is as good as a typical MP3 to the ear. Video sites re-encode uploads anyway.' },
+      { q: 'Can I use a moving background or a waveform?', a: 'Not on this page: it makes a still-picture video, which is what most music uploads on YouTube are. For moving pictures, merge real video clips with Add audio to video.' },
+      { q: 'I want the MP3 from an MP4, not the other way round.', a: 'Use Video to MP3, which pulls the sound out of a video as an MP3.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
