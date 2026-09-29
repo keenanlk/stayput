@@ -189,8 +189,7 @@ code { font-family: var(--mono); font-size: 0.9em; background: var(--surface-2);
 .site-footer .links { margin-top: 4px; }
 .site-footer a:hover { color: var(--ink); text-decoration: underline; }
 .site-footer .conversions { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
-.site-footer .conversions ul { display: block; column-count: 4; column-gap: 24px; }
-.site-footer .conversions li { break-inside: avoid; }
+.site-footer .conversions a { font-weight: 650; color: var(--ink); }
 .site-footer .legal { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 20px; }
 
 /* Buttons and inputs */
@@ -422,7 +421,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .page-thumb .controls { display: flex; gap: 4px; }
 
 @media (max-width: 900px) {
-  .site-footer .conversions ul { column-count: 3; }
   .hero-grid { grid-template-columns: 1fr; gap: 44px; padding: 56px 0 64px; }
   .index { grid-template-columns: 1fr; gap: 56px; }
   .index #image-tools, .index #media-tools, .index #pdf-tools { grid-column: auto; grid-row: auto; }
@@ -431,7 +429,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 
 @media (max-width: 720px) {
   .site-footer .cols { grid-template-columns: 1fr; }
-  .site-footer .conversions ul { column-count: 2; }
   .file-item, .result-item { grid-template-columns: 40px 1fr; }
   .file-item .actions, .result-item .actions { grid-column: 1 / -1; justify-content: flex-end; }
   .section { margin-top: 64px; }
