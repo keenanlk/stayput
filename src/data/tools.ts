@@ -1986,7 +1986,7 @@ export const tools: Tool[] = [
     name: 'Add text to image',
     title: 'Add Text to Image Online, Free, No Upload | Stayput',
     description:
-      'Put text on a photo in your browser: drag it into place, pick a font, colour, outline or box, and save full size. Batch for captions or watermarks. No upload.',
+      'Put text on a photo in your browser: drag it into place, pick a font, colour, outline or box, and save full size. Batch captions too. No upload.',
     heading: 'Add text to an image',
     tagline: 'Write on a photo, a screenshot or a meme and drag the words where you want them. Done on this device, never uploaded.',
     category: 'images',
@@ -2011,7 +2011,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I add the same text to many images?',
-        a: 'Yes. Drop them all at once and the text goes in the same place on each, which is how to caption a set of photos or put your name on them as a watermark. The preview shows the first image.',
+        a: 'Yes. Drop them all at once and the text goes in the same place on each, which is how to caption a set of photos. For a repeated or tiled name across photos, use the watermark tool. The preview shows the first image.',
       },
       {
         q: 'How do I make text readable on a busy photo?',

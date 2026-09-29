@@ -46,7 +46,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'webcam-test': ['mic-test', 'compress-image'],
   'audio-to-video': ['compress-video', 'trim-video'],
   'compress-audio': ['trim-audio', 'audio-converter'],
-  'add-text-to-image': ['compress-image', 'crop-image'],
+  'add-text-to-image': ['watermark-image', 'compress-image'],
   'trim-audio': ['add-audio-to-video', 'video-to-mp3'],
   'blur-image': ['compress-image', 'crop-image'],
   'rotate-image': ['crop-image', 'compress-image'],

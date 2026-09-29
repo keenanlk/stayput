@@ -2876,32 +2876,6 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
-  {
-    slug: 'add-watermark-to-photo',
-    base: 'add-text-to-image',
-    name: 'Add watermark to photo',
-    title: 'Add Watermark to Photos Free, Batch, No Upload | Stayput',
-    description: 'Put your name or © notice on a batch of photos in your browser: semi-transparent text in the corner, same place on every image. No upload.',
-    heading: 'Add a watermark to photos',
-    tagline: 'Stamp your name on a whole set of photos at once, on your own device.',
-    keywords: ['add watermark to photo', 'watermark photos', 'watermark photos free', 'batch watermark', 'add copyright to photo', 'text watermark online'],
-    dropLabel: 'Drop photos to watermark',
-    defaults: { text1: '© Your name', size: '3.5', opacity: '65', effect: 'shadow', color: '#ffffff', pos1: '0.84,0.94' },
-    intro: [
-      'A small, semi-transparent name in the corner tells people where a photo came from and discourages reposting without credit. This page puts the same text in the same place on every photo you drop in, drawn at full size, so a whole shoot is watermarked in one go.',
-      'Your photos are never uploaded, which matters most for client work and unreleased shots: watermarking sites receive the clean originals you are trying to protect. Change the text, drag it anywhere, and raise the opacity for a stronger mark.',
-    ],
-    steps: [
-      'Drop one or more photos, or tap to pick them.',
-      'Replace “Your name”, then drag the text or use Corner, and set the size and opacity.',
-      'Save. One photo downloads straight away; several come as a zip.',
-    ],
-    faq: [
-      { q: 'Can I add a logo instead of text?', a: 'Not yet: this tool adds text. A © symbol and your name or website is the most common watermark.' },
-      { q: 'Does it work on portrait and landscape photos together?', a: 'Yes. The position and size are a share of each photo, so the mark sits in the same corner at the same relative size on both.' },
-      noUpload,
-    ],
-  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
