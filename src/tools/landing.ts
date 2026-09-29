@@ -39,6 +39,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
   'remove-background': () => import('./remove-background'),
+  'passport-photo': () => import('./passport-photo'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';
