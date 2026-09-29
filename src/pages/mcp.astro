@@ -35,6 +35,18 @@ const jsonLd = [
     <p>StayPut’s PDF and photo tools also come as an <a href="https://modelcontextprotocol.io" rel="noopener">MCP server</a>, so Claude, Cursor, VS Code and other assistants can use them on the files on your computer. Ask “merge the two invoices in Downloads” or “does this photo have my location in it?” and the work happens on your machine.</p>
     <p>It runs the same code as this website. Your files are read from disk and written back to disk. <strong>Nothing is uploaded, and the server makes no network requests at all.</strong> It is free, open source and needs no account or API key.</p>
 
+    <figure class="mcp-flow">
+      <div class="mcp-machine">
+        <span class="mcp-machine-label">Your computer</span>
+        <ol>
+          <li><b>Your assistant</b><span>Claude, Cursor, VS Code</span></li>
+          <li class="mcp-core"><b>stayput-mcp</b><span>the same code as this site</span></li>
+          <li><b>Your files</b><span>read and written on disk</span></li>
+        </ol>
+      </div>
+      <figcaption><span class="mcp-zero">0</span> network requests from stayput-mcp. It works on files on disk and nothing else.</figcaption>
+    </figure>
+
     <h2>Install</h2>
     <p>You need <a href="https://nodejs.org" rel="noopener">Node.js</a> 20 or newer.</p>
     <h3>Claude Code</h3>
