@@ -6,6 +6,7 @@ import { guides } from '../data/guides';
 const images = tools.filter((t) => t.category === 'images');
 const pdfs = tools.filter((t) => t.category === 'pdf');
 const media = tools.filter((t) => t.category === 'media');
+const CAP = 8;
 ---
 <footer class="site-footer">
   <div class="wrap">
@@ -18,14 +19,25 @@ const media = tools.filter((t) => t.category === 'media');
         </ul>
       </div>
       <div>
-        <h3>Image tools</h3>
-        <ul>{images.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
-        <h3>Video and audio</h3>
-        <ul>{media.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
+        <h3><a href="/#image-tools">Image tools</a></h3>
+        <ul>
+          {images.slice(0, CAP).map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}
+          <li><a href="/#image-tools">All image tools →</a></li>
+        </ul>
       </div>
       <div>
-        <h3>PDF tools</h3>
-        <ul>{pdfs.map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}</ul>
+        <h3><a href="/#pdf-tools">PDF tools</a></h3>
+        <ul>
+          {pdfs.slice(0, CAP).map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}
+          <li><a href="/#pdf-tools">All PDF tools →</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3><a href="/#media-tools">Video and audio</a></h3>
+        <ul>
+          {media.slice(0, CAP).map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}
+          <li><a href="/#media-tools">All video tools →</a></li>
+        </ul>
       </div>
       <div>
         <h3><a href="/guides">Guides</a></h3>
