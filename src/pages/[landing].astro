@@ -20,6 +20,7 @@ import CropImage from '../components/options/CropImage.astro';
 import ReorderPdf from '../components/options/ReorderPdf.astro';
 import CropStage from '../components/CropStage.astro';
 import ReorderStage from '../components/ReorderStage.astro';
+import SignStage from '../components/SignStage.astro';
 
 export function getStaticPaths() {
   return [
@@ -40,16 +41,19 @@ const options = {
   'pdf-to-word': PdfToWord,
   'crop-image': CropImage,
   'reorder-pdf': ReorderPdf,
+  // Sign PDF has no option controls; everything happens on the stage.
+  'sign-pdf': null,
 } as const;
+if (!(base in options)) throw new Error(`Landing page ${tool.slug} has no options component for ${base}`);
 const Options = options[base as keyof typeof options];
-if (!Options) throw new Error(`Landing page ${tool.slug} has no options component for ${base}`);
 ---
 <ToolLayout tool={tool} intro={intro} engineSlug={engine} base={base}>
   {base === 'strip-exif' && <div slot="panel" id="meta-report" class="meta-report" hidden></div>}
   {base === 'crop-image' && <CropStage slot="panel" />}
   {base === 'reorder-pdf' && <ReorderStage slot="panel" />}
+  {base === 'sign-pdf' && <SignStage slot="panel" />}
   {base === 'pdf-to-word' && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
-  <Fragment slot="options"><Options defaults={defaults} /></Fragment>
+  <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>
 </ToolLayout>
 {base === 'pdf-to-word' && (
   <style is:global>
