@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(57);
+  expect(await page.locator('.tool-card').count()).toBe(58);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'black-and-white-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -972,6 +972,7 @@ test('preset landing pages render, run their base tool with the preset options a
     ['whatsapp-sticker-maker', 'sticker-maker', async () => expect(page.locator('#size')).toHaveValue('512')],
     ['pdf-metadata-viewer', 'remove-pdf-metadata', async () => expect(page.locator('#run')).toContainText('Remove metadata')],
     ['black-and-white-pdf', 'grayscale-pdf', async () => expect(page.locator('#run')).toContainText('Make black and white')],
+    ['sepia-filter', 'black-and-white-image', async () => expect(page.locator('input[name="mode"][value="sepia"]')).toBeChecked()],
     ['confidential-watermark', 'watermark-pdf', async () => expect(page.locator('#wm-text')).toHaveValue('CONFIDENTIAL')],
     ['watermark-id-copy', 'watermark-image', async () => expect(page.locator('input[name="layout"][value="tiled"]')).toBeChecked()],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
@@ -4036,5 +4037,49 @@ test('Webcam test shows the camera with its real resolution and frame rate, and 
   await page.locator('#cam-stop').click();
   await expect(page.locator('#cam-start')).toBeVisible();
   net.assertNothingLeft([]);
+  expect(errors).toEqual([]);
+});
+
+test('Black and white photo previews and converts to grayscale, two-tone and sepia, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'black-and-white-image');
+  const net = watchNetwork(page);
+  const pixels = async (d: Download) =>
+    page.evaluate(async (b64) => {
+      const bmp = await createImageBitmap(new Blob([Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))]));
+      const c = new OffscreenCanvas(bmp.width, bmp.height);
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(bmp, 0, 0);
+      const d = ctx.getImageData(0, 0, c.width, c.height).data;
+      let maxChroma = 0;
+      const levels = new Set<number>();
+      let warm = 0;
+      for (let i = 0; i < d.length; i += 4 * 97) {
+        maxChroma = Math.max(maxChroma, Math.max(d[i]!, d[i + 1]!, d[i + 2]!) - Math.min(d[i]!, d[i + 1]!, d[i + 2]!));
+        levels.add(d[i]!);
+        if (d[i]! > d[i + 2]! + 8) warm++;
+      }
+      return { maxChroma, levels: levels.size, warm, w: c.width, h: c.height };
+    }, Buffer.from(await bytesOf(d)).toString('base64'));
+  const { downloads } = await run(page, [staticFx('pug.jpg')], async () => {
+    await expect(page.locator('#mono-panel')).toBeVisible();
+    await expect(page.locator('#mono-hint')).toContainText('grayscale');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('pug-grayscale.jpg');
+  let p = await pixels(downloads[0]!);
+  const again = async () => (await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]))[0];
+  expect(p.maxChroma).toBeLessThan(12);
+  expect(p.levels).toBeGreaterThan(50);
+  await choose(page.locator('input[name="mode"][value="bw"]'));
+  await expect(page.locator('#mono-hint')).toContainText('pure black and white');
+  await page.locator('#format').selectOption('image/png');
+  let d = await again();
+  expect(d.suggestedFilename()).toBe('pug-bw.png');
+  p = await pixels(d);
+  expect(p.levels).toBeLessThanOrEqual(2);
+  await choose(page.locator('input[name="mode"][value="sepia"]'));
+  d = await again();
+  p = await pixels(d);
+  expect(p.warm).toBeGreaterThan(100);
+  net.assertNothingLeft(['pug.jpg']);
   expect(errors).toEqual([]);
 });

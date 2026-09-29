@@ -2190,6 +2190,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'black-and-white-image',
+    name: 'Black and white photo',
+    title: 'Make a Photo Black and White, Free, No Upload | Stayput',
+    description:
+      'Turn photos black and white: grayscale, high contrast, pure black and white for scans and signatures, or sepia. Live preview, batches, no upload.',
+    heading: 'Make a photo black and white',
+    tagline: 'Grayscale, high contrast, two-tone or sepia, previewed live and made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos to make black and white',
+    action: 'Convert',
+    keywords: ['black and white photo', 'convert image to black and white', 'black and white filter', 'make photo black and white', 'grayscale image', 'sepia filter', 'black and white converter'],
+    steps: [
+      'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL).',
+      'Pick a look: grayscale, high contrast, pure black and white, or sepia. The first photo previews it.',
+      'Download the converted photos, one by one or as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. Each photo is decoded, converted and saved by code running in your browser tab. Nothing is sent to a server, and the page works offline once it has loaded.',
+      },
+      {
+        q: 'What is the difference between the looks?',
+        a: 'Grayscale keeps every tone of the original as a shade of grey. High contrast stretches those tones so the darks are deeper and the lights brighter, which suits portraits and street photos. Pure black and white uses only two colours, ideal for a scanned document, a signature or a stencil. Sepia gives the warm brown of an old print.',
+      },
+      {
+        q: 'How do I make a signature or scan clean black and white?',
+        a: 'Choose Pure black and white and PNG. The split between ink and paper is chosen automatically from the image, so grey paper becomes white and pen strokes become solid black. Photograph the page in even light for the cleanest result.',
+      },
+      {
+        q: 'Does it keep transparency?',
+        a: 'Yes, when you save as PNG or WebP. JPG has no transparency, so transparent areas become white.',
+      },
+      {
+        q: 'Is the location and camera data kept?',
+        a: 'No. The converted photo is a new image drawn by your browser, so EXIF data such as GPS location, camera model and date is not carried over.',
+      },
+    ],
+  },
+  {
     slug: 'grayscale-pdf',
     name: 'Grayscale PDF',
     title: 'Convert PDF to Grayscale, Text Kept, No Upload | Stayput',
