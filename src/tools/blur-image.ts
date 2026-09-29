@@ -142,6 +142,7 @@ async function showImage(file: File) {
   delete panel.dataset.faces;
   panel.hidden = false;
   redraw();
+  if (autoFind && !whole()) void runFindFaces();
 }
 
 function hideImage() {
@@ -193,10 +194,16 @@ const endDraw = () => {
 stage.addEventListener('pointerup', endDraw);
 stage.addEventListener('pointercancel', endDraw);
 
-findBtn.addEventListener('click', async () => {
-  if (!bitmap) return;
+/** On the blur-face landing page the job is faces, so the search starts as soon as a photo is in. */
+const autoFind = document.getElementById('tool')?.dataset.slug === 'blur-face';
+const findLabel = findBtn.textContent;
+
+async function runFindFaces() {
+  if (!bitmap || findBtn.disabled) return;
   const source = bitmap;
   findBtn.disabled = true;
+  findBtn.textContent = 'Finding faces…';
+  panel.dataset.finding = 'true';
   try {
     const faces = await findFaces(source, (stage) => {
       notice = stage === 'loading' ? 'Loading the face finder (about 4 MB, first time only)…' : 'Looking for faces…';
@@ -214,9 +221,14 @@ findBtn.addEventListener('click', async () => {
     notice = `The face finder could not start (${e instanceof Error ? e.message : String(e)}). Drag across each face instead.`;
   } finally {
     findBtn.disabled = false;
+    findBtn.textContent = findLabel;
+    delete panel.dataset.finding;
     redraw();
   }
-});
+  // Another photo was dropped while this one was being searched: search that one too.
+  if (autoFind && bitmap && bitmap !== source && !whole()) void runFindFaces();
+}
+findBtn.addEventListener('click', () => void runFindFaces());
 undoBtn.addEventListener('click', () => {
   areas.pop();
   notice = undefined;

@@ -686,16 +686,16 @@ export const presets: Preset[] = [
     defaults: { area: 'areas', effect: 'blur', strength: '6' },
     intro: [
       'School events, team photos, a protest, a street scene with strangers in the background: before a photo goes on social media or into a newsletter, the faces of people who did not agree to be posted often need to go. Many parents blur their children’s faces on public accounts, and schools and clubs ask for it when some families opt out. The irony of most face-blurring websites is that they want the unblurred photo uploaded to their server first.',
-      'Here the photo opens in your browser and stays there. Press Find faces and a face detector running in the page marks every face it can see; or drag a box over each face yourself. The blur appears straight away, and each box has a × in its corner to remove it. On a phone, drag with one finger. The blur reads the pixels around each box so the edge fades into the photo instead of looking like a pasted rectangle.',
+      'Here the photo opens in your browser and stays there. As soon as it loads, a face detector running in the page marks every face it can see; drag a box over any it missed. The blur appears straight away, and each box has a × in its corner to remove it. On a phone, drag with one finger. The blur reads the pixels around each box so the edge fades into the photo instead of looking like a pasted rectangle.',
       'For a face that must not be recognised at all, push Strength up until the preview shows only a soft patch of skin tone, or switch the effect to Pixelate or Black box. Hair, a distinctive jacket or a name badge can identify someone as surely as a face, so cover those too. The saved photo is written without its location and camera data, which a posted photo of children should not carry anyway.',
     ],
     steps: [
       'Drop the photo, or tap to pick it from your camera roll.',
-      'Press Find faces, or drag a box over each face. Check none is missed, and raise Strength until nobody is recognisable in the preview.',
+      'Wait a moment while every face is found and boxed, then drag across any face it missed. Check none is missed, and raise Strength until nobody is recognisable in the preview.',
       'Save the photo. It downloads at full resolution, ready to post.',
     ],
     faq: [
-      { q: 'Does it find faces automatically?', a: 'Yes. Press Find faces and a small face detector (Google’s MediaPipe, about 4 MB the first time) runs inside this tab and marks every face it sees, including small ones in a group photo. It can still miss a face that is turned away, covered or tiny, and a missed face in a photo of children is the mistake that matters, so check the preview and drag across anything it left.' },
+      { q: 'Does it find faces automatically?', a: 'Yes. As soon as the photo loads, a small face detector (Google’s MediaPipe, about 4 MB the first time) runs inside this tab and marks every face it sees, including small ones in a group photo. It can still miss a face that is turned away, covered or tiny, and a missed face in a photo of children is the mistake that matters, so check the preview and drag across anything it left.' },
       { q: 'Can I blur faces on my phone?', a: 'Yes. Open the page in Safari or Chrome, pick the photo from your camera roll, and drag a finger across each face. The photo is processed on the phone and saved back through the browser’s download.' },
       { q: 'Is blur enough, or should I use pixelate?', a: 'Both work for faces when the strength is high enough that you cannot tell who it is. A strong blur looks softer and less jarring in a group photo; pixelation reads more clearly as deliberately hidden.' },
       noUpload,

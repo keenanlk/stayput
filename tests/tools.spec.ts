@@ -1768,6 +1768,9 @@ test('Find faces marks every face, even small ones in a group, with a detector s
   // Four small copies of one face on a 2400x1600 canvas, at known places.
   await page.locator('#file-input').setInputFiles([fx('group.jpg')]);
   await expect(page.locator('#blur-panel')).toBeVisible();
+  // On the general blur tool the search waits for the button.
+  await expect(page.locator('#blur-panel')).not.toHaveAttribute('data-finding', 'true');
+  await expect(page.locator('#blur-panel')).not.toHaveAttribute('data-faces', /.*/);
   await page.locator('#blur-find').click();
   await expect(page.locator('#blur-panel')).toHaveAttribute('data-faces', '4', { timeout: 60_000 });
   await expect(page.locator('#blur-hint')).toContainText('Found 4 faces');
@@ -1789,6 +1792,25 @@ test('Find faces marks every face, even small ones in a group, with a detector s
   net.assertNothingLeft(['group.jpg', 'face.jpg']);
   // MediaPipe logs its CPU delegate start-up as a console error; that line is expected.
   expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+});
+
+test('Blur face page finds faces as soon as the photo loads, and the boxes stay editable', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await stubAnalytics(page);
+  await page.goto('/blur-face');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('group.jpg')]);
+  // No button press: the search starts by itself and says so while it runs.
+  await expect(page.locator('#blur-find')).toHaveText('Finding faces…');
+  await expect(page.locator('#blur-panel')).toHaveAttribute('data-faces', '4', { timeout: 60_000 });
+  await expect(page.locator('#blur-find')).toHaveText('Find faces');
+  await expect(page.locator('#blur-find')).toBeEnabled();
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(4);
+  // Remove one box with its ×; the rest stay.
+  await page.locator('.blur-area button').first().click({ force: true });
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(3);
+  expect(errors).toEqual([]);
 });
 
 /** Decode audio bytes in the page: duration, channel count and loudness (RMS of the first channel). */
