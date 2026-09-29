@@ -1826,6 +1826,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'webcam-test',
+    name: 'Webcam test',
+    title: 'Webcam Test: Check Your Camera Online, Private | Stayput',
+    description:
+      'Test your webcam in the browser: live preview, real resolution and frame rate, mirror view and a snapshot as JPG. The picture never leaves your device.',
+    heading: 'Test your webcam',
+    tagline: 'See your camera, its real resolution and frame rate, before a call or an interview. Nothing is recorded or sent anywhere.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your webcam',
+    action: 'Test',
+    keywords: ['webcam test', 'camera test', 'test my webcam', 'online webcam test', 'is my webcam working', 'check camera', 'webcam resolution test'],
+    steps: [
+      'Press Test my webcam and allow the camera when your browser asks. Choose another camera from the list if you have several.',
+      'Check the picture, then read what the camera really delivers: its resolution, aspect ratio and the frame rate measured in this page.',
+      'Take a photo to save a snapshot as JPG, then press Turn off the camera.',
+    ],
+    faq: [
+      {
+        q: 'Is my picture recorded or uploaded?',
+        a: 'No. The camera shows in this page from a local stream, and nothing is recorded or sent anywhere. A snapshot is only made when you press Take a photo, and it goes straight to your downloads.',
+      },
+      {
+        q: 'My camera is not found or shows black. What is wrong?',
+        a: 'Check the lens cover or privacy switch, that no other app such as Zoom or Teams is using the camera, and that the browser is allowed to use it: on a Mac under System Settings, Privacy and Security, Camera; on Windows under Settings, Privacy, Camera. Some laptops also have a camera key on the keyboard.',
+      },
+      {
+        q: 'Why is the resolution lower than my camera’s box says?',
+        a: 'Browsers ask for 1080p here, and a camera gives the closest mode it has. Many “1080p” webcams only deliver 720p over USB, or drop resolution in apps that request less. Choose 4K under Ask for to see the most your camera offers.',
+      },
+      {
+        q: 'Why is the measured frame rate low?',
+        a: 'Webcams slow down in dim light to let in more light per frame, often from 30 to 15 frames per second. Turn on a lamp facing you and test again.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
@@ -2190,6 +2228,98 @@ export const tools: Tool[] = [
       {
         q: 'My hair looks cut off at the edges.',
         a: 'Fine, flyaway hair against a busy background is the hardest case for the cut-out. A photo against a plain wall works best. You can also run the photo through the background remover first, adjusting Keep around the edges, and drop the PNG it gives you here.',
+      },
+    ],
+  },
+  {
+    slug: 'grayscale-pdf',
+    name: 'Grayscale PDF',
+    title: 'Convert PDF to Grayscale, Text Kept, No Upload | Stayput',
+    description:
+      'Turn a colour PDF into grayscale for printing or submission. Text stays selectable and sharp, and the file barely grows. Runs in your browser; nothing is uploaded.',
+    heading: 'Convert a PDF to grayscale',
+    tagline: 'Every colour becomes its own shade of grey, and the text stays text.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to convert to grayscale',
+    action: 'Convert to grayscale',
+    keywords: ['pdf to grayscale', 'grayscale pdf', 'convert pdf to grayscale', 'pdf black and white', 'remove color from pdf', 'greyscale pdf', 'print pdf in grayscale'],
+    steps: [
+      'Drop one or more PDFs, or tap to pick them.',
+      'Press Convert to grayscale.',
+      'Download the grayscale copies. Pages, text, links and bookmarks are kept.',
+    ],
+    faq: [
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The conversion runs in your browser tab, so the document stays on your device, and the page works offline once it has loaded.',
+      },
+      {
+        q: 'Will the text still be selectable?',
+        a: 'Yes. The pages are not turned into pictures. A grey layer that removes colour is placed over each page, so text can still be selected, searched and copied, and it stays sharp at any zoom.',
+      },
+      {
+        q: 'Why would I need a grayscale PDF?',
+        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo.',
+      },
+      {
+        q: 'Do different colours stay distinguishable?',
+        a: 'Colours of different brightness become different greys; colours of similar brightness, such as a mid red and a mid green, can end up almost the same grey. Check charts and colour-coded tables in the result before you send it.',
+      },
+      {
+        q: 'Are comments and form fields converted too?',
+        a: 'Highlights, sticky notes and form fields are drawn by your PDF reader on top of the page, so they keep their colour. Flatten them into the page first if they must be grey as well.',
+      },
+      {
+        q: 'Does the file get bigger?',
+        a: 'Only by a few hundred bytes per document. Nothing is re-rendered, so there are no page images to add, unlike converters that rasterise every page.',
+      },
+    ],
+  },
+  {
+    slug: 'crop-pdf',
+    name: 'Crop PDF',
+    title: 'Crop PDF Pages and Trim Margins, Free, No Upload | Stayput',
+    description:
+      'Crop PDF pages to the area you draw, or trim white margins from every page in one click. Text stays sharp and selectable. Runs in your browser, no upload.',
+    heading: 'Crop a PDF',
+    tagline: 'Cut PDF pages down to what matters: draw the area to keep, or trim the white margins automatically.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF to crop',
+    action: 'Download cropped PDF',
+    keywords: ['crop pdf', 'crop pdf pages', 'trim pdf margins', 'remove white margins from pdf', 'cut pdf page', 'resize pdf page', 'crop pdf online free'],
+    steps: [
+      'Drop the PDF. Its pages appear here, drawn in your browser.',
+      'Press Trim white margins to crop each page to its content, or drag on a page to draw the area to keep, for every page or just that one.',
+      'Download the cropped PDF. Text, links and images inside the area stay exactly as they were.',
+    ],
+    faq: [
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The pages are drawn and the crop is written by code running in your browser tab, so the document never leaves your device, and the page works offline once it has loaded.',
+      },
+      {
+        q: 'Does cropping lower the quality?',
+        a: 'No. The pages are not turned into pictures: the tool changes the page boxes that tell every viewer and printer which part of the page to show. Text stays sharp at any zoom and can still be selected and searched.',
+      },
+      {
+        q: 'Is the cropped-off part deleted?',
+        a: 'No, it is hidden. Every PDF viewer and printer shows only the cropped area, but the content outside it is still in the file and a PDF editor can bring it back. To remove something for good, such as an account number in a margin, use the redact PDF tool instead.',
+      },
+      {
+        q: 'What does Trim white margins do?',
+        a: 'It looks at each page on its own and crops it to the smallest box that holds all its text and images, plus a small margin, so a page with a wide border becomes easier to read on a phone or e-reader. Pages that are already full are left alone.',
+      },
+      {
+        q: 'Can I crop pages to different sizes?',
+        a: 'Yes. Choose This page before you draw and the box applies only to the page you are looking at. Trim white margins always works page by page. Go to another page and draw again to crop it differently.',
+      },
+      {
+        q: 'Why is the file almost the same size?',
+        a: 'Because nothing is removed from the pages, only hidden. If you need a smaller file, run the cropped PDF through the compress PDF tool.',
       },
     ],
   },

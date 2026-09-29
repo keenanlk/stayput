@@ -1,0 +1,36 @@
+---
+/** Page stage for Crop PDF: draw the crop box, or trim white margins automatically. */
+---
+<div id="crop-panel" class="sign-panel" hidden>
+  <div class="sign-maker">
+    <div class="field-row">
+      <button class="btn btn-primary" type="button" id="auto-trim">Trim white margins</button>
+      <span class="small muted">or drag on the page to draw the area to keep.</span>
+    </div>
+    <div class="field-row">
+      <span class="small">Apply a drawn box to</span>
+      <div class="segmented" role="radiogroup" aria-label="Pages to crop">
+        <label><input type="radio" name="crop-scope" value="all" checked /><span>Every page</span></label>
+        <label><input type="radio" name="crop-scope" value="page" /><span>This page</span></label>
+      </div>
+    </div>
+    <p class="muted small" id="crop-result" role="status"></p>
+  </div>
+  <div class="pdf-stage-wrap">
+    <div class="field-row pager">
+      <button class="btn btn-sm" type="button" id="prev-page" aria-label="Previous page">←</button>
+      <span id="page-label" class="small" style="font-weight:600">Page 1 of 1</span>
+      <button class="btn btn-sm" type="button" id="next-page" aria-label="Next page">→</button>
+      <span class="muted small" id="crop-count"></span>
+      <button class="btn btn-sm btn-ghost" type="button" id="crop-reset">Undo crop</button>
+    </div>
+    <div class="pdf-stage" id="stage">
+      <canvas id="page-canvas"></canvas>
+      <div class="crop-layer" id="crop-layer" aria-label="Page. Drag to draw the area to keep."></div>
+    </div>
+  </div>
+</div>
+<style is:global>
+  .crop-layer { position: absolute; inset: 0; cursor: crosshair; touch-action: none; overflow: hidden; }
+  .crop-box { position: absolute; outline: 2px dashed var(--accent); box-shadow: 0 0 0 9999px rgba(20, 20, 20, 0.45); pointer-events: none; }
+</style>

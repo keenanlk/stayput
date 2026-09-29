@@ -179,6 +179,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser opens the microphone (getUserMedia) with its own clean-up turned off, and the Web Audio API measures the level of each moment of sound in your tab. The play-back check is recorded by the browser’s built-in recorder into memory and played straight back.',
     versus: 'Many online mic tests record you and upload the clip to play it back, or run ads and trackers around the test. Here nothing is stored or sent: the sound goes from your microphone to this tab and nowhere else.',
   },
+  'webcam-test': {
+    how: 'Your browser opens the camera (getUserMedia) and shows it in a video element on this page. The resolution comes from the picture itself, the frame rate is counted from the frames that actually arrive, and a snapshot is drawn to a canvas and saved as JPG by your browser.',
+    versus: 'Many online webcam tests send your picture to their servers to take a photo or record a clip, and run ads and trackers around the test. Here the picture goes from your camera to this tab and nowhere else.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',
@@ -214,6 +218,14 @@ export const engines: Record<string, Engine> = {
   'remove-pdf-metadata': {
     how: 'pdf-lib (MIT) parses the PDF in your tab (an encrypted file is first decrypted by qpdf, compiled to WebAssembly and served from this site). The trailer’s information dictionary and file ID are dropped, every /Metadata XMP stream and /PieceInfo entry is unlinked from the catalog, pages, images and fonts, and every object nothing refers to any more is deleted before the file is written back out, so the removed data is really gone rather than just hidden.',
     versus: 'The PDFs people clean before sharing are the ones where the author matters: CVs, legal filings, reports sent anonymously, documents for a client who should not see who drafted them. Uploading them to a metadata-removal site hands the full document, name included, to a stranger. Here nothing is sent anywhere.',
+  },
+  'grayscale-pdf': {
+    how: 'pdf-lib (MIT) opens the PDF in your tab and draws one neutral grey rectangle over each page with the PDF Saturation blend mode. Blending keeps the brightness of whatever is underneath and takes the grey’s zero saturation, so every colour, in text, drawings and photos alike, turns into its own shade of grey. Nothing on the page is rewritten or re-rendered, so text stays text.',
+    versus: 'Most online converters rasterise every page to make it grayscale, which uploads your document, makes text unselectable and often makes the file much larger. Here nothing leaves your device, text stays sharp and searchable, and the file grows by a few hundred bytes.',
+  },
+  'crop-pdf': {
+    how: 'pdf.js (Apache 2.0) draws each page in your tab so you can see what you are keeping. Trim white margins renders every page at 72 dpi and finds the smallest box holding all the ink. When you save, pdf-lib (MIT) sets each page’s media and crop box to that area, mapped through the page’s rotation. The page content itself is not re-rendered, so text stays sharp and selectable and the file barely changes size.',
+    versus: 'Online PDF croppers upload the whole document to change four numbers per page, and several only crop the first pages on a free plan or add a watermark. Here the file never leaves your device, every page is cropped, and nothing is added.',
   },
   'redact-pdf': {
     how: 'pdf.js (Apache 2.0) renders each page in your tab and reads its text layer, so a search finds every match with its position. When you save, each page with a box is rendered at 200 dpi, the boxes are painted onto the pixels, and pdf-lib (MIT) replaces that page’s content with the image. The old text, fonts, links, comments and form values on those pages are then deleted from the file along with its metadata, so nothing is left under the black.',

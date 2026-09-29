@@ -47,6 +47,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'watermark-image': () => import('./watermark-image'),
   'watermark-pdf': () => import('./watermark-pdf'),
   'remove-pdf-metadata': () => import('./remove-pdf-metadata'),
+  'grayscale-pdf': () => import('./grayscale-pdf'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };
