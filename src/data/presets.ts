@@ -2098,6 +2098,50 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'extract-frames-from-video',
+    base: 'video-to-jpg',
+    name: 'Extract frames from video',
+    title: 'Extract Frames from Video: Every Frame as an Image, No Upload | Stayput',
+    description: 'Extract every frame, or a few frames a second, from a video as JPG or PNG images in your browser. Download them in one zip. Nothing uploaded.',
+    heading: 'Extract frames from a video',
+    tagline: 'Pull individual frames out of a clip, for a thumbnail, a still, or frame-by-frame study.',
+    keywords: ['extract frames from video', 'video frame extractor', 'get frames from video', 'every frame of video', 'video to image sequence', 'split video into frames'],
+    dropLabel: 'Drop a video to extract frames from',
+    defaults: { every: '5' },
+    intro: [
+      'A thumbnail for a YouTube video, the one sharp frame from a burst of action, a sequence of images for a flipbook or a training dataset: all start with pulling frames out of a video.',
+      'Choose how many frames to take, from ten spread across the clip to every single frame, and save them as JPG or PNG. Each frame is full size and upright. Download one, or all in a zip.',
+      'Frames are decoded on your device. Nothing is uploaded, which matters when the video is of your family or your work.',
+    ],
+    steps: ['Drop a video.', 'Choose how many frames (five a second is selected).', 'Press Save frames and download them in a zip.'],
+    faq: [
+      { q: 'How many frames does a video have?', a: 'Most phone videos have 30 frames a second, and slow motion has 120 or 240. A one-minute clip at 30 fps is 1,800 frames, so this page saves up to 1,000 at a time; trim the video first to get every frame of a longer part.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'video-to-png',
+    base: 'video-to-jpg',
+    name: 'Video to PNG',
+    title: 'Video to PNG: Save Video Frames as Lossless PNG Images | Stayput',
+    description: 'Save frames of an MP4, MOV or WebM video as lossless PNG images in your browser. One a second, spread across the clip, or every frame. No upload.',
+    heading: 'Video to PNG',
+    tagline: 'Save stills from a video as PNG images with every pixel intact, without uploading it.',
+    keywords: ['video to png', 'mp4 to png', 'video frames to png', 'convert video to png sequence', 'mov to png'],
+    dropLabel: 'Drop a video to save as PNG',
+    defaults: { format: 'image/png', every: 'spread:10' },
+    intro: [
+      'PNG keeps each frame exactly as the video decoder produced it, with no extra compression, which is what you want for editing, design mockups or image sequences for animation software.',
+      'Pick how many frames to save and press Save frames. Every image is full size and upright; download them one by one or in a single zip.',
+      'The video stays on your device the whole time.',
+    ],
+    steps: ['Drop a video.', 'Choose how many frames (10 spread across the video is selected).', 'Press Save frames and download the PNGs.'],
+    faq: [
+      { q: 'Why are the PNG files so big?', a: 'PNG stores every pixel without loss, so a 1080p frame is often 2 to 4 MB. Choose JPG instead when the images are for viewing or sharing.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

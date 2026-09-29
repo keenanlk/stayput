@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(39);
+  expect(await page.locator('.tool-card').count()).toBe(40);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3054,4 +3054,42 @@ test('Reverse video plays the clip backwards and no bytes leave the tab', async 
   expect(Math.abs(last - srcFirst)).toBeLessThan(12);
   net.assertNothingLeft(['fade.webm']);
   expect(errors).toEqual([]);
+});
+
+test('Video to JPG saves one full-size frame a second and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'video-to-jpg');
+  const clip = staticFx('clip.webm');
+  const { video } = await videoTracks(readFileSync(clip));
+  const net = watchNetwork(page);
+  const { items } = await run(page, [clip]);
+  // clip.webm lasts just under 3 seconds: frames at 0, 1 and 2 s.
+  expect(items).toBe(3);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['clip-0001.jpg', 'clip-0002.jpg', 'clip-0003.jpg']);
+  expect(jpegSize(files['clip-0002.jpg']!)).toEqual({ width: video!.width, height: video!.height });
+  // The frame on screen at 1 s, stamped with its own start time.
+  await expect(page.locator('#results-list .result-item').nth(1)).toContainText(/at 0:0(0\.9\d|1\.0\d)/);
+  net.assertNothingLeft(['clip.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Extract frames from video can save every frame, and Video to PNG saves PNGs', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/extract-frames-from-video');
+  const clip = staticFx('clip.webm');
+  const { Input, BufferSource, ALL_FORMATS, EncodedPacketSink } = await import('mediabunny');
+  const input = new Input({ source: new BufferSource(readFileSync(clip)), formats: ALL_FORMATS });
+  let packets = 0;
+  for await (const _ of new EncodedPacketSink((await input.getPrimaryVideoTrack())!).packets(undefined, undefined, { metadataOnly: true })) packets++;
+  const { items } = await run(page, [clip], async () => {
+    await page.locator('#every').selectOption('all');
+  });
+  expect(items).toBe(packets);
+
+  await page.goto('/video-to-png');
+  await expect(page.locator('#format')).toHaveValue('image/png');
+  const png = await run(page, [clip]);
+  expect(png.items).toBe(10);
+  const files = await zipAll(page);
+  expect([...files['clip-0001.png']!.subarray(1, 4)].map((c) => String.fromCharCode(c)).join('')).toBe('PNG');
 });

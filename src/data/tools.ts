@@ -1518,6 +1518,40 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-to-jpg',
+    name: 'Video to JPG',
+    title: 'Video to JPG: Extract Frames from a Video as Images, No Upload | Stayput',
+    description:
+      'Save frames from an MP4, MOV, WebM or MKV video as JPG or PNG images in your browser: one a second, spread across the clip, or every frame. Nothing uploaded.',
+    heading: 'Video to JPG',
+    tagline: 'Turn a video into still images: a few good frames or every single one. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a video to take frames from',
+    action: 'Save frames',
+    keywords: ['video to jpg', 'extract frames from video', 'video to images', 'video to png', 'mp4 to jpg', 'video frame extractor', 'screenshot from video'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV), or tap to pick one.',
+      'Choose how many frames to save and whether as JPG or PNG.',
+      'Save frames, then download the ones you want or all of them in one zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes only the frames you asked for and saves them as images in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Which option gives me the best still from a clip?',
+        a: '10 or 30 frames spread across the video gives a quick overview to pick from. To catch an exact moment, like a blink-free group photo, choose five frames a second or every frame.',
+      },
+      {
+        q: 'Are the images full resolution?',
+        a: 'Yes. Each image is the full size of the video, upright as the video plays. A 4K video gives 3840×2160 images. PNG keeps every pixel exactly; JPG files are much smaller and look the same to the eye.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
