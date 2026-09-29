@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VideoToMp3 from '../../components/options/VideoToMp3.astro';
+const tool = toolBySlug('video-to-mp3')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VideoToMp3 /></Fragment>
+</ToolLayout>
+<script src="../../tools/video-to-mp3.ts"></script>

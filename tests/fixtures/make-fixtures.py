@@ -93,3 +93,16 @@ group = Image.new('RGB', (2400, 1600), (90, 110, 130))
 for x, y in [(150, 200), (800, 1100), (1400, 300), (2000, 1150)]:
     group.paste(face, (x, y))
 group.save(os.path.join(out, 'group.jpg'), quality=80)
+
+# 1.5 s stereo WAV at 48 kHz: a 440 Hz tone on the left, 880 Hz on the right.
+import wave, math
+with wave.open(os.path.join(out, 'tone.wav'), 'wb') as w:
+    w.setnchannels(2)
+    w.setsampwidth(2)
+    w.setframerate(48000)
+    frames = bytearray()
+    for i in range(72000):
+        l = int(12000 * math.sin(2 * math.pi * 440 * i / 48000))
+        r = int(12000 * math.sin(2 * math.pi * 880 * i / 48000))
+        frames += struct.pack('<hh', l, r)
+    w.writeframes(bytes(frames))

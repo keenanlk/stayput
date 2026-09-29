@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(22);
+  expect(await page.locator('.tool-card').count()).toBe(23);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -861,6 +861,14 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('input[name="effect"][value="pixelate"]')).toBeChecked();
     }],
     ['blur-face', 'blur-image', async () => expect(page.locator('#strength')).toHaveValue('6')],
+    ['mp4-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('192')],
+    ['m4a-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('128')],
+    ['wav-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('256')],
+    ['mov-to-mp3', 'video-to-mp3', async () => expect(page.locator('#format')).toHaveValue('mp3')],
+    ['mp4-to-wav', 'video-to-mp3', async () => {
+      await expect(page.locator('#format')).toHaveValue('wav');
+      await expect(page.locator('#bitrate-field')).toBeHidden();
+    }],
     ['flip-image', 'rotate-image', async () => {
       await expect(page.locator('input[name="rotate"][value="0"]')).toBeChecked();
       await expect(page.locator('#flip-h')).toBeChecked();
@@ -1778,4 +1786,68 @@ test('Find faces marks every face, even small ones in a group, with a detector s
   net.assertNothingLeft(['group.jpg', 'face.jpg']);
   // MediaPipe logs its CPU delegate start-up as a console error; that line is expected.
   expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+});
+
+/** Decode audio bytes in the page: duration, channel count and loudness (RMS of the first channel). */
+async function audioInfo(page: Page, bytes: Uint8Array) {
+  return page.evaluate(async (arr) => {
+    const ctx = new OfflineAudioContext(2, 1, 44100);
+    const buf = await ctx.decodeAudioData(new Uint8Array(arr).buffer);
+    const d = buf.getChannelData(0);
+    let sum = 0;
+    for (let i = 0; i < d.length; i++) sum += d[i]! * d[i]!;
+    return { duration: buf.duration, channels: buf.numberOfChannels, rms: Math.sqrt(sum / d.length) };
+  }, Array.from(bytes));
+}
+
+test('Video to MP3 converts a video and a WAV in one batch, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'video-to-mp3');
+  const net = watchNetwork(page);
+  // A 2.2 s WebM with a 440 Hz Opus sound track, and a 1.5 s stereo 48 kHz WAV.
+  const { items } = await run(page, [staticFx('talk.webm'), 'tone.wav']);
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['talk.mp3', 'tone.mp3']);
+  for (const [name, seconds] of [['talk.mp3', 2.2], ['tone.mp3', 1.5]] as const) {
+    const mp3 = files[name]!;
+    // An MP3 starts with a frame sync (11 set bits); this encoder writes no ID3 tag.
+    expect(mp3[0]).toBe(0xff);
+    expect(mp3[1]! & 0xe0).toBe(0xe0);
+    const info = await audioInfo(page, mp3);
+    expect(info.channels).toBe(2);
+    expect(info.duration).toBeGreaterThan(seconds - 0.4);
+    expect(info.duration).toBeLessThan(seconds + 0.4);
+    expect(info.rms, `${name} is not silent`).toBeGreaterThan(0.05);
+  }
+  net.assertNothingLeft(['talk.webm', 'tone.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('MP4 to WAV page writes a 44.1 kHz WAV, mono on request, and a video without sound gets a clear error', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/mp4-to-wav');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [staticFx('talk.webm')], async () => {
+    await choose(page.locator('input[name="channels"][value="mono"]'));
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('talk.wav');
+  const wav = await bytesOf(downloads[0]!);
+  const dv = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+  expect(new TextDecoder().decode(wav.slice(0, 4))).toBe('RIFF');
+  expect(new TextDecoder().decode(wav.slice(8, 12))).toBe('WAVE');
+  expect(dv.getUint16(22, true)).toBe(1); // mono
+  expect(dv.getUint32(24, true)).toBe(44100);
+  expect(dv.getUint16(34, true)).toBe(16);
+  const info = await audioInfo(page, wav);
+  expect(info.duration).toBeGreaterThan(1.8);
+  expect(info.rms).toBeGreaterThan(0.05);
+  net.assertNothingLeft(['talk.webm']);
+
+  // clip.webm has video only.
+  await page.goto('/tools/video-to-mp3');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('clip.webm')]);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('No audio could be read from this file');
 });

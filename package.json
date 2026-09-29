@@ -31,7 +31,8 @@
     "heic-to": "1.5.2",
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.3.289",
-    "utif2": "4.1.0"
+    "utif2": "4.1.0",
+    "wasm-media-encoders": "0.7.0"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

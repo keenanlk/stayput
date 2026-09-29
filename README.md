@@ -44,7 +44,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Video to GIF](https://stayput.dev/tools/video-to-gif) (MP4, MOV, WebM; trim, size, frame rate) | [Reorder and delete pages](https://stayput.dev/tools/reorder-pdf) |
 | [Blur or pixelate image](https://stayput.dev/tools/blur-image) (faces, plates, text; blur, pixelate or black box) | [Sign PDF](https://stayput.dev/tools/sign-pdf) (draw or type, place on any page) |
 | [Rotate or flip image](https://stayput.dev/tools/rotate-image) (quarter turns, mirror, batch) | [Add page numbers](https://stayput.dev/tools/pdf-page-numbers) |
-| | [PDF to Word or text](https://stayput.dev/tools/pdf-to-word) (paragraphs and headings, not layout) |
+| [Video or audio to MP3](https://stayput.dev/tools/video-to-mp3) (MP4, MOV, M4A, WAV; or to WAV) | [PDF to Word or text](https://stayput.dev/tools/pdf-to-word) (paragraphs and headings, not layout) |
 | | [Unlock PDF](https://stayput.dev/tools/unlock-pdf) (remove a password you know, or print/copy restrictions) |
 | | [Password protect PDF](https://stayput.dev/tools/protect-pdf) (AES-256) |
 

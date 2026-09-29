@@ -177,7 +177,7 @@ const jsonLd = [
   </section>
 
   <section class="wrap section split">
-    <h2>More {tool.category === 'pdf' ? 'PDF' : 'image'} tools</h2>
+    <h2>More {tool.category === 'pdf' ? 'PDF' : tool.category === 'media' ? 'video and audio' : 'image'} tools</h2>
     <div class="tool-grid">{related.map((t) => <ToolCard tool={t} />)}</div>
   </section>
 
