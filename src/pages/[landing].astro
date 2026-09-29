@@ -45,6 +45,9 @@ import ImageToText from '../components/options/ImageToText.astro';
 import ColorPicker from '../components/options/ColorPicker.astro';
 import RemoveBackground from '../components/options/RemoveBackground.astro';
 import PassportPhoto from '../components/options/PassportPhoto.astro';
+import Watermark from '../components/options/Watermark.astro';
+import WatermarkPdf from '../components/options/WatermarkPdf.astro';
+import WatermarkStage from '../components/WatermarkStage.astro';
 import ColorStage from '../components/ColorStage.astro';
 import CropStage from '../components/CropStage.astro';
 import ReorderStage from '../components/ReorderStage.astro';
@@ -98,6 +101,8 @@ const options = {
   'color-picker': ColorPicker,
   'remove-background': RemoveBackground,
   'passport-photo': PassportPhoto,
+  'watermark-image': Watermark,
+  'watermark-pdf': WatermarkPdf,
   // Sign PDF has no option controls; everything happens on the stage.
   'sign-pdf': null,
 } as const;
@@ -113,6 +118,7 @@ const Options = options[base as keyof typeof options];
   {base === 'trim-audio' && <AudioStage slot="panel" />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
+  {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}
   {base === 'color-picker' && <ColorStage slot="panel" />}
   {base === 'pdf-to-word' && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>

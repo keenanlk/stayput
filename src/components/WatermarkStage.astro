@@ -1,0 +1,16 @@
+---
+/**
+ * Live preview of the watermark on the first photo or first PDF page. Driven
+ * by src/tools/watermark-image.ts and src/tools/watermark-pdf.ts.
+ */
+---
+<div id="wm-panel" class="wm-panel" hidden>
+  <div class="wm-stage"><canvas id="wm-canvas" aria-label="Preview of the watermark"></canvas></div>
+  <p class="muted small wm-hint" id="wm-hint"></p>
+</div>
+<style is:global>
+  .wm-panel { display: grid; gap: 8px; }
+  .wm-stage { line-height: 0; justify-self: start; max-width: 100%; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .wm-stage canvas { display: block; max-width: 100%; max-height: 55vh; width: auto; height: auto; }
+  .wm-hint { margin: 0; }
+</style>

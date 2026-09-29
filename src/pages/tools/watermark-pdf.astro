@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import WatermarkPdf from '../../components/options/WatermarkPdf.astro';
+import WatermarkStage from '../../components/WatermarkStage.astro';
+const tool = toolBySlug('watermark-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <WatermarkStage slot="panel" />
+  <Fragment slot="options"><WatermarkPdf /></Fragment>
+</ToolLayout>
+<script src="../../tools/watermark-pdf.ts"></script>

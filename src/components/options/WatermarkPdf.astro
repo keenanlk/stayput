@@ -1,0 +1,7 @@
+---
+/** The watermark options set up for PDFs (no file type choice, document-style defaults). */
+import Watermark from './Watermark.astro';
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<Watermark pdf defaults={defaults} />

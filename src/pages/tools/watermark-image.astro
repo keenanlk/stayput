@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import Watermark from '../../components/options/Watermark.astro';
+import WatermarkStage from '../../components/WatermarkStage.astro';
+const tool = toolBySlug('watermark-image')!;
+---
+<ToolLayout tool={tool}>
+  <WatermarkStage slot="panel" />
+  <Fragment slot="options"><Watermark /></Fragment>
+</ToolLayout>
+<script src="../../tools/watermark-image.ts"></script>
