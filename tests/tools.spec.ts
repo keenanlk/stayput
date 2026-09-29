@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(60);
+  expect(await page.locator('.tool-card').count()).toBe(61);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4230,4 +4230,48 @@ test('Audio to video refuses two pictures and says why', async ({ page }) => {
   await page.locator('#file-input').setInputFiles([fx('tone.wav'), fx('swatches.png'), fx('plain.jpg')]);
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('Add one picture');
+});
+
+test('Compress audio shrinks a WAV and an MP3 to mono 64 kbps', async ({ page }) => {
+  const errors = await open(page, 'compress-audio');
+  const net = watchNetwork(page);
+  const { items } = await run(page, ['tone.wav', staticFx('song.mp3')], async () => {
+    await page.locator('#quality').selectOption('64');
+    await page.locator('#mono').check();
+  });
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  const wav = readFileSync(fx('tone.wav'));
+  const small = files['tone-compressed.mp3']!;
+  expect(small.length).toBeLessThan(wav.length / 10);
+  const info = await audioInfo(page, small);
+  expect(info.duration).toBeGreaterThan(1.45);
+  await expect(page.locator('#results-list')).toContainText('64 kbps MP3, mono');
+  expect(files['song-compressed.mp3']!.length).toBeLessThan(readFileSync(staticFx('song.mp3')).length);
+  net.assertNothingLeft(['tone.wav', 'song.mp3']);
+  expect(errors).toEqual([]);
+});
+
+test('Compress MP3 opens at 96 kbps and can write OGG Opus', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/compress-mp3');
+  await expect(page.locator('#quality')).toHaveValue('96');
+  const { downloads } = await run(page, ['tone.wav'], async () => {
+    await page.locator('#format').selectOption('ogg');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('tone-compressed.ogg');
+  const ogg = await bytesOf(downloads[0]!);
+  expect(Buffer.from(ogg.subarray(0, 4)).toString()).toBe('OggS');
+  expect(ogg.length).toBeLessThan(readFileSync(fx('tone.wav')).length / 10);
+});
+
+test('Compress audio hands back an MP3 it cannot make smaller', async ({ page }) => {
+  await open(page, 'compress-audio');
+  // song.mp3 is about 135 kbps, below the 160 kbps setting.
+  const { downloads } = await run(page, [staticFx('song.mp3')], async () => {
+    await page.locator('#quality').selectOption('160');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('song.mp3');
+  expect((await bytesOf(downloads[0]!)).length).toBe(readFileSync(staticFx('song.mp3')).length);
+  await expect(page.locator('#results-list')).toContainText('kept as it was');
 });

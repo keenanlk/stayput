@@ -1944,6 +1944,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'compress-audio',
+    name: 'Compress audio',
+    title: 'Compress Audio: Reduce MP3 and WAV File Size, No Upload | Stayput',
+    description:
+      'Make MP3, WAV, M4A and other audio files smaller in your browser, or fit them under 8, 16 or 25 MB for Discord, WhatsApp or email. No upload, no sign-up.',
+    heading: 'Compress audio',
+    tagline: 'Shrink recordings, podcasts and songs to send or store. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif',
+    multiple: true,
+    dropLabel: 'Drop audio files to compress',
+    action: 'Compress',
+    keywords: ['compress audio', 'compress mp3', 'reduce mp3 file size', 'audio compressor online', 'reduce audio file size', 'compress wav', 'make mp3 smaller'],
+    steps: [
+      'Drop one or more audio files (MP3, WAV, M4A, FLAC, OGG), or tap to pick them.',
+      'Choose how hard to compress, or a size limit such as 25 MB for email. Tick Mono for a voice recording.',
+      'Compress. One file downloads straight away; several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Nothing is sent anywhere, so there is no size cap and it works offline once the page has loaded.',
+      },
+      {
+        q: 'How much smaller will it get?',
+        a: 'A WAV shrinks to about a tenth at 128 kbps. An MP3 that is already 320 kbps drops to about 40%, and one at 128 kbps only gets smaller at a lower setting. If a file is already smaller than the setting would make it, you get it back unchanged.',
+      },
+      {
+        q: 'How does Fit under work?',
+        a: 'It works out the bitrate that brings the file under the limit from its length, and uses that when it is lower than your chosen setting. An hour of audio needs about 48 kbps to fit in 25 MB, fine for speech. Tick Mono as well for recordings of talk.',
+      },
+      {
+        q: 'MP3 or OGG?',
+        a: 'MP3 plays everywhere. OGG with Opus sounds better at low bitrates, so a voice memo at 48 kbps Opus is as clear as a 96 kbps MP3; Chrome, Firefox, Android, Discord and WhatsApp play it, older iPhones may not.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

@@ -2798,6 +2798,58 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'compress-mp3',
+    base: 'compress-audio',
+    name: 'Compress MP3',
+    title: 'Compress MP3: Reduce MP3 File Size Online, No Upload | Stayput',
+    description: 'Make MP3 files smaller in your browser: pick a lower bitrate or a size limit for email and Discord. Batch, no upload, no sign-up.',
+    heading: 'Compress MP3',
+    tagline: 'Shrink MP3s to send, upload or fit on a phone, on your own device.',
+    keywords: ['compress mp3', 'reduce mp3 file size', 'mp3 compressor', 'make mp3 smaller', 'compress mp3 for email', 'mp3 size reducer'],
+    dropLabel: 'Drop MP3 files to compress',
+    accept: 'audio/mpeg,.mp3,audio/*',
+    defaults: { quality: '96' },
+    intro: [
+      'An MP3’s size is its bitrate times its length. A 320 kbps song takes about 2.4 MB a minute; at 96 kbps it is 0.7 MB, still clear for podcasts, audiobooks and voice. This page re-encodes each MP3 at the bitrate you choose, or at whatever bitrate fits a size limit, entirely in your browser.',
+      'Nothing is uploaded, so recordings of meetings and lectures stay on your machine, and there is no daily file limit. If an MP3 is already smaller than the setting would make it, you get the original back instead of a worse copy.',
+    ],
+    steps: [
+      'Drop one or more MP3 files, or tap to pick them.',
+      '96 kbps is already chosen. Pick a size limit for email or Discord, and Mono for speech.',
+      'Compress. Each MP3 downloads when it is ready; several come as a zip.',
+    ],
+    faq: [
+      { q: 'Does compressing an MP3 lose quality?', a: 'Yes, a little: it is decoded and encoded again at a lower bitrate. For speech at 64 to 96 kbps nobody notices; for music, stay at 128 kbps or above.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'compress-wav',
+    base: 'compress-audio',
+    name: 'Compress WAV',
+    title: 'Compress WAV: Make WAV Files Smaller, No Upload | Stayput',
+    description: 'Shrink large WAV recordings to a tenth of the size in your browser, as MP3 or OGG, or fit them under an email limit. No upload.',
+    heading: 'Compress WAV',
+    tagline: 'Turn huge WAV recordings into files small enough to send, on your own device.',
+    keywords: ['compress wav', 'compress wav file', 'reduce wav file size', 'wav compressor', 'make wav smaller'],
+    dropLabel: 'Drop WAV files to compress',
+    accept: 'audio/wav,audio/x-wav,.wav,.wave,.aiff,.aif,audio/*',
+    defaults: { quality: '128' },
+    intro: [
+      'A WAV stores every sample uncompressed, about 10 MB a minute in CD quality, so a 30 minute interview is over 300 MB, too big for email and slow to upload anywhere. Compressed to 128 kbps MP3 it is about 29 MB, and to 64 kbps mono about 14 MB, with speech just as clear.',
+      'This page does it in your browser, so the WAV is never uploaded. To keep every sample and still halve the size, use the audio converter’s FLAC option instead.',
+    ],
+    steps: [
+      'Drop one or more WAV files, or tap to pick them.',
+      'Pick how hard to compress, or a size limit. Tick Mono for speech.',
+      'Compress. Each file downloads when it is ready; several come as a zip.',
+    ],
+    faq: [
+      { q: 'Can I compress a WAV without losing quality?', a: 'Only to about half, as FLAC, with the audio converter. MP3 and OGG get to a tenth or less by leaving out what you cannot hear.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
