@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RemoveObject from '../../components/options/RemoveObject.astro';
+import EraseStage from '../../components/EraseStage.astro';
+const tool = toolBySlug('remove-object')!;
+---
+<ToolLayout tool={tool}>
+  <EraseStage slot="panel" />
+  <Fragment slot="options"><RemoveObject /></Fragment>
+</ToolLayout>
+<script src="../../tools/remove-object.ts"></script>

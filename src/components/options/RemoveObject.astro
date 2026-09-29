@@ -1,0 +1,29 @@
+---
+/** Option controls for the object remover, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const brush = defaults.brush ?? '40';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field wide">
+  <label for="brush">Brush size <output id="brush-out">{brush}</output></label>
+  <input type="range" id="brush" min="8" max="120" step="2" value={brush} />
+  <p class="muted small">Cover the whole object and a little around it, including its shadow. Erase works best on one thing at a time.</p>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>

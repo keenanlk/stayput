@@ -1,0 +1,37 @@
+---
+/**
+ * The object remover's stage: the picture on a canvas, with the brush strokes
+ * painted over it in a second canvas. Paint over something and press Erase to
+ * fill it in; repeat as often as needed. Shown once an image is dropped;
+ * driven by src/tools/remove-object.ts.
+ */
+---
+<div id="erase-panel" class="erase-panel" hidden>
+  <div class="erase-stage" id="erase-stage" role="application" aria-label="Image preview. Paint over anything you want to remove.">
+    <canvas id="erase-canvas"></canvas>
+    <canvas id="erase-strokes" class="erase-strokes"></canvas>
+    <div id="erase-brush" class="erase-brush" hidden></div>
+  </div>
+  <div class="erase-bar">
+    <p class="muted small erase-hint" id="erase-hint" aria-live="polite">Paint over the thing to remove, then press Erase.</p>
+    <span class="erase-actions">
+      <button class="btn btn-sm btn-primary" type="button" id="erase-go" disabled>Erase</button>
+      <button class="btn btn-sm btn-ghost" type="button" id="erase-undo" disabled>Undo</button>
+      <button class="btn btn-sm btn-ghost" type="button" id="erase-clear" disabled>Clear brush</button>
+    </span>
+  </div>
+</div>
+<style is:global>
+  .erase-panel { display: grid; gap: 8px; }
+  .erase-stage { position: relative; display: inline-block; max-width: 100%; line-height: 0; user-select: none; -webkit-user-select: none; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); touch-action: none; overflow: hidden; justify-self: start; cursor: none; }
+  .erase-stage canvas { display: block; max-width: 100%; max-height: 65vh; width: auto; height: auto; }
+  .erase-stage .erase-strokes { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; opacity: 0.55; pointer-events: none; }
+  .erase-stage.is-busy { cursor: progress; }
+  .erase-stage.is-busy .erase-strokes { animation: erase-pulse 1s ease-in-out infinite alternate; }
+  @keyframes erase-pulse { to { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { .erase-stage.is-busy .erase-strokes { animation: none; } }
+  .erase-brush { position: absolute; border: 1.5px solid #fff; outline: 1px solid rgba(0, 0, 0, 0.6); border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); }
+  .erase-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .erase-hint { margin: 0; flex: 1 1 220px; }
+  .erase-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
+</style>
