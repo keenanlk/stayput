@@ -1,0 +1,18 @@
+---
+/** Option controls for add audio to video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const mode = defaults.mode ?? 'replace';
+---
+<p class="small muted wide" style="margin:0">Drop one video and one sound file: an MP3, WAV or M4A, or another video to take its sound. If both are videos, the top one keeps its picture.</p>
+<div class="field">
+  <label for="mode">The video’s own sound</label>
+  <select id="mode">
+    <option value="replace" selected={mode === 'replace'}>Replace it with the new sound</option>
+    <option value="mix" selected={mode === 'mix'}>Keep it, with the new sound quieter underneath</option>
+  </select>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="loop" checked={defaults.loop !== 'false'} /> Loop the sound if it is shorter than the video</label>
+  <label class="check"><input type="checkbox" id="fade" checked={defaults.fade !== 'false'} /> Fade the sound out at the end</label>
+</div>

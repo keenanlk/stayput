@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(37);
+  expect(await page.locator('.tool-card').count()).toBe(38);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2937,4 +2937,43 @@ test('Merge videos joins clips in order into one MP4 the size of the first, with
   await expect(page.locator('#results-list .result-item')).toContainText('2 videos joined');
   net.assertNothingLeft(['halves.webm', 'recording.webm']);
   expect(errors).toEqual([]);
+});
+
+test('Add audio to video lays a song under a silent video, looped to its length, with the picture copied, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'add-audio-to-video');
+  const song = staticFx('song.mp3');
+  const clip = staticFx('clip.webm');
+  const before = await soundOf(page, readFileSync(song));
+  const net = watchNetwork(page);
+  // The song goes first: the tool works out which file is the video.
+  const { downloads } = await run(page, [song, clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('clip-with-audio.webm');
+  const out = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(out);
+  expect(tracks.video?.codec).toBe('vp8');
+  expect(tracks.audio).toBe(1);
+  const picture = await videoSeconds(out);
+  expect(Math.abs(picture - (await videoSeconds(readFileSync(clip))))).toBeLessThan(0.05);
+  const after = await soundOf(page, out);
+  // The 1 s song is repeated to fill the 3 s video, at the same note.
+  expect(after.seconds).toBeGreaterThan(picture - 0.2);
+  expect(after.seconds).toBeLessThan(picture + 0.2);
+  expect(Math.abs(after.hz - before.hz)).toBeLessThan(before.hz * 0.05);
+  await expect(page.locator('#results-list .result-item')).toContainText('sound looped');
+  net.assertNothingLeft(['song.mp3', 'clip.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Add music to video can keep the video’s own sound under the song', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/add-music-to-video');
+  const rec = await recordClip(page);
+  const { downloads } = await run(page, [rec, staticFx('song.mp3')], async () => {
+    await page.locator('#mode').selectOption('mix');
+  });
+  const out = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(out);
+  expect(tracks.audio).toBe(1);
+  expect(tracks.video?.codec).toBe('vp8');
+  await expect(page.locator('#results-list .result-item')).toContainText('mixed in song.mp3');
 });

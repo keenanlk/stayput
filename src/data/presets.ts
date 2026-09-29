@@ -2054,6 +2054,28 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'add-music-to-video',
+    base: 'add-audio-to-video',
+    name: 'Add music to video',
+    title: 'Add Music to Video Free: Put a Song on Any Clip, No Upload | Stayput',
+    description: 'Add a song to a video in your browser. MP3, WAV or M4A, looped or faded to fit, over or instead of the original sound. No upload, no watermark.',
+    heading: 'Add music to a video',
+    tagline: 'Put a song under a clip for a reel, a slideshow or a school project, without uploading anything.',
+    keywords: ['add music to video', 'put music on video', 'add song to video', 'add background music to video', 'add mp3 to video', 'music video maker free'],
+    dropLabel: 'Drop a video and a song',
+    defaults: { mode: 'replace' },
+    intro: [
+      'Holiday clips, a slideshow exported from your phone, a product demo: a song makes them watchable. Drop the video and the song, and Stayput lays the music under the picture, cut and faded at the end of the video or looped if the song is short.',
+      'To keep what people say in the clip, choose to keep the video’s sound: the music then plays at half volume underneath.',
+      'The picture is copied untouched, so there is no loss of quality and no waiting for a re-encode. Nothing is uploaded, and there is no watermark.',
+    ],
+    steps: ['Drop a video and a song.', 'Replace the sound, or keep it with the music underneath.', 'Press Add audio and save the video.'],
+    faq: [
+      { q: 'Can I use any song?', a: 'The tool works with any MP3, WAV, M4A, OGG or FLAC file on your device. Whether you may post the result is a copyright question: platforms like Instagram and TikTok may mute videos with commercial music, so royalty-free music is the safe choice for public posts.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
