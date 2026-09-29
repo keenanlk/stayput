@@ -1,0 +1,28 @@
+---
+/** Option controls for video to JPG, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const every = defaults.every ?? '1';
+const format = defaults.format ?? 'image/jpeg';
+const choices = [
+  ['spread:10', '10 frames spread across the video'],
+  ['spread:30', '30 frames spread across the video'],
+  ['1', 'One frame every second'],
+  ['2', 'Two frames every second'],
+  ['5', 'Five frames every second'],
+  ['all', 'Every frame (up to 1,000)'],
+] as const;
+---
+<div class="field">
+  <label for="every">Frames to save</label>
+  <select id="every">
+    {choices.map(([v, l]) => <option value={v} selected={v === every}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="image/jpeg" selected={format === 'image/jpeg'}>JPG (smaller files)</option>
+    <option value="image/png" selected={format === 'image/png'}>PNG (exact pixels)</option>
+  </select>
+</div>
