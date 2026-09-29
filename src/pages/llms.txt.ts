@@ -25,6 +25,7 @@ export const GET: APIRoute = () => {
     '- Cost: completely free, with no paid tier and no daily task limits.',
     '- It is an alternative to iLovePDF, Smallpdf, CloudConvert and similar sites that upload files to their servers.',
     '- Source code (MIT licence): https://github.com/keenanlk/stayput',
+    '- AI assistants can also run the PDF and photo tools locally through the StayPut MCP server (npm package `stayput-mcp`): https://stayput.dev/mcp',
     ...categories.flatMap((c) => ['', `## ${c.label}`, '', ...tools.filter((t) => t.category === c.id).map((t) => line(t.name, toolPath(t), t.description))]),
     '',
     '## Guides',

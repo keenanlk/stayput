@@ -1,0 +1,67 @@
+---
+import Base from '../layouts/Base.astro';
+
+const tools = [
+  ['merge_pdfs', 'Combine PDFs into one, in the order you name them.'],
+  ['extract_pdf_pages', 'Keep only some pages, reorder them, or drop the ones you do not need.'],
+  ['split_pdf', 'One file per page, or every N pages, written into a folder.'],
+  ['rotate_pdf', 'Turn every page, or just the sideways ones, by 90, 180 or 270 degrees.'],
+  ['number_pdf_pages', 'Stamp page numbers like "Page 3 of 12", skipping a cover if you want.'],
+  ['pdf_info', 'Page count, page sizes and title, so the assistant knows what it is working with.'],
+  ['images_to_pdf', 'JPG and PNG images into one PDF, one per page, without re-compressing them.'],
+  ['inspect_image_metadata', 'Show the GPS location, camera, capture time and other data hidden in a photo.'],
+  ['strip_image_metadata', 'Write a copy of a photo with EXIF, GPS and XMP removed, without re-encoding it.'],
+];
+const title = 'StayPut MCP Server: Local PDF and Photo Tools for AI Assistants';
+const description = 'Let Claude, Cursor or VS Code merge, split and rotate PDFs and strip photo GPS data on your own machine. Free, open source, nothing uploaded.';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'StayPut MCP server',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Windows, macOS, Linux',
+    description,
+    url: 'https://stayput.dev/mcp',
+    downloadUrl: 'https://www.npmjs.com/package/stayput-mcp',
+    license: 'https://opensource.org/licenses/MIT',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  },
+];
+---
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <article class="wrap-narrow prose page">
+    <h1>StayPut for AI assistants</h1>
+    <p>StayPut’s PDF and photo tools also come as an <a href="https://modelcontextprotocol.io" rel="noopener">MCP server</a>, so Claude, Cursor, VS Code and other assistants can use them on the files on your computer. Ask “merge the two invoices in Downloads” or “does this photo have my location in it?” and the work happens on your machine.</p>
+    <p>It runs the same code as this website. Your files are read from disk and written back to disk. <strong>Nothing is uploaded, and the server makes no network requests at all.</strong> It is free, open source and needs no account or API key.</p>
+
+    <h2>Install</h2>
+    <p>You need <a href="https://nodejs.org" rel="noopener">Node.js</a> 20 or newer.</p>
+    <h3>Claude Code</h3>
+    <div class="snippet"><pre><code>claude mcp add stayput -- npx -y stayput-mcp</code></pre></div>
+    <h3>Claude Desktop, Cursor, Windsurf</h3>
+    <p>Add this to the app’s MCP settings file (<code>claude_desktop_config.json</code>, <code>.cursor/mcp.json</code> and so on), then restart the app:</p>
+    <div class="snippet"><pre><code>{`{
+  "mcpServers": {
+    "stayput": {
+      "command": "npx",
+      "args": ["-y", "stayput-mcp"]
+    }
+  }
+}`}</code></pre></div>
+    <h3>VS Code</h3>
+    <div class="snippet"><pre><code>{`code --add-mcp '{"name":"stayput","command":"npx","args":["-y","stayput-mcp"]}'`}</code></pre></div>
+
+    <h2>What it can do</h2>
+    <ul>
+      {tools.map(([name, text]) => <li><code>{name}</code>: {text}</li>)}
+    </ul>
+    <p>Every tool writes a new file and tells the assistant where it is. Your originals are never changed, and an existing file is never overwritten. Password-protected PDFs are unlocked locally when you give the password.</p>
+
+    <h2>Why local matters here</h2>
+    <p>Several PDF tools for AI assistants are wrappers around an online service: your contract or bank statement is uploaded to someone else’s server so a model can press a button there. This one never sends a file anywhere, which you can check in the <a href="https://github.com/keenanlk/stayput/tree/main/mcp" rel="noopener">source code</a>.</p>
+
+    <h2>Not in the server (yet)</h2>
+    <p>HEIC, WebP and AVIF conversion, compression, PDF to image and signing need a browser engine, so they stay on the website: <a href="/tools/heic-to-jpg">HEIC to JPG</a>, <a href="/tools/compress-pdf">compress PDF</a>, <a href="/tools/pdf-to-image">PDF to image</a> and <a href="/tools/sign-pdf">sign PDF</a> all run in your browser the same way.</p>
+  </article>
+</Base>
