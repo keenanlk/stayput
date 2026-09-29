@@ -5,6 +5,8 @@ const { defaults = {} } = Astro.props;
 const area = defaults.area ?? 'areas';
 const effect = defaults.effect ?? 'blur';
 const strength = defaults.strength ?? '5';
+const emoji = defaults.emoji ?? '🙂';
+const picks = ['🙂', '😎', '😂', '😇', '🤡', '🥸', '🐱', '🐶', '🐸', '⭐', '❤️', '🙈'];
 const format = defaults.format ?? 'keep';
 const quality = defaults.quality ?? '92';
 const formats = [
@@ -27,6 +29,16 @@ const formats = [
     <label><input type="radio" name="effect" value="blur" checked={effect === 'blur'} /><span>Blur</span></label>
     <label><input type="radio" name="effect" value="pixelate" checked={effect === 'pixelate'} /><span>Pixelate</span></label>
     <label><input type="radio" name="effect" value="box" checked={effect === 'box'} /><span>Black box</span></label>
+    <label><input type="radio" name="effect" value="emoji" checked={effect === 'emoji'} /><span>Emoji</span></label>
+  </div>
+</div>
+<div class="field" id="emoji-field" hidden={effect !== 'emoji'}>
+  <label for="emoji">Emoji <span class="muted">(tap one, or type or paste any)</span></label>
+  <div class="emoji-row">
+    <input type="text" id="emoji" value={emoji} maxlength="16" autocomplete="off" spellcheck="false" aria-label="Emoji to cover each area with" />
+    <div class="emoji-picks" role="group" aria-label="Common emoji">
+      {picks.map((e) => <button type="button" class="emoji-pick" data-emoji={e} aria-label={`Use ${e}`} aria-pressed={String(e === emoji)}>{e}</button>)}
+    </div>
   </div>
 </div>
 <div class="field" id="strength-field">
@@ -44,3 +56,12 @@ const formats = [
   <label for="quality">Quality <output id="quality-out">{quality}</output></label>
   <input type="range" id="quality" min="30" max="100" value={quality} />
 </div>
+<style>
+  .emoji-row { display: grid; gap: 8px; }
+  #emoji { width: 5.5em; font-size: 22px; text-align: center; padding: 4px 8px; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", var(--font); }
+  .emoji-pick { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", var(--font); }
+  .emoji-picks { display: flex; flex-wrap: wrap; gap: 4px; }
+  .emoji-pick { font-size: 22px; line-height: 1; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
+  .emoji-pick:hover { border-color: var(--line-strong); }
+  .emoji-pick[aria-pressed='true'] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+</style>

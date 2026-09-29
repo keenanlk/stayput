@@ -1794,6 +1794,43 @@ test('Find faces marks every face, even small ones in a group, with a detector s
   expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
 });
 
+test('Blur image can cover areas with an emoji picked or pasted', async ({ page }) => {
+  const errors = await open(page, 'blur-image');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('stripes.png')]);
+  await expect(page.locator('#blur-panel')).toBeVisible();
+  await markArea(page, [0.3, 0.2], [0.7, 0.8]);
+  await expect.poll(async () => (await page.locator('#blur-panel').getAttribute('data-areas'))!.length).toBeGreaterThan(0);
+  const [ax, ay, aw, ah] = (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(',').map(Number);
+  await expect(page.locator('#emoji-field')).toBeHidden();
+  await choose(page.locator('input[name="effect"][value="emoji"]'));
+  await expect(page.locator('#emoji-field')).toBeVisible();
+  await page.locator('.emoji-pick[data-emoji="🐱"]').click();
+  await expect(page.locator('#emoji')).toHaveValue('🐱');
+  await expect(page.locator('.emoji-pick[data-emoji="🐱"]')).toHaveAttribute('aria-pressed', 'true');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('stripes-emoji.png');
+  await expect(page.locator('#results-list')).toContainText('emoji 🐱');
+  // The stripes are black and white; a colour emoji puts colour in the middle of the area.
+  const png = await bytesOf(download);
+  const colourful: boolean[] = [];
+  for (const fy of [0.2, 0.35, 0.5, 0.65, 0.8]) {
+    for (const fx_ of [0.2, 0.35, 0.5, 0.65, 0.8]) {
+      const px = await pixelAt(page, png, Math.round(ax! + aw! * fx_), Math.round(ay! + ah! * fy));
+      colourful.push(Math.max(px[0]!, px[1]!, px[2]!) - Math.min(px[0]!, px[1]!, px[2]!) > 40);
+    }
+  }
+  // Most of a 5x5 grid inside the area lands on the emoji's colour (eyes and mouth are dark).
+  expect(colourful.filter(Boolean).length, `colour inside the area: ${colourful}`).toBeGreaterThanOrEqual(13);
+  const outsidePx = await pixelAt(page, png, 5, 5);
+  expect(Math.max(...outsidePx.slice(0, 3)) - Math.min(...outsidePx.slice(0, 3))).toBeLessThan(10);
+  // Pasting text keeps only the first emoji.
+  await page.locator('#emoji').fill('🦊🦊 fox');
+  await page.locator('#emoji').blur();
+  await expect(page.locator('#emoji')).toHaveValue('🦊');
+  expect(errors).toEqual([]);
+});
+
 test('Blur face page finds faces as soon as the photo loads, and the boxes stay editable', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
