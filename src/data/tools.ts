@@ -2142,6 +2142,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'pitch-changer',
+    name: 'Pitch and speed changer',
+    title: 'Change Pitch or Speed of Audio Online, No Upload | Stayput',
+    description:
+      'Shift a song or recording up or down by semitones without changing its length, or speed it up or slow it down without chipmunk voices. MP3, WAV, M4A, FLAC. Runs in your browser; nothing is uploaded.',
+    heading: 'Change the pitch or speed of audio',
+    tagline: 'Change the key of a song, or play it faster or slower, keeping the other the same. Done on this device.',
+    category: 'media',
+    accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.webm',
+    multiple: true,
+    dropLabel: 'Drop audio files to change pitch or speed',
+    action: 'Change',
+    keywords: ['pitch changer', 'change pitch of audio', 'audio pitch shifter', 'change key of song', 'speed up audio', 'slow down audio', 'mp3 speed changer', 'transpose audio'],
+    steps: [
+      'Drop one or more sound files (MP3, WAV, M4A, FLAC, OGG), or tap to pick them.',
+      'Move the pitch in semitones, choose a speed, or both. Keep the original format or pick another.',
+      'Run it. Each file downloads when it is ready; several come as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my audio uploaded?',
+        a: 'No. Your browser decodes the sound, the pitch and speed change run in the page, and the file is written again in your tab. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'How do I change the key of a song?',
+        a: 'Move the pitch slider by the number of semitones between the keys: from C to D is +2, from E to C is −4. The tempo and length stay the same, so you can sing or play along in a key that suits your voice or instrument.',
+      },
+      {
+        q: 'Will speeding up make voices sound like chipmunks?',
+        a: 'No. Speed changes keep the pitch unless you tick the option to let the pitch follow the speed, which gives the record-player effect some people want for sped-up or slowed songs.',
+      },
+      {
+        q: 'How good is the quality?',
+        a: 'Small changes, a few semitones or up to about 1.5× speed, sound natural. Very large ones, a whole octave or half speed, add some smearing, as every pitch shifter does. Save as WAV or FLAC if you will edit the result further.',
+      },
+      {
+        q: 'Can I use it on a video?',
+        a: 'This page takes sound files. For a video, use Change video speed, which keeps the pitch of the voices, or save the sound first with Video to MP3.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

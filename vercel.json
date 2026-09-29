@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/pitch-changer",
+      "destination": "/tools/pitch-changer",
+      "permanent": true
+    },
+    {
       "source": "/extract-pdf-images",
       "destination": "/tools/extract-pdf-images",
       "permanent": true

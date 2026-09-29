@@ -2977,6 +2977,60 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'speed-up-audio',
+    base: 'pitch-changer',
+    name: 'Speed up audio',
+    title: 'Speed Up Audio Online Without Chipmunk Voices, Free | Stayput',
+    description: 'Speed up an MP3, podcast, lecture or voice memo in your browser and keep the voice at its normal pitch. Save as MP3 or WAV. No upload.',
+    heading: 'Speed up audio',
+    tagline: 'Listen in less time, with voices that still sound like themselves.',
+    keywords: ['speed up audio', 'speed up mp3', 'make audio faster', 'speed up voice memo', 'audio speed changer', 'speed up podcast'],
+    dropLabel: 'Drop audio files to speed up',
+    action: 'Speed up',
+    defaults: { speed: '1.25' },
+    intro: [
+      'Players can speed up playback, but a saved faster copy is handy for a phone that cannot, a clip that has to fit a time limit, or a voice memo you will send on. This page makes that copy at 1.25× to start with; pick anything from 1.05× to 2×.',
+      'The pitch stays where it was, so speech stays clear rather than squeaky. If you want the old sped-up-record sound instead, tick the option that lets the pitch follow the speed. Recordings of lectures, meetings and interviews stay on your device.',
+    ],
+    steps: [
+      'Drop one or more MP3, WAV, M4A or other sound files.',
+      'Pick the speed. Leave the pitch at 0 to keep voices natural.',
+      'Run it. Each faster file downloads when it is ready.',
+    ],
+    faq: [
+      { q: 'What speed is best for podcasts and lectures?', a: 'Most people follow speech easily at 1.25× to 1.5×. Above 1.75× only very clear speakers stay comfortable.' },
+      { q: 'Can I make a sped-up song for TikTok?', a: 'Yes. Tick “Let the pitch follow the speed” for the higher, brighter sped-up sound those edits use, or leave it off to keep the key.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'slow-down-audio',
+    base: 'pitch-changer',
+    name: 'Slow down audio',
+    title: 'Slow Down Audio Without Changing Pitch, Free, No Upload | Stayput',
+    description: 'Slow down a song, solo or language recording to learn it, keeping the pitch. MP3, WAV, M4A. Runs in your browser; nothing is uploaded.',
+    heading: 'Slow down audio',
+    tagline: 'Hear every note of a fast passage, in the same key, on your own device.',
+    keywords: ['slow down audio', 'slow down mp3', 'slow down song without changing pitch', 'audio slower', 'slow down music to learn', 'slowed audio'],
+    dropLabel: 'Drop audio files to slow down',
+    action: 'Slow down',
+    defaults: { speed: '0.75' },
+    intro: [
+      'Musicians slow a recording down to learn a solo, and language learners do it to catch every word. Starting at 0.75×, this page makes a slower copy in the same key, so you can play along on your instrument without retuning.',
+      'Go as slow as half speed. For the dreamy slowed-and-reverb sound, tick the option that lets the pitch drop with the speed. The file stays on your device.',
+    ],
+    steps: [
+      'Drop one or more songs or recordings.',
+      'Pick a speed below 1×. Leave the pitch at 0 to stay in key, or shift it to match your tuning.',
+      'Run it and download the slower copy.',
+    ],
+    faq: [
+      { q: 'Will it stay in tune with my guitar?', a: 'Yes. Slowing down keeps the pitch unless you tick the option to let it follow the speed. If the recording itself is tuned a little off, nudge the pitch by a semitone.' },
+      { q: 'How slow can it go?', a: 'Down to 0.5×. Below about 0.7×, drums and sharp attacks start to sound soft, which is normal for any time stretch.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
