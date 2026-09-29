@@ -773,7 +773,7 @@ export const presets: Preset[] = [
     intro: [
       'M4A is Apple’s name for audio in an MP4 container, normally AAC. It is what the iPhone Voice Memos app saves, what iTunes ripped CDs into, and what many Android recorders and WhatsApp exports produce. It sounds good and files are small, but plenty of things still want an MP3: older car stereos, some podcast and transcription services, school and work upload forms, and audio editors on Windows.',
       'Voice memos are also exactly the kind of recording that should not pass through a stranger’s server: interviews, lectures you recorded, notes to yourself, a doctor’s appointment. This page converts them in your browser. The M4A is decoded by your browser’s own AAC decoder and written as an MP3 by the LAME encoder running in the page.',
-      'This page opens at 128 kbps, which is more than enough for speech and still fine for most music. Switch to mono for a voice memo and the MP3 is half the size again. Drop a whole folder of memos and they convert in one go.',
+      'This page opens at 128 kbps, which is more than enough for speech and still fine for most music. For a voice memo, switch to mono and drop to 96 kbps: the MP3 is a quarter smaller and the voice stays clear. Drop a whole folder of memos and they convert in one go.',
     ],
     steps: [
       'Drop one or more M4A files, or tap to pick them. On an iPhone, share a voice memo to Files first, then pick it here.',
@@ -2217,10 +2217,14 @@ export const presets: Preset[] = [
       'A chorus for your ringtone, ten seconds of a song for a video, a talk without the silence at the start: an MP3 cutter keeps just the part you want.',
       'Drop the file, play it or click the waveform to find the moment, and press Set start and Set end. A short fade out is on so the cut does not end abruptly. Other formats work too: WAV, M4A, OGG, FLAC, or a video.',
       'The song is cut in your browser. Nothing is uploaded, and there are no ads between you and the download.',
+      'To make a ringtone, play the song and press Set start just before the part you want, usually the start of the chorus. Then press Set end 20 to 30 seconds later; for an iPhone, stay under 40 seconds. The line under the controls shows how long the cut is. You can also type exact times in seconds, to a tenth: one minute and five seconds is 65. Tick Fade in at the start as well if the cut begins mid note, and each fade lasts 1.5 seconds.',
+      'The cut is saved as an MP3 at 192 kbps, whatever the original bitrate was, and its name ends in -trimmed. If you plan to edit the clip again, choose WAV under Save as so it is not encoded twice. The page keeps one continuous part of one file. To remove something from the middle, cut the part before it and the part after it, then join the two with Merge MP3.',
     ],
     steps: ['Drop an MP3.', 'Set the start and end on the waveform.', 'Press Trim audio and save the MP3.'],
     faq: [
       { q: 'How do I use the cut as a ringtone?', a: 'On Android, copy the MP3 to your phone and pick it in Settings, Sound, Phone ringtone. On iPhone, ringtones are 40 seconds at most and must be added through GarageBand or the Music app on a computer.' },
+      { q: 'Can I cut several MP3 files at once?', a: 'No. The cutter works on one file at a time, because each one needs its own start and end on the waveform. Cut the first, download it, then drop the next file in its place. If you only want to shorten a batch to a size limit rather than choose a part, Compress MP3 handles many files at once.' },
+      { q: 'Does cutting an MP3 lower its quality?', a: 'Slightly, because the kept part is decoded and encoded again as MP3 at 192 kbps. For a ringtone or a clip in a video you will not hear it. From a 320 kbps original, or when the clip will be edited further, choose WAV, which keeps the decoded sound exactly and is about 10 MB a minute.' },
       noUpload,
     ],
   },
@@ -2333,6 +2337,8 @@ export const presets: Preset[] = [
     intro: [
       'FLAC is lossless compression for audio: it stores exactly the same samples as a WAV, packed the way a zip packs a document, so the file is usually 40 to 60 percent smaller and decodes back to the identical sound. It keeps the sample rate, plays in most music apps and on Android, and is what music archives and download stores use.',
       'This page reads each WAV from your disk and writes the FLAC in your browser, keeping the original sample rate. Nothing is uploaded, so a folder of multitrack stems or an hour of field recordings converts as fast as your computer can read it, and unreleased material stays on your machine.',
+      'A typical job is an archive of recordings: a folder of bounced mixes, a band\'s rehearsal takes or a field recorder\'s card. Drop the whole folder, leave FLAC and Stereo chosen, and you get a zip of FLAC files with the same names. The sample rate of each file is kept, so a 48 kHz recording stays 48 kHz and a 96 kHz one stays 96 kHz. The one change is depth: samples are written at 16 bits, so a 16-bit WAV comes back bit for bit, and a 24-bit or 32-bit float WAV does not.',
+      'Choose Mono only when both channels of the WAV are the same, for example a single microphone recorded into a stereo file. Then the FLAC is half the size again and loses nothing. For a real stereo recording, Mono mixes the two sides together, which you cannot undo. AIFF files from Logic or a Mac can be dropped here too and come out as FLAC in the same way.',
     ],
     steps: [
       'Drop one or more WAV files, or tap to pick them.',
@@ -2342,6 +2348,8 @@ export const presets: Preset[] = [
     faq: [
       { q: 'How much smaller is the FLAC?', a: 'Usually 40 to 60 percent of the WAV for music, less for quiet speech and near silence, more for dense noise. The saving depends on the sound, not on a setting.' },
       { q: 'Is 24-bit kept?', a: 'No. The FLAC is 16-bit, like a CD. For 24-bit masters you will keep editing, keep the WAV.' },
+      { q: 'How can I check the FLAC is really lossless?', a: 'For a 16-bit WAV, convert the FLAC back to WAV on this same page and compare the two in an audio editor: invert one and mix it with the other, and the result is silence. Tools that print an audio checksum, such as ffmpeg\'s md5 output of the decoded samples, show the same numbers for both files.' },
+      { q: 'Will the FLAC play on my phone and in my music app?', a: 'Android, Windows, VLC, foobar2000 and most music players read FLAC. On an iPhone the Files app and VLC play it, but the Apple Music app does not import FLAC. If the files are going into an Apple library, convert a copy to M4A for listening and keep the FLAC as the archive.' },
       noUpload,
     ],
   },
@@ -2360,6 +2368,8 @@ export const presets: Preset[] = [
     intro: [
       'M4A is AAC audio in an MP4 container, the format of Apple Music, iTunes purchases and iPhone voice memos. Some Apple workflows want it rather than MP3: GarageBand ringtones start from an M4A, and some car and podcast apps prefer AAC.',
       'This page decodes each MP3 in your browser and writes an M4A with the browser’s own AAC encoder, which Safari and Chrome or Edge on Windows and Mac include. Nothing is uploaded. Converting from MP3 cannot add quality, so 192 kbps is plenty to keep what the MP3 had.',
+      'Before converting, check that you really need an M4A. iPhones, the Music app and iTunes all play MP3 already, so a song library does not have to change. The cases where M4A matters are narrower: a ringtone you are building in GarageBand, an app or car system that only lists AAC files, or a video editor that wants AAC audio. For those, convert just the files you need and keep the MP3s as your originals.',
+      'Match the bitrate to the MP3 you start from. A 128 kbps MP3 gains nothing at 256 kbps; it only gets bigger. Pick 192 kbps for most music, or 128 kbps when the MP3 was already 128 kbps or is a podcast. Each conversion throws a little away, so never convert the M4A back to MP3 and then to M4A again. The M4A is written at 48 kHz, the rate AAC encoders in browsers work at.',
     ],
     steps: [
       'Drop one or more MP3 files, or tap to pick them.',
@@ -2367,8 +2377,10 @@ export const presets: Preset[] = [
       'Convert. Each M4A downloads when it is ready; several come as a zip.',
     ],
     faq: [
-      { q: 'Why does it say my browser cannot make M4A?', a: 'Browsers use the operating system’s AAC encoder. Firefox and Chrome on Linux have none. Open this page in Safari, or in Chrome or Edge on Windows or Mac.' },
+      { q: 'Why does the M4A option not work in Firefox?', a: 'Browsers borrow the operating system\'s AAC encoder to write M4A, and Firefox, like Chrome on Linux, does not have one it can use. Open the page in Safari, or in Chrome or Edge on Windows or Mac. If the file is only going to an iPhone, you can also skip the conversion: iPhones play the MP3 as it is.' },
       { q: 'Is M4A better than MP3?', a: 'A file made from an original recording sounds a little better as AAC than as MP3 at the same size. A file made from an MP3 keeps the MP3’s quality, never more.' },
+      { q: 'Can I make an iPhone ringtone from the M4A?', a: 'Yes, with one more step. iPhone ringtones are AAC files with an .m4r name and 40 seconds at most. Cut the part you want first with the MP3 cutter, convert it here, then import the M4A into GarageBand on the iPhone and export it as a ringtone, or rename it to .m4r and add it through Finder or iTunes.' },
+      { q: 'Are the song title, artist and cover art kept?', a: 'No. The M4A is a new file written from the decoded sound, so the tags from the MP3 are not copied across. If you are adding the files to the Music app, you can type the title and artist and paste cover art in the song\'s info window after importing.' },
       noUpload,
     ],
   },
@@ -2385,8 +2397,10 @@ export const presets: Preset[] = [
     accept: 'audio/mpeg,.mp3,audio/*',
     defaults: { format: 'ogg', bitrate: '128' },
     intro: [
-      'OGG is an open container that game engines (Godot, Unity, RPG Maker), browsers and many Linux apps prefer. This page writes it with Opus, the modern codec inside it, which sounds as good as MP3 at around two thirds of the bitrate and is what Discord and WhatsApp use for voice.',
+      'OGG is an open container that browsers, Discord and many Linux apps prefer. This page writes it with Opus, the modern codec inside it, which sounds as good as MP3 at around two thirds of the bitrate and is what Discord and WhatsApp use for voice.',
       'Each MP3 is decoded and encoded by your browser’s own Opus encoder, so nothing is uploaded and there is no file limit. 128 kbps Opus is transparent for music; 96 kbps is plenty for sound effects and speech.',
+      'A common job is a folder of sound effects or music loops for a web page or a browser game. Drop the whole folder and they come back as a zip of .ogg files with the same names. For short effects that your audio library places around the player, choose Mono: sounds that move in 3D space are usually expected to be mono, and the whole bitrate then goes to one channel. Keep Stereo for background music. The files are written at 48 kHz, the rate Opus always uses.',
+      'Opus is efficient, so the saving is real. A 320 kbps MP3 at 2.4 MB a minute becomes about 0.96 MB a minute at 128 kbps, and a page that loads a dozen sounds gets noticeably lighter. Converting cannot bring back detail the MP3 already lost, so there is no point going above 128 kbps. If you have the original WAV of a track, convert that instead of the MP3 for the cleanest result.',
     ],
     steps: [
       'Drop one or more MP3 files, or tap to pick them.',
@@ -2394,8 +2408,10 @@ export const presets: Preset[] = [
       'Convert. Each OGG downloads when it is ready; several come as a zip.',
     ],
     faq: [
-      { q: 'Is it OGG Vorbis or OGG Opus?', a: 'Opus. Browsers can encode Opus but not Vorbis. Godot, Unity, Firefox, Chrome and VLC play Opus in OGG; a few old players only know Vorbis.' },
+      { q: 'Is it OGG Vorbis or OGG Opus?', a: 'Opus. Browsers can encode Opus but not Vorbis. Firefox, Chrome, VLC, Discord and most Linux players play Opus in OGG; some older players and game engines only know Vorbis.' },
       { q: 'Does Safari support it?', a: 'Recent Safari plays OGG Opus. Making the file works in Chrome, Edge and Firefox; if Safari cannot, the page says so when you choose OGG.' },
+      { q: 'Will my game engine import OGG Opus files?', a: 'Check with one file before converting a whole folder. Browsers, VLC and many players read Opus in OGG, but some engine versions and importers only read OGG Vorbis and reject Opus, even though both use the .ogg name. If yours refuses the file, keep the MP3 or WAV for that engine, since this page cannot write Vorbis.' },
+      { q: 'Should I use OGG on a website instead of MP3?', a: 'It saves bandwidth, but serve an MP3 alongside it for older Safari versions and devices that do not play Opus. An audio element with two source lines, the OGG first and the MP3 second, lets each browser pick the file it can play. For a single background track the saving may not be worth keeping two copies.' },
       noUpload,
     ],
   },
@@ -2414,6 +2430,8 @@ export const presets: Preset[] = [
     intro: [
       'A WAV holds uncompressed audio, about 10 MB a minute. AAC in an M4A at 256 kbps, the quality Apple Music sells, is about a fifth of that and sounds the same to nearly everyone, and it plays on every Apple device and in iTunes.',
       'This page encodes each WAV with your browser’s own AAC encoder, which Safari and Chrome or Edge on Windows and Mac include, so the recordings never leave your computer.',
+      'Starting from a WAV is the best case for AAC, because the encoder works from the full recording rather than from an MP3 that has already lost detail. That is why 256 kbps is the default here: it is the rate Apple Music sells at, and from a lossless source it is hard to tell apart from the WAV. A three minute song comes out at about 5.8 MB instead of about 30 MB. For voice memos, lectures and interviews, 128 kbps with Mono chosen is plenty, at half the size of 256 kbps.',
+      'The M4A is written at 48 kHz and at most in stereo. If your WAV came from a recorder at 96 kHz or 24-bit, the M4A is a listening copy, not a replacement: keep the WAV, or turn it into FLAC on this same page, as the master you edit from. The Music app on Mac and Windows imports M4A directly, but it does not import FLAC, which is the usual reason people need this conversion.',
     ],
     steps: [
       'Drop one or more WAV files, or tap to pick them.',
@@ -2421,7 +2439,9 @@ export const presets: Preset[] = [
       'Convert. Each M4A downloads when it is ready; several come as a zip.',
     ],
     faq: [
-      { q: 'Why does it say my browser cannot make M4A?', a: 'Browsers use the operating system’s AAC encoder. Firefox and Chrome on Linux have none. Open this page in Safari, or in Chrome or Edge on Windows or Mac, or choose FLAC to shrink the WAV without an AAC encoder.' },
+      { q: 'My browser says it cannot write M4A. What can I do with the WAV instead?', a: 'M4A needs an AAC encoder from the operating system, which Firefox and Chrome on Linux do not have. Switch to Safari, or to Chrome or Edge on Windows or Mac. If you only need the WAV smaller and do not need Apple\'s format, choose FLAC for a lossless copy at about half the size, or MP3 for a small file that plays everywhere.' },
+      { q: 'What bitrate should I choose for a WAV?', a: '256 kbps for music you want to keep and listen to on good headphones. 192 kbps if you need to fit more on a phone and cannot hear a difference. 128 kbps, with Mono chosen, for speech recorded with one microphone. Higher than 256 kbps rarely helps AAC; the 320 kbps option is there if you want to be sure.' },
+      { q: 'How do I get the M4A into Apple Music on my iPhone?', a: 'On a Mac, drag the M4A files into the Music app and sync the phone, or turn on Sync Library to have them appear on every device signed in to your Apple Account. On Windows, add them to the Apple Music app or iTunes the same way. Files saved to the Files app play there, but they do not show up in the Music library.' },
       noUpload,
     ],
   },
@@ -2702,6 +2722,8 @@ export const presets: Preset[] = [
     intro: [
       'Normalizing sets each file to a target loudness, so a quiet voice memo and a loud music clip play at the same level. This page measures the loudness of the talking or music, ignoring pauses, and brings each file to about −14 LUFS, the level Spotify and YouTube use.',
       'A limiter eases down any peak that would clip, so boosting a quiet file does not distort. Each file is saved in its own format unless you pick another, and nothing is uploaded: interviews, lectures and rehearsal recordings stay on your machine.',
+      'A typical use is a batch that comes from different places: podcast episodes recorded in different rooms, voice notes from several people, or tracks for a playlist taken from different albums. Drop them all, leave Normalize chosen, and each file is measured on its own. Quiet files are lifted, by at most 30 dB so a nearly silent file does not turn into hiss, and loud files are turned down. The note on each result shows the change in dB, so you can see what happened.',
+      'Leave Save as on Same as the original to keep each file\'s own format, at about its original bitrate for MP3, M4A and OGG. Normalize works on videos too: the picture is copied and only the sound is changed. The target is about −14 LUFS, the level Spotify and YouTube play at. Podcast apps often recommend about −16 LUFS, so a normalized episode is slightly louder than that, which is rarely a problem.',
     ],
     steps: [
       'Drop one or more audio files or videos, or tap to pick them.',
@@ -2711,6 +2733,8 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Is this peak or loudness normalization?', a: 'Loudness. Peak normalization only lifts the single loudest sample to the top, which barely helps a recording with one loud cough. Loudness normalization matches how loud files sound.' },
       { q: 'Is it true LUFS?', a: 'Close to it. The level is the average power of the loud parts in 400 ms blocks, the same gating idea LUFS uses, without the frequency weighting. Files come out within a decibel or two of each other.' },
+      { q: 'Will normalizing fix one person being quieter than another in the same recording?', a: 'No. Normalizing sets one gain for the whole file, so the balance inside the recording stays the same: if one speaker is 6 dB quieter than the other, they still are. It makes a file as a whole match your other files. Evening out voices within one recording needs a compressor or leveller in an audio editor.' },
+      { q: 'Why did a file get quieter?', a: 'Because it was louder than the target. Loud masters, many music videos and some screen recordings sit well above −14 LUFS, so they are turned down to match the rest. That is the point of normalizing a batch. If you only want files louder, choose By an amount instead and pick how many dB.' },
       noUpload,
     ],
   },
@@ -2729,6 +2753,8 @@ export const presets: Preset[] = [
     intro: [
       'Phone videos filmed from across a room, screen recordings with a quiet microphone and old camera clips often play too softly. This page turns the sound up by the amount you choose and puts it back with the original picture, which is copied as it is, so the video looks exactly the same and the job is quick.',
       'A limiter keeps the loudest moments from clipping, so a +10 or +15 dB boost stays clean. Nothing is uploaded and there is no watermark or size cap.',
+      'Pick the amount by how quiet the video is now. +6 dB helps a clip that is a bit soft next to others; +10 dB suits a phone video where people speak from a few metres away; +15 or +20 dB is for a screen recording made with the laptop microphone turned low. Try one clip first, listen, and run the rest. If you are gathering clips from different phones and want them all at the same level, choose Normalize under Change instead of a fixed amount.',
+      'A few things to expect. An iPhone MOV or an MKV comes back as an MP4 with the same picture; a WebM made with the VP8 codec stays a WebM so it still plays in Safari. The Save as list only affects audio files; videos always keep their picture and get new sound. Turning the sound up also lifts wind, hum and room noise, so a boost makes speech louder but not cleaner.',
     ],
     steps: [
       'Drop one or more videos, or tap to pick them.',
@@ -2737,6 +2763,9 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Is the picture re-encoded?', a: 'No. The video packets are copied into the new file unchanged. Only the sound is decoded, turned up and encoded again (AAC in MP4, Opus in WebM).' },
+      { q: 'How much louder is +10 dB?', a: 'To the ear, about twice as loud. +6 dB is clearly louder, +3 dB only a little. Because the limiter holds the loudest moments at the same ceiling, a big boost mostly raises the quiet parts, such as speech in between louder sounds, which is usually what a quiet video needs.' },
+      { q: 'Can I make a video quieter instead?', a: 'Yes. The How much list also has −3, −6 and −10 dB, which is about half as loud. That helps when a clip with loud music or a shouting crowd sits next to quieter ones in an edit, or when a video\'s sound is too harsh on a phone speaker.' },
+      { q: 'What if my video has no sound at all?', a: 'Then there is nothing to boost and the page tells you the file has no sound to change. If the video should have sound, check that the recording app had microphone access. To give a silent video a soundtrack, use Add audio to video.' },
       noUpload,
     ],
   },
@@ -2756,6 +2785,8 @@ export const presets: Preset[] = [
       'Audiobooks and lectures often arrive as dozens of short MP3 chapters, and a playlist or a mix is easier to share as one file. This page joins MP3 files end to end into a single MP3 that plays in any app, car stereo or phone.',
       'Drop the files in, sort them with the arrows (they keep the order you add them in), and choose whether to add a short pause or a crossfade between tracks. The joined file is written once at the quality you pick, so it plays without gaps or glitches at the joins.',
       'The files are decoded and joined by your browser. Nothing is uploaded, so private recordings stay private and there is no limit on how many you join.',
+      'For an audiobook, the order is what usually goes wrong. Files join top to bottom in the order they were added, and a file picker often sorts Chapter 10 before Chapter 2. Check the list before you press Merge MP3 and fix the order with the arrows; naming files 01, 02, 03 before you start avoids it. Leave Between files on Nothing, straight on for chapters. For voice notes or separate talks, 1 or 2 seconds of silence makes each start easy to hear.',
+      'Set the MP3 quality to match the files you start with. Chapters at 64 or 128 kbps gain nothing at 320 kbps and only make a larger file; 128 kbps is right for spoken word. Files do not need to match each other: different bitrates and sample rates are all decoded at 44.1 kHz, and a mono chapter is copied to both sides when the others are stereo. The result is saved as merged.mp3, so rename it before adding it to a library.',
     ],
     steps: [
       'Drop the MP3 files, or tap to pick them. Sort them with the arrows.',
@@ -2766,6 +2797,8 @@ export const presets: Preset[] = [
       { q: 'Why not just stick the MP3 files together?', a: 'Gluing the bytes together (as some command-line tricks do) leaves each file’s tags and encoder padding at the joins, which causes clicks, wrong durations and players that stop after the first track. Decoding and writing one new MP3 avoids all of that.' },
       { q: 'Will the song titles and cover art be kept?', a: 'No. The merged file is a new MP3 without tags; add a title and cover in your music app afterwards if you need them.' },
       { q: 'How many files can I merge?', a: 'As many as your device’s memory holds. A few hours of audio is fine on a laptop; very long merges on a phone may be slow.' },
+      { q: 'How does the crossfade work for a DJ style mix?', a: 'With a crossfade, the end of one track overlaps the start of the next, one fading out while the other fades in, so the join is smooth and the mix is shorter than the tracks added up. The 5 second crossfade suits songs; 2 seconds suits short clips. A crossfade never takes more than half of the shorter track, so a brief jingle is not swallowed.' },
+      { q: 'Can I merge MP3s with WAV or M4A files?', a: 'Yes. Any file your browser can play can go in the list, including WAV, M4A, FLAC, OGG and the sound of a video. Everything is decoded to the same format before joining, so mixed files work fine. Choose MP3 under Save as for one file that plays everywhere, or WAV if you will edit the result.' },
       noUpload,
     ],
   },
@@ -2813,6 +2846,8 @@ export const presets: Preset[] = [
     intro: [
       'An MP3’s size is its bitrate times its length. A 320 kbps song takes about 2.4 MB a minute; at 96 kbps it is 0.7 MB, still clear for podcasts, audiobooks and voice. This page re-encodes each MP3 at the bitrate you choose, or at whatever bitrate fits a size limit, entirely in your browser.',
       'Nothing is uploaded, so recordings of meetings and lectures stay on your machine, and there is no daily file limit. If an MP3 is already smaller than the setting would make it, you get the original back instead of a worse copy.',
+      'For an audiobook or a podcast on a phone, Small at 96 kbps keeps the voice clear at three quarters of the size of a 128 kbps file, and ticking Mono gives all of that bitrate to one channel. For a song you still want to enjoy, Light at 160 kbps sounds the same as the original to most people. When the file has to go somewhere with a limit, leave the compression where it is and choose a Fit under size: the page works out the bitrate from the length and steps down only as far as it has to.',
+      'As a rough guide, 25 MB holds about 25 minutes of stereo MP3 at 128 kbps and about 50 minutes at 64 kbps. The 8 MB setting fits about 16 minutes at 64 kbps. The lowest step is 32 kbps, so if a very long file still comes out over the limit, the result says so; cut it into parts with the MP3 cutter and compress each one.',
     ],
     steps: [
       'Drop one or more MP3 files, or tap to pick them.',
@@ -2821,6 +2856,8 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Does compressing an MP3 lose quality?', a: 'Yes, a little: it is decoded and encoded again at a lower bitrate. For speech at 64 to 96 kbps nobody notices; for music, stay at 128 kbps or above.' },
+      { q: 'What bitrate is my MP3 now, and will compressing it help?', a: 'Divide the file size by its length: about 2.4 MB a minute is 320 kbps, 1.4 MB is 192 kbps and 1 MB is 128 kbps. Compressing only helps when the setting is lower than that. If it is not, you get your original file back, marked as already smaller, rather than a copy that is worse and no smaller.' },
+      { q: 'Can I send an MP3 on Discord without Nitro?', a: 'At the time of writing, free Discord accounts can upload files up to 10 MB. Choose 8 MB (Discord) under Fit under, which leaves some room, and the MP3 comes out small enough. A song of about four minutes fits at 160 kbps and a half hour talk at 32 kbps; anything much longer has to be split into parts first.' },
       noUpload,
     ],
   },
@@ -2839,6 +2876,8 @@ export const presets: Preset[] = [
     intro: [
       'A WAV stores every sample uncompressed, about 10 MB a minute in CD quality, so a 30 minute interview is over 300 MB, too big for email and slow to upload anywhere. Compressed to 128 kbps MP3 it is about 29 MB, and to 64 kbps mono about 14 MB, with speech just as clear.',
       'This page does it in your browser, so the WAV is never uploaded. To keep every sample and still halve the size, use the audio converter’s FLAC option instead.',
+      'Say you recorded a one hour interview as a WAV and need to email it. Choose 25 MB (Gmail and Outlook) under Fit under and tick Mono, so the whole bitrate goes to one channel of speech. The page works out that an hour needs about 48 kbps to fit, which still sounds clear for speech, and saves a file of roughly 21 MB. For a song or a mix you want someone to hear properly, leave Fit under at No limit and choose Light or Balanced instead.',
+      'Save as offers two formats. MP3 opens on any computer or phone, so it is the safe choice for sending to someone else. OGG Opus sounds better than MP3 at low bitrates, which matters most below 96 kbps, but a few older players cannot open it. Either way the compressed file is a copy for sharing: keep the WAV if you will edit or remix the recording later.',
     ],
     steps: [
       'Drop one or more WAV files, or tap to pick them.',
@@ -2847,6 +2886,8 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Can I compress a WAV without losing quality?', a: 'Only to about half, as FLAC, with the audio converter. MP3 and OGG get to a tenth or less by leaving out what you cannot hear.' },
+      { q: 'Why is my WAV so big?', a: 'A WAV stores every sample as a number with no compression. CD quality stereo is about 10 MB a minute, and recorders set to 24-bit at 48 kHz write about 17 MB a minute, so a long session quickly runs to gigabytes. MP3 and Opus keep what the ear hears and drop the rest, which is where the tenfold saving comes from.' },
+      { q: 'Which Compression setting should I pick for a WAV of music?', a: 'Light (160 kbps) if the listener cares about the sound, for example a mix sent to a bandmate or a client for approval. Balanced (128 kbps) for demos and rehearsal takes. Small and Smallest are made for speech and make music sound thin. Leave Mono unticked for music, or the stereo image is lost.' },
       noUpload,
     ],
   },
