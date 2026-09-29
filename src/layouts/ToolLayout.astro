@@ -2,6 +2,7 @@
 import Base from './Base.astro';
 import Icon from '../components/Icon.astro';
 import ToolCard from '../components/ToolCard.astro';
+import UploadVsLocal from '../components/UploadVsLocal.astro';
 import { tools, toolPath, type Tool } from '../data/tools';
 import { pairs } from '../data/pairs';
 import { presets } from '../data/presets';
@@ -37,6 +38,12 @@ const presetLinks = presets
   .filter((p) => p.slug !== tool.slug && tools.find((t) => t.slug === p.base)?.category === tool.category)
   .sort((a, b) => Number(b.base === (base ?? tool.slug)) - Number(a.base === (base ?? tool.slug)))
   .slice(0, 8);
+// File labels for the upload-vs-local diagram: the format pair when the slug names one, else the category's usual file.
+const labels: Record<string, string> = { jpg: 'JPG', jpeg: 'JPG', png: 'PNG', webp: 'WebP', heic: 'HEIC', avif: 'AVIF', svg: 'SVG', jxl: 'JXL', jfif: 'JFIF', gif: 'GIF', ico: 'ICO', bmp: 'BMP', tiff: 'TIFF', pdf: 'PDF', mp4: 'MP4', mov: 'MOV', mp3: 'MP3', m4a: 'M4A', wav: 'WAV', text: 'TXT', word: 'DOCX', image: 'Photo', picture: 'Photo', screenshot: 'PNG', video: 'Video' };
+const fallback = tool.category === 'pdf' ? 'PDF' : tool.category === 'media' ? 'Video' : 'Photo';
+const [slugFrom, slugTo] = tool.slug.split('-to-').map((part) => labels[part.split('-').pop() ?? '']);
+const diagFrom = slugFrom ?? fallback;
+const diagTo = tool.slug.includes('-to-') ? (slugTo ?? diagFrom) : diagFrom;
 const next = (nextSteps[base ?? tool.slug] ?? []).map((s) => tools.find((t) => t.slug === s)).filter((t): t is Tool => !!t);
 const guides = guidesFor([tool.slug, base ?? tool.slug]).slice(0, 4);
 const jsonLd = [
@@ -156,7 +163,10 @@ const jsonLd = [
   </section>
 
   <section class="wrap section split">
-    <h2>In your browser, not on a server</h2>
+    <div>
+      <h2>In your browser, not on a server</h2>
+      <UploadVsLocal from={diagFrom} to={diagTo} />
+    </div>
     <div class="engine">
       <p>{engine.how}</p>
       <p class="versus"><strong>Compared with upload-based tools:</strong> {engine.versus}</p>

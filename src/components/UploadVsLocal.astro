@@ -1,0 +1,40 @@
+---
+// Decorative diagram for "In your browser, not on a server": an upload site's round trip
+// against the same job done inside this tab. The paragraphs beside it carry the content.
+interface Props { from: string; to: string }
+const { from, to } = Astro.props;
+const fit = (s: string) => (s.length > 5 ? 11 : 13);
+const file = (x: number, y: number, label: string) => ({ x, y, label, size: fit(label) });
+const files = [file(30, 60, from), file(48, 224, from), file(254, 224, to)];
+---
+<svg class="uvl" viewBox="0 0 360 296" width="360" height="296" aria-hidden="true" focusable="false">
+  <text class="uvl-lane" x="0" y="14">Upload sites</text>
+  <g class="uvl-them">
+    <rect x="0.75" y="28.75" width="118.5" height="88.5" rx="8" />
+    <path d="M1 44h118" />
+    <circle cx="11" cy="36.5" r="2" /><circle cx="18" cy="36.5" r="2" /><circle cx="25" cy="36.5" r="2" />
+    <rect x="240.75" y="28.75" width="118.5" height="88.5" rx="8" />
+    <rect x="253" y="44" width="94" height="14" rx="3" /><rect x="253" y="66" width="94" height="14" rx="3" /><rect x="253" y="88" width="94" height="14" rx="3" />
+    <path class="uvl-trip" d="M128 58H228m-6-5 6 5-6 5" />
+    <path class="uvl-trip" d="M232 90H132m6-5-6 5 6 5" />
+    <text class="uvl-note" x="180" y="50">upload</text>
+    <text class="uvl-note" x="180" y="108">download</text>
+    <text class="uvl-note" x="300" y="134">their server</text>
+  </g>
+  <text class="uvl-lane uvl-lane-us" x="0" y="170">Stayput</text>
+  <g class="uvl-us">
+    <rect x="0.75" y="182.75" width="358.5" height="108.5" rx="10" />
+    <path d="M1 200h358" />
+    <circle cx="12" cy="191.5" r="2" /><circle cx="19" cy="191.5" r="2" /><circle cx="26" cy="191.5" r="2" />
+    <path class="uvl-go" d="M116 244H242m-6-5 6 5-6 5" />
+    <text class="uvl-here" x="179" y="234">converted in this tab</text>
+    <text class="uvl-zero" x="346" y="282">0 requests</text>
+  </g>
+  {files.map((f) => (
+    <g class="uvl-file">
+      <path d={`M${f.x + 0.75} ${f.y + 0.75}h46.5l11 11v28.5h-57.5z`} />
+      <path class="uvl-fold" d={`M${f.x + 47.25} ${f.y + 0.75}v11h11`} />
+      <text x={f.x + 29} y={f.y + 25} font-size={f.size}>{f.label}</text>
+    </g>
+  ))}
+</svg>

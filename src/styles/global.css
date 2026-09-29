@@ -324,6 +324,45 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 @media (prefers-reduced-motion: reduce) { .conv-map .cm-pulses { display: none; } }
 @media (max-width: 900px) { .conv-map { display: none; } }
 
+/* Tool pages: upload round trip against the same job in this tab, under "In your browser, not on a server". */
+.uvl { display: block; width: 100%; max-width: 360px; height: auto; margin-top: 32px; overflow: visible; }
+.uvl text { font-family: var(--font); }
+.uvl-lane { fill: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; }
+.uvl-lane-us { fill: var(--accent-ink); }
+.uvl-them rect, .uvl-them > path { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.5; }
+.uvl-them circle { fill: var(--line-strong); }
+.uvl-them .uvl-trip { fill: none; stroke: var(--muted); stroke-dasharray: 4 4; stroke-linecap: round; stroke-linejoin: round; }
+.uvl-note { fill: var(--muted); font: 11.5px var(--mono) !important; text-anchor: middle; }
+.uvl-us rect { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.uvl-us > path { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+.uvl-us circle { fill: var(--accent); }
+.uvl-us .uvl-go { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.uvl-here { fill: var(--accent-ink); font-size: 12.5px; font-weight: 650; text-anchor: middle; }
+.uvl-zero { fill: var(--muted); font: 11.5px var(--mono) !important; text-anchor: end; }
+.uvl-file path { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.5; stroke-linejoin: round; }
+.uvl-file .uvl-fold { fill: none; }
+.uvl-file text { fill: var(--ink); font-weight: 650; text-anchor: middle; }
+@media (max-width: 900px) { .uvl { display: none; } }
+
+/* /mcp: where the server runs, drawn as a machine boundary around assistant, server and files. */
+.mcp-flow { margin: 28px 0 8px; }
+.mcp-machine { position: relative; border: 1.5px dashed var(--line-strong); border-radius: var(--radius); padding: 30px 18px 18px; }
+.mcp-machine-label { position: absolute; top: -10px; left: 16px; padding: 0 8px; background: var(--ground); color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; }
+.mcp-flow ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; counter-reset: none; }
+.prose .mcp-flow li { position: relative; display: grid; gap: 4px; align-content: start; margin: 0; padding: 14px 14px 13px; background: var(--surface); border: 1.5px solid var(--line-strong); border-radius: var(--radius-sm); }
+.prose .mcp-flow li::before { content: none; }
+.prose .mcp-flow li b { color: var(--ink); font-size: 15.5px; font-weight: 700; }
+.prose .mcp-flow li span { color: var(--muted); font-size: 13.5px; line-height: 1.4; }
+.prose .mcp-flow li.mcp-core { background: var(--accent-soft); border-color: var(--accent); }
+.prose .mcp-flow li.mcp-core b { color: var(--accent-ink); font-family: var(--mono); font-size: 14.5px; }
+.prose .mcp-flow li + li::after { content: ""; position: absolute; left: -30px; top: 50%; width: 24px; height: 12px; margin-top: -6px; background: var(--accent); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpath d='M1 6h20M17 1.5 21.5 6 17 10.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpath d='M1 6h20M17 1.5 21.5 6 17 10.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+.mcp-flow figcaption { margin-top: 12px; color: var(--muted); font-size: 14px; }
+.mcp-zero { color: var(--accent-ink); font-weight: 800; }
+@media (max-width: 640px) {
+  .mcp-flow ol { grid-template-columns: 1fr; gap: 28px; }
+  .prose .mcp-flow li + li::after { left: 50%; top: -22px; margin: 0 0 0 -6px; width: 12px; height: 16px; transform: rotate(90deg); transform-origin: center; width: 16px; height: 12px; margin-left: -8px; }
+}
+
 .spec-sheet { margin: 0; display: grid; border-top: 1px solid var(--ink); }
 .spec-sheet > div { display: grid; grid-template-columns: minmax(110px, 2fr) minmax(0, 5fr); gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .spec-sheet dt { font-weight: 700; }
