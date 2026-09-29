@@ -1776,6 +1776,59 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'cut-video',
+    base: 'trim-video',
+    name: 'Cut video',
+    title: 'Cut Video Online, Free, No Upload, No Watermark | Stayput',
+    description: 'Cut a part out of a video in your browser. Set the start and end on the player and save the clip in seconds, same quality. MP4, MOV, WebM. No upload.',
+    heading: 'Cut a video',
+    tagline: 'Keep just the part you need from a long recording, without uploading the whole thing anywhere.',
+    keywords: ['cut video', 'cut video online', 'video cutter', 'cut mp4', 'cut part of a video', 'clip a video'],
+    dropLabel: 'Drop a video to cut',
+    intro: [
+      'Most of the time you only need a slice of a video: the goal from a match, the answer from a two-hour call recording, the thirty seconds of a screen recording that shows the bug. Drop the file here, scrub to the first moment you want and press Set start, then to the last and press Set end.',
+      'The clip is cut by copying the video and sound between those points into a new file, rather than re-encoding them. That is why it takes seconds even for a long 4K file, and why the clip looks exactly like the original. If the start needs to be precise to the frame, tick the exact option and the clip is re-encoded instead.',
+      'Cutting happens in your browser. Recordings of meetings, family videos and gameplay are not uploaded to a converter site, there is no watermark, and there is no limit on the size of the video you start from.',
+    ],
+    steps: [
+      'Drop the video, or tap to pick it.',
+      'Scrub to the start and press Set start, then to the end and press Set end.',
+      'Press Trim and save the clip.',
+    ],
+    faq: [
+      { q: 'Can I cut several parts out at once?', a: 'One clip per run. To make several, trim the first, then change the start and end and trim again; the video stays loaded.' },
+      { q: 'Can I cut the middle out and keep the rest?', a: 'Not in one step. Trim the part before and the part after as two clips; joining them needs a video editor.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'trim-mp4',
+    base: 'trim-video',
+    name: 'Trim MP4',
+    title: 'Trim MP4 Online Without Re-encoding, No Upload | Stayput',
+    description: 'Trim an MP4 in your browser without re-encoding: the clip keeps its original quality and is ready in seconds. Free, no upload, no watermark.',
+    heading: 'Trim an MP4',
+    tagline: 'Cut the start and end off an MP4 with no quality loss and no upload.',
+    keywords: ['trim mp4', 'cut mp4', 'trim mp4 without re-encoding', 'mp4 cutter', 'trim mp4 online', 'shorten mp4'],
+    dropLabel: 'Drop an MP4 to trim',
+    accept: 'video/mp4,.mp4,.m4v,video/*',
+    intro: [
+      'Phone videos, screen recordings and downloads almost always come as MP4 with H.264 video, and they usually have a few seconds too many at each end. This page cuts them down without re-encoding: the frames between your start and end are copied into a new MP4, so the picture is identical and the file is ready as fast as it can be read.',
+      'Because an MP4 made without re-encoding has to start on a key frame, the clip may begin up to half a second before the point you set. Most phones and cameras put a key frame every second or two, so in practice the cut is where you expect it. For a frame-exact start, tick the exact option.',
+      'Your MP4 stays on your device throughout. The page runs the cut in your browser tab and saves the new file straight to your downloads.',
+    ],
+    steps: [
+      'Drop the MP4, or tap to pick it.',
+      'Set the start and end on the player, or type the times.',
+      'Trim, and the shorter MP4 downloads.',
+    ],
+    faq: [
+      { q: 'Is it really lossless?', a: 'Yes, unless you tick the exact option. The encoded video and sound are copied, not decoded and encoded again, so nothing about the picture or sound changes.' },
+      { q: 'Will the sound stay in sync?', a: 'Yes. Video and sound are cut from the same points and their timing is kept exactly.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

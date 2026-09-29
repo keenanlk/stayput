@@ -1,0 +1,32 @@
+---
+/** Option controls for trimming a video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<div class="field-row wide vg-trim">
+  <div class="field">
+    <label for="vg-start">Start (seconds)</label>
+    <div class="vg-time"><input type="number" id="vg-start" min="0" step="0.1" value="0" inputmode="decimal" /><button class="btn btn-sm btn-ghost" type="button" id="vg-set-start">Set start</button></div>
+  </div>
+  <div class="field">
+    <label for="vg-end">End (seconds)</label>
+    <div class="vg-time"><input type="number" id="vg-end" min="0" step="0.1" value="0" inputmode="decimal" /><button class="btn btn-sm btn-ghost" type="button" id="vg-set-end">Set end</button></div>
+  </div>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="exact" checked={defaults.exact === 'true'} /> Cut exactly on the frame (re-encodes, slower)</label>
+  <p class="muted small">Left off, the clip is copied without re-encoding: instant and with no quality loss, starting at most half a second early.</p>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>
+<p class="muted small vg-estimate" id="vg-estimate" aria-live="polite"></p>
+<style is:global>
+  .vg-trim { align-items: end; }
+  .vg-trim .field { flex: 1 1 180px; }
+  .vg-time { display: flex; gap: 6px; }
+  .vg-time input { width: 100%; min-width: 0; }
+  .vg-time .btn { white-space: nowrap; }
+  .vg-estimate { margin: 0; grid-column: 1 / -1; }
+  .vg-estimate.is-over { color: var(--warn); font-weight: 600; }
+</style>

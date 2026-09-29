@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import TrimVideo from '../../components/options/TrimVideo.astro';
+import VideoStage from '../../components/VideoStage.astro';
+const tool = toolBySlug('trim-video')!;
+---
+<ToolLayout tool={tool}>
+  <VideoStage slot="panel" />
+  <Fragment slot="options"><TrimVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/trim-video.ts"></script>
