@@ -36,6 +36,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'reverse-video': () => import('./reverse-video'),
   'video-to-jpg': () => import('./video-to-jpg'),
   'trim-audio': () => import('./trim-audio'),
+  'screen-recorder': () => import('./screen-recorder'),
   'merge-audio': () => import('./merge-audio'),
   'volume-booster': () => import('./volume-booster'),
   'audio-converter': () => import('./audio-converter'),
