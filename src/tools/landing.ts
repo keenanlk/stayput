@@ -43,6 +43,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'passport-photo': () => import('./passport-photo'),
   'watermark-image': () => import('./watermark-image'),
   'watermark-pdf': () => import('./watermark-pdf'),
+  'remove-pdf-metadata': () => import('./remove-pdf-metadata'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

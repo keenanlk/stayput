@@ -2485,6 +2485,36 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'pdf-metadata-viewer',
+    base: 'remove-pdf-metadata',
+    name: 'PDF metadata viewer',
+    title: 'PDF Metadata Viewer: See Author, Dates, Software | Stayput',
+    description: 'See who wrote a PDF, which program made it and when, plus any XMP metadata, right in your browser. Remove it in one click. Nothing is uploaded.',
+    heading: 'See the metadata in a PDF',
+    tagline: 'Author, software, dates and hidden XMP, read on your device.',
+    keywords: ['pdf metadata viewer', 'view pdf metadata', 'pdf properties', 'who created this pdf', 'pdf author', 'check pdf metadata'],
+    dropLabel: 'Drop a PDF to see its metadata',
+    action: 'Remove metadata',
+    defaults: {},
+    intro: [
+      'Every PDF has a properties panel most people never open. It usually names the author, often the full name from the Word or Pages licence or the user account of the computer it was made on, and records which program created the document and which one turned it into a PDF, with version numbers and the exact dates it was created and last saved. Many files repeat all of it in an XMP packet, which some apps extend with editing history.',
+      'Drop a PDF here and that information is listed straight away, read by code running in your browser. It is useful for checking a document before you send it, for seeing whether a CV, a quote or a leaked memo was really written by who it claims, and for finding out which scanner or app produced a file.',
+      'If you do not want the metadata to travel with the file, press Remove metadata. You get a copy with the same name, the same pages and text, and none of the hidden fields. The original file on your device is not changed, and nothing is uploaded at any point.',
+    ],
+    steps: [
+      'Drop one or more PDFs. The author, software, dates, XMP and file ID of each are listed at once.',
+      'Read the list. Nothing has been changed yet.',
+      'To send a clean copy, press Remove metadata and download it.',
+    ],
+    faq: [
+      { q: 'Can the metadata prove who wrote a PDF?', a: 'It is a clue, not proof. The author field is whatever the creating app filled in, usually the name on the account or licence, and anyone can edit it. Dates come from the clock of the computer that saved the file. Treat mismatches as questions to ask, not answers.' },
+      { q: 'Why does my PDF show a name I do not recognise?', a: 'Word and other apps copy the author from the template or from the file the document started as. If you reused an old document or a company template, the original author’s name can still be in it, which is a good reason to check before you send.' },
+      { q: 'What do Created with and Made into PDF by mean?', a: 'Created with (the Creator field) is the program the document was written in, such as Microsoft Word or Google Docs. Made into PDF by (the Producer field) is the software that wrote the PDF itself, such as macOS Quartz, Adobe PDF Library or a scanner’s firmware.' },
+      { q: 'Does it show metadata of images inside the PDF?', a: 'It counts XMP packets attached to images and pages, and removes them. The EXIF data inside embedded photos is not listed; if that matters, clean the photos with the remove EXIF tool before placing them in the document.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

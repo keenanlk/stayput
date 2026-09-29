@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/remove-pdf-metadata",
+      "destination": "/tools/remove-pdf-metadata",
+      "permanent": true
+    },
+    {
       "source": "/passport-photo",
       "destination": "/tools/passport-photo",
       "permanent": true

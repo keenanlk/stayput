@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(46);
+  expect(await page.locator('.tool-card').count()).toBe(47);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -968,6 +968,7 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['2x2-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('us')],
     ['35x45-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('eu')],
+    ['pdf-metadata-viewer', 'remove-pdf-metadata', async () => expect(page.locator('#run')).toContainText('Remove metadata')],
     ['confidential-watermark', 'watermark-pdf', async () => expect(page.locator('#wm-text')).toHaveValue('CONFIDENTIAL')],
     ['watermark-id-copy', 'watermark-image', async () => expect(page.locator('input[name="layout"][value="tiled"]')).toBeChecked()],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
@@ -3330,6 +3331,73 @@ test('Watermark PDF stamps every page, keeps the text, and no bytes leave the ta
   const now = (await textItems(out, 1)).map((t) => t.str).join('');
   expect(now).toBe(was);
   net.assertNothingLeft(['rotated.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Remove PDF metadata lists and strips author, XMP and file ID, keeps the pages, and no bytes leave the tab', async ({ page }) => {
+  // A PDF with the kinds of metadata Word, Acrobat and Illustrator leave behind.
+  const src = await PDFDocument.create({ updateMetadata: false });
+  src.setTitle('Q3 layoffs draft');
+  src.setAuthor('Jane Q. Whistle');
+  src.setCreator('Microsoft Word for Microsoft 365');
+  src.setProducer('Acrobat PDFMaker 23');
+  src.setCreationDate(new Date('2026-03-04T10:00:00Z'));
+  const p = src.addPage([300, 300]);
+  const font = await src.embedFont('Helvetica');
+  p.drawText('Visible text stays', { x: 20, y: 150, size: 14, font });
+  const xmp = src.context.stream('<x:xmpmeta xmlns:x="adobe:ns:meta/"><dc:creator>Jane Q. Whistle</dc:creator></x:xmpmeta>', { Type: 'Metadata', Subtype: 'XML' });
+  src.catalog.set(PDFName.of('Metadata'), src.context.register(xmp));
+  p.node.set(PDFName.of('PieceInfo'), src.context.obj({ Illustrator: { Private: 'layer data by Jane' } }));
+  src.context.trailerInfo.ID = src.context.obj([src.context.obj('abc'), src.context.obj('abc')]);
+  const bytes = await src.save({ useObjectStreams: false });
+  const dir = mkdtempSync(join(tmpdir(), 'meta-'));
+  const file = join(dir, 'memo.pdf');
+  writeFileSync(file, bytes);
+
+  const errors = await open(page, 'remove-pdf-metadata');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [file], async () => {
+    const report = page.locator('#meta-report');
+    await expect(report).toContainText('Author: Jane Q. Whistle');
+    await expect(report).toContainText('Created with: Microsoft Word');
+    await expect(report).toContainText('Created: 2026-03-04');
+    await expect(report).toContainText('XMP metadata: 1 packet');
+    await expect(report).toContainText('PieceInfo');
+    await expect(report).toContainText('File ID: yes');
+  });
+  // Same name, so the file does not announce it was cleaned.
+  expect(downloads[0]!.suggestedFilename()).toBe('memo.pdf');
+  const out = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(out, { updateMetadata: false });
+  expect(doc.getAuthor()).toBeUndefined();
+  expect(doc.getTitle()).toBeUndefined();
+  expect(doc.getCreator()).toBeUndefined();
+  expect(doc.getProducer()).toBeUndefined();
+  expect(doc.catalog.get(PDFName.of('Metadata'))).toBeUndefined();
+  expect(doc.getPage(0).node.get(PDFName.of('PieceInfo'))).toBeUndefined();
+  expect(doc.context.trailerInfo.ID).toBeUndefined();
+  // The name is gone from every byte of the file, not just unlinked.
+  expect(Buffer.from(out).includes('Whistle')).toBe(false);
+  expect(Buffer.from(out).includes('Jane')).toBe(false);
+  expect((await textItems(out, 1)).map((t) => t.str).join('')).toBe('Visible text stays');
+  net.assertNothingLeft(['memo.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Remove PDF metadata cleans restricted and scanned PDFs without losing pages', async ({ page }) => {
+  const errors = await open(page, 'remove-pdf-metadata');
+  const files = [staticFx('owner-locked.pdf'), fx('scan.pdf'), fx('article.pdf')];
+  const { items } = await run(page, files);
+  expect(items).toBe(3);
+  const zipped = await zipAll(page);
+  for (const f of files) {
+    const name = f.split('/').pop()!;
+    const pages = (await getDocument({ data: new Uint8Array(readFileSync(f)) }).promise).numPages;
+    const after = await PDFDocument.load(zipped[name]!, { updateMetadata: false });
+    expect(after.isEncrypted).toBe(false);
+    expect(after.getPageCount()).toBe(pages);
+    expect(after.getProducer()).toBeUndefined();
+  }
   expect(errors).toEqual([]);
 });
 

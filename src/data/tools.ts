@@ -1857,6 +1857,52 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'remove-pdf-metadata',
+    name: 'Remove PDF metadata',
+    title: 'Remove Metadata from PDF, Free, No Upload | Stayput',
+    description:
+      'See and remove the hidden author, software, dates, XMP and file ID in a PDF before you share it. Runs in your browser; the document is never uploaded.',
+    heading: 'Remove metadata from a PDF',
+    tagline: 'See the name, software and dates hidden in a PDF, and strip them before it goes out.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to check and clean',
+    action: 'Remove metadata',
+    keywords: ['remove metadata from pdf', 'pdf metadata remover', 'remove author from pdf', 'pdf metadata viewer', 'strip pdf metadata', 'clean pdf metadata', 'anonymize pdf'],
+    steps: [
+      'Drop one or more PDFs, or tap to pick them. The metadata each one carries is listed straight away.',
+      'Press Remove metadata.',
+      'Download the cleaned PDFs. They keep their names, pages, text and links; only the metadata is gone.',
+    ],
+    faq: [
+      {
+        q: 'What metadata does a PDF carry?',
+        a: 'Usually the author (often your full name or your computer’s user name, taken from Word or your operating system), the title, the program that created it and the one that made the PDF, with version numbers, and the dates it was created and last changed. Many PDFs also carry an XMP packet repeating all that, sometimes with edit history, and some apps add private data (PieceInfo) and a unique file ID.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The file is read and rewritten by code running in your browser tab, so a CV, contract, legal filing or anonymous tip never leaves your device. The page works with Wi-Fi off once it has loaded.',
+      },
+      {
+        q: 'Does it change the document itself?',
+        a: 'No. Pages, text, fonts, images, links, bookmarks and form fields are kept as they are. Only the information dictionary, XMP metadata, PieceInfo private data, the file ID and any objects nothing refers to any more are removed.',
+      },
+      {
+        q: 'Why keep the same file name?',
+        a: 'A name like report-clean.pdf would itself tell people the file was scrubbed. Rename it yourself if you want to; the name you give a file is not stored inside it.',
+      },
+      {
+        q: 'Does it remove everything that could identify me?',
+        a: 'It removes the document metadata. It cannot know about names written in the text itself, in comments, in headers and footers, or in the EXIF data of photos placed on the pages. Check the visible content, and remove photo metadata with the remove EXIF tool before you put photos into a document.',
+      },
+      {
+        q: 'Can I just see the metadata without removing it?',
+        a: 'Yes. Drop the PDF and read the list; nothing is changed until you press Remove metadata, and the file on your device is never changed at all, because the cleaned copy is a new download.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
