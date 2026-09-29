@@ -47,6 +47,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'compress-audio': () => import('./compress-audio'),
   'volume-booster': () => import('./volume-booster'),
   'pitch-changer': () => import('./pitch-changer'),
+  'tuner': () => import('./tuner'),
   'audio-converter': () => import('./audio-converter'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(67);
+  expect(await page.locator('.index .tool-card').count()).toBe(68);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -497,7 +497,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4570,4 +4570,86 @@ test('Pitch changer refuses to run when nothing would change', async ({ page }) 
   await page.locator('#file-input').setInputFiles([fx('tone.wav')]);
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('Choose a pitch or a speed');
+});
+
+/** Stand in for the microphone with a sine tone whose frequency the test can change. */
+async function fakeTone(page: Page, hz: number) {
+  await page.addInitScript((f) => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      const ac = new AudioContext();
+      const osc = ac.createOscillator();
+      osc.frequency.value = f;
+      const gain = ac.createGain();
+      gain.gain.value = 0.3;
+      const dest = ac.createMediaStreamDestination();
+      osc.connect(gain).connect(dest);
+      osc.start();
+      (window as unknown as { __osc: OscillatorNode }).__osc = osc;
+      return dest.stream;
+    };
+  }, hz);
+}
+
+test('Tuner names the guitar string, shows it flat, then in tune, and sends nothing', async ({ page }) => {
+  // A2 (110 Hz) 18 cents flat.
+  await fakeTone(page, 110 * 2 ** (-18 / 1200));
+  const errors = await open(page, 'tuner');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#instrument').selectOption('guitar');
+  await expect(page.locator('.tuner-string')).toHaveText(['E2', 'A2', 'D3', 'G3', 'B3', 'E4']);
+  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-name')).toHaveText('A');
+  await expect(page.locator('#tuner-octave')).toHaveText('2');
+  await expect(page.locator('#tuner-hint')).toHaveText(/1[6-9] cents flat: tune up/);
+  await expect(page.locator('.tuner-string').nth(1)).toHaveAttribute('data-active', 'true');
+  const left = await page.locator('#tuner-needle').evaluate((n) => parseFloat(n.style.left));
+  expect(left).toBeGreaterThan(29);
+  expect(left).toBeLessThan(35);
+  await page.evaluate(() => (window as unknown as { __osc: OscillatorNode }).__osc.frequency.setValueAtTime(110, 0));
+  await expect(page.locator('#tuner-hint')).toHaveText('In tune');
+  await expect(page.locator('#tuner-panel')).toHaveAttribute('data-tuned', 'true');
+  await expect(page.locator('.tuner-string').nth(1)).toHaveAttribute('data-tuned', 'true');
+  await expect(page.locator('#tuner-freq')).toContainText('110.0 Hz');
+  await page.locator('#tuner-stop').click();
+  await expect(page.locator('#tuner-start')).toBeVisible();
+  // One anonymous usage event, naming only the instrument.
+  const runs = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run'));
+  expect(runs).toHaveLength(1);
+  expect(runs[0]!.d.format).toBe('guitar');
+  net.assertNothingLeft([]);
+  expect(errors).toEqual([]);
+});
+
+test('Ukulele tuner page starts on ukulele, reads a chromatic note on A4 = 432, and explains a blocked microphone', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/ukulele-tuner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#instrument')).toHaveValue('ukulele');
+  await expect(page.locator('.tuner-string')).toHaveText(['G4', 'C4', 'E4', 'A4']);
+  await page.locator('#instrument').selectOption('ukulele-low-g');
+  await expect(page.locator('.tuner-string').first()).toHaveText('G3');
+
+  await fakeTone(page, 432);
+  await page.goto('/tools/tuner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('.tuner-string')).toHaveCount(0);
+  await page.locator('#a4').fill('432');
+  await page.locator('#a4').dispatchEvent('change');
+  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-name')).toHaveText('A');
+  await expect(page.locator('#tuner-hint')).toHaveText('In tune');
+
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      throw new DOMException('denied', 'NotAllowedError');
+    };
+  });
+  await page.goto('/guitar-tuner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#instrument')).toHaveValue('guitar');
+  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-message')).toContainText('microphone is blocked');
+  await expect(page.locator('#tuner-message')).toContainText('press a string');
 });

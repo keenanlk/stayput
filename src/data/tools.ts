@@ -2184,6 +2184,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'tuner',
+    name: 'Online tuner',
+    title: 'Online Tuner: Guitar, Bass, Ukulele, Chromatic, Private | Stayput',
+    description:
+      'Tune a guitar, bass, ukulele, violin or any instrument with your microphone. Note, cents and a needle, plus reference notes. Nothing is recorded or sent.',
+    heading: 'Online tuner',
+    tagline: 'Play a note and see how sharp or flat it is. Guitar, bass, ukulele, violin or chromatic, with the sound kept in your tab.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Start the tuner',
+    action: 'Tune',
+    keywords: ['online tuner', 'tuner', 'chromatic tuner', 'guitar tuner', 'bass tuner', 'ukulele tuner', 'violin tuner', 'tuner with microphone'],
+    steps: [
+      'Choose your instrument, or Chromatic for anything else, and press Start the tuner. Allow the microphone when your browser asks.',
+      'Play one string or note and let it ring. The big letter is the note, and the needle shows how many cents sharp (right) or flat (left) it is.',
+      'Turn the peg until the needle sits in the shaded middle and the text says In tune, then move to the next string.',
+    ],
+    faq: [
+      {
+        q: 'Is the sound recorded or uploaded?',
+        a: 'No. The pitch is measured by code in this page from the live microphone input, a few times a second, and each reading is thrown away straight after. Nothing is saved, and nothing is sent anywhere.',
+      },
+      {
+        q: 'How accurate is it?',
+        a: 'Within about one cent on a clear, sustained note, which is finer than most ears can hear (a semitone is 100 cents). Let the string ring rather than plucking it repeatedly, and tune in a quiet room: other notes or chatter make the reading jump.',
+      },
+      {
+        q: 'What does A4 = 440 Hz mean? Should I change it?',
+        a: 'It is the pitch the whole scale is built from: the A above middle C vibrates 440 times a second. Almost all modern music uses 440. Change it only to match a piano or a recording tuned elsewhere, such as 442 for many orchestras, or 432 if you prefer that tuning.',
+      },
+      {
+        q: 'Why does it jump around on my low strings?',
+        a: 'A low string has few vibrations in each moment of sound, and a laptop microphone picks up little bass. Hold the phone or laptop close to the instrument, pluck firmly once and wait a moment for the reading to settle. For an electric guitar or bass without an amp, a clip-on or pedal tuner will do better.',
+      },
+      {
+        q: 'Can I tune without a microphone?',
+        a: 'Yes. With an instrument chosen, press a string button to hear its note for two seconds, then tune your string until the two sound the same and the wobble between them slows to a stop.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
