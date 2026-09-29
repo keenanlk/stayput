@@ -29,12 +29,14 @@ const media = tools.filter((t) => t.category === 'media');
       </div>
       <div>
         <h3><a href="/guides">Guides</a></h3>
-        <ul>{guides.map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a></li>)}</ul>
+        <ul>
+          {guides.slice(0, 5).map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a></li>)}
+          <li><a href="/guides">All guides →</a></li>
+        </ul>
       </div>
     </div>
     <div class="conversions">
-      <h3>Conversions</h3>
-      <ul>{pairs.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}{presets.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}</ul>
+      <a href="/conversions">All {pairs.length + presets.length} conversions →</a>
     </div>
     <div class="legal">
       <span>© {new Date().getFullYear()} Stayput</span>
