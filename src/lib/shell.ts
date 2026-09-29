@@ -349,8 +349,35 @@ export function createShell(opts: ShellOptions) {
       dl.className = 'btn btn-sm';
       dl.textContent = 'Download';
       dl.addEventListener('click', () => downloadBlob(o.blob, o.name));
+      if (o.text !== undefined) {
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'btn btn-sm btn-primary';
+        copy.textContent = 'Copy text';
+        copy.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(o.text!);
+            copy.textContent = 'Copied';
+          } catch {
+            // Clipboard blocked (an insecure context, or permission denied): select it for Ctrl+C instead.
+            area.select();
+            copy.textContent = 'Press Ctrl+C';
+          }
+          setTimeout(() => (copy.textContent = 'Copy text'), 2000);
+        });
+        actions.prepend(copy);
+      }
+      const area = document.createElement('textarea');
       actions.append(dl);
       row.append(thumb, info, actions);
+      if (o.text !== undefined) {
+        area.className = 'result-text';
+        area.readOnly = true;
+        area.value = o.text;
+        area.rows = Math.min(14, Math.max(3, o.text.split('\n').length + 1));
+        area.setAttribute('aria-label', `Text read from ${o.name}`);
+        row.append(area);
+      }
       resultsList.append(row);
     }
     if (outs.length > 1 && totalIn > 0) {

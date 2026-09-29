@@ -802,6 +802,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'image-to-text',
+    name: 'Image to text',
+    title: 'Image to Text Converter (OCR), Free, No Upload | Stayput',
+    description:
+      'Copy the text out of a photo, screenshot or scan. Free OCR that runs in your browser: JPG, PNG, HEIC, WebP. Batch, no upload, no sign-up.',
+    heading: 'Image to text (OCR)',
+    tagline: 'Get the words out of a photo, screenshot or scanned page, ready to copy. The image is read on this device and never uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos, screenshots or scans to read',
+    action: 'Read text',
+    keywords: ['image to text', 'extract text from image', 'picture to text', 'ocr', 'screenshot to text', 'jpg to text', 'photo to text', 'copy text from image'],
+    steps: [
+      'Drop one or more images (JPG, PNG, HEIC, WebP, screenshots or scans), or tap to pick them.',
+      'Keep line breaks as they are in the image, or join them into paragraphs for pasting into a document or an email.',
+      'Read text. The text appears on the page with a Copy button, and each image can be saved as a .txt file.',
+    ],
+    faq: [
+      {
+        q: 'Is my image uploaded?',
+        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page. The engine and its English model (about 6 MB) are downloaded from this site the first time you use it, then the tool works offline. Switch off Wi-Fi after the first run and it still reads images.',
+      },
+      {
+        q: 'How accurate is it?',
+        a: 'Very good on printed text that is sharp and straight: screenshots, documents, scans, signs and receipts photographed head-on. It struggles with handwriting, curved or angled text, heavy shadows and decorative fonts. For a phone photo, fill the frame with the text and hold the phone parallel to the page. Always check numbers you plan to rely on.',
+      },
+      {
+        q: 'Which languages does it read?',
+        a: 'English, including accented Latin letters in names and places. More languages are on the way; each needs its own model of a few megabytes.',
+      },
+      {
+        q: 'Can it read a scanned PDF?',
+        a: 'Not directly yet. Turn the pages into images with PDF to JPG first, then drop them here. If the PDF already has selectable text, PDF to Word gets it out faster and keeps the paragraphs.',
+      },
+      {
+        q: 'Why is the first run slower?',
+        a: 'The first time, your browser downloads the OCR engine and model from this site. They are cached, so later runs start straight away, even offline. Reading a full page takes a few seconds on a laptop and a little longer on a phone.',
+      },
+    ],
+  },
+  {
     slug: 'video-to-mp3',
     name: 'Video to MP3',
     title: 'Video to MP3 Converter, MP4 to MP3, No Upload | Stayput',
