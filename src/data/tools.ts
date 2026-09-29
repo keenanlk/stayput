@@ -1628,6 +1628,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'volume-booster',
+    name: 'Volume booster',
+    title: 'Volume Booster: Make Audio or Video Louder, No Upload | Stayput',
+    description:
+      'Make an MP3, voice memo or video louder or quieter, or normalize a batch to the same loudness, in your browser. No clipping, no upload, no sign-up.',
+    heading: 'Make audio louder',
+    tagline: 'Boost a quiet recording, turn down a loud one, or even out a batch. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop audio or video files to change the volume',
+    action: 'Change volume',
+    keywords: ['volume booster', 'increase audio volume', 'make audio louder', 'mp3 volume booster', 'increase video volume', 'normalize audio', 'amplify audio', 'make mp3 louder'],
+    steps: [
+      'Drop one or more sound files (MP3, WAV, M4A, FLAC, OGG) or videos (MP4, MOV, WebM), or tap to pick them.',
+      'Choose how much louder or quieter, or Normalize to bring every file to the same comfortable loudness. Keep the original format or pick another.',
+      'Run it. Peaks that would clip are eased down so nothing distorts. Videos keep their picture untouched and get the new sound.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound, the volume change runs in the page, and the file is written again in your tab. Videos have their picture copied across without re-encoding. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Will boosting make it distort?',
+        a: 'Not by clipping. A limiter looks a few milliseconds ahead and turns down only the peaks that would go past the top, then eases back, so a +10 dB boost stays clean. The result card says what share of the sound was eased. Very large boosts on already loud music will sound squashed; use Normalize for those.',
+      },
+      {
+        q: 'What does Normalize do?',
+        a: 'It measures how loud the talking or music is (ignoring pauses) and turns each file up or down to about −14 LUFS, the level Spotify and YouTube play at. A batch of voice memos or podcast clips ends up at the same volume.',
+      },
+      {
+        q: 'Does it make a video louder too?',
+        a: 'Yes. Drop an MP4, MOV or WebM and the new sound is put back with the original picture, which is copied as it is. The sound is re-encoded as AAC in an MP4, or Opus in a WebM.',
+      },
+      {
+        q: 'Does the MP3 lose quality?',
+        a: 'Saving an MP3 again re-encodes it, at about the original’s bitrate, which is inaudible for most listening. For editing, save as WAV or FLAC.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

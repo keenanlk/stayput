@@ -2575,6 +2575,58 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'normalize-audio',
+    base: 'volume-booster',
+    name: 'Normalize audio',
+    title: 'Normalize Audio Online: Even Out Loudness, No Upload | Stayput',
+    description: 'Normalize MP3, WAV and other audio to the same loudness in your browser, like Spotify does. Batch, no clipping, nothing uploaded.',
+    heading: 'Normalize audio',
+    tagline: 'Bring a batch of recordings to the same comfortable loudness, on your own device.',
+    keywords: ['normalize audio', 'audio normalizer', 'normalize mp3', 'normalize volume', 'loudness normalization online', 'even out audio levels'],
+    dropLabel: 'Drop audio files to normalize',
+    defaults: { mode: 'normalize' },
+    intro: [
+      'Normalizing sets each file to a target loudness, so a quiet voice memo and a loud music clip play at the same level. This page measures the loudness of the talking or music, ignoring pauses, and brings each file to about −14 LUFS, the level Spotify and YouTube use.',
+      'A limiter eases down any peak that would clip, so boosting a quiet file does not distort. Each file is saved in its own format unless you pick another, and nothing is uploaded: interviews, lectures and rehearsal recordings stay on your machine.',
+    ],
+    steps: [
+      'Drop one or more audio files or videos, or tap to pick them.',
+      'Normalize is already chosen. Keep the original format or pick another.',
+      'Run it. Each file downloads when it is ready; several come as a zip.',
+    ],
+    faq: [
+      { q: 'Is this peak or loudness normalization?', a: 'Loudness. Peak normalization only lifts the single loudest sample to the top, which barely helps a recording with one loud cough. Loudness normalization matches how loud files sound.' },
+      { q: 'Is it true LUFS?', a: 'Close to it. The level is the average power of the loud parts in 400 ms blocks, the same gating idea LUFS uses, without the frequency weighting. Files come out within a decibel or two of each other.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'increase-video-volume',
+    base: 'volume-booster',
+    name: 'Increase video volume',
+    title: 'Increase Video Volume Online, Free, No Upload | Stayput',
+    description: 'Make a quiet MP4, MOV or WebM video louder in your browser. The picture is copied untouched, peaks stay clean. No upload, no watermark.',
+    heading: 'Increase video volume',
+    tagline: 'Turn up a quiet video without re-encoding the picture, on your own device.',
+    keywords: ['increase video volume', 'make video louder', 'boost video volume', 'mp4 volume booster', 'increase volume of video online'],
+    dropLabel: 'Drop videos to make louder',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    defaults: { db: '10' },
+    intro: [
+      'Phone videos filmed from across a room, screen recordings with a quiet microphone and old camera clips often play too softly. This page turns the sound up by the amount you choose and puts it back with the original picture, which is copied as it is, so the video looks exactly the same and the job is quick.',
+      'A limiter keeps the loudest moments from clipping, so a +10 or +15 dB boost stays clean. Nothing is uploaded and there is no watermark or size cap.',
+    ],
+    steps: [
+      'Drop one or more videos, or tap to pick them.',
+      'Choose how much louder: +10 dB is about twice as loud. Or pick Normalize.',
+      'Run it. Each video downloads when it is ready.',
+    ],
+    faq: [
+      { q: 'Is the picture re-encoded?', a: 'No. The video packets are copied into the new file unchanged. Only the sound is decoded, turned up and encoded again (AAC in MP4, Opus in WebM).' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

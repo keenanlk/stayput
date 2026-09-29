@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VolumeBooster from '../../components/options/VolumeBooster.astro';
+const tool = toolBySlug('volume-booster')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VolumeBooster /></Fragment>
+</ToolLayout>
+<script src="../../tools/volume-booster.ts"></script>
