@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(20);
+  expect(await page.locator('.tool-card').count()).toBe(21);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -856,6 +856,11 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['mp4-to-gif', 'video-to-gif', async () => expect(page.locator('#vg-panel')).toBeAttached()],
     ['mov-to-gif', 'video-to-gif', async () => expect(page.locator('#fps')).toHaveValue('10')],
+    ['pixelate-image', 'blur-image', async () => {
+      await expect(page.locator('input[name="area"][value="whole"]')).toBeChecked();
+      await expect(page.locator('input[name="effect"][value="pixelate"]')).toBeChecked();
+    }],
+    ['blur-face', 'blur-image', async () => expect(page.locator('#strength')).toHaveValue('6')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -1615,4 +1620,79 @@ test('Video to GIF refuses an end time before the start with a clear message', a
   await expect(page.locator('#vg-estimate')).toHaveText('The end must come after the start.');
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('end time must come after the start');
+});
+
+/** Drag across the blur stage between two points given as fractions of the image. */
+async function markArea(page: Page, from: [number, number], to: [number, number]) {
+  const canvas = page.locator('#blur-canvas');
+  // Keep the whole image clear of the Run bar pinned to the bottom of the screen.
+  await canvas.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const b = (await canvas.boundingBox())!;
+  await page.mouse.move(b.x + b.width * from[0], b.y + b.height * from[1]);
+  await page.mouse.down();
+  await page.mouse.move(b.x + b.width * to[0], b.y + b.height * to[1], { steps: 5 });
+  await page.mouse.up();
+}
+
+test('Blur image hides only the marked areas, per effect, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'blur-image');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('stripes.png')]);
+  await expect(page.locator('#blur-panel')).toBeVisible();
+  // Running with no area marked explains what to do instead of saving an unchanged copy.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Mark at least one area');
+  // Two areas on the 400x300 stripes: left quarter and bottom-right corner; a tap adds nothing.
+  await markArea(page, [0.05, 0.1], [0.25, 0.5]);
+  await markArea(page, [0.6, 0.6], [0.9, 0.9]);
+  await markArea(page, [0.5, 0.2], [0.5, 0.2]);
+  await expect(page.locator('.blur-area')).toHaveCount(2);
+  // Undo drops the last area; draw it again.
+  await page.locator('#blur-undo').click();
+  await expect(page.locator('.blur-area')).toHaveCount(1);
+  await markArea(page, [0.6, 0.6], [0.9, 0.9]);
+  await expect(page.locator('.blur-area')).toHaveCount(2);
+  const areas = (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(';').map((a) => a.split(',').map(Number));
+  expect(areas).toHaveLength(2);
+  const [ax, ay, aw, ah] = areas[0]!;
+  const inside: [number, number] = [Math.round(ax! + aw! / 2), Math.round(ay! + ah! / 2)];
+  const outside: [number, number] = [200, 20];
+
+  const grey = (px: number[]) => px[0]! > 90 && px[0]! < 165;
+  const pure = (px: number[]) => px[0]! < 10 || px[0]! > 245;
+  for (const [effect, name, check] of [
+    ['blur', 'stripes-blurred.png', grey],
+    ['pixelate', 'stripes-pixelated.png', grey],
+    ['box', 'stripes-redacted.png', (px: number[]) => px[0] === 0 && px[1] === 0 && px[2] === 0],
+  ] as const) {
+    await choose(page.locator(`input[name="effect"][value="${effect}"]`));
+    const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+    expect(download.suggestedFilename()).toBe(name);
+    const png = await bytesOf(download);
+    expect(pngSize(png)).toEqual({ width: 400, height: 300 });
+    expect(check(await pixelAt(page, png, ...inside)), `${effect} inside`).toBe(true);
+    expect(pure(await pixelAt(page, png, ...outside)), `${effect} outside`).toBe(true);
+  }
+  net.assertNothingLeft(['stripes.png']);
+  // The shell logs failed runs; the only one here is the deliberate run with no area.
+  expect(errors.filter((e) => !e.includes('Mark at least one area'))).toEqual([]);
+});
+
+test('Pixelate image page pixelates the whole picture into blocks', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/pixelate-image');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['stripes.png']);
+  expect(downloads[0]!.suggestedFilename()).toBe('stripes-pixelated.png');
+  const png = await bytesOf(downloads[0]!);
+  // Every block averages black and white stripes to grey, at the edges too.
+  for (const [x, y] of [[0, 0], [199, 150], [399, 299]] as const) {
+    const px = await pixelAt(page, png, x, y);
+    expect(px[0]).toBeGreaterThan(90);
+    expect(px[0]).toBeLessThan(165);
+  }
+  net.assertNothingLeft(['stripes.png']);
 });

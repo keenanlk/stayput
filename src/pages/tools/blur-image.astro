@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import BlurImage from '../../components/options/BlurImage.astro';
+import BlurStage from '../../components/BlurStage.astro';
+const tool = toolBySlug('blur-image')!;
+---
+<ToolLayout tool={tool}>
+  <BlurStage slot="panel" />
+  <Fragment slot="options"><BlurImage /></Fragment>
+</ToolLayout>
+<script src="../../tools/blur-image.ts"></script>

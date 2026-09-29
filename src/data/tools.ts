@@ -718,6 +718,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'blur-image',
+    name: 'Blur & pixelate image',
+    title: 'Blur Image or Pixelate Faces Online, No Upload | Stayput',
+    description:
+      'Blur or pixelate faces, number plates and text in a photo, or black them out, in your browser. Mark the areas, download. Nothing is uploaded.',
+    heading: 'Blur or pixelate an image',
+    tagline: 'Hide faces, plates, addresses and account numbers before you share a photo. The photo never leaves this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: false,
+    dropLabel: 'Drop an image to blur',
+    action: 'Save image',
+    keywords: ['blur image', 'pixelate image', 'blur face', 'blur face in photo', 'censor image', 'blur image online', 'redact image', 'blur license plate'],
+    steps: [
+      'Drop a photo or screenshot (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick one.',
+      'Drag across each face, plate or line of text to hide, or choose "Whole image". Pick blur, pixelate or black box and set the strength; the preview updates as you go.',
+      'Save the image. It is written at full resolution in your browser and downloads straight away.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. The photo is decoded and edited on a canvas inside your browser tab, and the new file is written there too. That matters most for exactly the photos people blur: children, other people’s faces, ID cards, bank screenshots. You can load the page, turn off Wi-Fi and it still works.',
+      },
+      {
+        q: 'Should I blur, pixelate or use a black box?',
+        a: 'Blur and pixelate are fine for faces, bodies and backgrounds. For text such as card numbers, addresses, names or passwords, use Black box. Research tools have recovered text from light pixelation and blur by trying likely words until the blurred result matches, and a solid box leaves nothing to recover.',
+      },
+      {
+        q: 'Can someone unblur the image I save?',
+        a: 'Not from the file itself. The saved image contains only the blurred or pixelated pixels; the originals are not hidden underneath in a layer and the editing steps are not stored. Location and camera metadata are dropped too, because the file is written fresh from the canvas.',
+      },
+      {
+        q: 'Can I blur several faces at once?',
+        a: 'Yes. Drag a box over each one; every box gets the same effect. Tap the × on a box to remove it, or use Undo. There is no limit on the number of areas.',
+      },
+      {
+        q: 'How do I blur the whole picture?',
+        a: 'Choose "Whole image" and set the strength. Strength is relative to the size of the photo, so the same setting looks the same on a small screenshot and a 48 megapixel photo. At high strength pixelate gives the big-block mosaic look.',
+      },
+    ],
+  },
+  {
     slug: 'video-to-gif',
     name: 'Video to GIF',
     title: 'Video to GIF Converter, MP4 to GIF, No Upload | Stayput',
