@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync, readdirSync } from 'node:fs';
+import { tools, toolPath } from '../src/data/tools';
+import { guides } from '../src/data/guides';
 
 const dist = new URL('../dist/', import.meta.url);
 
@@ -44,4 +46,16 @@ test('press page offers every logo as SVG and PNG, and the files are served', as
     if (href.endsWith('.svg')) expect(await res.text(), href).not.toContain('<text');
   }
   await expect(page.locator('footer a[href="/press"]')).toBeVisible();
+});
+
+test('llms.txt lists every tool and guide with working links', async ({ request }) => {
+  const res = await request.get('/llms.txt');
+  expect(res.status()).toBe(200);
+  expect(res.headers()['content-type']).toContain('text/plain');
+  const body = await res.text();
+  expect(body.startsWith('# StayPut\n\n> ')).toBe(true);
+  for (const t of tools) expect(body).toContain(`](https://stayput.dev${toolPath(t)})`);
+  for (const g of guides) expect(body).toContain(`](https://stayput.dev/guides/${g.slug})`);
+  const paths = [...body.matchAll(/\]\(https:\/\/stayput\.dev(\/[^)]*)\)/g)].map((m) => m[1]!);
+  for (const path of new Set(paths)) expect((await request.get(path)).status(), path).toBe(200);
 });
