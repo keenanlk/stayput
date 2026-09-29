@@ -384,6 +384,11 @@
       "source": "/flatten-pdf",
       "destination": "/tools/flatten-pdf",
       "permanent": true
+    },
+    {
+      "source": "/resize-pdf",
+      "destination": "/tools/resize-pdf",
+      "permanent": true
     }
   ],
   "headers": [
