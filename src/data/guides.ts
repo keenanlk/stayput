@@ -435,6 +435,7 @@ export const guides: Guide[] = [
           '[CloudConvert](/guides/is-cloudconvert-safe), [FreeConvert](/guides/is-freeconvert-safe), [Convertio](/guides/is-convertio-safe) and [Zamzar](/guides/is-zamzar-safe) for general file conversion.',
           '[iLovePDF](/guides/is-ilovepdf-safe), [Smallpdf](/guides/is-smallpdf-safe) and [PDF24](/guides/is-pdf24-safe) for PDFs.',
           '[Ezgif](/guides/is-ezgif-safe) for GIFs and short video edits.',
+          '[remove.bg](/guides/is-remove-bg-safe) for background removal.',
         ],
       },
     ],
@@ -1167,6 +1168,62 @@ export const guides: Guide[] = [
       { q: 'How long does Zamzar keep my files?', a: 'Its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
       { q: 'Does Zamzar have ads?', a: 'Its privacy policy says it does not host third-party advertising on zamzar.com. It does use Google Analytics.' },
       { q: 'Can I convert files without uploading them?', a: 'Yes, for common image, PDF and audio formats. Browser-based tools like Stayput’s process files on your device and work offline once loaded.' },
+    ],
+  },
+  {
+    slug: 'is-remove-bg-safe',
+    title: 'Is remove.bg Safe? Uploads, AI Training and a No-Upload Option',
+    description: 'remove.bg is run by Canva Austria GmbH and deletes uploads shortly after processing, but its policy allows account uploads to train AI. What that means, and how to cut out photos locally.',
+    heading: 'Is remove.bg safe?',
+    dek: 'remove.bg is a legitimate Canva-owned service. Two details in its privacy policy matter more than the usual deletion promise: training and preview-only free downloads.',
+    keywords: ['is remove.bg safe', 'remove.bg safe', 'is remove bg safe', 'is remove.bg legit', 'remove.bg privacy', 'remove.bg alternative no upload'],
+    updated: '2026-09-29',
+    tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-image'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'Yes, remove.bg is legitimate and widely used. It belongs to Canva: its privacy policy names the operator as Canva Austria GmbH in Vienna, the company behind Kaleido, remove.bg, Unscreen and Designify. Using it will not harm your computer, and the policy says uploads are deleted shortly after processing.',
+          'On the website every cut-out is made on its servers, so each photo is uploaded. For a product shot that is rarely a concern. For a picture of your children, a selfie or anyone who did not agree to it, two parts of the policy are worth reading before you drop the file in.',
+        ],
+      },
+      {
+        h: 'What remove.bg’s policy says',
+        p: ['From the remove.bg privacy policy (last updated 16 July 2025) and pricing page, as checked on 29 September 2026:'],
+        list: [
+          '**Deletion.** Files are uploaded, processed, offered for download and then deleted “shortly after”. The policy gives no exact time.',
+          '**AI training.** The company may analyse media uploads and related data in your account to train its algorithms, models and AI products. Separately, the site asks some users to opt in with “Contribute this image & help us make remove.bg better”.',
+          '**Location.** Data is stored and processed in Europe and in any other country where the company, its affiliates or service providers have facilities. Server logs are kept for up to three months.',
+          '**Analytics.** Google Analytics collects usage data through cookies.',
+          '**Free vs paid.** Preview images are free on the website; each full-resolution result costs a credit.',
+        ],
+      },
+      {
+        h: 'What that means for your photos',
+        p: [
+          'Short-lived storage is the norm for upload tools. The training clause is the part to weigh: it covers uploads tied to an account, which is exactly where people who buy credits end up. If you would rather your family photos or client work did not feed a model, that is a reason to avoid signing in or to use a different tool.',
+          'The preview limit changes the calculation too. To get a full-size cut-out for free, many people end up uploading the same photo to several sites in turn, multiplying the copies on other people’s servers.',
+        ],
+      },
+      {
+        h: 'Cutting out a photo without uploading it',
+        p: [
+          'Stayput’s [background remover](/tools/remove-background) runs an open segmentation model inside your browser tab. The photo is never sent anywhere, the result is at your photo’s full resolution, and there are no credits or watermark. Use [Make background transparent](/make-background-transparent) for a PNG with a see-through background, or [White background](/white-background) for marketplace-ready product shots. To hide a face instead of cutting it out, use [Blur image](/tools/blur-image).',
+          'remove.bg’s own model is very good at difficult hair and busy scenes, and it offers an API, desktop apps and a Photoshop plug-in for bulk work. For a quick cut-out of a private photo, a local tool avoids the upload, the training question and the preview limit in one go.',
+        ],
+      },
+      {
+        h: 'How to check where a photo goes',
+        p: [
+          'Open your browser’s network panel, drop a photo into any background remover and look for an upload about the size of the file; or load the page, turn on airplane mode and try again. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is remove.bg legit?', a: 'Yes. It is a Canva brand, operated by Canva Austria GmbH in Vienna, Austria, and is one of the best-known background removers.' },
+      { q: 'Does remove.bg keep my photos?', a: 'Its privacy policy says uploaded files are deleted shortly after processing, without giving an exact time. Server logs are kept for up to three months.' },
+      { q: 'Does remove.bg use my photos to train AI?', a: 'Its privacy policy says it may analyse media uploads and related data in your account to train its algorithms and AI products. It also asks some users to contribute images voluntarily.' },
+      { q: 'How can I remove a background without uploading the photo?', a: 'Use a tool that runs the model in your browser, such as Stayput’s background remover. After the model has downloaded once, it works with the network switched off.' },
     ],
   },
 ];
