@@ -1,0 +1,25 @@
+---
+/**
+ * The add-text stage: a live preview of the first image with the text on it.
+ * Drag a text to move it. Driven by src/tools/add-text-to-image.ts.
+ */
+---
+<div id="text-panel" class="text-panel" hidden>
+  <div class="text-stage"><canvas id="text-canvas" aria-label="Preview of the image with your text. Drag the text to move it."></canvas></div>
+  <div class="text-bar" role="group" aria-label="Move the selected text">
+    <span class="small muted" id="text-which">Text</span>
+    <button class="btn btn-sm btn-ghost" type="button" data-place="0.5,0.12">Top</button>
+    <button class="btn btn-sm btn-ghost" type="button" data-place="0.5,0.5">Middle</button>
+    <button class="btn btn-sm btn-ghost" type="button" data-place="0.5,0.88">Bottom</button>
+    <button class="btn btn-sm btn-ghost" type="button" data-place="0.8,0.92">Corner</button>
+  </div>
+  <p class="muted small text-hint" id="text-hint">Drag the text on the picture to move it.</p>
+</div>
+<style is:global>
+  .text-panel { display: grid; gap: 8px; }
+  .text-stage { line-height: 0; justify-self: start; max-width: 100%; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--surface-2); }
+  .text-stage canvas { display: block; max-width: 100%; max-height: 60vh; width: auto; height: auto; cursor: grab; touch-action: none; }
+  .text-stage canvas.is-dragging { cursor: grabbing; }
+  .text-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .text-hint { margin: 0; }
+</style>

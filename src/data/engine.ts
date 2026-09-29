@@ -191,6 +191,26 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser decodes the sound into plain samples, draws the picture once onto a canvas (fitted whole over a blurred copy, or the title on a plain colour), and its own WebCodecs encoders write that still frame once a second with the sound as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
     versus: 'Online MP3-to-video converters upload your music and cover art, add their logo to free videos, and cap the length. Unreleased tracks and private recordings stay private here: nothing leaves your device.',
   },
+  'compress-audio': {
+    how: 'Your browser decodes the sound with its own audio decoders. When you set a size limit, the bitrate is worked out from the length of the sound so the file lands under it. The smaller file is then written in your tab, as MP3 by LAME compiled to WebAssembly or as OGG by the browser’s own Opus encoder (WebCodecs) with Mediabunny (MPL-2.0) writing the container.',
+    versus: 'Online audio compressors upload the recording before they shrink it, which for a large WAV is the slowest part, and cap free files at 50 to 100 MB. Here nothing is uploaded, so there is no cap and private recordings stay on your device.',
+  },
+  'add-text-to-image': {
+    how: 'Your browser decodes each image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab at full size. Your text is wrapped to fit, then drawn with the canvas text functions at a size that is a share of the image, with an outline, shadow or backing box if chosen, and the result is encoded once in the format you picked. Fonts come from your device, apart from the site’s own Archivo and Caveat.',
+    versus: 'Online text and meme tools upload the picture, many stamp their own watermark on the free version, and some keep the uploads to show in a public gallery. Here the image never leaves your device and the file you save carries no mark but yours.',
+  },
+  'split-image': {
+    how: 'Your browser decodes the picture (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL). When the tiles must be square or 4:5, the middle of the picture is kept at the right proportions. Each tile is then copied pixel for pixel from the original onto its own canvas, without scaling, and encoded once in the format you chose.',
+    versus: 'Grid and carousel apps ask for your whole photo library, add a watermark unless you subscribe, and web versions upload the picture. Here it never leaves your device and the tiles carry no mark.',
+  },
+  'collage-maker': {
+    how: 'Your browser decodes each picture (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL). The layout is worked out with plain arithmetic: pictures in a row share a height, in a stack share a width, and in a grid get equal cells, cropped from the middle or fitted whole. Each picture is then drawn once at its place on a single canvas in your tab with high-quality scaling, and the collage is encoded in the format you chose.',
+    versus: 'Collage apps and websites upload every photo, lock layouts behind a subscription and often add their logo to the result. Here the photos never leave your device and the collage carries no mark.',
+  },
+  'extract-pdf-images': {
+    how: 'pdf.js (Apache 2.0), the PDF engine inside Firefox, opens the file in your tab and lists every drawing instruction on each chosen page. Each instruction that paints a stored picture hands over that picture decoded at its own size, whatever the format inside the PDF (JPEG, JPEG 2000, Flate, JBIG2 or fax-style CCITT), with any transparency mask applied. It is then saved as PNG or JPG. Pictures smaller than 50 pixels and repeats found by comparing a small thumbnail are left out unless you untick those options.',
+    versus: 'Online extractors upload the whole PDF to pull out a few photos, and the PDFs people mine for pictures are often private: contracts with scanned signatures, property reports, medical letters, a friend’s wedding brochure. Here the file never leaves your device, and every image comes out at its stored resolution rather than as a screenshot of the page.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',

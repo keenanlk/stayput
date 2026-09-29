@@ -1,0 +1,93 @@
+---
+/** Option controls for the collage maker, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const layout = defaults.layout ?? 'grid';
+const columns = defaults.columns ?? '0';
+const fit = defaults.fit ?? 'fill';
+const gap = defaults.gap ?? '2';
+const background = defaults.background ?? '#ffffff';
+const size = defaults.size ?? '2400';
+const format = defaults.format ?? 'image/jpeg';
+const quality = defaults.quality ?? '90';
+const layouts = [
+  ['grid', 'Grid'],
+  ['row', 'Side by side'],
+  ['column', 'Stacked'],
+] as const;
+const columnChoices = [
+  ['0', 'Automatic'],
+  ['2', '2'],
+  ['3', '3'],
+  ['4', '4'],
+  ['5', '5'],
+] as const;
+const sizes = [
+  ['1200', '1200 px (messages)'],
+  ['2400', '2400 px (good default)'],
+  ['4000', '4000 px (print)'],
+] as const;
+const formats = [
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless, allows transparent)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field">
+  <label>Layout</label>
+  <div class="segmented" role="radiogroup" aria-label="Layout">
+    {layouts.map(([v, l]) => <label><input type="radio" name="layout" value={v} checked={v === layout} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field-row collage-row" id="grid-fields" hidden={layout !== 'grid'}>
+  <div class="field">
+    <label for="columns">Columns</label>
+    <select id="columns">
+      {columnChoices.map(([v, l]) => <option value={v} selected={v === columns}>{l}</option>)}
+    </select>
+  </div>
+  <div class="field">
+    <label for="fit">Pictures</label>
+    <select id="fit">
+      <option value="fill" selected={fit === 'fill'}>Fill each cell (crop edges)</option>
+      <option value="fit" selected={fit === 'fit'}>Show whole picture</option>
+    </select>
+  </div>
+</div>
+<div class="field">
+  <label for="gap">Spacing <output id="gap-out">{gap}</output></label>
+  <input type="range" id="gap" min="0" max="8" step="1" value={gap} />
+</div>
+<div class="field">
+  <label for="background">Background</label>
+  <div class="colour-row">
+    <input type="color" id="background" value={background} aria-label="Background colour" />
+    <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White"></button>
+    <button type="button" class="swatch" data-color="#000000" style="background:#000000" aria-label="Black"></button>
+    <label class="check small"><input type="checkbox" id="transparent" /> Transparent (PNG)</label>
+  </div>
+</div>
+<div class="field">
+  <label for="size">Longest side</label>
+  <select id="size">
+    {sizes.map(([v, l]) => <option value={v} selected={v === size}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>
+<p class="muted small">Pictures are placed in the order they are listed. Use the arrows in the list to move them.</p>
+<style>
+  .collage-row { gap: 12px; }
+  .collage-row .field { flex: 1 1 140px; }
+  .colour-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  #background { width: 44px; height: 36px; padding: 2px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); }
+  .swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); cursor: pointer; }
+</style>

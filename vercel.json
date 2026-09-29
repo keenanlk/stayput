@@ -21,6 +21,11 @@
       "permanent": true
     },
     {
+      "source": "/extract-pdf-images",
+      "destination": "/tools/extract-pdf-images",
+      "permanent": true
+    },
+    {
       "source": "/grayscale-pdf",
       "destination": "/tools/grayscale-pdf",
       "permanent": true

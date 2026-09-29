@@ -1,0 +1,44 @@
+---
+/** Option controls for the audio compressor, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const quality = defaults.quality ?? '128';
+const fit = defaults.fit ?? 'none';
+const format = defaults.format ?? 'mp3';
+const mono = defaults.mono === 'true';
+const qualities = [
+  ['160', 'Light (160 kbps, music sounds the same)'],
+  ['128', 'Balanced (128 kbps, good for music)'],
+  ['96', 'Small (96 kbps, fine for podcasts)'],
+  ['64', 'Smallest (64 kbps, voice only)'],
+] as const;
+const fits = [
+  ['none', 'No limit'],
+  ['8', '8 MB (Discord)'],
+  ['16', '16 MB (WhatsApp)'],
+  ['25', '25 MB (Gmail and Outlook)'],
+] as const;
+---
+<div class="field">
+  <label for="quality">Compression</label>
+  <select id="quality">
+    {qualities.map(([v, l]) => <option value={v} selected={v === quality}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="fit">Fit under</label>
+  <select id="fit">
+    {fits.map(([v, l]) => <option value={v} selected={v === fit}>{l}</option>)}
+  </select>
+  <p class="muted small">Long files are compressed harder, when needed, to come in under the limit.</p>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="mp3" selected={format === 'mp3'}>MP3 (plays everywhere)</option>
+    <option value="ogg" selected={format === 'ogg'}>OGG Opus (smaller for the same quality)</option>
+  </select>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mono" checked={mono} /> Mono (half the size, for speech)</label>
+</div>

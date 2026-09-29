@@ -24,6 +24,9 @@ mkdirSync(frames);
 
 const browser = await chromium.launch({
   executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+  // Hide navigator.webdriver so the site loads its usage counter as it does for
+  // a visitor, and the request panel shows that ping.
+  args: ['--disable-blink-features=AutomationControlled'],
 });
 const ctx = await browser.newContext({
   viewport: { width: 1270, height: 760 },
@@ -35,9 +38,12 @@ const ctx = await browser.newContext({
 if (showHost) {
   await ctx.route(`${base}/**`, async (r) => r.fulfill({ response: await r.fetch({ url: r.request().url().replace(base, local) }) }));
 }
-// Same as the tests: analytics stubbed (the site serves its own decoders).
-await ctx.route('https://stats.keenankaufman.com/**', (r) =>
-  r.fulfill({ contentType: 'text/javascript', body: 'window.umami={track(){}};' }),
+// The real Umami script runs, so the panel shows its ping exactly as a visitor
+// sees it. The ping itself is answered here and never reaches the stats server.
+await ctx.route('https://stats.keenankaufman.com/**', async (r) =>
+  r.request().url().endsWith('/st.js')
+    ? r.fulfill({ response: await r.fetch() })
+    : r.fulfill({ contentType: 'application/json', body: '{}' }),
 );
 if (fontDir) {
   await ctx.route('**/__fonts/*', (r) => r.fulfill({ path: fontDir + '/' + r.request().url().split('/').pop(), contentType: 'font/woff2' }));
@@ -112,7 +118,7 @@ await settle(300);
 await shot('04-strip-exif.png');
 
 // 5. The network proof panel, open, after a HEIC batch. Also the GIF source.
-const heics = Array.from({ length: 10 }, (_, i) => sample(`IMG_${4021 + i}.HEIC`));
+const heics = Array.from({ length: 3 }, (_, i) => sample(`IMG_${4021 + i}.HEIC`));
 await go('/tools/heic-to-jpg');
 await settle(600);
 let n = 0;
@@ -120,7 +126,7 @@ const frame = async () => page.screenshot({ path: `${frames}f${String(n++).padSt
 await frame();
 await frame();
 await page.locator('#file-input').setInputFiles(heics);
-await page.locator('#tool[data-count="10"]').waitFor();
+await page.locator(`#tool[data-count="${heics.length}"]`).waitFor();
 await page.evaluate(() => {
   document.getElementById('netproof').open = true;
   const q = document.getElementById('quality');
@@ -163,7 +169,7 @@ const endFont = fontDir
 await page.setContent(`<!doctype html><html><head>${endFont}</head><body style="margin:0;width:1270px;height:760px;display:grid;place-items:center;background:#F3F6F4;font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:#1B241F">
 <div style="text-align:center">
   <svg width="60" height="74" viewBox="0 0 18 22"><circle cx="9" cy="7" r="6" fill="#1F6F50"/><rect x="7.6" y="11" width="2.8" height="10" rx="1.4" fill="#1F6F50"/></svg>
-  <div style="font-size:56px;font-weight:700;letter-spacing:-.02em;margin-top:18px">Open the network tab.<br>It stays empty.</div>
+  <div style="font-size:56px;font-weight:700;letter-spacing:-.02em;margin-top:18px">Open the network tab.<br>Your files never appear in it.</div>
   <div style="font-size:26px;color:#465249;margin-top:22px">stayput.dev · free, open source, nothing uploaded</div>
 </div></body></html>`);
 await page.evaluate(() => document.fonts.ready);

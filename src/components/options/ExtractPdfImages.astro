@@ -1,0 +1,28 @@
+---
+/** Option controls for Extract images from PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'image/png';
+---
+<div class="field wide">
+  <label>Pages <span class="muted" id="page-info"></span></label>
+  <div class="segmented" role="radiogroup" aria-label="Pages">
+    <label><input type="radio" name="pages" value="all" checked /><span>All pages</span></label>
+    <label><input type="radio" name="pages" value="range" /><span>Choose pages</span></label>
+  </div>
+</div>
+<div class="field wide" id="range-field" hidden>
+  <label for="range">Pages</label>
+  <input type="text" id="range" placeholder="e.g. 1-3, 5" autocomplete="off" />
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="image/png" selected={format === 'image/png'}>PNG (exact pixels, keeps transparency)</option>
+    <option value="image/jpeg" selected={format === 'image/jpeg'}>JPG (smaller, for photos)</option>
+  </select>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="skip-small" checked={defaults.skipSmall !== 'false'} /> Leave out icons and lines under 50 pixels</label>
+  <label class="check"><input type="checkbox" id="dedupe" checked={defaults.dedupe !== 'false'} /> Leave out repeats, such as a logo on every page</label>
+</div>

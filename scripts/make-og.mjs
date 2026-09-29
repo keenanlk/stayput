@@ -58,6 +58,14 @@ const browser = await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { e
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
 for (const p of pages) {
   await page.setContent(html(p));
+  // A short heading that still wraps at the large size would run into the tagline: use the two-line layout.
+  await page.evaluate(() => {
+    const h = document.querySelector('h1');
+    if (h.getBoundingClientRect().height > parseFloat(getComputedStyle(h).fontSize) * 1.5 && getComputedStyle(h).fontSize === '78px') {
+      h.style.fontSize = '66px';
+      if (h.getBoundingClientRect().height > 66 * 1.5) document.querySelector('p').style.top = '372px';
+    }
+  });
   const png = await page.screenshot({ type: 'png' });
   const out = p.slug === 'site' ? 'public/og.png' : `public/og/${p.slug}.png`;
   writeFileSync(out, png);
