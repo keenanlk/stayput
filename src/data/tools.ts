@@ -1899,6 +1899,144 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'remove-pdf-metadata',
+    name: 'Remove PDF metadata',
+    title: 'Remove Metadata from PDF, Free, No Upload | Stayput',
+    description:
+      'See and remove the hidden author, software, dates, XMP and file ID in a PDF before you share it. Runs in your browser; the document is never uploaded.',
+    heading: 'Remove metadata from a PDF',
+    tagline: 'See the name, software and dates hidden in a PDF, and strip them before it goes out.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to check and clean',
+    action: 'Remove metadata',
+    keywords: ['remove metadata from pdf', 'pdf metadata remover', 'remove author from pdf', 'pdf metadata viewer', 'strip pdf metadata', 'clean pdf metadata', 'anonymize pdf'],
+    steps: [
+      'Drop one or more PDFs, or tap to pick them. The metadata each one carries is listed straight away.',
+      'Press Remove metadata.',
+      'Download the cleaned PDFs. They keep their names, pages, text and links; only the metadata is gone.',
+    ],
+    faq: [
+      {
+        q: 'What metadata does a PDF carry?',
+        a: 'Usually the author (often your full name or your computer’s user name, taken from Word or your operating system), the title, the program that created it and the one that made the PDF, with version numbers, and the dates it was created and last changed. Many PDFs also carry an XMP packet repeating all that, sometimes with edit history, and some apps add private data (PieceInfo) and a unique file ID.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The file is read and rewritten by code running in your browser tab, so a CV, contract, legal filing or anonymous tip never leaves your device. The page works with Wi-Fi off once it has loaded.',
+      },
+      {
+        q: 'Does it change the document itself?',
+        a: 'No. Pages, text, fonts, images, links, bookmarks and form fields are kept as they are. Only the information dictionary, XMP metadata, PieceInfo private data, the file ID and any objects nothing refers to any more are removed.',
+      },
+      {
+        q: 'Why keep the same file name?',
+        a: 'A name like report-clean.pdf would itself tell people the file was scrubbed. Rename it yourself if you want to; the name you give a file is not stored inside it.',
+      },
+      {
+        q: 'Does it remove everything that could identify me?',
+        a: 'It removes the document metadata. It cannot know about names written in the text itself, in comments, in headers and footers, or in the EXIF data of photos placed on the pages. Check the visible content, and remove photo metadata with the remove EXIF tool before you put photos into a document.',
+      },
+      {
+        q: 'Can I just see the metadata without removing it?',
+        a: 'Yes. Drop the PDF and read the list; nothing is changed until you press Remove metadata, and the file on your device is never changed at all, because the cleaned copy is a new download.',
+      },
+    ],
+  },
+  {
+    slug: 'sticker-maker',
+    name: 'Sticker maker',
+    title: 'Sticker Maker: Photo to Sticker, Free, No Upload | Stayput',
+    description:
+      'Turn a photo into a sticker: the background is removed, a white die-cut border is added, and you get a transparent PNG or a 512 px WebP for WhatsApp. Nothing is uploaded.',
+    heading: 'Make a sticker from a photo',
+    tagline: 'Cut out a person, pet or object, add a white border, and save it as a sticker, on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos to turn into stickers',
+    action: 'Make sticker',
+    keywords: ['sticker maker', 'photo to sticker', 'make sticker from photo', 'whatsapp sticker maker', 'telegram sticker', 'die cut sticker', 'sticker with white border'],
+    steps: [
+      'Drop one or more photos with a clear subject: a face, a pet, a mug, a plant.',
+      'Pick the border (none, thin or thick) and its colour, and the size: fitted to the subject, or 512 × 512 for WhatsApp and Telegram.',
+      'Download the stickers as transparent PNG or WebP, one by one or as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. The cut-out model runs inside your browser tab, and the border and file are made there too. Photos of your friends, kids and pets stay on your device. The only download is the model, fetched from this site once and then cached.',
+      },
+      {
+        q: 'How do I use it in WhatsApp?',
+        a: 'Choose 512 × 512 and WebP. On WhatsApp Web or the desktop app, open the sticker panel, choose Create, and upload the file. On a phone, WhatsApp only takes custom stickers through a sticker app or pack, so the desktop route is the quickest. The file is kept under WhatsApp’s 100 KB limit where possible.',
+      },
+      {
+        q: 'And Telegram?',
+        a: 'Telegram stickers are also 512 pixels on the long side, in PNG or WebP. Choose 512 × 512 and send the file to Telegram’s @Stickers bot to add it to a pack.',
+      },
+      {
+        q: 'Can I print the sticker?',
+        a: 'Yes. Choose Fit the subject and PNG for the largest size your photo allows (up to 2048 pixels on the long side). The white border is the classic die-cut look that sticker printers cut along; most print services accept a transparent PNG.',
+      },
+      {
+        q: 'Why does the cut-out miss part of my subject?',
+        a: 'The model works best with one clear subject standing out from its background. If part is missing or bits of background stay, open the background remover with the same photo, adjust Keep around the edges, save the PNG, and drop that here.',
+      },
+      {
+        q: 'Can I make a sticker of a drawing or logo?',
+        a: 'Yes, as long as it stands out from its background. For a logo that is already on transparency, the border is added around its shape directly.',
+      },
+    ],
+  },
+  {
+    slug: 'profile-picture-maker',
+    name: 'Profile picture maker',
+    title: 'Profile Picture Maker: Cut Out, Colour, Circle | Stayput',
+    description:
+      'Turn a photo into a profile picture: background removed, your face centred on a colour, as a circle or square at 1024 px. Made in your browser; nothing is uploaded.',
+    heading: 'Make a profile picture',
+    tagline: 'A clean headshot on a colour of your choice, framed around your face, made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop a photo of yourself',
+    action: 'Make profile picture',
+    keywords: ['profile picture maker', 'pfp maker', 'profile photo maker', 'avatar maker from photo', 'linkedin profile picture', 'headshot background', 'circle profile picture'],
+    steps: [
+      'Drop a photo where your face is clear and well lit; a selfie works.',
+      'Pick a background colour and a circle or square.',
+      'Download the 1024 × 1024 picture and upload it to LinkedIn, Slack, Discord, Instagram or anywhere else.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. A face detector and a cut-out model run inside your browser tab, and the picture is drawn there. Your face does not go to a server, which is more than most avatar and headshot apps can say.',
+      },
+      {
+        q: 'How is the picture framed?',
+        a: 'Around your face: the face fills about 40% of the width with the eyes a little above the middle, the usual headshot framing that still looks right when a site crops it to a circle. If no face is found, for a pet or an object, the whole subject is fitted in instead.',
+      },
+      {
+        q: 'Which background colour works best?',
+        a: 'A colour that contrasts with your hair and clothes and stays recognisable at thumbnail size. Soft, light colours read as professional on LinkedIn; bright ones stand out in Slack and Discord member lists. Using the same colour everywhere makes you easier to spot.',
+      },
+      {
+        q: 'Why 1024 × 1024?',
+        a: 'It is larger than any site displays, so every site can scale it down sharply: LinkedIn shows 400 × 400, Slack and Discord show much smaller. Uploading a bigger square than needed avoids the blur you get when a site enlarges a small one.',
+      },
+      {
+        q: 'Should I choose circle or square?',
+        a: 'Most sites crop to a circle themselves, so a square with a colour background works everywhere. Choose Circle when the picture will be shown as-is on a page, in a slide or an email signature, where a square would look boxy; the corners are transparent, so it is saved as PNG.',
+      },
+      {
+        q: 'My hair looks cut off at the edges.',
+        a: 'Fine, flyaway hair against a busy background is the hardest case for the cut-out. A photo against a plain wall works best. You can also run the photo through the background remover first, adjusting Keep around the edges, and drop the PNG it gives you here.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);

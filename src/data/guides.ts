@@ -1658,6 +1658,1061 @@ export const guides: Guide[] = [
       { q: 'Does blurring a face upload the photo anywhere?', a: 'Not with a browser-based tool that runs face detection locally. Stayput\'s runs entirely in your tab, so the photo never leaves your device.' },
     ],
   },
+  {
+    slug: 'how-to-convert-mov-to-mp4',
+    title: 'How to Convert MOV to MP4 (Mac, Windows, iPhone)',
+    description: 'MOV plays fine on a Mac or iPhone but not everywhere else. Here is how to convert it to MP4 on a Mac and Windows without extra software, and a browser tool that never re-encodes when it does not need to.',
+    heading: 'How to convert MOV to MP4',
+    dek: 'MOV plays fine on Apple devices but not everywhere else. Here is how to convert it on a Mac and on Windows.',
+    keywords: ['how to convert mov to mp4', 'mov to mp4 converter', 'convert mov to mp4 on mac', 'convert mov to mp4 windows', 'mov file wont play windows'],
+    updated: '2026-09-29',
+    tools: ['video-to-mp4', 'mov-to-mp4'],
+    sections: [
+      {
+        h: 'Why a MOV won\'t play somewhere else',
+        p: [
+          'MOV is Apple\'s QuickTime container format: the default for iPhone recordings, Mac screen recordings and FaceTime footage. It usually holds the same H.264 or HEVC video that MP4 does, but some Windows apps, older TVs, video editors and web uploaders only recognise the MP4 wrapper, and a few reject a MOV outright with no explanation. Converting the container to MP4, not necessarily the video itself, is normally all it takes.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'QuickTime Player can do this directly: open the MOV file, then File, **Export As**, and choose a resolution (1080p, 720p, etc). QuickTime saves the export as an .mp4 file. This does re-encode the video, so it takes roughly as long as the clip itself and can lose a very small amount of quality.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Clipchamp, preinstalled on Windows 11, opens a MOV file directly: import it, add it to the timeline, and export, which produces an MP4 by default. Older MOV files using less common codecs sometimes fail to import in Windows\' own apps; that is the case where a browser tool that reads the file itself, rather than relying on Windows\' installed codecs, is more reliable.',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The Shortcuts app has a **Convert Media** action that can output MP4: create a shortcut with **Select Photos** followed by **Convert Media** set to MP4, then run it on the video. This is mainly useful for sending a video to something that insists on MP4 before it will even accept the file.',
+        ],
+      },
+      {
+        h: 'Converting without re-encoding when possible',
+        p: [
+          'Since most MOV files already contain H.264 video, Stayput\'s [video to MP4](/tools/video-to-mp4) converter (and the dedicated [MOV to MP4](/mov-to-mp4) page) checks first: if the video is already H.264, it repackages the container in seconds with no quality loss and no re-encoding at all; only HEVC or other codecs get re-encoded. Everything happens in your browser tab, so a private video is never uploaded, and there is no file-size limit.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is MOV the same video as MP4, just renamed?', a: 'Often, yes, when the video inside is H.264: the two are different containers around the same kind of data, so a straight repackage with no quality loss is possible. A MOV using HEVC or another codec needs an actual re-encode.' },
+      { q: 'Why does my MOV file look huge compared to an MP4 of the same video?', a: 'File size comes mainly from the video codec and bitrate inside, not the container, so a MOV and MP4 with the same codec and settings are close in size. A large MOV is more often about how it was recorded than the container format.' },
+      { q: 'Can I convert MOV to MP4 without losing quality?', a: 'Yes, when the source is already H.264, a container-only conversion changes nothing about the video data. Re-encoding to a different codec always carries some quality trade-off.' },
+      { q: 'Do I need Handbrake or another app to convert MOV to MP4?', a: 'Not for a quick conversion. QuickTime Player (Mac), Clipchamp (Windows) or a browser tool cover most cases without installing dedicated software.' },
+    ],
+  },
+  {
+    slug: 'how-to-merge-pdfs-on-iphone',
+    title: 'How to Merge PDFs on an iPhone (No App Required)',
+    description: 'The Files app has a built-in way to combine PDFs, though it is not obvious. Here is the exact steps, plus a faster browser tool for reordering pages first.',
+    heading: 'How to merge PDFs on an iPhone',
+    dek: 'The Files app can do this, though the steps are not obvious. Here they are, plus a faster option when you need to reorder pages.',
+    keywords: ['how to merge pdfs on iphone', 'combine pdf files on iphone', 'merge pdf iphone no app', 'join pdf files iphone', 'combine pdfs iphone files app'],
+    updated: '2026-09-29',
+    tools: ['merge-pdf', 'combine-pdf'],
+    sections: [
+      {
+        h: 'The built-in way, through the Files app',
+        p: [
+          'Open the **Files** app, find the PDFs you want to combine, and tap **Select** in the top corner. Tap each PDF to select all of them, in the order you want them to appear, then tap the share icon. From the share sheet, tap **Print**. In the print preview, use two fingers to pinch outward on the page thumbnail; this opens a full-page preview showing every page from every selected file in one continuous document. Tap the share icon again from this view and choose **Save to Files** (or Save to Photos, or share it directly). What comes out is a single PDF with every page from your selected files, in the order you picked them.',
+        ],
+      },
+      {
+        h: 'Why this feels hidden',
+        p: [
+          'This works because the Print preview treats anything printable, including a stack of separate PDFs, as one combined document, and the pinch gesture reveals the pages behind that print job as their own file. It is a genuine, no-install way to merge PDFs, but it does not appear anywhere as a "merge" or "combine" button, and it is easy to miss the pinch-to-preview step.',
+        ],
+      },
+      {
+        h: 'The limits of this method',
+        p: [
+          'The Files app trick joins files in the order you tapped them, and there is no way to reorder or remove individual pages once they are in the combined preview: if you tap files in the wrong order, you have to start over. It also does not let you drop specific pages from the middle of a document before merging.',
+        ],
+      },
+      {
+        h: 'When you need more control',
+        p: [
+          'Stayput\'s [merge PDF](/tools/merge-pdf) tool lets you drag files into the exact order you want, see thumbnails of every page, and remove any you do not need, before merging, all in your phone\'s browser. There is no size limit, and the files are combined locally rather than uploaded anywhere, which matters for something like a signed lease or a set of ID documents.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Do I need to download an app to merge PDFs on iPhone?', a: 'No. The Files app\'s Print-preview trick merges PDFs natively, and a browser-based tool covers cases needing reordering, without installing anything either way.' },
+      { q: 'Can I choose the order of pages when merging on iPhone?', a: 'With the Files app trick, only by selecting the files in that order beforehand. A tool with a visible page list, like Stayput\'s merge tool, lets you reorder afterward too.' },
+      { q: 'Does merging PDFs on an iPhone upload them anywhere?', a: 'The Files app method stays entirely on the device. A browser tool that processes files locally, rather than uploading them to a server, keeps the same guarantee.' },
+      { q: 'Can I merge PDFs and images together?', a: 'The Files app print trick works with PDFs and can include some image types in the same selection since both are printable. A converter that turns images into PDF pages first is the more reliable way to mix the two.' },
+    ],
+  },
+  {
+    slug: 'how-to-resize-a-photo-for-social-media',
+    title: 'How to Resize a Photo for Instagram, Discord and Profile Pictures',
+    description: 'Every platform crops or squeezes a photo to its own shape if you upload it as-is. Here are the sizes that matter and how to hit them exactly, on any device.',
+    heading: 'How to resize a photo for social media',
+    dek: 'Upload the wrong shape and the platform crops it for you, sometimes badly. Here are the sizes that matter and how to hit them.',
+    keywords: ['how to resize a photo for instagram', 'resize image for discord', 'profile picture size', 'instagram photo dimensions', 'image size for social media'],
+    updated: '2026-09-29',
+    tools: ['resize-image-for-instagram', 'crop-image-to-square'],
+    sections: [
+      {
+        h: 'Why the platform\'s own crop is worth avoiding',
+        p: [
+          'Instagram, Discord, LinkedIn and most other platforms will accept almost any photo, but if its proportions don\'t match what the platform expects, they crop it automatically, often centred, which can cut off a face at the edge of a group photo or leave a subject off-centre. Cropping it yourself first, to the platform\'s actual target size, keeps the framing you intended.',
+        ],
+      },
+      {
+        h: 'The sizes that matter',
+        p: ['The exact numbers vary a little as platforms update their apps, but these cover almost every case:'],
+        list: [
+          '**Instagram feed post:** 1:1 square (1080×1080) or 4:5 portrait (1080×1350), which shows more of a tall photo in the feed without cropping.',
+          '**Instagram Story or Reel:** 9:16 portrait (1080×1920), filling the full vertical screen.',
+          '**Discord and most forum avatars:** square, at least 128×128, though a larger square (512×512 or more) looks sharp on high-DPI screens.',
+          '**LinkedIn and most profile pictures:** square, at least 400×400.',
+          '**A cover photo or banner** (Facebook, LinkedIn, X): a wide rectangle, typically at least 1500 px wide; check the specific platform, since these change more often than the others.',
+        ],
+      },
+      {
+        h: 'Resizing on a phone or computer',
+        p: [
+          'Stayput\'s [resize for Instagram](/resize-image-for-instagram) preset offers the 4:5, square and 9:16 crops directly, letting you position the crop before saving so the important part of the photo stays in frame. For a plain square, for Discord, LinkedIn or any other profile picture, [crop to square](/crop-image-to-square) does the same with a 1:1 frame you can drag over any part of the photo. Both run in your browser: no upload, no account, and the photo is exported at full resolution rather than whatever the platform\'s own cropper produces.',
+        ],
+      },
+      {
+        h: 'A couple of things that catch people out',
+        p: [
+          'Round profile pictures (most platforms display them in a circle) still need a square source image; the platform masks the corners itself, so cropping to a circle yourself is unnecessary and can leave transparent corners where none are expected. And Instagram\'s minimum resolution is lower than it looks: 1080px wide covers virtually every device, so exporting a much larger image just adds file size without a visible improvement.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the best size for an Instagram post in 2026?', a: '1080×1080 for a square post, or 1080×1350 (4:5) to show more of a portrait photo without Instagram cropping it further.' },
+      { q: 'Why did Discord crop my profile picture oddly?', a: 'Discord expects a square image and centre-crops anything else. Cropping to a square yourself, keeping the subject centred, avoids that.' },
+      { q: 'Does resizing a photo lower its quality?', a: 'Cropping alone does not resample the kept pixels. Scaling a photo down loses some detail, though usually not visibly for web and app use; scaling up cannot add detail that was not there originally.' },
+      { q: 'Can I resize a photo without uploading it to Instagram\'s own tools?', a: 'Yes. A browser-based cropping tool produces the exact size before you ever open Instagram, and the photo never leaves your device to do it.' },
+    ],
+  },
+  {
+    slug: 'how-to-take-a-passport-photo-at-home',
+    title: 'How to Take a Passport Photo at Home (US and International)',
+    description: 'A compliant passport photo is mostly about background, lighting and framing, not equipment. Here is how to take one with a phone, the exact requirements, and a tool that sizes it correctly.',
+    heading: 'How to take a passport photo at home',
+    dek: 'Mostly about background, lighting and framing, not equipment. Here is how to get it right with just a phone.',
+    keywords: ['how to take a passport photo at home', 'passport photo requirements', 'diy passport photo', 'passport photo size', 'take your own passport photo'],
+    updated: '2026-09-29',
+    tools: ['passport-photo', '2x2-photo', '35x45-photo'],
+    sections: [
+      {
+        h: 'What passport photo rules actually require',
+        p: [
+          'Requirements vary a little by country, but the common ground covers most of it: a plain white or off-white background, even lighting with no harsh shadows on the face or background, a neutral expression with both eyes open, no glasses (most countries now reject photos with glasses, even clear ones), no shadow across the face, and the head filling a specific portion of the frame. The US requires a 2×2 inch photo with the head (chin to top of hair) between 1 inch and 1 3/8 inches. Most of Europe and the Schengen area use 35×45 mm with similar head-size rules.',
+        ],
+      },
+      {
+        h: 'Setting up the shot',
+        p: [
+          'Stand about 4-6 feet from a plain wall, ideally white or light-coloured, in daylight from a window rather than overhead lighting, which casts shadows under the eyes and chin. Have someone else take the photo (or use a tripod and timer) rather than a selfie, since a selfie\'s wide-angle lens distorts facial proportions at close range and most rules require it to be taken by someone else or from a fixed camera anyway. Face the camera directly, keep a neutral expression, and remove glasses, hats, and anything covering the face other than religious head coverings, which most countries explicitly allow.',
+        ],
+      },
+      {
+        h: 'From that photo to a compliant file',
+        p: [
+          'Stayput\'s [passport photo maker](/tools/passport-photo) takes that photo and does the sizing work: it finds your eyes, mouth and hairline, scales your head into the required range automatically, and centres you in either a [2×2 inch US format](/2x2-photo) or a [35×45 mm European format](/35x45-photo). It can also replace the background with plain white if your wall was not perfectly even, and it produces both a single digital photo and a 4×6 inch print sheet with multiple copies, ready to print at a pharmacy or photo kiosk. All of this happens in your browser; the photo is never uploaded.',
+        ],
+      },
+      {
+        h: 'Photo-booth vs. DIY: what actually differs',
+        p: [
+          'A passport photo both booth costs money mainly for the guaranteed compliant background and lighting, not for anything a phone cannot do at home with a bit of care. The most common reasons DIY photos get rejected are a shadowed or uneven background, glasses, and a head that is too small or too large in the frame, all three of which the steps above and the sizing tool directly address.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I take my own passport photo with my phone?', a: 'Yes, most passport agencies accept a photo you took yourself as long as it meets the size, background and lighting requirements; a phone camera is more than sharp enough.' },
+      { q: 'Can I wear glasses in a passport photo?', a: 'Most countries, including the US since 2016, no longer allow glasses in a passport photo, even clear prescription glasses.' },
+      { q: 'What background do I need for a passport photo?', a: 'Plain white or off-white, evenly lit with no shadows, for almost every country\'s passport photo.' },
+      { q: 'How is the head-size requirement measured?', a: 'From the bottom of the chin to the top of the hair (not including the very top of the head\'s shadow or hairline flyaways), which must fall within a specific range: 1 to 1 3/8 inches for the US 2×2 photo, and a similar proportion for the 35×45 mm format used across most of Europe.' },
+    ],
+  },
+  {
+    slug: 'how-to-remove-a-password-from-a-pdf',
+    title: 'How to Remove a Password From a PDF (Mac, Windows, Browser)',
+    description: 'If you can already open a PDF, removing its password is usually a save-or-print trick you already have installed. Here is how on a Mac and on Windows, and a browser tool for restriction passwords too.',
+    heading: 'How to remove a password from a PDF',
+    dek: 'If you can already open it, removing the password is usually a save or print trick built into your computer. Here is how.',
+    keywords: ['how to remove a password from a pdf', 'unlock pdf password', 'remove pdf password mac', 'remove pdf password windows', 'pdf password protected remove'],
+    updated: '2026-09-29',
+    tools: ['unlock-pdf'],
+    sections: [
+      {
+        h: 'The two kinds of PDF password',
+        p: [
+          'An **open password** stops the file from being viewed at all until it is entered; you need to know this one to do anything with the file. A **permissions password** (or "owner password") lets the file open freely but blocks printing, copying text or editing, and can sometimes be removed even without knowing it, since most PDF readers let you view and print a restricted file regardless. What follows is for a PDF you can already legally open and want to stop having to unlock every time.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'Preview does this in one step: open the password-protected PDF (entering the password when asked), then choose File, **Export As PDF**. Preview saves a new copy without the password or the permission restrictions, because it exports the already-decrypted content rather than the original encrypted file.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no equivalent one-click export in the built-in PDF viewer, but the print trick works: open the PDF in Edge or Chrome (entering the password), choose **Print**, then set the destination to **Save as PDF** or **Microsoft Print to PDF**, and save. The resulting file is a fresh, unprotected PDF, since printing renders the page content rather than copying the original encrypted file.',
+        ],
+      },
+      {
+        h: 'The print trick on any device',
+        p: [
+          'The same idea works anywhere a PDF can be opened and printed: iPhone, Android and any browser support printing to a PDF file. It works for permission restrictions unconditionally, and for an open password once you have entered it correctly, since by that point the reader is showing you the plain content.',
+        ],
+      },
+      {
+        h: 'A dedicated tool for restriction passwords',
+        p: [
+          'When you already know the password and just want it gone for good, Stayput\'s [unlock PDF](/tools/unlock-pdf) tool removes it directly in your browser: enter the password once, and it re-saves the PDF without it, without the print step\'s slight risk of re-rendering text as an image in some viewers. Nothing is uploaded; the file and its password stay on your device.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I remove a PDF password without knowing it?', a: 'Not an open password that genuinely restricts viewing; you need it to see the content at all. A permissions password (blocking printing or copying) can often be bypassed just by viewing and printing the file, since most readers do not enforce those restrictions strictly.' },
+      { q: 'Does printing to PDF lower the quality?', a: 'For ordinary text and images, no meaningful difference. Highly precise vector graphics or forms with fillable fields can occasionally lose some structure through a print-based export, since printing flattens the page.' },
+      { q: 'Is removing a password from a PDF I own legal?', a: 'Yes, removing a password from a PDF you have the legal right to open and use is fine. This does not apply to files you do not have permission to access.' },
+      { q: 'Does an online PDF password remover upload the file?', a: 'Many do, which means both the file and its password reach someone else\'s server. A browser-based tool that processes the file locally avoids that.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-pdf-to-word',
+    title: 'How to Convert a PDF to Word (Editable .docx)',
+    description: 'Microsoft Word and Google Docs can both open a PDF and convert it directly, no separate converter needed for most documents. Here is how, and a browser tool for when the result needs cleaning up.',
+    heading: 'How to convert a PDF to Word',
+    dek: 'Word and Google Docs can both open a PDF directly. Here is how, and what to use when the result comes out messy.',
+    keywords: ['how to convert a pdf to word', 'pdf to word converter', 'convert pdf to docx', 'edit a pdf in word', 'pdf to editable document'],
+    updated: '2026-09-29',
+    tools: ['pdf-to-word'],
+    sections: [
+      {
+        h: 'Why this usually just works, and sometimes doesn\'t',
+        p: [
+          'Converting a PDF to Word means rebuilding editable paragraphs, headings and (approximately) formatting from a format that only stores where each character sits on the page, not the document structure behind it. For a PDF that was originally a Word document exported to PDF, this reconstruction is usually accurate. For a scanned document (a photo or scan with no real text layer) or a PDF with a complex multi-column layout, the result is rougher, since the converter is guessing at structure that isn\'t really there.',
+        ],
+      },
+      {
+        h: 'In Microsoft Word',
+        p: [
+          'Open Word, choose File, **Open**, and select the PDF directly. Word converts it automatically and opens it as an editable document; a message explains that some layout may shift as a result. Save it as .docx from there. This works in Word for Windows and Mac without any add-in.',
+        ],
+      },
+      {
+        h: 'In Google Docs',
+        p: [
+          'Upload the PDF to Google Drive, right-click it, choose **Open with, Google Docs**. Docs converts it into an editable document, with the same layout caveats as Word\'s conversion, and keeps the original PDF untouched in Drive alongside the new Doc.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither the Word nor Google Docs mobile apps convert a PDF to an editable document the way their desktop and web versions do; they mainly view PDFs. Converting on a phone means using a tool built for it, or opening the file in a desktop version later.',
+        ],
+      },
+      {
+        h: 'A dedicated converter for the text underneath',
+        p: [
+          'Stayput\'s [PDF to Word](/tools/pdf-to-word) tool rebuilds paragraphs and headings from the PDF\'s text layer directly, on your phone or computer, in the browser, without uploading the document. It also offers a plain-text export for when you only need the words, not the formatting. As with Word and Docs\' own conversion, a scanned PDF with no text layer needs OCR first, such as with Stayput\'s [image to text](/tools/image-to-text) tool, before there is any text to convert.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I convert a scanned PDF to Word?', a: 'Only after it has gone through OCR to create a text layer; a scan is just an image until then, so any converter starts by guessing text from pixels, and it is only as good as the OCR behind it.' },
+      { q: 'Why did the formatting change after converting?', a: 'The converter is reconstructing structure (columns, headings, spacing) from where text sits on the page, which is an approximation rather than a copy of the original document\'s actual layout.' },
+      { q: 'Is there a free way to convert PDF to Word without installing anything?', a: 'Yes. Opening the PDF directly in Word or Google Docs (both already have this built in) or using a browser-based converter both avoid installing separate software.' },
+      { q: 'Does converting a PDF to Word online upload my document?', a: 'It depends on the tool. Google Docs\' conversion uploads it to Google Drive by definition; a browser-based tool that processes the file locally does not upload it anywhere.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-a-photo-to-pdf',
+    title: 'How to Convert a Photo to PDF (iPhone, Android, Windows, Mac)',
+    description: 'Every recent phone and computer can turn a photo into a PDF without installing anything, though the steps are different on each. Here is how, plus a browser tool for combining several photos into one document.',
+    heading: 'How to convert a photo to PDF',
+    dek: 'Every device can do this, in different ways and different places in the menus. Here is how on each, plus combining several photos into one file.',
+    keywords: ['how to convert a photo to pdf', 'jpg to pdf', 'image to pdf converter', 'turn a picture into a pdf', 'save photo as pdf'],
+    updated: '2026-09-29',
+    tools: ['image-to-pdf', 'jpg-to-pdf'],
+    sections: [
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'From the Photos app: select the photo (or several, by tapping **Select** and choosing more than one), tap the share icon, and choose **Print**. In the print preview, pinch outward on the page thumbnail to open the full-page view, then tap the share icon again and **Save to Files** to save it as a PDF. Selecting multiple photos beforehand puts every one into the same PDF, one photo per page, in the order they were selected.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Google Drive has a built-in **Scan** feature (tap the **+** button, then **Scan**) that photographs a document directly into a PDF, with automatic cropping and contrast, which works well for documents rather than ordinary photos. For an existing photo already on the phone, the Google Photos app doesn\'t export to PDF directly; use the same print-preview trick as iPhone through the phone\'s Print option in the photo\'s share menu, or use a browser tool.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Open the photo in the Photos app, or select it in File Explorer, and choose **Print**. Set the printer to **Microsoft Print to PDF** and print; this saves the image as a one-page PDF rather than sending it to a physical printer. This method only handles one photo per PDF at a time.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'Open the photo in Preview, then File, **Export As PDF**. For several photos in one PDF, select them all in Preview\'s sidebar first (or select multiple files in Finder and open them together in Preview), then use **File, Print**, and in the print dialog\'s PDF menu choose **Save as PDF**; this combines every open photo into a single multi-page document.',
+        ],
+      },
+      {
+        h: 'Combining several photos with more control',
+        p: [
+          'Stayput\'s [image to PDF](/tools/image-to-pdf) tool (and the [JPG to PDF](/jpg-to-pdf) preset) lets you drop in multiple photos, reorder them by dragging, and choose the page size and margins, all in the browser before generating the PDF. It handles JPG, PNG, WebP and HEIC photos straight from an iPhone camera roll, and nothing is uploaded to produce the file.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I combine several photos into one PDF?', a: 'Yes, on every platform above, either by selecting multiple photos before using the print-to-PDF trick, or with a tool built to combine several images into one document with control over the order.' },
+      { q: 'What is the print-to-PDF trick and why does it work?', a: 'Printing normally sends a page to a printer; choosing a "Save as PDF" or "Print to PDF" destination instead captures that same rendered page as a PDF file rather than physical paper, which works for a photo just as well as a document.' },
+      { q: 'Does converting a photo to PDF reduce its quality?', a: 'The print-based methods can slightly compress or resize the image to fit a standard page. A dedicated converter that embeds the image at its original resolution keeps it unchanged, just wrapped in a PDF page.' },
+      { q: 'Can I scan a paper document into a PDF, not just convert an existing photo?', a: 'Yes: the iPhone\'s Notes app and Android\'s Google Drive both have a document-scanning mode that photographs and auto-crops a physical page directly into a PDF, which is more reliable for a document than photographing it manually.' },
+    ],
+  },
+  {
+    slug: 'how-to-password-protect-a-pdf',
+    title: 'How to Password Protect a PDF (Windows, Mac, Browser)',
+    description: 'A few PDF readers can add a password themselves, but most people need a separate tool with real encryption. Here is what your computer can already do, and a browser tool that encrypts the file with AES-256 without uploading it.',
+    heading: 'How to password protect a PDF',
+    dek: 'Unlike removing a password, adding real encryption usually needs a dedicated tool rather than a built-in export option. Here is what works.',
+    keywords: ['how to password protect a pdf', 'add password to pdf', 'encrypt pdf', 'lock a pdf with a password', 'pdf password protection free'],
+    updated: '2026-09-29',
+    tools: ['protect-pdf'],
+    sections: [
+      {
+        h: 'Why this is harder than removing a password',
+        p: [
+          'Removing a password from a PDF you can already open is often a save-or-print trick, because the reader has already decrypted the content and just needs to re-save it. Adding a password means encrypting the file from scratch with a real cipher, which most everyday apps, including Preview on a Mac and the Photos or Files apps on Windows, simply do not offer as a built-in feature.',
+        ],
+      },
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview can add a password: open the PDF, choose File, **Export**, check **Encrypt**, and set a password. This uses standard PDF encryption and is the one common exception to "your OS can\'t do this natively" below, but it is Mac-only.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no equivalent built into File Explorer, the Photos app, or Edge\'s PDF viewer. Microsoft Word can save a document as a password-protected PDF (File, **Save As**, PDF, then **Options, Encrypt the document with a password**), but only if the PDF started as a Word file; it cannot add a password to a PDF you did not create in Word.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform has a native way to add a password to an existing PDF. The Files app on iPhone and most Android file managers can only view and organize PDFs, not encrypt them.',
+        ],
+      },
+      {
+        h: 'A browser tool that actually encrypts the file',
+        p: [
+          'Stayput\'s [protect PDF](/tools/protect-pdf) tool sets a real password with AES-256 encryption directly in the browser: the file is encrypted on your device before it is ever saved, so the unprotected version never leaves your computer or gets uploaded anywhere to be locked. It works on any device, including Windows and Android where there is no built-in option, and handles several PDFs in one batch.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is browser-based PDF encryption actually secure?', a: 'Yes, when the tool uses a standard, real cipher like AES-256 rather than just hiding the content. The key difference versus an online converter is whether the file is uploaded to add the password; if it is not, the plain file never leaves your device.' },
+      { q: 'Can I password protect a PDF for free?', a: 'Yes, both Preview\'s built-in export on Mac and a browser-based tool that runs locally are free, unlike some online converters that charge or limit file size.' },
+      { q: 'What is the difference between an open password and a permissions password?', a: 'An open password is required just to view the file at all. A permissions (or owner) password lets anyone view it but is meant to block printing, copying or editing, though many readers do not strictly enforce that restriction.' },
+      { q: 'Will adding a password change the PDF\'s content or formatting?', a: 'No. Password protection encrypts the existing file; it does not alter the text, images or layout, only who can open or use it.' },
+    ],
+  },
+  {
+    slug: 'how-to-split-a-pdf',
+    title: 'How to Split a PDF Into Separate Pages',
+    description: 'Splitting a PDF means extracting a page range or breaking it into individual files, something most built-in PDF viewers cannot do. Here is what actually works, on desktop and in the browser.',
+    heading: 'How to split a PDF into separate pages',
+    dek: 'Most built-in PDF viewers can reorder or delete pages, but not split a document into separate files. Here is what does the job.',
+    keywords: ['how to split a pdf', 'extract pages from pdf', 'split pdf into separate files', 'pdf splitter free', 'pull one page out of a pdf'],
+    updated: '2026-09-29',
+    tools: ['split-pdf'],
+    sections: [
+      {
+        h: 'What "splitting" usually means',
+        p: [
+          'Splitting a PDF covers a few different jobs: pulling out one page range as its own file (say, pages 3 to 5 of a 20-page report), or breaking every page into its own separate document. Deleting pages you don\'t want, which some readers support, is a different operation and doesn\'t produce the extracted pages as their own file.',
+        ],
+      },
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview\'s sidebar lets you drag individual page thumbnails out onto the desktop, which saves each dragged page as its own single-page PDF. There is no built-in way to extract a multi-page range as one file without repeating this per page, or without dragging a multi-page selection (shift-click a range first, then drag).',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'The built-in PDF viewer in Edge does not support splitting or extracting pages. Print-to-PDF can print a chosen page range (in the print dialog\'s page range field) to a new PDF, which handles extracting one range but not breaking a document into many separate files at once.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Files app or PDF viewer supports splitting a document. A print-to-PDF with a page range, from the share sheet, works the same way as the Windows trick above for pulling out one range.',
+        ],
+      },
+      {
+        h: 'A dedicated splitter for pages or ranges',
+        p: [
+          'Stayput\'s [split PDF](/tools/split-pdf) tool extracts a specific page range, or breaks the whole document into individual single-page PDFs, in one step, directly in the browser. It works the same way on a phone or a computer and does not upload the document to do it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I split a PDF without installing software?', a: 'Yes, a browser-based splitter needs no install and works the same on any device, unlike Preview\'s drag-out method which is Mac-only.' },
+      { q: 'What is the difference between splitting and deleting pages?', a: 'Deleting removes pages from the existing document and leaves the rest; splitting produces the removed (or selected) pages as their own separate file, keeping both parts usable.' },
+      { q: 'Can I extract just one page from a PDF?', a: 'Yes, that\'s the simplest case of a page range, whether by dragging a single page out in Preview, printing that one page to a new PDF, or using a dedicated split tool.' },
+      { q: 'Does splitting a PDF reduce its quality?', a: 'No, splitting copies the existing pages into new files without re-rendering them, so text and images stay exactly as they were.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-a-video-to-mp3',
+    title: 'How to Convert a Video to MP3',
+    description: 'Pulling the audio out of a video and saving it as an MP3 is different from just muting the video, and most phones and computers have no built-in way to do it. Here is what actually works.',
+    heading: 'How to convert a video to MP3',
+    dek: 'This is different from muting a video: you want the sound saved as its own file. Most devices have no built-in way to do that.',
+    keywords: ['how to convert a video to mp3', 'mp4 to mp3', 'extract audio from video', 'save video sound as mp3', 'video to audio converter'],
+    updated: '2026-09-29',
+    tools: ['video-to-mp3'],
+    sections: [
+      {
+        h: 'Converting versus muting',
+        p: [
+          'Muting a video, or removing its audio track, gets rid of the sound and keeps the silent video. Converting a video to MP3 is closer to the opposite: keep the sound, discard the video frames, and save the audio as a standalone file you can put on a music player or send separately. They are two different operations even though both involve separating audio from video.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither the Photos app nor the built-in camera roll has a way to export just the audio track of a video. Voice Memos and similar apps only record new audio; they don\'t extract it from an existing video file. This is one of the more common "how do I" gaps on mobile, since it is a fairly specific, less common task.',
+        ],
+      },
+      {
+        h: 'On a Mac with QuickTime',
+        p: [
+          'QuickTime Player can export audio only: open the video, choose File, **Export As**, and pick **Audio Only**. This saves an M4A file, not an MP3 directly, so a follow-up conversion step is needed if MP3 specifically is required (many devices and players accept M4A just as well, so check whether that\'s actually necessary first).',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no built-in equivalent in the Movies & TV or Photos apps for extracting audio from a video as a separate file. This is a task Windows genuinely has no native tool for, which is why most people search for a converter rather than a menu option.',
+        ],
+      },
+      {
+        h: 'A direct converter to MP3',
+        p: [
+          'Stayput\'s [video to MP3](/tools/video-to-mp3) tool does this directly, on any device: drop in a video (or several, in a batch) and it extracts the audio and saves it as an MP3 or WAV, in the browser, without uploading the file. It skips the extra M4A-to-MP3 conversion step that QuickTime\'s export leaves you with.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is converting a video to MP3 the same as muting the video?', a: 'No. Muting removes the audio and keeps the silent video; converting to MP3 keeps the audio as its own file and discards the video.' },
+      { q: 'Why does QuickTime save an M4A instead of an MP3?', a: 'M4A is Apple\'s preferred audio format and what QuickTime\'s "Audio Only" export produces by default; it is not the same file extension as MP3 even though both are compressed audio, so some further conversion or a different tool is needed for MP3 specifically.' },
+      { q: 'Does the audio quality change when converting to MP3?', a: 'MP3 is a compressed format, so there is some quality loss versus the original video\'s audio track, though it is usually not noticeable for speech or typical video soundtracks at a reasonable bitrate.' },
+      { q: 'Can I convert just part of a video to MP3?', a: 'Trim the video to the part you want first (or trim the resulting audio file afterward), since most converters, including a browser-based one, convert the whole file by default.' },
+    ],
+  },
+  {
+    slug: 'how-to-trim-an-mp3-file',
+    title: 'How to Trim an MP3 File (Cut a Song, Voice Memo or Podcast)',
+    description: 'Cutting an MP3 or other audio file down to just the part you want usually needs a waveform to see what you are cutting, which most phones and computers do not show by default. Here is what works.',
+    heading: 'How to trim an MP3 file',
+    dek: 'Cutting audio precisely needs to see the waveform, which most built-in apps do not show. Here is what actually works.',
+    keywords: ['how to trim an mp3', 'cut a song online', 'trim audio file', 'mp3 cutter free', 'cut a voice memo'],
+    updated: '2026-09-29',
+    tools: ['trim-audio'],
+    sections: [
+      {
+        h: 'Why this is fiddlier than trimming a video',
+        p: [
+          'Most phones show a visible timeline with a video preview when trimming, which makes it easy to see roughly where to cut. Audio has no picture, only sound, so trimming accurately without seeing a waveform means guessing based on playback position alone, which is slow and imprecise for anything more exact than "somewhere near the start."',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The Voice Memos app can trim a recording it made itself: tap the recording, tap the options icon, **Edit Recording**, then drag the trim handles at the top of the waveform. This only works for recordings made in Voice Memos, not for an MP3 or other audio file already on the phone from somewhere else.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'There is no universal built-in audio trimmer across Android phones; some manufacturers\' own Sound Recorder apps include one for their own recordings, similar to Voice Memos, but it doesn\'t handle an arbitrary MP3 file already saved to the phone.',
+        ],
+      },
+      {
+        h: 'On a Mac with GarageBand',
+        p: [
+          'GarageBand can trim any audio file: import it as a track, drag its edges to the length you want, and export with **Share, Export Song to Disk**. This works for any MP3, not just recordings made in the app, but it is a full music app for a simple cut, and exporting adds a few extra steps compared to a purpose-built trimmer.',
+        ],
+      },
+      {
+        h: 'A waveform-based trimmer built for exactly this',
+        p: [
+          'Stayput\'s [trim audio](/tools/trim-audio) tool shows the waveform so you can see exactly where to cut, works on any MP3, WAV, M4A or other audio file (or the sound from a video), adds fades if you want them, and exports as MP3 or WAV, all in the browser with nothing uploaded. It works the same way on a phone or a computer, unlike Voice Memos or GarageBand which each only cover one device.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I trim an MP3 without installing an app?', a: 'Yes, a browser-based trimmer with a visible waveform works on a phone or computer without installing anything, and handles any MP3 rather than only recordings made in a specific app.' },
+      { q: 'Why do I need to see a waveform to trim audio accurately?', a: 'A waveform shows where the sound actually starts and stops, including silences and peaks, which makes it possible to cut precisely instead of guessing from playback position alone.' },
+      { q: 'Does trimming an MP3 reduce its quality?', a: 'Trimming itself doesn\'t re-encode the audio content, only shortens it; quality loss only happens if the tool re-compresses the file at a lower bitrate during export.' },
+      { q: 'Can I add a fade-in or fade-out when trimming?', a: 'Some tools support this, including Stayput\'s trim audio tool; a plain trim without a fade can sound abrupt at the cut points, especially for music or speech.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-page-numbers-to-a-pdf',
+    title: 'How to Add Page Numbers to a PDF',
+    description: 'Word and Google Docs can number pages before exporting to PDF, but once a document is already a PDF, most viewers have no way to stamp numbers onto it. Here is what works, including for a PDF you did not create yourself.',
+    heading: 'How to add page numbers to a PDF',
+    dek: 'Easy if you still have the original Word file; much harder if all you have is the finished PDF. Here is what actually works.',
+    keywords: ['how to add page numbers to a pdf', 'number pdf pages', 'insert page numbers pdf', 'pdf page numbering free', 'add page numbers to a scanned pdf'],
+    updated: '2026-09-29',
+    tools: ['pdf-page-numbers'],
+    sections: [
+      {
+        h: 'The easy case: you still have the original document',
+        p: [
+          'If the PDF came from Word or Google Docs, the simplest path is to add page numbers in the original document (Word: **Insert, Page Number**; Google Docs: **Insert, Page numbers**) and re-export to PDF. This gives full control over the numbering format and skips touching the PDF at all.',
+        ],
+      },
+      {
+        h: 'When you only have the PDF',
+        p: [
+          'Often the original document is gone, came from someone else, or is a scan, and page numbers need to be stamped directly onto the existing PDF. This is a different job: adding a small text layer to each page rather than reflowing a document, and it is something neither Preview on a Mac nor the built-in PDF viewers on Windows, iPhone or Android can do.',
+        ],
+      },
+      {
+        h: 'On a Mac, Windows, iPhone or Android',
+        p: [
+          'None of the built-in PDF viewers on any of these platforms, including Preview, Edge\'s reader, and the Files apps on iPhone and Android, offer a way to stamp page numbers onto an existing PDF. This is a genuine gap across every platform, not something hidden in a menu.',
+        ],
+      },
+      {
+        h: 'A dedicated tool for stamping numbers onto a PDF',
+        p: [
+          'Stayput\'s [add page numbers](/tools/pdf-page-numbers) tool stamps a number onto every page directly, with a choice of position (corner or centre), format (plain number, or "Page 1 of 10"), font and starting number, done in the browser without uploading the document. It works the same way whether the PDF came from Word, a scanner, or somewhere else entirely.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I add page numbers to a PDF without the original document?', a: 'Yes, a tool that stamps numbers directly onto the existing PDF pages works regardless of what created the file, unlike adding numbers in Word or Docs which requires the original source document.' },
+      { q: 'Can I start numbering from a page other than 1?', a: 'A dedicated PDF page-numbering tool typically lets you set a starting number, which is useful when a cover page or table of contents should not be counted.' },
+      { q: 'Does adding page numbers change the PDF\'s existing content?', a: 'No, it adds a small text layer to each page without altering the original text or images underneath.' },
+      { q: 'Can I number a scanned PDF the same way?', a: 'Yes, stamping numbers works on any PDF, including a scan with no underlying text layer, since it is adding a new number on top rather than depending on what is already there.' },
+    ],
+  },
+  {
+    slug: 'how-to-merge-multiple-videos-into-one',
+    title: 'How to Merge Multiple Videos Into One',
+    description: 'Joining several video clips end to end into a single file is not something most phone camera rolls or built-in video apps do without a full editor. Here is what actually works, including a browser tool.',
+    heading: 'How to merge multiple videos into one',
+    dek: 'Most camera rolls can play clips one after another, not merge them into a single file. Here is what actually joins them.',
+    keywords: ['how to merge videos', 'combine video clips into one', 'join videos together', 'merge mp4 files free', 'stitch videos into one file'],
+    updated: '2026-09-29',
+    tools: ['merge-videos'],
+    sections: [
+      {
+        h: 'Why this needs more than the camera roll',
+        p: [
+          'Playing several clips in sequence in the Photos app, or grouping them into an album, is not the same as merging them into one video file: the clips stay separate, so sharing them as a single file, or uploading them somewhere that only accepts one video, still doesn\'t work.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither the Photos app nor the default camera roll has a built-in way to merge clips into one video file. iMovie (free on iPhone and Mac) can do it: add the clips to a new project in the order you want, and export. This is a full video editor, though, for what is otherwise a simple join.',
+        ],
+      },
+      {
+        h: 'On a Mac with iMovie',
+        p: [
+          'Same approach as iPhone: create a new project, drag the clips onto the timeline in order, and share/export as a video file. Reordering clips is done by dragging them along the timeline before exporting.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'The Photos app\'s video editor (Clipchamp, built into recent versions of Windows) can combine clips on a timeline similarly to iMovie: add each clip, arrange the order, and export. Like iMovie, it is a general editor rather than a single-purpose merge tool.',
+        ],
+      },
+      {
+        h: 'A tool built just for joining clips',
+        p: [
+          'Stayput\'s [merge videos](/tools/merge-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I merge videos without a full video editor?', a: 'Yes, a tool built specifically for joining clips end to end skips the timeline, transitions and other editing features a full app like iMovie or Clipchamp includes.' },
+      { q: 'Can I merge videos in different formats together?', a: 'A capable merge tool can combine MP4, MOV, WebM and MKV clips in a single output; some simpler methods require all clips to already share the same format.' },
+      { q: 'Does merging videos re-encode and lose quality?', a: 'Some quality loss is common since the clips need to be combined into a single continuous stream, though a well-built tool keeps this minimal at a matching resolution and bitrate.' },
+      { q: 'Can I reorder the clips before merging?', a: 'Yes, on every method above, whether by dragging clips along a timeline in a full editor or reordering them in a dedicated merge tool before joining.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-wav-to-mp3',
+    title: 'How to Convert WAV to MP3 (and Other Audio Formats)',
+    description: 'A WAV file is much larger than the equivalent MP3 for the same audio, which is usually why people need to convert one to the other. Here is how, including what your OS can already do, and a browser converter for the rest.',
+    heading: 'How to convert WAV to MP3',
+    dek: 'WAV files are large; MP3 is the smaller, more compatible format most people actually need. Here is how to convert between them.',
+    keywords: ['how to convert wav to mp3', 'audio format converter', 'convert m4a to mp3', 'convert flac to mp3', 'wav to mp3 free no upload'],
+    updated: '2026-09-29',
+    tools: ['audio-converter'],
+    sections: [
+      {
+        h: 'Why WAV and MP3 are so different in size',
+        p: [
+          'WAV is an uncompressed format: it stores the raw audio data directly, which makes files large but exactly reproduces the original sound. MP3 compresses the audio, discarding some detail that is harder for most people to hear, which is why an MP3 of the same recording is often a tenth the size or smaller.',
+        ],
+      },
+      {
+        h: 'On a Mac with QuickTime or iTunes/Music',
+        p: [
+          'QuickTime Player can export a WAV file as an M4A (File, **Export As**, Audio Only), but not directly to MP3. The Music app can convert to MP3 if "Create MP3 Version" is enabled first in its settings (Preferences, **Files, Import Settings**, set to MP3 Encoder), then right-click the imported song and choose it from there — a roundabout path for a simple conversion.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no built-in converter between audio formats in Windows Media Player or the Photos app; both mainly play files rather than convert them. This is a genuine gap, which is why most people search for a dedicated converter rather than a settings menu.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform has a native audio format converter. Files that arrive as WAV, FLAC or another format either play as-is in a compatible app, or need converting elsewhere before they will import into an app that expects MP3 specifically.',
+        ],
+      },
+      {
+        h: 'A direct converter between formats',
+        p: [
+          'Stayput\'s [audio converter](/tools/audio-converter) tool converts between MP3, WAV, FLAC, M4A and OGG directly, in a batch, in the browser, without uploading the files or needing the Music app\'s roundabout MP3-encoder setting. It also pulls audio out of a video file in the same step if needed.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does converting WAV to MP3 lose audio quality?', a: 'Yes, some quality is lost since MP3 is a compressed (lossy) format, though at a reasonable bitrate the difference is not noticeable for most listening.' },
+      { q: 'Can I convert MP3 back to WAV?', a: 'Yes, but this does not recover any detail that was discarded during the original MP3 compression; it just changes the container and encoding, not the underlying quality.' },
+      { q: 'Why can\'t I just rename a .wav file to .mp3?', a: 'The file extension does not change the actual audio encoding inside the file, so renaming it does not convert anything; the data still needs to be re-encoded by a converter.' },
+      { q: 'Is there a free way to convert audio formats without installing software?', a: 'Yes, a browser-based converter works without installing anything and, when it runs locally, does not upload the audio file anywhere to convert it.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-a-watermark-to-a-photo',
+    title: 'How to Add a Watermark to a Photo',
+    description: 'Putting your name, a copyright line or a website on photos before sharing them usually means a separate app, since phone camera rolls have no built-in watermarking feature. Here is what works.',
+    heading: 'How to add a watermark to a photo',
+    dek: 'Phone camera rolls have no built-in watermark feature. Here is what actually adds text to a photo before you share it.',
+    keywords: ['how to add a watermark to a photo', 'add text to a photo', 'copyright watermark image', 'add watermark to picture free', 'photo watermark online'],
+    updated: '2026-09-29',
+    tools: ['watermark-image'],
+    sections: [
+      {
+        h: 'Why this needs a separate step',
+        p: [
+          'A watermark is text or a logo layered onto a photo, usually to mark ownership or discourage unauthorized use before sharing a preview or a sample image. Neither the iPhone nor Android Photos app, nor Windows Photos, has a built-in way to add this kind of text overlay; their editing tools cover cropping, filters and basic adjustments, not adding new text to the image.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'The Markup tool (available from the Photos app\'s edit screen, or the share sheet\'s Markup option) can add text to a photo by tapping the **+** button and choosing **Text**, then positioning and resizing it. This works for a one-off photo but has no way to save a watermark style to reuse, and repeating it across many photos means doing this manually each time.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Most Android phones\' built-in Photos or Gallery apps don\'t include a markup or text tool at all; Google Photos\' editor covers filters and adjustments only. Adding text on Android typically means a separate app made for the purpose.',
+        ],
+      },
+      {
+        h: 'On a Mac or Windows',
+        p: [
+          'Preview on a Mac has a Markup toolbar with a text tool, similar to iPhone\'s Markup, reached from the toolbar\'s annotation icon. Windows\' Photos app has no equivalent text-overlay tool; adding text there means a separate editor.',
+        ],
+      },
+      {
+        h: 'A tool built for watermarking many photos at once',
+        p: [
+          'Stayput\'s [watermark image](/tools/watermark-image) tool is built for this specifically: set the text once (a name, copyright line or website), choose a corner, the centre, or a repeated pattern across the photo, adjust size, opacity and colour, and apply it to a batch of photos at once, all in the browser with nothing uploaded. This avoids repeating the Markup trick photo by photo.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I watermark several photos at once?', a: 'Yes, a dedicated watermarking tool applies the same text, position and style to a batch of photos in one step, unlike Markup-based methods which handle one photo at a time.' },
+      { q: 'Does adding a watermark reduce the photo\'s resolution?', a: 'No, a well-built watermarking tool adds the text or logo at the photo\'s original resolution rather than resizing or recompressing the image itself.' },
+      { q: 'Can I make the watermark harder to remove by repeating it across the image?', a: 'Yes, a repeated, semi-transparent watermark pattern across the whole photo is harder to crop or clone out than a single watermark in one corner.' },
+      { q: 'Is watermarking free?', a: 'Yes, both the built-in Markup tools on iPhone and Mac, and a browser-based watermarking tool, are free; some online watermarking services add their own logo unless you pay, which a tool that doesn\'t do that avoids.' },
+    ],
+  },
+  {
+    slug: 'how-to-rotate-a-pdf',
+    title: 'How to Rotate a PDF (and Save It That Way)',
+    description: 'Most PDF viewers can rotate a page temporarily just to read it, but that view resets the next time it opens. Making a rotation permanent is a different, less obvious step. Here is how.',
+    heading: 'How to rotate a PDF',
+    dek: 'Rotating a PDF to read it and rotating it permanently are two different things. Here is how to make the fix stick.',
+    keywords: ['how to rotate a pdf', 'rotate pdf permanently', 'fix sideways pdf pages', 'rotate a scanned pdf', 'rotate pdf and save'],
+    updated: '2026-09-29',
+    tools: ['rotate-pdf'],
+    sections: [
+      {
+        h: 'Why the rotation doesn\'t save',
+        p: [
+          'Most PDF readers, including the ones built into iPhone, Android, Mac and Windows, let you rotate the current view with a button or gesture so a sideways page reads right-side up. That rotation is just how the viewer is displaying the page in that session; it is not written back into the file, so the page opens sideways again next time, and anyone else who opens the PDF sees it unrotated too.',
+        ],
+      },
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview can rotate a page and save it that way: select the page in the sidebar, use the rotate buttons in the toolbar (or **Tools, Rotate Left/Right**), then save the file. This is one of the few built-in viewers that actually writes the rotation into the saved PDF rather than only changing the display.',
+        ],
+      },
+      {
+        h: 'On Windows, iPhone or Android',
+        p: [
+          'None of the default PDF viewers on these platforms (Edge\'s reader, or the Files/Photos apps on iPhone and Android) save a rotation permanently; whatever rotate control they offer only affects that viewing session. This is a genuine gap, not a hidden setting, which is why the fix tends to come up as a repeated search across every platform except Mac.',
+        ],
+      },
+      {
+        h: 'A tool that rotates and saves it for good',
+        p: [
+          'Stayput\'s [rotate PDF](/tools/rotate-pdf) tool rotates all pages or just the ones you select by 90, 180 or 270 degrees and saves the change permanently into a new file, directly in the browser without uploading the document. It works the same way on any device, including Windows, iPhone and Android where there is no built-in equivalent.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why does my PDF keep opening sideways even after I rotate it?', a: 'Most viewers only rotate the on-screen display for that session; the rotation is not saved into the file unless the tool specifically supports saving it, like Preview on a Mac or a dedicated rotate tool.' },
+      { q: 'Can I rotate just one page instead of the whole document?', a: 'Yes, both Preview and a dedicated PDF rotation tool let you select individual pages to rotate rather than applying it to every page.' },
+      { q: 'Does rotating a PDF affect its text or image quality?', a: 'No, rotation only changes the page\'s orientation; the underlying text and images are unchanged.' },
+      { q: 'Why are scanned PDFs so often sideways in the first place?', a: 'A scanner or phone camera can capture a page in whatever orientation it was fed or held, and the scanning software doesn\'t always auto-correct it, leaving the saved PDF rotated.' },
+    ],
+  },
+  {
+    slug: 'how-to-slow-down-or-speed-up-a-video',
+    title: 'How to Slow Down or Speed Up a Video',
+    description: 'Changing how fast a video plays, permanently, in the saved file, is different from adjusting playback speed in a player. Here is what phones and computers can do, and a browser tool with proper pitch correction.',
+    heading: 'How to slow down or speed up a video',
+    dek: 'This changes the saved file itself, not just how a player plays it back. Here is what actually works, including keeping the audio in tune.',
+    keywords: ['how to slow down a video', 'how to speed up a video', 'change video speed', 'slow motion video editor free', 'speed up video without app'],
+    updated: '2026-09-29',
+    tools: ['video-speed'],
+    sections: [
+      {
+        h: 'Playback speed versus the actual file',
+        p: [
+          'Many video players, including YouTube and some phone players, let you change playback speed while watching, but that setting only affects how that player shows the video to you; the file itself, and how it plays for anyone else or on any other app, is unchanged. Actually speeding up or slowing down a video means re-encoding a new file at the different speed.',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The Photos app has no built-in speed control for existing videos. iMovie (free on iPhone) can do it: add the clip to a project, select it, and use the speed slider to make it faster or slower, then export. Apple\'s own Slo-Mo camera mode only works for footage recorded that way from the start, not for slowing down existing regular video.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Most Android phones\' default Gallery or Photos apps don\'t include a speed editor. Google Photos\' basic editor also doesn\'t offer this; changing speed typically means a separate video editor app.',
+        ],
+      },
+      {
+        h: 'On a Mac or Windows',
+        p: [
+          'iMovie on Mac works the same way as on iPhone: select the clip, drag the speed slider, export. Windows\' Clipchamp (built into recent versions of Windows) includes a similar speed control on its timeline. Both are full editors for what is otherwise a single adjustment.',
+        ],
+      },
+      {
+        h: 'A direct speed changer with pitch correction',
+        p: [
+          'Stayput\'s [change video speed](/tools/video-speed) tool speeds a video up to 2x, 4x or 8x, or slows it to 0.5x or 0.25x, directly in the browser, and keeps the audio\'s pitch correct rather than letting it sound chipmunk-high or slowed to a growl, which is a common side effect of naive speed changes. Nothing is uploaded to do it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does changing video speed also change the audio pitch?', a: 'It can, unless the tool specifically corrects for it; naive speed changes raise the pitch when sped up and lower it when slowed down, while pitch-correct tools keep the voice or music sounding natural.' },
+      { q: 'Is changing playback speed in a video player the same as actually speeding up the file?', a: 'No, a player\'s speed control only affects how that app plays the video back; the saved file, and how it plays anywhere else, stays at its original speed.' },
+      { q: 'Can I slow down only part of a video, not the whole thing?', a: 'Trim the clip to just the section you want first, then apply the speed change to that shorter clip, since most tools change the speed of the whole file by default.' },
+      { q: 'Why would I want to slow down a video that wasn\'t recorded in slow motion?', a: 'Slowing down regular footage can create a slow-motion effect after the fact, useful when the moment wasn\'t recorded with a slow-motion camera setting to begin with, though it looks less smooth than footage recorded at a genuinely higher frame rate.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-a-watermark-to-a-pdf',
+    title: 'How to Add a Watermark to a PDF (Confidential, Draft, or Copy Number)',
+    description: 'Marking every page of a PDF as confidential, a draft or a numbered copy is not something built-in PDF viewers can do; it usually needs the original document or a dedicated tool. Here is how.',
+    heading: 'How to add a watermark to a PDF',
+    dek: 'Stamping "confidential" or "draft" across every page needs either the original document or a tool built for it. Here is how.',
+    keywords: ['how to add a watermark to a pdf', 'stamp confidential on pdf', 'add draft watermark to pdf', 'pdf watermark free online', 'watermark every page of a pdf'],
+    updated: '2026-09-29',
+    tools: ['watermark-pdf'],
+    sections: [
+      {
+        h: 'What a PDF watermark is for',
+        p: [
+          'A PDF watermark stamps repeated text, such as CONFIDENTIAL, DRAFT, or a recipient\'s name as a copy marker, across every page, usually as a diagonal, semi-transparent overlay that doesn\'t block reading the content underneath. It is meant to discourage a document from being redistributed as if it were final, or to trace which copy went to whom.',
+        ],
+      },
+      {
+        h: 'If you still have the original document',
+        p: [
+          'Word has a built-in watermark feature (**Design, Watermark**) that adds text before exporting to PDF, and it is the easiest path when the source file is still available. This does not help once the document only exists as a PDF, which is the more common situation.',
+        ],
+      },
+      {
+        h: 'On a Mac, Windows, iPhone or Android',
+        p: [
+          'None of the built-in PDF viewers on any platform, Preview included, can stamp a watermark across an existing PDF\'s pages; Preview\'s Markup tool can add text to one page at a time, but not automatically repeat it across every page of a multi-page document.',
+        ],
+      },
+      {
+        h: 'A tool that stamps every page at once',
+        p: [
+          'Stayput\'s [watermark PDF](/tools/watermark-pdf) tool stamps text across every page in one step, diagonally, repeated, or in a corner, directly in the browser, whether or not the original document still exists. It works on a PDF from any source, including a scan or one someone else sent you.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I watermark a PDF I no longer have the original document for?', a: 'Yes, a tool that stamps the watermark directly onto the existing PDF pages works regardless of what created the file or whether the source document still exists.' },
+      { q: 'Does a watermark block someone from reading the document?', a: 'No, a proper watermark is semi-transparent and placed so it doesn\'t obscure the text; its purpose is visibility as a marker, not blocking access to the content.' },
+      { q: 'Can I put a different watermark on each copy, like a recipient\'s name?', a: 'Yes, since the watermark text is set per file, each copy sent to a different person can carry that person\'s name or a unique copy number, useful for tracing which copy leaked if a document is redistributed.' },
+      { q: 'Does watermarking a PDF change its other content?', a: 'No, it adds a new layer of text on top of each page without altering the existing text, images or layout underneath.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-a-gif-to-mp4',
+    title: 'How to Convert a GIF to MP4',
+    description: 'A GIF is often far larger than the equivalent video, and some places do not accept it at all. Converting to MP4 shrinks the file and makes it playable everywhere. Here is how.',
+    heading: 'How to convert a GIF to MP4',
+    dek: 'A GIF of the same clip is usually much bigger than an MP4, and some platforms will not accept a GIF at all. Here is how to convert it.',
+    keywords: ['how to convert a gif to mp4', 'gif to video converter', 'gif to mp4 free', 'shrink a gif file', 'convert animated gif to video'],
+    updated: '2026-09-29',
+    tools: ['gif-to-mp4'],
+    sections: [
+      {
+        h: 'Why convert a GIF to MP4 at all',
+        p: [
+          'GIF stores every frame with limited color compression, which makes an animated GIF file far larger than a video of the same clip using modern video compression. Some platforms and messaging apps also handle a GIF differently from a video, or don\'t accept one at all in certain upload spots, which is the other common reason to convert.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Photos app has a built-in GIF-to-video converter; a GIF saved to the camera roll stays a GIF unless something converts it. Some messaging apps automatically convert a GIF to a short video internally when sending it, but that conversion isn\'t something you control or can save as your own file.',
+        ],
+      },
+      {
+        h: 'On a Mac or Windows',
+        p: [
+          'There is no built-in converter in Preview, Photos, or File Explorer on either platform for turning a GIF into a video file; both mainly treat a GIF as an image that happens to animate, not as source video to re-encode.',
+        ],
+      },
+      {
+        h: 'A direct converter to MP4',
+        p: [
+          'Stayput\'s [GIF to MP4](/tools/gif-to-mp4) tool converts animated GIFs to MP4 video directly in the browser, in a batch, without uploading the files. The resulting MP4 is typically a fraction of the original GIF\'s size and plays correctly as a video on Instagram, WhatsApp, X and in slide decks where a GIF sometimes doesn\'t behave as expected.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why is a GIF so much bigger than the same clip as MP4?', a: 'GIF uses an older, less efficient compression scheme with a limited color palette per frame; MP4 uses modern video compression designed specifically to keep motion video small.' },
+      { q: 'Does converting a GIF to MP4 lose the animation loop?', a: 'A converted MP4 can be set to loop the same way a GIF does in most players and platforms, though the setting to loop it depends on where it is played, not the file itself.' },
+      { q: 'Will an MP4 look the same quality as the original GIF?', a: 'Generally as good or better, since MP4\'s compression preserves more color detail than GIF\'s limited palette, while also producing a smaller file.' },
+      { q: 'Can I convert several GIFs to MP4 at once?', a: 'Yes, a browser-based batch converter can process multiple GIF files in one go rather than one at a time.' },
+    ],
+  },
+  {
+    slug: 'how-to-reorder-pages-in-a-pdf',
+    title: 'How to Reorder Pages in a PDF',
+    description: 'Fixing the order of pages in a PDF, or deleting the ones you do not need, is easy on a Mac but missing from most other built-in PDF viewers. Here is what works everywhere.',
+    heading: 'How to reorder pages in a PDF',
+    dek: 'Rearranging pages is built into Preview on a Mac, but missing on Windows, iPhone and Android. Here is what works on every device.',
+    keywords: ['how to reorder pdf pages', 'rearrange pages in a pdf', 'delete pages from a pdf', 'change pdf page order free', 'move pages in a pdf document'],
+    updated: '2026-09-29',
+    tools: ['reorder-pdf'],
+    sections: [
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview\'s sidebar (View, **Thumbnails**) shows every page, and dragging a thumbnail to a new position moves it, while selecting a page and pressing delete removes it. Save the file afterward. This is one of the few built-in PDF viewers that supports rearranging pages directly.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Edge\'s PDF reader can delete a page (right-click a thumbnail in the sidebar, **Delete**) but has no way to drag pages into a new order; reordering isn\'t supported in the built-in viewer at all.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Files app or default PDF viewer supports reordering or deleting individual pages from an existing PDF. This is a genuine gap on mobile, not a hidden setting.',
+        ],
+      },
+      {
+        h: 'A page thumbnail view that works on any device',
+        p: [
+          'Stayput\'s [reorder & delete pages](/tools/reorder-pdf) tool shows every page as a thumbnail, lets you drag them into a new order and remove the ones you don\'t need, then saves the result, directly in the browser without uploading the document. It works the same way on a phone or a computer, unlike Preview\'s drag-and-drop which is Mac-only.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I delete a page from a PDF without deleting others?', a: 'Yes, both Preview\'s sidebar and a dedicated page-management tool let you select and remove one page while leaving the rest of the document intact.' },
+      { q: 'Can I reorder pages on an iPhone or Android?', a: 'Not with the built-in Files app or default PDF viewer on either platform; a browser-based tool that shows page thumbnails works the same way on mobile as on a computer.' },
+      { q: 'Does reordering pages change their content?', a: 'No, it only changes the position of each page in the document; the text and images on each page stay exactly as they were.' },
+      { q: 'Can I undo a page deletion after saving?', a: 'Once saved, the deleted page is gone from that file; keep a copy of the original PDF beforehand if there is any chance you\'ll need the removed page again.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-music-to-a-video',
+    title: 'How to Add Music or Audio to a Video',
+    description: 'Putting a song, voice-over or sound effect onto a video, without losing the video quality, usually needs more than a phone camera roll. Here is what actually works.',
+    heading: 'How to add music to a video',
+    dek: 'Adding a soundtrack to an existing video is not something most camera rolls support directly. Here is what does the job.',
+    keywords: ['how to add music to a video', 'add audio to a video free', 'put a song on a video', 'add background music to video online', 'replace video sound with music'],
+    updated: '2026-09-29',
+    tools: ['add-audio-to-video'],
+    sections: [
+      {
+        h: 'Adding versus replacing',
+        p: [
+          'Adding audio to a video can mean two different things: mixing a new track (music, a voice-over) in alongside the video\'s existing sound, or replacing the original sound entirely with something else, such as swapping in a licensed song for a clip that had no usable audio.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'The Photos app has no built-in way to add or swap a video\'s soundtrack. Some social apps (Instagram Reels, TikTok) let you add music at the point of posting, but that only applies within that app, not to a video file you can save and use elsewhere.',
+        ],
+      },
+      {
+        h: 'On a Mac with iMovie',
+        p: [
+          'iMovie can add an audio track: import the video into a project, drag a song or audio file onto the timeline below the video, and adjust its volume or fade. Export when done. This works well but requires building a small project for what might be a one-off edit.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Clipchamp (built into recent versions of Windows) supports adding an audio track to a video timeline similarly to iMovie. There is no equivalent in the simpler Photos app video editor.',
+        ],
+      },
+      {
+        h: 'A direct tool for adding or swapping sound',
+        p: [
+          'Stayput\'s [add audio to video](/tools/add-audio-to-video) tool puts an MP3, WAV or M4A onto a video, or swaps in the audio from another clip, with options to mix or fully replace the original sound, loop a short track to match the video\'s length, and fade in or out, directly in the browser. The picture is copied over untouched, and nothing is uploaded.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I add music to a video without a full video editor?', a: 'Yes, a tool built specifically for adding or replacing audio skips the timeline, transitions and other features a full editor like iMovie or Clipchamp includes.' },
+      { q: 'Can I keep the original sound and add music on top?', a: 'Yes, mixing keeps both the original audio and the new track together at whatever relative volume you set, rather than replacing one with the other.' },
+      { q: 'What happens if my music track is shorter than the video?', a: 'A tool with a loop option repeats the track to fill the video\'s length; without it, the audio simply stops early and the rest of the video plays silent or on its original sound.' },
+      { q: 'Does adding audio reduce video quality?', a: 'No, a well-built tool copies the video stream unchanged and only adds or replaces the separate audio track.' },
+    ],
+  },
+  {
+    slug: 'how-to-make-a-favicon',
+    title: 'How to Make a Favicon (and the Other Icons a Website Needs)',
+    description: 'A modern website needs more than a single favicon.ico: Apple touch icons, Android icons and a manifest file, each a different size. Here is how to generate the full set from one logo.',
+    heading: 'How to make a favicon',
+    dek: 'A modern site needs more than one favicon.ico; here is how to generate the whole set of icons from a single logo.',
+    keywords: ['how to make a favicon', 'favicon generator free', 'create apple touch icon', 'favicon ico from png', 'website icon generator'],
+    updated: '2026-09-29',
+    tools: ['favicon-generator'],
+    sections: [
+      {
+        h: 'Why one favicon.ico isn\'t enough anymore',
+        p: [
+          'Browsers, Apple\'s home-screen icon, Android\'s icon system and web app manifests each expect their own icon file, in different sizes and sometimes different formats: a classic .ico for browser tabs, PNGs at specific sizes for Apple touch icons and Android, and a site.webmanifest file describing them. Missing one means a blank or default icon in that context, even if the browser tab icon looks fine.',
+        ],
+      },
+      {
+        h: 'Making the source image',
+        p: [
+          'Whatever generates the icon set needs a single clean source image to start from, typically a square logo or mark at a reasonably high resolution (512px or larger works well), since every other size is produced by scaling down from it. A simple, high-contrast mark scales down more legibly than a detailed logo, which can turn into a blur at 16x16 pixels.',
+        ],
+      },
+      {
+        h: 'Doing it by hand',
+        p: [
+          'It is possible to resize a logo to each required size manually in any image editor and name the files correctly, but getting every size, format and the manifest file right (there are a dozen or so distinct files for full coverage) is tedious and easy to get subtly wrong, which shows up as a missing icon on just one platform.',
+        ],
+      },
+      {
+        h: 'A generator that produces the whole set at once',
+        p: [
+          'Stayput\'s [favicon generator](/tools/favicon-generator) tool takes one PNG, JPG or SVG logo and produces favicon.ico, the Apple touch icon, Android and maskable icons, and a site.webmanifest file, plus the HTML snippet to paste into a page\'s head, all generated in the browser without uploading the logo.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What size should my source logo be?', a: 'At least 512x512 pixels is a safe starting point, since every icon size needed is produced by scaling down from the source; starting too small means the largest generated icons will look soft.' },
+      { q: 'Do I need a favicon.ico if I already have PNG icons?', a: 'Yes, some older browsers and contexts specifically look for favicon.ico by name, so it is still worth including alongside the newer PNG-based icons.' },
+      { q: 'What is a maskable icon?', a: 'An Android-specific icon format with extra padding so the system can crop it into different shapes (circle, rounded square) without cutting off important parts of the logo.' },
+      { q: 'Can I generate a favicon from an SVG logo?', a: 'Yes, an SVG source can be rasterized to each required PNG size, often with cleaner results than starting from an already-rasterized image.' },
+    ],
+  },
+  {
+    slug: 'how-to-get-a-color-code-from-an-image',
+    title: 'How to Get a Color Code From an Image (Eyedropper)',
+    description: 'Finding the exact hex or RGB code of a color you see in a photo needs an eyedropper tool, which most built-in photo viewers do not include. Here is what works, including on a phone.',
+    heading: 'How to get a color code from an image',
+    dek: 'Matching a color you see in a photo needs an eyedropper, which most photo viewers do not have built in. Here is what actually gets the exact code.',
+    keywords: ['how to get color code from image', 'eyedropper tool online', 'find hex code from a photo', 'color picker from picture free', 'get rgb value from image'],
+    updated: '2026-09-29',
+    tools: ['color-picker'],
+    sections: [
+      {
+        h: 'Why you can\'t just guess a color code',
+        p: [
+          'Two shades that look almost identical to the eye can have noticeably different hex codes, and matching a brand color, a paint swatch or a design element exactly needs a tool that samples the actual pixel value rather than a visual estimate.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'The built-in Digital Color Meter app (in Applications, Utilities) shows the RGB value under the cursor anywhere on screen, including over an open image. It is accurate but shows raw values rather than a convenient hex code, and it is a separate app most people don\'t know exists.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Windows has no built-in eyedropper for an arbitrary open image; the closest built-in option is the color picker inside Paint (choose the eyedropper tool, click a pixel, then check the color properties for its code), which requires opening the image in Paint specifically.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Photos app includes an eyedropper or color-code tool. Some design apps include one, but that means installing something just for an occasional lookup.',
+        ],
+      },
+      {
+        h: 'A browser eyedropper with a magnifier',
+        p: [
+          'Stayput\'s [color picker from image](/tools/color-picker) tool drops in a photo and shows a magnified view so you can point at the exact pixel, then copies its HEX, RGB or HSL code. It also extracts the image\'s main colors as a palette, and works the same way on a phone or a computer, all in the browser without uploading the photo.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the difference between HEX, RGB and HSL?', a: 'They are different ways of writing the same color: HEX is a six-digit code used mainly in web design, RGB gives separate red, green and blue values, and HSL describes hue, saturation and lightness, which is sometimes more intuitive for adjusting a shade.' },
+      { q: 'Can I get a color code from a photo on my phone?', a: 'Yes, with a browser-based eyedropper tool; neither iPhone nor Android has a built-in way to do this from the Photos app.' },
+      { q: 'How accurate is a screen color picker?', a: 'It reads the exact pixel value as displayed, which is accurate for that image and device, though the same color can render slightly differently across screens with different color calibration.' },
+      { q: 'Can I get a full palette of colors from an image, not just one pixel?', a: 'Yes, a tool that extracts the main colors from an image gives a small palette representing its dominant shades, useful for matching a design to a photo\'s overall look.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);

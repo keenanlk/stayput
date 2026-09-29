@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(47);
+  expect(await page.locator('.tool-card').count()).toBe(50);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'volume-booster'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -968,6 +968,9 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['2x2-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('us')],
     ['35x45-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('eu')],
+    ['linkedin-profile-picture', 'profile-picture-maker', async () => expect(page.locator('input[name="shape"][value="square"]')).toBeChecked()],
+    ['whatsapp-sticker-maker', 'sticker-maker', async () => expect(page.locator('#size')).toHaveValue('512')],
+    ['pdf-metadata-viewer', 'remove-pdf-metadata', async () => expect(page.locator('#run')).toContainText('Remove metadata')],
     ['confidential-watermark', 'watermark-pdf', async () => expect(page.locator('#wm-text')).toHaveValue('CONFIDENTIAL')],
     ['watermark-id-copy', 'watermark-image', async () => expect(page.locator('input[name="layout"][value="tiled"]')).toBeChecked()],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
@@ -3331,6 +3334,150 @@ test('Watermark PDF stamps every page, keeps the text, and no bytes leave the ta
   expect(now).toBe(was);
   net.assertNothingLeft(['rotated.pdf']);
   expect(errors).toEqual([]);
+});
+
+test('Remove PDF metadata lists and strips author, XMP and file ID, keeps the pages, and no bytes leave the tab', async ({ page }) => {
+  // A PDF with the kinds of metadata Word, Acrobat and Illustrator leave behind.
+  const src = await PDFDocument.create({ updateMetadata: false });
+  src.setTitle('Q3 layoffs draft');
+  src.setAuthor('Jane Q. Whistle');
+  src.setCreator('Microsoft Word for Microsoft 365');
+  src.setProducer('Acrobat PDFMaker 23');
+  src.setCreationDate(new Date('2026-03-04T10:00:00Z'));
+  const p = src.addPage([300, 300]);
+  const font = await src.embedFont('Helvetica');
+  p.drawText('Visible text stays', { x: 20, y: 150, size: 14, font });
+  const xmp = src.context.stream('<x:xmpmeta xmlns:x="adobe:ns:meta/"><dc:creator>Jane Q. Whistle</dc:creator></x:xmpmeta>', { Type: 'Metadata', Subtype: 'XML' });
+  src.catalog.set(PDFName.of('Metadata'), src.context.register(xmp));
+  p.node.set(PDFName.of('PieceInfo'), src.context.obj({ Illustrator: { Private: 'layer data by Jane' } }));
+  src.context.trailerInfo.ID = src.context.obj([src.context.obj('abc'), src.context.obj('abc')]);
+  const bytes = await src.save({ useObjectStreams: false });
+  const dir = mkdtempSync(join(tmpdir(), 'meta-'));
+  const file = join(dir, 'memo.pdf');
+  writeFileSync(file, bytes);
+
+  const errors = await open(page, 'remove-pdf-metadata');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [file], async () => {
+    const report = page.locator('#meta-report');
+    await expect(report).toContainText('Author: Jane Q. Whistle');
+    await expect(report).toContainText('Created with: Microsoft Word');
+    await expect(report).toContainText('Created: 2026-03-04');
+    await expect(report).toContainText('XMP metadata: 1 packet');
+    await expect(report).toContainText('PieceInfo');
+    await expect(report).toContainText('File ID: yes');
+  });
+  // Same name, so the file does not announce it was cleaned.
+  expect(downloads[0]!.suggestedFilename()).toBe('memo.pdf');
+  const out = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(out, { updateMetadata: false });
+  expect(doc.getAuthor()).toBeUndefined();
+  expect(doc.getTitle()).toBeUndefined();
+  expect(doc.getCreator()).toBeUndefined();
+  expect(doc.getProducer()).toBeUndefined();
+  expect(doc.catalog.get(PDFName.of('Metadata'))).toBeUndefined();
+  expect(doc.getPage(0).node.get(PDFName.of('PieceInfo'))).toBeUndefined();
+  expect(doc.context.trailerInfo.ID).toBeUndefined();
+  // The name is gone from every byte of the file, not just unlinked.
+  expect(Buffer.from(out).includes('Whistle')).toBe(false);
+  expect(Buffer.from(out).includes('Jane')).toBe(false);
+  expect((await textItems(out, 1)).map((t) => t.str).join('')).toBe('Visible text stays');
+  net.assertNothingLeft(['memo.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Remove PDF metadata cleans restricted and scanned PDFs without losing pages', async ({ page }) => {
+  const errors = await open(page, 'remove-pdf-metadata');
+  const files = [staticFx('owner-locked.pdf'), fx('scan.pdf'), fx('article.pdf')];
+  const { items } = await run(page, files);
+  expect(items).toBe(3);
+  const zipped = await zipAll(page);
+  for (const f of files) {
+    const name = f.split('/').pop()!;
+    const pages = (await getDocument({ data: new Uint8Array(readFileSync(f)) }).promise).numPages;
+    const after = await PDFDocument.load(zipped[name]!, { updateMetadata: false });
+    expect(after.isEncrypted).toBe(false);
+    expect(after.getPageCount()).toBe(pages);
+    expect(after.getProducer()).toBeUndefined();
+  }
+  expect(errors).toEqual([]);
+});
+
+test('Sticker maker cuts out the subject with a white border, and makes a WhatsApp-ready WebP', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'sticker-maker');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('pug.jpg')]);
+  const [d] = await Promise.all([page.waitForEvent('download', { timeout: 180_000 }), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('pug-sticker.png');
+  const png = await bytesOf(d);
+  const { width, height } = pngSize(png);
+  // Trimmed to the pug: much smaller than the 640 x 426 photo, taller than wide.
+  expect(width).toBeLessThan(300);
+  expect(height).toBeGreaterThan(width);
+  // Corners are transparent; a white border runs round the subject.
+  expect((await pixelAt(page, png, 1, 1))[3]).toBe(0);
+  const edge = await page.evaluate(async (b64) => {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([arr]));
+    const c = document.createElement('canvas');
+    c.width = bmp.width;
+    c.height = bmp.height;
+    const g = c.getContext('2d')!;
+    g.drawImage(bmp, 0, 0);
+    // First opaque pixel along the middle row, from the left: the border.
+    const y = Math.round(c.height * 0.6);
+    const row = g.getImageData(0, y, c.width, 1).data;
+    for (let x = 0; x < c.width; x++) if (row[x * 4 + 3]! > 250) return [...row.slice(x * 4 + 8, x * 4 + 12)];
+    return [];
+  }, Buffer.from(png).toString('base64'));
+  expect(Math.min(...edge.slice(0, 3))).toBeGreaterThan(235);
+
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('pug.jpg')]);
+  await page.locator('#size').selectOption('512');
+  await page.locator('#format').selectOption('image/webp');
+  const [w] = await Promise.all([page.waitForEvent('download', { timeout: 180_000 }), page.locator('#run').click()]);
+  expect(w.suggestedFilename()).toBe('pug-sticker.webp');
+  const webp = await bytesOf(w);
+  expect(String.fromCharCode(...webp.subarray(8, 12))).toBe('WEBP');
+  expect(webp.length).toBeLessThanOrEqual(100_000);
+  const dims = await page.evaluate(async (b64) => {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([arr], { type: 'image/webp' }));
+    return [bmp.width, bmp.height];
+  }, Buffer.from(webp).toString('base64'));
+  expect(dims).toEqual([512, 512]);
+  net.assertNothingLeft(['pug.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Profile picture maker frames the face on a colour, as a circle, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'profile-picture-maker');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('face.jpg')]);
+  const [d] = await Promise.all([page.waitForEvent('download', { timeout: 180_000 }), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('face-profile.png');
+  const png = await bytesOf(d);
+  expect(pngSize(png)).toEqual({ width: 1024, height: 1024 });
+  // Circle: transparent corners; yellow background inside the circle beside the head.
+  expect((await pixelAt(page, png, 4, 4))[3]).toBe(0);
+  const bg = await pixelAt(page, png, 150, 300);
+  expect(bg[3]).toBe(255);
+  expect(Math.abs(bg[0]! - 0xf2) + Math.abs(bg[1]! - 0xc1) + Math.abs(bg[2]! - 0x4e)).toBeLessThan(12);
+  // The face is in the middle, not background.
+  const mid = await pixelAt(page, png, 512, 470);
+  expect(Math.abs(mid[0]! - 0xf2) + Math.abs(mid[1]! - 0xc1) + Math.abs(mid[2]! - 0x4e)).toBeGreaterThan(60);
+  net.assertNothingLeft(['face.jpg']);
+  expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
 });
 
 test('Trim audio shows the waveform and cuts the chosen part to a WAV, and no bytes leave the tab', async ({ page }) => {
