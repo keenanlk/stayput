@@ -157,3 +157,12 @@ test('a missing file is a tool error that names the path, not a crash', async ()
   assert.equal(res.isError, true);
   assert.match(text(res), /nope\.pdf/);
 });
+
+test('package.json, server.json and the server agree on name and version', async () => {
+  const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+  const reg = JSON.parse(await readFile(new URL('../server.json', import.meta.url), 'utf8'));
+  assert.equal(reg.name, pkg.mcpName);
+  assert.equal(reg.version, pkg.version);
+  assert.deepEqual(reg.packages.map((p) => [p.identifier, p.version]), [[pkg.name, pkg.version]]);
+  assert.equal(client.getServerVersion().version, pkg.version);
+});
