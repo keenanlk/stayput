@@ -1,9 +1,11 @@
-import { createShell, processEach, radio, str } from '../lib/shell';
+import { bindRange, createShell, num, processEach, radio, str } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
-import { coverage, cutout, findSubject } from '../lib/background';
+import { blurBackground, coverage, cutout, findSubject } from '../lib/background';
 
 const colorField = document.getElementById('bg-color-field')!;
+const strengthField = document.getElementById('strength-field')!;
+bindRange('strength', 'strength-out');
 const format = document.getElementById('format') as HTMLSelectElement;
 const jpg = format.querySelector<HTMLOptionElement>('option[value="image/jpeg"]')!;
 
@@ -11,6 +13,7 @@ const jpg = format.querySelector<HTMLOptionElement>('option[value="image/jpeg"]'
 const sync = () => {
   const bg = radio('bg', 'transparent');
   colorField.hidden = bg !== 'color';
+  strengthField.hidden = bg !== 'blur';
   jpg.disabled = bg === 'transparent';
   if (jpg.disabled && format.value === 'image/jpeg') format.value = 'image/png';
 };
@@ -27,8 +30,10 @@ function background(): string | undefined {
 createShell({
   async process(files, progress) {
     const fill = background();
+    const blurred = radio('bg', 'transparent') === 'blur';
+    const strength = num('strength', 5);
     const type = str('format', 'image/png') as EncodeType;
-    return processEach(files, progress, 'Removing the background from', async (entry, index) => {
+    return processEach(files, progress, blurred ? 'Blurring the background of' : 'Removing the background from', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
       const { bitmap } = await decodeImage(entry.file);
       try {
@@ -38,12 +43,12 @@ createShell({
         );
         if (coverage(mask) < 0.005) throw new Error('No subject was found in this photo. It works best on a clear person, animal or object against its background.');
         progress.set(`Saving ${entry.file.name}…`, share(0.9));
-        const canvas = cutout(bitmap, mask, { background: fill });
+        const canvas = blurred ? blurBackground(bitmap, mask, strength) : cutout(bitmap, mask, { background: fill });
         const blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : 0.92);
         if (blob.type !== type) throw new Error(`This browser cannot save ${type.replace('image/', '').toUpperCase()} images. Choose PNG.`);
         const preview = await createImageBitmap(canvas);
         const out: OutputFile = {
-          name: suffixName(entry.file.name, '-no-bg', extForType(type)),
+          name: suffixName(entry.file.name, blurred ? '-blurred-bg' : '-no-bg', extForType(type)),
           blob,
           previewUrl: await thumbnail(preview),
           note: `${bitmap.width}×${bitmap.height}`,

@@ -954,6 +954,11 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['color-picker-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
     ['make-background-transparent', 'remove-background', async () => {
+    ['blur-background', 'remove-background', async () => {
+      await expect(page.locator('input[name="bg"][value="blur"]')).toBeChecked();
+      await expect(page.locator('#strength-field')).toBeVisible();
+      await expect(page.locator('#format')).toHaveValue('image/jpeg');
+    }],
       await expect(page.locator('input[name="bg"][value="transparent"]')).toBeChecked();
       await expect(page.locator('#format')).toHaveValue('image/png');
     }],
@@ -3188,4 +3193,46 @@ test('MP3 cutter saves an MP3 of the chosen part, faded out by default', async (
   expect(after.seconds).toBeLessThan(0.58);
   expect(Math.abs(after.hz - before.hz)).toBeLessThan(before.hz * 0.05);
   await expect(page.locator('#results-list .result-item')).toContainText('fade out');
+});
+
+test('Blur background keeps the subject sharp and softens the scene behind it', async ({ page }) => {
+  test.setTimeout(240_000);
+  await stubAnalytics(page);
+  await page.goto('/blur-background');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('face.jpg')]);
+  const [d] = await Promise.all([page.waitForEvent('download', { timeout: 180_000 }), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('face-blurred-bg.jpg');
+  const out = await bytesOf(d);
+  const src = readFileSync(staticFx('face.jpg'));
+  // Local contrast in the flag stripes (top left) drops; the face keeps its detail.
+  const contrast = (bytes: Uint8Array, x: number, y: number) =>
+    page.evaluate(
+      async ([b64, px, py]) => {
+        const bin = atob(b64 as string);
+        const arr = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+        const bmp = await createImageBitmap(new Blob([arr]));
+        const c = document.createElement('canvas');
+        c.width = bmp.width;
+        c.height = bmp.height;
+        const ctx = c.getContext('2d')!;
+        ctx.drawImage(bmp, 0, 0);
+        const d = ctx.getImageData(px as number, py as number, 24, 24).data;
+        let lo = 255;
+        let hi = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const v = (d[i]! + d[i + 1]! + d[i + 2]!) / 3;
+          lo = Math.min(lo, v);
+          hi = Math.max(hi, v);
+        }
+        return hi - lo;
+      },
+      [Buffer.from(bytes).toString('base64'), x, y],
+    );
+  expect(await contrast(out, 10, 150)).toBeLessThan((await contrast(src, 10, 150)) * 0.6);
+  expect(await contrast(out, 185, 110)).toBeGreaterThan((await contrast(src, 185, 110)) * 0.8);
+  // Every pixel is opaque: a blurred scene, not a hole.
+  expect((await pixelAt(page, out, 8, 8))[3]).toBe(255);
+  net.assertNothingLeft(['face.jpg']);
 });
