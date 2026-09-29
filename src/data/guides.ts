@@ -934,6 +934,232 @@ export const guides: Guide[] = [
       { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so the PDF never leaves your device. It keeps working with the network off once the page has loaded.' },
     ],
   },
+  {
+    slug: 'is-ezgif-safe',
+    title: 'Is Ezgif Safe? What Happens to Your Uploads, and a No-Upload GIF Maker',
+    description: 'Ezgif is a long-running GIF editor from Latvia that deletes uploads an hour after last use. What its policy covers, why the ads matter, and how to make GIFs without uploading.',
+    heading: 'Is ezgif safe?',
+    dek: 'Ezgif is a legitimate, popular GIF tool with a short deletion window. The file you are about to drop in decides whether uploading it is fine.',
+    keywords: ['is ezgif safe', 'ezgif safe', 'is ezgif legit', 'is ezgif.com safe', 'ezgif privacy', 'ezgif virus', 'ezgif alternative'],
+    updated: '2026-09-29',
+    tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'Yes, in the ordinary sense. Ezgif.com has been one of the go-to GIF editors for years, and its about page says it is developed and hosted by Open Idea, a small company in Latvia. Using it does not put malware on your computer, and it states a short retention period for the files you give it.',
+          'Every ezgif tool works on its servers: the video or image you choose is uploaded, edited there, and the result is shown back to you. So for a meme or a game clip there is little to think about. For a screen recording that shows your inbox, a video of your children, or anything from work, the useful question is whether that file should be uploaded at all.',
+        ],
+      },
+      {
+        h: 'What ezgif’s privacy page says',
+        p: ['From ezgif’s privacy and about pages, as checked on 29 September 2026:'],
+        list: [
+          '**Deletion.** Uploaded files stay on its servers for up to one hour after they were last used with its tools, then are deleted automatically.',
+          '**Visibility.** File names are not listed publicly.',
+          '**Cookies and ads.** The site uses cookies to analyse traffic with anonymised, aggregated data, to remember preferences and to serve advertisements.',
+          '**Operator.** Developed and hosted by Open Idea, Latvia. The site is served over HTTPS.',
+        ],
+        after: ['The privacy page does not describe certifications, encryption at rest or who else can reach the servers, which is typical for a small free tool rather than a warning sign.'],
+      },
+      {
+        h: 'The two real risks',
+        p: [
+          'The first is the upload itself. A screen capture or phone video can hold more than you notice: notifications, names, addresses on envelopes, a location in the background. Once uploaded, it sits on a server you cannot inspect until the hour-after-last-use timer runs out, and each edit you make restarts that clock.',
+          'The second is the ads. Ezgif is free because it shows advertising, and on any ad-supported download site the risk is clicking a large advert styled as a download button. Save your result with the link under the output image, or by right-clicking the image itself.',
+        ],
+      },
+      {
+        h: 'Making GIFs without uploading',
+        p: [
+          'Modern browsers can decode video and encode GIFs on your own device. Stayput’s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs inside the page, with trimming, size and frame-rate settings. [GIF to MP4](/tools/gif-to-mp4) goes the other way for a much smaller file, [Crop image](/tools/crop-image) trims a still, and [Compress image](/tools/compress-image) shrinks one. Nothing is sent anywhere, there are no ads next to the download, and once loaded the pages work in airplane mode.',
+          'Ezgif still does more GIF-specific editing than these tools, such as frame-by-frame editing, effects and text overlays on animations. For a harmless clip it is a fine choice; for a private recording, convert it locally.',
+        ],
+      },
+      {
+        h: 'Check any GIF site yourself',
+        p: [
+          'Open the browser’s network panel, add your video, and watch for a request about the size of the file. Or load the page, turn off Wi-Fi and try it. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both tests.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is ezgif legit?', a: 'Yes. It is a long-established free GIF editor, developed and hosted by Open Idea in Latvia according to its about page.' },
+      { q: 'How long does ezgif keep my files?', a: 'Its privacy page says uploads are kept up to one hour after they were last used with its tools and then deleted automatically.' },
+      { q: 'Can ezgif give my computer a virus?', a: 'Converting a file there does not. The usual risk on ad-supported sites is clicking an advert that looks like a download button, so save the result from the output itself.' },
+      { q: 'How do I make a GIF without uploading the video?', a: 'Use a converter that runs in the browser. Stayput’s Video to GIF encodes the GIF on your device; switch off the network after the page loads and it still works.' },
+    ],
+  },
+  {
+    slug: 'is-pdf24-safe',
+    title: 'Is PDF24 Safe? Online Tools vs PDF24 Creator, and a No-Install Option',
+    description: 'PDF24 is run by Geek Software GmbH in Germany and deletes online uploads after one hour. How its online and desktop versions differ, and how to edit PDFs in the browser without uploading.',
+    heading: 'Is PDF24 safe?',
+    dek: 'PDF24 is a long-standing German project, and it tells you itself that its offline app is the more private option. Here is how to choose between the two, and a third way.',
+    keywords: ['is pdf24 safe', 'pdf24 safe', 'is pdf24 legit', 'is pdf24 tools safe', 'pdf24 privacy', 'pdf24 creator safe'],
+    updated: '2026-09-29',
+    tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'PDF24 is legitimate. It is operated by Geek Software GmbH, a German company, which says it has been developing the PDF24 tools since 2006. Both its online tools and its PDF24 Creator desktop app are free.',
+          'What makes PDF24 unusual is that it answers the privacy question on its own homepage: the online tools process files on its servers, and if you want to be more secure, it recommends PDF24 Creator, where files stay on your PC. So which PDF24 you use matters more than whether PDF24 is safe.',
+        ],
+      },
+      {
+        h: 'What PDF24 says about the online tools',
+        p: ['From tools.pdf24.org and the Geek Software privacy policy, as checked on 29 September 2026:'],
+        list: [
+          '**Processing.** The online tools run on PDF24’s own servers, not in your browser.',
+          '**Deletion.** Uploaded files are deleted from the server automatically after one hour, and you can remove them sooner yourself.',
+          '**Encryption.** File transfers to its servers are encrypted.',
+          '**Law.** As a German company it processes data under the GDPR.',
+          '**Offline option.** PDF24 Creator for Windows provides the same tools offline, with files kept on your computer.',
+        ],
+      },
+      {
+        h: 'Choosing between online, desktop and in-browser',
+        p: [
+          'The online tools are convenient and, for ordinary PDFs, the one-hour deletion rule is a sensible design. The trade-off is the same as any upload service: for that hour your document sits on a server you cannot see into.',
+          'PDF24 Creator removes the upload, but it is Windows software you install and keep updated, which is not an option on a Mac, a Chromebook, a phone or a locked-down work laptop. Tools that run inside a web page sit between the two: nothing to install, and nothing uploaded.',
+        ],
+      },
+      {
+        h: 'PDF jobs in the browser, without uploading',
+        p: [
+          'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work on any device with a modern browser and keep working with the network switched off.',
+          'PDF24 has a far larger toolbox, including Office conversions, OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on any other device, a browser tool avoids both the upload and the install.',
+        ],
+      },
+      {
+        h: 'See for yourself where the file goes',
+        p: [
+          'You can confirm PDF24’s own description, or ours, in a minute: watch the network panel while adding a PDF, or try the page in airplane mode. [This guide](/guides/does-this-website-upload-my-files) shows how, and [Is it safe to merge PDFs online?](/guides/is-it-safe-to-merge-pdfs-online) covers the wider risks.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is PDF24 legit?', a: 'Yes. PDF24 is operated by Geek Software GmbH, a German company, and has been developed since 2006.' },
+      { q: 'How long does PDF24 keep uploaded files?', a: 'Its site says files uploaded to the online tools are deleted automatically after one hour, and can be removed manually before then.' },
+      { q: 'Is PDF24 Creator safer than the online tools?', a: 'PDF24 itself says so: Creator processes files on your own PC, so nothing is uploaded. It is Windows software, though.' },
+      { q: 'How can I edit a PDF privately on a Mac or phone?', a: 'Use a tool that works in the browser without uploading, such as Stayput’s PDF tools. After the page loads, they keep working offline.' },
+    ],
+  },
+  {
+    slug: 'is-convertio-safe',
+    title: 'Is Convertio Safe? Its File Deletion Rules, and Converting Without Uploading',
+    description: 'Convertio is run by Convertio Limited in Cyprus, keeps files in the EU and deletes outputs within 24 hours. What that covers, the ads caveat, and how to convert common formats locally.',
+    heading: 'Is Convertio safe?',
+    dek: 'Convertio is a well-known converter with a published deletion policy. For private files, the safer choice is a converter that never receives them.',
+    keywords: ['is convertio safe', 'convertio safe', 'is convertio legit', 'is convertio.co safe', 'convertio privacy', 'convertio virus'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'Convertio.co is a legitimate and widely used converter. Its terms name the operator as Convertio Limited, a company registered in Limassol, Cyprus, and its privacy page sets out how quickly files are removed. For a font, an e-book or an unusual audio format with nothing personal in it, it is a practical option.',
+          'It converts on its servers, which means uploading. Whether that is safe for you depends on the file, not the brand: a vacation photo and a scanned tax return deserve different answers.',
+        ],
+      },
+      {
+        h: 'Convertio’s stated practices',
+        p: ['From Convertio’s privacy page and terms, as checked on 29 September 2026:'],
+        list: [
+          '**Input files** are removed right after conversion.',
+          '**Converted files** are deleted when you click the × next to them, or automatically after 24 hours.',
+          '**Access.** The company says it does not read, look into or copy your files.',
+          '**Location.** Files are kept in the European Union.',
+          '**Transport.** Connections use a secure channel with HSTS enabled.',
+          '**Ads and analytics.** The site uses cookies, Google Analytics and Google AdSense, and third-party advertisers may use their own tracking.',
+        ],
+      },
+      {
+        h: 'Putting that in context',
+        p: [
+          'Deleting inputs immediately and outputs within a day is a reasonable policy for a free converter, and keeping data in the EU brings GDPR protections. What the policy cannot remove is the period in which the converted copy exists on its servers, or the need to take deletion on trust.',
+          'The advertising matters for a different reason. On ad-supported file sites, the thing to avoid is a banner designed to look like a download button. Use the Download button next to your converted file, and ignore anything asking you to install a browser extension or app to finish.',
+        ],
+      },
+      {
+        h: 'Common conversions that never leave your device',
+        p: [
+          'For the formats most people convert, the browser can do the job locally. Stayput’s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF; [HEIC to JPG](/tools/heic-to-jpg) fixes iPhone photos; [Image to PDF](/tools/image-to-pdf) turns photos or scans into a PDF; and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack. The file is processed in the page, there are no ads, and airplane mode proves it.',
+          'Convertio supports hundreds of formats that browsers cannot read, so for those a server is the only practical route. Keep it for files that would not matter if a stranger saw them.',
+        ],
+      },
+      {
+        h: 'A quick test for any converter',
+        p: [
+          'The network panel in your browser shows every request a page makes; an upload looks like one request roughly the size of your file. [Does this website upload my files?](/guides/does-this-website-upload-my-files) explains that check and the faster airplane-mode test.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is Convertio legit?', a: 'Yes. It is operated by Convertio Limited, registered in Cyprus, and is one of the most used online converters.' },
+      { q: 'How long does Convertio keep my files?', a: 'Its privacy page says input files are removed right after conversion and converted files are deleted when you click ×, or after 24 hours automatically.' },
+      { q: 'Where does Convertio store files?', a: 'In the European Union, according to its privacy page.' },
+      { q: 'How do I convert HEIC to JPG without uploading?', a: 'Use a converter that runs in the browser, such as Stayput’s HEIC to JPG. The photo is decoded and re-encoded on your device.' },
+    ],
+  },
+  {
+    slug: 'is-zamzar-safe',
+    title: 'Is Zamzar Safe? Seven-Day Storage, Email Links and a Local Alternative',
+    description: 'Zamzar is a UK converter that keeps free conversions for up to seven days and can email download links. What that means for private files, and how to convert without uploading.',
+    heading: 'Is Zamzar safe?',
+    dek: 'Zamzar is one of the oldest online converters and runs without third-party ads. Its storage window is longer than most, which is the detail worth knowing.',
+    keywords: ['is zamzar safe', 'zamzar safe', 'is zamzar legit', 'is zamzar.com safe', 'zamzar privacy', 'zamzar virus'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
+    sections: [
+      {
+        h: 'The short answer',
+        p: [
+          'Zamzar is legitimate. It is run by Zamzar Limited, a company registered in England, and has been converting files online since 2006. Its privacy policy was last updated in August 2026, and the site says it hosts no third-party advertising, which removes the fake-download-button problem common on free converters.',
+          'The point to understand before uploading something personal is retention. Free conversions can stay on Zamzar’s systems for up to seven days, noticeably longer than services that delete within hours.',
+        ],
+      },
+      {
+        h: 'What Zamzar’s policy says',
+        p: ['From Zamzar’s privacy policy, last modified 14 August 2026, as checked on 29 September 2026:'],
+        list: [
+          '**Free conversions.** Files you submit and their converted outputs are stored for no longer than 7 days.',
+          '**Accounts.** For account holders, data is kept while the account is active; files are permanently removed 35 days after an account is deactivated.',
+          '**Email.** If you give an email address, Zamzar sends links to download your converted files there.',
+          '**Encryption.** Traffic to and from its servers uses TLS.',
+          '**Ads and analytics.** No third-party advertising on zamzar.com; it uses Google Analytics.',
+          '**Service providers.** Data is shared with vendors for server hosting and content delivery.',
+        ],
+      },
+      {
+        h: 'What a seven-day window means',
+        p: [
+          'A week is a design choice that makes email delivery work: the link has to stay valid until you open it. The consequence is that a copy of your file, and the converted result, may sit on a server for days, reachable by anyone who gets the download link from your inbox.',
+          'For a song or a slide deck that is rarely a concern. For an ID scan, payslip or medical letter it is worth avoiding, and some workplaces forbid sending such files to unapproved services at all.',
+        ],
+      },
+      {
+        h: 'Converting on your own device instead',
+        p: [
+          'Stayput’s tools do the most common conversions inside your browser, so there is no copy on a server and no link to expire. Use the [image converter](/tools/convert-image) for JPG, PNG, WebP, HEIC and more, [Compress image](/tools/compress-image) to shrink photos for upload forms, [PDF to image](/tools/pdf-to-image) to turn pages into JPG or PNG, and [Video to MP3](/tools/video-to-mp3) for audio. The result downloads straight from the page.',
+          'Zamzar covers many more formats and offers an API and account features. For obscure formats with nothing private inside, it remains a solid choice.',
+        ],
+      },
+      {
+        h: 'How to tell whether a site uploads',
+        p: [
+          'Load the converter, switch on airplane mode and try a file: server-based tools fail, local ones keep working. [Our guide](/guides/does-this-website-upload-my-files) also shows the network-panel check.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is Zamzar legit?', a: 'Yes. It is operated by Zamzar Limited, a company registered in England, and has run online conversions since 2006.' },
+      { q: 'How long does Zamzar keep my files?', a: 'Its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
+      { q: 'Does Zamzar have ads?', a: 'Its privacy policy says it does not host third-party advertising on zamzar.com. It does use Google Analytics.' },
+      { q: 'Can I convert files without uploading them?', a: 'Yes, for common image, PDF and audio formats. Browser-based tools like Stayput’s process files on your device and work offline once loaded.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
