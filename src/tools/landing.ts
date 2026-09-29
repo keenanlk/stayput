@@ -34,6 +34,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'merge-videos': () => import('./merge-videos'),
   'add-audio-to-video': () => import('./add-audio-to-video'),
   'reverse-video': () => import('./reverse-video'),
+  'video-to-jpg': () => import('./video-to-jpg'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
   'remove-background': () => import('./remove-background'),
