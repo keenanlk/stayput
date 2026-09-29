@@ -3006,18 +3006,27 @@ async function fadeClip(page: Page): Promise<string> {
     c.width = 320;
     c.height = 180;
     const ctx = c.getContext('2d')!;
-    const rec = new MediaRecorder(c.captureStream(30), { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 1e6 });
+    // Frames are pushed by hand and the clip holds black at the start and white at the end,
+    // so a busy CI machine that drops frames still records a dark first and a bright last frame.
+    const stream = c.captureStream(0);
+    const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack;
+    const rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 1e6 });
     const chunks: Blob[] = [];
     rec.ondataavailable = (e) => chunks.push(e.data);
+    const paint = (v: number) => {
+      ctx.fillStyle = `rgb(${v},${v},${v})`;
+      ctx.fillRect(0, 0, 320, 180);
+      track.requestFrame();
+    };
+    paint(0);
     rec.start();
     const t0 = performance.now();
     await new Promise<void>((done) => {
       const frame = () => {
-        const f = Math.min(1, (performance.now() - t0) / 1500);
-        const v = Math.round(255 * f);
-        ctx.fillStyle = `rgb(${v},${v},${v})`;
-        ctx.fillRect(0, 0, 320, 180);
-        if (f < 1) requestAnimationFrame(frame);
+        const t = performance.now() - t0;
+        // 250 ms black, a 1 s fade, then 250 ms white.
+        paint(Math.round(255 * Math.min(1, Math.max(0, (t - 250) / 1000))));
+        if (t < 1500) setTimeout(frame, 33);
         else done();
       };
       frame();
@@ -3049,7 +3058,10 @@ async function firstAndLastBrightness(page: Page, bytes: Uint8Array, type: strin
     c.height = v.videoHeight;
     const ctx = c.getContext('2d')!;
     const at = async (t: number) => {
+      // 'seeked' can fire before the new frame is painted, so also wait for the frame itself
+      // (or a short timeout when the seek lands on the frame already shown).
       await new Promise<void>((ok) => { v.onseeked = () => ok(); v.currentTime = t; });
+      await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); setTimeout(ok, 300); });
       ctx.drawImage(v, 0, 0);
       return ctx.getImageData(c.width >> 1, c.height >> 1, 1, 1).data[0]!;
     };
