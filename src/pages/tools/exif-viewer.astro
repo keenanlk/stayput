@@ -1,0 +1,43 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('exif-viewer')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" class="exif-panel" id="exif-panel" hidden>
+    <div id="exif-report" class="exif-report" aria-live="polite"></div>
+    <p class="exif-remove">
+      <span>Found something you would rather not share?</span>
+      <a class="btn btn-sm" href="/tools/strip-exif" data-to="strip-exif">Remove EXIF data</a>
+    </p>
+  </div>
+</ToolLayout>
+<style is:global>
+  .exif-report { display: grid; gap: 12px; }
+  .exif-card { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+  .exif-card > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .exif-card > header strong { color: var(--ink); overflow-wrap: anywhere; }
+  .exif-card > header span { font-size: 13px; color: var(--muted); }
+  .exif-facts { list-style: none; margin: 0; padding: 4px 14px; display: grid; }
+  .exif-facts li { display: grid; grid-template-columns: 8.5rem 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .exif-facts li:last-child { border-bottom: 0; }
+  .exif-facts .k { color: var(--muted); }
+  .exif-facts .v { color: var(--ink); overflow-wrap: anywhere; }
+  .exif-facts .v .field-row { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .exif-facts li.alert .k { color: var(--warn); font-weight: 600; }
+  .exif-facts li.alert { box-shadow: inset 3px 0 0 var(--warn); margin-left: -14px; padding-left: 14px; }
+  .exif-facts li.clear .v { color: var(--ok); }
+  .exif-card details { border-top: 1px solid var(--line); }
+  .exif-card summary { cursor: pointer; padding: 10px 14px; font-size: 14px; font-weight: 560; color: var(--accent-ink); }
+  .exif-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .exif-table th[scope="rowgroup"] { text-align: left; padding: 12px 14px 4px; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+  .exif-table th[scope="row"] { text-align: left; font-weight: 400; color: var(--muted); padding: 5px 14px; width: 13rem; vertical-align: top; }
+  .exif-table td { padding: 5px 14px 5px 0; color: var(--ink); overflow-wrap: anywhere; font-family: var(--mono); }
+  .exif-table tr.sensitive th[scope="row"] { color: var(--warn); }
+  .exif-remove { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0 0; font-size: 14px; color: var(--ink-2); }
+  @media (max-width: 480px) {
+    .exif-facts li { grid-template-columns: 1fr; gap: 2px; }
+    .exif-table th[scope="row"] { width: 42%; }
+  }
+</style>
+<script src="../../tools/exif-viewer.ts"></script>

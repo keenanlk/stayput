@@ -23,7 +23,7 @@ const resolve = (slug: string): Tool | undefined => {
 const linked = guide.tools.map(resolve).filter((t): t is Tool => !!t);
 const primary = linked[0];
 const more = guides.filter((g) => g.slug !== guide.slug).slice(0, 4);
-const wordCount = guide.sections.reduce((n, s) => n + [...s.p, ...(s.list ?? [])].join(' ').split(/\s+/).length, 0);
+const wordCount = guide.sections.reduce((n, s) => n + [...s.p, ...(s.list ?? []), ...(s.after ?? [])].join(' ').split(/\s+/).length, 0);
 
 const jsonLd = [
   {
@@ -80,6 +80,8 @@ const updated = new Date(guide.updated + 'T00:00:00Z').toLocaleDateString('en-GB
           <h2>{s.h}</h2>
           {s.p.map((p) => <p set:html={inline(p)} />)}
           {s.list && <ul>{s.list.map((li) => <li set:html={inline(li)} />)}</ul>}
+          {s.code && <pre class="code"><code>{s.code}</code></pre>}
+          {s.after?.map((p) => <p set:html={inline(p)} />)}
         </section>
       ))}
 
