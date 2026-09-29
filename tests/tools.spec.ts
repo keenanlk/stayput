@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(25);
+  expect(await page.locator('.tool-card').count()).toBe(26);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -879,6 +879,8 @@ test('preset landing pages render, run their base tool with the preset options a
     ['color-picker-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
     ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
     ['hex-color-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
+    ['gif-to-video', 'gif-to-mp4', async () => expect(page.locator('#repeat')).toHaveValue('auto')],
+    ['animated-gif-to-mp4', 'gif-to-mp4', async () => expect(page.locator('#repeat')).toHaveValue('1')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -2016,4 +2018,87 @@ test('Color picker reads the pixel under a click, finds the main colours, saves 
   expect(px.slice(0, 3)).toEqual([0xe6, 0x39, 0x46]);
   net.assertNothingLeft(['swatches.png']);
   expect(errors).toEqual([]);
+});
+
+/** Walk an MP4's boxes: the video's width and height from tkhd, and its sample count from stsz. */
+function mp4Info(b: Uint8Array) {
+  const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  const type = (o: number) => String.fromCharCode(b[o + 4]!, b[o + 5]!, b[o + 6]!, b[o + 7]!);
+  const info = { brand: String.fromCharCode(...b.subarray(8, 12)), width: 0, height: 0, samples: 0, codec: '' };
+  const walk = (start: number, end: number) => {
+    for (let o = start; o + 8 <= end; ) {
+      const size = v.getUint32(o);
+      const t = type(o);
+      if (size < 8) break;
+      if (['moov', 'trak', 'mdia', 'minf', 'stbl'].includes(t)) walk(o + 8, o + size);
+      if (t === 'tkhd') {
+        const version = b[o + 8]!;
+        const off = o + 8 + (version === 1 ? 88 : 76);
+        info.width = v.getUint32(off) >>> 16;
+        info.height = v.getUint32(off + 4) >>> 16;
+      }
+      if (t === 'stsz') info.samples = v.getUint32(o + 16);
+      if (t === 'stsd') info.codec = type(o + 16);
+      o += size;
+    }
+  };
+  walk(0, b.length);
+  return info;
+}
+
+/** Play an MP4 in the page and read its length, size and the colour at a few moments. */
+async function videoProbe(page: Page, bytes: Uint8Array, times: number[]) {
+  return page.evaluate(async ({ data, times }) => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
+    await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    const ctx = c.getContext('2d')!;
+    const colours: number[][] = [];
+    for (const t of times) {
+      await new Promise((ok) => { v.onseeked = ok; v.currentTime = t; });
+      ctx.drawImage(v, 0, 0);
+      colours.push([...ctx.getImageData(c.width >> 1, c.height >> 1, 1, 1).data].slice(0, 3));
+    }
+    return { duration: v.duration, width: v.videoWidth, height: v.videoHeight, colours };
+  }, { data: [...bytes], times });
+}
+
+const dominant = (px: number[]) => ['red', 'green', 'blue'][px.indexOf(Math.max(...px))];
+
+test('GIF to MP4 keeps each frame and its timing, repeats a short loop to 3 seconds, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'gif-to-mp4');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['anim.gif']);
+  expect(downloads[0]!.suggestedFilename()).toBe('anim.mp4');
+  await expect(page.locator('#results-list .result-item')).toContainText('242×162, 3.0 s (3 loops)');
+  const mp4 = await bytesOf(downloads[0]!);
+  const info = mp4Info(mp4);
+  expect(info.brand).toMatch(/isom|mp41|mp42/);
+  // A 121x81 GIF is enlarged 2x and rounded to even sides, as encoders require; 3 frames played 3 times.
+  expect(info).toMatchObject({ width: 242, height: 162, samples: 9 });
+  expect(['avc1', 'vp09', 'av01']).toContain(info.codec);
+  const probe = await videoProbe(page, mp4, [0.1, 0.35, 0.7, 1.1, 2.9]);
+  expect(probe.duration).toBeCloseTo(3, 1);
+  expect(probe.colours.map(dominant)).toEqual(['red', 'green', 'blue', 'red', 'blue']);
+  net.assertNothingLeft(['anim.gif']);
+  expect(errors).toEqual([]);
+});
+
+test('Animated GIF to MP4 page plays once, and a file that is not a GIF gets a clear error', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/animated-gif-to-mp4');
+  await expect(page.locator('#tool')).toBeVisible();
+  const { downloads } = await run(page, ['anim.gif']);
+  const info = mp4Info(await bytesOf(downloads[0]!));
+  expect(info.samples).toBe(3);
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'fake.gif', mimeType: 'image/gif', buffer: readFileSync(fx('swatches.png')) });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  await expect(page.locator('#error')).toContainText('This file is not a GIF.');
 });
