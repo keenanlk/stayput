@@ -1,0 +1,16 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('remove-pdf-metadata')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="meta-report" class="meta-report" hidden aria-live="polite"></div>
+</ToolLayout>
+<style is:global>
+  .meta-report { display: grid; gap: 8px; font-size: 14px; }
+  .meta-row { padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); overflow-wrap: anywhere; }
+  .meta-row strong { color: var(--ink); }
+  .meta-row.has-gps { border-left: 4px solid var(--warn); }
+  .meta-list { margin: 6px 0 0; padding-left: 18px; }
+</style>
+<script src="../../tools/remove-pdf-metadata.ts"></script>

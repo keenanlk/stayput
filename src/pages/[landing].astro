@@ -46,6 +46,8 @@ import RemoveBackground from '../components/options/RemoveBackground.astro';
 import PassportPhoto from '../components/options/PassportPhoto.astro';
 import Watermark from '../components/options/Watermark.astro';
 import WatermarkPdf from '../components/options/WatermarkPdf.astro';
+import StickerMaker from '../components/options/StickerMaker.astro';
+import ProfilePicture from '../components/options/ProfilePicture.astro';
 import WatermarkStage from '../components/WatermarkStage.astro';
 import ColorStage from '../components/ColorStage.astro';
 import CropStage from '../components/CropStage.astro';
@@ -101,6 +103,10 @@ const options = {
   'passport-photo': PassportPhoto,
   'watermark-image': Watermark,
   'watermark-pdf': WatermarkPdf,
+  // Remove PDF metadata has no options: the report is the interface.
+  'remove-pdf-metadata': null,
+  'sticker-maker': StickerMaker,
+  'profile-picture-maker': ProfilePicture,
   // Sign PDF has no option controls; everything happens on the stage.
   'sign-pdf': null,
 } as const;
@@ -108,7 +114,7 @@ if (!(base in options)) throw new Error(`Landing page ${tool.slug} has no option
 const Options = options[base as keyof typeof options];
 ---
 <ToolLayout tool={tool} intro={intro} engineSlug={engine} base={base}>
-  {base === 'strip-exif' && <div slot="panel" id="meta-report" class="meta-report" hidden></div>}
+  {(base === 'strip-exif' || base === 'remove-pdf-metadata') && <div slot="panel" id="meta-report" class="meta-report" hidden></div>}
   {(base === 'crop-image' || base === 'crop-video') && <CropStage slot="panel" />}
   {base === 'reorder-pdf' && <ReorderStage slot="panel" />}
   {base === 'sign-pdf' && <SignStage slot="panel" />}
@@ -126,8 +132,9 @@ const Options = options[base as keyof typeof options];
     .text-preview { max-height: 260px; overflow: auto; white-space: pre-wrap; font: 14px/1.5 var(--font-body, inherit); padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); margin: 0; }
   </style>
 )}
-{base === 'strip-exif' && (
+{(base === 'strip-exif' || base === 'remove-pdf-metadata') && (
   <style is:global>
+    .meta-list { margin: 6px 0 0; padding-left: 18px; }
     .meta-report { display: grid; gap: 8px; font-size: 14px; }
     .meta-row { padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); }
     .meta-row strong { color: var(--ink); }
