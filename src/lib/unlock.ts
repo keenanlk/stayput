@@ -117,15 +117,15 @@ function loadModule(): Promise<QpdfModule> {
   return modulePromise;
 }
 
-/** Run `qpdf --decrypt`. Throws PasswordRequiredError when a user password is needed or wrong. */
-export async function decryptPdf(bytes: Uint8Array, password = ''): Promise<Uint8Array> {
+/** Run qpdf on `bytes` with `args` between the input and output paths; returns the output and qpdf's stderr. */
+async function runQpdf(bytes: Uint8Array, args: string[]): Promise<{ code: number; stderr: string; out?: Uint8Array }> {
   const qpdf = await loadModule();
   const messages: string[] = [];
   qpdf.FS.writeFile('/in.pdf', bytes);
   let code: number;
   sink = messages;
   try {
-    code = qpdf.callMain(['--decrypt', ...(password ? [`--password=${password}`] : []), '/in.pdf', '/out.pdf']);
+    code = qpdf.callMain([...args, '/in.pdf', '/out.pdf']);
   } catch (e) {
     code = typeof e === 'object' && e && 'status' in e ? Number((e as { status: unknown }).status) : 1;
   } finally {
@@ -137,16 +137,43 @@ export async function decryptPdf(bytes: Uint8Array, password = ''): Promise<Uint
     }
   }
   const stderr = messages.join('\n');
-  if (code !== 0) {
-    if (/invalid password/i.test(stderr)) throw new PasswordRequiredError(password !== '');
-    const detail = stderr.trim().split('\n').pop()?.replace(/^this\.program:\s*(\/in\.pdf:\s*)?/, '');
-    throw new Error(`This PDF could not be unlocked${detail ? ` (${detail})` : ''}.`);
-  }
+  // qpdf exits 3 for "succeeded with warnings", which still writes a usable file.
+  if (code !== 0 && code !== 3) return { code, stderr };
   const out = qpdf.FS.readFile('/out.pdf');
   // Copy out of the wasm heap, then free the file inside it.
   const copy = new Uint8Array(out);
   qpdf.FS.unlink('/out.pdf');
-  return copy;
+  return { code, stderr, out: copy };
+}
+
+function lastLine(stderr: string): string | undefined {
+  return stderr.trim().split('\n').pop()?.replace(/^this\.program:\s*(\/in\.pdf:\s*)?/, '');
+}
+
+/** Run `qpdf --decrypt`. Throws PasswordRequiredError when a user password is needed or wrong. */
+export async function decryptPdf(bytes: Uint8Array, password = ''): Promise<Uint8Array> {
+  const { stderr, out } = await runQpdf(bytes, ['--decrypt', ...(password ? [`--password=${password}`] : [])]);
+  if (!out) {
+    if (/invalid password/i.test(stderr)) throw new PasswordRequiredError(password !== '');
+    const detail = lastLine(stderr);
+    throw new Error(`This PDF could not be unlocked${detail ? ` (${detail})` : ''}.`);
+  }
+  return out;
+}
+
+/**
+ * Encrypt with AES-256 (PDF 2.0 security handler, readable by every current
+ * viewer). The same password opens the file and grants full permissions, so
+ * nothing is restricted once it is open.
+ */
+export async function encryptPdf(bytes: Uint8Array, password: string): Promise<Uint8Array> {
+  if (!password) throw new Error('Enter a password to protect the PDF with.');
+  const { stderr, out } = await runQpdf(bytes, ['--encrypt', `--user-password=${password}`, `--owner-password=${password}`, '--bits=256', '--']);
+  if (!out) {
+    const detail = lastLine(stderr);
+    throw new Error(`This PDF could not be protected${detail ? ` (${detail})` : ''}.`);
+  }
+  return out;
 }
 
 /* Remember decrypted results per file so the password is asked once. */

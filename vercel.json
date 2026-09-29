@@ -41,6 +41,16 @@
       "permanent": true
     },
     {
+      "source": "/unlock-pdf",
+      "destination": "/tools/unlock-pdf",
+      "permanent": true
+    },
+    {
+      "source": "/protect-pdf",
+      "destination": "/tools/protect-pdf",
+      "permanent": true
+    },
+    {
       "source": "/favicon-generator",
       "destination": "/tools/favicon-generator",
       "permanent": true

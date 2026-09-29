@@ -147,7 +147,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(16);
+  expect(await page.locator('.tool-card').count()).toBe(18);
   expect(errors).toEqual([]);
 });
 
@@ -443,7 +443,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -1331,4 +1331,62 @@ test('Sign PDF says what is needed before Run until a signature is placed', asyn
   await expect(page.locator('#run-hint')).toBeHidden();
   await page.locator('.stamp-signature .stamp-remove').dispatchEvent('click');
   await expect(page.locator('#run-hint')).toBeVisible();
+});
+
+test('Unlock PDF removes an open password with the password field and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'unlock-pdf');
+  const net = watchNetwork(page);
+  page.on('dialog', (d) => void d.dismiss());
+  const { downloads } = await run(page, [staticFx('user-locked.pdf')], async () => {
+    await page.locator('#password').fill('stayput');
+  });
+  const out = await bytesOf(downloads[0]!);
+  expect(new TextDecoder('latin1').decode(out)).not.toContain('/Encrypt');
+  expect((await PDFDocument.load(out)).getPageCount()).toBe(3);
+  await expect(page.locator('#results-list')).toContainText('password removed');
+  net.assertNothingLeft(['user-locked.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Unlock PDF strips owner-only restrictions without asking and says so for an open PDF', async ({ page }) => {
+  const errors = await open(page, 'unlock-pdf');
+  let asked = false;
+  page.on('dialog', (d) => {
+    asked = true;
+    void d.dismiss();
+  });
+  const { downloads } = await run(page, [staticFx('owner-locked.pdf'), 'text.pdf']);
+  expect(asked).toBe(false);
+  expect(downloads).toHaveLength(0);
+  const files = await zipAll(page);
+  expect(Object.keys(files)).toHaveLength(2);
+  for (const b of Object.values(files)) expect(new TextDecoder('latin1').decode(b)).not.toContain('/Encrypt');
+  await expect(page.locator('#results-list')).toContainText('restrictions removed');
+  await expect(page.locator('#results-list')).toContainText('had no password');
+  expect(errors).toEqual([]);
+});
+
+test('Protect PDF encrypts with AES-256 so the file needs the password to open', async ({ page }) => {
+  const errors = await open(page, 'protect-pdf');
+  const net = watchNetwork(page);
+  // Mismatched passwords block the run with a clear message.
+  await page.locator('#file-input').setInputFiles(fx('text.pdf'));
+  await page.locator('#password').fill('correct horse');
+  await page.locator('#password-confirm').fill('correct hose');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('do not match');
+  await page.locator('#password-confirm').fill('correct horse');
+  await page.locator('#clear').click();
+  errors.splice(0); // the shell logs the mismatch it just showed
+  const { downloads } = await run(page, ['text.pdf']);
+  const out = await bytesOf(downloads[0]!);
+  const raw = new TextDecoder('latin1').decode(out);
+  expect(raw).toContain('/Encrypt');
+  expect(raw).toMatch(/\/V 5/);
+  // pdf.js refuses it without the password and opens it with the right one.
+  await expect(getDocument({ data: out.slice() }).promise).rejects.toThrow(/password/i);
+  const doc = await getDocument({ data: out.slice(), password: 'correct horse' }).promise;
+  expect(doc.numPages).toBe(3);
+  net.assertNothingLeft(['text.pdf']);
+  expect(errors).toEqual([]);
 });
