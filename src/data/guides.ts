@@ -1837,6 +1837,150 @@ export const guides: Guide[] = [
       { q: 'How is the head-size requirement measured?', a: 'From the bottom of the chin to the top of the hair (not including the very top of the head\'s shadow or hairline flyaways), which must fall within a specific range: 1 to 1 3/8 inches for the US 2×2 photo, and a similar proportion for the 35×45 mm format used across most of Europe.' },
     ],
   },
+  {
+    slug: 'how-to-remove-a-password-from-a-pdf',
+    title: 'How to Remove a Password From a PDF (Mac, Windows, Browser)',
+    description: 'If you can already open a PDF, removing its password is usually a save-or-print trick you already have installed. Here is how on a Mac and on Windows, and a browser tool for restriction passwords too.',
+    heading: 'How to remove a password from a PDF',
+    dek: 'If you can already open it, removing the password is usually a save or print trick built into your computer. Here is how.',
+    keywords: ['how to remove a password from a pdf', 'unlock pdf password', 'remove pdf password mac', 'remove pdf password windows', 'pdf password protected remove'],
+    updated: '2026-09-29',
+    tools: ['unlock-pdf'],
+    sections: [
+      {
+        h: 'The two kinds of PDF password',
+        p: [
+          'An **open password** stops the file from being viewed at all until it is entered; you need to know this one to do anything with the file. A **permissions password** (or "owner password") lets the file open freely but blocks printing, copying text or editing, and can sometimes be removed even without knowing it, since most PDF readers let you view and print a restricted file regardless. What follows is for a PDF you can already legally open and want to stop having to unlock every time.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'Preview does this in one step: open the password-protected PDF (entering the password when asked), then choose File, **Export As PDF**. Preview saves a new copy without the password or the permission restrictions, because it exports the already-decrypted content rather than the original encrypted file.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no equivalent one-click export in the built-in PDF viewer, but the print trick works: open the PDF in Edge or Chrome (entering the password), choose **Print**, then set the destination to **Save as PDF** or **Microsoft Print to PDF**, and save. The resulting file is a fresh, unprotected PDF, since printing renders the page content rather than copying the original encrypted file.',
+        ],
+      },
+      {
+        h: 'The print trick on any device',
+        p: [
+          'The same idea works anywhere a PDF can be opened and printed: iPhone, Android and any browser support printing to a PDF file. It works for permission restrictions unconditionally, and for an open password once you have entered it correctly, since by that point the reader is showing you the plain content.',
+        ],
+      },
+      {
+        h: 'A dedicated tool for restriction passwords',
+        p: [
+          'When you already know the password and just want it gone for good, Stayput\'s [unlock PDF](/tools/unlock-pdf) tool removes it directly in your browser: enter the password once, and it re-saves the PDF without it, without the print step\'s slight risk of re-rendering text as an image in some viewers. Nothing is uploaded; the file and its password stay on your device.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I remove a PDF password without knowing it?', a: 'Not an open password that genuinely restricts viewing; you need it to see the content at all. A permissions password (blocking printing or copying) can often be bypassed just by viewing and printing the file, since most readers do not enforce those restrictions strictly.' },
+      { q: 'Does printing to PDF lower the quality?', a: 'For ordinary text and images, no meaningful difference. Highly precise vector graphics or forms with fillable fields can occasionally lose some structure through a print-based export, since printing flattens the page.' },
+      { q: 'Is removing a password from a PDF I own legal?', a: 'Yes, removing a password from a PDF you have the legal right to open and use is fine. This does not apply to files you do not have permission to access.' },
+      { q: 'Does an online PDF password remover upload the file?', a: 'Many do, which means both the file and its password reach someone else\'s server. A browser-based tool that processes the file locally avoids that.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-pdf-to-word',
+    title: 'How to Convert a PDF to Word (Editable .docx)',
+    description: 'Microsoft Word and Google Docs can both open a PDF and convert it directly, no separate converter needed for most documents. Here is how, and a browser tool for when the result needs cleaning up.',
+    heading: 'How to convert a PDF to Word',
+    dek: 'Word and Google Docs can both open a PDF directly. Here is how, and what to use when the result comes out messy.',
+    keywords: ['how to convert a pdf to word', 'pdf to word converter', 'convert pdf to docx', 'edit a pdf in word', 'pdf to editable document'],
+    updated: '2026-09-29',
+    tools: ['pdf-to-word'],
+    sections: [
+      {
+        h: 'Why this usually just works, and sometimes doesn\'t',
+        p: [
+          'Converting a PDF to Word means rebuilding editable paragraphs, headings and (approximately) formatting from a format that only stores where each character sits on the page, not the document structure behind it. For a PDF that was originally a Word document exported to PDF, this reconstruction is usually accurate. For a scanned document (a photo or scan with no real text layer) or a PDF with a complex multi-column layout, the result is rougher, since the converter is guessing at structure that isn\'t really there.',
+        ],
+      },
+      {
+        h: 'In Microsoft Word',
+        p: [
+          'Open Word, choose File, **Open**, and select the PDF directly. Word converts it automatically and opens it as an editable document; a message explains that some layout may shift as a result. Save it as .docx from there. This works in Word for Windows and Mac without any add-in.',
+        ],
+      },
+      {
+        h: 'In Google Docs',
+        p: [
+          'Upload the PDF to Google Drive, right-click it, choose **Open with, Google Docs**. Docs converts it into an editable document, with the same layout caveats as Word\'s conversion, and keeps the original PDF untouched in Drive alongside the new Doc.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither the Word nor Google Docs mobile apps convert a PDF to an editable document the way their desktop and web versions do; they mainly view PDFs. Converting on a phone means using a tool built for it, or opening the file in a desktop version later.',
+        ],
+      },
+      {
+        h: 'A dedicated converter for the text underneath',
+        p: [
+          'Stayput\'s [PDF to Word](/tools/pdf-to-word) tool rebuilds paragraphs and headings from the PDF\'s text layer directly, on your phone or computer, in the browser, without uploading the document. It also offers a plain-text export for when you only need the words, not the formatting. As with Word and Docs\' own conversion, a scanned PDF with no text layer needs OCR first, such as with Stayput\'s [image to text](/tools/image-to-text) tool, before there is any text to convert.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I convert a scanned PDF to Word?', a: 'Only after it has gone through OCR to create a text layer; a scan is just an image until then, so any converter starts by guessing text from pixels, and it is only as good as the OCR behind it.' },
+      { q: 'Why did the formatting change after converting?', a: 'The converter is reconstructing structure (columns, headings, spacing) from where text sits on the page, which is an approximation rather than a copy of the original document\'s actual layout.' },
+      { q: 'Is there a free way to convert PDF to Word without installing anything?', a: 'Yes. Opening the PDF directly in Word or Google Docs (both already have this built in) or using a browser-based converter both avoid installing separate software.' },
+      { q: 'Does converting a PDF to Word online upload my document?', a: 'It depends on the tool. Google Docs\' conversion uploads it to Google Drive by definition; a browser-based tool that processes the file locally does not upload it anywhere.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-a-photo-to-pdf',
+    title: 'How to Convert a Photo to PDF (iPhone, Android, Windows, Mac)',
+    description: 'Every recent phone and computer can turn a photo into a PDF without installing anything, though the steps are different on each. Here is how, plus a browser tool for combining several photos into one document.',
+    heading: 'How to convert a photo to PDF',
+    dek: 'Every device can do this, in different ways and different places in the menus. Here is how on each, plus combining several photos into one file.',
+    keywords: ['how to convert a photo to pdf', 'jpg to pdf', 'image to pdf converter', 'turn a picture into a pdf', 'save photo as pdf'],
+    updated: '2026-09-29',
+    tools: ['image-to-pdf', 'jpg-to-pdf'],
+    sections: [
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'From the Photos app: select the photo (or several, by tapping **Select** and choosing more than one), tap the share icon, and choose **Print**. In the print preview, pinch outward on the page thumbnail to open the full-page view, then tap the share icon again and **Save to Files** to save it as a PDF. Selecting multiple photos beforehand puts every one into the same PDF, one photo per page, in the order they were selected.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Google Drive has a built-in **Scan** feature (tap the **+** button, then **Scan**) that photographs a document directly into a PDF, with automatic cropping and contrast, which works well for documents rather than ordinary photos. For an existing photo already on the phone, the Google Photos app doesn\'t export to PDF directly; use the same print-preview trick as iPhone through the phone\'s Print option in the photo\'s share menu, or use a browser tool.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Open the photo in the Photos app, or select it in File Explorer, and choose **Print**. Set the printer to **Microsoft Print to PDF** and print; this saves the image as a one-page PDF rather than sending it to a physical printer. This method only handles one photo per PDF at a time.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'Open the photo in Preview, then File, **Export As PDF**. For several photos in one PDF, select them all in Preview\'s sidebar first (or select multiple files in Finder and open them together in Preview), then use **File, Print**, and in the print dialog\'s PDF menu choose **Save as PDF**; this combines every open photo into a single multi-page document.',
+        ],
+      },
+      {
+        h: 'Combining several photos with more control',
+        p: [
+          'Stayput\'s [image to PDF](/tools/image-to-pdf) tool (and the [JPG to PDF](/jpg-to-pdf) preset) lets you drop in multiple photos, reorder them by dragging, and choose the page size and margins, all in the browser before generating the PDF. It handles JPG, PNG, WebP and HEIC photos straight from an iPhone camera roll, and nothing is uploaded to produce the file.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I combine several photos into one PDF?', a: 'Yes, on every platform above, either by selecting multiple photos before using the print-to-PDF trick, or with a tool built to combine several images into one document with control over the order.' },
+      { q: 'What is the print-to-PDF trick and why does it work?', a: 'Printing normally sends a page to a printer; choosing a "Save as PDF" or "Print to PDF" destination instead captures that same rendered page as a PDF file rather than physical paper, which works for a photo just as well as a document.' },
+      { q: 'Does converting a photo to PDF reduce its quality?', a: 'The print-based methods can slightly compress or resize the image to fit a standard page. A dedicated converter that embeds the image at its original resolution keeps it unchanged, just wrapped in a PDF page.' },
+      { q: 'Can I scan a paper document into a PDF, not just convert an existing photo?', a: 'Yes: the iPhone\'s Notes app and Android\'s Google Drive both have a document-scanning mode that photographs and auto-crops a physical page directly into a PDF, which is more reliable for a document than photographing it manually.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
