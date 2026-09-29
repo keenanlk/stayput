@@ -4,6 +4,7 @@
  * (MIT) for colour quantisation and LZW. Everything runs in this tab.
  */
 import { GIFEncoder, quantize, applyPalette } from 'gifenc';
+import { renderWebpFrames, type WebpAnimation } from './webp-anim';
 import { canvasToBlob, drawScaled, encodeBitmap, fitSize, makeCanvas } from './image';
 import { imagesToPdf } from './pdf';
 import type { OutputType } from './formats';
@@ -151,6 +152,29 @@ export function writeGif(img: ImageData): Uint8Array {
   const transparentIndex = palette.findIndex((c) => c[3] === 0);
   const gif = GIFEncoder();
   gif.writeFrame(index, img.width, img.height, { palette, transparent: transparentIndex >= 0, transparentIndex: Math.max(0, transparentIndex) });
+  gif.finish();
+  return gif.bytes();
+}
+
+/** WebP counts total plays (0 = forever); GIF counts repeats after the first (-1 = play once). */
+const gifRepeat = (plays: number) => (plays === 0 ? 0 : plays === 1 ? -1 : plays - 1);
+
+/**
+ * Animated GIF from an animated WebP, one frame at a time. Each frame gets its
+ * own 256-colour palette; frames are full-canvas and disposed to background,
+ * so transparent areas never show the previous frame through.
+ */
+export async function writeAnimatedGif(anim: WebpAnimation, onProgress?: (done: number, total: number) => void): Promise<Uint8Array> {
+  const gif = GIFEncoder();
+  await renderWebpFrames(anim, (img, duration, i) => {
+    const rgba = new Uint8Array(img.data.buffer, img.data.byteOffset, img.data.byteLength);
+    const palette = quantize(rgba, 256, { format: 'rgba4444', oneBitAlpha: true });
+    const index = applyPalette(rgba, palette, 'rgba4444');
+    const transparentIndex = palette.findIndex((c) => c[3] === 0);
+    // Browsers play delays under 20 ms at 100 ms, so floor them at 20.
+    gif.writeFrame(index, img.width, img.height, { palette, delay: Math.max(20, duration), repeat: gifRepeat(anim.loops), dispose: 2, transparent: transparentIndex >= 0, transparentIndex: Math.max(0, transparentIndex) });
+    onProgress?.(i + 1, anim.frames.length);
+  });
   gif.finish();
   return gif.bytes();
 }

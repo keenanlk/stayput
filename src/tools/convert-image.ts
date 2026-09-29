@@ -1,6 +1,7 @@
 import { createShell, bindRange, num, str, bool, processEach, type ShellFile } from '../lib/shell';
 import { decodeImage, supportsWebpEncoding, thumbnail } from '../lib/image';
-import { writeImage } from '../lib/encoders';
+import { writeAnimatedGif, writeImage } from '../lib/encoders';
+import { parseAnimatedWebp } from '../lib/webp-anim';
 import { detectKind, kindFromName, KIND_LABEL, type ImageKind } from '../lib/detect';
 import { GROUPS, outputFormat, searchFormats, type OutputFormat, type OutputType } from '../lib/formats';
 import { extractExifTiff, jpegWithExif, withNormalOrientation } from '../lib/exif';
@@ -246,7 +247,9 @@ createShell({
     return processEach(files, progress, 'Converting', async (entry) => {
       if ((await detectKind(entry.file)) === 'pdf') throw new Error('This is a PDF, not an image. Use PDF to Image to turn its pages into pictures.');
       const decoded = await decodeImage(entry.file);
-      let blob = await writeImage(decoded.bitmap, type, { quality, background });
+      // An animated WebP stays animated as a GIF; every other path keeps the first frame.
+      const anim = type === 'image/gif' && (await detectKind(entry.file)) === 'webp' ? parseAnimatedWebp(new Uint8Array(await entry.file.arrayBuffer())) : undefined;
+      let blob = anim ? new Blob([(await writeAnimatedGif(anim)) as BlobPart], { type }) : await writeImage(decoded.bitmap, type, { quality, background });
       if (keepExif) {
         const tiff = extractExifTiff(new Uint8Array(await entry.file.arrayBuffer()));
         if (tiff) {
@@ -254,7 +257,7 @@ createShell({
           blob = new Blob([jpegWithExif(jpeg, withNormalOrientation(tiff)) as BlobPart], { type });
         }
       }
-      const out: OutputFile = { name: replaceExt(entry.file.name, f.ext), blob, originalSize: entry.file.size, previewUrl: await thumbnail(decoded.bitmap) };
+      const out: OutputFile = { name: replaceExt(entry.file.name, f.ext), blob, originalSize: entry.file.size, previewUrl: await thumbnail(decoded.bitmap), ...(anim ? { note: `${anim.frames.length} frames, animated` } : {}) };
       decoded.bitmap.close();
       return out;
     });
