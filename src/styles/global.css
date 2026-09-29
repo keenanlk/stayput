@@ -538,7 +538,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .sign-actions { gap: 8px; }
 .pdf-stage-wrap { display: grid; gap: 10px; }
 .pager { gap: 10px; }
-.pdf-stage { position: relative; display: inline-block; max-width: 100%; box-shadow: var(--shadow); border: 1px solid var(--line); background: #fff; line-height: 0; user-select: none; -webkit-user-select: none; }
+.pdf-stage { position: relative; display: inline-block; justify-self: start; max-width: 100%; box-shadow: var(--shadow); border: 1px solid var(--line); background: #fff; line-height: 0; user-select: none; -webkit-user-select: none; }
 .pdf-stage canvas { display: block; max-width: 100%; }
 .stamp-layer { position: absolute; inset: 0; }
 .stamp { position: absolute; cursor: move; touch-action: none; border: 1px dashed transparent; box-sizing: border-box; }

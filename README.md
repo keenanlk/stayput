@@ -61,6 +61,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Reverse video](https://stayput.dev/tools/reverse-video) (play a clip backwards) | |
 | [Video to JPG](https://stayput.dev/tools/video-to-jpg) (save frames as JPG or PNG) | |
 | [Trim audio](https://stayput.dev/tools/trim-audio) (cut MP3, WAV, M4A with a waveform) | |
+| [Volume booster](https://stayput.dev/tools/volume-booster) (louder, quieter or normalized audio and video) | |
 | [Audio converter](https://stayput.dev/tools/audio-converter) (MP3, WAV, FLAC, M4A, OGG) | |
 | [QR code generator](https://stayput.dev/tools/qr-code-generator) (link, Wi-Fi, contact, email, phone; PNG or SVG) | |
 

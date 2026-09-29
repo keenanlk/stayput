@@ -163,6 +163,10 @@ export const engines: Record<string, Engine> = {
     how: 'A QR encoder written for this site (byte mode, versions 1 to 40, Reed–Solomon error correction and the standard’s mask scoring) turns your text into the grid of squares in your tab. The PNG is drawn on a canvas by your browser and the SVG is written as one path, so both are exact, with no blur.',
     versus: 'Most QR code sites make you sign up, send your link and Wi-Fi password to their servers, and hand out “dynamic” codes that redirect through their domain, so they can count scans and switch your code off when a trial ends. Here the code holds your text directly, never expires, and nothing you type leaves your device.',
   },
+  'volume-booster': {
+    how: 'Your browser decodes the sound with its own audio decoders. Every sample is multiplied by the gain you chose (or the gain that brings the gated loudness to about −14 LUFS), then a look-ahead peak limiter turns down only the moments that would pass −1 dBFS, easing in over 5 ms and out over 150 ms. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders. For a video, Mediabunny (MPL-2.0) copies the picture packets unchanged and adds the new sound.',
+    versus: 'Online volume boosters upload the recording or video, cap the file size, and often just multiply the samples so loud parts clip and crackle. Here nothing leaves your device and the limiter keeps boosted sound clean.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',
@@ -194,6 +198,22 @@ export const engines: Record<string, Engine> = {
   'watermark-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab. For each page size, the watermark is drawn once on a transparent canvas at about 216 dpi and embedded as a PNG, then placed over every page of that size, following each page’s crop box and rotation. The original page content is not rewritten, so text, links and forms are untouched.',
     versus: 'Online PDF watermark tools upload the whole document to add a line of text to it, and the documents people watermark are the confidential ones. Here nothing is sent anywhere, there is no page or file limit, and nothing but your watermark is added.',
+  },
+  'remove-pdf-metadata': {
+    how: 'pdf-lib (MIT) parses the PDF in your tab (an encrypted file is first decrypted by qpdf, compiled to WebAssembly and served from this site). The trailer’s information dictionary and file ID are dropped, every /Metadata XMP stream and /PieceInfo entry is unlinked from the catalog, pages, images and fonts, and every object nothing refers to any more is deleted before the file is written back out, so the removed data is really gone rather than just hidden.',
+    versus: 'The PDFs people clean before sharing are the ones where the author matters: CVs, legal filings, reports sent anonymously, documents for a client who should not see who drafted them. Uploading them to a metadata-removal site hands the full document, name included, to a stranger. Here nothing is sent anywhere.',
+  },
+  'redact-pdf': {
+    how: 'pdf.js (Apache 2.0) renders each page in your tab and reads its text layer, so a search finds every match with its position. When you save, each page with a box is rendered at 200 dpi, the boxes are painted onto the pixels, and pdf-lib (MIT) replaces that page’s content with the image. The old text, fonts, links, comments and form values on those pages are then deleted from the file along with its metadata, so nothing is left under the black.',
+    versus: 'Redacting on a website means uploading the exact document you are trying to keep private, and many free editors only draw a black rectangle on top, so the name or number underneath can still be copied, searched or extracted. Here the file never leaves your device and the text under each box is removed, not hidden.',
+  },
+  'sticker-maker': {
+    how: 'The same open segmentation model as the background remover (ISNet, Apache 2.0, running on onnxruntime-web in a web worker) marks the subject. The cut-out is trimmed to the subject’s bounds, and the border is drawn by stamping a tinted silhouette of it in rings around the edge on a canvas, so it follows every curve. The canvas is saved as PNG or WebP by your browser.',
+    versus: 'Sticker apps and sites upload your photos of people and pets to a server to cut them out, and many add a watermark or ask for a subscription. Here the photo never leaves your device and the sticker is yours at full size.',
+  },
+  'profile-picture-maker': {
+    how: 'Two open models run in your tab: MediaPipe’s BlazeFace (Apache 2.0) finds your face and eyes, and ISNet (Apache 2.0) on onnxruntime-web cuts you out of the photo. The cut-out is scaled and placed so the face sits in the standard headshot position, over a solid colour, clipped to a circle if you choose, and saved at 1024 × 1024 by your browser.',
+    versus: 'Profile picture and AI headshot apps upload your face, often keep it to train models, and charge for the full-size file. Here your photo is processed on your device, and the result is yours at full size with no watermark.',
   },
   'color-picker': {
     how: 'Your browser decodes the image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab. The colour under the cursor is read straight from that canvas, one pixel at a time, at up to 4096 pixels across, so a pick matches the file exactly. The main colours come from k-means clustering over a sample of about 20,000 pixels, run in the page with a fixed seed so the same image always gives the same palette.',
