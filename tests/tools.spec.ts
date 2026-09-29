@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(50);
+  expect(await page.locator('.tool-card').count()).toBe(51);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'redact-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3709,4 +3709,85 @@ test('Redact PDF finds email addresses and long numbers', async ({ page }) => {
   // Tapping a box removes it.
   await page.locator('.redact-box').first().click();
   await expect(page.locator('.redact-box')).toHaveCount(1);
+});
+
+async function levels(page: Page, bytes: Uint8Array): Promise<{ seconds: number; peak: number; rms: number }> {
+  return page.evaluate(async (b64) => {
+    const data = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const buf = await new OfflineAudioContext(1, 1, 48000).decodeAudioData(data.buffer);
+    const ch = buf.getChannelData(0);
+    // Skip the edges, where encoders fade in and out.
+    const a = Math.floor(ch.length * 0.2);
+    const b = Math.floor(ch.length * 0.8);
+    let peak = 0;
+    let sum = 0;
+    for (let i = a; i < b; i++) {
+      peak = Math.max(peak, Math.abs(ch[i]!));
+      sum += ch[i]! * ch[i]!;
+    }
+    return { seconds: buf.duration, peak, rms: Math.sqrt(sum / (b - a)) };
+  }, Buffer.from(bytes).toString('base64'));
+}
+
+test('Volume booster makes a WAV twice as loud at +6 dB, keeps its format, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'volume-booster');
+  const net = watchNetwork(page);
+  const before = await levels(page, readFileSync(fx('tone.wav')));
+  const { downloads } = await run(page, ['tone.wav']);
+  expect(downloads[0]!.suggestedFilename()).toBe('tone-louder.wav');
+  const after = await levels(page, await bytesOf(downloads[0]!));
+  expect(after.rms / before.rms).toBeCloseTo(2, 1);
+  expect(after.seconds).toBeCloseTo(1.5, 2);
+  await expect(page.locator('#results-list .result-item')).toContainText('+6.0 dB');
+  net.assertNothingLeft(['tone.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('Volume booster limits a +20 dB boost instead of clipping', async ({ page }) => {
+  const errors = await open(page, 'volume-booster');
+  const { downloads } = await run(page, ['tone.wav'], async () => {
+    await page.locator('#db').selectOption('20');
+    await page.locator('#format').selectOption('flac');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('tone-louder.flac');
+  const after = await levels(page, await bytesOf(downloads[0]!));
+  // Held at -1 dBFS (0.891), and much louder than the 0.37 peak it started at.
+  expect(after.peak).toBeLessThan(0.9);
+  expect(after.peak).toBeGreaterThan(0.85);
+  await expect(page.locator('#results-list .result-item')).toContainText('of peaks eased');
+  expect(errors).toEqual([]);
+});
+
+test('Normalize audio brings a quiet and a loud file to the same loudness', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/normalize-audio');
+  await expect(page.locator('#db-field')).toBeHidden();
+  const { items } = await run(page, ['tone.wav', staticFx('song.flac')]);
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['song-normalized.flac', 'tone-normalized.wav']);
+  const a = await levels(page, files['tone-normalized.wav']!);
+  const b = await levels(page, files['song-normalized.flac']!);
+  const db = (x: number) => 20 * Math.log10(x);
+  // The tone is stereo with a louder right side, so compare the loudness of the left channels loosely.
+  expect(Math.abs(db(a.rms) - db(b.rms))).toBeLessThan(3);
+  expect(db(a.rms)).toBeGreaterThan(-20);
+});
+
+test('Increase video volume copies the picture and turns up the sound', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/increase-video-volume');
+  const net = watchNetwork(page);
+  const src = readFileSync(staticFx('talk.webm'));
+  const before = await levels(page, src);
+  const { downloads } = await run(page, [staticFx('talk.webm')]);
+  const name = downloads[0]!.suggestedFilename();
+  expect(name).toMatch(/^talk-louder\.(webm|mp4)$/);
+  const out = await bytesOf(downloads[0]!);
+  const after = await levels(page, out);
+  expect(after.rms).toBeGreaterThan(before.rms * 1.8);
+  const tracks = await videoTracks(out);
+  expect(tracks.video).not.toBeNull();
+  await expect(page.locator('#results-list .result-item')).toContainText('picture copied');
+  net.assertNothingLeft(['talk.webm']);
 });
