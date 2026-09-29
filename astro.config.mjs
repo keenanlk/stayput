@@ -27,6 +27,8 @@ export default defineConfig({
       alias: [
         { find: /^onnxruntime-web\/wasm$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.wasm.min.mjs', import.meta.url)) },
         { find: /^onnxruntime-web\/webgpu$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.wasm.min.mjs', import.meta.url)) },
+        // The vocal remover's fast path on WebGPU; it loads its own 27 MB .wasm from /vendor/, only there.
+        { find: /^ort-webgpu$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.webgpu.min.mjs', import.meta.url)) },
       ],
     },
   },

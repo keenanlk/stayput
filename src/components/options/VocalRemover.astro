@@ -1,0 +1,23 @@
+---
+/** Option controls for the vocal remover, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const stems = defaults.stems ?? 'instrumental';
+const format = defaults.format ?? 'mp3';
+---
+<div class="field">
+  <label for="stems">Keep</label>
+  <select id="stems">
+    <option value="instrumental" selected={stems === 'instrumental'}>The music, without vocals (karaoke)</option>
+    <option value="vocals" selected={stems === 'vocals'}>The vocals only (acapella)</option>
+    <option value="both" selected={stems === 'both'}>Both, as two files</option>
+  </select>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="mp3" selected={format === 'mp3'}>MP3 (320 kbps)</option>
+    <option value="wav" selected={format === 'wav'}>WAV (lossless, larger)</option>
+  </select>
+</div>
+<p class="muted small">The first run downloads the separation model (67 MB) to this browser. In browsers with WebGPU (recent Chrome and Edge on computers, Safari 26) it runs on the graphics chip and is much faster; on the CPU alone, separating takes several times as long as the song.</p>

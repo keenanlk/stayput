@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VocalRemover from '../../components/options/VocalRemover.astro';
+const tool = toolBySlug('vocal-remover')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VocalRemover /></Fragment>
+</ToolLayout>
+<script src="../../tools/vocal-remover.ts"></script>

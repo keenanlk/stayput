@@ -68,6 +68,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'resize-pdf': () => import('./resize-pdf'),
   'transcribe': () => import('./transcribe'),
   'add-subtitles-to-video': () => import('./add-subtitles'),
+  'vocal-remover': () => import('./vocal-remover'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

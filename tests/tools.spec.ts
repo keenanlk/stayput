@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(82);
+  expect(await page.locator('.index .tool-card').count()).toBe(83);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -983,6 +983,11 @@ test('preset landing pages render, run their base tool with the preset options a
     ['mp3-to-text', 'transcribe', async () => expect(page.locator('#format')).toHaveValue('txt')],
     ['auto-caption-video', 'add-subtitles-to-video', async () => expect(page.locator('input[name="size"][value="large"]')).toBeChecked()],
     ['burn-subtitles-into-video', 'add-subtitles-to-video', async () => expect(page.locator('input[name="look"][value="box"]')).toBeChecked()],
+    ['karaoke-maker', 'vocal-remover', async () => expect(page.locator('#stems')).toHaveValue('instrumental')],
+    ['acapella-extractor', 'vocal-remover', async () => {
+      await expect(page.locator('#stems')).toHaveValue('vocals');
+      await expect(page.locator('#format')).toHaveValue('wav');
+    }],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
     ['png-to-svg', 'image-to-svg', async () => {
@@ -5668,4 +5673,101 @@ test('Invert image colors opens with Invert on and makes an exact negative', asy
   const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[40, 100], [260, 100]]);
   expect(out.px[0]!.slice(0, 3)).toEqual([155, 155, 155]);
   expect(out.px[1]!.slice(0, 3)).toEqual([95, 95, 95]);
+});
+
+/**
+ * A stereo WAV of the JFK speech over a chord progression, both at 44.1 kHz,
+ * with the two parts returned so the separation can be checked against them.
+ */
+function speechOverChords(seconds: number): { file: string; speech: Float32Array; music: Float32Array } {
+  const wav = readFileSync(staticFx('jfk.wav'));
+  let o = 12;
+  let data = 0;
+  let len = 0;
+  while (o < wav.length) {
+    const size = wav.readUInt32LE(o + 4);
+    if (wav.toString('ascii', o, o + 4) === 'data') {
+      data = o + 8;
+      len = size;
+      break;
+    }
+    o += 8 + size;
+  }
+  const at16 = (i: number) => (i * 2 < len ? wav.readInt16LE(data + i * 2) / 32768 : 0);
+  const n = Math.round(44100 * seconds);
+  const speech = new Float32Array(n);
+  const music = new Float32Array(n);
+  const chords = [[261.6, 329.6, 392], [220, 261.6, 329.6], [174.6, 220, 261.6], [196, 246.9, 293.7]];
+  for (let i = 0; i < n; i++) {
+    const t16 = (i * 16000) / 44100;
+    const a = Math.floor(t16);
+    speech[i] = at16(a) * (1 - (t16 - a)) + at16(a + 1) * (t16 - a);
+    const t = i / 44100;
+    let v = 0;
+    for (const f of chords[Math.floor(t / 1.5) % 4]!) for (let h = 1; h <= 4; h++) v += Math.sin(2 * Math.PI * f * h * t) / (h * h);
+    music[i] = 0.08 * v * Math.exp(-2 * (t % 1.5));
+  }
+  const buf = Buffer.alloc(44 + n * 4);
+  buf.write('RIFF', 0);
+  buf.writeUInt32LE(36 + n * 4, 4);
+  buf.write('WAVEfmt ', 8);
+  buf.writeUInt32LE(16, 16);
+  buf.writeUInt16LE(1, 20);
+  buf.writeUInt16LE(2, 22);
+  buf.writeUInt32LE(44100, 24);
+  buf.writeUInt32LE(44100 * 4, 28);
+  buf.writeUInt16LE(4, 32);
+  buf.writeUInt16LE(16, 34);
+  buf.write('data', 36);
+  buf.writeUInt32LE(n * 4, 40);
+  for (let i = 0; i < n; i++) {
+    const s = Math.round(Math.max(-1, Math.min(1, speech[i]! + music[i]!)) * 32767);
+    buf.writeInt16LE(s, 44 + i * 4);
+    buf.writeInt16LE(s, 46 + i * 4);
+  }
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'song.wav');
+  writeFileSync(file, buf);
+  return { file, speech, music };
+}
+
+/** Left channel of a 16-bit WAV as floats. */
+function wavLeft(b: Uint8Array): Float32Array {
+  const buf = Buffer.from(b);
+  const ch = buf.readUInt16LE(22);
+  const n = buf.readUInt32LE(40) / (2 * ch);
+  return Float32Array.from({ length: n }, (_, i) => buf.readInt16LE(44 + i * 2 * ch) / 32768);
+}
+
+function correlation(a: Float32Array, b: Float32Array): number {
+  let ab = 0, aa = 0, bb = 0;
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    ab += a[i]! * b[i]!;
+    aa += a[i]! * a[i]!;
+    bb += b[i]! * b[i]!;
+  }
+  return ab / Math.sqrt(aa * bb);
+}
+
+test('Vocal remover splits speech from music into two WAVs, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'vocal-remover');
+  const net = watchNetwork(page);
+  const { file, speech, music } = speechOverChords(5.5);
+  const { items } = await run(page, [file], async () => {
+    await page.locator('#stems').selectOption('both');
+    await page.locator('#format').selectOption('wav');
+  });
+  expect(items).toBe(2);
+  await expect(page.locator('#results-list')).toContainText('music without the vocals');
+  await expect(page.locator('#results-list')).toContainText('on the CPU');
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['song-instrumental.wav', 'song-vocals.wav']);
+  const inst = wavLeft(files['song-instrumental.wav']!);
+  const voc = wavLeft(files['song-vocals.wav']!);
+  expect(inst.length).toBe(speech.length);
+  expect(correlation(inst, music)).toBeGreaterThan(0.9);
+  expect(Math.abs(correlation(inst, speech))).toBeLessThan(0.1);
+  expect(correlation(voc, speech)).toBeGreaterThan(0.95);
+  net.assertNothingLeft(['song.wav']);
+  expect(errors).toEqual([]);
 });

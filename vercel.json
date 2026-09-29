@@ -419,6 +419,11 @@
       "source": "/add-subtitles-to-video",
       "destination": "/tools/add-subtitles-to-video",
       "permanent": true
+    },
+    {
+      "source": "/vocal-remover",
+      "destination": "/tools/vocal-remover",
+      "permanent": true
     }
   ],
   "headers": [

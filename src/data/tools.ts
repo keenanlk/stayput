@@ -2668,6 +2668,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'vocal-remover',
+    name: 'Vocal remover',
+    title: 'Vocal Remover: Karaoke and Acapella from Any Song, No Upload | Stayput',
+    description:
+      'Remove vocals from a song for karaoke, or keep only the vocals for an acapella. An AI separation model runs on your device. MP3, WAV, M4A, FLAC or video in; no upload, no account.',
+    heading: 'Vocal remover',
+    tagline: 'Split a song into the music and the voice with an AI model running in this tab. Karaoke tracks and acapellas without uploading anything.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.webm,.mp4,.mov,.m4v,.mkv',
+    multiple: true,
+    dropLabel: 'Drop songs to separate',
+    action: 'Separate',
+    keywords: ['vocal remover', 'remove vocals from song', 'karaoke maker', 'acapella extractor', 'instrumental maker', 'isolate vocals', 'stem splitter', 'vocal remover without upload'],
+    steps: [
+      'Drop one or more songs, or videos with music.',
+      'Choose what to keep: the music without the vocals, the vocals alone, or both as two files, and MP3 or WAV.',
+      'Press Separate. The first run downloads the model once; each song is split in pieces and the files download when it is done.',
+    ],
+    faq: [
+      {
+        q: 'Is my song uploaded?',
+        a: 'No. The song is decoded in this tab and the separation model runs on your device, so unreleased demos, stems for a client and your own recordings stay with you. The only download is the model itself, from this site, the first time.',
+      },
+      {
+        q: 'How good is the separation?',
+        a: 'It uses UVR-MDX-NET Inst HQ 3, one of the models Ultimate Vocal Remover offers for instrumentals, so the music usually comes out clean enough to sing over. Heavy reverb, backing vocals mixed like instruments and very distorted recordings leave faint traces of voice, and the acapella can carry a little of the drums.',
+      },
+      {
+        q: 'Why is it slow on my computer?',
+        a: 'The model does a lot of arithmetic. Browsers with WebGPU (recent Chrome and Edge on computers, Safari 26) run it on the graphics chip, which is many times faster. Without WebGPU it runs on the CPU and takes several times as long as the song, with the time left shown as it goes. Keep the tab open until it finishes.',
+      },
+      {
+        q: 'Can it split drums and bass too?',
+        a: 'No, this model makes two parts: vocals and everything else.',
+      },
+      {
+        q: 'Can I use the result?',
+        a: 'For practice, karaoke at home, remixes of your own songs and study, yes. Separating a track does not change who owns it: publishing an instrumental or acapella of someone else’s song still needs their permission.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
