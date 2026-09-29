@@ -1,0 +1,61 @@
+---
+/** Option controls for Add subtitles to video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const language = defaults.language ?? 'auto';
+const look = defaults.look ?? 'outline';
+const size = defaults.size ?? 'medium';
+const place = defaults.place ?? 'bottom';
+const languages = [
+  ['auto', 'Detect automatically'],
+  ['en', 'English'],
+  ['es', 'Spanish'],
+  ['fr', 'French'],
+  ['de', 'German'],
+  ['it', 'Italian'],
+  ['pt', 'Portuguese'],
+  ['nl', 'Dutch'],
+  ['pl', 'Polish'],
+  ['ru', 'Russian'],
+  ['uk', 'Ukrainian'],
+  ['tr', 'Turkish'],
+  ['ar', 'Arabic'],
+  ['hi', 'Hindi'],
+  ['ja', 'Japanese'],
+  ['ko', 'Korean'],
+  ['zh', 'Chinese'],
+] as const;
+---
+<p class="muted small" id="subs-source">Drop an SRT or VTT file along with the video to burn in your own subtitles. Without one, they are written from the speech.</p>
+<div class="field" id="language-field">
+  <label for="language">Spoken language</label>
+  <select id="language">
+    {languages.map(([v, l]) => <option value={v} selected={v === language}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label>Look</label>
+  <div class="segmented" role="radiogroup" aria-label="Look">
+    <label><input type="radio" name="look" value="outline" checked={look === 'outline'} /><span>White, black edge</span></label>
+    <label><input type="radio" name="look" value="box" checked={look === 'box'} /><span>On a dark band</span></label>
+    <label><input type="radio" name="look" value="yellow" checked={look === 'yellow'} /><span>Yellow</span></label>
+  </div>
+</div>
+<div class="field">
+  <label>Size</label>
+  <div class="segmented" role="radiogroup" aria-label="Size">
+    <label><input type="radio" name="size" value="small" checked={size === 'small'} /><span>Small</span></label>
+    <label><input type="radio" name="size" value="medium" checked={size === 'medium'} /><span>Medium</span></label>
+    <label><input type="radio" name="size" value="large" checked={size === 'large'} /><span>Large</span></label>
+  </div>
+</div>
+<div class="field">
+  <label>Place</label>
+  <div class="segmented" role="radiogroup" aria-label="Place">
+    <label><input type="radio" name="place" value="bottom" checked={place === 'bottom'} /><span>Bottom</span></label>
+    <label><input type="radio" name="place" value="top" checked={place === 'top'} /><span>Top</span></label>
+  </div>
+</div>
+<label class="check"><input type="checkbox" id="translate" checked={defaults.translate === 'true'} /> Translate the speech to English</label>
+<label class="check"><input type="checkbox" id="save-srt" checked={defaults.saveSrt === 'true'} /> Also save the subtitles as an SRT file</label>
+<p class="muted small" id="model-note">Writing subtitles from speech downloads the speech model (76 MB) once. Then every frame is drawn again and the video re-encoded, which takes longer for longer and sharper videos.</p>

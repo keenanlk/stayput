@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(80);
+  expect(await page.locator('.index .tool-card').count()).toBe(81);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -981,6 +981,8 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['video-to-subtitles', 'transcribe', async () => expect(page.locator('#format')).toHaveValue('srt')],
     ['mp3-to-text', 'transcribe', async () => expect(page.locator('#format')).toHaveValue('txt')],
+    ['auto-caption-video', 'add-subtitles-to-video', async () => expect(page.locator('input[name="size"][value="large"]')).toBeChecked()],
+    ['burn-subtitles-into-video', 'add-subtitles-to-video', async () => expect(page.locator('input[name="look"][value="box"]')).toBeChecked()],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
     ['png-to-svg', 'image-to-svg', async () => {
@@ -5292,7 +5294,7 @@ test('Transcribe turns a speech recording into SRT captions with the words spoke
     await page.locator('#format').selectOption('srt');
   });
   expect(downloads[0]!.suggestedFilename()).toBe('jfk.srt');
-  await expect(page.locator('#results-list')).toContainText(/0:11 of English speech, \d+ words in \d+ captions/);
+  await expect(page.locator('#results-list')).toContainText(/0:11 of English speech, \d+ words in \d+ captions?/);
   const srt = new TextDecoder().decode(await bytesOf(downloads[0]!));
   expect(srt).toMatch(/^1\n00:00:0\d,\d{3} --> 00:00:\d\d,\d{3}\n/);
   expect(srt.toLowerCase()).toContain('ask not what your country can do for you');
@@ -5414,6 +5416,121 @@ test('Enlarge image opens at 2× and puts a JPG on white', async ({ page }) => {
   const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[10, 10]]);
   expect([out.width, out.height]).toEqual([400, 400]);
   expect(Math.min(...out.px[0]!.slice(0, 3))).toBeGreaterThan(240);
+});
+
+/**
+ * Record a plain grey 640×360 clip in the page, with the WAV at `wav` as its
+ * sound when given (played in real time), or silent for `seconds`.
+ */
+async function greyClip(page: Page, name: string, opts: { wav?: string; seconds?: number }): Promise<string> {
+  const wav = opts.wav ? [...readFileSync(opts.wav)] : null;
+  const bytes = await page.evaluate(async ({ wav, seconds }) => {
+    const c = document.createElement('canvas');
+    c.width = 640;
+    c.height = 360;
+    const ctx = c.getContext('2d')!;
+    const ac = new AudioContext();
+    const dest = ac.createMediaStreamDestination();
+    let length = seconds ?? 2;
+    const src = ac.createBufferSource();
+    if (wav) {
+      src.buffer = await ac.decodeAudioData(new Uint8Array(wav).buffer);
+      length = src.buffer.duration;
+    }
+    src.connect(dest);
+    const stream = new MediaStream([...c.captureStream(30).getVideoTracks(), ...dest.stream.getAudioTracks()]);
+    const rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8,opus' });
+    const chunks: Blob[] = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    rec.start();
+    if (wav) src.start();
+    const t0 = performance.now();
+    await new Promise<void>((done) => {
+      const frame = () => {
+        ctx.fillStyle = '#808080';
+        ctx.fillRect(0, 0, 640, 360);
+        // A moving dot, so the recorder keeps producing frames.
+        ctx.fillStyle = '#707070';
+        ctx.fillRect(((performance.now() - t0) / 10) % 600, 20, 20, 20);
+        if (performance.now() - t0 < length * 1000 + 300) requestAnimationFrame(frame);
+        else done();
+      };
+      frame();
+    });
+    rec.stop();
+    await new Promise((r) => (rec.onstop = r));
+    return [...new Uint8Array(await new Blob(chunks).arrayBuffer())];
+  }, { wav, seconds: opts.seconds });
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), name);
+  writeFileSync(file, Buffer.from(bytes));
+  return file;
+}
+
+/** Share of pixels in the top and bottom quarters of the frame at `t` that are caption yellow. */
+async function yellowBands(page: Page, bytes: Uint8Array, t: number) {
+  return page.evaluate(async ({ data, t }) => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
+    await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
+    await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); v.currentTime = t; });
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(v, 0, 0);
+    const band = (y0: number) => {
+      const d = ctx.getImageData(0, y0, c.width, c.height >> 2).data;
+      let n = 0;
+      for (let i = 0; i < d.length; i += 4) if (d[i]! > 200 && d[i + 1]! > 170 && d[i + 2]! < 90) n++;
+      return n / (d.length / 4);
+    };
+    return { top: band(0), bottom: band(c.height - (c.height >> 2)) };
+  }, { data: [...bytes], t });
+}
+
+test('Add subtitles to video burns in captions from an SRT file, only while each is due, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(120_000);
+  const errors = await open(page, 'add-subtitles-to-video');
+  const clip = await greyClip(page, 'walk.webm', { seconds: 3 });
+  const srt = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'walk.srt');
+  writeFileSync(srt, '1\n00:00:00,000 --> 00:00:01,500\nHello from the park\n');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip, srt], async () => {
+    await choose(page.locator('input[name="look"][value="yellow"]'));
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('walk-subtitled.mp4');
+  await expect(page.locator('#results-list')).toContainText('1 caption from your subtitle file');
+  const mp4 = await bytesOf(downloads[0]!);
+  const during = await yellowBands(page, mp4, 0.7);
+  expect(during.bottom).toBeGreaterThan(0.01);
+  expect(during.top).toBe(0);
+  const after = await yellowBands(page, mp4, 2.5);
+  expect(after.bottom).toBe(0);
+  net.assertNothingLeft(['walk.webm', 'walk.srt']);
+  expect(errors).toEqual([]);
+});
+
+test('Add subtitles to video writes captions from the speech and can save them as SRT too', async ({ page }) => {
+  test.setTimeout(180_000);
+  const errors = await open(page, 'add-subtitles-to-video');
+  const clip = await greyClip(page, 'speech.webm', { wav: staticFx('jfk.wav') });
+  const net = watchNetwork(page);
+  const { items } = await run(page, [clip], async () => {
+    await choose(page.locator('input[name="place"][value="top"]'));
+    await choose(page.locator('input[name="look"][value="yellow"]'));
+    await choose(page.locator('#save-srt'));
+  });
+  expect(items).toBe(2);
+  await expect(page.locator('#results-list')).toContainText(/captions? written from English speech/);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['speech-subtitled.mp4', 'speech.srt']);
+  expect(new TextDecoder().decode(files['speech.srt']).toLowerCase()).toContain('ask not what your country can do for you');
+  const frame = await yellowBands(page, files['speech-subtitled.mp4']!, 5);
+  expect(frame.top).toBeGreaterThan(0.01);
+  expect(frame.bottom).toBe(0);
+  net.assertNothingLeft(['speech.webm']);
+  expect(errors).toEqual([]);
 });
 
 /** A 400×300 PNG: a smooth blue-to-green gradient with a red 60×60 square in the middle. */

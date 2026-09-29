@@ -2626,6 +2626,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'add-subtitles-to-video',
+    name: 'Add subtitles to video',
+    title: 'Add Subtitles to Video: Auto Captions Burned In, No Upload | Stayput',
+    description:
+      'Burn captions into an MP4, MOV or WebM: written from the speech by Whisper on your device, or from your own SRT or VTT file. Three looks, no watermark, no upload.',
+    heading: 'Add subtitles to a video',
+    tagline: 'Captions written from the speech and burned into the picture, on your own device. Or bring an SRT and burn in that.',
+    category: 'media',
+    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,.srt,.vtt',
+    multiple: true,
+    dropLabel: 'Drop a video, and an SRT or VTT file if you have one',
+    action: 'Add subtitles',
+    keywords: ['add subtitles to video', 'auto caption video', 'burn subtitles into video', 'hardcode subtitles', 'add captions to video', 'srt to video', 'open captions', 'subtitles without upload'],
+    steps: [
+      'Drop a video. To use subtitles you already have, drop the SRT or VTT file with it.',
+      'Choose the look, size and place of the captions, and the spoken language if detection gets it wrong.',
+      'Press Add subtitles. Without a subtitle file, the speech model writes them first (it downloads once); then every frame is drawn with its caption and the video is saved as a new file.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The soundtrack is transcribed by a speech model running in this tab, and the frames are redrawn and encoded by your browser’s own video encoder. The only download is the model itself, from this site, the first time.',
+      },
+      {
+        q: 'What is the difference between burned-in and separate subtitles?',
+        a: 'Burned-in (open) captions are part of the picture, so they show everywhere the video plays, including Instagram, TikTok and messaging apps that ignore subtitle files. They cannot be turned off or edited afterwards. For captions viewers can switch on and off, make an SRT with Video to subtitles and upload it alongside the video.',
+      },
+      {
+        q: 'Can I fix mistakes before they are burned in?',
+        a: 'Yes. Tick Also save the subtitles as an SRT file, correct the words in any text editor, then drop the video again with the corrected SRT: your file is used as it is, and nothing is transcribed.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'Writing the captions takes about two to three minutes for every ten minutes of speech on a laptop. Redrawing and encoding the video then depends on its length and resolution and on your device’s video encoder. Keep the tab open while it works.',
+      },
+      {
+        q: 'Is there a watermark or a length limit?',
+        a: 'No watermark and no limit. The only limit is your device’s memory, since the new video is built in the tab.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
