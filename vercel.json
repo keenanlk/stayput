@@ -21,6 +21,11 @@
       "permanent": true
     },
     {
+      "source": "/remove-object",
+      "destination": "/tools/remove-object",
+      "permanent": true
+    },
+    {
       "source": "/remove-noise",
       "destination": "/tools/remove-noise",
       "permanent": true

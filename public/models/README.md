@@ -31,3 +31,15 @@ https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-genera
 and checked against the PyTorch model (largest difference under 1e-6). The
 image upscaler loads it on the first picture and runs it in a web worker
 through onnxruntime-web, served from /vendor/.
+
+`migan-pipeline-v2.onnx` is MI-GAN (Sargsyan et al., ICCV 2023) by Picsart AI
+Research, released under the MIT License
+(https://github.com/Picsart-AI-Research/MI-GAN). The file is the authors'
+ONNX pipeline export, unchanged, from
+https://huggingface.co/andraniksargsyan/migan/resolve/main/migan_pipeline_v2.onnx
+(28,079,181 bytes, SHA-256
+6f1f3530a1a2324b19752018ce756088b07973cda8d7d890034ace5c8a48c40b). It takes the
+picture and a mask as 8-bit pixels, crops around the masked area, fills it at
+512 × 512 and blends the fill back at full size. The object remover loads it on
+the first erase and runs it in a web worker through onnxruntime-web, served
+from /vendor/.

@@ -2994,6 +2994,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'remove-object',
+    name: 'Remove object from photo',
+    title: 'Remove Objects from Photos (Magic Eraser), No Upload | Stayput',
+    description:
+      'Paint over a person, a bin, a wire or a date stamp and an AI fills it in with what should be behind it. Runs in your browser, free, no sign-up, no upload.',
+    heading: 'Remove an object from a photo',
+    tagline: 'Paint over what should not be there and let a small AI fill it in, on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: false,
+    dropLabel: 'Drop a photo to clean up',
+    action: 'Save',
+    keywords: ['remove object from photo', 'magic eraser', 'remove person from photo', 'object remover', 'remove unwanted objects from photos', 'photo eraser', 'remove text from image', 'cleanup pictures'],
+    steps: [
+      'Drop a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL).',
+      'Paint over the thing to remove, a little past its edges and over its shadow, and press Erase. Repeat for anything else; Undo steps back.',
+      'Press Save to download the cleaned-up photo.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. The eraser is MI-GAN, a small open-source inpainting network, running as WebAssembly in a background thread of this page. Your photo is decoded, filled in and saved in your tab. The 28 MB model is the only thing downloaded, once, from this site.',
+      },
+      {
+        q: 'What does it do well, and what not?',
+        a: 'It is best at things standing on a background that repeats: a person on a beach, a bin on a pavement, a wire across the sky, a spot on a wall, a date stamp in a corner. It invents what is behind, so a large object in front of something unique, like a face or a sign, comes back as a plausible blur rather than the real thing.',
+      },
+      {
+        q: 'How do I get the cleanest result?',
+        a: 'Paint a little past the edges of the object and include its shadow and reflection, which the eye notices at once if left behind. Erase one thing at a time: a smaller area gets more detail. If a patch looks smudged, paint over just that patch and erase again.',
+      },
+      {
+        q: 'Does it change the rest of the photo?',
+        a: 'No. Only the painted pixels are replaced; every other pixel is copied through as it was. The photo keeps its full size. Saving as PNG adds no compression at all, and JPG at quality 92 is visually the same as the original.',
+      },
+      {
+        q: 'Is the camera data kept?',
+        a: 'No. The saved photo is written fresh from the canvas, so location, camera and date metadata are left out, which suits a picture you are about to post.',
+      },
+    ],
+  },
+  {
     slug: 'black-and-white-image',
     name: 'Black and white photo',
     title: 'Make a Photo Black and White, Free, No Upload | Stayput',
