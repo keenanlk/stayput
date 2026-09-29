@@ -3,6 +3,7 @@ name: Publish MCP server
 on:
   push:
     tags: ["mcp-v*"] # e.g. mcp-v0.1.0
+  workflow_dispatch: {} # manual trigger, e.g. when pushing a tag isn't possible
 
 jobs:
   publish:
