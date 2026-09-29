@@ -977,6 +977,11 @@ test('preset landing pages render, run their base tool with the preset options a
     ['reduce-png-size', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['cut-video', 'trim-video', async () => expect(page.locator('#exact')).not.toBeChecked()],
     ['trim-mp4', 'trim-video', async () => expect(page.locator('#exact')).not.toBeChecked()],
+    ['pdf-to-tiff', 'pdf-to-image', async () => {
+      await expect(page.locator('#format')).toHaveValue('image/tiff');
+      await expect(page.locator('#dpi')).toHaveValue('300');
+      await expect(page.locator('#quality-field')).toBeHidden();
+    }],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -2536,4 +2541,28 @@ test('Trim video cuts exactly on request, and an end before the start is refused
   expect(seconds).toBeGreaterThan(1.35);
   expect(seconds).toBeLessThan(1.65);
   await expect(page.locator('#results-list .result-item')).toContainText('cut exactly');
+});
+
+test('PDF to TIFF writes every page into one multi-page TIFF that Pillow reads, and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/pdf-to-tiff');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['text.pdf'], async () => {
+    await page.locator('#dpi').selectOption('72');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('text.tiff');
+  const tiff = await bytesOf(downloads[0]!);
+  const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+  writeFileSync(join(dir, 'out.tiff'), tiff);
+  const script = 'import sys,json;from PIL import Image;im=Image.open(sys.argv[1]);pages=[];\nwhile True:\n  im.load();pages.append({"size":im.size,"mode":im.mode,"compression":im.info.get("compression"),"dpi":[round(x) for x in im.info.get("dpi",(0,0))],"dark":sum(1 for p in im.convert("L").getdata() if p<128)})\n  try: im.seek(im.tell()+1)\n  except EOFError: break\nprint(json.dumps(pages))';
+  const pages = JSON.parse(execFileSync('python3', ['-c', script, join(dir, 'out.tiff')], { encoding: 'utf8' }));
+  // text.pdf has three pages.
+  expect(pages).toHaveLength(3);
+  for (const p of pages) {
+    expect(p).toMatchObject({ size: [612, 792], mode: 'RGB', compression: 'tiff_adobe_deflate', dpi: [72, 72] });
+    // Real text was rendered, not a blank page.
+    expect(p.dark).toBeGreaterThan(100);
+  }
+  net.assertNothingLeft(['text.pdf']);
 });

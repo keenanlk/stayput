@@ -1829,6 +1829,33 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'pdf-to-tiff',
+    base: 'pdf-to-image',
+    name: 'PDF to TIFF',
+    title: 'PDF to TIFF Converter, Multi-Page TIFF, No Upload | Stayput',
+    description: 'Convert a PDF to one multi-page TIFF in your browser, at 150 or 300 DPI, for archives, fax and document systems. Free, nothing uploaded.',
+    heading: 'Convert PDF to TIFF',
+    tagline: 'Every page of a PDF in one multi-page TIFF, the format archives, fax services and scanning systems ask for.',
+    keywords: ['pdf to tiff', 'convert pdf to tiff', 'pdf to tiff converter', 'pdf to multi page tiff', 'pdf to tif', 'pdf to tiff 300 dpi'],
+    dropLabel: 'Drop a PDF to convert to TIFF',
+    defaults: { format: 'image/tiff', dpi: '300' },
+    intro: [
+      'TIFF is still the format of record in a lot of places: document management and records systems, court and government e-filing portals, fax services, print shops and archives. Many of them want a single multi-page TIFF rather than a folder of images, one page per image inside one file.',
+      'This page renders each page of the PDF in your browser with pdf.js, at 300 DPI by default (the usual archival and print resolution), and writes them all into one TIFF with lossless compression, so text stays crisp and the file is a fraction of the size of an uncompressed TIFF. Choose 150 DPI for a smaller file when the TIFF is only for viewing on screen, or a page range if you only need part of the document.',
+      'Contracts, medical records and court papers are exactly the documents that get converted to TIFF, so the conversion runs on your device. The PDF is never uploaded.',
+    ],
+    steps: [
+      'Drop the PDF, or tap to pick it.',
+      'Keep all pages at 300 DPI, or choose a page range or a lower resolution.',
+      'Convert, and one .tiff file with every page downloads.',
+    ],
+    faq: [
+      { q: 'Is it one TIFF or one per page?', a: 'One multi-page TIFF with every page you chose, which is what document systems and fax services expect. For one image per page, pick PNG or JPG instead.' },
+      { q: 'Which compression does the TIFF use?', a: 'Deflate (ZIP) compression of 24-bit colour pages. It is lossless and read by Windows, macOS Preview, Photoshop, Acrobat and document systems built on libtiff. Some fax services want black-and-white CCITT Group 4 TIFFs, which this page does not write.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
