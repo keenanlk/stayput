@@ -2533,6 +2533,186 @@ export const guides: Guide[] = [
       { q: 'Can I convert several GIFs to MP4 at once?', a: 'Yes, a browser-based batch converter can process multiple GIF files in one go rather than one at a time.' },
     ],
   },
+  {
+    slug: 'how-to-reorder-pages-in-a-pdf',
+    title: 'How to Reorder Pages in a PDF',
+    description: 'Fixing the order of pages in a PDF, or deleting the ones you do not need, is easy on a Mac but missing from most other built-in PDF viewers. Here is what works everywhere.',
+    heading: 'How to reorder pages in a PDF',
+    dek: 'Rearranging pages is built into Preview on a Mac, but missing on Windows, iPhone and Android. Here is what works on every device.',
+    keywords: ['how to reorder pdf pages', 'rearrange pages in a pdf', 'delete pages from a pdf', 'change pdf page order free', 'move pages in a pdf document'],
+    updated: '2026-09-29',
+    tools: ['reorder-pdf'],
+    sections: [
+      {
+        h: 'On a Mac with Preview',
+        p: [
+          'Preview\'s sidebar (View, **Thumbnails**) shows every page, and dragging a thumbnail to a new position moves it, while selecting a page and pressing delete removes it. Save the file afterward. This is one of the few built-in PDF viewers that supports rearranging pages directly.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Edge\'s PDF reader can delete a page (right-click a thumbnail in the sidebar, **Delete**) but has no way to drag pages into a new order; reordering isn\'t supported in the built-in viewer at all.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Files app or default PDF viewer supports reordering or deleting individual pages from an existing PDF. This is a genuine gap on mobile, not a hidden setting.',
+        ],
+      },
+      {
+        h: 'A page thumbnail view that works on any device',
+        p: [
+          'Stayput\'s [reorder & delete pages](/tools/reorder-pdf) tool shows every page as a thumbnail, lets you drag them into a new order and remove the ones you don\'t need, then saves the result, directly in the browser without uploading the document. It works the same way on a phone or a computer, unlike Preview\'s drag-and-drop which is Mac-only.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I delete a page from a PDF without deleting others?', a: 'Yes, both Preview\'s sidebar and a dedicated page-management tool let you select and remove one page while leaving the rest of the document intact.' },
+      { q: 'Can I reorder pages on an iPhone or Android?', a: 'Not with the built-in Files app or default PDF viewer on either platform; a browser-based tool that shows page thumbnails works the same way on mobile as on a computer.' },
+      { q: 'Does reordering pages change their content?', a: 'No, it only changes the position of each page in the document; the text and images on each page stay exactly as they were.' },
+      { q: 'Can I undo a page deletion after saving?', a: 'Once saved, the deleted page is gone from that file; keep a copy of the original PDF beforehand if there is any chance you\'ll need the removed page again.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-music-to-a-video',
+    title: 'How to Add Music or Audio to a Video',
+    description: 'Putting a song, voice-over or sound effect onto a video, without losing the video quality, usually needs more than a phone camera roll. Here is what actually works.',
+    heading: 'How to add music to a video',
+    dek: 'Adding a soundtrack to an existing video is not something most camera rolls support directly. Here is what does the job.',
+    keywords: ['how to add music to a video', 'add audio to a video free', 'put a song on a video', 'add background music to video online', 'replace video sound with music'],
+    updated: '2026-09-29',
+    tools: ['add-audio-to-video'],
+    sections: [
+      {
+        h: 'Adding versus replacing',
+        p: [
+          'Adding audio to a video can mean two different things: mixing a new track (music, a voice-over) in alongside the video\'s existing sound, or replacing the original sound entirely with something else, such as swapping in a licensed song for a clip that had no usable audio.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'The Photos app has no built-in way to add or swap a video\'s soundtrack. Some social apps (Instagram Reels, TikTok) let you add music at the point of posting, but that only applies within that app, not to a video file you can save and use elsewhere.',
+        ],
+      },
+      {
+        h: 'On a Mac with iMovie',
+        p: [
+          'iMovie can add an audio track: import the video into a project, drag a song or audio file onto the timeline below the video, and adjust its volume or fade. Export when done. This works well but requires building a small project for what might be a one-off edit.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Clipchamp (built into recent versions of Windows) supports adding an audio track to a video timeline similarly to iMovie. There is no equivalent in the simpler Photos app video editor.',
+        ],
+      },
+      {
+        h: 'A direct tool for adding or swapping sound',
+        p: [
+          'Stayput\'s [add audio to video](/tools/add-audio-to-video) tool puts an MP3, WAV or M4A onto a video, or swaps in the audio from another clip, with options to mix or fully replace the original sound, loop a short track to match the video\'s length, and fade in or out, directly in the browser. The picture is copied over untouched, and nothing is uploaded.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I add music to a video without a full video editor?', a: 'Yes, a tool built specifically for adding or replacing audio skips the timeline, transitions and other features a full editor like iMovie or Clipchamp includes.' },
+      { q: 'Can I keep the original sound and add music on top?', a: 'Yes, mixing keeps both the original audio and the new track together at whatever relative volume you set, rather than replacing one with the other.' },
+      { q: 'What happens if my music track is shorter than the video?', a: 'A tool with a loop option repeats the track to fill the video\'s length; without it, the audio simply stops early and the rest of the video plays silent or on its original sound.' },
+      { q: 'Does adding audio reduce video quality?', a: 'No, a well-built tool copies the video stream unchanged and only adds or replaces the separate audio track.' },
+    ],
+  },
+  {
+    slug: 'how-to-make-a-favicon',
+    title: 'How to Make a Favicon (and the Other Icons a Website Needs)',
+    description: 'A modern website needs more than a single favicon.ico: Apple touch icons, Android icons and a manifest file, each a different size. Here is how to generate the full set from one logo.',
+    heading: 'How to make a favicon',
+    dek: 'A modern site needs more than one favicon.ico; here is how to generate the whole set of icons from a single logo.',
+    keywords: ['how to make a favicon', 'favicon generator free', 'create apple touch icon', 'favicon ico from png', 'website icon generator'],
+    updated: '2026-09-29',
+    tools: ['favicon-generator'],
+    sections: [
+      {
+        h: 'Why one favicon.ico isn\'t enough anymore',
+        p: [
+          'Browsers, Apple\'s home-screen icon, Android\'s icon system and web app manifests each expect their own icon file, in different sizes and sometimes different formats: a classic .ico for browser tabs, PNGs at specific sizes for Apple touch icons and Android, and a site.webmanifest file describing them. Missing one means a blank or default icon in that context, even if the browser tab icon looks fine.',
+        ],
+      },
+      {
+        h: 'Making the source image',
+        p: [
+          'Whatever generates the icon set needs a single clean source image to start from, typically a square logo or mark at a reasonably high resolution (512px or larger works well), since every other size is produced by scaling down from it. A simple, high-contrast mark scales down more legibly than a detailed logo, which can turn into a blur at 16x16 pixels.',
+        ],
+      },
+      {
+        h: 'Doing it by hand',
+        p: [
+          'It is possible to resize a logo to each required size manually in any image editor and name the files correctly, but getting every size, format and the manifest file right (there are a dozen or so distinct files for full coverage) is tedious and easy to get subtly wrong, which shows up as a missing icon on just one platform.',
+        ],
+      },
+      {
+        h: 'A generator that produces the whole set at once',
+        p: [
+          'Stayput\'s [favicon generator](/tools/favicon-generator) tool takes one PNG, JPG or SVG logo and produces favicon.ico, the Apple touch icon, Android and maskable icons, and a site.webmanifest file, plus the HTML snippet to paste into a page\'s head, all generated in the browser without uploading the logo.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What size should my source logo be?', a: 'At least 512x512 pixels is a safe starting point, since every icon size needed is produced by scaling down from the source; starting too small means the largest generated icons will look soft.' },
+      { q: 'Do I need a favicon.ico if I already have PNG icons?', a: 'Yes, some older browsers and contexts specifically look for favicon.ico by name, so it is still worth including alongside the newer PNG-based icons.' },
+      { q: 'What is a maskable icon?', a: 'An Android-specific icon format with extra padding so the system can crop it into different shapes (circle, rounded square) without cutting off important parts of the logo.' },
+      { q: 'Can I generate a favicon from an SVG logo?', a: 'Yes, an SVG source can be rasterized to each required PNG size, often with cleaner results than starting from an already-rasterized image.' },
+    ],
+  },
+  {
+    slug: 'how-to-get-a-color-code-from-an-image',
+    title: 'How to Get a Color Code From an Image (Eyedropper)',
+    description: 'Finding the exact hex or RGB code of a color you see in a photo needs an eyedropper tool, which most built-in photo viewers do not include. Here is what works, including on a phone.',
+    heading: 'How to get a color code from an image',
+    dek: 'Matching a color you see in a photo needs an eyedropper, which most photo viewers do not have built in. Here is what actually gets the exact code.',
+    keywords: ['how to get color code from image', 'eyedropper tool online', 'find hex code from a photo', 'color picker from picture free', 'get rgb value from image'],
+    updated: '2026-09-29',
+    tools: ['color-picker'],
+    sections: [
+      {
+        h: 'Why you can\'t just guess a color code',
+        p: [
+          'Two shades that look almost identical to the eye can have noticeably different hex codes, and matching a brand color, a paint swatch or a design element exactly needs a tool that samples the actual pixel value rather than a visual estimate.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'The built-in Digital Color Meter app (in Applications, Utilities) shows the RGB value under the cursor anywhere on screen, including over an open image. It is accurate but shows raw values rather than a convenient hex code, and it is a separate app most people don\'t know exists.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Windows has no built-in eyedropper for an arbitrary open image; the closest built-in option is the color picker inside Paint (choose the eyedropper tool, click a pixel, then check the color properties for its code), which requires opening the image in Paint specifically.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform\'s Photos app includes an eyedropper or color-code tool. Some design apps include one, but that means installing something just for an occasional lookup.',
+        ],
+      },
+      {
+        h: 'A browser eyedropper with a magnifier',
+        p: [
+          'Stayput\'s [color picker from image](/tools/color-picker) tool drops in a photo and shows a magnified view so you can point at the exact pixel, then copies its HEX, RGB or HSL code. It also extracts the image\'s main colors as a palette, and works the same way on a phone or a computer, all in the browser without uploading the photo.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the difference between HEX, RGB and HSL?', a: 'They are different ways of writing the same color: HEX is a six-digit code used mainly in web design, RGB gives separate red, green and blue values, and HSL describes hue, saturation and lightness, which is sometimes more intuitive for adjusting a shade.' },
+      { q: 'Can I get a color code from a photo on my phone?', a: 'Yes, with a browser-based eyedropper tool; neither iPhone nor Android has a built-in way to do this from the Photos app.' },
+      { q: 'How accurate is a screen color picker?', a: 'It reads the exact pixel value as displayed, which is accurate for that image and device, though the same color can render slightly differently across screens with different color calibration.' },
+      { q: 'Can I get a full palette of colors from an image, not just one pixel?', a: 'Yes, a tool that extracts the main colors from an image gives a small palette representing its dominant shades, useful for matching a design to a photo\'s overall look.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
