@@ -106,3 +106,12 @@ with wave.open(os.path.join(out, 'tone.wav'), 'wb') as w:
         r = int(12000 * math.sin(2 * math.pi * 880 * i / 48000))
         frames += struct.pack('<hh', l, r)
     w.writeframes(bytes(frames))
+
+# 400x200 PNG of flat colour blocks for the colour picker: the left half is
+# #E63946 red, the top right quarter #1D3557 navy, the bottom right quarter
+# #A8DADC pale teal. So the palette is red (50%), then navy and teal (25% each).
+swatches = Image.new('RGB', (400, 200), (0xE6, 0x39, 0x46))
+wd = ImageDraw.Draw(swatches)
+wd.rectangle([200, 0, 399, 99], fill=(0x1D, 0x35, 0x57))
+wd.rectangle([200, 100, 399, 199], fill=(0xA8, 0xDA, 0xDC))
+swatches.save(os.path.join(out, 'swatches.png'))
