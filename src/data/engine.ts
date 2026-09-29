@@ -167,6 +167,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser decodes the sound with its own audio decoders. Every sample is multiplied by the gain you chose (or the gain that brings the gated loudness to about −14 LUFS), then a look-ahead peak limiter turns down only the moments that would pass −1 dBFS, easing in over 5 ms and out over 150 ms. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders. For a video, Mediabunny (MPL-2.0) copies the picture packets unchanged and adds the new sound.',
     versus: 'Online volume boosters upload the recording or video, cap the file size, and often just multiply the samples so loud parts clip and crackle. Here nothing leaves your device and the limiter keeps boosted sound clean.',
   },
+  'merge-audio': {
+    how: 'Your browser’s own audio decoders read each file (MP3, AAC in M4A or MP4, Opus or Vorbis, FLAC, WAV) into plain samples at 44.1 kHz in your tab. The sounds are laid end to end, with equal-power crossfades if you chose them, and written once as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
+    versus: 'Online audio joiners upload every file, cap free use at a few files or a few minutes, and keep the uploads on their servers. Here the files never leave your device, and there is no limit on how many you join.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',
@@ -202,6 +206,10 @@ export const engines: Record<string, Engine> = {
   'remove-pdf-metadata': {
     how: 'pdf-lib (MIT) parses the PDF in your tab (an encrypted file is first decrypted by qpdf, compiled to WebAssembly and served from this site). The trailer’s information dictionary and file ID are dropped, every /Metadata XMP stream and /PieceInfo entry is unlinked from the catalog, pages, images and fonts, and every object nothing refers to any more is deleted before the file is written back out, so the removed data is really gone rather than just hidden.',
     versus: 'The PDFs people clean before sharing are the ones where the author matters: CVs, legal filings, reports sent anonymously, documents for a client who should not see who drafted them. Uploading them to a metadata-removal site hands the full document, name included, to a stranger. Here nothing is sent anywhere.',
+  },
+  'redact-pdf': {
+    how: 'pdf.js (Apache 2.0) renders each page in your tab and reads its text layer, so a search finds every match with its position. When you save, each page with a box is rendered at 200 dpi, the boxes are painted onto the pixels, and pdf-lib (MIT) replaces that page’s content with the image. The old text, fonts, links, comments and form values on those pages are then deleted from the file along with its metadata, so nothing is left under the black.',
+    versus: 'Redacting on a website means uploading the exact document you are trying to keep private, and many free editors only draw a black rectangle on top, so the name or number underneath can still be copied, searched or extracted. Here the file never leaves your device and the text under each box is removed, not hidden.',
   },
   'sticker-maker': {
     how: 'The same open segmentation model as the background remover (ISNet, Apache 2.0, running on onnxruntime-web in a web worker) marks the subject. The cut-out is trimmed to the subject’s bounds, and the border is drawn by stamping a tinted silhouette of it in rings around the edge on a canvas, so it follows every curve. The canvas is saved as PNG or WebP by your browser.',

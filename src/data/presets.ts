@@ -2655,6 +2655,35 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'merge-mp3',
+    base: 'merge-audio',
+    name: 'Merge MP3',
+    title: 'Merge MP3 Files: Join Songs into One MP3, No Upload | Stayput',
+    description: 'Combine MP3 files into a single MP3 in your browser: songs, audiobook chapters or voice notes, in any order. No upload, no file limit, no watermark.',
+    heading: 'Merge MP3 files',
+    tagline: 'Join songs, audiobook chapters or recordings into one MP3, in the order you choose.',
+    keywords: ['merge mp3', 'join mp3', 'combine mp3 files', 'mp3 joiner', 'mp3 merger', 'merge mp3 files online'],
+    dropLabel: 'Drop the MP3 files to join',
+    action: 'Merge MP3',
+    defaults: { format: 'mp3', between: 'none', bitrate: '192' },
+    intro: [
+      'Audiobooks and lectures often arrive as dozens of short MP3 chapters, and a playlist or a mix is easier to share as one file. This page joins MP3 files end to end into a single MP3 that plays in any app, car stereo or phone.',
+      'Drop the files in, sort them with the arrows (they keep the order you add them in), and choose whether to add a short pause or a crossfade between tracks. The joined file is written once at the quality you pick, so it plays without gaps or glitches at the joins.',
+      'The files are decoded and joined by your browser. Nothing is uploaded, so private recordings stay private and there is no limit on how many you join.',
+    ],
+    steps: [
+      'Drop the MP3 files, or tap to pick them. Sort them with the arrows.',
+      'Choose what goes between tracks, and the MP3 quality: 128 kbps suits speech, 192 kbps music.',
+      'Merge and download the single MP3.',
+    ],
+    faq: [
+      { q: 'Why not just stick the MP3 files together?', a: 'Gluing the bytes together (as some command-line tricks do) leaves each file’s tags and encoder padding at the joins, which causes clicks, wrong durations and players that stop after the first track. Decoding and writing one new MP3 avoids all of that.' },
+      { q: 'Will the song titles and cover art be kept?', a: 'No. The merged file is a new MP3 without tags; add a title and cover in your music app afterwards if you need them.' },
+      { q: 'How many files can I merge?', a: 'As many as your device’s memory holds. A few hours of audio is fine on a laptop; very long merges on a phone may be slow.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
