@@ -404,6 +404,11 @@
       "source": "/transcribe",
       "destination": "/tools/transcribe",
       "permanent": true
+    },
+    {
+      "source": "/add-subtitles-to-video",
+      "destination": "/tools/add-subtitles-to-video",
+      "permanent": true
     }
   ],
   "headers": [

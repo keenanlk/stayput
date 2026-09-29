@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import AddSubtitles from '../../components/options/AddSubtitles.astro';
+const tool = toolBySlug('add-subtitles-to-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><AddSubtitles /></Fragment>
+</ToolLayout>
+<script src="../../tools/add-subtitles.ts"></script>
