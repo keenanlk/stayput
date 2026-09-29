@@ -10,6 +10,7 @@
   },
   "homepage": "https://stayput.dev/mcp",
   "transport": "stdio",
+  "dockerfile": "glama/Dockerfile",
   "tags": [
     "mcp",
     "model-context-protocol",

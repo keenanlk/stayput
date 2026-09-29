@@ -9,7 +9,7 @@
 Free, open-source image and PDF tools that run entirely in your browser.<br>
 Nothing is uploaded, there are no accounts or limits, and it works offline.
 
-**[Open stayput.dev](https://stayput.dev)** · [Tools](#tools) · [Verify the claim](#open-the-network-tab-it-stays-empty) · [How it works](#how-it-works) · [Privacy](https://stayput.dev/privacy)
+**[Open stayput.dev](https://stayput.dev)** · [Tools](#tools) · [Verify the claim](#open-the-network-tab-it-stays-empty) · [How it works](#how-it-works) · [MCP server](#mcp-server) · [Privacy](https://stayput.dev/privacy)
 
 [![CI](https://github.com/keenanlk/stayput/actions/workflows/ci.yml/badge.svg)](https://github.com/keenanlk/stayput/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f6f5f.svg)](LICENSE)
@@ -50,9 +50,19 @@ That is the whole pitch, and you can check it in three ways:
 
 Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [WebP to PNG](https://stayput.dev/webp-to-png), [AVIF to JPG](https://stayput.dev/avif-to-jpg) and [JXL to PNG](https://stayput.dev/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.dev/jpg-to-pdf), [PDF to JPG](https://stayput.dev/pdf-to-jpg), [Combine PDF](https://stayput.dev/combine-pdf), [Resize image](https://stayput.dev/resize-image), [Crop to circle](https://stayput.dev/crop-image-to-circle) and [Remove location from photos](https://stayput.dev/remove-location-from-photos); and [guides](https://stayput.dev/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
 
+## MCP server
+
+Stayput also ships as a local [Model Context Protocol](https://modelcontextprotocol.io) server, [`stayput-mcp`](mcp/), so an LLM client can call the same PDF and photo tools as tool calls, still with no network access and no uploads:
+
+```json
+{ "mcpServers": { "stayput": { "command": "npx", "args": ["-y", "stayput-mcp"] } } }
+```
+
+See [`mcp/README.md`](mcp/README.md) for the full tool list, or [stayput.dev/mcp](https://stayput.dev/mcp).
+
 ## How it works
 
-The site is a static [Astro](https://astro.build) build: one page per tool, a shared tool shell, and a TypeScript module per tool that does the work in the tab.
+The site is a static [Astro](https://astro.build) build: one page per tool, a shared tool shell, and a TypeScript module per tool that does the work in the tab. The MCP server (above) is the one part of this repo that does run as a local process; everything else described below is the browser-only website.
 
 - **HEIC decoding**: [heic-to](https://github.com/hoppergee/heic-to), a WebAssembly build of libheif, served by the site itself from `/vendor/` (copied out of node_modules at build time by `scripts/vendor.mjs`). The request fetches only the decoder; no image data is sent.
 - **PDF editing**: [pdf-lib](https://pdf-lib.js.org) for merge, split, rotate, reorder, page numbers (standard fonts, nothing embedded), signature stamps, image embedding and rewriting image streams.
