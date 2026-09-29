@@ -8,7 +8,7 @@ type Ev = { n: string; d: Record<string, string> };
 /** Every property an event may carry. Anything else is a privacy regression. */
 const ALLOWED = new Set([
   'tool', 'outcome', 'files', 'input', 'output', 'duration', 'attempt',
-  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format', 'error_class',
+  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format', 'error_class', 'page', 'kind', 'rank', 'via',
 ]);
 
 /** Replace Umami with a stub that keeps events in sessionStorage so they survive navigation. */
@@ -209,4 +209,31 @@ test('a failed run reports a bare error class, never the error message or file n
   // A bare JS error name (e.g. "Error", "TypeError"), never a message or the file name.
   expect(run.d.error_class).toMatch(/^[A-Za-z]+$/);
   assertPrivate(all, ['definitely-not-a-real-pdf-secret-name.pdf']);
+});
+
+test('a header search pick is counted with its destination only, and the run it leads to carries via=search', async ({ page }) => {
+  await stub(page);
+  await page.goto('/about');
+  await page.keyboard.press('/');
+  const input = page.getByRole('combobox', { name: 'Search tools' });
+  await input.fill('remove gps');
+  await expect(page.getByRole('option').first()).toContainText('Remove EXIF Data');
+  await input.press('Enter');
+  await expect(page).toHaveURL(/\/tools\/strip-exif$/);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fx('photo.jpg'));
+  await page.locator('#run').click();
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+  let all = await events(page);
+  expect(all.find((e) => e.n === 'search_open')!.d).toEqual({ page: '/about' });
+  expect(all.find((e) => e.n === 'search_pick')!.d).toEqual({ to: '/tools/strip-exif', kind: 'tool', rank: '1' });
+  expect(all.find((e) => e.n === 'files_added')!.d).toMatchObject({ via: 'search' });
+  expect(all.find((e) => e.n === 'tool_run')!.d).toMatchObject({ via: 'search' });
+  for (const e of all) expect(JSON.stringify(e.d)).not.toContain('gps');
+
+  // The next page was not reached through search.
+  await runTool(page, '/compress-jpg', 'big.jpg');
+  all = await events(page);
+  expect(all.filter((e) => e.n === 'tool_run')[1]!.d.via).toBeUndefined();
+  assertPrivate(all, ['photo.jpg', 'big.jpg']);
 });

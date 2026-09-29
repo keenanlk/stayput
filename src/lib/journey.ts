@@ -16,6 +16,7 @@
 
 const TAB_KEY = 'stayput:tab';
 const LOCAL_KEY = 'stayput:local';
+const VIA_KEY = 'stayput:via';
 
 interface TabState {
   landing: string;
@@ -45,6 +46,8 @@ export interface Journey {
   isNewVisit: boolean;
   /** Experiment E2 arm, assigned at random once per visit. */
   ns: 'on' | 'off';
+  /** How this page was reached when the site knows: "search" after a header search pick (E18). */
+  via?: string;
 }
 
 const SOURCES: [RegExp, string][] = [
@@ -163,8 +166,17 @@ export function journey(): Journey {
     write(session, TAB_KEY + ':visit', { visit });
     write(local, LOCAL_KEY, { ...saved, lastVisit: today });
   }
-  current = { landing: state.landing, ref: state.ref, from, visit, isNewVisit, ns: state.ns };
+  // Set by markVia() on the page before; it describes this page load only.
+  const via = read<string>(session, VIA_KEY);
+  if (via) session?.removeItem(VIA_KEY);
+  current = { landing: state.landing, ref: state.ref, from, visit, isNewVisit, ns: state.ns, ...(via ? { via } : {}) };
   return current;
+}
+
+/** Note how the next page in this tab is being reached ("search"); read once by journey() there. */
+export function markVia(via: string): void {
+  journey();
+  write(storage('sessionStorage'), VIA_KEY, via);
 }
 
 /**

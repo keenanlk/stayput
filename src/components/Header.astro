@@ -1,11 +1,18 @@
 ---
 import Logo from './Logo.astro';
+import Icon from './Icon.astro';
 const path = Astro.url.pathname;
 const is = (p: string) => (path === p ? 'page' : undefined);
 ---
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="/" aria-label="Stayput home"><Logo /> Stayput</a>
+    <!-- Shown by src/lib/search-ui.ts; without scripts the home page tool index is the way in. -->
+    <button type="button" class="search-trigger" aria-label="Search tools" aria-haspopup="dialog" aria-keyshortcuts="/ Control+K Meta+K" hidden>
+      <Icon name="search" />
+      <span class="st-label" aria-hidden="true">Search tools</span>
+      <kbd class="st-key" aria-hidden="true">/</kbd>
+    </button>
     <nav class="nav" aria-label="Main">
       <a href="/#image-tools">Image tools</a>
       <a href="/#pdf-tools">PDF tools</a>
@@ -15,4 +22,18 @@ const is = (p: string) => (path === p ? 'page' : undefined);
       <a class="cta" href="https://github.com/keenanlk/stayput" rel="noopener">Source</a>
     </nav>
   </div>
+  <dialog class="search-dialog" aria-label="Search tools">
+    <div class="search-bar">
+      <Icon name="search" />
+      <input type="search" role="combobox" aria-label="Search tools" aria-expanded="true" aria-controls="search-results" aria-autocomplete="list" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="HEIC to JPG, shrink a PDF, blur a face" />
+      <button type="button" class="search-close">Close</button>
+    </div>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Results"></ul>
+    <p class="search-empty" hidden>Nothing here does that yet. Try a simpler word, like <b>compress</b>, <b>convert</b> or <b>PDF</b>.</p>
+    <p class="search-foot"><span class="search-keys"><kbd>↑</kbd><kbd>↓</kbd> to move, <kbd>Enter</kbd> to open, <kbd>Esc</kbd> to close.</span> Search runs on this page. Nothing you type is sent.</p>
+  </dialog>
 </header>
+<script>
+  import { initSearch } from '../lib/search-ui';
+  initSearch();
+</script>
