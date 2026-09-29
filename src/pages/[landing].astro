@@ -23,6 +23,8 @@ import BlurImage from '../components/options/BlurImage.astro';
 import RotateImage from '../components/options/RotateImage.astro';
 import VideoToMp3 from '../components/options/VideoToMp3.astro';
 import ImageToText from '../components/options/ImageToText.astro';
+import ColorPicker from '../components/options/ColorPicker.astro';
+import ColorStage from '../components/ColorStage.astro';
 import CropStage from '../components/CropStage.astro';
 import ReorderStage from '../components/ReorderStage.astro';
 import SignStage from '../components/SignStage.astro';
@@ -54,6 +56,7 @@ const options = {
   'rotate-image': RotateImage,
   'video-to-mp3': VideoToMp3,
   'image-to-text': ImageToText,
+  'color-picker': ColorPicker,
   // Sign PDF has no option controls; everything happens on the stage.
   'sign-pdf': null,
 } as const;
@@ -68,6 +71,7 @@ const Options = options[base as keyof typeof options];
   {base === 'video-to-gif' && <VideoStage slot="panel" />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
+  {base === 'color-picker' && <ColorStage slot="panel" />}
   {base === 'pdf-to-word' && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>
 </ToolLayout>
