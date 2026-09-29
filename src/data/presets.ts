@@ -2510,6 +2510,9 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Why do some colours end up the same grey?', a: 'Grayscale keeps brightness only, so two different colours of the same brightness, such as a mid red and a mid green, become the same grey. If they must stay apart, choose High contrast, which spreads the tones further.' },
       { q: 'Does it work for icons and logos with a transparent background?', a: 'Yes. Save as PNG or WebP and the transparent parts stay transparent; only the coloured pixels are changed.' },
+      { q: 'Which weights are used for red, green and blue?', a: 'The Rec. 709 luma weights: about 21% red, 72% green and 7% blue. Green counts most because the eye is most sensitive to it, which is why a simple average of the three channels looks wrong, with blues too light and greens too dark.' },
+      { q: 'Can I check a website design for colour blindness this way?', a: 'Grayscale shows whether your interface depends on colour alone, for example a red error and a green success message that look identical without colour. It is not a colour-blindness simulator, but it catches the same class of problem quickly.' },
+      { q: 'Will the file get smaller?', a: 'Usually a little, because there is less colour detail for the encoder to store. For a much smaller file, run the result through the image compressor afterwards.' },
       noUpload,
     ],
   },
@@ -2538,6 +2541,9 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Can I make it look more or less aged?', a: 'This is a single classic sepia tone. For a harsher, grainier look, try High contrast first and then apply sepia to that result.' },
       { q: 'Is the original photo changed?', a: 'No. You download a new copy; the photo on your device stays as it was.' },
+      { q: 'Why did old photographs turn brown?', a: 'Sepia toning replaced the silver in a print with silver sulfide, which is far more stable in air, so toned prints lasted decades longer than untoned ones. The warm brown was a side effect that became a style, and later a visual shorthand for the past.' },
+      { q: 'What works best with sepia?', a: 'Portraits, architecture, landscapes and anything with texture: wood, stone, fabric, weathered faces. Photos that rely on colour, such as a sunset or a bowl of fruit, lose their point. Modern details like cars and signs give the vintage look away, so crop them out first if you can.' },
+      { q: 'Can I print it?', a: 'Yes. The photo keeps its full resolution. Printers render the brown tones well on matte or cream paper, which adds to the old-print feel.' },
       noUpload,
     ],
   },
