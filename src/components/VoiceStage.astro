@@ -1,0 +1,71 @@
+---
+/**
+ * The recorder for Voice recorder: a live level meter and timer, the record,
+ * pause and stop buttons, the microphone and format choices, and a player for
+ * the finished recording. It replaces the drop zone. Driven by
+ * src/tools/voice-recorder.ts.
+ */
+import Icon from './Icon.astro';
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'mp3';
+---
+<div id="vr-panel" class="vr-panel">
+  <div class="vr-deck" id="vr-deck" data-state="idle">
+    <canvas id="vr-meter" class="vr-meter" height="96" aria-hidden="true"></canvas>
+    <div class="vr-idle" id="vr-idle">
+      <Icon name="mic" />
+      <strong>Record your voice with your microphone</strong>
+      <span>Your browser asks for the microphone once. The sound stays on this device.</span>
+    </div>
+    <span class="vr-time" id="vr-time" hidden>0:00</span>
+  </div>
+  <audio id="vr-audio" class="vr-audio" controls hidden></audio>
+  <div class="vr-controls">
+    <button type="button" class="btn btn-primary btn-lg" id="vr-start">Start recording</button>
+    <button type="button" class="btn btn-lg" id="vr-pause" hidden>Pause</button>
+    <button type="button" class="btn btn-lg" id="vr-stop" hidden>Stop and save</button>
+  </div>
+  <div class="vr-options">
+    <div class="field">
+      <label for="vr-device">Microphone</label>
+      <select id="vr-device"><option value="">Default microphone</option></select>
+    </div>
+    <div class="field">
+      <label for="vr-format">Save as</label>
+      <select id="vr-format">
+        <option value="mp3" selected={format === 'mp3'}>MP3 (plays everywhere)</option>
+        <option value="wav" selected={format === 'wav'}>WAV (uncompressed, for editing)</option>
+        <option value="m4a" selected={format === 'm4a'}>M4A (AAC, for Apple devices)</option>
+      </select>
+    </div>
+    <div class="field">
+      <span class="vr-label">Sound</span>
+      <label class="check"><input type="checkbox" id="vr-clean" checked={defaults.clean !== 'false'} /> Reduce background noise and echo</label>
+    </div>
+  </div>
+  <p class="muted small vr-note" id="vr-note" aria-live="polite"></p>
+</div>
+<style is:global>
+  /* The recording is made here, so there is no drop zone or file list; the run bar re-saves in another format. */
+  .tool-panel:has(#vr-panel) #drop,
+  .tool-panel:has(#vr-panel) #file-list { display: none; }
+  #tool[data-count='0']:has(#vr-panel) .run-dock { display: none; }
+  .vr-panel { display: grid; gap: 16px; }
+  .vr-deck { position: relative; min-height: 180px; background: var(--surface-2); border: 1px dashed var(--line-strong); border-radius: var(--radius); display: grid; place-items: center; overflow: hidden; }
+  .vr-deck:not([data-state='idle']) { border-style: solid; }
+  .vr-meter { position: absolute; inset: auto 0 0 0; width: 100%; height: 96px; }
+  .vr-deck[data-state='idle'] .vr-meter { visibility: hidden; }
+  .vr-idle { position: relative; display: grid; justify-items: center; gap: 6px; padding: 20px; text-align: center; color: var(--muted); }
+  .vr-idle strong { color: var(--ink); font-size: 1.05rem; }
+  .vr-idle svg { width: 36px; height: 36px; color: var(--accent); }
+  .vr-time { position: relative; align-self: start; margin-top: 22px; font-size: 2.4rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .vr-deck[data-state='live'] .vr-time::before { content: ''; display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #e5484d; margin-right: 12px; vertical-align: middle; }
+  .vr-deck[data-state='paused'] .vr-time { color: var(--muted); }
+  .vr-audio { width: 100%; }
+  .vr-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+  .vr-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; }
+  .vr-label { font-size: 14px; font-weight: 620; color: var(--ink-2); }
+  .vr-note { margin: 0; }
+  .vr-note.is-warn { color: var(--warn); font-weight: 600; }
+</style>

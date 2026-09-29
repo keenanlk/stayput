@@ -1628,6 +1628,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'voice-recorder',
+    name: 'Voice recorder',
+    title: 'Online Voice Recorder: Record to MP3, No Upload | Stayput',
+    description:
+      'Record your voice with your microphone and save it as MP3, WAV or M4A, right in the browser. No app, no sign-up, no time limit, and nothing is uploaded.',
+    heading: 'Record your voice',
+    tagline: 'A voice memo, a voice-over or a quick demo, recorded in this tab and saved as MP3. The sound never leaves your device.',
+    category: 'media',
+    accept: 'audio/*,.webm,.ogg,.m4a',
+    multiple: false,
+    dropLabel: 'Record your voice',
+    action: 'Save recording',
+    keywords: ['voice recorder', 'online voice recorder', 'record audio', 'record voice', 'mp3 recorder', 'audio recorder online', 'record my voice'],
+    steps: [
+      'Press Start recording and allow the microphone when your browser asks. Choose another microphone from the list if you have more than one.',
+      'Speak. The meter shows the level; pause and resume as often as you like.',
+      'Press Stop and save. Listen back on the page and download the recording as MP3, WAV or M4A.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. The microphone is recorded by your browser in this tab, and the MP3 is written by code in this page. There is no account and no server, so nobody else can hear it, and the page works offline once loaded.',
+      },
+      {
+        q: 'Does it work on my phone?',
+        a: 'Yes, in Safari on iPhone and iPad and in Chrome on Android. Keep the screen on while recording: phones pause web pages when the screen locks.',
+      },
+      {
+        q: 'Why does my voice sound muffled or quiet?',
+        a: 'Noise and echo reduction is on by default, which suits calls and memos. For music or a clean voice-over with a good microphone, untick "Reduce background noise and echo" to record the raw sound, then use the volume booster if it is too quiet.',
+      },
+      {
+        q: 'Is there a time limit?',
+        a: 'No. The recording is held in memory until you save it; an hour of speech is only a few tens of megabytes. Saving a very long recording as MP3 takes a little while, and WAV is fastest.',
+      },
+    ],
+  },
+  {
     slug: 'volume-booster',
     name: 'Volume booster',
     title: 'Volume Booster: Make Audio or Video Louder, No Upload | Stayput',

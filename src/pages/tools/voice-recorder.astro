@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VoiceStage from '../../components/VoiceStage.astro';
+const tool = toolBySlug('voice-recorder')!;
+---
+<ToolLayout tool={tool}>
+  <VoiceStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/voice-recorder.ts"></script>
