@@ -2885,6 +2885,221 @@ export const guides: Guide[] = [
       { q: 'Is my photo uploaded to remove a background locally?', a: 'No. A tool that runs the cutout model in the browser processes the image on your device; you can confirm this with the browser\'s network panel or by trying it in airplane mode after the page loads.' },
     ],
   },
+  {
+    slug: 'convertio-alternative',
+    title: 'A Free Convertio Alternative With No File Size Cap',
+    description: 'Convertio\'s free plan limits files to 100MB and 10 conversions a day. Here is what that looks like, and a browser-based alternative with neither limit for common formats.',
+    heading: 'A free Convertio alternative with no file size cap',
+    dek: 'Convertio\'s free plan caps both file size and how many conversions you get per day. Here is an alternative with no such ceiling.',
+    keywords: ['convertio alternative', 'free convertio alternative', 'convertio alternative no limit', 'convertio free plan limit', 'convertio without upload'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf', 'audio-converter'],
+    sections: [
+      {
+        h: 'What Convertio does well',
+        p: [
+          'Convertio supports a very wide range of file types across documents, images, audio, video and archives, with a simple drag-and-drop interface. It is a legitimate, widely used converter run by Convertio Limited.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'Convertio\'s free plan, as of when this page was checked, capped files at 100MB and limited free accounts to around 10 conversions a day; going beyond either meant a paid plan, with its lowest tier listed around $9.99 a month for a higher daily count and larger files, up to a top tier that removes the daily cap entirely. A single large video or archive can hit the 100MB ceiling on its own, well before the conversion count matters.',
+          'It is also, like any converter of this kind, an upload-based service. Its stated file-handling and retention practices are covered separately in [Is Convertio safe?](/guides/is-convertio-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'For formats a browser can already decode and encode, there is no file to upload and nothing to count: Stayput\'s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and more with no size ceiling other than what your device can hold in memory, [HEIC to JPG](/tools/heic-to-jpg) covers iPhone photos, [image to PDF](/tools/image-to-pdf) turns photos into documents, the [audio converter](/tools/audio-converter) handles MP3, WAV, FLAC, M4A and OGG, and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack.',
+        ],
+      },
+      {
+        h: 'Where Convertio still has the edge',
+        p: [
+          'Convertio\'s format coverage extends well beyond what a browser can read natively, including many document, e-book, archive and specialist formats. For a common image, audio or video conversion where the file is a reasonable size, a browser tool sidesteps both the size cap and the daily count entirely.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is there a free Convertio alternative with no file size limit?', a: 'Yes, for formats a browser can already handle. A tool that converts locally has no server-side size tier to enforce, so the practical limit is only what your device can process.' },
+      { q: 'How many free conversions does Convertio allow per day?', a: 'Its free plan, as of when this page was checked, allowed around 10 conversions a day, with paid tiers raising that count and the 100MB file size cap.' },
+      { q: 'Does a browser converter support as many formats as Convertio?', a: 'No, Convertio covers many more file types, particularly documents, e-books and archives; for common image, audio and video formats, a browser tool matches it with no limit.' },
+      { q: 'Can I convert a large file without hitting a size cap?', a: 'For formats the browser can decode locally, size is limited only by your device\'s memory, not a fixed plan tier the way an upload-based converter enforces.' },
+    ],
+  },
+  {
+    slug: 'zamzar-alternative',
+    title: 'A Free Zamzar Alternative With No Daily Limit',
+    description: 'Zamzar\'s free plan allows just two conversions a day with a 50MB file cap. Here is what that looks like, and a browser-based alternative with neither restriction.',
+    heading: 'A free Zamzar alternative with no daily limit',
+    dek: 'Zamzar\'s free plan is one of the tightest around: two conversions a day, 50MB per file. Here is an alternative with no such cap.',
+    keywords: ['zamzar alternative', 'free zamzar alternative', 'zamzar alternative no limit', 'zamzar free plan limit', 'zamzar without upload'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
+    sections: [
+      {
+        h: 'What Zamzar does well',
+        p: [
+          'Zamzar has converted files online since 2006 and covers a large number of formats, with an API for developers and no third-party advertising on its site, which avoids the fake-download-button problem common on free converters. It is a long-running, legitimate service run by Zamzar Limited.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'Zamzar\'s free plan, as of when this page was checked, was notably tight: about two conversions within any 24-hour period, and a 50MB cap per file. Paid plans, listed from around $12 a month, raise those limits substantially. For anyone converting more than a couple of files in a day, or a single file over 50MB, the free tier runs out quickly.',
+          'As with any upload-based converter, the file also spends time on Zamzar\'s servers to be processed; its retention practices (including a seven-day storage window for free conversions) are covered in [Is Zamzar safe?](/guides/is-zamzar-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'A browser-based converter has no daily count and no server-side file size tier: Stayput\'s [image converter](/tools/convert-image) and [compress image](/tools/compress-image) handle JPG, PNG, WebP, HEIC and more, [PDF to image](/tools/pdf-to-image) turns pages into JPG or PNG, and [Video to MP3](/tools/video-to-mp3) pulls out a soundtrack. Converting a tenth file in a day, or a file well over 50MB, costs nothing extra because there is no server job being metered.',
+        ],
+      },
+      {
+        h: 'Where Zamzar still has the edge',
+        p: [
+          'Zamzar\'s broader format support and its API for automated conversions go beyond what a browser tool offers. For everyday image, PDF and audio conversions, especially more than two a day, a browser-based tool with no cap is the more practical option.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How many free conversions does Zamzar allow per day?', a: 'Its free plan, as of when this page was checked, allowed about two conversions within a 24-hour period, with a 50MB file size cap.' },
+      { q: 'Is there a Zamzar alternative with no daily conversion limit?', a: 'Yes, for common formats. A browser-based converter processes files on your device, so there is no per-day count to run out of.' },
+      { q: 'Can I convert a file bigger than 50MB for free?', a: 'With a tool that converts in the browser, file size is limited by your device\'s memory rather than a fixed plan tier.' },
+      { q: 'Does Zamzar have ads?', a: 'According to its privacy policy, zamzar.com does not host third-party advertising, though it does use Google Analytics.' },
+    ],
+  },
+  {
+    slug: 'freeconvert-alternative',
+    title: 'A Free FreeConvert Alternative With No Processing Time Cap',
+    description: 'FreeConvert\'s free plan is generous on file size but caps processing at 5 minutes per file. Here is what that looks like, and a browser-based alternative with no such cap.',
+    heading: 'A free FreeConvert alternative with no processing time cap',
+    dek: 'FreeConvert\'s free plan allows large files, but each one only gets 5 minutes of processing time. Here is an alternative with nothing to time out.',
+    keywords: ['freeconvert alternative', 'free freeconvert alternative', 'freeconvert alternative no limit', 'freeconvert free plan limit', 'freeconvert without upload'],
+    updated: '2026-09-29',
+    tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
+    sections: [
+      {
+        h: 'What FreeConvert does well',
+        p: [
+          'FreeConvert.com, operated by TRMedia Inc., supports a wide range of formats and, compared to many competitors, is relatively generous with free-tier file size, reportedly allowing files up to around 1GB. It is a legitimate, widely used converter.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'The catch on FreeConvert\'s free plan, as of when this page was checked, was a processing time cap of about 5 minutes per file, alongside a daily conversion count around 25; a large or complex file that needs longer than 5 minutes to process can fail or get cut off on the free tier, and its Pro plan (around $9.99 a month) removes the time limit and raises the file size ceiling further.',
+          'It is also an upload-based service, sending your file to its servers for the full duration of that processing window. Its stated retention practices are covered in [Is FreeConvert safe?](/guides/is-freeconvert-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'A tool that converts inside your browser has nothing to time out, because there is no shared server queue: Stayput\'s [image converter](/tools/convert-image) and [compress image](/tools/compress-image) handle common image formats, [Video to GIF](/tools/video-to-gif) turns clips into animations, and [Video to MP3](/tools/video-to-mp3) extracts audio, all limited only by your own device\'s speed, not a fixed processing window.',
+        ],
+      },
+      {
+        h: 'Where FreeConvert still has the edge',
+        p: [
+          'FreeConvert covers document, e-book and archive formats a browser cannot read natively, and its generous size allowance on paid tiers suits very large files that need server-grade processing power. For common image, audio and video conversions, a browser tool avoids the processing-time cap entirely.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why does my FreeConvert conversion fail or time out?', a: 'Its free plan, as of when this page was checked, capped processing at around 5 minutes per file; a large or complex file that needs longer can fail to finish on the free tier.' },
+      { q: 'Is there a FreeConvert alternative with no time limit?', a: 'Yes, for common formats. A browser-based converter runs at the speed of your own device with no shared processing queue to be timed out of.' },
+      { q: 'How big a file can I convert for free with FreeConvert?', a: 'Its free plan, as of when this page was checked, allowed files up to around 1GB, though the 5-minute processing cap can still cut off a large or complex conversion before it finishes.' },
+      { q: 'Does a browser converter have ads like FreeConvert?', a: 'A tool with no server cost per conversion has less need to fund itself with advertising the way a free tier on an upload-based service typically does.' },
+    ],
+  },
+  {
+    slug: 'pdf24-alternative',
+    title: 'A PDF24 Alternative That Works on Any Device Without Uploading',
+    description: 'PDF24\'s free online tools have no size limits, but they still upload your PDF to a server; its private offline option, PDF24 Creator, is Windows only. Here is an alternative that works anywhere without uploading.',
+    heading: 'A PDF24 alternative that works on any device without uploading',
+    dek: 'PDF24 itself recommends its offline app for privacy, but that app is Windows only. Here is an alternative that skips the upload on any device.',
+    keywords: ['pdf24 alternative', 'pdf24 alternative mac', 'pdf24 without upload', 'pdf24 alternative no install', 'pdf24 creator alternative'],
+    updated: '2026-09-29',
+    tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf', 'rotate-pdf', 'reorder-pdf'],
+    sections: [
+      {
+        h: 'What PDF24 does well',
+        p: [
+          'PDF24, run by Geek Software GmbH in Germany, has offered free PDF tools since 2006, and as of when this page was checked its online tools carried no file size or task limits, which is unusually generous compared to most free converters. It is a legitimate, long-running service.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'PDF24\'s own homepage points out the trade-off itself: the online tools process files on its servers, and for more privacy it recommends PDF24 Creator, a desktop app where files stay on your PC. The catch is that PDF24 Creator is Windows-only, so it is not an option on a Mac, a Chromebook, a phone or a locked-down work laptop, which is exactly where people go looking for an alternative.',
+          'PDF24\'s stated retention and security practices for the online tools are covered in [Is PDF24 safe?](/guides/is-pdf24-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s PDF tools run inside the browser tab itself, so there is no upload regardless of device: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [unlock PDF](/tools/unlock-pdf), [rotate PDF](/tools/rotate-pdf) and [reorder and delete pages](/tools/reorder-pdf) all work the same way on Windows, Mac, Linux, Chromebooks and phones, without installing anything.',
+        ],
+      },
+      {
+        h: 'Where PDF24 still has the edge',
+        p: [
+          'PDF24\'s toolbox is larger, including OCR, Office conversions and a virtual PDF printer available in Creator on Windows. If you are on Windows and need those specifically, Creator remains a solid private choice; for the everyday jobs above, on any device, a browser tool matches PDF24\'s no-limit approach without the upload or the install.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is PDF24 Creator available for Mac?', a: 'No, PDF24 Creator is Windows-only; on other platforms, PDF24\'s online tools upload the file to its servers instead.' },
+      { q: 'Does PDF24\'s online version have file size limits?', a: 'As of when this page was checked, PDF24 stated no artificial usage limits on its free online tools, unlike most competing converters.' },
+      { q: 'Is there a way to edit PDFs privately on a Mac or phone?', a: 'Yes, a tool that runs inside the browser, such as Stayput\'s PDF tools, processes the file on your device without uploading it, on any platform.' },
+      { q: 'Why does PDF24 recommend its desktop app over the website?', a: 'Its own homepage explains that the online tools process files on its servers, while the desktop app keeps everything on your own PC, which it frames as the more private option.' },
+    ],
+  },
+  {
+    slug: 'ezgif-alternative',
+    title: 'A Free Ezgif Alternative With No File Size Cap',
+    description: 'Ezgif caps uploads at 200MB and shows ads around the download. Here is a browser-based GIF alternative with no size cap and nothing to click around.',
+    heading: 'A free ezgif alternative with no file size cap',
+    dek: 'Ezgif caps how big a file you can upload and runs ads around the result. Here is an alternative with neither.',
+    keywords: ['ezgif alternative', 'free ezgif alternative', 'ezgif alternative no ads', 'ezgif file size limit', 'gif maker without upload'],
+    updated: '2026-09-29',
+    tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
+    sections: [
+      {
+        h: 'What ezgif does well',
+        p: [
+          'Ezgif.com, run by Open Idea in Latvia, has been one of the most popular free GIF editors for years, with frame-by-frame editing, effects and text overlays that go beyond simple conversion. It is a legitimate, long-running tool.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'Ezgif is upload-based: as of when this page was checked, it capped uploads at 200MB (with some individual tools limited lower, around 100MB), which a longer or higher-resolution video can exceed easily. It is also ad-supported, and on ad-funded download sites the recurring complaint is a large advertisement styled to look like the actual download button.',
+          'Its stated retention practices, including a roughly one-hour deletion window after last use, are covered in [Is ezgif safe?](/guides/is-ezgif-safe).',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs directly on your device, [GIF to MP4](/tools/gif-to-mp4) goes the other way, and [crop image](/tools/crop-image) and [compress image](/tools/compress-image) handle stills, all with no upload size cap beyond what your device can hold in memory, and no advertising around the result.',
+        ],
+      },
+      {
+        h: 'Where ezgif still has the edge',
+        p: [
+          'Ezgif\'s frame-by-frame GIF editing, text overlays and effects are more specialized than what a browser conversion tool offers. For turning a clip into a GIF or back, or basic image edits, a browser tool with no size cap and no ads covers the common case.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is ezgif\'s file size limit?', a: 'As of when this page was checked, ezgif capped uploads at 200MB, with some individual tools limited to around 100MB.' },
+      { q: 'Is there a GIF maker with no upload size limit?', a: 'Yes, for video-to-GIF conversion specifically. A tool that encodes the GIF in your browser is limited by your device\'s memory rather than a fixed upload cap.' },
+      { q: 'Does ezgif have ads?', a: 'Yes, the site is ad-supported; the usual advice is to use the download link directly under the result rather than a large advertisement styled as a button.' },
+      { q: 'Can I make a GIF without uploading the video?', a: 'Yes, a browser-based converter like Stayput\'s Video to GIF processes the clip on your device; switching on airplane mode after the page loads confirms it keeps working.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
