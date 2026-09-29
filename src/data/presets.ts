@@ -701,6 +701,35 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'flip-image',
+    base: 'rotate-image',
+    name: 'Flip image',
+    title: 'Flip Image Online: Mirror a Photo, No Upload | Stayput',
+    description: 'Flip an image horizontally or vertically, or mirror a selfie, in your browser. Batch flip, live preview, free. Nothing is uploaded.',
+    heading: 'Flip an image',
+    tagline: 'Mirror a photo left to right or turn it upside down, one image or a folder full, without sending anything anywhere.',
+    keywords: ['flip image', 'flip image horizontally', 'mirror image online', 'flip photo', 'mirror flip image', 'flip picture', 'unmirror selfie'],
+    dropLabel: 'Drop images to flip',
+    action: 'Flip',
+    defaults: { rotate: '0', 'flip-h': 'true' },
+    intro: [
+      'Flipping an image makes its mirror copy. A horizontal flip swaps left and right, the way a reflection in a bathroom mirror does; a vertical flip swaps top and bottom, like a reflection in still water. It is not the same as rotating: a photo rotated 180 degrees is upside down but text in it still reads correctly, while a flipped photo turns every letter backwards.',
+      'The most common reason to flip is a selfie. Many front cameras save the picture the way the preview looked, which is mirrored, so a shop sign behind you or the logo on your shirt comes out backwards. This page opens with "Flip horizontally" already ticked; drop the photo, check the preview and press Flip. Designers use the same move to point a product shot or a portrait towards the text on a page, and printers need mirrored artwork for iron-on transfers and T-shirt printing.',
+      'Tick "Flip vertically" as well to mirror both ways, or add a quarter turn from the Rotate row in the same step. Drop a whole batch and every image gets the same change. The flip happens on a canvas in your browser tab: pixels are moved, not resampled, and PNGs stay lossless.',
+    ],
+    steps: [
+      'Drop the image or images to flip, or tap to pick them. The preview shows the first one mirrored.',
+      'Keep "Flip horizontally" for a left-to-right mirror, or tick "Flip vertically" instead to turn it upside down as a reflection.',
+      'Press Flip. The mirrored copies download; the originals stay as they were.',
+    ],
+    faq: [
+      { q: 'What is the difference between flip horizontal and flip vertical?', a: 'Horizontal mirrors across a vertical line, so the left side becomes the right; that is what you want for selfies and for pointing a subject the other way. Vertical mirrors across a horizontal line, so the top becomes the bottom, as in a reflection on water.' },
+      { q: 'How do I mirror an image for an iron-on transfer?', a: 'Flip horizontally, save as PNG so edges stay crisp, and print the mirrored copy. When it is pressed onto the fabric it reads the right way round again.' },
+      { q: 'Will flipping change the size or quality?', a: 'No pixels are added or lost and the size stays the same. PNGs stay exact; JPG and WebP files are saved once at quality 92 unless you change it.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

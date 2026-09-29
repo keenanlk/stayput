@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(21);
+  expect(await page.locator('.tool-card').count()).toBe(22);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -861,6 +861,10 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('input[name="effect"][value="pixelate"]')).toBeChecked();
     }],
     ['blur-face', 'blur-image', async () => expect(page.locator('#strength')).toHaveValue('6')],
+    ['flip-image', 'rotate-image', async () => {
+      await expect(page.locator('input[name="rotate"][value="0"]')).toBeChecked();
+      await expect(page.locator('#flip-h')).toBeChecked();
+    }],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -1647,12 +1651,13 @@ test('Blur image hides only the marked areas, per effect, and no bytes leave the
   await markArea(page, [0.05, 0.1], [0.25, 0.5]);
   await markArea(page, [0.6, 0.6], [0.9, 0.9]);
   await markArea(page, [0.5, 0.2], [0.5, 0.2]);
-  await expect(page.locator('.blur-area')).toHaveCount(2);
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(2);
   // Undo drops the last area; draw it again.
   await page.locator('#blur-undo').click();
-  await expect(page.locator('.blur-area')).toHaveCount(1);
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(1);
   await markArea(page, [0.6, 0.6], [0.9, 0.9]);
-  await expect(page.locator('.blur-area')).toHaveCount(2);
+  // Outlines redraw on the next frame, so wait for the recorded areas themselves.
+  await expect.poll(async () => (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(';').length).toBe(2);
   const areas = (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(';').map((a) => a.split(',').map(Number));
   expect(areas).toHaveLength(2);
   const [ax, ay, aw, ah] = areas[0]!;
@@ -1695,4 +1700,52 @@ test('Pixelate image page pixelates the whole picture into blocks', async ({ pag
     expect(px[0]).toBeLessThan(165);
   }
   net.assertNothingLeft(['stripes.png']);
+});
+
+const dark = (px: number[]) => px[0]! < 70 && px[1]! < 70 && px[2]! < 70;
+
+test('Rotate image turns a batch a quarter right, keeps the preview in step, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'rotate-image');
+  const net = watchNetwork(page);
+  // plain.jpg is 800x600 with a dark block in its top-left corner.
+  const { items } = await run(page, ['plain.jpg', 'graphic.png'], async () => {
+    await expect(page.locator('#rotate-panel')).toBeVisible();
+    await expect(page.locator('#rotate-panel')).toHaveAttribute('data-transform', '90,');
+    // The quick buttons drive the same options: left then right is back to 90.
+    await page.locator('#rotate-left').click();
+    await expect(page.locator('#rotate-panel')).toHaveAttribute('data-transform', '0,');
+    await page.locator('#rotate-right').click();
+    await expect(page.locator('#rotate-panel')).toHaveAttribute('data-transform', '90,');
+    await expect(page.locator('#rotate-hint')).toContainText('all 2 images');
+  });
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['graphic-rotated.png', 'plain-rotated.jpg']);
+  const jpg = files['plain-rotated.jpg']!;
+  expect(jpegSize(jpg)).toEqual({ width: 600, height: 800 });
+  // A quarter turn right carries the top-left corner to the top-right.
+  expect(dark(await pixelAt(page, jpg, 590, 10))).toBe(true);
+  expect(dark(await pixelAt(page, jpg, 10, 10))).toBe(false);
+  expect(pngSize(files['graphic-rotated.png']!)).toEqual({ width: 480, height: 640 });
+  net.assertNothingLeft(['plain.jpg', 'graphic.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Flip image page mirrors left to right, and a no-op is refused', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/flip-image');
+  await expect(page.locator('#tool')).toBeVisible();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['plain.jpg']);
+  expect(downloads[0]!.suggestedFilename()).toBe('plain-flipped.jpg');
+  const jpg = await bytesOf(downloads[0]!);
+  expect(jpegSize(jpg)).toEqual({ width: 800, height: 600 });
+  expect(dark(await pixelAt(page, jpg, 790, 10))).toBe(true);
+  expect(dark(await pixelAt(page, jpg, 10, 10))).toBe(false);
+  net.assertNothingLeft(['plain.jpg']);
+  // Untick the flip: nothing would change, so the tool says so instead of saving a copy.
+  await choose(page.locator('#flip-h'));
+  await page.locator('#flip-h').uncheck({ force: true });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Pick a rotation or a flip first');
 });

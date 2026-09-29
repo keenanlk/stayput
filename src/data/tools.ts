@@ -760,6 +760,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'rotate-image',
+    name: 'Rotate & flip image',
+    title: 'Rotate or Flip Image Online, Free, No Upload | Stayput',
+    description:
+      'Rotate photos 90 or 180 degrees and flip or mirror them in your browser. One image or a whole batch, with a live preview. Nothing is uploaded.',
+    heading: 'Rotate or flip an image',
+    tagline: 'Fix a sideways photo, a mirrored selfie or an upside-down scan. One image or a batch, and none of them leave this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop images to rotate or flip',
+    action: 'Rotate',
+    keywords: ['rotate image', 'flip image', 'rotate photo', 'flip photo', 'mirror image', 'rotate image online', 'flip image horizontally', 'rotate image 90 degrees'],
+    steps: [
+      'Drop one or more images (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
+      'Choose a quarter turn right or left or 180°, and tick flip horizontally or vertically if you need a mirror. The preview shows the first image as it will come out.',
+      'Rotate. One image downloads straight away; a batch downloads one by one or as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Why does my photo show sideways on one device and upright on another?',
+        a: 'Phones save photos in the sensor’s orientation and add a note in the EXIF data saying which way is up. Most apps read that note; some older software, email clients and upload forms ignore it and show the photo sideways. This tool applies the orientation, turns the pixels themselves and writes the file without the note, so it looks the same everywhere.',
+      },
+      {
+        q: 'How do I un-mirror a selfie?',
+        a: 'Tick "Flip horizontally" and set Rotate to None. Front cameras often save selfies as a mirror image, which is why text on a T-shirt reads backwards. Flipping horizontally puts it the right way round.',
+      },
+      {
+        q: 'Does rotating reduce the quality?',
+        a: 'PNG stays lossless. A JPG is re-encoded once at the quality you set (92 by default), which is not visible on screen; set 100 for the closest copy. Rotating the same JPG many times over is what slowly softens it, so rotate from the original.',
+      },
+      {
+        q: 'Can I rotate many photos at once?',
+        a: 'Yes. Drop as many as you like; the same turn and flip apply to all of them. They are processed one after another in your browser and can be downloaded together as a zip.',
+      },
+      {
+        q: 'Is anything uploaded?',
+        a: 'No. Each image is decoded and redrawn on a canvas inside your browser tab, then saved from there. You can load the page, turn off Wi-Fi and it still works.',
+      },
+    ],
+  },
+  {
     slug: 'video-to-gif',
     name: 'Video to GIF',
     title: 'Video to GIF Converter, MP4 to GIF, No Upload | Stayput',

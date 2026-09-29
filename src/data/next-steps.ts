@@ -23,6 +23,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'favicon-generator': ['crop-image', 'compress-image'],
   'video-to-gif': ['compress-image', 'crop-image'],
   'blur-image': ['compress-image', 'crop-image'],
+  'rotate-image': ['crop-image', 'compress-image'],
   'unlock-pdf': ['merge-pdf', 'compress-pdf'],
   'protect-pdf': ['compress-pdf', 'sign-pdf'],
 };

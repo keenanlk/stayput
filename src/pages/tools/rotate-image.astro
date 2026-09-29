@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RotateImage from '../../components/options/RotateImage.astro';
+import RotateStage from '../../components/RotateStage.astro';
+const tool = toolBySlug('rotate-image')!;
+---
+<ToolLayout tool={tool}>
+  <RotateStage slot="panel" />
+  <Fragment slot="options"><RotateImage /></Fragment>
+</ToolLayout>
+<script src="../../tools/rotate-image.ts"></script>
