@@ -1138,6 +1138,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'trim-video',
+    name: 'Trim video',
+    title: 'Trim Video Online: Cut MP4, MOV, WebM, No Upload | Stayput',
+    description:
+      'Trim a video in your browser: pick the start and end, and get the clip in seconds with no quality loss. MP4, MOV, WebM, MKV. No upload, no watermark.',
+    heading: 'Trim a video',
+    tagline: 'Cut a clip out of a longer video without uploading it. Most cuts take seconds and keep the original quality.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a video to trim',
+    action: 'Trim',
+    keywords: ['trim video', 'cut video', 'trim video online', 'video cutter', 'trim mp4', 'cut mp4'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV), or tap to pick one. It opens in a player on the page.',
+      'Play or scrub to where the clip should start and press Set start, then to the end and press Set end. Or type the times in seconds.',
+      'Trim. The clip is copied out of the video without re-encoding, so it keeps the original quality and downloads in seconds.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser plays the video from the file on your device, and the clip is cut by code in this page. There is no server, no size limit and no watermark, and the page works offline.',
+      },
+      {
+        q: 'Why does my clip start a moment early?',
+        a: 'Videos are stored as key frames with changes in between, and a clip copied without re-encoding has to start on a key frame. When the nearest one is within half a second before your start, the clip begins there. Tick "Cut exactly on the frame" to re-encode the clip and start exactly where you set it.',
+      },
+      {
+        q: 'Does trimming lower the quality?',
+        a: 'Not by default: the video and sound between your start and end are copied as they are. An exact cut re-encodes the clip at high quality, which is close but not identical to the original.',
+      },
+      {
+        q: 'What format is the trimmed clip?',
+        a: 'The same as the video you dropped: an MP4 stays an MP4, a MOV stays a MOV, and WebM and MKV stay WebM and MKV. To get an MP4 from any of them, use Video to MP4 afterwards.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

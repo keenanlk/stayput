@@ -26,6 +26,7 @@ import GifToMp4 from '../components/options/GifToMp4.astro';
 import CompressVideo from '../components/options/CompressVideo.astro';
 import VideoToMp4 from '../components/options/VideoToMp4.astro';
 import CompressPng from '../components/options/CompressPng.astro';
+import TrimVideo from '../components/options/TrimVideo.astro';
 import ImageToText from '../components/options/ImageToText.astro';
 import ColorPicker from '../components/options/ColorPicker.astro';
 import ColorStage from '../components/ColorStage.astro';
@@ -63,6 +64,7 @@ const options = {
   'compress-video': CompressVideo,
   'video-to-mp4': VideoToMp4,
   'compress-png': CompressPng,
+  'trim-video': TrimVideo,
   'image-to-text': ImageToText,
   'color-picker': ColorPicker,
   // Sign PDF has no option controls; everything happens on the stage.
@@ -76,7 +78,7 @@ const Options = options[base as keyof typeof options];
   {base === 'crop-image' && <CropStage slot="panel" />}
   {base === 'reorder-pdf' && <ReorderStage slot="panel" />}
   {base === 'sign-pdf' && <SignStage slot="panel" />}
-  {base === 'video-to-gif' && <VideoStage slot="panel" />}
+  {(base === 'video-to-gif' || base === 'trim-video') && <VideoStage slot="panel" />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {base === 'color-picker' && <ColorStage slot="panel" />}

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(29);
+  expect(await page.locator('.tool-card').count()).toBe(30);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -975,6 +975,8 @@ test('preset landing pages render, run their base tool with the preset options a
     ),
     ['png-compressor', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['reduce-png-size', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
+    ['cut-video', 'trim-video', async () => expect(page.locator('#exact')).not.toBeChecked()],
+    ['trim-mp4', 'trim-video', async () => expect(page.locator('#exact')).not.toBeChecked()],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -2197,11 +2199,11 @@ function mp4Info(b: Uint8Array) {
 }
 
 /** Play an MP4 in the page and read its length, size and the colour at a few moments. */
-async function videoProbe(page: Page, bytes: Uint8Array, times: number[]) {
-  return page.evaluate(async ({ data, times }) => {
+async function videoProbe(page: Page, bytes: Uint8Array, times: number[], type = 'video/mp4') {
+  return page.evaluate(async ({ data, times, type }) => {
     const v = document.createElement('video');
     v.muted = true;
-    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
+    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type }));
     await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
     const c = document.createElement('canvas');
     c.width = v.videoWidth;
@@ -2228,7 +2230,7 @@ async function videoProbe(page: Page, bytes: Uint8Array, times: number[]) {
       colours.push([...ctx.getImageData(c.width >> 1, c.height >> 1, 1, 1).data].slice(0, 3));
     }
     return { duration: v.duration, width: v.videoWidth, height: v.videoHeight, colours };
-  }, { data: [...bytes], times });
+  }, { data: [...bytes], times, type });
 }
 
 const dominant = (px: number[]) => ['red', 'green', 'blue'][px.indexOf(Math.max(...px))];
@@ -2468,4 +2470,70 @@ test('Compress PNG lossless keeps every pixel, and a JPG gets a clear error', as
   await page.locator('#run').click();
   await expect(page.locator('#error')).toHaveClass(/is-active/);
   await expect(page.locator('#error')).toContainText('This file is not a PNG.');
+});
+
+/** Probe a saved clip's length by playing it; recordings made by MediaRecorder need a seek to learn it. */
+async function clipLength(page: Page, bytes: Uint8Array, type: string): Promise<number> {
+  return page.evaluate(async ({ data, type }) => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type }));
+    await new Promise((ok, bad) => { v.onloadedmetadata = ok; v.onerror = () => bad(new Error('clip will not load')); });
+    if (!Number.isFinite(v.duration)) {
+      await new Promise((ok) => { v.onseeked = ok; v.currentTime = 1e7; });
+    }
+    return v.duration;
+  }, { data: [...bytes], type });
+}
+
+test('Trim video copies the part between start and end, keeps the format, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'trim-video');
+  const clip = await recordClip(page);
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(clip);
+  // The recording has no length in its header; the page finds it anyway.
+  await expect(page.locator('#vg-panel')).toBeVisible();
+  const length = Number(await page.locator('#vg-panel').getAttribute('data-duration'));
+  expect(length).toBeGreaterThan(2.5);
+  await expect(page.locator('#vg-end')).toHaveValue(String(length));
+  await page.locator('#vg-start').fill('1');
+  await page.locator('#vg-end').fill('2.5');
+  await expect(page.locator('#vg-estimate')).toContainText('Keeps 0:01.5');
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  await expect.poll(() => downloads.length).toBe(1);
+  expect(downloads[0]!.suggestedFilename()).toBe('recording-trimmed.webm');
+  const webm = await bytesOf(downloads[0]!);
+  const seconds = await clipLength(page, webm, 'video/webm');
+  // Copied cuts may start up to half a second early.
+  expect(seconds).toBeGreaterThan(1.4);
+  expect(seconds).toBeLessThan(2.1);
+  net.assertNothingLeft(['recording.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Trim video cuts exactly on request, and an end before the start is refused', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/cut-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const clip = await recordClip(page);
+  await page.locator('#file-input').setInputFiles(clip);
+  await expect(page.locator('#vg-panel')).toBeVisible();
+  await page.locator('#vg-start').fill('2');
+  await page.locator('#vg-end').fill('1');
+  await expect(page.locator('#vg-estimate')).toHaveText('The end must come after the start.');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('The end time must come after the start time.');
+  await page.locator('#vg-start').fill('0.5');
+  await page.locator('#vg-end').fill('2');
+  await choose(page.locator('#exact'));
+  const [download] = await Promise.all([page.waitForEvent('download', { timeout: 60_000 }), page.locator('#run').click()]);
+  const seconds = await clipLength(page, await bytesOf(download), 'video/webm');
+  expect(seconds).toBeGreaterThan(1.35);
+  expect(seconds).toBeLessThan(1.65);
+  await expect(page.locator('#results-list .result-item')).toContainText('cut exactly');
 });
