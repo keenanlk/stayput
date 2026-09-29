@@ -1226,6 +1226,228 @@ export const guides: Guide[] = [
       { q: 'How can I remove a background without uploading the photo?', a: 'Use a tool that runs the model in your browser, such as Stayput’s background remover. After the model has downloaded once, it works with the network switched off.' },
     ],
   },
+  {
+    slug: 'remove-background-from-a-photo',
+    title: 'How to Remove the Background From a Photo (iPhone, Android, Windows, Mac)',
+    description: 'Every recent phone and computer can lift a subject out of a photo without installing anything. Here is how on iPhone, Android, Windows and Mac, and a free browser tool for full-resolution PNGs and batches.',
+    heading: 'How to remove the background from a photo',
+    dek: 'iPhone, Android, Windows and Mac can all do this without an app. Here is how on each, and where they fall short.',
+    keywords: ['how to remove background from a photo', 'remove background from image', 'cut out background iphone', 'remove background from photo android', 'transparent background photo', 'background eraser'],
+    updated: '2026-09-29',
+    tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
+    sections: [
+      {
+        h: 'What "removing the background" means',
+        p: [
+          'A background cutout needs two things: a mask that says which pixels are the subject and which are not, and something to put behind the subject once the rest is gone, usually nothing (transparency), white, or a blur. The masking step used to need Photoshop\'s selection tools. Phones and computers now do it with an on-device model, in one tap, for a single photo, and the browser tool below does the same for a full-size file or a batch.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'Open the photo, then touch and hold the subject until a glowing outline appears around it (this needs iOS 16 or later). Once the outline appears, either tap **Copy** to put just the subject, with a transparent background, on the clipboard, or drag it straight out into Messages, Notes or Mail. There is no button to save it as a PNG file directly from Photos; the fastest way to get a file is to paste the copied subject into a blank Notes page, then export or screenshot it, or use the browser tool below for a proper PNG.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Most Pixel phones (Pixel 6 and later) and many recent Samsung Galaxy phones support the same idea: press and hold on the subject in a photo, in Google Photos or the Gallery app, until it is outlined, then tap **Copy**. On a Pixel this is also reachable through Circle to Search: hold the home gesture, circle the subject, and tap **Copy**. The result pastes as a transparent cutout, not a downloadable file, so if you need a PNG, paste it into an image editor or use the browser tool.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Windows 11\'s Paint app has a one-click **Remove background** button: open the photo in Paint, click the button in the toolbar (it appears once your image is loaded), and Paint replaces the background with a checkered transparent pattern automatically. Save as PNG to keep the transparency; saving as JPG fills it in with white. If your version of Paint does not show the button, it needs to be updated from the Microsoft Store.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'macOS Ventura and later can lift a subject system-wide: open the photo in Preview or Photos, right-click (or Control-click) the subject, and choose **Copy Subject**. Paste it anywhere to get a transparent cutout. In Preview you can also click and hold on the subject until it is outlined, then drag it onto the desktop to save it as a standalone PNG file, which is the quickest way to get an actual file without a third-party app.',
+        ],
+      },
+      {
+        h: 'When the built-in tools fall short',
+        p: [
+          'These features are made for quick, single-photo edits: they can struggle with busy backgrounds, fine hair or fur, and low-contrast edges, and none of them let you process many photos at once or choose a plain white or blurred background instead of transparency. Stayput\'s [background remover](/tools/remove-background) runs an open-source segmentation model (ISNet) inside your browser tab, so it works offline after the model loads once, keeps your photo at full resolution, and never uploads anything. Use [Make background transparent](/make-background-transparent) for a PNG, [White background](/white-background) for product photos and headshots, or [Blur background](/blur-background) for a portrait-mode look.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Which is better, my phone\'s built-in cutout or a background remover tool?', a: 'The phone feature is faster for a quick share, but it copies the subject to your clipboard rather than saving a file, and it does not offer a white or blurred background. A dedicated tool gives you a real PNG at full resolution and more background options.' },
+      { q: 'Do I need Photoshop to remove a background?', a: 'No. iPhone, Android, Windows and Mac all have a built-in way to lift a subject, and a browser-based tool can produce a full PNG without any software installed.' },
+      { q: 'Why does the cutout have rough edges around hair?', a: 'Fine hair and fur are the hardest case for any segmentation model, phone or browser. Zooming in and using a tool with a higher-resolution model, or manually touching up the edge afterward, usually helps.' },
+      { q: 'Can I remove the background from several photos at once?', a: 'Phone features work one photo at a time. A browser tool that processes files locally can be run on each photo in a batch without waiting on uploads or per-image limits.' },
+    ],
+  },
+  {
+    slug: 'how-to-make-a-gif-from-a-video',
+    title: 'How to Make a GIF From a Video (iPhone, Android, Windows, Mac)',
+    description: 'A short clip is often more useful as a GIF than a video: it loops, plays without a tap, and works where video does not. Here is how to make one on each platform, and a browser tool with no upload or size cap.',
+    heading: 'How to make a GIF from a video',
+    dek: 'A GIF loops and plays anywhere without a tap. Here is how to make one on each platform, and a browser tool for when there is no built-in way.',
+    keywords: ['how to make a gif from a video', 'convert video to gif', 'mp4 to gif', 'turn video into gif iphone', 'make a gif from a video clip'],
+    updated: '2026-09-29',
+    tools: ['video-to-gif', 'mp4-to-gif', 'mov-to-gif'],
+    sections: [
+      {
+        h: 'Why a GIF instead of the video',
+        p: [
+          'A GIF has no play button, no sound and no controls: it loads and loops immediately in a chat, a forum post, a README or a slide, even on sites that block autoplaying video. The trade-off is file size and quality, since a GIF stores far less information per frame than a video codec does. Trim the clip to the part that matters first, since every extra second adds to the size before you even convert it.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'The Shortcuts app can do this without any other software: open Shortcuts, tap the **+** to create a new shortcut, add the **Select Photos** action followed by the **Convert Media** action, set its format to **GIF**, then tap the play button and pick your video. The result saves to Photos as an actual GIF file. It is a few steps to set up once, but after that it is a one-tap shortcut you can reuse or add to the share sheet.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Android and Google Photos do not have a built-in video-to-GIF export. Google Photos can trim a clip and make a looping "Cinemagraph" style Motion Photo, but that stays inside Google Photos and is not a standalone GIF file you can post elsewhere. For an actual GIF file, use a browser tool or a dedicated GIF-maker app.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Windows has no built-in converter for turning an existing video file into a GIF. The free, open-source **ScreenToGif** app can do it (its "Video to GIF" import handles this even though the app is mainly built for screen recording), but it is a separate download and install. For a one-off conversion, a browser tool avoids installing anything.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'macOS can export a **Live Photo** as a GIF (right-click it in Photos and choose "Save as GIF"), but that only works for Live Photos, not for a regular MOV or MP4 you already have. Converting an arbitrary video file to GIF on a Mac otherwise needs QuickTime Player plus a command-line tool such as ffmpeg, or a browser tool.',
+        ],
+      },
+      {
+        h: 'Converting without installing anything',
+        p: [
+          'Stayput\'s [video to GIF](/tools/video-to-gif) converter reads the video and writes the GIF entirely in your browser tab, so there is no upload and no file-size cap. It handles [MP4](/mp4-to-gif), [MOV](/mov-to-gif) straight from an iPhone, and WebM. For a smaller file, lower the frame rate and the output width before converting; a GIF at 10-12 fps and 480px wide is usually plenty for chat and forum posts, and cuts the size dramatically compared to the source resolution and frame rate.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why is my GIF so much bigger than the video it came from?', a: 'GIF compresses far less efficiently than video codecs like H.264. Trimming the clip, lowering the frame rate, and reducing the width before converting are the three levers that bring the size down.' },
+      { q: 'Can I make a GIF without sound?', a: 'Yes, and you have to: the GIF format has no audio track at all, so any conversion drops the sound automatically.' },
+      { q: 'What is the best frame rate for a GIF?', a: '10-15 frames per second looks smooth enough for most clips and keeps the file much smaller than matching the video\'s original 24-60 fps.' },
+      { q: 'Does converting a video to GIF upload it anywhere?', a: 'Not with a browser-based converter. Stayput\'s reads and writes the file in your tab using WebCodecs, so the video never leaves your device.' },
+    ],
+  },
+  {
+    slug: 'how-to-compress-a-video-without-losing-quality',
+    title: 'How to Compress a Video Without Losing Quality',
+    description: 'Phone video is bitrate, not just resolution, and most of that bitrate is bigger than it needs to be. Here is what actually controls the size-to-quality trade-off, how to compress on each platform, and a browser tool with size targets.',
+    heading: 'How to compress a video without losing quality',
+    dek: 'Most phone video is recorded at a far higher bitrate than the screen needs. Here is what to change, and what actually loses quality.',
+    keywords: ['how to compress a video without losing quality', 'compress video', 'reduce video file size', 'shrink video file', 'video compressor'],
+    updated: '2026-09-29',
+    tools: ['compress-video', 'compress-video-for-discord', 'compress-video-for-email'],
+    sections: [
+      {
+        h: 'Why phone video files are so big',
+        p: [
+          'A phone records 1080p video at roughly 16 megabits per second and 4K at far more, because it is optimized to look good straight out of the camera, not to be small. A one-minute clip easily passes 100 MB at that rate. Almost none of that bitrate is visible on a phone or laptop screen: encoding the same footage at a quarter or a fifth of the bitrate is very hard to tell apart from the original on anything but a large, calibrated display.',
+        ],
+      },
+      {
+        h: 'What actually controls the trade-off',
+        p: [
+          'Three settings decide the result: **bitrate** (how much data per second of video; lower it and the file shrinks roughly proportionally), **resolution** (a 1080p clip has four times the pixels of 540p, so downscaling saves a lot before any perceptible loss), and **codec** (H.264 is universal, but H.265/AV1 fit the same quality into a smaller file if the destination supports them). Cutting bitrate too far causes blocky compression artefacts in fast motion; cutting resolution first, then bitrate, usually looks better than dropping bitrate alone.',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'There is no in-app "compress" button, but Mail does it for you: attach the video in Mail and tap the size options that appear (Small, Medium, Large, Actual Size) before sending — Small and Medium re-encode the video at a lower bitrate and resolution. To shrink files you record from now on, go to Settings, Camera, Record Video, and pick a lower resolution or frame rate; this does not affect videos already on your phone.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Android has no built-in compressor either. Sending a video through WhatsApp, Google Messages or similar apps re-encodes it at a lower bitrate automatically, which works as a rough compressor if you do not need the original attached anywhere.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Clipchamp comes preinstalled with Windows 11: open it, import the clip, and use the export step\'s quality presets (720p or 1080p, and a bitrate/quality slider) to control the size before saving.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'QuickTime Player can re-export at a lower resolution: open the file, then File, **Export As**, and choose 1080p, 720p or 480p instead of the original size. This reduces resolution, not bitrate directly, but it is a real, built-in way to shrink a file.',
+        ],
+      },
+      {
+        h: 'Compressing to an exact target',
+        p: [
+          'Stayput\'s [video compressor](/tools/compress-video) re-encodes the file in your browser tab and lets you pick a quality level or a target file size. The [Discord preset](/compress-video-for-discord) aims for Discord\'s 10 MB upload limit, and the [email preset](/compress-video-for-email) aims for 25 MB, both re-encoding automatically until the file fits. Nothing is uploaded to do this: the encoding runs on your device.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does lowering the resolution always look worse?', a: 'On a small screen (phone, chat preview) it is often invisible, since the display cannot show the extra detail anyway. It matters more if the video will be viewed full-screen on a large display.' },
+      { q: 'Should I lower bitrate or resolution first?', a: 'Resolution first for a big size cut with the least visible loss, then bitrate to fine-tune. Cutting bitrate alone on a high-resolution video tends to show blocky artefacts sooner.' },
+      { q: 'Why does a re-compressed video sometimes look worse than the original even at a similar size?', a: 'Re-encoding an already-compressed video is lossy on top of lossy. Compressing straight from the original file, rather than a copy that has already been re-saved once, keeps more quality at the same target size.' },
+      { q: 'What is a reasonable size for a 30-second phone video?', a: 'At a bitrate most people cannot distinguish from the original, a 30-second 1080p clip typically compresses to somewhere between 3 and 8 MB, well under most upload limits.' },
+    ],
+  },
+  {
+    slug: 'how-to-trim-a-video-without-an-app',
+    title: 'How to Trim a Video Without Installing an App (iPhone, Android, Windows, Mac)',
+    description: 'Every major phone and computer can cut the start and end off a video without installing anything. Here is how on each platform, and a browser tool for trimming without re-encoding.',
+    heading: 'How to trim a video without installing an app',
+    dek: 'iPhone, Android, Windows and Mac can all trim a video with what is already installed. Here is how on each.',
+    keywords: ['how to trim a video without an app', 'trim video online', 'cut video without app', 'trim video iphone', 'cut a video windows'],
+    updated: '2026-09-29',
+    tools: ['trim-video', 'cut-video', 'trim-mp4'],
+    sections: [
+      {
+        h: 'What "trim" means here',
+        p: [
+          'Trimming removes footage from the start and/or the end of a clip without touching what is in between, as opposed to cutting a piece out of the middle. Every platform below can do at least this much without installing anything new.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'Open the video in Photos and tap **Edit**. Drag the yellow handles at either end of the filmstrip at the bottom of the screen to the new start and end points, then tap the checkmark. Choose **Save as New Clip** to keep the original as well, or **Save Video** to overwrite it.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'In Google Photos, open the video, tap the pencil (Edit) icon, and drag the trim handles under the preview to the new start and end points, then tap **Save copy**. Samsung Gallery has the same trim handles under its own video editor.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Windows 11 hands video editing to Clipchamp, which comes preinstalled: import the clip onto the timeline, drag the playhead to a cut point, use the split tool, delete the piece you do not want, and export. It is more steps than a single trim gesture, but it needs no extra download.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'Open the video in QuickTime Player and press **Cmd+T** (or Edit, Trim). Drag the yellow handles on the filmstrip to the new start and end, then File, **Export As**, to save the trimmed clip as a new file.',
+        ],
+      },
+      {
+        h: 'Trimming without re-encoding',
+        p: [
+          'Every option above re-encodes the video during export, which takes time and can lose a little quality even at "the same" settings. Stayput\'s [trim video](/tools/trim-video) tool trims in your browser tab; the [Trim MP4](/trim-mp4) preset cuts at keyframes without re-encoding when the cut points allow it, which is close to instant and keeps the original quality exactly. Nothing is uploaded either way, so a private clip stays on your device.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I cut a piece out of the middle of a video, not just the ends?', a: 'That is a split-and-delete edit rather than a trim. Clipchamp on Windows and iMovie on Mac can do this; Stayput\'s trim tool currently handles start-and-end trimming.' },
+      { q: 'Does trimming a video lose quality?', a: 'Re-encoding during trim can lose a small, usually invisible amount. Trimming at keyframes without re-encoding, like the Trim MP4 preset, keeps the exact original quality.' },
+      { q: 'Why does my phone\'s trim take a moment to save?', a: 'The phone is re-encoding the clip from the new start point, which takes roughly as long as the clip itself, longer for higher resolutions.' },
+      { q: 'Can I trim a video on my phone without uploading it anywhere?', a: 'Yes. The built-in Photos and Google Photos trimmers, and a browser tool that runs locally, all keep the file on your device.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);

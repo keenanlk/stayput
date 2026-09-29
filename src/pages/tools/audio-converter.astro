@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import AudioConverter from '../../components/options/AudioConverter.astro';
+const tool = toolBySlug('audio-converter')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><AudioConverter /></Fragment>
+</ToolLayout>
+<script src="../../tools/audio-converter.ts"></script>

@@ -10,10 +10,10 @@ import { vendorDir } from './vendor';
 /** MP3 is almost always 44.1 kHz; decoding resamples to it. */
 export const SAMPLE_RATE = 44100;
 
-/** Decode the file's audio track into PCM. The whole file is read into memory first. */
-export async function decodeAudio(file: File): Promise<AudioBuffer> {
+/** Decode the file's audio track into PCM at `rate`. The whole file is read into memory first. */
+export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<AudioBuffer> {
   const bytes = await file.arrayBuffer();
-  const ctx = new OfflineAudioContext(2, 1, SAMPLE_RATE);
+  const ctx = new OfflineAudioContext(2, 1, rate);
   let buffer: AudioBuffer;
   try {
     buffer = await ctx.decodeAudioData(bytes);
@@ -72,7 +72,7 @@ export async function encodeMp3(chans: Float32Array[], bitrate: Bitrate, onProgr
 }
 
 /** Write PCM channels as a 16-bit little-endian WAV file. */
-export function encodeWav(chans: Float32Array[]): Blob {
+export function encodeWav(chans: Float32Array[], rate = SAMPLE_RATE): Blob {
   const n = chans[0]!.length;
   const ch = chans.length;
   const dataBytes = n * ch * 2;
@@ -86,8 +86,8 @@ export function encodeWav(chans: Float32Array[]): Blob {
   v.setUint32(16, 16, true);
   v.setUint16(20, 1, true); // PCM
   v.setUint16(22, ch, true);
-  v.setUint32(24, SAMPLE_RATE, true);
-  v.setUint32(28, SAMPLE_RATE * ch * 2, true);
+  v.setUint32(24, rate, true);
+  v.setUint32(28, rate * ch * 2, true);
   v.setUint16(32, ch * 2, true);
   v.setUint16(34, 16, true);
   str(36, 'data');

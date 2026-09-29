@@ -1586,6 +1586,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'audio-converter',
+    name: 'Audio converter',
+    title: 'Audio Converter: MP3, WAV, M4A, OGG, FLAC, No Upload | Stayput',
+    description:
+      'Convert audio between MP3, WAV, FLAC, M4A and OGG in your browser, or pull the sound out of a video. Batch, no size limit, no upload, no sign-up.',
+    heading: 'Audio converter',
+    tagline: 'Turn any sound file into MP3, WAV, FLAC, M4A or OGG. Your files are converted on this device and never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop audio files to convert',
+    action: 'Convert',
+    keywords: ['audio converter', 'convert audio', 'audio file converter', 'wav to flac', 'mp3 to m4a', 'mp3 to ogg', 'flac converter', 'audio format converter'],
+    steps: [
+      'Drop one or more sound files (MP3, WAV, FLAC, M4A, OGG, Opus, AIFF) or videos, or tap to pick them.',
+      'Choose the format to convert to. For MP3, M4A and OGG pick a quality; WAV and FLAC keep every sample.',
+      'Convert. One file downloads straight away; several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound with its own decoders, and the new file is written inside the page: MP3 by LAME compiled to WebAssembly, WAV and FLAC by small encoders in this site’s code, M4A and OGG by the browser’s built-in AAC and Opus encoders. Nothing is sent anywhere, so there is no size cap and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Which format should I choose?',
+        a: 'MP3 plays on everything. M4A (AAC) sounds a little better than MP3 at the same size and is what iPhones and Apple Music use. OGG with Opus is the smallest for a given quality and suits websites, games and voice. WAV is uncompressed, for editing. FLAC keeps exactly the same sound as WAV at about half the size, for archiving music.',
+      },
+      {
+        q: 'Is WAV to FLAC really lossless?',
+        a: 'Yes, for 16-bit audio. The FLAC decodes to the same samples, at the same sample rate, as the 16-bit WAV this tool would write. 24-bit recordings are stored as 16-bit, which is still beyond what anyone can hear, but keep the original if you need 24-bit for mastering.',
+      },
+      {
+        q: 'Why can’t my browser make an M4A?',
+        a: 'M4A needs an AAC encoder, and browsers only have one where the operating system provides it: Safari, and Chrome or Edge on Windows and Mac have it, while Firefox and Chrome on Linux do not. The page tells you when you pick M4A. MP3 plays in all the same places.',
+      },
+      {
+        q: 'Does converting improve the quality?',
+        a: 'No. Converting can keep the quality (to WAV or FLAC) or lower it (to MP3, M4A or OGG), never raise it. An MP3 turned into a FLAC is a bigger file with the same MP3 sound.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
