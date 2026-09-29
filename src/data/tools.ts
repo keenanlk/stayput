@@ -1408,6 +1408,116 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'merge-videos',
+    name: 'Merge videos',
+    title: 'Merge Videos Online: Combine Clips into One MP4, No Upload | Stayput',
+    description:
+      'Join two or more videos end to end into one MP4 in your browser. MP4, MOV, WebM and MKV. Reorder the clips, keep the sound. No upload, no watermark.',
+    heading: 'Merge videos',
+    tagline: 'Combine clips into a single video, in the order you choose. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop the videos to join',
+    action: 'Merge videos',
+    keywords: ['merge videos', 'combine videos', 'join videos', 'video merger', 'merge videos online', 'combine mp4 files', 'put videos together'],
+    steps: [
+      'Drop two or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Put them in order with the arrows. The first video sets the size of the result.',
+      'Merge. The clips are joined and encoded into one MP4, with each clip’s sound in place.',
+    ],
+    faq: [
+      {
+        q: 'Are my videos uploaded?',
+        a: 'No. Your browser decodes each clip, draws its frames one after another and encodes them into one MP4 in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Can I join videos of different sizes or shapes?',
+        a: 'Yes. The result takes the size of the first video, and any clip with a different shape is fitted inside it with black bars, so nothing is stretched or cut off. Put the clip whose shape you want first, or crop the others to match first with Crop video.',
+      },
+      {
+        q: 'What happens to the sound?',
+        a: 'Each clip keeps its own sound, lined up with its picture. A clip with no sound is silent in the result. Tick Remove the sound for a silent video.',
+      },
+      {
+        q: 'Why does merging take a while?',
+        a: 'Clips from different cameras rarely share the same format, so every frame is encoded again to make one continuous video. That runs on your device, using its hardware video encoder where the browser has one.',
+      },
+    ],
+  },
+  {
+    slug: 'add-audio-to-video',
+    name: 'Add audio to video',
+    title: 'Add Audio or Music to Video Online, No Upload | Stayput',
+    description:
+      'Put an MP3, WAV or M4A on a video, or swap in the sound of another clip, in your browser. Replace or mix, loop and fade. Picture copied untouched, nothing uploaded.',
+    heading: 'Add audio to a video',
+    tagline: 'Put music or a voice-over on a video, or replace its sound. The picture is copied as it is, and nothing is uploaded.',
+    category: 'media',
+    accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac',
+    multiple: true,
+    dropLabel: 'Drop a video and a sound file',
+    action: 'Add audio',
+    keywords: ['add audio to video', 'add music to video', 'put music on video', 'replace audio in video', 'add mp3 to video', 'add sound to video'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV) and a sound file (MP3, WAV, M4A, or another video).',
+      'Choose whether the new sound replaces the video’s own sound or plays quietly underneath it.',
+      'Add audio. The picture is copied without re-encoding and the new sound is laid under it, looped or cut to fit.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound, fits it to the video and writes a new file in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Does the video lose quality?',
+        a: 'No. The picture is copied packet by packet, exactly as it was, so it takes seconds and nothing changes. Only the sound is encoded again, as AAC in an MP4 (or Opus in a WebM for VP8 videos).',
+      },
+      {
+        q: 'What if the song is longer or shorter than the video?',
+        a: 'A longer sound is cut at the end of the video and faded out. A shorter one is repeated until the video ends, or, with Loop unticked, the rest of the video is silent.',
+      },
+      {
+        q: 'Can I keep the original sound and add music under it?',
+        a: 'Yes. Choose Keep it, with the new sound quieter underneath: the music plays at half volume under the voices in the video.',
+      },
+    ],
+  },
+  {
+    slug: 'reverse-video',
+    name: 'Reverse video',
+    title: 'Reverse Video Online: Play a Clip Backwards, No Upload | Stayput',
+    description:
+      'Play a video backwards in your browser, with the sound reversed or removed. MP4, MOV, WebM or MKV in, MP4 out. No upload, no watermark, no sign-up.',
+    heading: 'Reverse a video',
+    tagline: 'Make a clip play backwards, for a rewind effect, a boomerang or a laugh. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to reverse',
+    action: 'Reverse',
+    keywords: ['reverse video', 'reverse video online', 'play video backwards', 'rewind video', 'backwards video maker', 'video reverser'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Keep the sound to hear it backwards too, or tick Remove the sound.',
+      'Reverse. Each video is decoded from the end to the start and saved as an MP4.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes the video, puts its frames in the opposite order and encodes it again in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Why does reversing take longer than other video tools?',
+        a: 'Videos are stored so they can only be decoded forwards. To play one backwards, the page decodes it in short pieces starting from the end, which means some frames are decoded twice. It still runs as fast as your device can decode and encode.',
+      },
+      {
+        q: 'Does it work on long videos?',
+        a: 'Yes. Only a second or so of frames is held in memory at a time, so a long video takes longer but does not run out of memory. For a quick boomerang, trim the clip first with Trim video.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

@@ -135,6 +135,18 @@ export const engines: Record<string, Engine> = {
     how: 'Mediabunny (MPL-2.0) decodes the video in your tab and gives every frame a new time; when speeding up, frames beyond 60 a second are dropped. The sound track is decoded by your browser and stretched with WSOLA, a method that overlaps short slices of sound so the pitch stays the same. Both are encoded again by your browser (WebCodecs) into an MP4, H.264 and AAC where available.',
     versus: 'Online speed changers upload the video to process it, cap free files, and often add a watermark or turn voices into chipmunks. Here the video stays on your device and the sound keeps its pitch.',
   },
+  'merge-videos': {
+    how: 'Mediabunny (MPL-2.0) reads each MP4, MOV, WebM or MKV clip in your tab. Your browser decodes the frames (WebCodecs), draws them one clip after another onto a picture the size of the first clip, and encodes the whole once into an MP4, H.264 where available and VP9 or AV1 otherwise. Each clip’s sound is decoded by your browser and laid end to end to match.',
+    versus: 'Online video mergers upload every clip before they start, cap free files at a few hundred megabytes, and often stamp a watermark on the result. Here the clips never leave your device.',
+  },
+  'add-audio-to-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV video in your tab and copies its picture packet by packet into a new file, with no re-encoding. The sound file is decoded by your browser, looped or cut and faded to the length of the video, mixed with the video’s own sound if you asked, and encoded as AAC (or Opus) by your browser (WebCodecs).',
+    versus: 'Online editors upload the video and the song to a server, re-encode the whole picture, cap free exports and often add a watermark. Here nothing leaves your device and the picture is not touched.',
+  },
+  'reverse-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV container in your tab. Because video can only be decoded forwards, your browser (WebCodecs) decodes it in short windows from the end to the start; each window’s frames are held in memory, encoded last first, and freed. The sound is decoded by your browser and reversed. Both go into an MP4, H.264 and AAC where available.',
+    versus: 'Online reversers upload the clip to a server, limit free videos to a short length, and often add a watermark. Here the video never leaves your device.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',

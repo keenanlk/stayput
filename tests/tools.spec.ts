@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(37);
+  expect(await page.locator('.tool-card').count()).toBe(40);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'remove-background'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'remove-background'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2923,6 +2923,145 @@ test('Slow down video doubles the length at 0.5× and can drop the sound', async
   const picture = await videoSeconds(mp4);
   expect(picture).toBeGreaterThan(pictureBefore * 2 - 0.15);
   expect(picture).toBeLessThan(pictureBefore * 2 + 0.15);
+});
+
+test('Merge videos joins clips in order into one MP4 the size of the first, with sound, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'merge-videos');
+  const halves = await halvesClip(page);
+  const clip = await recordClip(page);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [halves, clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('merged.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(mp4);
+  // The first clip sets the size; the 1280x720 recording is fitted inside it.
+  expect(tracks.video).toMatchObject({ width: 640, height: 360 });
+  // The second clip's sound comes through, after the silent first clip.
+  expect(tracks.audio).toBe(1);
+  const expected = (await videoSeconds(readFileSync(halves))) + (await videoSeconds(readFileSync(clip)));
+  const picture = await videoSeconds(mp4);
+  expect(picture).toBeGreaterThan(expected - 0.15);
+  expect(picture).toBeLessThan(expected + 0.15);
+  await expect(page.locator('#results-list .result-item')).toContainText('2 videos joined');
+  net.assertNothingLeft(['halves.webm', 'recording.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Add audio to video lays a song under a silent video, looped to its length, with the picture copied, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'add-audio-to-video');
+  const song = staticFx('song.mp3');
+  const clip = staticFx('clip.webm');
+  const before = await soundOf(page, readFileSync(song));
+  const net = watchNetwork(page);
+  // The song goes first: the tool works out which file is the video.
+  const { downloads } = await run(page, [song, clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('clip-with-audio.webm');
+  const out = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(out);
+  expect(tracks.video?.codec).toBe('vp8');
+  expect(tracks.audio).toBe(1);
+  const picture = await videoSeconds(out);
+  expect(Math.abs(picture - (await videoSeconds(readFileSync(clip))))).toBeLessThan(0.05);
+  const after = await soundOf(page, out);
+  // The 1 s song is repeated to fill the 3 s video, at the same note.
+  expect(after.seconds).toBeGreaterThan(picture - 0.2);
+  expect(after.seconds).toBeLessThan(picture + 0.2);
+  expect(Math.abs(after.hz - before.hz)).toBeLessThan(before.hz * 0.05);
+  await expect(page.locator('#results-list .result-item')).toContainText('sound looped');
+  net.assertNothingLeft(['song.mp3', 'clip.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Add music to video can keep the video’s own sound under the song', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/add-music-to-video');
+  const rec = await recordClip(page);
+  const { downloads } = await run(page, [rec, staticFx('song.mp3')], async () => {
+    await page.locator('#mode').selectOption('mix');
+  });
+  const out = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(out);
+  expect(tracks.audio).toBe(1);
+  expect(tracks.video?.codec).toBe('vp8');
+  await expect(page.locator('#results-list .result-item')).toContainText('mixed in song.mp3');
+});
+
+/** A WebM that starts black and ends white, so a reversed copy can be told apart. */
+async function fadeClip(page: Page): Promise<string> {
+  const bytes = await page.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = 320;
+    c.height = 180;
+    const ctx = c.getContext('2d')!;
+    const rec = new MediaRecorder(c.captureStream(30), { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 1e6 });
+    const chunks: Blob[] = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    rec.start();
+    const t0 = performance.now();
+    await new Promise<void>((done) => {
+      const frame = () => {
+        const f = Math.min(1, (performance.now() - t0) / 1500);
+        const v = Math.round(255 * f);
+        ctx.fillStyle = `rgb(${v},${v},${v})`;
+        ctx.fillRect(0, 0, 320, 180);
+        if (f < 1) requestAnimationFrame(frame);
+        else done();
+      };
+      frame();
+    });
+    rec.stop();
+    await new Promise((r) => (rec.onstop = r));
+    return [...new Uint8Array(await new Blob(chunks).arrayBuffer())];
+  });
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'fade.webm');
+  writeFileSync(file, Buffer.from(bytes));
+  return file;
+}
+
+/** Brightness (0 to 255) of the first and last frames, read through a video element. */
+async function firstAndLastBrightness(page: Page, bytes: Uint8Array, type: string): Promise<[number, number]> {
+  return page.evaluate(async ({ b64, type }) => {
+    const data = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([data], { type }));
+    await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
+    if (!Number.isFinite(v.duration)) {
+      // MediaRecorder WebMs have no duration until the end has been seen.
+      v.currentTime = 1e6;
+      await new Promise((ok) => (v.ondurationchange = ok));
+    }
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    const ctx = c.getContext('2d')!;
+    const at = async (t: number) => {
+      await new Promise<void>((ok) => { v.onseeked = () => ok(); v.currentTime = t; });
+      ctx.drawImage(v, 0, 0);
+      return ctx.getImageData(c.width >> 1, c.height >> 1, 1, 1).data[0]!;
+    };
+    return [await at(0), await at(Math.max(0, v.duration - 0.02))] as [number, number];
+  }, { b64: Buffer.from(bytes).toString('base64'), type });
+}
+
+test('Reverse video plays the clip backwards and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'reverse-video');
+  const clip = await fadeClip(page);
+  const src = readFileSync(clip);
+  const [srcFirst, srcLast] = await firstAndLastBrightness(page, src, 'video/webm');
+  expect(srcLast - srcFirst).toBeGreaterThan(20);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('fade-reversed.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  expect((await videoTracks(mp4)).video).toMatchObject({ width: 320, height: 180 });
+  expect(Math.abs((await videoSeconds(mp4)) - (await videoSeconds(src)))).toBeLessThan(0.1);
+  const [first, last] = await firstAndLastBrightness(page, mp4, 'video/mp4');
+  // Now it starts bright and ends dark.
+  expect(Math.abs(first - srcLast)).toBeLessThan(12);
+  expect(Math.abs(last - srcFirst)).toBeLessThan(12);
+  net.assertNothingLeft(['fade.webm']);
+  expect(errors).toEqual([]);
 });
 
 test('Remove background cuts out the subject at full size with a model served by the site', async ({ page }) => {
