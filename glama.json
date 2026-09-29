@@ -1,0 +1,22 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": ["keenanlk"],
+  "name": "stayput",
+  "title": "Stayput",
+  "description": "Local MCP server for PDF and photo tasks: merge, split, rotate, number, images to PDF, inspect and strip photo metadata. Files never leave your machine, no accounts, no API keys.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keenanlk/stayput"
+  },
+  "homepage": "https://stayput.dev/mcp",
+  "transport": "stdio",
+  "tags": [
+    "mcp",
+    "model-context-protocol",
+    "pdf",
+    "merge-pdf",
+    "exif",
+    "privacy",
+    "local"
+  ]
+}
