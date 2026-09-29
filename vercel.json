@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/passport-photo",
+      "destination": "/tools/passport-photo",
+      "permanent": true
+    },
+    {
       "source": "/remove-background",
       "destination": "/tools/remove-background",
       "permanent": true

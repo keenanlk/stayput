@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import PassportPhoto from '../../components/options/PassportPhoto.astro';
+const tool = toolBySlug('passport-photo')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><PassportPhoto /></Fragment>
+</ToolLayout>
+<script src="../../tools/passport-photo.ts"></script>

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(42);
+  expect(await page.locator('.tool-card').count()).toBe(43);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3144,6 +3144,58 @@ test('Remove background cuts out the subject at full size with a model served by
   expect(requested.filter((u) => u.endsWith('.onnx')).length).toBe(before);
   net.assertNothingLeft(['face.jpg']);
   expect(errors).toEqual([]);
+});
+
+test('Passport photo maker crops a 2x2 photo with the head in range and a 4x6 print sheet, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'passport-photo');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('face.jpg')]);
+  await choose(page.locator('input[name="bg"][value="white"]'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 180_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  const files = await zipAll(page);
+  const photo = files['face-passport.jpg']!;
+  const sheet = files['face-passport-4x6-print.jpg']!;
+  // 2 x 2 inches at 600 pixels per inch.
+  expect(jpegSize(photo)).toEqual({ width: 1200, height: 1200 });
+  const s = jpegSize(sheet);
+  expect([s.width, s.height].sort()).toEqual([1200, 1800]);
+  // White background above the head and in the corners; the face is in the middle.
+  for (const [x, y] of [[20, 20], [1180, 20], [600, 40]] as const) {
+    expect(Math.min(...(await pixelAt(page, photo, x, y)).slice(0, 3))).toBeGreaterThan(235);
+  }
+  const face = await pixelAt(page, photo, 600, 560);
+  expect(Math.min(...face.slice(0, 3))).toBeLessThan(235);
+  // Head height: first non-white row down the centre line sits between 5% and 25% of the height.
+  const top = await page.evaluate(async (b64) => {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([arr]));
+    const c = document.createElement('canvas');
+    c.width = bmp.width;
+    c.height = bmp.height;
+    const g = c.getContext('2d')!;
+    g.drawImage(bmp, 0, 0);
+    const d = g.getImageData(600, 0, 1, bmp.height).data;
+    for (let y = 0; y < bmp.height; y++) if (Math.min(d[y * 4]!, d[y * 4 + 1]!, d[y * 4 + 2]!) < 200) return y;
+    return -1;
+  }, Buffer.from(photo).toString('base64'));
+  expect(top).toBeGreaterThan(60);
+  expect(top).toBeLessThan(300);
+
+  // 35 x 45 mm: eight copies fit on the 4 x 6 sheet, four across two rows.
+  await page.locator('#size').selectOption('eu');
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toContainText('8 copies', { timeout: 60_000 });
+  const eu = await zipAll(page);
+  expect(jpegSize(eu['face-passport.jpg']!)).toEqual({ width: 827, height: 1063 });
+  net.assertNothingLeft(['face.jpg']);
+  // MediaPipe logs its CPU delegate to the console as an "error".
+  expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
 });
 
 test('Trim audio shows the waveform and cuts the chosen part to a WAV, and no bytes leave the tab', async ({ page }) => {

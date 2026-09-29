@@ -1673,6 +1673,52 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'passport-photo',
+    name: 'Passport photo maker',
+    title: 'Passport Photo Maker, Free, No Upload | Stayput',
+    description:
+      'Make a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, plus a 4 × 6 print sheet. Runs in your browser; your photo is never uploaded.',
+    heading: 'Make a passport photo',
+    tagline: 'Crop a photo to passport size with the head at the right height, and get a sheet to print at any photo counter.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: false,
+    dropLabel: 'Drop a photo of yourself',
+    action: 'Make passport photo',
+    keywords: ['passport photo', 'passport photo maker', 'passport photo online', 'id photo', 'visa photo', '2x2 photo', '35x45 photo', 'passport size photo', 'passport photo app'],
+    steps: [
+      'Drop a photo taken straight on: face the camera, neutral expression, eyes open, in even light, with some space above your head.',
+      'Pick the size, and keep the background or replace it with white or light grey. The first photo downloads the face finder and cut-out model once.',
+      'Download the single photo for online applications, and the 4 × 6 sheet to print at a photo counter or at home, then cut along the grey lines.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The only downloads are the two models, fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
+      },
+      {
+        q: 'How is the head sized?',
+        a: 'The head is measured from the top of the hair to the chin and scaled to the middle of the allowed range: 1 to 1 3/8 inches (25 to 35 mm) on a 2 × 2 inch US photo, 32 to 36 mm on a 35 × 45 mm photo. The chin is estimated from where your eyes and mouth are, so check the result looks right before you print.',
+      },
+      {
+        q: 'What sizes can I make?',
+        a: '2 × 2 inches (51 × 51 mm), used for US passports and visas and by a few other countries, and 35 × 45 mm, used for Schengen visas and most European passports, among many others. Sizes and rules differ between countries and change, so check your government’s current photo rules before you apply.',
+      },
+      {
+        q: 'How do I print it?',
+        a: 'Download the 4 × 6 inch print sheet and order a standard 4 × 6 (10 × 15 cm) photo print at a pharmacy, supermarket kiosk or online photo lab, or print it at home on photo paper at 100% scale. The sheet holds several copies at the exact size; cut along the thin grey lines. Prints of this size usually cost well under a dollar.',
+      },
+      {
+        q: 'Should I replace the background?',
+        a: 'Only if you have to. Most offices want a plain white or off-white background, and some, including the UK passport office, reject photos changed by software, which is why the UK size is not offered here. Standing in front of a light, plain wall and keeping the photo’s own background is the safest choice.',
+      },
+      {
+        q: 'What photo works best?',
+        a: 'One taken by someone else from about 1.5 metres (4 to 5 feet) away, at eye level, in even daylight with no shadows on your face or behind you. Take off glasses and hats, keep your hair off your face, and leave plenty of space above your head and around your shoulders so there is room to crop.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);

@@ -44,6 +44,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'image-to-text': ['blur-image', 'image-to-pdf'],
   'color-picker': ['crop-image', 'compress-image'],
   'remove-background': ['crop-image', 'compress-image'],
+  'passport-photo': ['compress-image', 'image-to-pdf'],
   'unlock-pdf': ['merge-pdf', 'compress-pdf'],
   'protect-pdf': ['compress-pdf', 'sign-pdf'],
 };

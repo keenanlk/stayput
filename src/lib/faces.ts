@@ -121,3 +121,45 @@ export async function findFaces(bitmap: ImageBitmap, onProgress?: (stage: 'loadi
   }
   return mergeBoxes(found).map((b) => padFace(b, W, H));
 }
+
+export interface Landmarks {
+  /** The detector's tight box: roughly eyebrows to chin. */
+  box: Rect;
+  score: number;
+  /** Midpoint between the eyes, and the mouth, in image pixels. */
+  eyes: { x: number; y: number };
+  mouth: { x: number; y: number };
+}
+
+/**
+ * Faces in a single portrait with their eye and mouth positions, from one
+ * pass over the whole image. For photos where the face is large (passport
+ * photos, headshots); group photos go through `findFaces`.
+ */
+export async function findPortraitFaces(bitmap: ImageBitmap, onProgress?: (stage: 'loading' | 'scanning') => void): Promise<Landmarks[]> {
+  onProgress?.('loading');
+  const fd = await load();
+  onProgress?.('scanning');
+  const W = bitmap.width;
+  const H = bitmap.height;
+  const s = Math.min(1, TILE_MAX / Math.max(W, H));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(W * s));
+  canvas.height = Math.max(1, Math.round(H * s));
+  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const out: Landmarks[] = [];
+  for (const d of fd.detect(canvas).detections) {
+    const b = d.boundingBox;
+    const k = d.keypoints;
+    // BlazeFace keypoints: right eye, left eye, nose tip, mouth, right ear, left ear (0..1).
+    if (!b || !k || k.length < 4) continue;
+    out.push({
+      box: { x: b.originX / s, y: b.originY / s, w: b.width / s, h: b.height / s },
+      score: d.categories[0]?.score ?? 0,
+      eyes: { x: ((k[0]!.x + k[1]!.x) / 2) * W, y: ((k[0]!.y + k[1]!.y) / 2) * H },
+      mouth: { x: k[3]!.x * W, y: k[3]!.y * H },
+    });
+  }
+  return out.sort((a, b) => b.box.w * b.box.h - a.box.w * a.box.h);
+}
+

@@ -1,0 +1,36 @@
+---
+/** Option controls for the passport photo maker, shared by the tool page and its landing pages. */
+import { sizes } from '../../lib/passport';
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const size = defaults.size ?? 'us';
+const bg = defaults.bg ?? 'keep';
+const backgrounds = [
+  ['keep', 'Keep the photo’s own'],
+  ['white', 'Replace with white'],
+  ['grey', 'Replace with light grey'],
+] as const;
+---
+<div class="field wide">
+  <label for="size">Photo size</label>
+  <select id="size">
+    {sizes.map((s) => <option value={s.id} selected={s.id === size}>{s.label}</option>)}
+  </select>
+</div>
+<div class="field wide">
+  <label>Background</label>
+  <div class="segmented" role="radiogroup" aria-label="Background">
+    {backgrounds.map(([v, l]) => <label><input type="radio" name="bg" value={v} checked={v === bg} /><span>{l}</span></label>)}
+  </div>
+</div>
+<p class="field wide passport-note">
+  Stand in front of a plain white or light wall if you can: some offices reject photos whose background was changed by software. Replacing it is here for when that is not possible. The first photo downloads the face finder and cut-out model once (about 50 MB).
+</p>
+
+<style>
+  .passport-note {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+</style>
