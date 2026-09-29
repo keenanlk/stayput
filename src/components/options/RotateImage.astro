@@ -1,0 +1,43 @@
+---
+/** Option controls for rotate and flip image, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const rotate = defaults.rotate ?? '90';
+const flipH = defaults['flip-h'] === 'true';
+const flipV = defaults['flip-v'] === 'true';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const turns = [
+  ['0', 'None'],
+  ['90', '90° right'],
+  ['180', '180°'],
+  ['270', '90° left'],
+] as const;
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field">
+  <label>Rotate</label>
+  <div class="segmented" role="radiogroup" aria-label="Rotate">
+    {turns.map(([v, l]) => <label><input type="radio" name="rotate" value={v} checked={v === rotate} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field">
+  <label>Flip</label>
+  <label class="check"><input type="checkbox" id="flip-h" checked={flipH} /> Flip horizontally (mirror left to right)</label>
+  <label class="check"><input type="checkbox" id="flip-v" checked={flipV} /> Flip vertically (upside down mirror)</label>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>

@@ -1,0 +1,23 @@
+---
+/**
+ * The rotate stage: a live preview of the first image with the chosen turn
+ * and flip, plus quick buttons. Driven by src/tools/rotate-image.ts.
+ */
+---
+<div id="rotate-panel" class="rotate-panel" hidden>
+  <div class="rotate-stage"><canvas id="rotate-canvas" aria-label="Preview of the rotated image"></canvas></div>
+  <div class="rotate-bar">
+    <button class="btn btn-sm btn-ghost" type="button" id="rotate-left">↺ Rotate left</button>
+    <button class="btn btn-sm btn-ghost" type="button" id="rotate-right">↻ Rotate right</button>
+    <button class="btn btn-sm btn-ghost" type="button" id="flip-h-btn">⇋ Flip horizontal</button>
+    <button class="btn btn-sm btn-ghost" type="button" id="flip-v-btn">⇅ Flip vertical</button>
+  </div>
+  <p class="muted small rotate-hint" id="rotate-hint"></p>
+</div>
+<style is:global>
+  .rotate-panel { display: grid; gap: 8px; }
+  .rotate-stage { line-height: 0; justify-self: start; max-width: 100%; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .rotate-stage canvas { display: block; max-width: 100%; max-height: 55vh; width: auto; height: auto; }
+  .rotate-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rotate-hint { margin: 0; }
+</style>
