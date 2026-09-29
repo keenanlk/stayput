@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(52);
+  expect(await page.locator('.tool-card').count()).toBe(55);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3692,6 +3692,45 @@ test('Wi-Fi QR code page opens on Wi-Fi and keeps the password in the page', asy
   net.assertNothingLeft(['hunter2-secret', 'Guest Net']);
 });
 
+test('Voice recorder records the microphone to an MP3 that keeps the pitch, and no bytes leave the tab', async ({ page }) => {
+  // Stand in for the microphone: a 440 Hz tone.
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async (constraints?: MediaStreamConstraints) => {
+      (window as unknown as { __asked: unknown }).__asked = constraints;
+      const ac = new AudioContext();
+      const osc = ac.createOscillator();
+      osc.frequency.value = 440;
+      const dest = ac.createMediaStreamDestination();
+      osc.connect(dest);
+      osc.start();
+      return dest.stream;
+    };
+  });
+  const errors = await open(page, 'voice-recorder');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#vr-start').click();
+  await expect(page.locator('#vr-deck')).toHaveAttribute('data-state', 'live');
+  const asked = await page.evaluate(() => (window as unknown as { __asked: { audio: MediaTrackConstraints } }).__asked.audio);
+  expect(asked.noiseSuppression).toBe(true);
+  await page.waitForTimeout(1500);
+  await page.locator('#vr-stop').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 30_000 });
+  await expect(page.locator('#vr-audio')).toBeVisible();
+  const item = page.locator('#results-list .result-item');
+  await expect(item.locator('.name')).toHaveText(/^voice-recording-\d{4}-\d{2}-\d{2}-\d{4}\.mp3$/);
+  await expect(item).toContainText('mono');
+  const [download] = await Promise.all([page.waitForEvent('download'), item.getByRole('button', { name: 'Download' }).click()]);
+  const mp3 = await bytesOf(download);
+  const sound = await soundOf(page, mp3);
+  expect(sound.seconds).toBeGreaterThan(1.1);
+  expect(sound.seconds).toBeLessThan(2.2);
+  expect(Math.abs(sound.hz - 440)).toBeLessThan(22);
+  net.assertNothingLeft(['voice-recording']);
+  expect(errors).toEqual([]);
+});
+
 test('Redact PDF removes the text under the boxes, keeps other pages, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'redact-pdf');
   const net = watchNetwork(page);
@@ -3845,4 +3884,86 @@ test('Increase video volume copies the picture and turns up the sound', async ({
   expect(tracks.video).not.toBeNull();
   await expect(page.locator('#results-list .result-item')).toContainText('picture copied');
   net.assertNothingLeft(['talk.webm']);
+});
+
+test('Merge audio joins files of different formats in order, with silence between, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'merge-audio');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [staticFx('song.flac'), 'tone.wav'], async () => {
+    await page.locator('#between').selectOption('gap-1');
+    await page.locator('#format').selectOption('wav');
+    await expect(page.locator('#bitrate-field')).toBeHidden();
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('merged.wav');
+  const wav = await bytesOf(downloads[0]!);
+  const info = await audioInfo(page, wav);
+  // 1 s + 1 s of silence + 1.5 s; the mono FLAC is spread to both channels to match the stereo WAV.
+  expect(info.duration).toBeCloseTo(3.5, 1);
+  expect(info.channels).toBe(2);
+  const silent = await page.evaluate(async (arr) => {
+    const buf = await new OfflineAudioContext(2, 1, 44100).decodeAudioData(new Uint8Array(arr).buffer);
+    const d = buf.getChannelData(0);
+    const peak = (from: number, to: number) => d.subarray(Math.round(from * 44100), Math.round(to * 44100)).reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+    return { song: peak(0.2, 0.8), gap: peak(1.1, 1.9), tone: peak(2.2, 3.3) };
+  }, Array.from(wav));
+  expect(silent.gap).toBe(0);
+  expect(silent.song).toBeGreaterThan(0.05);
+  expect(silent.tone).toBeGreaterThan(0.05);
+  await expect(page.locator('#results-list .result-item')).toContainText('2 files joined');
+  net.assertNothingLeft(['song.flac', 'tone.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('Merge MP3 joins two MP3s into one MP3', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/merge-mp3');
+  await expect(page.locator('#format')).toHaveValue('mp3');
+  const { downloads } = await run(page, [staticFx('song.mp3'), staticFx('song.mp3')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('merged.mp3');
+  const sound = await soundOf(page, await bytesOf(downloads[0]!));
+  expect(sound.seconds).toBeGreaterThan(1.95);
+  expect(sound.seconds).toBeLessThan(2.2);
+});
+
+test('Mic test shows the level and a verdict, plays back a short recording, and sends nothing', async ({ page }) => {
+  // Stand in for the microphone: a tone at about -12 dBFS.
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async (constraints?: MediaStreamConstraints) => {
+      (window as unknown as { __asked: unknown }).__asked = constraints;
+      const ac = new AudioContext();
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      gain.gain.value = 0.25;
+      const dest = ac.createMediaStreamDestination();
+      osc.connect(gain).connect(dest);
+      osc.start();
+      return dest.stream;
+    };
+  });
+  const errors = await open(page, 'mic-test');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#mic-start').click();
+  await expect(page.locator('#mic-panel')).toHaveAttribute('data-verdict', 'ok');
+  await expect(page.locator('#mic-verdict')).toContainText('works');
+  // The raw input is tested, without the browser's clean-up.
+  const asked = await page.evaluate(() => (window as unknown as { __asked: { audio: MediaTrackConstraints } }).__asked.audio);
+  expect(asked.noiseSuppression).toBe(false);
+  expect(asked.autoGainControl).toBe(false);
+  await expect(page.locator('#mic-db')).toContainText(/-1[0-9] dB peak/);
+  await expect(page.locator('#mic-facts')).toBeVisible();
+  await page.locator('#mic-record').click();
+  await expect(page.locator('#mic-record')).toContainText('Recording');
+  await expect(page.locator('#mic-audio')).toHaveAttribute('src', /^blob:/, { timeout: 10_000 });
+  await expect(page.locator('#mic-record')).toBeEnabled();
+  await page.locator('#mic-stop').click();
+  await expect(page.locator('#mic-start')).toBeVisible();
+  await expect(page.locator('#mic-note')).toContainText('microphone is off');
+  // One anonymous usage event for a working test, with no device names in it.
+  const runs = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run'));
+  expect(runs).toHaveLength(1);
+  expect(runs[0]!.d.format).toBe('mic');
+  net.assertNothingLeft([]);
+  expect(errors).toEqual([]);
 });

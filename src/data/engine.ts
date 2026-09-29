@@ -163,9 +163,21 @@ export const engines: Record<string, Engine> = {
     how: 'A QR encoder written for this site (byte mode, versions 1 to 40, Reed–Solomon error correction and the standard’s mask scoring) turns your text into the grid of squares in your tab. The PNG is drawn on a canvas by your browser and the SVG is written as one path, so both are exact, with no blur.',
     versus: 'Most QR code sites make you sign up, send your link and Wi-Fi password to their servers, and hand out “dynamic” codes that redirect through their domain, so they can count scans and switch your code off when a trial ends. Here the code holds your text directly, never expires, and nothing you type leaves your device.',
   },
+  'voice-recorder': {
+    how: 'Your browser records the microphone with its built-in recorder (MediaRecorder), with its own noise and echo reduction if you leave it on. When you stop, the sound is decoded and written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, or M4A by the browser’s AAC encoder.',
+    versus: 'Online voice recorders upload the recording to their servers to convert it, show ads around the download, and some keep your recordings in an account. Voice memos, interviews and dictation are private. Here the sound never leaves your device.',
+  },
   'volume-booster': {
     how: 'Your browser decodes the sound with its own audio decoders. Every sample is multiplied by the gain you chose (or the gain that brings the gated loudness to about −14 LUFS), then a look-ahead peak limiter turns down only the moments that would pass −1 dBFS, easing in over 5 ms and out over 150 ms. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders. For a video, Mediabunny (MPL-2.0) copies the picture packets unchanged and adds the new sound.',
     versus: 'Online volume boosters upload the recording or video, cap the file size, and often just multiply the samples so loud parts clip and crackle. Here nothing leaves your device and the limiter keeps boosted sound clean.',
+  },
+  'merge-audio': {
+    how: 'Your browser’s own audio decoders read each file (MP3, AAC in M4A or MP4, Opus or Vorbis, FLAC, WAV) into plain samples at 44.1 kHz in your tab. The sounds are laid end to end, with equal-power crossfades if you chose them, and written once as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
+    versus: 'Online audio joiners upload every file, cap free use at a few files or a few minutes, and keep the uploads on their servers. Here the files never leave your device, and there is no limit on how many you join.',
+  },
+  'mic-test': {
+    how: 'Your browser opens the microphone (getUserMedia) with its own clean-up turned off, and the Web Audio API measures the level of each moment of sound in your tab. The play-back check is recorded by the browser’s built-in recorder into memory and played straight back.',
+    versus: 'Many online mic tests record you and upload the clip to play it back, or run ads and trackers around the test. Here nothing is stored or sent: the sound goes from your microphone to this tab and nowhere else.',
   },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',

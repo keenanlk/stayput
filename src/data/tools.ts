@@ -1670,6 +1670,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'voice-recorder',
+    name: 'Voice recorder',
+    title: 'Online Voice Recorder: Record to MP3, No Upload | Stayput',
+    description:
+      'Record your voice with your microphone and save it as MP3, WAV or M4A, right in the browser. No app, no sign-up, no time limit, and nothing is uploaded.',
+    heading: 'Record your voice',
+    tagline: 'A voice memo, a voice-over or a quick demo, recorded in this tab and saved as MP3. The sound never leaves your device.',
+    category: 'media',
+    accept: 'audio/*,.webm,.ogg,.m4a',
+    multiple: false,
+    dropLabel: 'Record your voice',
+    action: 'Save recording',
+    keywords: ['voice recorder', 'online voice recorder', 'record audio', 'record voice', 'mp3 recorder', 'audio recorder online', 'record my voice'],
+    steps: [
+      'Press Start recording and allow the microphone when your browser asks. Choose another microphone from the list if you have more than one.',
+      'Speak. The meter shows the level; pause and resume as often as you like.',
+      'Press Stop and save. Listen back on the page and download the recording as MP3, WAV or M4A.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. The microphone is recorded by your browser in this tab, and the MP3 is written by code in this page. There is no account and no server, so nobody else can hear it, and the page works offline once loaded.',
+      },
+      {
+        q: 'Does it work on my phone?',
+        a: 'Yes, in Safari on iPhone and iPad and in Chrome on Android. Keep the screen on while recording: phones pause web pages when the screen locks.',
+      },
+      {
+        q: 'Why does my voice sound muffled or quiet?',
+        a: 'Noise and echo reduction is on by default, which suits calls and memos. For music or a clean voice-over with a good microphone, untick "Reduce background noise and echo" to record the raw sound, then use the volume booster if it is too quiet.',
+      },
+      {
+        q: 'Is there a time limit?',
+        a: 'No. The recording is held in memory until you save it; an hour of speech is only a few tens of megabytes. Saving a very long recording as MP3 takes a little while, and WAV is fastest.',
+      },
+    ],
+  },
+  {
     slug: 'volume-booster',
     name: 'Volume booster',
     title: 'Volume Booster: Make Audio or Video Louder, No Upload | Stayput',
@@ -1708,6 +1746,82 @@ export const tools: Tool[] = [
       {
         q: 'Does the MP3 lose quality?',
         a: 'Saving an MP3 again re-encodes it, at about the original’s bitrate, which is inaudible for most listening. For editing, save as WAV or FLAC.',
+      },
+    ],
+  },
+  {
+    slug: 'merge-audio',
+    name: 'Merge audio',
+    title: 'Merge Audio Files Online: Join MP3 and WAV, No Upload | Stayput',
+    description:
+      'Join two or more audio files into one MP3 or WAV in your browser, in the order you choose, with silence or a crossfade between them. No upload, no limits.',
+    heading: 'Merge audio files',
+    tagline: 'Combine songs, voice notes or podcast segments into one file. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac,.webm,.mp4',
+    multiple: true,
+    dropLabel: 'Drop the audio files to join',
+    action: 'Merge audio',
+    keywords: ['merge audio', 'merge mp3', 'combine audio files', 'join mp3', 'audio joiner', 'combine mp3 files', 'mp3 merger'],
+    steps: [
+      'Drop two or more audio files (MP3, WAV, M4A, OGG, FLAC, or the sound of a video), or tap to pick them. Use the arrows to put them in order.',
+      'Choose what goes between them: nothing, a moment of silence, or a crossfade that blends one into the next.',
+      'Merge. The files are joined and written as one MP3 or WAV, which downloads straight away.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Nothing is sent to a server, there is no size limit, and the page works offline once loaded.',
+      },
+      {
+        q: 'Can I mix different formats?',
+        a: 'Yes. An MP3, a WAV from a recorder and an M4A voice memo can be joined together; everything is converted to 44.1 kHz on the way. If any file is stereo, mono files are played in both ears.',
+      },
+      {
+        q: 'Does merging lower the quality?',
+        a: 'Saving as WAV keeps every sample. MP3 is re-encoded once at the quality you choose; at 192 kbps or more the difference from the originals is very hard to hear.',
+      },
+      {
+        q: 'Can I cut the files before joining them?',
+        a: 'Use Trim audio on each file first to cut the start or end, then merge the trimmed files here.',
+      },
+    ],
+  },
+  {
+    slug: 'mic-test',
+    name: 'Mic test',
+    title: 'Mic Test: Check Your Microphone Online, Private | Stayput',
+    description:
+      'Test your microphone in the browser: a live level meter, a plain verdict, and a five-second record and play back. Nothing is recorded to a server.',
+    heading: 'Test your microphone',
+    tagline: 'See whether your microphone works and how loud it is, and hear yourself back, before a call or a recording.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your microphone',
+    action: 'Test',
+    keywords: ['mic test', 'microphone test', 'test my mic', 'online mic test', 'is my mic working', 'check microphone', 'mic checker'],
+    steps: [
+      'Press Test my microphone and allow it when your browser asks. Choose another microphone from the list if you have several.',
+      'Speak. The bar moves with your voice, and the verdict says whether the level is right, too quiet or clipping.',
+      'Press Record 5 seconds and play back to hear exactly how you sound, then press Stop using the microphone.',
+    ],
+    faq: [
+      {
+        q: 'Is my voice recorded or uploaded?',
+        a: 'No. The level is measured by code in this page from the live input, and nothing is recorded unless you press the play-back button. That recording stays in this tab’s memory, is never sent anywhere, and disappears when you close the page.',
+      },
+      {
+        q: 'The bar does not move. What is wrong?',
+        a: 'Check the microphone is not muted (many headsets and laptops have a mute key or switch), that the right microphone is chosen in the list, and that no other app such as Zoom or Teams is holding it. On a Mac, allow the browser under System Settings, Privacy and Security, Microphone; on Windows, under Settings, Privacy, Microphone.',
+      },
+      {
+        q: 'What level should I aim for?',
+        a: 'When you speak normally, the average should sit around the middle of the bar (about −30 to −15 dB) and the peak marker should stay clear of the right end. A peak at the end means the sound is clipping, which sounds harsh; turn the input volume down.',
+      },
+      {
+        q: 'Why does it sound different in calls?',
+        a: 'This test turns off the browser’s noise suppression, echo cancellation and automatic gain, so you hear what the microphone really picks up. Call apps apply their own clean-up, which usually makes voices quieter in the background and more even.',
       },
     ],
   },
