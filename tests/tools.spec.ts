@@ -455,7 +455,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -469,7 +469,7 @@ test('format-pair pages render, preset the converter and link a social image', a
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');
-    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon' }[to!];
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp' }[to!];
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }
@@ -789,6 +789,18 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#format')).toHaveValue('image/png');
     }],
     ['crop-image-to-square', 'crop-image', async () => expect(page.locator('#aspect')).toHaveValue('1:1')],
+    ['webp-to-pdf', 'image-to-pdf', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /webp/)],
+    ['gif-to-pdf', 'image-to-pdf', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /gif/)],
+    ['combine-images-into-pdf', 'image-to-pdf', async () => {
+      await expect(page.locator('#page-size')).toHaveValue('a4');
+      await expect(page.locator('#margin')).toHaveValue('10');
+    }],
+    ['tiff-to-pdf', 'image-to-pdf', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /tif/)],
+    ['add-signature-to-pdf', 'sign-pdf', async () => expect(page.locator('#sig-pad')).toBeAttached()],
+    ['resize-image-for-instagram', 'crop-image', async () => {
+      await expect(page.locator('#aspect')).toHaveValue('4:5');
+      await expect(page.locator('#format')).toHaveValue('image/jpeg');
+    }],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -803,6 +815,52 @@ test('preset landing pages render, run their base tool with the preset options a
     expect((await page.request.get(`/og/${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
     await check();
     expect(errors, slug).toEqual([]);
+  }
+});
+
+test('Add signature landing page loads the signing stage and signs a PDF', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/add-signature-to-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#sign-panel')).toBeVisible();
+  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await page.locator('#sig-text').fill('Ada Lovelace');
+  await page.locator('#add-signature').click();
+  await expect(page.locator('.stamp-signature')).toHaveCount(1);
+  await page.locator('#add-date').click();
+  await expect(page.locator('.stamp')).toHaveCount(2);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('text-signed.pdf');
+  const doc = await PDFDocument.load(await bytesOf(download));
+  expect(doc.getPageCount()).toBe(3);
+  net.assertNothingLeft(['text.pdf']);
+});
+
+test('TIFF to PDF keeps every page of a multi-page TIFF and a fax page, and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/tiff-to-pdf');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['scan.tiff', 'fax.tif']);
+  const doc = await PDFDocument.load(await bytesOf(downloads[0]!));
+  expect(doc.getPageCount()).toBe(3);
+  expect(doc.getPage(0).getSize()).toEqual({ width: 800, height: 1000 });
+  expect(doc.getPage(2).getSize()).toEqual({ width: 1728, height: 600 });
+  net.assertNothingLeft(['scan.tiff', 'fax.tif']);
+});
+
+test('TIFF to JPG and TIFF to PNG decode TIFFs the browser cannot open', async ({ page }) => {
+  for (const [slug, type] of [['tiff-to-jpg', 'image/jpeg'], ['tiff-to-png', 'image/png']] as const) {
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    const { downloads } = await run(page, ['scan.tiff']);
+    const bytes = await bytesOf(downloads[0]!);
+    const dims = await page.evaluate(async ([b, t]) => {
+      const bmp = await createImageBitmap(new Blob([new Uint8Array(b)], { type: t }));
+      return [bmp.width, bmp.height];
+    }, [Array.from(bytes), type] as const);
+    expect(dims, slug).toEqual([800, 1000]);
   }
 });
 

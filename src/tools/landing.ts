@@ -15,6 +15,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'pdf-to-word': () => import('./pdf-to-word'),
   'crop-image': () => import('./crop-image'),
   'reorder-pdf': () => import('./reorder-pdf'),
+  'sign-pdf': () => import('./sign-pdf'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';
