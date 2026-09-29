@@ -106,7 +106,7 @@ self.addEventListener('message', (event) => {
 });
 
 const isImmutable = (url) =>
-  url.origin === self.location.origin && (url.pathname.startsWith('/_astro/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/vendor/'));
+  url.origin === self.location.origin && (url.pathname.startsWith('/_astro/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/vendor/') || url.pathname.startsWith('/models/'));
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;

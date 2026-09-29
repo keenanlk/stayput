@@ -43,6 +43,7 @@ test.describe('search ranking', () => {
     expect(top('jpeg to png')).toEqual(['/jpg-to-png']);
     expect(top('signature', 2)).toContain('/tools/sign-pdf');
     expect(top('audio from video', 3)).toContain('/tools/video-to-mp3');
+    expect(top('remove background', 1)).toContain('/tools/remove-background');
   });
 
   test('empty query lists the tools; nonsense finds nothing', () => {
@@ -51,7 +52,7 @@ test.describe('search ranking', () => {
     expect(all.every((e) => e.k === 'tool')).toBe(true);
     expect(search(index, 'qzxv')).toEqual([]);
     // No half matches: a job the site cannot do shows the empty state, not look-alikes.
-    expect(search(index, 'remove background')).toEqual([]);
+    expect(search(index, 'translate document')).toEqual([]);
   });
 });
 

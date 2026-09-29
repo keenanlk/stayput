@@ -38,6 +38,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'trim-audio': () => import('./trim-audio'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
+  'remove-background': () => import('./remove-background'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

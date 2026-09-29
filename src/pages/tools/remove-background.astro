@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RemoveBackground from '../../components/options/RemoveBackground.astro';
+const tool = toolBySlug('remove-background')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><RemoveBackground /></Fragment>
+</ToolLayout>
+<script src="../../tools/remove-background.ts"></script>
