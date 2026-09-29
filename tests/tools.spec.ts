@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Download } from '@playwright/test';
+import { test, expect, type Page, type Download, type Locator } from '@playwright/test';
 import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync } from 'node:fs';
 import { execSync, execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -91,6 +91,16 @@ async function run(page: Page, files: string[], configure?: () => Promise<void>)
   return { downloads, items };
 }
 
+/**
+ * Tick a visually hidden radio or checkbox. Once a file is in, the Run bar is
+ * pinned over the bottom of the screen; scrolling the input to the middle first
+ * keeps the forced click from landing on the bar instead.
+ */
+async function choose(input: Locator) {
+  await input.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  await input.check({ force: true });
+}
+
 async function bytesOf(d: Download): Promise<Uint8Array> {
   const p = await d.path();
   return new Uint8Array(readFileSync(p!));
@@ -171,7 +181,7 @@ test('HEIC to JPG converts and can keep EXIF with GPS', async ({ page }) => {
 test('HEIC to PNG without EXIF', async ({ page }) => {
   await open(page, 'heic-to-jpg');
   const { downloads } = await run(page, ['iphone.heic'], async () => {
-    await page.locator('input[name="format"][value="png"]').check({ force: true });
+    await choose(page.locator('input[name="format"][value="png"]'));
   });
   const png = await bytesOf(downloads[0]!);
   expect(sniffFormat(png)).toBe('png');
@@ -411,7 +421,7 @@ test('Split PDF extracts a range and splits every page', async ({ page }) => {
   expect(doc.getPageCount()).toBe(2);
   expect(downloads[0]!.suggestedFilename()).toBe('text-pages-3,1.pdf');
 
-  await page.locator('input[name="split-mode"][value="each"]').check({ force: true });
+  await choose(page.locator('input[name="split-mode"][value="each"]'));
   await page.locator('#run').click();
   await expect(page.locator('#results')).toHaveClass(/is-active/);
   expect(await page.locator('#results-list .result-item').count()).toBe(3);
@@ -429,7 +439,7 @@ test('Compress PDF recompresses images, cleans losslessly and flattens', async (
   const doc = await PDFDocument.load(out);
   expect(doc.getPageCount()).toBe(2);
 
-  await page.locator('input[name="mode"][value="lossless"]').check({ force: true });
+  await choose(page.locator('input[name="mode"][value="lossless"]'));
   const downloads: Download[] = [];
   page.on('download', (d) => downloads.push(d));
   await page.locator('#run').click();
@@ -437,7 +447,7 @@ test('Compress PDF recompresses images, cleans losslessly and flattens', async (
   await expect.poll(() => downloads.length).toBe(1);
   expect((await PDFDocument.load(await bytesOf(downloads[0]!))).getPageCount()).toBe(2);
 
-  await page.locator('input[name="mode"][value="flatten"]').check({ force: true });
+  await choose(page.locator('input[name="mode"][value="flatten"]'));
   await page.locator('#run').click();
   await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
   await expect.poll(() => downloads.length).toBe(2);
@@ -475,7 +485,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
   await open(page, 'pdf-to-image');
   const { items } = await run(page, ['text.pdf'], async () => {
     await expect(page.locator('#page-info')).toHaveText('3 pages');
-    await page.locator('input[name="pages"][value="range"]').check({ force: true });
+    await choose(page.locator('input[name="pages"][value="range"]'));
     await page.locator('#range').fill('1-2');
     await page.locator('#dpi').selectOption('72');
   });
@@ -694,7 +704,7 @@ test('Sign PDF places a drawn and a typed signature on two pages and no bytes le
   await page.locator('#next-page').click();
   await expect(page.locator('#page-label')).toHaveText('Page 2 of 3');
   await expect(page.locator('.stamp')).toHaveCount(0);
-  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
   await page.locator('#sig-text').fill('Keenan Example');
   await page.locator('#add-signature').click();
   await page.locator('#add-date').click();
@@ -755,7 +765,7 @@ test('Sign PDF draw pad and typed preview stay paper-bright and legible in dark 
   }
 
   // Typed preview: same paper background, and the chosen ink stays legible on it.
-  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
   await page.locator('#sig-text').fill('Keenan Example');
   const previewBg = await page.locator('#sig-preview').evaluate((el) => getComputedStyle(el).backgroundColor);
   expect(luminance(previewBg)).toBeGreaterThan(0.6);
@@ -1131,7 +1141,7 @@ test('Page numbers and signatures land inside pages whose MediaBox is offset or 
   await page.goto('/tools/sign-pdf');
   const signed = await run(page, ['boxes.pdf'], async () => {
     await expect(page.locator('#page-label')).toHaveText('Page 1 of 2');
-    await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+    await choose(page.locator('input[name="sig-mode"][value="type"]'));
     await page.locator('#sig-text').fill('Keenan');
     await page.locator('#add-signature').click();
   });
@@ -1367,7 +1377,7 @@ test('Sign PDF says what is needed before Run until a signature is placed', asyn
   await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
   await expect(page.locator('#run-hint')).toBeVisible();
   await expect(page.locator('#run-hint')).toContainText('Add signature to this page');
-  await page.locator('input[name="sig-mode"][value="type"]').check({ force: true });
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
   await page.locator('#sig-text').fill('Keenan Example');
   await page.locator('#add-signature').click();
   await expect(page.locator('.stamp-signature')).toHaveCount(1);
