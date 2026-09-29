@@ -1784,6 +1784,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'webcam-test',
+    name: 'Webcam test',
+    title: 'Webcam Test: Check Your Camera Online, Private | Stayput',
+    description:
+      'Test your webcam in the browser: live preview, real resolution and frame rate, mirror view and a snapshot as JPG. The picture never leaves your device.',
+    heading: 'Test your webcam',
+    tagline: 'See your camera, its real resolution and frame rate, before a call or an interview. Nothing is recorded or sent anywhere.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your webcam',
+    action: 'Test',
+    keywords: ['webcam test', 'camera test', 'test my webcam', 'online webcam test', 'is my webcam working', 'check camera', 'webcam resolution test'],
+    steps: [
+      'Press Test my webcam and allow the camera when your browser asks. Choose another camera from the list if you have several.',
+      'Check the picture, then read what the camera really delivers: its resolution, aspect ratio and the frame rate measured in this page.',
+      'Take a photo to save a snapshot as JPG, then press Turn off the camera.',
+    ],
+    faq: [
+      {
+        q: 'Is my picture recorded or uploaded?',
+        a: 'No. The camera shows in this page from a local stream, and nothing is recorded or sent anywhere. A snapshot is only made when you press Take a photo, and it goes straight to your downloads.',
+      },
+      {
+        q: 'My camera is not found or shows black. What is wrong?',
+        a: 'Check the lens cover or privacy switch, that no other app such as Zoom or Teams is using the camera, and that the browser is allowed to use it: on a Mac under System Settings, Privacy and Security, Camera; on Windows under Settings, Privacy, Camera. Some laptops also have a camera key on the keyboard.',
+      },
+      {
+        q: 'Why is the resolution lower than my camera’s box says?',
+        a: 'Browsers ask for 1080p here, and a camera gives the closest mode it has. Many “1080p” webcams only deliver 720p over USB, or drop resolution in apps that request less. Choose 4K under Ask for to see the most your camera offers.',
+      },
+      {
+        q: 'Why is the measured frame rate low?',
+        a: 'Webcams slow down in dim light to let in more light per frame, often from 30 to 15 frames per second. Turn on a lamp facing you and test again.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
