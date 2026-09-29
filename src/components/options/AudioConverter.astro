@@ -1,0 +1,42 @@
+---
+/** Option controls for the audio converter, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'mp3';
+const bitrate = defaults.bitrate ?? '192';
+const channels = defaults.channels ?? 'stereo';
+const formats = [
+  ['mp3', 'MP3 (plays everywhere)'],
+  ['wav', 'WAV (uncompressed, for editing)'],
+  ['flac', 'FLAC (lossless, half the size of WAV)'],
+  ['m4a', 'M4A (AAC, for Apple devices)'],
+  ['ogg', 'OGG (Opus, small, for the web and games)'],
+] as const;
+const bitrates = [
+  ['96', '96 kbps (speech, smallest)'],
+  ['128', '128 kbps'],
+  ['192', '192 kbps (good default)'],
+  ['256', '256 kbps'],
+  ['320', '320 kbps (highest)'],
+] as const;
+---
+<div class="field">
+  <label for="format">Convert to</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+  <p class="muted small" id="format-note" hidden></p>
+</div>
+<div class="field" id="bitrate-field">
+  <label for="bitrate">Quality</label>
+  <select id="bitrate">
+    {bitrates.map(([v, l]) => <option value={v} selected={v === bitrate}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label>Channels</label>
+  <div class="segmented" role="radiogroup" aria-label="Channels">
+    <label><input type="radio" name="channels" value="stereo" checked={channels === 'stereo'} /><span>Stereo</span></label>
+    <label><input type="radio" name="channels" value="mono" checked={channels === 'mono'} /><span>Mono (half the size)</span></label>
+  </div>
+</div>
