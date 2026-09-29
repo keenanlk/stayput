@@ -28,7 +28,11 @@ const engine = engineFor(engineSlug ?? tool.slug);
 // so every tool is linked from several pages rather than only the first four in the list.
 const sameCategory = tools.filter((t) => t.category === tool.category);
 const home = sameCategory.findIndex((t) => t.slug === (base ?? tool.slug));
-const neighbours = sameCategory.map((_, i) => sameCategory[(home + 1 + i) % sameCategory.length]!).filter((t) => t.slug !== tool.slug);
+// A stable per-page number, so pages sharing a base tool start their link lists at different places
+// and every sibling page gets linked from somewhere, not only the first few in each list.
+const spin = [...tool.slug].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+const offset = base && base !== tool.slug ? spin % sameCategory.length : 0;
+const neighbours = sameCategory.map((_, i) => sameCategory[(home + 1 + offset + i) % sameCategory.length]!).filter((t) => t.slug !== tool.slug);
 const baseTool = base ? tools.find((t) => t.slug === base) : undefined;
 const related = [...(baseTool ? [baseTool] : []), ...neighbours.filter((t) => t !== baseTool)].slice(0, 4);
 const isPair = path.startsWith('/') && !path.startsWith('/tools/');
@@ -46,9 +50,13 @@ const conversions = pairs
 // Landing pages that are presets of tools in this category, so "JPG to PDF" is reachable from the PDF tools.
 // Presets of the same tool come first, then those sharing a format with this page.
 const presetScore = (p: (typeof presets)[number]) => 2 * Number(p.base === (base ?? tool.slug)) + sharesFormat(p.slug);
-const presetLinks = presets
-  .filter((p) => p.slug !== tool.slug && (tools.find((t) => t.slug === p.base)?.category === tool.category || sharesFormat(p.slug) > 0))
-  .sort((a, b) => presetScore(b) - presetScore(a))
+// Ties are broken by rotating from a per-page start, so each page shows a different dozen.
+const inScope = presets.filter((p) => p.slug !== tool.slug && (tools.find((t) => t.slug === p.base)?.category === tool.category || sharesFormat(p.slug) > 0));
+const turn = (i: number) => (i - (spin % Math.max(1, inScope.length)) + inScope.length) % Math.max(1, inScope.length);
+const presetLinks = inScope
+  .map((p, i) => ({ p, i: turn(i) }))
+  .sort((a, b) => presetScore(b.p) - presetScore(a.p) || a.i - b.i)
+  .map(({ p }) => p)
   .slice(0, 12);
 // File labels for the upload-vs-local diagram: the format pair when the slug names one, else the category's usual file.
 const labels: Record<string, string> = { jpg: 'JPG', jpeg: 'JPG', png: 'PNG', webp: 'WebP', heic: 'HEIC', avif: 'AVIF', svg: 'SVG', jxl: 'JXL', jfif: 'JFIF', gif: 'GIF', ico: 'ICO', bmp: 'BMP', tiff: 'TIFF', pdf: 'PDF', mp4: 'MP4', mov: 'MOV', mp3: 'MP3', m4a: 'M4A', wav: 'WAV', text: 'TXT', word: 'DOCX', image: 'Photo', picture: 'Photo', screenshot: 'PNG', video: 'Video' };
@@ -57,7 +65,14 @@ const [slugFrom, slugTo] = tool.slug.split('-to-').map((part) => labels[part.spl
 const diagFrom = slugFrom ?? fallback;
 const diagTo = tool.slug.includes('-to-') ? (slugTo ?? diagFrom) : diagFrom;
 const next = (nextSteps[base ?? tool.slug] ?? []).map((s) => tools.find((t) => t.slug === s)).filter((t): t is Tool => !!t);
-const guides = guidesFor([tool.slug, base ?? tool.slug]).slice(0, 4);
+// Guides whose main tool is this page come first, then those whose main tool is the base tool, then the rest.
+const guides0 = guidesFor([tool.slug, base ?? tool.slug]);
+const guideScore = (g: (typeof guides0)[number]) => 2 * Number(g.tools[0] === tool.slug) + Number(g.tools[0] === (base ?? tool.slug)) + Number(g.tools.includes(tool.slug));
+const guides = guides0
+  .map((g, i) => ({ g, i: (i - (spin % Math.max(1, guides0.length)) + guides0.length) % Math.max(1, guides0.length) }))
+  .sort((a, b) => guideScore(b.g) - guideScore(a.g) || a.i - b.i)
+  .map(({ g }) => g)
+  .slice(0, 5);
 const jsonLd = [
   {
     '@context': 'https://schema.org',

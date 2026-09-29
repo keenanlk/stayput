@@ -3109,14 +3109,19 @@ export const isSafetyGuide = (g: Guide): boolean => /^is-.+-safe$/.test(g.slug);
 
 /**
  * Guides to suggest under another guide: other safety guides first when the
- * reader is on one, then the guides sharing the most tools, in list order on ties.
+ * reader is on one, then the guides sharing the most tools, then other how-to guides
+ * under a how-to guide. Ties go to the guides listed after this one (wrapping
+ * around), which were usually written alongside it, so every guide is suggested
+ * from somewhere rather than only the first few in the list.
  */
 export function relatedGuides(guide: Guide, count = 4): Guide[] {
   const safety = isSafetyGuide(guide);
-  const score = (g: Guide) => g.tools.filter((t) => guide.tools.includes(t)).length + (safety && isSafetyGuide(g) ? 10 : 0);
+  const howTo = (g: Guide) => g.slug.startsWith('how-to-');
+  const score = (g: Guide) => g.tools.filter((t) => guide.tools.includes(t)).length + (safety && isSafetyGuide(g) ? 10 : 0) + (howTo(guide) && howTo(g) ? 0.5 : 0);
+  const own = guides.indexOf(guide);
   return guides
-    .filter((g) => g.slug !== guide.slug)
-    .map((g, i) => ({ g, i, s: score(g) }))
+    .map((g, i) => ({ g, i: (i - own + guides.length) % guides.length, s: score(g) }))
+    .filter(({ g }) => g.slug !== guide.slug)
     .sort((a, b) => b.s - a.s || a.i - b.i)
     .slice(0, count)
     .map((x) => x.g);
