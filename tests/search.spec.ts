@@ -39,7 +39,8 @@ test.describe('search ranking', () => {
     expect(top('remove password')).toEqual(['/tools/unlock-pdf']);
     expect(top('gps', 3)).toContain('/tools/strip-exif');
     expect(top('ocr')).toEqual(['/tools/image-to-text']);
-    expect(top('gif', 3)).toContain('/tools/video-to-gif');
+    // Both ways of making a GIF come up for the bare word.
+    expect(top('gif', 4)).toEqual(expect.arrayContaining(['/tools/video-to-gif', '/tools/gif-maker']));
     expect(top('jpeg to png')).toEqual(['/jpg-to-png']);
     expect(top('signature', 2)).toContain('/tools/sign-pdf');
     expect(top('audio from video', 3)).toContain('/tools/video-to-mp3');
