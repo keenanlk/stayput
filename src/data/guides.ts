@@ -2173,6 +2173,192 @@ export const guides: Guide[] = [
       { q: 'Can I add a fade-in or fade-out when trimming?', a: 'Some tools support this, including Stayput\'s trim audio tool; a plain trim without a fade can sound abrupt at the cut points, especially for music or speech.' },
     ],
   },
+  {
+    slug: 'how-to-add-page-numbers-to-a-pdf',
+    title: 'How to Add Page Numbers to a PDF',
+    description: 'Word and Google Docs can number pages before exporting to PDF, but once a document is already a PDF, most viewers have no way to stamp numbers onto it. Here is what works, including for a PDF you did not create yourself.',
+    heading: 'How to add page numbers to a PDF',
+    dek: 'Easy if you still have the original Word file; much harder if all you have is the finished PDF. Here is what actually works.',
+    keywords: ['how to add page numbers to a pdf', 'number pdf pages', 'insert page numbers pdf', 'pdf page numbering free', 'add page numbers to a scanned pdf'],
+    updated: '2026-09-29',
+    tools: ['pdf-page-numbers'],
+    sections: [
+      {
+        h: 'The easy case: you still have the original document',
+        p: [
+          'If the PDF came from Word or Google Docs, the simplest path is to add page numbers in the original document (Word: **Insert, Page Number**; Google Docs: **Insert, Page numbers**) and re-export to PDF. This gives full control over the numbering format and skips touching the PDF at all.',
+        ],
+      },
+      {
+        h: 'When you only have the PDF',
+        p: [
+          'Often the original document is gone, came from someone else, or is a scan, and page numbers need to be stamped directly onto the existing PDF. This is a different job: adding a small text layer to each page rather than reflowing a document, and it is something neither Preview on a Mac nor the built-in PDF viewers on Windows, iPhone or Android can do.',
+        ],
+      },
+      {
+        h: 'On a Mac, Windows, iPhone or Android',
+        p: [
+          'None of the built-in PDF viewers on any of these platforms, including Preview, Edge\'s reader, and the Files apps on iPhone and Android, offer a way to stamp page numbers onto an existing PDF. This is a genuine gap across every platform, not something hidden in a menu.',
+        ],
+      },
+      {
+        h: 'A dedicated tool for stamping numbers onto a PDF',
+        p: [
+          'Stayput\'s [add page numbers](/tools/pdf-page-numbers) tool stamps a number onto every page directly, with a choice of position (corner or centre), format (plain number, or "Page 1 of 10"), font and starting number, done in the browser without uploading the document. It works the same way whether the PDF came from Word, a scanner, or somewhere else entirely.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I add page numbers to a PDF without the original document?', a: 'Yes, a tool that stamps numbers directly onto the existing PDF pages works regardless of what created the file, unlike adding numbers in Word or Docs which requires the original source document.' },
+      { q: 'Can I start numbering from a page other than 1?', a: 'A dedicated PDF page-numbering tool typically lets you set a starting number, which is useful when a cover page or table of contents should not be counted.' },
+      { q: 'Does adding page numbers change the PDF\'s existing content?', a: 'No, it adds a small text layer to each page without altering the original text or images underneath.' },
+      { q: 'Can I number a scanned PDF the same way?', a: 'Yes, stamping numbers works on any PDF, including a scan with no underlying text layer, since it is adding a new number on top rather than depending on what is already there.' },
+    ],
+  },
+  {
+    slug: 'how-to-merge-multiple-videos-into-one',
+    title: 'How to Merge Multiple Videos Into One',
+    description: 'Joining several video clips end to end into a single file is not something most phone camera rolls or built-in video apps do without a full editor. Here is what actually works, including a browser tool.',
+    heading: 'How to merge multiple videos into one',
+    dek: 'Most camera rolls can play clips one after another, not merge them into a single file. Here is what actually joins them.',
+    keywords: ['how to merge videos', 'combine video clips into one', 'join videos together', 'merge mp4 files free', 'stitch videos into one file'],
+    updated: '2026-09-29',
+    tools: ['merge-videos'],
+    sections: [
+      {
+        h: 'Why this needs more than the camera roll',
+        p: [
+          'Playing several clips in sequence in the Photos app, or grouping them into an album, is not the same as merging them into one video file: the clips stay separate, so sharing them as a single file, or uploading them somewhere that only accepts one video, still doesn\'t work.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither the Photos app nor the default camera roll has a built-in way to merge clips into one video file. iMovie (free on iPhone and Mac) can do it: add the clips to a new project in the order you want, and export. This is a full video editor, though, for what is otherwise a simple join.',
+        ],
+      },
+      {
+        h: 'On a Mac with iMovie',
+        p: [
+          'Same approach as iPhone: create a new project, drag the clips onto the timeline in order, and share/export as a video file. Reordering clips is done by dragging them along the timeline before exporting.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'The Photos app\'s video editor (Clipchamp, built into recent versions of Windows) can combine clips on a timeline similarly to iMovie: add each clip, arrange the order, and export. Like iMovie, it is a general editor rather than a single-purpose merge tool.',
+        ],
+      },
+      {
+        h: 'A tool built just for joining clips',
+        p: [
+          'Stayput\'s [merge videos](/tools/merge-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I merge videos without a full video editor?', a: 'Yes, a tool built specifically for joining clips end to end skips the timeline, transitions and other editing features a full app like iMovie or Clipchamp includes.' },
+      { q: 'Can I merge videos in different formats together?', a: 'A capable merge tool can combine MP4, MOV, WebM and MKV clips in a single output; some simpler methods require all clips to already share the same format.' },
+      { q: 'Does merging videos re-encode and lose quality?', a: 'Some quality loss is common since the clips need to be combined into a single continuous stream, though a well-built tool keeps this minimal at a matching resolution and bitrate.' },
+      { q: 'Can I reorder the clips before merging?', a: 'Yes, on every method above, whether by dragging clips along a timeline in a full editor or reordering them in a dedicated merge tool before joining.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-wav-to-mp3',
+    title: 'How to Convert WAV to MP3 (and Other Audio Formats)',
+    description: 'A WAV file is much larger than the equivalent MP3 for the same audio, which is usually why people need to convert one to the other. Here is how, including what your OS can already do, and a browser converter for the rest.',
+    heading: 'How to convert WAV to MP3',
+    dek: 'WAV files are large; MP3 is the smaller, more compatible format most people actually need. Here is how to convert between them.',
+    keywords: ['how to convert wav to mp3', 'audio format converter', 'convert m4a to mp3', 'convert flac to mp3', 'wav to mp3 free no upload'],
+    updated: '2026-09-29',
+    tools: ['audio-converter'],
+    sections: [
+      {
+        h: 'Why WAV and MP3 are so different in size',
+        p: [
+          'WAV is an uncompressed format: it stores the raw audio data directly, which makes files large but exactly reproduces the original sound. MP3 compresses the audio, discarding some detail that is harder for most people to hear, which is why an MP3 of the same recording is often a tenth the size or smaller.',
+        ],
+      },
+      {
+        h: 'On a Mac with QuickTime or iTunes/Music',
+        p: [
+          'QuickTime Player can export a WAV file as an M4A (File, **Export As**, Audio Only), but not directly to MP3. The Music app can convert to MP3 if "Create MP3 Version" is enabled first in its settings (Preferences, **Files, Import Settings**, set to MP3 Encoder), then right-click the imported song and choose it from there — a roundabout path for a simple conversion.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'There is no built-in converter between audio formats in Windows Media Player or the Photos app; both mainly play files rather than convert them. This is a genuine gap, which is why most people search for a dedicated converter rather than a settings menu.',
+        ],
+      },
+      {
+        h: 'On an iPhone or Android',
+        p: [
+          'Neither platform has a native audio format converter. Files that arrive as WAV, FLAC or another format either play as-is in a compatible app, or need converting elsewhere before they will import into an app that expects MP3 specifically.',
+        ],
+      },
+      {
+        h: 'A direct converter between formats',
+        p: [
+          'Stayput\'s [audio converter](/tools/audio-converter) tool converts between MP3, WAV, FLAC, M4A and OGG directly, in a batch, in the browser, without uploading the files or needing the Music app\'s roundabout MP3-encoder setting. It also pulls audio out of a video file in the same step if needed.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does converting WAV to MP3 lose audio quality?', a: 'Yes, some quality is lost since MP3 is a compressed (lossy) format, though at a reasonable bitrate the difference is not noticeable for most listening.' },
+      { q: 'Can I convert MP3 back to WAV?', a: 'Yes, but this does not recover any detail that was discarded during the original MP3 compression; it just changes the container and encoding, not the underlying quality.' },
+      { q: 'Why can\'t I just rename a .wav file to .mp3?', a: 'The file extension does not change the actual audio encoding inside the file, so renaming it does not convert anything; the data still needs to be re-encoded by a converter.' },
+      { q: 'Is there a free way to convert audio formats without installing software?', a: 'Yes, a browser-based converter works without installing anything and, when it runs locally, does not upload the audio file anywhere to convert it.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-a-watermark-to-a-photo',
+    title: 'How to Add a Watermark to a Photo',
+    description: 'Putting your name, a copyright line or a website on photos before sharing them usually means a separate app, since phone camera rolls have no built-in watermarking feature. Here is what works.',
+    heading: 'How to add a watermark to a photo',
+    dek: 'Phone camera rolls have no built-in watermark feature. Here is what actually adds text to a photo before you share it.',
+    keywords: ['how to add a watermark to a photo', 'add text to a photo', 'copyright watermark image', 'add watermark to picture free', 'photo watermark online'],
+    updated: '2026-09-29',
+    tools: ['watermark-image'],
+    sections: [
+      {
+        h: 'Why this needs a separate step',
+        p: [
+          'A watermark is text or a logo layered onto a photo, usually to mark ownership or discourage unauthorized use before sharing a preview or a sample image. Neither the iPhone nor Android Photos app, nor Windows Photos, has a built-in way to add this kind of text overlay; their editing tools cover cropping, filters and basic adjustments, not adding new text to the image.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'The Markup tool (available from the Photos app\'s edit screen, or the share sheet\'s Markup option) can add text to a photo by tapping the **+** button and choosing **Text**, then positioning and resizing it. This works for a one-off photo but has no way to save a watermark style to reuse, and repeating it across many photos means doing this manually each time.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Most Android phones\' built-in Photos or Gallery apps don\'t include a markup or text tool at all; Google Photos\' editor covers filters and adjustments only. Adding text on Android typically means a separate app made for the purpose.',
+        ],
+      },
+      {
+        h: 'On a Mac or Windows',
+        p: [
+          'Preview on a Mac has a Markup toolbar with a text tool, similar to iPhone\'s Markup, reached from the toolbar\'s annotation icon. Windows\' Photos app has no equivalent text-overlay tool; adding text there means a separate editor.',
+        ],
+      },
+      {
+        h: 'A tool built for watermarking many photos at once',
+        p: [
+          'Stayput\'s [watermark image](/tools/watermark-image) tool is built for this specifically: set the text once (a name, copyright line or website), choose a corner, the centre, or a repeated pattern across the photo, adjust size, opacity and colour, and apply it to a batch of photos at once, all in the browser with nothing uploaded. This avoids repeating the Markup trick photo by photo.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I watermark several photos at once?', a: 'Yes, a dedicated watermarking tool applies the same text, position and style to a batch of photos in one step, unlike Markup-based methods which handle one photo at a time.' },
+      { q: 'Does adding a watermark reduce the photo\'s resolution?', a: 'No, a well-built watermarking tool adds the text or logo at the photo\'s original resolution rather than resizing or recompressing the image itself.' },
+      { q: 'Can I make the watermark harder to remove by repeating it across the image?', a: 'Yes, a repeated, semi-transparent watermark pattern across the whole photo is harder to crop or clone out than a single watermark in one corner.' },
+      { q: 'Is watermarking free?', a: 'Yes, both the built-in Markup tools on iPhone and Mac, and a browser-based watermarking tool, are free; some online watermarking services add their own logo unless you pay, which a tool that doesn\'t do that avoids.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
