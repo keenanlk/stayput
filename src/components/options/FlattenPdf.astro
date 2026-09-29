@@ -1,0 +1,17 @@
+---
+/** Option controls for Flatten PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const mode = defaults.mode ?? 'vector';
+const modes = [
+  ['vector', 'Fields and annotations'],
+  ['image', 'Whole pages, as images'],
+] as const;
+---
+<div class="field wide">
+  <label>Flatten</label>
+  <div class="segmented" role="radiogroup" aria-label="Flatten">
+    {modes.map(([v, l]) => <label><input type="radio" name="mode" value={v} checked={v === mode} /><span>{l}</span></label>)}
+  </div>
+  <p class="muted small">Fields and annotations keeps the text sharp and selectable. Whole pages as images leaves nothing to select, copy or edit, and the file is usually larger.</p>
+</div>
