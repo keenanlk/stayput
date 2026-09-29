@@ -1,0 +1,39 @@
+---
+/** Option controls for the adjust tool, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const sliders = [
+  ['brightness', 'Brightness', -100, 100],
+  ['contrast', 'Contrast', -100, 100],
+  ['saturation', 'Saturation', -100, 100],
+  ['warmth', 'Warmth', -100, 100],
+  ['sharpen', 'Sharpen', 0, 100],
+] as const;
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+{sliders.map(([id, label, min, max]) => (
+  <div class="field">
+    <label for={id}>{label} <output id={`${id}-out`}>{defaults[id] ?? '0'}</output></label>
+    <input type="range" id={id} min={min} max={max} step="1" value={defaults[id] ?? '0'} data-adjust />
+  </div>
+))}
+<div class="field">
+  <label class="check"><input type="checkbox" id="invert" checked={defaults.invert === 'true'} data-adjust /> Invert colours (negative)</label>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>

@@ -67,6 +67,8 @@ import BlackAndWhite from '../components/options/BlackAndWhite.astro';
 import UpscaleImage from '../components/options/UpscaleImage.astro';
 import RemoveObject from '../components/options/RemoveObject.astro';
 import EraseStage from '../components/EraseStage.astro';
+import AdjustImage from '../components/options/AdjustImage.astro';
+import AdjustStage from '../components/AdjustStage.astro';
 import ImageToSvg from '../components/options/ImageToSvg.astro';
 import GifMaker from '../components/options/GifMaker.astro';
 import ResizePdf from '../components/options/ResizePdf.astro';
@@ -151,6 +153,7 @@ const options = {
   'black-and-white-image': BlackAndWhite,
   'upscale-image': UpscaleImage,
   'remove-object': RemoveObject,
+  'adjust-image': AdjustImage,
   'image-to-svg': ImageToSvg,
   'gif-maker': GifMaker,
   'resize-pdf': ResizePdf,
@@ -178,6 +181,7 @@ const Options = options[base as keyof typeof options];
   {base === 'screen-recorder' && <RecordStage slot="panel" defaults={defaults} />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'remove-object' && <EraseStage slot="panel" />}
+  {base === 'adjust-image' && <AdjustStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {base === 'black-and-white-image' && <MonoStage slot="panel" />}
   {base === 'image-to-svg' && <SvgStage slot="panel" />}

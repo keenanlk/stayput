@@ -3120,6 +3120,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'adjust-image',
+    name: 'Adjust photo',
+    title: 'Adjust Brightness, Contrast and Colour of a Photo, No Upload | Stayput',
+    description:
+      'Brighten a dark photo, add contrast, boost or mute colour, warm it up, sharpen it or invert it, with a live preview. Batches of images, all in your browser.',
+    heading: 'Adjust brightness, contrast and colour',
+    tagline: 'Brightness, contrast, saturation, warmth, sharpening and invert, previewed live and made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos to adjust',
+    action: 'Apply',
+    keywords: ['adjust image brightness', 'brighten photo', 'increase contrast of image', 'sharpen image', 'invert image colors', 'saturation editor', 'photo color correction', 'make photo brighter'],
+    steps: [
+      'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL).',
+      'Move the sliders while you watch the preview; press and hold Hold to compare to see the original.',
+      'Press Apply. Every photo you dropped gets the same settings.',
+    ],
+    faq: [
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. Each photo is decoded and adjusted pixel by pixel on a canvas in your tab, and saved by your browser. Nothing is sent anywhere, so it works offline once the page has loaded.',
+      },
+      {
+        q: 'Why does brightness not wash out the whites?',
+        a: 'Brightness here is a curve, not a flat addition: it lifts the dark and middle tones while black stays black and white stays white. Adding a fixed amount to every pixel, as simple editors do, turns bright skies into flat white patches.',
+      },
+      {
+        q: 'How much should I sharpen?',
+        a: 'For a photo straight off a phone, 20 to 40 is usually enough. Look at edges such as hair or text in the preview: once a thin bright halo appears along them you have gone too far. Sharpening cannot rescue a badly blurred shot; for a small or soft picture the AI upscaler adds real detail.',
+      },
+      {
+        q: 'Can I adjust many photos at once?',
+        a: 'Yes. Drop them all; the preview shows the first, and the same settings are applied to every one when you press Apply. That suits a set shot in the same light, such as product photos or a batch of scans.',
+      },
+      {
+        q: 'Is the camera data kept?',
+        a: 'No. The adjusted photos are written fresh from the canvas, so location, camera and date metadata are not in them.',
+      },
+    ],
+  },
+  {
     slug: 'black-and-white-image',
     name: 'Black and white photo',
     title: 'Make a Photo Black and White, Free, No Upload | Stayput',

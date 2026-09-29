@@ -67,6 +67,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Add text to image](https://stayput.dev/tools/add-text-to-image) (captions, memes, watermarks) | |
 | [AI image upscaler](https://stayput.dev/tools/upscale-image) (2×, 3× or 4× with Real-ESRGAN, on the device) | |
 | [Remove object from photo](https://stayput.dev/tools/remove-object) (paint over it, MI-GAN fills it in on the device) | |
+| [Adjust photo](https://stayput.dev/tools/adjust-image) (brightness, contrast, saturation, warmth, sharpen, invert) | |
 | [Compress audio](https://stayput.dev/tools/compress-audio) (smaller MP3 or OGG, or fit a size limit) | |
 | [Volume booster](https://stayput.dev/tools/volume-booster) (louder, quieter or normalized audio and video) | |
 | [Pitch and speed changer](https://stayput.dev/tools/pitch-changer) (change key by semitones, speed up or slow down) | |

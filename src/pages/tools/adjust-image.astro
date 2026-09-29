@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import AdjustImage from '../../components/options/AdjustImage.astro';
+import AdjustStage from '../../components/AdjustStage.astro';
+const tool = toolBySlug('adjust-image')!;
+---
+<ToolLayout tool={tool}>
+  <AdjustStage slot="panel" />
+  <Fragment slot="options"><AdjustImage /></Fragment>
+</ToolLayout>
+<script src="../../tools/adjust-image.ts"></script>
