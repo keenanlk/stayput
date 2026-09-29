@@ -64,13 +64,13 @@ export interface ConvertResult {
 export async function convertAudio(
   file: File,
   format: AudioFormat,
-  opts: { bitrate: number; mono: boolean; onProgress?: (f: number) => void; transform?: (chans: Float32Array[], rate: number) => Float32Array[]; bitrateOf?: () => number },
+  opts: { bitrate: number; mono: boolean; onProgress?: (f: number) => void; transform?: (chans: Float32Array[], rate: number) => Float32Array[] | Promise<Float32Array[]>; bitrateOf?: () => number },
 ): Promise<ConvertResult> {
   const { bitrate, mono, onProgress, transform } = opts;
   const rate = format === 'mp3' ? MP3_RATE : format === 'wav' || format === 'flac' ? (await sourceRate(file)) ?? MP3_RATE : OPUS_RATE;
   const buffer = await decodeAudio(file, rate);
   const decoded = channelsOf(buffer, mono);
-  const chans = transform ? transform(decoded, rate) : decoded;
+  const chans = transform ? await transform(decoded, rate) : decoded;
   // A transform may settle the bitrate once it has seen the sound.
   const kbps = opts.bitrateOf?.() ?? bitrate;
   const base = { duration: buffer.duration, sampleRate: rate, channels: chans.length };

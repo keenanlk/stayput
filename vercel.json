@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/remove-noise",
+      "destination": "/tools/remove-noise",
+      "permanent": true
+    },
+    {
       "source": "/black-and-white-image",
       "destination": "/tools/black-and-white-image",
       "permanent": true
