@@ -127,6 +127,14 @@ export const engines: Record<string, Engine> = {
     how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV container in your tab. Each frame is decoded by your browser (WebCodecs), turned and flipped, and encoded again, H.264 where the browser has it and VP9 or AV1 otherwise, so the turn is part of the picture rather than a flag some players ignore. The sound is copied as it is when the MP4 can hold it.',
     versus: 'Online rotators upload the video to turn it on a server, cap the file size, and some add a watermark. A sideways phone video is often a personal one. Here it never leaves your device, and you can rotate a batch at once.',
   },
+  'crop-video': {
+    how: 'Your browser shows a frame from the video on your device so you can draw the box. Mediabunny (MPL-2.0) then reads the MP4, MOV, WebM or MKV container in your tab; each frame is decoded by your browser (WebCodecs), cut to the box, and encoded again, H.264 where available and VP9 or AV1 otherwise. The sound is copied as it is when the MP4 can hold it.',
+    versus: 'Online croppers upload the whole video to change its frame, cap free files at a few hundred megabytes, and many stamp a watermark on the result. Here the video never leaves your device.',
+  },
+  'video-speed': {
+    how: 'Mediabunny (MPL-2.0) decodes the video in your tab and gives every frame a new time; when speeding up, frames beyond 60 a second are dropped. The sound track is decoded by your browser and stretched with WSOLA, a method that overlaps short slices of sound so the pitch stays the same. Both are encoded again by your browser (WebCodecs) into an MP4, H.264 and AAC where available.',
+    versus: 'Online speed changers upload the video to process it, cap free files, and often add a watermark or turn voices into chipmunks. Here the video stays on your device and the sound keeps its pitch.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',

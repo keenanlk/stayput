@@ -1,0 +1,31 @@
+---
+/** Option controls for crop video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const aspect = defaults.aspect ?? 'free';
+const aspects = [
+  ['free', 'Free'],
+  ['9:16', 'Vertical (9:16) for TikTok, Reels, Shorts'],
+  ['1:1', 'Square (1:1)'],
+  ['4:5', 'Portrait post (4:5)'],
+  ['16:9', 'Widescreen (16:9)'],
+  ['4:3', 'Classic (4:3)'],
+  ['original', 'Same as the video'],
+] as const;
+---
+<div class="field">
+  <label for="aspect">Aspect ratio</label>
+  <select id="aspect">
+    {aspects.map(([v, l]) => <option value={v} selected={v === aspect}>{l}</option>)}
+  </select>
+</div>
+<div class="field-row wide crop-fields">
+  <div class="field"><label for="crop-x">Left (px)</label><input type="number" id="crop-x" min="0" step="1" value="0" /></div>
+  <div class="field"><label for="crop-y">Top (px)</label><input type="number" id="crop-y" min="0" step="1" value="0" /></div>
+  <div class="field"><label for="crop-w">Width (px)</label><input type="number" id="crop-w" min="1" step="1" value="0" /></div>
+  <div class="field"><label for="crop-h">Height (px)</label><input type="number" id="crop-h" min="1" step="1" value="0" /></div>
+  <button class="btn btn-sm btn-ghost" type="button" id="crop-reset">Reset</button>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>

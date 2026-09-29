@@ -1332,6 +1332,82 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'crop-video',
+    name: 'Crop video',
+    title: 'Crop Video Online: Cut the Frame to 9:16, 1:1, Any Size, No Upload | Stayput',
+    description:
+      'Crop a video in your browser: draw a box or pick 9:16, 1:1 or 4:5 for TikTok, Reels and Instagram. MP4, MOV, WebM in, MP4 out. No upload, no watermark.',
+    heading: 'Crop a video',
+    tagline: 'Cut away the edges of a video, or crop it to vertical or square for social media. Cropped on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a video to crop',
+    action: 'Crop',
+    keywords: ['crop video', 'crop video online', 'video cropper', 'crop mp4', 'crop video to 9:16', 'crop video for instagram'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV), or tap to pick it. A frame from it appears with a crop box.',
+      'Drag the box and its edges, or pick an aspect ratio such as 9:16 or 1:1. You can also type the position and size in pixels.',
+      'Crop. The whole video is cut to that box and re-encoded into an MP4, sound included.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser shows a frame from the file on your device, and the crop is done by its own video decoder and encoder in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'How do I make a landscape video vertical for TikTok or Reels?',
+        a: 'Choose Vertical (9:16). The box snaps to the tallest 9:16 area in the middle of the picture; drag it left or right to keep the part that matters.',
+      },
+      {
+        q: 'Does cropping lower the quality?',
+        a: 'Cropping keeps every pixel inside the box at its original size, but the video has to be encoded again. That is done at high quality, so the result looks very close to the original.',
+      },
+      {
+        q: 'Can I crop just part of the video’s length?',
+        a: 'This crops the picture for the whole video. To keep only part of the time, use Trim video first or afterwards.',
+      },
+    ],
+  },
+  {
+    slug: 'video-speed',
+    name: 'Change video speed',
+    title: 'Change Video Speed: Speed Up or Slow Down a Video, No Upload | Stayput',
+    description:
+      'Speed up a video to 2×, 4× or 8×, or slow it down to 0.5× or 0.25×, in your browser. The sound keeps its pitch. MP4 out. No upload, no watermark.',
+    heading: 'Change video speed',
+    tagline: 'Make a video faster or slower, with sound that stays at the right pitch. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to speed up or slow down',
+    action: 'Change speed',
+    keywords: ['speed up video', 'video speed changer', 'slow down video', 'change video speed', 'speed up video online', 'slow motion video'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Choose a speed: above 1× to speed up, below 1× to slow down.',
+      'Change speed. Each video is re-encoded at the new speed into an MP4, with its sound stretched to match.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes the video, re-times every frame and encodes it again in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Does the sound speed up too?',
+        a: 'Yes, and it keeps its pitch: the sound is cut into tiny overlapping pieces that are laid down closer together or further apart, so a voice at 2× sounds quick, not squeaky. Tick Remove the sound for a silent result.',
+      },
+      {
+        q: 'Will slow motion look smooth?',
+        a: 'Each frame is shown for longer, so 0.5× of a 60 fps phone video plays at a smooth 30 fps. Slowing a 30 fps video a lot will look steppy, because no new frames are invented in between.',
+      },
+      {
+        q: 'Why is my sped-up video not much smaller?',
+        a: 'Speeding up keeps up to 60 frames a second and drops the rest, so a 4× video is roughly a quarter as long but has the same picture quality per second. To make it smaller as well, run it through Compress video.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

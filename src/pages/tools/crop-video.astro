@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CropVideo from '../../components/options/CropVideo.astro';
+import CropStage from '../../components/CropStage.astro';
+const tool = toolBySlug('crop-video')!;
+---
+<ToolLayout tool={tool}>
+  <CropStage slot="panel" />
+  <Fragment slot="options"><CropVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/crop-video.ts"></script>

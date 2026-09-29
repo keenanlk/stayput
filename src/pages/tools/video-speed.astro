@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VideoSpeed from '../../components/options/VideoSpeed.astro';
+const tool = toolBySlug('video-speed')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VideoSpeed /></Fragment>
+</ToolLayout>
+<script src="../../tools/video-speed.ts"></script>
