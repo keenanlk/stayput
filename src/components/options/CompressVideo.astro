@@ -1,0 +1,47 @@
+---
+/** Option controls for the video compressor, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const mode = defaults.mode ?? 'balanced';
+const size = defaults.size ?? '25';
+const resolution = defaults.resolution ?? '0';
+const modes = [
+  ['balanced', 'Balanced (good quality, much smaller)'],
+  ['small', 'Smallest (lower quality)'],
+  ['high', 'High quality (less saving)'],
+  ['size', 'Fit a file size'],
+] as const;
+const resolutions = [
+  ['0', 'Keep original'],
+  ['1080', '1080p'],
+  ['720', '720p'],
+  ['480', '480p'],
+] as const;
+---
+<div class="field">
+  <label for="mode">Compression</label>
+  <select id="mode">
+    {modes.map(([v, l]) => <option value={v} selected={v === mode}>{l}</option>)}
+  </select>
+</div>
+<div class="field" id="size-field" hidden={mode !== 'size'}>
+  <label for="size">Largest file size</label>
+  <select id="size">
+    <option value="8" selected={size === '8'}>8 MB</option>
+    <option value="10" selected={size === '10'}>10 MB (Discord free)</option>
+    <option value="16" selected={size === '16'}>16 MB (WhatsApp)</option>
+    <option value="25" selected={size === '25'}>25 MB (Gmail, Outlook)</option>
+    <option value="50" selected={size === '50'}>50 MB</option>
+    <option value="100" selected={size === '100'}>100 MB</option>
+  </select>
+  <p class="muted small">The resolution is lowered automatically when a long video needs it to fit.</p>
+</div>
+<div class="field">
+  <label for="resolution">Resolution</label>
+  <select id="resolution">
+    {resolutions.map(([v, l]) => <option value={v} selected={v === resolution}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>
