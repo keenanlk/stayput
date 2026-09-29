@@ -52,6 +52,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'gif-maker': ['compress-gif', 'gif-to-mp4'],
   'flatten-pdf': ['merge-pdf', 'compress-pdf'],
   'resize-pdf': ['merge-pdf', 'pdf-page-numbers'],
+  'transcribe': ['remove-silence', 'video-to-mp3'],
   'metronome': ['tuner', 'voice-recorder'],
   'tuner': ['metronome', 'pitch-changer'],
   'mic-test': ['merge-audio', 'audio-converter'],
