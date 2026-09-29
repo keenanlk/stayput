@@ -307,7 +307,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is it safe to check a photo here?',
-        a: 'Yes. The page reads the file with JavaScript in your tab and never sends it anywhere, so you can check a photo you would not want to upload. Most online EXIF viewers upload the photo to their server first, which hands them the very location you are trying to check. Open the network tab while you drop a photo and it stays empty.',
+        a: 'Yes. The page reads the file with JavaScript in your tab and never sends it anywhere, so you can check a photo you would not want to upload. Most online EXIF viewers upload the photo to their server first, which hands them the very location you are trying to check. Open the network tab while you drop a photo: apart from a small anonymous usage-count ping, no request carries the photo.',
       },
       {
         q: 'Which files can it read?',
