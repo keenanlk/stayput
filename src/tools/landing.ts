@@ -20,6 +20,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'blur-image': () => import('./blur-image'),
   'rotate-image': () => import('./rotate-image'),
   'video-to-mp3': () => import('./video-to-mp3'),
+  'gif-to-mp4': () => import('./gif-to-mp4'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
 };

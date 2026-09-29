@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import GifToMp4 from '../../components/options/GifToMp4.astro';
+const tool = toolBySlug('gif-to-mp4')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><GifToMp4 /></Fragment>
+</ToolLayout>
+<script src="../../tools/gif-to-mp4.ts"></script>

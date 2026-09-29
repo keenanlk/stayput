@@ -974,6 +974,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'gif-to-mp4',
+    name: 'GIF to MP4',
+    title: 'GIF to MP4 Converter, Free, No Upload | Stayput',
+    description:
+      'Convert animated GIFs to MP4 video in your browser. Smaller files that play on Instagram, WhatsApp, X and in slides. Batch, no watermark, no upload.',
+    heading: 'Convert GIF to MP4',
+    tagline: 'Turn animated GIFs into small MP4 videos that post and play anywhere. Converted on this device, never uploaded.',
+    category: 'media',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to convert to MP4',
+    action: 'Convert to MP4',
+    keywords: ['gif to mp4', 'animated gif to mp4', 'gif to video', 'convert gif to mp4', 'gif to mp4 converter', 'gif to video converter'],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Choose how long the video should be: short loops are repeated to at least 3 seconds so apps accept them, or pick a number of plays. Choose what transparent areas become.',
+      'Convert. Each GIF is encoded to MP4 in your browser; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded by code in this page and each frame is encoded by your browser’s own video encoder. There is no server in the process, so there is nothing to wait for and no size limit, and the page works with Wi-Fi off.',
+      },
+      {
+        q: 'Why is the MP4 so much smaller than the GIF?',
+        a: 'GIF compresses each frame on its own, with at most 256 colours. MP4 video stores only what changes from one frame to the next, so the same animation is often five to twenty times smaller, and it keeps its full colours. That is why sites such as X, Reddit and Giphy quietly turn uploaded GIFs into MP4.',
+      },
+      {
+        q: 'Will the video loop?',
+        a: 'A video file plays once; looping is up to the player. Most chat apps and social sites loop short videos automatically. If you need a fixed length, pick how many times the animation plays, or keep the default, which repeats short loops to at least 3 seconds (Instagram rejects shorter videos).',
+      },
+      {
+        q: 'Does it keep the timing of each frame?',
+        a: 'Yes. Every frame keeps its own delay from the GIF, so slow-downs and pauses play as they did. Frames with a delay of 0 or 1 hundredths of a second are shown for a tenth of a second, which is what every browser does with them too.',
+      },
+      {
+        q: 'Which video format do I get?',
+        a: 'An MP4 with H.264 video, the format every phone, laptop, social site and PowerPoint plays, in Chrome, Edge and Safari. A browser without an H.264 encoder (some Linux builds) writes VP9 in the MP4 instead, which browsers and Android play but older iPhones may not; the result says which one you got. There is no sound track, since GIFs have none.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

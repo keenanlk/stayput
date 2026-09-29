@@ -1,0 +1,29 @@
+---
+/** Option controls for GIF to MP4, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const repeat = defaults.repeat ?? 'auto';
+const background = defaults.background ?? 'white';
+const repeats = [
+  ['auto', 'Repeat to at least 3 seconds'],
+  ['1', 'Play once'],
+  ['2', 'Play 2 times'],
+  ['3', 'Play 3 times'],
+  ['5', 'Play 5 times'],
+  ['10', 'Play 10 times'],
+] as const;
+---
+<div class="field">
+  <label for="repeat">Length</label>
+  <select id="repeat">
+    {repeats.map(([v, l]) => <option value={v} selected={v === repeat}>{l}</option>)}
+  </select>
+  <p class="muted small">A video plays once, where a GIF loops. Short loops are repeated so Instagram, WhatsApp and other apps accept them.</p>
+</div>
+<div class="field">
+  <label>Transparent areas</label>
+  <div class="segmented" role="radiogroup" aria-label="Transparent areas">
+    <label><input type="radio" name="background" value="white" checked={background === 'white'} /><span>White</span></label>
+    <label><input type="radio" name="background" value="black" checked={background === 'black'} /><span>Black</span></label>
+  </div>
+</div>
