@@ -869,6 +869,23 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#format')).toHaveValue('wav');
       await expect(page.locator('#bitrate-field')).toBeHidden();
     }],
+    ['ogg-to-mp3', 'video-to-mp3', async () => {
+      await expect(page.locator('#bitrate')).toHaveValue('192');
+      await expect(page.locator('#file-input')).toHaveAttribute('accept', /ogg/);
+    }],
+    ['flac-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('320')],
+    ['webm-to-mp3', 'video-to-mp3', async () => expect(page.locator('#bitrate')).toHaveValue('128')],
+    ['opus-to-mp3', 'video-to-mp3', async () => {
+      await expect(page.locator('#bitrate')).toHaveValue('96');
+      await expect(page.locator('input[name="channels"][value="mono"]')).toBeChecked();
+    }],
+    ['ogg-to-wav', 'video-to-mp3', async () => expect(page.locator('#format')).toHaveValue('wav')],
+    ['flac-to-wav', 'video-to-mp3', async () => expect(page.locator('#format')).toHaveValue('wav')],
+    ['webm-to-gif', 'video-to-gif', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /webm/)],
+    ['blur-text-in-image', 'blur-image', async () => {
+      await expect(page.locator('input[name="area"][value="areas"]')).toBeChecked();
+      await expect(page.locator('input[name="effect"][value="box"]')).toBeChecked();
+    }],
     ...['extract-text-from-image', 'picture-to-text', 'screenshot-to-text', 'jpg-to-text', 'png-to-text'].map(
       (slug): [string, string, () => Promise<void>] => [slug, 'image-to-text', async () => expect(page.locator('input[name="lines"][value="keep"]')).toBeChecked()],
     ),
@@ -1917,6 +1934,26 @@ test('MP4 to WAV page writes a 44.1 kHz WAV, mono on request, and a video withou
   await page.locator('#file-input').setInputFiles([staticFx('clip.webm')]);
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('No audio could be read from this file');
+});
+
+test('OGG, Opus and FLAC landing pages turn real audio files into MP3 and WAV, and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  const net = watchNetwork(page);
+  // 1 s 440 Hz tones: OGG Vorbis, Opus in Ogg, and FLAC.
+  for (const [slug, file, out] of [['ogg-to-mp3', 'song.ogg', 'song.mp3'], ['opus-to-mp3', 'voice.opus', 'voice.mp3'], ['flac-to-wav', 'song.flac', 'song.wav']] as const) {
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool')).toBeVisible();
+    const { downloads } = await run(page, [staticFx(file)]);
+    expect(downloads[0]!.suggestedFilename(), slug).toBe(out);
+    const bytes = await bytesOf(downloads[0]!);
+    if (out.endsWith('.wav')) expect(new TextDecoder().decode(bytes.slice(8, 12))).toBe('WAVE');
+    else expect(bytes[0]).toBe(0xff);
+    const info = await audioInfo(page, bytes);
+    expect(info.duration, slug).toBeGreaterThan(0.7);
+    expect(info.duration, slug).toBeLessThan(1.4);
+    expect(info.rms, `${slug} is not silent`).toBeGreaterThan(0.05);
+  }
+  net.assertNothingLeft(['song.ogg', 'voice.opus', 'song.flac']);
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {
