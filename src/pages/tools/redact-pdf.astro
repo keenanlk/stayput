@@ -1,0 +1,11 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import RedactStage from '../../components/RedactStage.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('redact-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <RedactStage slot="panel" />
+  <Fragment slot="options"></Fragment>
+</ToolLayout>
+<script src="../../tools/redact-pdf.ts"></script>
