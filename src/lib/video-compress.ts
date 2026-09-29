@@ -153,20 +153,24 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       // clip opens with a large keyframe). Check the result and, if it is over the
       // limit, encode again at a proportionally lower rate. Progress restarts for each pass.
       const target = (opts.targetMB ?? 10) * 1e6;
-      const passes = 3;
+      const passes = 5;
       let bits = videoBitrate;
       let pass = 0;
       for (;;) {
-        const p0 = pass;
-        if (p0) opts.onPass?.(p0 + 1);
+        if (pass) opts.onPass?.(pass + 1);
         buffer = await encodeAt(bits, opts.onProgress);
         pass++;
         if (buffer.byteLength <= target || pass >= passes) break;
-        const audioShare = (audioBitrate as number) * duration / 8;
+        const audioShare = ((audioBitrate as number) * duration) / 8;
         const videoBytes = Math.max(1, buffer.byteLength - audioShare);
         const room = Math.max(1, target * 0.92 - audioShare);
-        bits = Math.floor(bits * Math.min(0.9, room / videoBytes));
-        if (bits < 60_000) break;
+        bits = Math.max(60_000, Math.floor(bits * Math.min(0.9, room / videoBytes)));
+        // Some encoders stop listening at low bitrates; from the third pass on, a
+        // smaller picture is what reliably makes the file smaller.
+        if (pass >= 2) {
+          const short = STEPS.find((st) => st < Math.min(width, height));
+          if (short) ({ width, height } = fit(srcW, srcH, short));
+        }
       }
     } else {
       buffer = await encodeAt(videoBitrate, opts.onProgress);
