@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(19);
+  expect(await page.locator('.tool-card').count()).toBe(20);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -854,6 +854,8 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#aspect')).toHaveValue('4:5');
       await expect(page.locator('#format')).toHaveValue('image/jpeg');
     }],
+    ['mp4-to-gif', 'video-to-gif', async () => expect(page.locator('#vg-panel')).toBeAttached()],
+    ['mov-to-gif', 'video-to-gif', async () => expect(page.locator('#fps')).toHaveValue('10')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -1532,4 +1534,85 @@ test('Protect PDF encrypts with AES-256 so the file needs the password to open',
   expect(doc.numPages).toBe(3);
   net.assertNothingLeft(['text.pdf']);
   expect(errors).toEqual([]);
+});
+
+/** Frame count, size and loop flag of a GIF, walked block by block. */
+function gifInfo(b: Uint8Array) {
+  expect(new TextDecoder().decode(b.slice(0, 6))).toBe('GIF89a');
+  const width = b[6]! | (b[7]! << 8);
+  const height = b[8]! | (b[9]! << 8);
+  let i = 13 + (b[10]! & 0x80 ? 3 * (2 << (b[10]! & 7)) : 0);
+  let frames = 0;
+  let loops = false;
+  const skipSubBlocks = () => {
+    while (b[i]! !== 0) i += b[i]! + 1;
+    i++;
+  };
+  while (i < b.length && b[i] !== 0x3b) {
+    if (b[i] === 0x21) {
+      if (b[i + 1] === 0xff && new TextDecoder().decode(b.slice(i + 3, i + 14)) === 'NETSCAPE2.0') loops = true;
+      i += 2;
+      skipSubBlocks();
+    } else if (b[i] === 0x2c) {
+      frames++;
+      const packed = b[i + 9]!;
+      i += 10 + (packed & 0x80 ? 3 * (2 << (packed & 7)) : 0);
+      i++; // LZW minimum code size
+      skipSubBlocks();
+    } else throw new Error(`bad GIF block 0x${b[i]!.toString(16)} at ${i}`);
+  }
+  return { width, height, frames, loops };
+}
+
+test('Video to GIF trims a clip into an animated GIF, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'video-to-gif');
+  const net = watchNetwork(page);
+  // A 3 second 320x240 WebM recorded by MediaRecorder: red, then green, then blue,
+  // one second each. Such files store no duration, which the tool has to find.
+  const { downloads } = await run(page, [staticFx('clip.webm')], async () => {
+    await expect(page.locator('#vg-panel')).toBeVisible();
+    await expect.poll(async () => Number(await page.locator('#vg-panel').getAttribute('data-duration'))).toBeGreaterThan(2.5);
+    await page.locator('#vg-start').fill('0.4');
+    await page.locator('#vg-end').fill('2.4');
+    await page.locator('#fps').selectOption('10');
+    await page.locator('#width').selectOption('640');
+    await expect(page.locator('#vg-estimate')).toContainText('320 × 240 GIF, 20 frames');
+    await choose(page.locator('input[name="loop"][value="forever"]'));
+  });
+  expect(downloads).toHaveLength(1);
+  expect(downloads[0]!.suggestedFilename()).toBe('clip.gif');
+  const gif = await bytesOf(downloads[0]!);
+  expect(gifInfo(gif)).toEqual({ width: 320, height: 240, frames: 20, loops: true });
+  // The first frame is from the red second and the last from the blue one.
+  const colours = await page.evaluate(async (bytes) => {
+    const dec = new ImageDecoder({ data: new Uint8Array(bytes), type: 'image/gif' });
+    await dec.tracks.ready;
+    const pick = async (frameIndex: number) => {
+      const { image } = await dec.decode({ frameIndex });
+      const c = new OffscreenCanvas(image.displayWidth, image.displayHeight);
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(image, 0, 0);
+      image.close();
+      return Array.from(ctx.getImageData(20, 20, 1, 1).data.slice(0, 3));
+    };
+    return [await pick(0), await pick(19)];
+  }, Array.from(gif));
+  const [first, last] = colours as [number[], number[]];
+  expect(first[0]).toBeGreaterThan(180);
+  expect(first[2]).toBeLessThan(80);
+  expect(last[2]).toBeGreaterThan(180);
+  expect(last[0]).toBeLessThan(80);
+  net.assertNothingLeft(['clip.webm']);
+  expect(errors).toEqual([]);
+});
+
+test('Video to GIF refuses an end time before the start with a clear message', async ({ page }) => {
+  await open(page, 'video-to-gif');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('clip.webm')]);
+  await expect(page.locator('#vg-panel')).toBeVisible();
+  await page.locator('#vg-end').fill('0');
+  await expect(page.locator('#vg-estimate')).toHaveText('The end must come after the start.');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('end time must come after the start');
 });

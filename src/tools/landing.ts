@@ -16,6 +16,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'crop-image': () => import('./crop-image'),
   'reorder-pdf': () => import('./reorder-pdf'),
   'sign-pdf': () => import('./sign-pdf'),
+  'video-to-gif': () => import('./video-to-gif'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

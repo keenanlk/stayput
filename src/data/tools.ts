@@ -718,6 +718,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-to-gif',
+    name: 'Video to GIF',
+    title: 'Video to GIF Converter, MP4 to GIF, No Upload | Stayput',
+    description:
+      'Turn an MP4, MOV or WebM clip into an animated GIF in your browser. Trim it, pick the size and frame rate. No upload, no watermark, no sign-up.',
+    heading: 'Convert video to GIF',
+    tagline: 'Trim a clip, pick a size and frame rate, and get a looping GIF. The video is decoded by your browser and never leaves this device.',
+    category: 'images',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a video to turn into a GIF',
+    action: 'Make GIF',
+    keywords: ['video to gif', 'mp4 to gif', 'mov to gif', 'webm to gif', 'convert video to gif', 'gif maker', 'make a gif from a video'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV), or tap to pick one. It opens in a player on the page.',
+      'Play or scrub to the moment you want and press "Set start" and "Set end", or type the times. Pick a width and a frame rate.',
+      'Make the GIF. It is built frame by frame in your browser and downloads when it is done.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser plays the video from the file on your device, Stayput copies the frames you asked for onto a canvas, and a small GIF encoder in the page writes the file. There is no server in the process; you can load the page, turn off Wi-Fi and it still works.',
+      },
+      {
+        q: 'How long can the GIF be?',
+        a: 'Up to 600 frames, which is 60 seconds at 10 frames per second or 30 seconds at 20. GIF is an old format with no real video compression, so a long or large GIF quickly runs to tens of megabytes. For sharing, a clip of 2 to 10 seconds at 480 pixels wide and 10 to 15 frames per second is the sweet spot.',
+      },
+      {
+        q: 'Why will my iPhone video not open?',
+        a: 'iPhones record in HEVC (H.265) by default. Safari and most Macs play it; Chrome and Firefox on Windows or Linux often cannot, and this tool can only use the decoders your browser has. Open the page in Safari, or set Camera, Formats to Most Compatible on the iPhone so new videos are saved as H.264.',
+      },
+      {
+        q: 'Why does the GIF look grainier than the video?',
+        a: 'A GIF frame can hold at most 256 colours, while a video frame has millions. Stayput picks the best 256 for each frame, which keeps screen recordings and cartoons crisp but can band smooth gradients such as skies. A smaller width and a lower frame rate make a much smaller file with little visible loss.',
+      },
+      {
+        q: 'Is there a watermark or a file size limit?',
+        a: 'No watermark and no upload limit. The only limit is your device’s memory: a long 4K video works, because only the frames you pick are decoded, but the GIF itself is capped at 600 frames.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
