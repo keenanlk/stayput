@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/black-and-white-image",
+      "destination": "/tools/black-and-white-image",
+      "permanent": true
+    },
+    {
       "source": "/extract-pdf-images",
       "destination": "/tools/extract-pdf-images",
       "permanent": true
