@@ -120,3 +120,20 @@ swatches.save(os.path.join(out, 'swatches.png'))
 # for 500 ms, looping. Odd sides, so the video must round them to even.
 anim = [Image.new('RGB', (121, 81), c) for c in [(230, 20, 20), (20, 200, 40), (20, 40, 230)]]
 anim[0].save(os.path.join(out, 'anim.gif'), save_all=True, append_images=anim[1:], duration=[200, 300, 500], loop=0)
+
+# 600x400 RGBA PNG for Compress PNG: a noisy two-way gradient on the left
+# half (tens of thousands of colours, like a photo), flat shapes on the right, and a fully
+# transparent top-left corner, saved without palette so it starts large.
+grad = Image.new('RGBA', (600, 400), (255, 255, 255, 255))
+gp = grad.load()
+import random
+rng = random.Random(3)
+for y in range(400):
+    for x in range(300):
+        n = rng.randint(-12, 12)
+        gp[x, y] = (max(0, min(255, int(x * 255 / 299) + n)), max(0, min(255, int(y * 255 / 399) - n)), 160, 255)
+gd = ImageDraw.Draw(grad)
+gd.rectangle([330, 40, 560, 180], fill=(29, 53, 87, 255))
+gd.ellipse([360, 220, 540, 380], fill=(230, 57, 70, 200))
+gd.rectangle([0, 0, 39, 39], fill=(0, 0, 0, 0))
+grad.save(os.path.join(out, 'gradient.png'), optimize=False, compress_level=6)

@@ -164,6 +164,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'compress-png',
+    name: 'Compress PNG',
+    title: 'Compress PNG Images, Up to 80% Smaller, No Upload | Stayput',
+    description:
+      'Compress PNG files in your browser and keep transparency: up to 80% smaller with a smart colour palette, or lossless. Batch, no limit, nothing uploaded.',
+    heading: 'Compress PNG',
+    tagline: 'Shrink PNG screenshots, logos and graphics while keeping them PNGs, transparency and all. Nothing is uploaded.',
+    category: 'images',
+    accept: 'image/png,.png,.apng',
+    multiple: true,
+    dropLabel: 'Drop PNG files to compress',
+    action: 'Compress',
+    keywords: ['compress png', 'png compressor', 'reduce png size', 'png optimizer', 'compress png online', 'tinypng alternative'],
+    steps: [
+      'Drop one or more PNG files, or tap to pick them.',
+      'Keep Best quality (256 colours) for most images, go down to 128 or 64 colours for a smaller file, or choose Lossless to keep every pixel.',
+      'Compress. Each file stays a PNG; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my PNG uploaded?',
+        a: 'No. The PNG is decoded and written again by code running in this page. There is no server in the process, no daily limit and no file size cap, and the page keeps working offline.',
+      },
+      {
+        q: 'How does it make PNGs so much smaller?',
+        a: 'A normal PNG stores every pixel in full colour, up to 16 million colours. Most screenshots, logos and illustrations use far fewer, so the image is rewritten with a palette of the 256 (or fewer) colours that matter most, which takes a quarter of the space before compression. This is the same idea TinyPNG and pngquant use. Lossless mode keeps every pixel and only finds a tighter way to store them.',
+      },
+      {
+        q: 'Is transparency kept?',
+        a: 'Yes, including soft edges and shadows. The palette stores a transparency level for each colour, so a logo on a transparent background stays transparent.',
+      },
+      {
+        q: 'What if my PNG is already optimised?',
+        a: 'If the compressed file would not be smaller, you get the original back unchanged, and the result says so. Photos saved as PNG shrink the most; for those, converting to JPG or WebP with Compress image saves even more.',
+      },
+      {
+        q: 'Does it work with animated PNGs?',
+        a: 'Yes. Every frame and its timing are kept, and the palette is shared across the frames.',
+      },
+    ],
+  },
+  {
     slug: 'strip-exif',
     name: 'Remove EXIF Data',
     title: 'Remove EXIF and GPS Data From Photos, Private | Stayput',

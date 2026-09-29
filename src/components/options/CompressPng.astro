@@ -1,0 +1,19 @@
+---
+/** Option controls for PNG compression, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const colors = defaults.colors ?? '256';
+const levels = [
+  ['256', 'Best quality (256 colours)'],
+  ['128', 'Smaller (128 colours)'],
+  ['64', 'Smallest (64 colours)'],
+  ['0', 'Lossless (pixels unchanged)'],
+] as const;
+---
+<div class="field">
+  <label for="colors">Compression</label>
+  <select id="colors">
+    {levels.map(([v, l]) => <option value={v} selected={v === colors}>{l}</option>)}
+  </select>
+  <p class="muted small">Fewer colours means a smaller file. Transparency is always kept, and the file stays a PNG.</p>
+</div>

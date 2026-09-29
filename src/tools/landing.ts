@@ -23,6 +23,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'gif-to-mp4': () => import('./gif-to-mp4'),
   'compress-video': () => import('./compress-video'),
   'video-to-mp4': () => import('./video-to-mp4'),
+  'compress-png': () => import('./compress-png'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
 };
