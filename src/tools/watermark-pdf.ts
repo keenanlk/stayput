@@ -64,7 +64,6 @@ const shell = createShell({
       const file: OutputFile = {
         name: suffixName(entry.file.name, '-watermarked', 'pdf'),
         blob: new Blob([out as BlobPart], { type: 'application/pdf' }),
-        originalSize: entry.file.size,
         note: `${stamps.length} page${stamps.length === 1 ? '' : 's'} watermarked`,
       };
       return file;

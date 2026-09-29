@@ -36,6 +36,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'reverse-video': () => import('./reverse-video'),
   'video-to-jpg': () => import('./video-to-jpg'),
   'trim-audio': () => import('./trim-audio'),
+  'volume-booster': () => import('./volume-booster'),
   'audio-converter': () => import('./audio-converter'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
@@ -43,6 +44,9 @@ const modules: Record<string, () => Promise<unknown>> = {
   'passport-photo': () => import('./passport-photo'),
   'watermark-image': () => import('./watermark-image'),
   'watermark-pdf': () => import('./watermark-pdf'),
+  'remove-pdf-metadata': () => import('./remove-pdf-metadata'),
+  'sticker-maker': () => import('./sticker-maker'),
+  'profile-picture-maker': () => import('./profile-picture'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';
