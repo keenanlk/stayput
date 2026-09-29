@@ -2,6 +2,7 @@ import { createShell, bindRange, num, str, radio } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { apply, effectSize, type Effect, type Rect } from '../lib/blur';
+import { findFaces } from '../lib/faces';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -14,6 +15,7 @@ const layer = $('blur-areas');
 const hint = $('blur-hint');
 const undoBtn = $<HTMLButtonElement>('blur-undo');
 const clearBtn = $<HTMLButtonElement>('blur-clear');
+const findBtn = $<HTMLButtonElement>('blur-find');
 const strengthField = $('strength-field');
 
 bindRange('quality', 'quality-out');
@@ -34,6 +36,8 @@ let previewScale = 1;
 /** Areas to hide, in source pixels, in the order they were drawn. */
 let areas: Rect[] = [];
 let drawing: { x0: number; y0: number; rect: Rect } | undefined;
+/** A message from the face finder that replaces the usual hint until the areas change. */
+let notice: string | undefined;
 
 const effect = () => radio('effect', 'blur') as Effect;
 const whole = () => radio('area', 'areas') === 'whole';
@@ -95,6 +99,7 @@ function layout() {
       del.setAttribute('aria-label', `Remove area ${i + 1}`);
       del.addEventListener('click', () => {
         areas.splice(i, 1);
+        notice = undefined;
         redraw();
       });
       el.append(del);
@@ -109,7 +114,10 @@ function layout() {
     }
   }
   undoBtn.disabled = clearBtn.disabled = isWhole || areas.length === 0;
-  hint.textContent = isWhole
+  findBtn.hidden = isWhole;
+  hint.textContent = notice && !isWhole
+    ? notice
+    : isWhole
     ? 'The whole image gets the effect. Switch to "Areas I mark" to hide only parts of it.'
     : areas.length === 0
       ? 'Drag across each face, plate or line of text to hide it.'
@@ -130,6 +138,8 @@ async function showImage(file: File) {
   canvas.height = Math.max(1, Math.round(srcH * previewScale));
   areas = [];
   drawing = undefined;
+  notice = undefined;
+  delete panel.dataset.faces;
   panel.hidden = false;
   redraw();
 }
@@ -174,18 +184,47 @@ const endDraw = () => {
   if (!drawing) return;
   const r = drawing.rect;
   drawing = undefined;
-  if (r.w >= MIN && r.h >= MIN) areas.push(r);
+  if (r.w >= MIN && r.h >= MIN) {
+    areas.push(r);
+    notice = undefined;
+  }
   redraw();
 };
 stage.addEventListener('pointerup', endDraw);
 stage.addEventListener('pointercancel', endDraw);
 
+findBtn.addEventListener('click', async () => {
+  if (!bitmap) return;
+  const source = bitmap;
+  findBtn.disabled = true;
+  try {
+    const faces = await findFaces(source, (stage) => {
+      notice = stage === 'loading' ? 'Loading the face finder (about 4 MB, first time only)…' : 'Looking for faces…';
+      layout();
+    });
+    if (source !== bitmap) return; // A different image was dropped meanwhile.
+    // Skip faces already covered by an area the person drew.
+    const fresh = faces.filter((f) => !areas.some((a) => a.x <= f.x + f.w / 2 && f.x + f.w / 2 <= a.x + a.w && a.y <= f.y + f.h / 2 && f.y + f.h / 2 <= a.y + a.h));
+    areas.push(...fresh);
+    notice = faces.length === 0
+      ? 'No faces found. Drag across any face to hide it yourself.'
+      : `Found ${faces.length} ${faces.length === 1 ? 'face' : 'faces'}. Check the preview: drag across any it missed, tap × on anything that is not a face.`;
+    panel.dataset.faces = String(faces.length);
+  } catch (e) {
+    notice = `The face finder could not start (${e instanceof Error ? e.message : String(e)}). Drag across each face instead.`;
+  } finally {
+    findBtn.disabled = false;
+    redraw();
+  }
+});
 undoBtn.addEventListener('click', () => {
   areas.pop();
+  notice = undefined;
   redraw();
 });
 clearBtn.addEventListener('click', () => {
   areas = [];
+  notice = undefined;
   redraw();
 });
 for (const el of document.querySelectorAll<HTMLInputElement>('input[name="area"], input[name="effect"]')) el.addEventListener('change', redraw);

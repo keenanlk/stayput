@@ -84,3 +84,12 @@ sd = ImageDraw.Draw(stripes)
 for x in range(0, 400, 2):
     sd.line([(x, 0), (x, 299)], fill=(0, 0, 0))
 stripes.save(os.path.join(out, 'stripes.png'))
+
+# A 2400x1600 "group photo": four small copies of the face fixture (a public
+# domain White House portrait, also used in MediaPipe's own tests), so each
+# face is under 1/20 of the frame and needs the tiled scan to be found.
+face = Image.open(os.path.join(os.path.dirname(__file__), 'static', 'face.jpg')).convert('RGB').resize((205, 256))
+group = Image.new('RGB', (2400, 1600), (90, 110, 130))
+for x, y in [(150, 200), (800, 1100), (1400, 300), (2000, 1150)]:
+    group.paste(face, (x, y))
+group.save(os.path.join(out, 'group.jpg'), quality=80)

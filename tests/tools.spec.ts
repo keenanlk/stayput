@@ -1749,3 +1749,33 @@ test('Flip image page mirrors left to right, and a no-op is refused', async ({ p
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('Pick a rotation or a flip first');
 });
+
+test('Find faces marks every face, even small ones in a group, with a detector served by the site', async ({ page }) => {
+  const errors = await open(page, 'blur-image');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  // Four small copies of one face on a 2400x1600 canvas, at known places.
+  await page.locator('#file-input').setInputFiles([fx('group.jpg')]);
+  await expect(page.locator('#blur-panel')).toBeVisible();
+  await page.locator('#blur-find').click();
+  await expect(page.locator('#blur-panel')).toHaveAttribute('data-faces', '4', { timeout: 60_000 });
+  await expect(page.locator('#blur-hint')).toContainText('Found 4 faces');
+  const areas = (await page.locator('#blur-panel').getAttribute('data-areas'))!.split(';').map((a) => a.split(',').map(Number));
+  // Each pasted face is 205x256 with the face itself around (65..145, 20..110) inside it.
+  for (const [x, y] of [[150, 200], [800, 1100], [1400, 300], [2000, 1150]] as const) {
+    const cx = x + 105;
+    const cy = y + 70;
+    expect(areas.some(([ax, ay, aw, ah]) => ax! <= cx && cx <= ax! + aw! && ay! <= cy && cy <= ay! + ah!), `face at ${x},${y}`).toBe(true);
+  }
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('group-blurred.jpg');
+
+  // A single portrait: one face, and no hand or fabric mistaken for another.
+  await page.locator('#file-input').setInputFiles([staticFx('face.jpg')]);
+  await expect(page.locator('#blur-panel')).not.toHaveAttribute('data-faces', '4');
+  await page.locator('#blur-find').click();
+  await expect(page.locator('#blur-panel')).toHaveAttribute('data-faces', '1', { timeout: 60_000 });
+  net.assertNothingLeft(['group.jpg', 'face.jpg']);
+  // MediaPipe logs its CPU delegate start-up as a console error; that line is expected.
+  expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+});
