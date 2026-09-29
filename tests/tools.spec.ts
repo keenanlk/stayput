@@ -3135,7 +3135,7 @@ test('Remove background cuts out the subject at full size with a model served by
   expect((await pixelAt(page, png, 200, 350))[3]).toBe(255);
   expect((await pixelAt(page, png, 205, 110))[3]).toBe(255);
   // The model and runtime come from this site, and nothing carries the photo out.
-  expect(requested).toContain('/models/isnet-general-use-uint8.onnx');
+  expect(requested).toContain('/models/isnet-general-use-int8w.onnx');
   expect(requested.some((u) => u.startsWith('/vendor/onnxruntime-web@') && u.endsWith('.wasm'))).toBe(true);
 
   // On white, saved as JPG: the corners are white and the model is not fetched again.
@@ -3203,6 +3203,59 @@ test('Passport photo maker crops a 2x2 photo with the head in range and a 4x6 pr
   net.assertNothingLeft(['face.jpg']);
   // MediaPipe logs its CPU delegate to the console as an "error".
   expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+});
+
+test('Remove background keeps a whole pet and drops background specks', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'remove-background');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const cut = async (name: string, keep = '0') => {
+    await page.reload();
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await page.locator('#file-input').setInputFiles([staticFx(name)]);
+    await choose(page.locator(`input[name="keep"][value="${keep}"]`));
+    const [d] = await Promise.all([page.waitForEvent('download', { timeout: 180_000 }), page.locator('#run').click()]);
+    const png = await bytesOf(d);
+    return png;
+  };
+  const alpha = async (png: Uint8Array, x: number, y: number) => (await pixelAt(page, png, x, y))[3]!;
+  /** Pixels in the top rows that are not fully transparent: specks of trees and sky. */
+  const specks = (png: Uint8Array, rows: number) =>
+    page.evaluate(
+      async ([b64, h]) => {
+        const bin = atob(b64 as string);
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        const bmp = await createImageBitmap(new Blob([arr]));
+        const c = document.createElement('canvas');
+        c.width = bmp.width;
+        c.height = h as number;
+        const g = c.getContext('2d')!;
+        g.drawImage(bmp, 0, 0);
+        const d = g.getImageData(0, 0, c.width, c.height).data;
+        let n = 0;
+        for (let i = 3; i < d.length; i += 4) if (d[i]! > 8) n++;
+        return n;
+      },
+      [Buffer.from(png).toString('base64'), rows] as const,
+    );
+  // A small pug in a sweater against sunlit trees: the sweater stays solid and the trees go.
+  const pug = await cut('pug.jpg');
+  expect(await alpha(pug, 330, 310)).toBeGreaterThan(240);
+  expect(await alpha(pug, 20, 20)).toBe(0);
+  expect(await alpha(pug, 600, 50)).toBe(0);
+  expect(await specks(pug, 200)).toBe(0);
+  // A puppy held by someone in a blue top: the whole puppy is kept, the person is not.
+  const frenchie = await cut('frenchie.jpg');
+  expect(await alpha(frenchie, 300, 380)).toBeGreaterThan(240);
+  expect(await alpha(frenchie, 240, 300)).toBeGreaterThan(240);
+  expect(await alpha(frenchie, 520, 200)).toBe(0);
+  expect(await alpha(frenchie, 20, 20)).toBe(0);
+  // Keep more still leaves the background clean.
+  const more = await cut('pug.jpg', '1');
+  expect(await alpha(more, 330, 310)).toBeGreaterThan(240);
+  expect(await specks(more, 200)).toBe(0);
+  expect(errors).toEqual([]);
 });
 
 test('Trim audio shows the waveform and cuts the chosen part to a WAV, and no bytes leave the tab', async ({ page }) => {

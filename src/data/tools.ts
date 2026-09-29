@@ -1703,7 +1703,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'What works best?',
-        a: 'A clear subject that stands out from its background: a person, a pet, a product on a table, a car, a logo on a plain wall. Fine hair and fur are kept as soft edges. Busy scenes where the subject blends into the background, or several overlapping subjects, may need a second try with a different photo.',
+        a: 'A clear subject that stands out from its background: a person, a pet, a product on a table, a car, a logo on a plain wall. Fine hair and fur are kept as soft edges. Busy scenes where the subject blends into the background, or several overlapping subjects, may need a second try: set Keep around the edges to More if part of the subject goes missing, or Less if bits of background stay.',
       },
       {
         q: 'How do I get a white background for a product photo?',
