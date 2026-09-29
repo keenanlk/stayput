@@ -37,7 +37,7 @@ That is the whole pitch, and you can check it in three ways:
 | --- | --- |
 | [HEIC to JPG or PNG](https://stayput.dev/tools/heic-to-jpg) (batch, keep or drop EXIF) | [Merge PDF](https://stayput.dev/tools/merge-pdf) |
 | [Convert images](https://stayput.dev/tools/convert-image) (PNG, JPG, WebP, AVIF, JPEG XL, HEIC, SVG in; JPG, PNG, WebP out) | [Split PDF / extract pages](https://stayput.dev/tools/split-pdf) |
-| [Compress and resize images](https://stayput.dev/tools/compress-image) (plus [Compress PNG](https://stayput.dev/tools/compress-png), transparency kept) | [Compress PDF](https://stayput.dev/tools/compress-pdf) (lossless cleanup, image recompression, or flatten) |
+| [Compress and resize images](https://stayput.dev/tools/compress-image) (plus [Compress PNG](https://stayput.dev/tools/compress-png), transparency kept, and [Compress GIF](https://stayput.dev/tools/compress-gif)) | [Compress PDF](https://stayput.dev/tools/compress-pdf) (lossless cleanup, image recompression, or flatten) |
 | [Remove EXIF and GPS data](https://stayput.dev/tools/strip-exif) (lossless, no re-encode) | [Rotate PDF pages](https://stayput.dev/tools/rotate-pdf) |
 | [Crop image](https://stayput.dev/tools/crop-image) (ratios, exact pixels, circle) | [Images to PDF](https://stayput.dev/tools/image-to-pdf) |
 | [EXIF viewer](https://stayput.dev/tools/exif-viewer) (location, camera, date and every field) | [PDF to images](https://stayput.dev/tools/pdf-to-image) (PNG, JPG or one multi-page TIFF) |

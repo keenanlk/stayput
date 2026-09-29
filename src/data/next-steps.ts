@@ -26,6 +26,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'compress-video': ['video-to-mp3', 'video-to-gif'],
   'video-to-mp4': ['compress-video', 'video-to-gif'],
   'compress-png': ['crop-image', 'favicon-generator'],
+  'compress-gif': ['gif-to-mp4', 'crop-image'],
   'trim-video': ['compress-video', 'video-to-gif'],
   'mute-video': ['video-to-mp3', 'compress-video'],
   'resize-video': ['compress-video', 'trim-video'],

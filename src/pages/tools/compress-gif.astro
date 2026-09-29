@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CompressGif from '../../components/options/CompressGif.astro';
+const tool = toolBySlug('compress-gif')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><CompressGif /></Fragment>
+</ToolLayout>
+<script src="../../tools/compress-gif.ts"></script>

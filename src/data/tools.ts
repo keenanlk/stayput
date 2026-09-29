@@ -164,6 +164,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'compress-gif',
+    name: 'Compress GIF',
+    title: 'GIF Compressor: Reduce GIF File Size Online, No Upload | Stayput',
+    description:
+      'Compress animated GIFs in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. Often 50 to 80% smaller. No upload.',
+    heading: 'Compress a GIF',
+    tagline: 'Make an animated GIF small enough for Discord, Slack, email or a web page. It is compressed on this device and never uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to compress',
+    action: 'Compress',
+    keywords: ['compress gif', 'gif compressor', 'reduce gif size', 'gif optimizer', 'make gif smaller', 'compress gif online'],
+    steps: [
+      'Drop one or more GIFs, or tap to pick them.',
+      'Keep Medium for most GIFs. For a much smaller file, also reduce the size or drop every second frame.',
+      'Compress. Each file stays an animated GIF with the same timing; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded and written again by code running in this page. There is no server in the process, no daily limit and no file size cap, and the page keeps working offline.',
+      },
+      {
+        q: 'How does it make GIFs smaller?',
+        a: 'Most GIFs store every frame whole, even when only a small part of the picture moves. Each frame is rewritten to hold just the area that changed, with the unchanged pixels left see-through so the frame before shows through. Medium and Strong also ignore changes too small to notice and use fewer colours, which is where GIF compressors such as gifsicle and ezgif get most of their savings.',
+      },
+      {
+        q: 'How do I get a GIF under a size limit?',
+        a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels. Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB.',
+      },
+      {
+        q: 'Will the animation play at the same speed?',
+        a: 'Yes. When frames are dropped, their time is added to the frame before, so the GIF lasts just as long and loops the same way.',
+      },
+      {
+        q: 'What if my GIF is already optimised?',
+        a: 'If the result would not be smaller, you get the original back unchanged, and the result says so.',
+      },
+    ],
+  },
+  {
     slug: 'compress-png',
     name: 'Compress PNG',
     title: 'Compress PNG Images, Up to 80% Smaller, No Upload | Stayput',

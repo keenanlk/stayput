@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(33);
+  expect(await page.locator('.tool-card').count()).toBe(34);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2699,4 +2699,116 @@ test('Rotate video turns and flips the picture itself, and the flip page starts 
   await page.locator('#flip-h').uncheck({ force: true });
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('Choose a rotation or a flip first.');
+});
+
+/**
+ * An animated GIF written the naive way many GIF makers do: 24 full frames of
+ * 240x160, each with its own palette, over a noisy background that never moves,
+ * with one square sliding across. Made in Node with gifenc.
+ */
+async function naiveGif(): Promise<string> {
+  // gifenc's Node build is CommonJS, so its functions arrive on the default export.
+  const mod = await import('gifenc');
+  const { GIFEncoder, quantize, applyPalette } = ((mod as unknown as { default?: typeof mod }).default ?? mod);
+  const w = 240;
+  const h = 160;
+  let seed = 11;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const bg = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const q = (y * w + x) * 4;
+      const n = rand() * 40;
+      bg.set([Math.min(255, 40 + x * 0.8 + n), Math.min(255, 60 + y + n), 150 + n * 0.5, 255], q);
+    }
+  }
+  const gif = GIFEncoder();
+  for (let f = 0; f < 24; f++) {
+    const rgba = bg.slice();
+    const sx = 10 + f * 8;
+    for (let y = 60; y < 90; y++) for (let x = sx; x < sx + 30; x++) rgba.set([250, 210, 20, 255], (y * w + x) * 4);
+    const palette = quantize(rgba, 256);
+    gif.writeFrame(applyPalette(rgba, palette), w, h, { palette, delay: 80, repeat: 0 });
+  }
+  gif.finish();
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'slide.gif');
+  writeFileSync(file, gif.bytes());
+  return file;
+}
+
+/** Pillow's view of an animated GIF: frame count, size, loop, total time, and how far frame k differs from another GIF's frame k. */
+function gifCompare(a: Uint8Array, original: string, k: number): { frames: number; size: number[]; loop: number; duration: number; diff: number } {
+  const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+  const file = join(dir, 'out.gif');
+  writeFileSync(file, a);
+  const script = [
+    'import sys,json',
+    'from PIL import Image,ImageChops,ImageStat',
+    'a=Image.open(sys.argv[1]);b=Image.open(sys.argv[2]);k=int(sys.argv[3])',
+    'dur=0',
+    'for i in range(a.n_frames):',
+    '  a.seek(i);dur+=a.info.get("duration",0)',
+    'a.seek(k);b.seek(k)',
+    'x=a.convert("RGB");y=b.convert("RGB").resize(x.size)',
+    'd=sum(ImageStat.Stat(ImageChops.difference(x,y)).mean)/3',
+    'print(json.dumps({"frames":a.n_frames,"size":list(a.size),"loop":a.info.get("loop",-1),"duration":dur,"diff":d}))',
+  ].join('\n');
+  return JSON.parse(execFileSync('python3', ['-c', script, file, original, String(k)], { encoding: 'utf8' }));
+}
+
+test('Compress GIF keeps only what changes, plays the same, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'compress-gif');
+  const gif = await naiveGif();
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [gif], async () => {
+    await page.locator('#level').selectOption('light');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('slide-compressed.gif');
+  const light = await bytesOf(downloads[0]!);
+  expect(light.length).toBeLessThan(readFileSync(gif).length * 0.5);
+  const l = gifCompare(light, gif, 12);
+  expect(l).toMatchObject({ frames: 24, size: [240, 160], loop: 0, duration: 24 * 80 });
+  expect(l.diff).toBeLessThan(2);
+  await expect(page.locator('#results-list .result-item')).toContainText('24 frames');
+  net.assertNothingLeft(['slide.gif']);
+
+  // Medium is smaller still and looks nearly the same.
+  await page.reload();
+  const medium = await bytesOf((await run(page, [gif])).downloads[0]!);
+  expect(medium.length).toBeLessThan(light.length);
+  expect(gifCompare(medium, gif, 12).diff).toBeLessThan(6);
+  expect(errors).toEqual([]);
+});
+
+test('Compress GIF halves the size and drops frames without changing the timing, and refuses a PNG', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/reduce-gif-size');
+  await expect(page.locator('#level')).toHaveValue('strong');
+  const gif = await naiveGif();
+  const { downloads } = await run(page, [gif], async () => {
+    await page.locator('#scale').selectOption('0.5');
+    await page.locator('#frames').selectOption('2');
+  });
+  const small = await bytesOf(downloads[0]!);
+  const s = gifCompare(small, gif, 0);
+  expect(s).toMatchObject({ frames: 12, size: [120, 80], loop: 0, duration: 24 * 80 });
+  expect(small.length).toBeLessThan(readFileSync(gif).length * 0.2);
+  await expect(page.locator('#results-list .result-item')).toContainText('12 of 24 frames');
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'photo.gif', mimeType: 'image/gif', buffer: readFileSync(fx('swatches.png')) });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('This file is not a GIF.');
+});
+
+test('Compress GIF hands back a GIF that is already tight unchanged', async ({ page }) => {
+  await open(page, 'compress-gif');
+  const { downloads } = await run(page, ['anim.gif'], async () => {
+    await page.locator('#level').selectOption('light');
+  });
+  const out = await bytesOf(downloads[0]!);
+  const original = readFileSync(fx('anim.gif'));
+  expect(out.length).toBeLessThanOrEqual(original.length);
+  expect(gifCompare(out, fx('anim.gif'), 2)).toMatchObject({ frames: 3, duration: 1000 });
+  if (out.length === original.length) await expect(page.locator('#results-list .result-item')).toContainText('original kept');
 });
