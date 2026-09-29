@@ -1,0 +1,51 @@
+{
+  "name": "stayput-mcp",
+  "version": "0.1.0",
+  "description": "Local MCP server for PDF and photo tasks: merge, split, rotate, number, images to PDF, inspect and strip photo metadata. Files never leave your machine.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://stayput.dev/mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keenanlk/stayput.git",
+    "directory": "mcp"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "pdf",
+    "merge-pdf",
+    "exif",
+    "privacy",
+    "local"
+  ],
+  "mcpName": "io.github.keenanlk/stayput",
+  "bin": {
+    "stayput-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "prepublishOnly": "node build.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "@neslinesli93/qpdf-wasm": "^0.3.0",
+    "pdf-lib": "^1.17.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

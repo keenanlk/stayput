@@ -59,3 +59,10 @@ frames = [photo(160, 120, (200, 40, 40)).convert('P'), photo(160, 120, (40, 40, 
 frames[0].save(os.path.join(out, 'banner.gif'), save_all=True, append_images=frames[1:], duration=200, loop=0, transparency=0)
 
 print('fixtures written to', out)
+
+# Two-page LZW TIFF, like a scanned document, and a one-bit Group 4 fax page
+pages = [photo(800, 1000, (230, 230, 225)), photo(800, 1000, (180, 210, 230))]
+pages[0].save(os.path.join(out, 'scan.tiff'), save_all=True, append_images=pages[1:], compression='tiff_lzw')
+fax = Image.new('1', (1728, 600), 1)
+ImageDraw.Draw(fax).rectangle([100, 100, 900, 300], fill=0)
+fax.save(os.path.join(out, 'fax.tif'), compression='group4')

@@ -1,0 +1,22 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('protect-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options">
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" autocomplete="new-password" spellcheck="false" />
+    </div>
+    <div class="field">
+      <label for="password-confirm">Type it again</label>
+      <input type="password" id="password-confirm" autocomplete="new-password" spellcheck="false" />
+    </div>
+    <div class="field wide">
+      <label class="check"><input type="checkbox" id="show-password" /> Show password</label>
+      <p class="small muted">There is no way to recover a forgotten password. Keep the original, or save the password in a password manager.</p>
+    </div>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/protect-pdf.ts"></script>

@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(17);
+  expect(await page.locator('.tool-card').count()).toBe(19);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'exif-viewer'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -508,7 +508,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -522,7 +522,7 @@ test('format-pair pages render, preset the converter and link a social image', a
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');
-    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon' }[to!];
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp' }[to!];
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }
@@ -842,6 +842,18 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#format')).toHaveValue('image/png');
     }],
     ['crop-image-to-square', 'crop-image', async () => expect(page.locator('#aspect')).toHaveValue('1:1')],
+    ['webp-to-pdf', 'image-to-pdf', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /webp/)],
+    ['gif-to-pdf', 'image-to-pdf', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /gif/)],
+    ['combine-images-into-pdf', 'image-to-pdf', async () => {
+      await expect(page.locator('#page-size')).toHaveValue('a4');
+      await expect(page.locator('#margin')).toHaveValue('10');
+    }],
+    ['tiff-to-pdf', 'image-to-pdf', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /tif/)],
+    ['add-signature-to-pdf', 'sign-pdf', async () => expect(page.locator('#sig-pad')).toBeAttached()],
+    ['resize-image-for-instagram', 'crop-image', async () => {
+      await expect(page.locator('#aspect')).toHaveValue('4:5');
+      await expect(page.locator('#format')).toHaveValue('image/jpeg');
+    }],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -856,6 +868,52 @@ test('preset landing pages render, run their base tool with the preset options a
     expect((await page.request.get(`/og/${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
     await check();
     expect(errors, slug).toEqual([]);
+  }
+});
+
+test('Add signature landing page loads the signing stage and signs a PDF', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/add-signature-to-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#sign-panel')).toBeVisible();
+  await choose(page.locator('input[name="sig-mode"][value="type"]'));
+  await page.locator('#sig-text').fill('Ada Lovelace');
+  await page.locator('#add-signature').click();
+  await expect(page.locator('.stamp-signature')).toHaveCount(1);
+  await page.locator('#add-date').click();
+  await expect(page.locator('.stamp')).toHaveCount(2);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('text-signed.pdf');
+  const doc = await PDFDocument.load(await bytesOf(download));
+  expect(doc.getPageCount()).toBe(3);
+  net.assertNothingLeft(['text.pdf']);
+});
+
+test('TIFF to PDF keeps every page of a multi-page TIFF and a fax page, and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/tiff-to-pdf');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, ['scan.tiff', 'fax.tif']);
+  const doc = await PDFDocument.load(await bytesOf(downloads[0]!));
+  expect(doc.getPageCount()).toBe(3);
+  expect(doc.getPage(0).getSize()).toEqual({ width: 800, height: 1000 });
+  expect(doc.getPage(2).getSize()).toEqual({ width: 1728, height: 600 });
+  net.assertNothingLeft(['scan.tiff', 'fax.tif']);
+});
+
+test('TIFF to JPG and TIFF to PNG decode TIFFs the browser cannot open', async ({ page }) => {
+  for (const [slug, type] of [['tiff-to-jpg', 'image/jpeg'], ['tiff-to-png', 'image/png']] as const) {
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    const { downloads } = await run(page, ['scan.tiff']);
+    const bytes = await bytesOf(downloads[0]!);
+    const dims = await page.evaluate(async ([b, t]) => {
+      const bmp = await createImageBitmap(new Blob([new Uint8Array(b)], { type: t }));
+      return [bmp.width, bmp.height];
+    }, [Array.from(bytes), type] as const);
+    expect(dims, slug).toEqual([800, 1000]);
   }
 });
 
@@ -1384,4 +1442,62 @@ test('Sign PDF says what is needed before Run until a signature is placed', asyn
   await expect(page.locator('#run-hint')).toBeHidden();
   await page.locator('.stamp-signature .stamp-remove').dispatchEvent('click');
   await expect(page.locator('#run-hint')).toBeVisible();
+});
+
+test('Unlock PDF removes an open password with the password field and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'unlock-pdf');
+  const net = watchNetwork(page);
+  page.on('dialog', (d) => void d.dismiss());
+  const { downloads } = await run(page, [staticFx('user-locked.pdf')], async () => {
+    await page.locator('#password').fill('stayput');
+  });
+  const out = await bytesOf(downloads[0]!);
+  expect(new TextDecoder('latin1').decode(out)).not.toContain('/Encrypt');
+  expect((await PDFDocument.load(out)).getPageCount()).toBe(3);
+  await expect(page.locator('#results-list')).toContainText('password removed');
+  net.assertNothingLeft(['user-locked.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Unlock PDF strips owner-only restrictions without asking and says so for an open PDF', async ({ page }) => {
+  const errors = await open(page, 'unlock-pdf');
+  let asked = false;
+  page.on('dialog', (d) => {
+    asked = true;
+    void d.dismiss();
+  });
+  const { downloads } = await run(page, [staticFx('owner-locked.pdf'), 'text.pdf']);
+  expect(asked).toBe(false);
+  expect(downloads).toHaveLength(0);
+  const files = await zipAll(page);
+  expect(Object.keys(files)).toHaveLength(2);
+  for (const b of Object.values(files)) expect(new TextDecoder('latin1').decode(b)).not.toContain('/Encrypt');
+  await expect(page.locator('#results-list')).toContainText('restrictions removed');
+  await expect(page.locator('#results-list')).toContainText('had no password');
+  expect(errors).toEqual([]);
+});
+
+test('Protect PDF encrypts with AES-256 so the file needs the password to open', async ({ page }) => {
+  const errors = await open(page, 'protect-pdf');
+  const net = watchNetwork(page);
+  // Mismatched passwords block the run with a clear message.
+  await page.locator('#file-input').setInputFiles(fx('text.pdf'));
+  await page.locator('#password').fill('correct horse');
+  await page.locator('#password-confirm').fill('correct hose');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('do not match');
+  await page.locator('#password-confirm').fill('correct horse');
+  await page.locator('#clear').click();
+  errors.splice(0); // the shell logs the mismatch it just showed
+  const { downloads } = await run(page, ['text.pdf']);
+  const out = await bytesOf(downloads[0]!);
+  const raw = new TextDecoder('latin1').decode(out);
+  expect(raw).toContain('/Encrypt');
+  expect(raw).toMatch(/\/V 5/);
+  // pdf.js refuses it without the password and opens it with the right one.
+  await expect(getDocument({ data: out.slice() }).promise).rejects.toThrow(/password/i);
+  const doc = await getDocument({ data: out.slice(), password: 'correct horse' }).promise;
+  expect(doc.numPages).toBe(3);
+  net.assertNothingLeft(['text.pdf']);
+  expect(errors).toEqual([]);
 });

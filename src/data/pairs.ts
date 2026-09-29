@@ -11,7 +11,7 @@ export interface Pair {
   from: string;
   to: string;
   /** Output MIME type preset in the converter. */
-  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon';
+  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon' | 'image/bmp';
   accept: string;
   title: string;
   description: string;
@@ -43,6 +43,12 @@ const icoSteps = (from: string) => [
   `Drop your ${from} files onto the page, or tap to pick them. Square images give the cleanest icons.`,
   'Nothing to set: every ICO gets the standard sizes from 16 to 256 pixels, up to the size of your image.',
   'Download each .ico file, or all of them as one zip.',
+];
+
+const bmpSteps = (from: string) => [
+  `Drop your ${from} files onto the page, or tap to pick them. Batches are fine.`,
+  'Pick a background colour for any transparent areas, since BMP here is 24-bit with no alpha channel.',
+  'Download each BMP, or all of them as one zip.',
 ];
 
 export const pairs: Pair[] = [
@@ -455,13 +461,153 @@ export const pairs: Pair[] = [
       { q: 'Can I use the ICO as a website favicon?', a: 'Yes: put it at the root of your site as favicon.ico and browsers pick it up. For the Apple and Android home screen icons as well, use Stayput’s favicon generator, which makes the whole set from one image.' },
     ],
   },
+  {
+    slug: 'bmp-to-png',
+    from: 'BMP',
+    to: 'PNG',
+    outputType: 'image/png',
+    accept: 'image/bmp,.bmp,.dib',
+    title: 'BMP to PNG Converter, Lossless, No Upload | Stayput',
+    description: 'Convert BMP bitmaps to PNG without losing a single pixel. Usually 5 to 20 times smaller. Runs in your browser, nothing is uploaded.',
+    heading: 'Convert BMP to PNG',
+    tagline: 'Same pixels, a fraction of the size, and a format every app and website accepts.',
+    keywords: ['bmp to png', 'convert bmp to png', 'bmp to png converter', 'bitmap to png', 'bmp to png lossless'],
+    intro: [
+      'BMP is the bitmap format Windows Paint saved by default for decades, and it is still what some scanners, CNC and embroidery programs, microscope cameras and old industrial software write out. It stores every pixel raw, row by row, so a 1920 by 1080 screenshot takes about 6 MB whether it shows a photo or a blank page. Many upload forms, chat apps and content systems reject it outright.',
+      'PNG is the natural replacement because it is also lossless. The colours of every pixel in the PNG match the bitmap exactly, but PNG compresses runs of repeated colour, so a diagram, screenshot or pixel-art sprite typically shrinks to a tenth of the BMP or less. Photos saved as BMP shrink less, often by half.',
+      'Your browser reads the bitmap, including the 1, 4 and 8-bit palette variants and 32-bit files with an alpha channel, and writes the PNG inside this tab. Nothing is sent to a server, which matters when the bitmaps come from lab equipment, medical imaging or a client’s scanner.',
+      'A few practical notes on specific sources. Screenshots saved from very old versions of Windows Paint, and exports from tools like MS Paint on Windows XP, are 24-bit and convert cleanly. Bitmaps from embroidery and sign-cutting software are often 1-bit or 4-bit with a tiny palette; the PNG keeps those exact colours, and is usually a few kilobytes. Game textures and sprite sheets from older engines sometimes use a magenta or bright green key colour instead of real transparency: that colour is kept as a normal colour, so remove it in an image editor if you need a transparent PNG.',
+      'If you are converting a folder of bitmaps for a website or an archive, drop them all at once and download the zip. File names stay the same apart from the extension, so links and references are easy to update. For photographs where size matters more than perfection, JPG gets much smaller still.',
+      'Why not just rename the file? Changing .bmp to .png leaves the bytes untouched, so the file still starts with the BM signature and stays the same size. Some viewers sniff the contents and open it anyway, but upload forms, content management systems and image hosts check the signature and refuse it, or worse, accept it and show a broken image later. A real conversion rewrites the data in PNG form.',
+    ],
+    faq: [
+      { q: 'Will converting BMP to PNG lose quality?', a: 'No. PNG is lossless, so the output has exactly the same pixel values as the bitmap. Open both side by side and zoom in: they are identical.' },
+      { q: 'Why is my PNG so much smaller than the BMP?', a: 'BMP normally stores no compression at all. PNG uses the same kind of compression as a zip file on the pixel rows, which removes the repetition without changing any pixel. Large areas of flat colour compress best.' },
+      { q: 'What about BMPs with transparency?', a: 'A 32-bit BMP with an alpha channel keeps its transparency in the PNG. Most BMPs are 24-bit and have no transparency to keep.' },
+      { q: 'Can Windows open PNG files everywhere a BMP worked?', a: 'Almost always. Photos, Paint, Word, PowerPoint and every browser open PNG. The exceptions are the same old or embedded programs that still ask for BMP in the first place; keep the original bitmap for those.' },
+      { q: 'Does the PNG keep the DPI of the scan?', a: 'The pixel count is identical, which is what decides print quality. The dots-per-inch tag from the bitmap header is not copied, so print dialogs may assume 72 or 96 dpi; set the print size you want there.' },
+      { q: 'Is anything uploaded?', a: 'No. The bitmap is decoded and the PNG is written by your browser, in this tab. The page keeps working with Wi-Fi turned off.' },
+    ],
+  },
+  {
+    slug: 'bmp-to-jpg',
+    from: 'BMP',
+    to: 'JPG',
+    outputType: 'image/jpeg',
+    accept: 'image/bmp,.bmp,.dib',
+    title: 'BMP to JPG Converter, Free, No Upload | Stayput',
+    description: 'Turn large BMP bitmaps into small JPG files with a quality slider. Batches welcome. Converted in your browser; nothing is uploaded.',
+    heading: 'Convert BMP to JPG',
+    tagline: 'Shrink uncompressed bitmaps into JPGs you can email, post or attach.',
+    keywords: ['bmp to jpg', 'bmp to jpeg', 'convert bmp to jpg', 'bmp to jpg converter', 'bitmap to jpg'],
+    intro: [
+      'A BMP photo is heavy: a 12-megapixel picture stored as a bitmap is around 36 MB, because the format keeps three bytes for every pixel and does not compress them. Email providers cap attachments at 20 or 25 MB, and most web forms take a few megabytes at most. As a JPG at quality 90 the same picture is usually 3 to 5 MB and looks the same on screen.',
+      'Choose JPG when the bitmap is a photograph or a scan of a photo: old digital cameras, webcam captures, frames grabbed by capture cards and security software often write BMP. For screenshots, line art and anything with sharp text, JPG blurs edges slightly; the BMP to PNG page keeps those pixel-perfect and still cuts the size a lot.',
+      'Everything happens inside this tab. The browser decodes the bitmap, the JPG encoder runs at the quality you set, and each file downloads directly from memory.',
+      'Where do BMP photos still come from? Film and flatbed scanner software set to "bitmap" output, dental and veterinary x-ray viewers exporting a frame, older point-and-shoot cameras in their uncompressed mode, and screen grabs from video capture cards. Many of those programs never ask about format, so a whole folder of multi-megabyte BMPs piles up before anyone notices.',
+      'Converting a batch is the usual case: drop the whole folder, keep quality at 90, and download a zip of JPGs a tenth of the size. The JPGs keep the pixel dimensions of the originals. BMP files carry no camera metadata to begin with, so there is nothing about where or when the picture was taken to preserve or to leak.',
+      'Transparency is rarely an issue with BMP, since nearly every bitmap is 24-bit with a solid background. The occasional 32-bit bitmap with an alpha channel, typically an icon or a graphic exported from a design tool, has its see-through areas filled with the background colour from the options, white unless you change it. For that kind of image, a PNG keeps the transparency and will look better.',
+      'On Windows, Paint and the Photos app can also save a BMP as JPG one file at a time through Save as. That works for a single picture. For dozens of bitmaps, or on a computer where you cannot install anything, doing the whole batch here is quicker, and the quality setting is under your control rather than fixed by the app.',
+    ],
+    faq: [
+      { q: 'What quality setting should I use?', a: '90 is visually identical to the bitmap for photos. 80 roughly halves the size again and is still fine for sharing on screens. Go to 95 or above only if the JPG will be edited further.' },
+      { q: 'How much smaller will the JPG be?', a: 'For photos, usually 8 to 15 times smaller than the BMP at quality 90. The exact size depends on detail: grass, gravel and noisy low-light shots compress less than skies and walls.' },
+      { q: 'Can I undo it and get the BMP back?', a: 'You can convert the JPG back to BMP, but the small losses from JPG compression stay. Keep the original bitmaps until you have checked the JPGs look right.' },
+      { q: 'Will the JPG be rotated or cropped?', a: 'No. BMP has no orientation tag, so the picture comes out exactly as the bitmap stores it, at the same width and height.' },
+      { q: 'My BMP is a screenshot and the JPG looks fuzzy around text. Why?', a: 'JPG is built for photographs and smooths hard edges. Convert screenshots and diagrams to PNG instead, which is lossless.' },
+      { q: 'Are my files sent anywhere?', a: 'No. Decoding and encoding both happen in your browser. There is no upload step and no server that could keep a copy.' },
+    ],
+  },
+  {
+    slug: 'png-to-bmp',
+    from: 'PNG',
+    to: 'BMP',
+    outputType: 'image/bmp',
+    accept: 'image/png,.png',
+    title: 'PNG to BMP Converter, 24-bit, No Upload | Stayput',
+    description: 'Convert PNG images to 24-bit BMP for older Windows software, embroidery machines and microcontroller displays. Free, in your browser, nothing uploaded.',
+    heading: 'Convert PNG to BMP',
+    tagline: 'A plain 24-bit bitmap for software that will not read anything else.',
+    keywords: ['png to bmp', 'convert png to bmp', 'png to bmp converter', 'png to bitmap', 'png to 24 bit bmp'],
+    intro: [
+      'Nobody picks BMP for its size. People need it because something downstream insists: an embroidery or laser-engraving program, a label printer driver, a game mod tool, a BIOS or boot-logo utility, a microcontroller display library, or a line-of-business Windows app written twenty years ago. Most of those expect the most basic variant, an uncompressed 24-bit bitmap, and that is exactly what this page writes.',
+      'BMP has no alpha channel in that variant, so transparent parts of your PNG are painted with the background colour you choose in the options. Pick white for printing and engraving, black for dark-background displays, or the exact colour your target software uses behind the image. The width and height stay the same as the PNG.',
+      'Expect a much larger file: the bitmap stores three bytes per pixel with no compression, so a 1000 by 1000 PNG becomes a 3 MB BMP however simple it looks. The conversion happens in your browser, and the PNG never leaves your device.',
+      'A few targets have their own quirks. Windows boot-logo and BIOS tools typically want a specific size, such as 640 by 480 or the exact screen resolution, so resize the PNG before converting. Embroidery software reads the bitmap as a colour map, so fewer colours make cleaner stitch regions. Arduino and ESP32 display libraries often read a 24-bit BMP from an SD card, row by row, which is precisely the bottom-up layout written here.',
+      'Colour depth is the setting people most often get wrong. A PNG exported from a design tool is usually 32-bit, with an alpha channel. Many BMP readers in embedded and legacy software handle only 24-bit and either refuse a 32-bit bitmap or draw its transparent pixels as black. Writing 24-bit with the transparency flattened onto a colour you picked avoids both problems.',
+      'If your software refuses the file, check what it expects before trying again: some programs want the .bmp extension in capitals, a maximum size, or an 8-bit palette. Those are rare, and the 24-bit output from this page is what almost every BMP reader is built to accept.',
+    ],
+    faq: [
+      { q: 'Which kind of BMP does this make?', a: 'An uncompressed 24-bit BMP (BITMAPINFOHEADER, bottom-up rows), the variant with the widest support in old and embedded software. It has no palette and no alpha channel.' },
+      { q: 'What happens to transparency?', a: 'It is flattened onto the background colour in the options, white by default. If your software needs a particular colour behind a logo, set it before converting.' },
+      { q: 'Can I convert JPG or WebP to BMP here too?', a: 'Yes, with the [image converter](/tools/convert-image): drop any image and pick BMP as the output format. It writes the same 24-bit bitmap.' },
+      { q: 'My device needs a 1-bit or 16-bit bitmap. Will this work?', a: 'Not directly. This page writes 24-bit colour. Most tools that need monochrome or 16-bit input can convert from a 24-bit BMP, and reading a 24-bit file is what they are most likely to support.' },
+      { q: 'Are the images uploaded?', a: 'No. The bitmap is assembled byte by byte in this tab. Nothing is sent over the network.' },
+    ],
+  },
+  {
+    slug: 'tiff-to-jpg',
+    from: 'TIFF',
+    to: 'JPG',
+    outputType: 'image/jpeg',
+    accept: 'image/tiff,.tif,.tiff',
+    title: 'TIFF to JPG Converter, Free, No Upload | Stayput',
+    description: 'Convert TIFF scans and camera files to JPG in your browser, LZW, ZIP and fax compression included. Batches welcome. Nothing is uploaded.',
+    heading: 'Convert TIFF to JPG',
+    tagline: 'Heavy scans and print files turned into JPGs you can email and upload.',
+    keywords: ['tiff to jpg', 'tif to jpg', 'convert tiff to jpg', 'tiff to jpeg', 'tiff to jpg converter'],
+    intro: [
+      'TIFF is the format of scanners, print shops, museums and professional cameras. It is excellent for archiving and a nuisance for anything else: a single scanned page at 300 dpi is often 25 MB, Chrome and Firefox will not display it, and most upload forms and email previews refuse it. A JPG of the same scan is typically a twentieth of the size and opens everywhere.',
+      'Only Safari can read TIFF on its own, so this page carries a TIFF decoder, UTIF.js, which is part of the site and runs in your tab. It handles the compression schemes real TIFFs use: none, LZW, Deflate (ZIP), PackBits, JPEG-in-TIFF, and CCITT Group 3 and 4 for black-and-white faxes and document scans. 16-bit files from scanners and raw converters are reduced to 8 bits per channel, which is what JPG stores.',
+      'A multi-page TIFF, such as a fax or a scanned contract, becomes a JPG of its first page here. To keep every page, the [TIFF to PDF](/tiff-to-pdf) page turns each one into a PDF page instead. Layers and alpha channels from Photoshop-saved TIFFs are flattened onto the background colour in the options.',
+      'Your scans often hold exactly the documents you would least like copied to a stranger’s server: IDs, medical letters, signed agreements, family photos. Nothing here is uploaded; the decoding and the JPG encoding both happen on your device, and the page keeps working offline once loaded.',
+      'Camera TIFFs are a separate case from scans. Raw converters such as Lightroom, Capture One and darktable export 16-bit TIFFs of 70 MB and more for editing. Turning one of those into a JPG for sharing is fine, but keep the TIFF as your master copy, since every later edit on the JPG loses a little quality.',
+      'Colour documents scanned for an office archive are the most common TIFF people need to share. A bank statement, a tax form or a school report scanned at 300 dpi comes out around 2500 by 3300 pixels. As a JPG at quality 85 that page is usually 400 to 900 KB, small enough to attach several to one email, and still sharp enough to print or read on a phone.',
+    ],
+    faq: [
+      { q: 'Why will my TIFF not open in Chrome or Windows Photos?', a: 'Chrome, Edge and Firefox have no TIFF decoder, and Windows Photos rejects some compression types and multi-page files. Converting to JPG gives a file every browser, phone and app shows.' },
+      { q: 'What quality should I pick for scans?', a: '85 to 90 keeps text crisp and paper texture natural. For black-and-white text documents, PNG is often smaller and sharper than JPG; try the TIFF to PNG page.' },
+      { q: 'My TIFF has several pages. What happens?', a: 'The JPG is the first page. Use TIFF to PDF to keep every page in one file, or split the TIFF into single pages in your scanner software first if you need one JPG per page.' },
+      { q: 'Is the 300 dpi resolution kept?', a: 'Every pixel is kept, so the print size at 300 dpi is the same. The dpi tag itself is not written into the JPG; print dialogs may assume 72 or 96 dpi until you set the size.' },
+      { q: 'Can I convert a whole folder of scans?', a: 'Yes. Drop them all at once. Each TIFF becomes a JPG with the same name, and the results download one by one or as a single zip.' },
+      { q: 'Are my files uploaded?', a: 'No. The decoder is loaded from this site as program code, and your TIFF is read only by this tab.' },
+    ],
+  },
+  {
+    slug: 'tiff-to-png',
+    from: 'TIFF',
+    to: 'PNG',
+    outputType: 'image/png',
+    accept: 'image/tiff,.tif,.tiff',
+    title: 'TIFF to PNG Converter, Lossless, No Upload | Stayput',
+    description: 'Convert TIFF images to lossless PNG in your browser, transparency kept. Reads LZW, ZIP and fax TIFFs. Free, batches welcome, nothing uploaded.',
+    heading: 'Convert TIFF to PNG',
+    tagline: 'A lossless PNG that browsers can show, made from your TIFF on this device.',
+    keywords: ['tiff to png', 'tif to png', 'convert tiff to png', 'tiff to png converter', 'tiff to png transparent'],
+    intro: [
+      'PNG is the right target when the TIFF is a graphic rather than a photograph: a logo from a print designer, a technical drawing, a map, a chart from a lab instrument, a screenshot saved by macOS in an older setting, or a black-and-white document scan. Like TIFF, PNG is lossless, so every pixel comes through unchanged, but unlike TIFF it displays in every browser and in almost every app and website.',
+      'Transparency survives the trip. TIFFs saved from Photoshop, Illustrator or GIMP with an alpha channel become PNGs with the same see-through areas, so a logo still sits cleanly on a coloured page. Files with 16 bits per channel are brought down to 8, which is all a screen shows.',
+      'Chrome, Edge and Firefox cannot decode TIFF, so the page includes UTIF.js, an open-source TIFF reader bundled with the site. It reads uncompressed, LZW, Deflate, PackBits and JPEG-compressed TIFFs, plus CCITT fax encoding. A bilevel fax page often comes out as a PNG of a few dozen kilobytes, much smaller than the same page as a JPG.',
+      'For photographs, PNG files get big: a 24-megapixel camera TIFF becomes a PNG of 40 MB or more. If the picture is a photo that is going to be shared rather than edited, TIFF to JPG is the better choice. Multi-page TIFFs give a PNG of the first page here.',
+      'Some everyday places TIFFs turn up: macOS used to save screenshots as TIFF and still does when the default was changed; Windows Snipping Tool and many scanner utilities offer it as an option; GIS software exports map tiles and elevation images as GeoTIFF; microscopes, gel imagers and astronomy cameras write it because it stores raw sensor values. The geographic and scientific tags in those files are not carried into the PNG, only the picture itself.',
+      'If a TIFF fails to convert, it is usually one of a small set of rare variants: floating-point pixel data from scientific instruments, tiled files larger than your device can hold in memory, or a proprietary compression from old imaging software. The error message says so, and nothing about the file has been sent anywhere in the attempt.',
+      'Black-and-white documents deserve a special mention. A one-bit TIFF of a typed page stores only black and white pixels. The PNG keeps every one of them pure black or pure white, and because two colours compress very well it stays small, where JPG would add grey smudges around every letter. That makes PNG the better target for contracts, forms and letters scanned in monochrome mode.',
+    ],
+    faq: [
+      { q: 'Is TIFF to PNG really lossless?', a: 'Yes, for 8-bit images: each pixel value in the PNG is identical to the TIFF. For 16-bit TIFFs the extra precision beyond 8 bits per channel is dropped, which is invisible on screen but matters if you plan heavy colour grading.' },
+      { q: 'Can I get one PNG per page from a multi-page TIFF?', a: 'Not on this page, which converts the first page. The TIFF to PDF page keeps every page; from the PDF, the PDF to PNG tool then saves each page as its own image.' },
+      { q: 'Will CMYK TIFFs from a print shop look right?', a: 'They are converted to RGB for the PNG. Colours may shift slightly, as they do in any screen preview of a print file, because the conversion does not use the print profile.' },
+      { q: 'How big will the PNG be?', a: 'Similar to an LZW-compressed TIFF, and far smaller than an uncompressed one. Flat graphics and scanned text compress extremely well; photographs much less.' },
+      { q: 'Is the file uploaded?', a: 'No. Everything happens in this tab; you can disconnect from the internet after the page loads and it still converts.' },
+    ],
+  },
 ];
 
 export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => p.slug === slug);
 
 /** A Pair expressed as a Tool so it can use the shared tool layout. */
 export function pairAsTool(p: Pair): Tool {
-  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : jpgSteps(p.from);
+  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : p.outputType === 'image/bmp' ? bmpSteps(p.from) : jpgSteps(p.from);
   return {
     slug: p.slug,
     path: `/${p.slug}`,

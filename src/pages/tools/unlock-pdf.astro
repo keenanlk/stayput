@@ -1,0 +1,14 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('unlock-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options">
+    <div class="field wide">
+      <label for="password">Password <span class="muted">(leave empty if the PDF opens without one)</span></label>
+      <input type="password" id="password" autocomplete="off" spellcheck="false" />
+    </div>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/unlock-pdf.ts"></script>
