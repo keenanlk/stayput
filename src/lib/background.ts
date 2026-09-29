@@ -1,6 +1,6 @@
 /**
  * Background removal in the browser. ISNet general-use (DIS, Apache-2.0),
- * quantised to 8-bit weights, finds the foreground at 1024×1024; the mask is
+ * with its weights stored as 8-bit integers (computed in full precision), finds the foreground at 1024×1024; the mask is
  * scaled back to the photo's own size and used as its alpha channel, so the
  * cut-out keeps full resolution. The model runs in a web worker
  * (bg.worker.ts). Nothing is fetched until the first photo, and nothing but
@@ -8,6 +8,7 @@
  */
 import { makeCanvas } from './image';
 import { blur as boxBlur } from './blur';
+import { refineMask } from './mask';
 
 const SIZE = 1024;
 /** ISNet expects RGB scaled to 0..1 with the ImageNet mean subtracted (std 1). */
@@ -37,8 +38,12 @@ function toTensor(bitmap: ImageBitmap): Float32Array {
   return out;
 }
 
-/** The foreground mask for a photo, 1024×1024, 0 (background) to 255 (subject). */
-export function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) => void): Promise<Uint8ClampedArray> {
+/**
+ * The foreground mask for a photo, 1024×1024, 0 (background) to 255 (subject),
+ * cleaned up by `refineMask`; `keep` (-1 to 1) keeps less or more of what the
+ * model is unsure about.
+ */
+export function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) => void, keep = 0): Promise<Uint8ClampedArray> {
   const id = nextId++;
   const pixels = toTensor(bitmap);
   const w = getWorker();
@@ -49,7 +54,7 @@ export function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) 
       if (msg.type === 'loading') return onLoading?.(msg.fraction ?? 0);
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
-      if (msg.type === 'mask') resolve(msg.mask!);
+      if (msg.type === 'mask') resolve(refineMask(msg.mask!, SIZE, keep));
       else reject(new Error(msg.message ?? 'Background removal failed.'));
     };
     const onError = (e: ErrorEvent) => {

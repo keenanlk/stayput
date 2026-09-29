@@ -7,12 +7,15 @@ It is licensed under the Apache License 2.0 (see the MediaPipe model card).
 The blur tool loads it only when someone presses "Find faces"; it runs in the
 browser through @mediapipe/tasks-vision, served from /vendor/.
 
-`isnet-general-use-uint8.onnx` is ISNet general-use from the DIS project
+`isnet-general-use-int8w.onnx` is ISNet general-use from the DIS project
 (https://github.com/xuebinqin/DIS), released under the Apache License 2.0. The
 ONNX export is the one distributed by rembg
 (https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx,
-179 MB). Only its main output is kept, and its weights are dynamically quantised
-to 8 bits with onnxruntime's `quantize_dynamic` (QUInt8), giving 46 MB. The
+179 MB). Only its main output is kept. The convolution weights are stored as
+8-bit integers, one scale per output channel, each followed by a
+DequantizeLinear node, so the file is 46 MB but the model still computes in
+32-bit float. (An earlier build used onnxruntime's `quantize_dynamic`, which
+also quantises activations; it left speckles on textured backgrounds.) The
 background remover loads it on the first photo and runs it in a web worker
 through onnxruntime-web, served from /vendor/.
 
