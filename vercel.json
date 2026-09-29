@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/upscale-image",
+      "destination": "/tools/upscale-image",
+      "permanent": true
+    },
+    {
       "source": "/remove-noise",
       "destination": "/tools/remove-noise",
       "permanent": true

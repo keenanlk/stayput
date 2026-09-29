@@ -60,6 +60,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'remove-pdf-metadata': () => import('./remove-pdf-metadata'),
   'grayscale-pdf': () => import('./grayscale-pdf'),
   'black-and-white-image': () => import('./black-and-white-image'),
+  'upscale-image': () => import('./upscale-image'),
   'image-to-svg': () => import('./image-to-svg'),
   'gif-maker': () => import('./gif-maker'),
   'resize-pdf': () => import('./resize-pdf'),

@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(77);
+  expect(await page.locator('.index .tool-card').count()).toBe(78);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -5350,4 +5350,50 @@ test('Remove background noise from video keeps the picture and the length, and n
   expect(info.duration).toBeLessThan(2.6);
   await expect(page.locator('#results-list .result-item')).toContainText('picture copied');
   net.assertNothingLeft(['talk.webm']);
+});
+
+/** Colours at a few points of an image file, read in the page. */
+async function pixelsOf(page: Page, bytes: Uint8Array, points: [number, number][]): Promise<{ width: number; height: number; px: number[][] }> {
+  return page.evaluate(
+    async ([data, pts]) => {
+      const bmp = await createImageBitmap(new Blob([new Uint8Array(data)]));
+      const c = new OffscreenCanvas(bmp.width, bmp.height);
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(bmp, 0, 0);
+      return { width: bmp.width, height: bmp.height, px: pts.map(([x, y]) => Array.from(ctx.getImageData(x, y, 1, 1).data)) };
+    },
+    [Array.from(bytes), points] as const,
+  );
+}
+
+test('AI image upscaler makes a transparent logo 4× bigger, keeps the transparency and colours, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(120_000);
+  const errors = await open(page, 'upscale-image');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [logoPng()]);
+  expect(downloads[0]!.suggestedFilename()).toBe('logo-4x.png');
+  const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[20, 20], [400, 320], [400, 660]]);
+  expect([out.width, out.height]).toEqual([800, 800]);
+  expect(out.px[0]![3]).toBe(0);
+  const [disc, bar] = [out.px[1]!, out.px[2]!];
+  expect(disc[3]).toBe(255);
+  expect(Math.max(disc[0]!, disc[1]!, disc[2]!)).toBeLessThan(40);
+  expect(bar[0]).toBeGreaterThan(180);
+  expect(bar[1]).toBeLessThan(70);
+  await expect(page.locator('#results-list .result-item')).toContainText('200×200 to 800×800');
+  net.assertNothingLeft(['logo.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Enlarge image opens at 2× and puts a JPG on white', async ({ page }) => {
+  test.setTimeout(120_000);
+  await stubAnalytics(page);
+  await page.goto('/enlarge-image');
+  const { downloads } = await run(page, [logoPng()], async () => {
+    await page.locator('#format').selectOption('image/jpeg');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('logo-2x.jpg');
+  const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[10, 10]]);
+  expect([out.width, out.height]).toEqual([400, 400]);
+  expect(Math.min(...out.px[0]!.slice(0, 3))).toBeGreaterThan(240);
 });

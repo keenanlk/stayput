@@ -75,6 +75,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'crop-pdf': ['compress-pdf', 'merge-pdf'],
   'grayscale-pdf': ['compress-pdf', 'pdf-page-numbers'],
   'black-and-white-image': ['compress-image', 'image-to-pdf'],
+  'upscale-image': ['compress-image', 'remove-background'],
   'sticker-maker': ['remove-background', 'compress-image'],
   'profile-picture-maker': ['compress-image', 'strip-exif'],
   'watermark-pdf': ['protect-pdf', 'compress-pdf'],
