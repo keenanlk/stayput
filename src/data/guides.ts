@@ -1448,6 +1448,216 @@ export const guides: Guide[] = [
       { q: 'Can I trim a video on my phone without uploading it anywhere?', a: 'Yes. The built-in Photos and Google Photos trimmers, and a browser tool that runs locally, all keep the file on your device.' },
     ],
   },
+  {
+    slug: 'how-to-rotate-a-sideways-video',
+    title: 'How to Rotate a Sideways Video (iPhone, Android, Windows, Mac)',
+    description: 'A video that plays sideways or upside down almost always has a fixable rotation flag, not damaged footage. Here is how to fix it on each platform, and a browser tool when the flag itself is the problem.',
+    heading: 'How to rotate a sideways video',
+    dek: 'Almost always a fixable rotation flag, not broken footage. Here is how to fix it on each platform.',
+    keywords: ['how to rotate a sideways video', 'video is sideways how to fix', 'rotate video 90 degrees', 'flip video upright', 'video playing upside down'],
+    updated: '2026-09-29',
+    tools: ['rotate-video'],
+    sections: [
+      {
+        h: 'Why a video ends up sideways',
+        p: [
+          'A phone records video in whatever orientation it was held, then writes a rotation flag into the file telling players to display it upright. Most apps read that flag correctly; some players, older software and a few messaging apps ignore it and show the raw, sideways frame instead. Re-encoding the video with a real 90-degree turn, rather than relying on the flag, fixes it everywhere.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'Open the video in Photos, tap **Edit**, then use the crop tool: tap the rotate icon (a square with a curved arrow) at the bottom-left of the crop screen to turn it 90 degrees, tapping again for more, then **Done**. This saves a real rotation, not just a flag.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'In Google Photos, open the video, tap **Edit**, open the crop/rotate tool, and tap the rotate icon until the video is upright, then save. Samsung Gallery\'s editor has the same rotate control.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Clipchamp (preinstalled on Windows 11) has a rotate button on the clip once it is on the timeline: import the video, select it, and use the rotate control in the properties panel, then export.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'QuickTime Player can do this directly: open the video and use **Edit, Rotate Left** or **Rotate Right** from the menu (or Cmd-R), then File, **Export As**, to save the corrected version.',
+        ],
+      },
+      {
+        h: 'When the fix does not stick',
+        p: [
+          'Some tools only change the rotation flag rather than the pixels, so the video looks right in one app and sideways again in another. Stayput\'s [rotate video](/tools/rotate-video) tool re-encodes the actual frames in your browser tab, so the fix holds everywhere the file is played, including sites and apps that ignore rotation metadata. It also flips a video horizontally for a mirrored recording. Nothing is uploaded: the rotation happens on your device.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why does my video look fine on my phone but sideways when I send it?', a: 'Your phone\'s player reads the rotation flag correctly; the app or device you sent it to may not. Re-encoding the rotation into the actual frames fixes it everywhere.' },
+      { q: 'Does rotating a video re-encode and lose quality?', a: 'Rotating by 90 or 180 degrees does not need to resample the image content, only reorder it, so a good encoder keeps quality very close to the original at a matching bitrate.' },
+      { q: 'Can I flip a video like a mirror, not just rotate it?', a: 'Yes, a horizontal flip is a separate operation from rotation, useful for footage recorded in a mirror or by a front camera that came out reversed.' },
+      { q: 'Will rotating fix a video that plays upside down?', a: 'Yes, a 180-degree rotation is the same fix, just turned twice as far.' },
+    ],
+  },
+  {
+    slug: 'how-to-remove-audio-from-a-video',
+    title: 'How to Remove Audio From a Video (Mute It) on iPhone, Android, Windows, Mac',
+    description: 'Muting a video for good, not just while you watch it, needs a real edit on most platforms. Here is how on iPhone, Android, Windows and Mac, and a browser tool that does it in one step.',
+    heading: 'How to remove audio from a video',
+    dek: 'The mute button on your phone only silences playback. Removing the audio for good needs an actual edit. Here is how, on each platform.',
+    keywords: ['how to remove audio from a video', 'mute a video', 'remove sound from video', 'delete audio from video file', 'video without sound'],
+    updated: '2026-09-29',
+    tools: ['mute-video', 'remove-audio-from-video'],
+    sections: [
+      {
+        h: 'Muting playback vs. removing the audio track',
+        p: [
+          'Turning your phone\'s ringer switch to silent, or tapping mute in a video player, only stops sound on that one playback. The audio track is still inside the file, and it plays normally for anyone else who opens it. Removing the audio for good means re-saving the file without that track, which is a real edit, not a playback setting.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'The Shortcuts app has a built-in **Remove Audio from Video** action: open Shortcuts, create a new shortcut, add **Select Photos** followed by **Remove Audio from Video**, then run it on your clip and save. It requires no other software and produces a silent copy of the video in Photos.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'There is no one-tap native option. Google Photos\' editor does not include a way to drop the audio track entirely, so muting a video for good on Android needs a third-party app or a browser tool.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'In Clipchamp (preinstalled on Windows 11), select the clip on the timeline and use the volume control in its properties to set it to 0%, then export; this writes the video with silent audio rather than truly removing the track, but the result is a video that never plays sound.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'QuickTime Player can strip the audio directly: open the video, choose **Edit, Remove Audio** from the menu bar (it appears when the file has an audio track), then File, **Export As**, to save the silent version.',
+        ],
+      },
+      {
+        h: 'Removing it in one step, on any device',
+        p: [
+          'Stayput\'s [mute video](/tools/mute-video) tool drops the audio track entirely in your browser tab, on any phone or computer, without an app to install. The [Remove audio from video](/remove-audio-from-video) preset is the same tool set up for this exact job. The file is processed locally, so nothing is uploaded.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does muting my phone remove the sound from a video permanently?', a: 'No. Muting only silences what you hear while watching; the audio track stays in the file for anyone else who opens it.' },
+      { q: 'Will removing audio make the video file smaller?', a: 'Yes, though usually only slightly, since audio is a small part of a video\'s total size compared to the picture.' },
+      { q: 'Can I remove audio from just part of a video?', a: 'Removing the whole track is the simplest edit and what all the options above do. To silence only part of a clip, trim out that section first, or edit in an app that supports separate audio and video timelines.' },
+      { q: 'Does removing the audio track lose video quality?', a: 'No. The video frames are untouched; only the separate audio stream is dropped.' },
+    ],
+  },
+  {
+    slug: 'how-to-copy-text-from-an-image',
+    title: 'How to Copy Text From an Image (iPhone, Android, Windows, Mac)',
+    description: 'Every recent phone and computer can turn a photo of text into text you can copy and paste, no app required. Here is how on each platform, and a browser tool for batches, scans and stubborn photos.',
+    heading: 'How to copy text from an image',
+    dek: 'iPhone, Android, Windows and Mac can all turn a photo of text into text you can select and paste. Here is how on each.',
+    keywords: ['how to copy text from an image', 'extract text from photo', 'image to text', 'ocr photo to text', 'copy text from screenshot'],
+    updated: '2026-09-29',
+    tools: ['image-to-text'],
+    sections: [
+      {
+        h: 'How this works without typing it out',
+        p: [
+          'Optical character recognition (OCR) looks at the shapes in a photo and matches them to letters, effectively reading the image. It works well on clear, well-lit, front-on text such as a document, a sign, a screenshot or a book page, and less well on handwriting, tight curves, or text at a steep angle.',
+        ],
+      },
+      {
+        h: 'On an iPhone or iPad',
+        p: [
+          'Live Text does this automatically (iOS 15 and later): open the photo, and if it contains text, a small icon with lines appears in the corner, or you can touch and hold directly on the text. A selection appears around the words; tap **Select All** and then **Copy** to put it on the clipboard. This also works live through the Camera app, without taking a photo first.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Google Lens does the equivalent: open the photo in Google Photos, tap the Lens icon, and it highlights the text it recognises; tap and drag to select some or all of it, then **Copy**. Google Lens is also built into the Camera app on many Android phones for live text recognition.',
+        ],
+      },
+      {
+        h: 'On Windows',
+        p: [
+          'Windows 11\'s Snipping Tool has a **Text Actions** button after you take a screenshot: it draws boxes around recognised text so you can select and copy it directly, without saving the image first. For text in a photo already on disk, open it in the Photos app and use its text-copy feature if your version has it, or use a browser tool.',
+        ],
+      },
+      {
+        h: 'On a Mac',
+        p: [
+          'Live Text works the same way as on iPhone: open the photo in Preview or Quick Look, hover or click on the text, and it becomes selectable; Cmd-A then Cmd-C selects and copies it. Right-clicking the image also offers **Copy All Text** as a shortcut.',
+        ],
+      },
+      {
+        h: 'For batches, scans and stubborn images',
+        p: [
+          'The built-in tools above work on one image at a time and need a fairly clean photo. Stayput\'s [image to text](/tools/image-to-text) tool runs Tesseract OCR entirely in your browser, so you can drop in several files (JPG, PNG, HEIC, WebP) and get text out of each without uploading anything or repeating the steps per photo. It is also useful for older scans and photos taken at an angle, where phone-camera Live Text sometimes misses lines.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I copy text from a photo without an app?', a: 'Yes. iPhone, Android, Windows and Mac all recognise text in a photo natively; a dedicated OCR tool is mainly useful for batches or harder images.' },
+      { q: 'Does OCR work on handwriting?', a: 'Poorly, in general. All the tools above are built and tuned for printed text; handwriting recognition is a separate, much less reliable technology.' },
+      { q: 'Why did some words come out wrong?', a: 'Low resolution, glare, a tight crop, or an unusual font all reduce accuracy. Retaking the photo straight-on, in even light, and at a higher resolution usually helps most.' },
+      { q: 'Can I extract text from a screenshot?', a: 'Yes, screenshots work the same as any other photo for all of these tools, and are often easier since the text is usually sharp and unobstructed.' },
+    ],
+  },
+  {
+    slug: 'how-to-blur-a-face-in-a-photo',
+    title: 'How to Blur a Face in a Photo (Before You Post It)',
+    description: 'Phones do not have a built-in way to blur a face in a photo. Here is why, what the workarounds actually do, and a browser tool built for exactly this.',
+    heading: 'How to blur a face in a photo',
+    dek: 'No phone has a built-in face-blur button. Here is what the workarounds do instead, and a tool built for exactly this.',
+    keywords: ['how to blur a face in a photo', 'blur face in picture', 'hide face in photo before posting', 'pixelate face online', 'anonymize photo face'],
+    updated: '2026-09-29',
+    tools: ['blur-face', 'blur-image'],
+    sections: [
+      {
+        h: 'Why there is no built-in button for this',
+        p: [
+          'iPhone, Android, Windows and Mac all have quick-editing tools for cropping, filters and markup, but none of them ship a dedicated face-blur or face-pixelate feature. The closest built-in option on most platforms is the general markup pen: draw a solid black or coloured shape over the face, which hides it completely but looks obviously edited and cannot be partially see-through.',
+        ],
+      },
+      {
+        h: 'Drawing over it with Markup',
+        p: [
+          'On an iPhone: open the photo, tap **Edit**, tap the markup icon (three dots in a circle, or the pen icon), and draw a filled shape over the face with the pen or shape tool. On a Mac, Preview\'s Markup toolbar (the pen-tip icon) has the same shapes and a fill colour. On Windows, Paint\'s shape tool with a fill colour does the same job. This works, and is often the fastest option when appearance does not matter, but it is a solid patch, not a blur, and it is easy to place badly on a moving or tilted face.',
+        ],
+      },
+      {
+        h: 'Why a blur or pixelate is often better than a solid box',
+        p: [
+          'A blur or pixelate keeps the photo looking like a real photo rather than a patched one, which matters for a listing, a group photo shared publicly, or a screenshot going into a report. It also degrades gracefully: light blurring still reads as "there was a face here" while heavy blurring makes the identity unrecoverable, which a badly-placed solid box does not guarantee if it slips even slightly.',
+        ],
+      },
+      {
+        h: 'Blurring or pixelating a face without an app',
+        p: [
+          'Stayput\'s [blur faces](/blur-face) tool detects faces automatically and lets you blur, pixelate, or black-box each one, with the strength adjustable per face, directly in your browser. It also works on other things worth hiding in a photo (a number plate, a screen, a name tag) using the underlying [blur & pixelate](/tools/blur-image) tool\'s manual marking. Nothing is uploaded: the photo and the detection both run on your device.',
+        ],
+      },
+      {
+        h: 'A quick checklist before posting',
+        p: [
+          'Beyond the obvious face, check for: other people\'s faces in the background, visible screens or documents, licence plates, house numbers, and anything reflective (glasses, windows, chrome) that can show what the camera itself would have caught.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does my phone have a face blur feature?', a: 'No major phone OS ships one natively. The closest built-in option is drawing a solid shape with the markup or pen tool.' },
+      { q: 'Is pixelating a face reversible?', a: 'A strong enough blur or pixelation cannot be reliably reversed to recover the original detail, though light blurring may still leave some identifying features visible; when in doubt, blur more heavily.' },
+      { q: 'Can I blur more than one face in the same photo?', a: 'Yes, Stayput\'s tool detects every face it finds and lets you blur each independently.' },
+      { q: 'Does blurring a face upload the photo anywhere?', a: 'Not with a browser-based tool that runs face detection locally. Stayput\'s runs entirely in your tab, so the photo never leaves your device.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
