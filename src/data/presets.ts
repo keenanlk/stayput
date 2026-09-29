@@ -558,6 +558,36 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'tiff-to-pdf',
+    base: 'image-to-pdf',
+    name: 'TIFF to PDF',
+    title: 'TIFF to PDF Converter, Multi-Page, No Upload | Stayput',
+    description: 'Convert multi-page TIFF scans and faxes to one PDF in your browser, every page kept. LZW, ZIP and Group 4 fax TIFFs. Free, nothing uploaded.',
+    heading: 'Convert TIFF to PDF',
+    tagline: 'Every page of a scanned or faxed TIFF, in one PDF, made on your device.',
+    keywords: ['tiff to pdf', 'tif to pdf', 'convert tiff to pdf', 'multi page tiff to pdf', 'fax tiff to pdf'],
+    accept: 'image/tiff,.tif,.tiff',
+    dropLabel: 'Drop TIFF files here',
+    defaults: { 'page-size': 'fit' },
+    intro: [
+      'Fax services, document scanners, e-fax inboxes, court and land-registry systems and older document management software still deliver pages as TIFF, often several pages in one file. The recipient usually wants a PDF: it opens on every phone, prints predictably and attaches to any form. This page turns each page of each TIFF into a page of one PDF.',
+      'The TIFF is read by UTIF.js, a decoder bundled with the site, because Chrome, Edge and Firefox cannot open TIFF themselves. It understands the compression schemes documents use, including CCITT Group 3 and Group 4 for black-and-white fax pages, plus LZW, Deflate and JPEG for colour scans. Each page is placed in the PDF at its own pixel size with "Fit to each image", or scaled onto A4 or Letter with a margin if you are going to print.',
+      'Drop several TIFFs and they follow each other in the order listed, every page of the first file, then every page of the next. Reorder files with the arrows before converting. Pages are stored as high-quality JPG inside the PDF, which keeps colour scans compact; a black-and-white fax page ends up well under 100 KB.',
+      'Faxes and scans tend to be paperwork you would not hand to an unknown website: medical referrals, tax letters, signed contracts, bank statements. Here nothing is uploaded. The TIFF is decoded and the PDF is written inside your browser tab, and closing the tab clears it.',
+    ],
+    steps: [
+      'Drop one or more TIFF files, or tap to pick them. Multi-page files are fine.',
+      'Keep "Fit to each image", or pick A4 or Letter with a margin for printing. Set the order of files with the arrows.',
+      'Convert. One PDF with every page of every TIFF downloads from your browser.',
+    ],
+    faq: [
+      { q: 'Are all pages of a multi-page TIFF included?', a: 'Yes. Every page becomes a PDF page, in the order stored in the file. The small preview images some scanners save beside each page are skipped.' },
+      { q: 'Will text in the scan be searchable?', a: 'No. The pages are images of the paper, exactly as in the TIFF. Searchable text needs optical character recognition, which this page does not do.' },
+      { q: 'Why does the fax look stretched?', a: 'Standard-resolution faxes use pixels twice as tall as they are wide (204 by 98 dpi). The page is placed pixel for pixel, so it can look squashed; choosing A4 or Letter does not correct the aspect either. Most modern fax services send fine mode, which is square and looks normal.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

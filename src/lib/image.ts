@@ -1,6 +1,7 @@
 import { decodeHeic } from './heic';
 import { decodeWithWasm, sniffWasmCodec, type WasmCodec } from './codecs';
 import { extOf, isHeicFile, readHead } from './files';
+import { decodeTiffPages, isTiffFile } from './tiff';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
 
@@ -66,8 +67,11 @@ export async function decodeImage(file: File): Promise<Decoded> {
     } catch {
       // AVIF and JPEG XL fall back to a WebAssembly decoder when the browser
       // has no native one (JPEG XL everywhere but Safari, AVIF in old browsers).
+      // TIFF opens natively only in Safari; elsewhere UTIF.js decodes the first page.
       const codec = wasmCodecFor(file, ext) ?? sniffWasmCodec(await readHead(file, 12));
-      bitmap = codec ? await decodeWithWasm(file, codec) : await loadViaImageElement(file);
+      if (codec) bitmap = await decodeWithWasm(file, codec);
+      else if (await isTiffFile(file)) bitmap = (await decodeTiffPages(file, 1))[0]!;
+      else bitmap = await loadViaImageElement(file);
     }
   }
   return { bitmap, width: bitmap.width, height: bitmap.height, heic: false };

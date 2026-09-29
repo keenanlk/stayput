@@ -1,5 +1,6 @@
 import { createShell, num, str, describeError, type Skipped } from '../lib/shell';
 import { decodeImage, encodeBitmap, thumbnail } from '../lib/image';
+import { decodeTiffPages, isTiffFile } from '../lib/tiff';
 import { imagesToPdf, type EmbeddableImage, type PageSize } from '../lib/pdf';
 import { extractExifTiff, parseTiff, sniffFormat } from '../lib/exif';
 import type { OutputFile } from '../lib/files';
@@ -20,7 +21,7 @@ createShell({
     for (const [i, entry] of files.entries()) {
       progress.set(`Preparing ${entry.file.name} (${i + 1} of ${files.length})`, (i / files.length) * 0.7);
       try {
-        images.push(await prepare(entry.file));
+        images.push(...(await prepare(entry.file)));
       } catch (e) {
         console.warn(`${entry.file.name}:`, e);
         firstError ??= e;
@@ -42,18 +43,26 @@ createShell({
   resultsTitle: () => 'PDF created',
 });
 
-/** PNGs and upright JPEGs are embedded as-is; everything else is decoded and re-encoded with EXIF orientation applied. */
-async function prepare(file: File): Promise<EmbeddableImage> {
+/**
+ * PNGs and upright JPEGs are embedded as-is; everything else is decoded and
+ * re-encoded with EXIF orientation applied. A multi-page TIFF (a fax or a
+ * scanned document) gives one image per page.
+ */
+async function prepare(file: File): Promise<EmbeddableImage[]> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const format = sniffFormat(bytes);
-  if (format === 'png') return { kind: 'png', bytes };
+  if (format === 'png') return [{ kind: 'png', bytes }];
   if (format === 'jpeg') {
     const tiff = extractExifTiff(bytes);
     const orientation = tiff ? parseTiff(tiff).orientation ?? 1 : 1;
-    if (orientation === 1) return { kind: 'jpg', bytes };
+    if (orientation === 1) return [{ kind: 'jpg', bytes }];
   }
-  const decoded = await decodeImage(file);
-  const blob = await encodeBitmap(decoded.bitmap, { type: 'image/jpeg', quality: 0.92 });
-  decoded.bitmap.close();
-  return { kind: 'jpg', bytes: new Uint8Array(await blob.arrayBuffer()) };
+  const bitmaps = (await isTiffFile(file)) ? await decodeTiffPages(file) : [(await decodeImage(file)).bitmap];
+  const out: EmbeddableImage[] = [];
+  for (const bitmap of bitmaps) {
+    const blob = await encodeBitmap(bitmap, { type: 'image/jpeg', quality: 0.92 });
+    bitmap.close();
+    out.push({ kind: 'jpg', bytes: new Uint8Array(await blob.arrayBuffer()) });
+  }
+  return out;
 }
