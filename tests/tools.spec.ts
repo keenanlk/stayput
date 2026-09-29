@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(81);
+  expect(await page.locator('.index .tool-card').count()).toBe(82);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -5613,4 +5613,59 @@ test('Remove text from image opens with a small brush and saves after painting w
   const [download] = await Promise.all([page.waitForEvent('download', { timeout: 90_000 }), page.locator('#run').click()]);
   expect(download.suggestedFilename()).toBe('square-erased.jpg');
   await expect(page.locator('#erase-panel')).toHaveAttribute('data-edits', '1');
+});
+
+/** A 300×200 PNG: grey 100 on the left half, grey 160 on the right, a transparent strip along the top. */
+function greyStepPng(): string {
+  const file = join(mkdtempSync(join(tmpdir(), 'adjust-')), 'step.png');
+  execFileSync('python3', ['-c', `
+from PIL import Image
+im = Image.new('RGBA', (300, 200))
+px = im.load()
+for y in range(200):
+    for x in range(300):
+        px[x, y] = (0, 0, 0, 0) if y < 20 else ((100, 100, 100, 255) if x < 150 else (160, 160, 160, 255))
+im.save(${JSON.stringify(file)})
+`]);
+  return file;
+}
+
+test('Adjust photo brightens with a curve, sharpens the edge, keeps transparency, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'adjust-image');
+  const net = watchNetwork(page);
+  const file = greyStepPng();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([file]);
+  await expect(page.locator('#adjust-panel')).toBeVisible();
+  // With every setting at 0 there is nothing to do.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Move at least one slider');
+  await page.locator('#brightness').fill('100');
+  await page.locator('#sharpen').fill('100');
+  await expect(page.locator('#adjust-panel')).toHaveAttribute('data-settings', 'brightness +100, sharpen 100');
+  await expect(page.locator('#brightness-out')).toHaveText('+100');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('step-adjusted.png');
+  await expect(page.locator('#results-list')).toContainText('brightness +100, sharpen 100');
+  const out = await pixelsOf(page, await bytesOf(download), [[40, 100], [260, 100], [149, 100], [150, 100], [40, 5]]);
+  // Gamma 0.5: 255·√(100/255) ≈ 160 and 255·√(160/255) ≈ 202, flat areas untouched by sharpening.
+  expect(Math.abs(out.px[0]![0]! - 160)).toBeLessThanOrEqual(2);
+  expect(Math.abs(out.px[1]![0]! - 202)).toBeLessThanOrEqual(2);
+  // The unsharp mask darkens the dark side of the edge and lightens the light side.
+  expect(out.px[2]![0]!).toBeLessThan(out.px[0]![0]! - 5);
+  expect(out.px[3]![0]!).toBeGreaterThan(out.px[1]![0]! + 5);
+  expect(out.px[4]![3]).toBe(0);
+  net.assertNothingLeft(['step.png']);
+  expect(errors.filter((e) => !e.includes('Move at least one slider'))).toEqual([]);
+});
+
+test('Invert image colors opens with Invert on and makes an exact negative', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/invert-image-colors');
+  await expect(page.locator('#invert')).toBeChecked();
+  const { downloads } = await run(page, [greyStepPng()]);
+  expect(downloads[0]!.suggestedFilename()).toBe('step-inverted.png');
+  const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[40, 100], [260, 100]]);
+  expect(out.px[0]!.slice(0, 3)).toEqual([155, 155, 155]);
+  expect(out.px[1]!.slice(0, 3)).toEqual([95, 95, 95]);
 });

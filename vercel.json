@@ -26,6 +26,11 @@
       "permanent": true
     },
     {
+      "source": "/adjust-image",
+      "destination": "/tools/adjust-image",
+      "permanent": true
+    },
+    {
       "source": "/remove-noise",
       "destination": "/tools/remove-noise",
       "permanent": true

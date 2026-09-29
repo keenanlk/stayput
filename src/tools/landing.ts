@@ -62,6 +62,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'black-and-white-image': () => import('./black-and-white-image'),
   'upscale-image': () => import('./upscale-image'),
   'remove-object': () => import('./remove-object'),
+  'adjust-image': () => import('./adjust-image'),
   'image-to-svg': () => import('./image-to-svg'),
   'gif-maker': () => import('./gif-maker'),
   'resize-pdf': () => import('./resize-pdf'),
