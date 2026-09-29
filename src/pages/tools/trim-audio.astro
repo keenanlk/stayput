@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import TrimAudio from '../../components/options/TrimAudio.astro';
+import AudioStage from '../../components/AudioStage.astro';
+const tool = toolBySlug('trim-audio')!;
+---
+<ToolLayout tool={tool}>
+  <AudioStage slot="panel" />
+  <Fragment slot="options"><TrimAudio /></Fragment>
+</ToolLayout>
+<script src="../../tools/trim-audio.ts"></script>

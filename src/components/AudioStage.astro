@@ -1,0 +1,18 @@
+---
+/**
+ * The sound player for Trim audio: a waveform of the dropped file with the
+ * kept part highlighted, and a player to find the start and end. Driven by
+ * src/tools/trim-audio.ts. The sound plays from a blob: URL of the local file.
+ */
+---
+<div id="au-panel" class="au-panel" hidden>
+  <canvas id="au-wave" class="au-wave" height="120" aria-label="Waveform of the sound. Click to jump to a moment."></canvas>
+  <audio id="au-audio" class="au-audio" controls preload="auto"></audio>
+  <p class="muted small au-info" id="au-info"></p>
+</div>
+<style is:global>
+  .au-panel { display: grid; gap: 8px; }
+  .au-wave { display: block; width: 100%; height: 120px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; touch-action: none; }
+  .au-audio { width: 100%; }
+  .au-info { margin: 0; }
+</style>

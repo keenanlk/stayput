@@ -2142,6 +2142,28 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'mp3-cutter',
+    base: 'trim-audio',
+    name: 'MP3 cutter',
+    title: 'MP3 Cutter: Cut a Song or Make a Ringtone, Free, No Upload | Stayput',
+    description: 'Cut an MP3 to the part you want in your browser, with a waveform and fades. Make a ringtone, an intro clip or a shorter song. Nothing uploaded.',
+    heading: 'MP3 cutter',
+    tagline: 'Cut the best part of a song for a ringtone, an alarm or a video, without uploading it.',
+    keywords: ['mp3 cutter', 'cut mp3', 'mp3 cutter online', 'ringtone maker', 'cut a song', 'trim mp3 online'],
+    dropLabel: 'Drop an MP3 to cut',
+    defaults: { 'fade-out': 'true' },
+    intro: [
+      'A chorus for your ringtone, ten seconds of a song for a video, a talk without the silence at the start: an MP3 cutter keeps just the part you want.',
+      'Drop the file, play it or click the waveform to find the moment, and press Set start and Set end. A short fade out is on so the cut does not end abruptly. Other formats work too: WAV, M4A, OGG, FLAC, or a video.',
+      'The song is cut in your browser. Nothing is uploaded, and there are no ads between you and the download.',
+    ],
+    steps: ['Drop an MP3.', 'Set the start and end on the waveform.', 'Press Trim audio and save the MP3.'],
+    faq: [
+      { q: 'How do I use the cut as a ringtone?', a: 'On Android, copy the MP3 to your phone and pick it in Settings, Sound, Phone ringtone. On iPhone, ringtones are 40 seconds at most and must be added through GarageBand or the Music app on a computer.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
