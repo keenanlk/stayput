@@ -424,6 +424,11 @@
       "source": "/vocal-remover",
       "destination": "/tools/vocal-remover",
       "permanent": true
+    },
+    {
+      "source": "/video-background-remover",
+      "destination": "/tools/video-background-remover",
+      "permanent": true
     }
   ],
   "headers": [

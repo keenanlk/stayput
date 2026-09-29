@@ -55,6 +55,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'transcribe': ['add-subtitles-to-video', 'remove-silence'],
   'add-subtitles-to-video': ['compress-video', 'trim-video'],
   'vocal-remover': ['pitch-changer', 'trim-audio'],
+  'video-background-remover': ['compress-video', 'add-subtitles-to-video'],
   'metronome': ['tuner', 'voice-recorder'],
   'tuner': ['metronome', 'pitch-changer'],
   'mic-test': ['merge-audio', 'audio-converter'],

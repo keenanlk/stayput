@@ -1,0 +1,26 @@
+---
+/** Option controls for Video background remover, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const bg = defaults.bg ?? 'blur';
+const strength = defaults.strength ?? '6';
+const color = defaults.color ?? '#00b140';
+---
+<div class="field">
+  <label>New background</label>
+  <div class="segmented" role="radiogroup" aria-label="New background">
+    <label><input type="radio" name="bg" value="blur" checked={bg === 'blur'} /><span>Blur</span></label>
+    <label><input type="radio" name="bg" value="color" checked={bg === 'color'} /><span>Colour</span></label>
+    <label><input type="radio" name="bg" value="image" checked={bg === 'image'} /><span>Picture</span></label>
+  </div>
+</div>
+<div class="field" id="strength-field" hidden={bg !== 'blur'}>
+  <label for="strength">Blur <output id="strength-out">{strength}</output></label>
+  <input type="range" id="strength" min="1" max="10" step="1" value={strength} />
+</div>
+<div class="field" id="color-field" hidden={bg !== 'color'}>
+  <label for="bg-color">Colour</label>
+  <input type="color" id="bg-color" value={color} />
+</div>
+<p class="muted small" id="image-hint" hidden={bg !== 'image'}>Drop a JPG or PNG together with the video; it fills the frame behind the person.</p>
+<p class="muted small">Made for people: talking heads, presenters, dancers. The first run downloads the person finder (16 MB) to this browser.</p>

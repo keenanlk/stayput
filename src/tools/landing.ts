@@ -69,6 +69,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'transcribe': () => import('./transcribe'),
   'add-subtitles-to-video': () => import('./add-subtitles'),
   'vocal-remover': () => import('./vocal-remover'),
+  'video-background-remover': () => import('./video-background'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(83);
+  expect(await page.locator('.index .tool-card').count()).toBe(84);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -987,6 +987,11 @@ test('preset landing pages render, run their base tool with the preset options a
     ['acapella-extractor', 'vocal-remover', async () => {
       await expect(page.locator('#stems')).toHaveValue('vocals');
       await expect(page.locator('#format')).toHaveValue('wav');
+    }],
+    ['blur-video-background', 'video-background-remover', async () => expect(page.locator('input[name="bg"][value="blur"]')).toBeChecked()],
+    ['green-screen-video', 'video-background-remover', async () => {
+      await expect(page.locator('input[name="bg"][value="color"]')).toBeChecked();
+      await expect(page.locator('#bg-color')).toHaveValue('#00b140');
     }],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
@@ -5770,4 +5775,82 @@ test('Vocal remover splits speech from music into two WAVs, and no bytes leave t
   expect(correlation(voc, speech)).toBeGreaterThan(0.95);
   net.assertNothingLeft(['song.wav']);
   expect(errors).toEqual([]);
+});
+
+/** Record a 2-second 640×360 clip of the portrait in face.jpg drifting slowly across a grey room. */
+async function portraitClip(page: Page): Promise<string> {
+  const jpg = [...readFileSync(staticFx('face.jpg'))];
+  const bytes = await page.evaluate(async (jpg) => {
+    const photo = await createImageBitmap(new Blob([new Uint8Array(jpg)]));
+    const c = document.createElement('canvas');
+    c.width = 640;
+    c.height = 360;
+    const ctx = c.getContext('2d')!;
+    const rec = new MediaRecorder(c.captureStream(30), { mimeType: 'video/webm;codecs=vp8' });
+    const chunks: Blob[] = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    rec.start();
+    const t0 = performance.now();
+    await new Promise<void>((done) => {
+      const frame = () => {
+        const t = performance.now() - t0;
+        ctx.fillStyle = '#9a9a9a';
+        ctx.fillRect(0, 0, 640, 360);
+        const h = 360;
+        const w = (photo.width / photo.height) * h;
+        ctx.drawImage(photo, 320 - w / 2 + t / 100, 0, w, h);
+        if (t < 2300) requestAnimationFrame(frame);
+        else done();
+      };
+      frame();
+    });
+    rec.stop();
+    await new Promise((r) => (rec.onstop = r));
+    return [...new Uint8Array(await new Blob(chunks).arrayBuffer())];
+  }, jpg);
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'call.webm');
+  writeFileSync(file, Buffer.from(bytes));
+  return file;
+}
+
+test('Video background remover paints a colour behind the person, keeps the person, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(180_000);
+  const errors = await open(page, 'video-background-remover');
+  const clip = await portraitClip(page);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [clip], async () => {
+    await choose(page.locator('input[name="bg"][value="color"]'));
+    await page.locator('#bg-color').fill('#ff00ff');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('call-new-background.mp4');
+  await expect(page.locator('#results-list')).toContainText(/a person in \d+% of frames/);
+  const mp4 = await bytesOf(downloads[0]!);
+  const shot = await page.evaluate(async ({ data }) => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
+    await new Promise((ok) => (v.onloadeddata = ok));
+    await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); v.currentTime = 1; });
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(v, 0, 0);
+    const at = (x: number, y: number) => [...ctx.getImageData(Math.round(x * c.width), Math.round(y * c.height), 1, 1).data].slice(0, 3);
+    return { corners: [at(0.03, 0.05), at(0.75, 0.05), at(0.03, 0.95), at(0.2, 0.5)], centre: at(0.52, 0.4) };
+  }, { data: [...mp4] });
+  const magenta = ([r, g, b]: number[]) => r! > 200 && g! < 80 && b! > 200;
+  expect(shot.corners.every(magenta)).toBe(true);
+  expect(magenta(shot.centre)).toBe(false);
+  net.assertNothingLeft(['call.webm']);
+  expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+});
+
+test('Video background remover puts a dropped picture behind the person', async ({ page }) => {
+  test.setTimeout(180_000);
+  await open(page, 'video-background-remover');
+  const clip = await portraitClip(page);
+  const { downloads } = await run(page, [clip, 'swatches.png']);
+  expect(downloads[0]!.suggestedFilename()).toBe('call-new-background.mp4');
+  await expect(page.locator('#results-list')).toContainText('background from swatches.png');
 });

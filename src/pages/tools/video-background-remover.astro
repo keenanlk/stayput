@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VideoBackground from '../../components/options/VideoBackground.astro';
+const tool = toolBySlug('video-background-remover')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VideoBackground /></Fragment>
+</ToolLayout>
+<script src="../../tools/video-background.ts"></script>
