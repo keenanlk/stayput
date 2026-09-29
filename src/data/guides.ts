@@ -425,7 +425,7 @@ export const guides: Guide[] = [
       {
         h: 'What Stayput looks like in the panel',
         p: [
-          'On any Stayput tool you will see the page and its scripts load, on the HEIC and JPEG XL pages one larger GET for the decoder program, and one small anonymous page-count request. After you add files: nothing, apart from that same small count when a tool finishes, which names the tool and a size bucket and never a file name. Each tool page also runs this count for you and lists the requests under "Open the network tab. It stays empty." The site is [open source](https://github.com/keenanlk/stayput), so the third check is reading the code.',
+          'On any Stayput tool you will see the page and its scripts load, on the HEIC and JPEG XL pages one larger GET for the decoder program, and one small anonymous page-count request. After you add files: nothing, apart from that same small count when a tool finishes, which names the tool and a size bucket and never a file name. Each tool page also runs this count for you and lists the requests under "Open the network tab. Your files never appear in it." The site is [open source](https://github.com/keenanlk/stayput), so the third check is reading the code.',
         ],
       },
       {
