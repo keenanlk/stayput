@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import StickerMaker from '../../components/options/StickerMaker.astro';
+const tool = toolBySlug('sticker-maker')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><StickerMaker /></Fragment>
+</ToolLayout>
+<script src="../../tools/sticker-maker.ts"></script>
