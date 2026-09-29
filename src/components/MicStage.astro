@@ -1,0 +1,72 @@
+---
+/**
+ * The microphone test: a live level meter with a plain verdict, what the
+ * browser reports about the microphone, and a short record-and-play-back
+ * check. It replaces the drop zone. Driven by src/tools/mic-test.ts.
+ */
+import Icon from './Icon.astro';
+---
+<div id="mic-panel" class="mic-panel" data-state="idle">
+  <div class="mic-deck">
+    <div class="mic-idle" id="mic-idle">
+      <Icon name="mic" />
+      <strong>Check that your microphone works</strong>
+      <span>Your browser asks for the microphone. Nothing is recorded unless you ask, and nothing is sent anywhere.</span>
+    </div>
+    <div class="mic-live" id="mic-live" hidden>
+      <p class="mic-verdict" id="mic-verdict" aria-live="polite">Listening…</p>
+      <div class="mic-meter" aria-hidden="true">
+        <div class="mic-fill" id="mic-fill"></div>
+        <div class="mic-peak" id="mic-peak"></div>
+      </div>
+      <p class="muted small mic-db" id="mic-db">-∞ dB</p>
+    </div>
+  </div>
+  <div class="mic-controls">
+    <button type="button" class="btn btn-primary btn-lg" id="mic-start">Test my microphone</button>
+    <button type="button" class="btn btn-lg" id="mic-record" hidden>Record 5 seconds and play back</button>
+    <button type="button" class="btn btn-lg btn-ghost" id="mic-stop" hidden>Stop using the microphone</button>
+  </div>
+  <audio id="mic-audio" class="mic-audio" controls hidden></audio>
+  <div class="mic-options">
+    <div class="field">
+      <label for="mic-device">Microphone</label>
+      <select id="mic-device"><option value="">Default microphone</option></select>
+    </div>
+    <dl class="mic-facts" id="mic-facts" hidden>
+      <div><dt>Device</dt><dd id="mic-name">–</dd></div>
+      <div><dt>Sample rate</dt><dd id="mic-rate">–</dd></div>
+      <div><dt>Channels</dt><dd id="mic-channels">–</dd></div>
+    </dl>
+  </div>
+  <p class="muted small mic-note" id="mic-note" aria-live="polite"></p>
+</div>
+<style is:global>
+  .tool-panel:has(#mic-panel) #drop,
+  .tool-panel:has(#mic-panel) #file-list,
+  .tool-panel:has(#mic-panel) .run-dock { display: none; }
+  .mic-panel { display: grid; gap: 16px; }
+  .mic-deck { min-height: 180px; background: var(--surface-2); border: 1px dashed var(--line-strong); border-radius: var(--radius); display: grid; place-items: center; padding: 20px; }
+  .mic-panel:not([data-state='idle']) .mic-deck { border-style: solid; }
+  .mic-idle { display: grid; justify-items: center; gap: 6px; text-align: center; color: var(--muted); }
+  .mic-idle strong { color: var(--ink); font-size: 1.05rem; }
+  .mic-idle svg { width: 36px; height: 36px; color: var(--accent); }
+  .mic-live { width: 100%; max-width: 560px; display: grid; gap: 10px; }
+  .mic-verdict { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--ink); text-align: center; }
+  .mic-panel[data-verdict='quiet'] .mic-verdict, .mic-panel[data-verdict='loud'] .mic-verdict { color: var(--warn); }
+  .mic-meter { position: relative; height: 18px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+  .mic-fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); transition: width 60ms linear; }
+  .mic-panel[data-verdict='loud'] .mic-fill { background: var(--warn); }
+  .mic-peak { position: absolute; top: 0; bottom: 0; width: 2px; left: 0; background: var(--ink); }
+  .mic-db { margin: 0; text-align: center; font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) { .mic-fill { transition: none; } }
+  .mic-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+  .mic-audio { width: 100%; }
+  .mic-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px 28px; align-items: start; }
+  .mic-facts { margin: 0; display: grid; gap: 6px; font-size: 14px; }
+  .mic-facts div { display: flex; gap: 10px; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  .mic-facts dt { color: var(--muted); }
+  .mic-facts dd { margin: 0; color: var(--ink); font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+  .mic-note { margin: 0; }
+  .mic-note.is-warn { color: var(--warn); font-weight: 600; }
+</style>

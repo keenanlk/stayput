@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import MicStage from '../../components/MicStage.astro';
+const tool = toolBySlug('mic-test')!;
+---
+<ToolLayout tool={tool}>
+  <MicStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/mic-test.ts"></script>

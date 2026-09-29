@@ -171,6 +171,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser’s own audio decoders read each file (MP3, AAC in M4A or MP4, Opus or Vorbis, FLAC, WAV) into plain samples at 44.1 kHz in your tab. The sounds are laid end to end, with equal-power crossfades if you chose them, and written once as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
     versus: 'Online audio joiners upload every file, cap free use at a few files or a few minutes, and keep the uploads on their servers. Here the files never leave your device, and there is no limit on how many you join.',
   },
+  'mic-test': {
+    how: 'Your browser opens the microphone (getUserMedia) with its own clean-up turned off, and the Web Audio API measures the level of each moment of sound in your tab. The play-back check is recorded by the browser’s built-in recorder into memory and played straight back.',
+    versus: 'Many online mic tests record you and upload the clip to play it back, or run ads and trackers around the test. Here nothing is stored or sent: the sound goes from your microphone to this tab and nowhere else.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',
