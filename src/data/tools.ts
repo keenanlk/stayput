@@ -82,7 +82,7 @@ export const tools: Tool[] = [
   {
     slug: 'convert-image',
     name: 'Image Converter',
-    title: 'Free Image Converter, No Upload: JPG, PNG, WebP, PDF, ICO | Stayput',
+    title: 'Image Converter: JPG, PNG, WebP, PDF, ICO, No Upload | Stayput',
     description:
       'Drop any image and Stayput detects its real format. Convert to JPG, PNG, WebP, PDF, ICO, GIF, BMP or TIFF without uploading. Free, batches, works offline.',
     heading: 'Convert images between formats',
@@ -892,7 +892,7 @@ export const tools: Tool[] = [
   {
     slug: 'color-picker',
     name: 'Color picker from image',
-    title: 'Color Picker from Image, HEX, RGB and Palette, No Upload | Stayput',
+    title: 'Color Picker from Image: HEX, RGB, Palette, No Upload | Stayput',
     description:
       'Pick any colour from an image and copy its HEX, RGB or HSL code, with a magnifier for exact pixels. Get the image’s main colours as a palette. Free, no upload.',
     heading: 'Color picker from an image',
@@ -1258,7 +1258,7 @@ export const tools: Tool[] = [
   {
     slug: 'resize-video',
     name: 'Resize video',
-    title: 'Resize Video: Change Resolution to 1080p, 720p, No Upload | Stayput',
+    title: 'Resize Video to 1080p or 720p Online, No Upload | Stayput',
     description:
       'Resize a video in your browser: 4K to 1080p, 1080p to 720p, half size or any width and height. MP4, MOV, WebM in, MP4 out. No upload, no watermark.',
     heading: 'Resize a video',
@@ -1334,7 +1334,7 @@ export const tools: Tool[] = [
   {
     slug: 'crop-video',
     name: 'Crop video',
-    title: 'Crop Video Online: Cut the Frame to 9:16, 1:1, Any Size, No Upload | Stayput',
+    title: 'Crop Video Online to 9:16, 1:1 or Any Size, No Upload | Stayput',
     description:
       'Crop a video in your browser: draw a box or pick 9:16, 1:1 or 4:5 for TikTok, Reels and Instagram. MP4, MOV, WebM in, MP4 out. No upload, no watermark.',
     heading: 'Crop a video',
@@ -1372,7 +1372,7 @@ export const tools: Tool[] = [
   {
     slug: 'video-speed',
     name: 'Change video speed',
-    title: 'Change Video Speed: Speed Up or Slow Down a Video, No Upload | Stayput',
+    title: 'Change Video Speed: Speed Up or Slow Down, No Upload | Stayput',
     description:
       'Speed up a video to 2×, 4× or 8×, or slow it down to 0.5× or 0.25×, in your browser. The sound keeps its pitch. MP4 out. No upload, no watermark.',
     heading: 'Change video speed',
@@ -1410,7 +1410,7 @@ export const tools: Tool[] = [
   {
     slug: 'merge-videos',
     name: 'Merge videos',
-    title: 'Merge Videos Online: Combine Clips into One MP4, No Upload | Stayput',
+    title: 'Merge Videos Online: Combine Clips into One MP4 | Stayput',
     description:
       'Join two or more videos end to end into one MP4 in your browser. MP4, MOV, WebM and MKV. Reorder the clips, keep the sound. No upload, no watermark.',
     heading: 'Merge videos',
@@ -1520,7 +1520,7 @@ export const tools: Tool[] = [
   {
     slug: 'video-to-jpg',
     name: 'Video to JPG',
-    title: 'Video to JPG: Extract Frames from a Video as Images, No Upload | Stayput',
+    title: 'Video to JPG: Save Video Frames as Images, No Upload | Stayput',
     description:
       'Save frames from an MP4, MOV, WebM or MKV video as JPG or PNG images in your browser: one a second, spread across the clip, or every frame. Nothing uploaded.',
     heading: 'Video to JPG',
