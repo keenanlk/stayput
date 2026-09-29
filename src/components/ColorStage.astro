@@ -1,0 +1,75 @@
+---
+/**
+ * The colour picker stage: the image with a magnifier, the colour under the
+ * pointer (or the last one picked) with its HEX, RGB and HSL values to copy,
+ * the colours picked so far, and the image's main colours as a strip sized by
+ * how much of the image each one covers. Driven by src/tools/color-picker.ts.
+ */
+---
+<div id="color-panel" class="color-panel" hidden>
+  <div class="color-work">
+    <div class="color-stage" id="color-stage">
+      <canvas id="color-canvas" tabindex="0" aria-label="The image. Move over it to see a colour, click or tap to pick it. Arrow keys move the cursor, Enter picks."></canvas>
+      <div class="color-loupe" id="color-loupe" hidden aria-hidden="true"><canvas id="color-loupe-canvas" width="121" height="121"></canvas></div>
+    </div>
+    <section class="color-card" id="color-card" aria-live="polite" aria-label="Current colour">
+      <div class="color-card-top">
+        <span class="color-card-hex" id="color-hex">#FFFFFF</span>
+        <span class="color-card-state" id="color-state">Move over the image</span>
+      </div>
+      <dl class="color-values">
+        <div><dt>HEX</dt><dd><code id="val-hex">#FFFFFF</code><button type="button" class="color-copy" data-copy="val-hex">Copy</button></dd></div>
+        <div><dt>RGB</dt><dd><code id="val-rgb">rgb(255, 255, 255)</code><button type="button" class="color-copy" data-copy="val-rgb">Copy</button></dd></div>
+        <div><dt>HSL</dt><dd><code id="val-hsl">hsl(0, 0%, 100%)</code><button type="button" class="color-copy" data-copy="val-hsl">Copy</button></dd></div>
+      </dl>
+    </section>
+  </div>
+  <div class="color-row">
+    <h3 class="color-row-title">Picked</h3>
+    <p class="muted small" id="color-picks-empty">Click or tap the image to keep a colour here.</p>
+    <ol class="color-picks" id="color-picks" aria-label="Colours you picked"></ol>
+  </div>
+  <div class="color-row">
+    <h3 class="color-row-title">Main colours in this image</h3>
+    <ol class="color-strip" id="color-strip" aria-label="Main colours, most common first"></ol>
+  </div>
+</div>
+<style is:global>
+  .color-panel { display: grid; gap: 18px; }
+  .color-work { display: grid; grid-template-columns: minmax(0, auto) 300px; justify-content: start; gap: 24px; align-items: start; }
+  .color-stage { position: relative; line-height: 0; justify-self: start; max-width: 100%; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .color-stage canvas#color-canvas { display: block; max-width: 100%; max-height: 60vh; width: auto; height: auto; cursor: crosshair; touch-action: none; }
+  .color-stage canvas#color-canvas:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .color-loupe { position: absolute; width: 121px; height: 121px; border-radius: 50%; overflow: hidden; pointer-events: none; border: 3px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.3); transform: translate(-50%, calc(-100% - 18px)); }
+  .color-loupe canvas { display: block; image-rendering: pixelated; }
+  .color-card { --swatch: #ffffff; --on: #000000; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--surface); }
+  .color-card-top { background: var(--swatch); color: var(--on); padding: 18px 16px 44px; display: grid; gap: 4px; transition: background 0.12s linear; }
+  .color-card-hex { font-size: 28px; font-weight: 700; letter-spacing: 0.01em; font-variant-numeric: tabular-nums; }
+  .color-card-state { font-size: 13px; opacity: 0.8; }
+  .color-values { margin: 0; padding: 6px 12px 10px; display: grid; }
+  .color-values > div { display: grid; grid-template-columns: 40px 1fr; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .color-values > div:first-child { border-top: 0; }
+  .color-values dt { font-size: 12px; font-weight: 650; color: var(--muted); }
+  .color-values dd { margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+  .color-values code { background: none; padding: 0; font-size: 14px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .color-copy { font: inherit; font-size: 13px; font-weight: 650; color: var(--accent-ink); background: none; border: 0; padding: 6px 4px; cursor: pointer; border-radius: 6px; }
+  .color-copy:hover { background: var(--accent-soft); }
+  .color-copy:focus-visible { outline: 2px solid var(--accent); }
+  .color-row { display: grid; gap: 8px; }
+  .color-row-title { font-size: 14px; margin: 0; }
+  .color-row p { margin: 0; }
+  .color-picks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .color-picks button { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 4px 4px; cursor: pointer; }
+  .color-picks button:hover { border-color: var(--line-strong); }
+  .color-picks i { width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
+  .color-strip { list-style: none; margin: 0; padding: 0; display: flex; min-height: 88px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--line); }
+  .color-strip li { display: flex; min-width: 56px; }
+  .color-strip button { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 2px; font: inherit; font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; border: 0; padding: 8px; cursor: pointer; text-align: left; }
+  .color-strip button span { font-weight: 500; opacity: 0.8; }
+  .color-strip button:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+  @media (max-width: 720px) {
+    .color-work { grid-template-columns: 1fr; }
+    .color-strip { flex-wrap: wrap; }
+    .color-strip li { flex-basis: 25% !important; min-height: 72px; }
+  }
+</style>

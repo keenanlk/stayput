@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ColorPicker from '../../components/options/ColorPicker.astro';
+import ColorStage from '../../components/ColorStage.astro';
+const tool = toolBySlug('color-picker')!;
+---
+<ToolLayout tool={tool}>
+  <ColorStage slot="panel" />
+  <Fragment slot="options"><ColorPicker /></Fragment>
+</ToolLayout>
+<script src="../../tools/color-picker.ts"></script>

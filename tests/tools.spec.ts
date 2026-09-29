@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(24);
+  expect(await page.locator('.tool-card').count()).toBe(25);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -893,6 +893,9 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('input[name="rotate"][value="0"]')).toBeChecked();
       await expect(page.locator('#flip-h')).toBeChecked();
     }],
+    ['color-picker-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
+    ['color-palette-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('8')],
+    ['hex-color-from-image', 'color-picker', async () => expect(page.locator('#colors')).toHaveValue('6')],
   ];
   for (const [slug, base, check] of presets) {
     const errors: string[] = [];
@@ -2002,4 +2005,52 @@ test('Extract text page joins lines into paragraphs, and an image without text g
   await page.locator('#file-input').setInputFiles(fx('plain.jpg'));
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('No text was found', { timeout: 60_000 });
+});
+
+test('Color picker reads the pixel under a click, finds the main colours, saves a palette, and no bytes leave the tab', async ({ page }) => {
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  const errors = await open(page, 'color-picker');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  // swatches.png: left half #E63946, top right #1D3557, bottom right #A8DADC.
+  await page.locator('#file-input').setInputFiles(fx('swatches.png'));
+  const panel = page.locator('#color-panel');
+  await expect(panel).toBeVisible();
+  await expect(panel).toHaveAttribute('data-palette', '#E63946,#1D3557,#A8DADC');
+  // The card opens on the most common colour.
+  await expect(page.locator('#val-hex')).toHaveText('#E63946');
+  const canvas = page.locator('#color-canvas');
+  // Centre the image so the pinned Run bar is not over it.
+  await canvas.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const box = (await canvas.boundingBox())!;
+  // Click the bottom right quarter.
+  await page.mouse.click(box.x + box.width * 0.8, box.y + box.height * 0.8);
+  await expect(panel).toHaveAttribute('data-picked', '#A8DADC');
+  await expect(page.locator('#val-rgb')).toHaveText('rgb(168, 218, 220)');
+  await expect(page.locator('#val-hsl')).toHaveText('hsl(182, 43%, 76%)');
+  await page.locator('.color-copy[data-copy="val-hex"]').click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('#A8DADC');
+  // The keyboard moves the cursor from there and picks with Enter: up 80 px lands in navy.
+  await canvas.focus();
+  for (let i = 0; i < 8; i++) await page.keyboard.press('Shift+ArrowUp');
+  await page.keyboard.press('Enter');
+  await expect(panel).toHaveAttribute('data-picked', '#1D3557');
+  await expect(panel).toHaveAttribute('data-picks', '#1D3557,#A8DADC');
+  // Fewer colours than asked for: flat blocks merge to three, whatever the setting.
+  await page.locator('#colors').selectOption('4');
+  await expect(panel).toHaveAttribute('data-palette', '#E63946,#1D3557,#A8DADC');
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/);
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  const text = await page.locator('#results-list .result-text').inputValue();
+  expect(text).toBe('Main colours\n#E63946  rgb(230, 57, 70)\n#1D3557  rgb(29, 53, 87)\n#A8DADC  rgb(168, 218, 220)\n\nPicked\n#1D3557  rgb(29, 53, 87)\n#A8DADC  rgb(168, 218, 220)');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#results-list .result-item').getByText('Download', { exact: true }).click()]);
+  expect(download.suggestedFilename()).toBe('swatches-palette.png');
+  const png = await bytesOf(download);
+  expect(pngSize(png)).toEqual({ width: 64 + 3 * 160, height: 32 + 2 * 200 + 16 });
+  // The first swatch of the main row is the red.
+  const px = await pixelAt(page, png, 32 + 80, 32 + 36 + 60);
+  expect(px.slice(0, 3)).toEqual([0xe6, 0x39, 0x46]);
+  net.assertNothingLeft(['swatches.png']);
+  expect(errors).toEqual([]);
 });

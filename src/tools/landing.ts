@@ -21,6 +21,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'rotate-image': () => import('./rotate-image'),
   'video-to-mp3': () => import('./video-to-mp3'),
   'image-to-text': () => import('./image-to-text'),
+  'color-picker': () => import('./color-picker'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

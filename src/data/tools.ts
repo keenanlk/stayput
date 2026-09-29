@@ -806,6 +806,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'color-picker',
+    name: 'Color picker from image',
+    title: 'Color Picker from Image, HEX, RGB and Palette, No Upload | Stayput',
+    description:
+      'Pick any colour from an image and copy its HEX, RGB or HSL code, with a magnifier for exact pixels. Get the image’s main colours as a palette. Free, no upload.',
+    heading: 'Color picker from an image',
+    tagline: 'Point at any pixel to get its HEX, RGB and HSL code, and see the main colours of the picture. The image stays on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: false,
+    dropLabel: 'Drop an image to pick colours from',
+    action: 'Save palette',
+    keywords: ['color picker from image', 'image color picker', 'color palette from image', 'hex color from image', 'get color from image', 'eyedropper', 'rgb from image'],
+    steps: [
+      'Drop an image (a screenshot, photo, logo or design), or tap to pick one.',
+      'Move over the image: the magnifier shows the exact pixel and the card shows its HEX, RGB and HSL values. Click or tap to keep a colour; copy any value with one click.',
+      'The main colours of the image appear as a strip, widest first. Save palette downloads them, with your picks, as an image and a list of codes.',
+    ],
+    faq: [
+      {
+        q: 'Is my image uploaded?',
+        a: 'No. The image is drawn on a canvas in this page and every colour is read from it on your device. There is no server in the process, so a screenshot of an unreleased design or a private photo never leaves your computer or phone.',
+      },
+      {
+        q: 'How do I get the exact colour of one pixel?',
+        a: 'Move over the image and watch the magnifier: the outlined square in the middle is the pixel you will get. On a keyboard, click the image and use the arrow keys (Shift moves ten pixels), then press Enter. On a phone, hold your finger down and slide; the colour is picked when you lift it.',
+      },
+      {
+        q: 'Why does the colour differ from the one in my design app?',
+        a: 'The picker reads the pixels in the file as they are. A photo or a screenshot compressed as JPG has slightly shifted colours, and a screenshot from a display with a wide colour gamut may have been converted. For brand colours, take them from the original file or a PNG export.',
+      },
+      {
+        q: 'How are the main colours chosen?',
+        a: 'The image is sampled and similar colours are grouped (k-means clustering). Each group becomes one swatch, sized by how much of the image it covers, so a background colour shows as the widest. Choose how many colours to find in the options; very similar ones are merged.',
+      },
+      {
+        q: 'Which formats can I copy?',
+        a: 'HEX (#1E90FF), RGB (rgb(30, 144, 255)) and HSL (hsl(210, 100%, 56%)), the three formats CSS, Figma, Canva and most design tools accept. Save palette also gives you every code as text to copy.',
+      },
+    ],
+  },
+  {
     slug: 'image-to-text',
     name: 'Image to text',
     title: 'Image to Text Converter (OCR), Free, No Upload | Stayput',
