@@ -9,6 +9,9 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4321',
     acceptDownloads: true,
+    // The shell smooth-scrolls results into view after a run; a forced click
+    // during that scroll lands at stale coordinates. Reduced motion makes it instant.
+    reducedMotion: 'reduce',
     // Playwright's request routing does not see requests a service worker makes,
     // so the worker is off by default; the offline test turns it on.
     serviceWorkers: 'block',
