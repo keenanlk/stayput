@@ -1,0 +1,9 @@
+---
+/** Option controls for merge videos, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<p class="small muted wide" style="margin:0">Videos are joined top to bottom. Use the arrows to reorder. The result takes the size of the first video; others are fitted inside it with black bars.</p>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>

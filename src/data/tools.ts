@@ -1408,6 +1408,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'merge-videos',
+    name: 'Merge videos',
+    title: 'Merge Videos Online: Combine Clips into One MP4, No Upload | Stayput',
+    description:
+      'Join two or more videos end to end into one MP4 in your browser. MP4, MOV, WebM and MKV. Reorder the clips, keep the sound. No upload, no watermark.',
+    heading: 'Merge videos',
+    tagline: 'Combine clips into a single video, in the order you choose. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop the videos to join',
+    action: 'Merge videos',
+    keywords: ['merge videos', 'combine videos', 'join videos', 'video merger', 'merge videos online', 'combine mp4 files', 'put videos together'],
+    steps: [
+      'Drop two or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Put them in order with the arrows. The first video sets the size of the result.',
+      'Merge. The clips are joined and encoded into one MP4, with each clip’s sound in place.',
+    ],
+    faq: [
+      {
+        q: 'Are my videos uploaded?',
+        a: 'No. Your browser decodes each clip, draws its frames one after another and encodes them into one MP4 in this tab. There is no upload, no size limit and no watermark.',
+      },
+      {
+        q: 'Can I join videos of different sizes or shapes?',
+        a: 'Yes. The result takes the size of the first video, and any clip with a different shape is fitted inside it with black bars, so nothing is stretched or cut off. Put the clip whose shape you want first, or crop the others to match first with Crop video.',
+      },
+      {
+        q: 'What happens to the sound?',
+        a: 'Each clip keeps its own sound, lined up with its picture. A clip with no sound is silent in the result. Tick Remove the sound for a silent video.',
+      },
+      {
+        q: 'Why does merging take a while?',
+        a: 'Clips from different cameras rarely share the same format, so every frame is encoded again to make one continuous video. That runs on your device, using its hardware video encoder where the browser has one.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

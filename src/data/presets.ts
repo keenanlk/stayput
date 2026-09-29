@@ -2032,6 +2032,28 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'combine-videos',
+    base: 'merge-videos',
+    name: 'Combine videos',
+    title: 'Combine Videos into One: Join MP4 Clips Free, No Upload | Stayput',
+    description: 'Combine several video clips into one MP4 in your browser. Phone clips, screen recordings, MOV or WebM. Reorder, keep the sound, nothing uploaded.',
+    heading: 'Combine videos into one',
+    tagline: 'Put your clips together into a single video you can share, without uploading them anywhere.',
+    keywords: ['combine videos', 'combine videos into one', 'join mp4 files', 'put videos together', 'combine clips', 'merge mp4'],
+    dropLabel: 'Drop the clips to combine',
+    defaults: {},
+    intro: [
+      'A holiday filmed in ten short clips, a recording that stopped halfway, a set of screen captures for one tutorial: combining them gives you one file to send or post.',
+      'Drop the clips, put them in order with the arrows, and press Merge. Each clip keeps its sound. Clips can come from different phones or apps; the first one sets the size and the rest are fitted inside it.',
+      'Your videos are not uploaded to a website, there is no watermark and no limit on length, and the page keeps working offline.',
+    ],
+    steps: ['Drop two or more clips.', 'Put them in order with the arrows.', 'Press Merge videos and save the MP4.'],
+    faq: [
+      { q: 'Can I combine a portrait and a landscape video?', a: 'Yes. The result uses the shape of the first clip and the other is shown whole with black bars. For a cleaner look, crop the clips to the same shape first with Crop video.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

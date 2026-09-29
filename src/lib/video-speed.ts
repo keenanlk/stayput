@@ -7,7 +7,6 @@
  * AAC where the browser has them). Nothing leaves the tab.
  */
 import {
-  AudioSample,
   AudioSampleSource,
   BlobSource,
   BufferTarget,
@@ -26,6 +25,7 @@ import {
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { pickVideoCodec } from './video-codec';
 import { timeStretch } from './stretch';
+import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
 export interface SpeedOptions {
   /** 2 plays twice as fast, 0.5 at half speed. */
@@ -44,19 +44,7 @@ export interface SpeedResult {
   audio: boolean;
 }
 
-const SAMPLE_RATE = 48_000;
 const MAX_FPS = 60;
-const CHUNK = 4096;
-
-async function decodeSound(file: File): Promise<Float32Array[] | null> {
-  const ctx = new OfflineAudioContext(2, 1, SAMPLE_RATE);
-  try {
-    const buffer = await ctx.decodeAudioData(await file.arrayBuffer());
-    return Array.from({ length: Math.min(2, buffer.numberOfChannels) }, (_, i) => buffer.getChannelData(i));
-  } catch {
-    return null;
-  }
-}
 
 export async function changeSpeed(file: File, opts: SpeedOptions): Promise<SpeedResult> {
   const speed = opts.speed;
@@ -75,7 +63,7 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
     // The sound, stretched to the new length at the same pitch.
     let sound: Float32Array[] | null = null;
     if (!opts.mute && (await input.getPrimaryAudioTrack())) {
-      const decoded = await decodeSound(file);
+      const decoded = await decodePcm(file);
       if (decoded) sound = timeStretch(decoded, speed);
     }
     const audioCodec = sound
@@ -90,21 +78,9 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
     await output.start();
 
     // Sound goes in alongside the pictures, so the file is written in order.
-    let soundAt = 0;
-    const soundLen = sound?.[0]?.length ?? 0;
-    const pushSoundUntil = async (seconds: number) => {
-      if (!sound || !audioSource) return;
-      const until = Math.min(soundLen, Math.round(seconds * SAMPLE_RATE));
-      while (soundAt < until) {
-        const n = Math.min(CHUNK, soundLen - soundAt);
-        const data = new Float32Array(n * sound.length);
-        sound.forEach((ch, c) => data.set(ch.subarray(soundAt, soundAt + n), c * n));
-        const sample = new AudioSample({ data, format: 'f32-planar', numberOfChannels: sound.length, sampleRate: SAMPLE_RATE, timestamp: soundAt / SAMPLE_RATE });
-        await audioSource.add(sample);
-        sample.close();
-        soundAt += n;
-      }
-    };
+    const feed = pcmFeeder(audioSource, sound);
+    const soundLen = feed.length;
+    const pushSoundUntil = (seconds: number) => feed.until(seconds);
 
     const sink = new VideoSampleSink(video);
     const start = await video.getFirstTimestamp();

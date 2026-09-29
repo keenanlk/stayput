@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(36);
+  expect(await page.locator('.tool-card').count()).toBe(37);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2915,4 +2915,26 @@ test('Slow down video doubles the length at 0.5× and can drop the sound', async
   const picture = await videoSeconds(mp4);
   expect(picture).toBeGreaterThan(pictureBefore * 2 - 0.15);
   expect(picture).toBeLessThan(pictureBefore * 2 + 0.15);
+});
+
+test('Merge videos joins clips in order into one MP4 the size of the first, with sound, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'merge-videos');
+  const halves = await halvesClip(page);
+  const clip = await recordClip(page);
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [halves, clip]);
+  expect(downloads[0]!.suggestedFilename()).toBe('merged.mp4');
+  const mp4 = await bytesOf(downloads[0]!);
+  const tracks = await videoTracks(mp4);
+  // The first clip sets the size; the 1280x720 recording is fitted inside it.
+  expect(tracks.video).toMatchObject({ width: 640, height: 360 });
+  // The second clip's sound comes through, after the silent first clip.
+  expect(tracks.audio).toBe(1);
+  const expected = (await videoSeconds(readFileSync(halves))) + (await videoSeconds(readFileSync(clip)));
+  const picture = await videoSeconds(mp4);
+  expect(picture).toBeGreaterThan(expected - 0.15);
+  expect(picture).toBeLessThan(expected + 0.15);
+  await expect(page.locator('#results-list .result-item')).toContainText('2 videos joined');
+  net.assertNothingLeft(['halves.webm', 'recording.webm']);
+  expect(errors).toEqual([]);
 });
