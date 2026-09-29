@@ -1718,6 +1718,22 @@ test('Blur image hides only the marked areas, per effect, and no bytes leave the
   expect(errors.filter((e) => !e.includes('Mark at least one area'))).toEqual([]);
 });
 
+test('Dragging on the picture in whole-image mode switches to marked areas', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/pixelate-image');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('stripes.png')]);
+  await expect(page.locator('#blur-panel')).toBeVisible();
+  await expect(page.locator('input[name="area"][value="whole"]')).toBeChecked();
+  await markArea(page, [0.1, 0.1], [0.4, 0.5]);
+  await expect(page.locator('input[name="area"][value="areas"]')).toBeChecked();
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(1);
+  const download = page.waitForEvent('download');
+  await page.locator('#run').click();
+  expect((await download).suggestedFilename()).toBe('stripes-pixelated.png');
+  await expect(page.locator('#results-list')).toContainText('pixelate, 1 area');
+});
+
 test('Pixelate image page pixelates the whole picture into blocks', async ({ page }) => {
   await stubAnalytics(page);
   await page.goto('/pixelate-image');
