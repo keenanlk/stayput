@@ -35,6 +35,8 @@ export interface CompressOptions {
   /** Drop the sound track. */
   mute: boolean;
   onProgress?: (fraction: number) => void;
+  /** Called when a size target needs another pass (2, 3). */
+  onPass?: (pass: number) => void;
 }
 
 export interface CompressResult {
@@ -114,33 +116,61 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
         ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: audioBitrate })
         : null;
 
-    const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-    const conversion = await Conversion.init({
-      input,
-      output,
-      tracks: 'primary',
-      video: {
-        width,
-        height,
-        fit: 'contain',
-        codec: videoCodec,
-        bitrate: videoBitrate,
-        forceTranscode: true,
-        // Bake a phone's rotation into the pixels so every player shows it upright.
-        allowTransformationMetadata: false,
-      },
-      audio: audioCodec
-        ? { codec: audioCodec, bitrate: audioBitrate, numberOfChannels: Math.min(2, sound!.numberOfChannels), forceTranscode: opts.mode === 'size' }
-        : { discard: true },
-    });
-    if (!conversion.isValid) {
-      const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+    const encodeAt = async (bitrate: number | Quality, onProgress?: (f: number) => void): Promise<ArrayBuffer> => {
+      const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
+      const conversion = await Conversion.init({
+        input,
+        output,
+        tracks: 'primary',
+        video: {
+          width,
+          height,
+          fit: 'contain',
+          codec: videoCodec,
+          bitrate,
+          forceTranscode: true,
+          // Bake a phone's rotation into the pixels so every player shows it upright.
+          allowTransformationMetadata: false,
+        },
+        audio: audioCodec
+          ? { codec: audioCodec, bitrate: audioBitrate, numberOfChannels: Math.min(2, sound!.numberOfChannels), forceTranscode: opts.mode === 'size' }
+          : { discard: true },
+      });
+      if (!conversion.isValid) {
+        const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
+        throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+      }
+      conversion.onProgress = (p) => onProgress?.(p);
+      await conversion.execute();
+      const buffer = output.target.buffer;
+      if (!buffer) throw new Error('The video could not be written.');
+      return buffer;
+    };
+
+    let buffer: ArrayBuffer;
+    if (opts.mode === 'size' && typeof videoBitrate === 'number') {
+      // Encoders treat the bitrate as a guide, and short clips overshoot most (every
+      // clip opens with a large keyframe). Check the result and, if it is over the
+      // limit, encode again at a proportionally lower rate. Progress restarts for each pass.
+      const target = (opts.targetMB ?? 10) * 1e6;
+      const passes = 3;
+      let bits = videoBitrate;
+      let pass = 0;
+      for (;;) {
+        const p0 = pass;
+        if (p0) opts.onPass?.(p0 + 1);
+        buffer = await encodeAt(bits, opts.onProgress);
+        pass++;
+        if (buffer.byteLength <= target || pass >= passes) break;
+        const audioShare = (audioBitrate as number) * duration / 8;
+        const videoBytes = Math.max(1, buffer.byteLength - audioShare);
+        const room = Math.max(1, target * 0.92 - audioShare);
+        bits = Math.floor(bits * Math.min(0.9, room / videoBytes));
+        if (bits < 60_000) break;
+      }
+    } else {
+      buffer = await encodeAt(videoBitrate, opts.onProgress);
     }
-    conversion.onProgress = (p) => opts.onProgress?.(p);
-    await conversion.execute();
-    const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
     return {
       blob: new Blob([buffer], { type: 'video/mp4' }),
       width,

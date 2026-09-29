@@ -123,7 +123,7 @@ function layout() {
   hint.textContent = notice && !isWhole
     ? notice
     : isWhole
-    ? 'The whole image gets the effect. Switch to "Areas I mark" to hide only parts of it.'
+    ? 'The whole image gets the effect. Drag across the picture to hide only part of it.'
     : areas.length === 0
       ? 'Drag across each face, plate or line of text to hide it.'
       : `${areas.length} ${areas.length === 1 ? 'area' : 'areas'} marked. Drag to add another, or tap × to remove one.`;
@@ -174,8 +174,14 @@ function toSource(e: PointerEvent): [number, number] {
 }
 
 stage.addEventListener('pointerdown', (e) => {
-  if (e.button !== 0 || !srcW || whole() || (e.target as HTMLElement).closest('button')) return;
+  if (e.button !== 0 || !srcW || (e.target as HTMLElement).closest('button')) return;
   e.preventDefault();
+  // Dragging on the picture means "just this part", so leave whole-image mode.
+  if (whole()) {
+    const areasRadio = document.querySelector<HTMLInputElement>('input[name="area"][value="areas"]')!;
+    areasRadio.checked = true;
+    areasRadio.dispatchEvent(new Event('change', { bubbles: true }));
+  }
   const [x, y] = toSource(e);
   drawing = { x0: x, y0: y, rect: { x: Math.round(x), y: Math.round(y), w: 0, h: 0 } };
   stage.setPointerCapture(e.pointerId);

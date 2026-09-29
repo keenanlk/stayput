@@ -605,7 +605,7 @@ export const guides: Guide[] = [
   {
     slug: "how-to-view-photo-metadata",
     title: "How to View Photo Metadata (EXIF) on iPhone, Android, Windows and Mac",
-    description: "See the hidden data in a photo: location, date, camera and more. The built-in way on every phone and computer, what each one hides, and how to check any photo without uploading it.",
+    description: "See a photo's hidden location, date and camera data. The built-in way on every phone and computer, what each hides, and how to check any photo without uploading it.",
     heading: "How to view photo metadata on any device",
     dek: "Every phone and computer can show some of a photo's EXIF data. Here is where to look, what each one leaves out, and how to see all of it.",
     keywords: ["how to view photo metadata", "view photo metadata", "view photo metadata iphone", "how to view photo metadata on android", "exif viewer", "check photo location"],
@@ -652,7 +652,7 @@ export const guides: Guide[] = [
   {
     slug: "strip-exif-without-re-encoding",
     title: "Stripping EXIF Without Re-encoding the Image: How a Lossless Remover Works",
-    description: "How to remove EXIF, GPS and other metadata from JPEG, PNG and WebP by editing the file structure instead of re-saving the pixels. The segments, the chunks, the gotchas and the code.",
+    description: "Remove EXIF, GPS and other metadata from JPEG, PNG and WebP by editing the file structure instead of re-saving the pixels: the segments, chunks, gotchas and code.",
     heading: "Stripping EXIF without re-encoding the JPEG",
     dek: "How Stayput removes location and camera data from photos in the browser, byte for byte, in about 600 lines of TypeScript and no library.",
     keywords: ["strip exif without re-encoding", "lossless exif removal", "remove exif javascript", "jpeg app1 segment", "remove metadata without losing quality", "exif remover how it works"],

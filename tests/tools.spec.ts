@@ -881,6 +881,16 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['ogg-to-wav', 'video-to-mp3', async () => expect(page.locator('#format')).toHaveValue('wav')],
     ['flac-to-wav', 'video-to-mp3', async () => expect(page.locator('#format')).toHaveValue('wav')],
+    ['mp3-to-wav', 'video-to-mp3', async () => {
+      await expect(page.locator('#format')).toHaveValue('wav');
+      await expect(page.locator('#file-input')).toHaveAttribute('accept', /mp3/);
+    }],
+    ['m4a-to-wav', 'video-to-mp3', async () => expect(page.locator('#format')).toHaveValue('wav')],
+    ['mkv-to-mp3', 'video-to-mp3', async () => {
+      await expect(page.locator('#bitrate')).toHaveValue('192');
+      await expect(page.locator('#file-input')).toHaveAttribute('accept', /mkv/);
+    }],
+    ['aac-to-mp3', 'video-to-mp3', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /aac/)],
     ['webm-to-gif', 'video-to-gif', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /webm/)],
     ['blur-text-in-image', 'blur-image', async () => {
       await expect(page.locator('input[name="area"][value="areas"]')).toBeChecked();
@@ -1728,6 +1738,22 @@ test('Blur image hides only the marked areas, per effect, and no bytes leave the
   expect(errors.filter((e) => !e.includes('Mark at least one area'))).toEqual([]);
 });
 
+test('Dragging on the picture in whole-image mode switches to marked areas', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/pixelate-image');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('stripes.png')]);
+  await expect(page.locator('#blur-panel')).toBeVisible();
+  await expect(page.locator('input[name="area"][value="whole"]')).toBeChecked();
+  await markArea(page, [0.1, 0.1], [0.4, 0.5]);
+  await expect(page.locator('input[name="area"][value="areas"]')).toBeChecked();
+  await expect(page.locator('.blur-area:not(.is-drawing)')).toHaveCount(1);
+  const download = page.waitForEvent('download');
+  await page.locator('#run').click();
+  expect((await download).suggestedFilename()).toBe('stripes-pixelated.png');
+  await expect(page.locator('#results-list')).toContainText('pixelate, 1 area');
+});
+
 test('Pixelate image page pixelates the whole picture into blocks', async ({ page }) => {
   await stubAnalytics(page);
   await page.goto('/pixelate-image');
@@ -1946,11 +1972,18 @@ test('MP4 to WAV page writes a 44.1 kHz WAV, mono on request, and a video withou
   await expect(page.locator('#error')).toContainText('No audio could be read from this file');
 });
 
-test('OGG, Opus and FLAC landing pages turn real audio files into MP3 and WAV, and no bytes leave the tab', async ({ page }) => {
+test('OGG, Opus, FLAC, MP3 and MKV landing pages turn real files into MP3 and WAV, and no bytes leave the tab', async ({ page }) => {
   await stubAnalytics(page);
   const net = watchNetwork(page);
-  // 1 s 440 Hz tones: OGG Vorbis, Opus in Ogg, and FLAC.
-  for (const [slug, file, out] of [['ogg-to-mp3', 'song.ogg', 'song.mp3'], ['opus-to-mp3', 'voice.opus', 'voice.mp3'], ['flac-to-wav', 'song.flac', 'song.wav']] as const) {
+  // 1 s 440 Hz tones: OGG Vorbis, Opus in Ogg, FLAC, MP3, and Opus in an MKV with video.
+  // (The test Chromium has no AAC decoder, so AAC and M4A pages are checked in the preset test only.)
+  for (const [slug, file, out] of [
+    ['ogg-to-mp3', 'song.ogg', 'song.mp3'],
+    ['opus-to-mp3', 'voice.opus', 'voice.mp3'],
+    ['flac-to-wav', 'song.flac', 'song.wav'],
+    ['mp3-to-wav', 'song.mp3', 'song.wav'],
+    ['mkv-to-mp3', 'show.mkv', 'show.mp3'],
+  ] as const) {
     await page.goto(`/${slug}`);
     await expect(page.locator('#tool')).toBeVisible();
     const { downloads } = await run(page, [staticFx(file)]);
@@ -1963,7 +1996,7 @@ test('OGG, Opus and FLAC landing pages turn real audio files into MP3 and WAV, a
     expect(info.duration, slug).toBeLessThan(1.4);
     expect(info.rms, `${slug} is not silent`).toBeGreaterThan(0.05);
   }
-  net.assertNothingLeft(['song.ogg', 'voice.opus', 'song.flac']);
+  net.assertNothingLeft(['song.ogg', 'voice.opus', 'song.flac', 'song.mp3', 'show.mkv']);
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {

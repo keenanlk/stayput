@@ -32,13 +32,15 @@ createShell({
     const { compressVideo } = await import('../lib/video-compress');
     return processEach(files, progress, 'Compressing', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
+      let again = '';
       progress.set(`Reading ${entry.file.name}…`, share(0.01));
       const r = await compressVideo(entry.file, {
         mode,
         targetMB,
         maxShortSide,
         mute,
-        onProgress: (f) => progress.set(`Compressing ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
+        onProgress: (f) => progress.set(`Compressing ${entry.file.name}${again}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
+        onPass: () => (again = ` again to fit under ${targetMB} MB`),
       });
       const notes = [`${r.width}×${r.height}`, clock(r.duration), r.videoCodec];
       if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');

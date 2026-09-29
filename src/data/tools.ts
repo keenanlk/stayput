@@ -206,7 +206,7 @@ export const tools: Tool[] = [
     name: 'EXIF Viewer',
     title: 'EXIF Viewer: See Photo Metadata and GPS, No Upload | Stayput',
     description:
-      'View the EXIF data in a photo: GPS location, camera, date, serial numbers and every other field. Reads JPG, PNG, WebP, HEIC and TIFF in your browser. Nothing uploaded.',
+      'View the EXIF data in a photo: GPS location, camera, date, serial numbers and every other field. Reads JPG, PNG, WebP, HEIC and TIFF in your browser, no upload.',
     heading: 'EXIF viewer: see what a photo reveals',
     tagline: 'Drop a photo to read its metadata, including the location it was taken. The file is read on this device, so checking a private photo does not share it.',
     category: 'images',
