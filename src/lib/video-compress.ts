@@ -20,9 +20,9 @@ import {
   QUALITY_LOW,
   QUALITY_MEDIUM,
   getFirstEncodableAudioCodec,
-  getFirstEncodableVideoCodec,
   type Quality,
 } from 'mediabunny';
+import { pickVideoCodec } from './video-codec';
 
 export type CompressMode = 'balanced' | 'small' | 'high' | 'size';
 
@@ -109,7 +109,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       audioBitrate = QUALITY[opts.mode];
     }
 
-    const videoCodec = await getFirstEncodableVideoCodec(['avc', 'vp9', 'av1'], { width, height, bitrate: videoBitrate });
+    const videoCodec = await pickVideoCodec({ width, height, bitrate: videoBitrate });
     if (!videoCodec) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const audioCodec =
       sound && soundOk

@@ -1,0 +1,32 @@
+---
+/** Option controls for resize video, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const size = defaults.size ?? '720';
+const sizes = [
+  ['2160', '4K (2160p)'],
+  ['1440', '1440p'],
+  ['1080', '1080p (Full HD)'],
+  ['720', '720p (HD)'],
+  ['480', '480p'],
+  ['360', '360p'],
+  ['240', '240p'],
+  ['50%', '50% of the original'],
+  ['25%', '25% of the original'],
+  ['custom', 'Custom width and height'],
+] as const;
+---
+<div class="field">
+  <label for="size">New size</label>
+  <select id="size">
+    {sizes.map(([v, l]) => <option value={v} selected={v === size}>{l}</option>)}
+  </select>
+  <p class="muted small">1080p and the others set the short side, so tall phone videos stay tall. The aspect ratio is kept.</p>
+</div>
+<div class="field-row" id="custom-size" hidden={size !== 'custom'}>
+  <div class="field"><label for="width">Width (px)</label><input type="number" id="width" min="16" max="7680" step="2" value={defaults.width ?? ''} placeholder="Auto" /></div>
+  <div class="field"><label for="height">Height (px)</label><input type="number" id="height" min="16" max="7680" step="2" value={defaults.height ?? ''} placeholder="Auto" /></div>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>

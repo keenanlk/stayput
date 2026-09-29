@@ -19,9 +19,9 @@ import {
   QUALITY_HIGH,
   WEBM,
   getFirstEncodableAudioCodec,
-  getFirstEncodableVideoCodec,
   type AudioCodec,
 } from 'mediabunny';
+import { pickVideoCodec } from './video-codec';
 import { CODEC_NAMES, unplayable } from './video-compress';
 
 export interface ConvertOptions {
@@ -57,7 +57,7 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
     const evenW = width + (width % 2);
     const evenH = height + (height % 2);
     // The best codec this browser can write; re-encoding into the codec the file already has gains nothing.
-    const best = await getFirstEncodableVideoCodec(['avc', 'vp9', 'av1'], { width: evenW, height: evenH, bitrate: QUALITY_HIGH });
+    const best = await pickVideoCodec({ width: evenW, height: evenH, bitrate: QUALITY_HIGH });
     let copyVideo = !!sourceVideo && (PLAYS_EVERYWHERE_VIDEO.includes(sourceVideo) || sourceVideo === best);
     if (!copyVideo && !(await video.canDecode())) {
       // iPhone HEVC in a browser that cannot decode it: MP4 can hold HEVC as it is,

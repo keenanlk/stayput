@@ -111,6 +111,18 @@ export const engines: Record<string, Engine> = {
     how: 'UPNG.js (MIT), the PNG codec from the Photopea editor, reads the PNG byte by byte in your tab, so the exact pixels are used, not a canvas copy. For lossy compression it reduces the image to a palette of up to 256 colours chosen for that image and writes an 8-bit PNG with full transparency; lossless mode keeps every pixel and picks the tightest colour type and filters. The result is compressed with pako’s deflate (MIT) and saved from memory.',
     versus: 'TinyPNG and similar sites upload every PNG to their server, limit free use to a handful of files at 5 MB each, and keep the files for a while. Screenshots, design exports and logos are often confidential. Here they never leave your device, and there is no daily limit or file cap.',
   },
+  'mute-video': {
+    how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, MOV, WebM or MKV container in your tab and copies every video packet into a new file of the same type, leaving the sound track out. Nothing is decoded or re-encoded, so the picture is bit-for-bit the same and the job takes about as long as reading the file.',
+    versus: 'Online tools that remove audio upload the whole video to do it, cap free files at a few hundred megabytes, and often re-encode the picture or add a watermark. Here nothing is uploaded, the picture is untouched, and a 2 GB file is done in seconds.',
+  },
+  'resize-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV container in your tab. Your browser’s own video decoder and encoder (WebCodecs) decode each frame, scale it to the new size and encode it again, H.264 where the browser has it and VP9 or AV1 otherwise. The sound is copied as it is when the MP4 can hold it, and Mediabunny writes the new MP4 in memory.',
+    versus: 'Online resizers upload the whole video before they start, which for a 4K phone clip can take longer than the resize, cap free files at a few hundred megabytes, and often add a watermark. Here the video never leaves your device.',
+  },
+  'rotate-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV container in your tab. Each frame is decoded by your browser (WebCodecs), turned and flipped, and encoded again, H.264 where the browser has it and VP9 or AV1 otherwise, so the turn is part of the picture rather than a flag some players ignore. The sound is copied as it is when the MP4 can hold it.',
+    versus: 'Online rotators upload the video to turn it on a server, cap the file size, and some add a watermark. A sideways phone video is often a personal one. Here it never leaves your device, and you can rotate a batch at once.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',

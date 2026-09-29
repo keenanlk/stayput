@@ -51,6 +51,9 @@ That is the whole pitch, and you can check it in three ways:
 | [Compress video](https://stayput.dev/tools/compress-video) (MP4, MOV, WebM; fit 10 MB for Discord or 25 MB for email) | |
 | [Video to MP4](https://stayput.dev/tools/video-to-mp4) (MOV, MKV, WebM; H.264 copied with no quality loss) | |
 | [Trim video](https://stayput.dev/tools/trim-video) (cut a clip without re-encoding) | |
+| [Mute video](https://stayput.dev/tools/mute-video) (remove the sound, picture copied untouched) | |
+| [Resize video](https://stayput.dev/tools/resize-video) (1080p, 720p, custom size) | |
+| [Rotate video](https://stayput.dev/tools/rotate-video) (90°, 180°, flip) | |
 
 Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [WebP to PNG](https://stayput.dev/webp-to-png), [AVIF to JPG](https://stayput.dev/avif-to-jpg) and [JXL to PNG](https://stayput.dev/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.dev/jpg-to-pdf), [PDF to JPG](https://stayput.dev/pdf-to-jpg), [Combine PDF](https://stayput.dev/combine-pdf), [Resize image](https://stayput.dev/resize-image), [Crop to circle](https://stayput.dev/crop-image-to-circle) and [Remove location from photos](https://stayput.dev/remove-location-from-photos); and [guides](https://stayput.dev/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
 

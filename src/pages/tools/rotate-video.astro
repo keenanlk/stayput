@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RotateVideo from '../../components/options/RotateVideo.astro';
+const tool = toolBySlug('rotate-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><RotateVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/rotate-video.ts"></script>
