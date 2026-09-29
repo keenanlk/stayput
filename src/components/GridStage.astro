@@ -1,0 +1,16 @@
+---
+/**
+ * The split-image stage: the first image with the cut lines drawn over it and
+ * the dropped edges dimmed. Driven by src/tools/split-image.ts.
+ */
+---
+<div id="grid-panel" class="grid-panel" hidden>
+  <div class="grid-stage"><canvas id="grid-canvas" aria-label="Preview of where the image will be cut"></canvas></div>
+  <p class="muted small grid-hint" id="grid-hint"></p>
+</div>
+<style is:global>
+  .grid-panel { display: grid; gap: 8px; }
+  .grid-stage { line-height: 0; justify-self: start; max-width: 100%; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--surface-2); }
+  .grid-stage canvas { display: block; max-width: 100%; max-height: 60vh; width: auto; height: auto; }
+  .grid-hint { margin: 0; }
+</style>

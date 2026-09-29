@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import AddText from '../../components/options/AddText.astro';
+import TextStage from '../../components/TextStage.astro';
+const tool = toolBySlug('add-text-to-image')!;
+---
+<ToolLayout tool={tool}>
+  <TextStage slot="panel" />
+  <Fragment slot="options"><AddText /></Fragment>
+</ToolLayout>
+<script src="../../tools/add-text-to-image.ts"></script>

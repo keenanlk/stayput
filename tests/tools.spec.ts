@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(60);
+  expect(await page.locator('.tool-card').count()).toBe(65);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4230,4 +4230,246 @@ test('Audio to video refuses two pictures and says why', async ({ page }) => {
   await page.locator('#file-input').setInputFiles([fx('tone.wav'), fx('swatches.png'), fx('plain.jpg')]);
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('Add one picture');
+});
+
+test('Compress audio shrinks a WAV and an MP3 to mono 64 kbps', async ({ page }) => {
+  const errors = await open(page, 'compress-audio');
+  const net = watchNetwork(page);
+  const { items } = await run(page, ['tone.wav', staticFx('song.mp3')], async () => {
+    await page.locator('#quality').selectOption('64');
+    await page.locator('#mono').check();
+  });
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  const wav = readFileSync(fx('tone.wav'));
+  const small = files['tone-compressed.mp3']!;
+  expect(small.length).toBeLessThan(wav.length / 10);
+  const info = await audioInfo(page, small);
+  expect(info.duration).toBeGreaterThan(1.45);
+  await expect(page.locator('#results-list')).toContainText('64 kbps MP3, mono');
+  expect(files['song-compressed.mp3']!.length).toBeLessThan(readFileSync(staticFx('song.mp3')).length);
+  net.assertNothingLeft(['tone.wav', 'song.mp3']);
+  expect(errors).toEqual([]);
+});
+
+test('Compress MP3 opens at 96 kbps and can write OGG Opus', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/compress-mp3');
+  await expect(page.locator('#quality')).toHaveValue('96');
+  const { downloads } = await run(page, ['tone.wav'], async () => {
+    await page.locator('#format').selectOption('ogg');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('tone-compressed.ogg');
+  const ogg = await bytesOf(downloads[0]!);
+  expect(Buffer.from(ogg.subarray(0, 4)).toString()).toBe('OggS');
+  expect(ogg.length).toBeLessThan(readFileSync(fx('tone.wav')).length / 10);
+});
+
+test('Compress audio hands back an MP3 it cannot make smaller', async ({ page }) => {
+  await open(page, 'compress-audio');
+  // song.mp3 is about 135 kbps, below the 160 kbps setting.
+  const { downloads } = await run(page, [staticFx('song.mp3')], async () => {
+    await page.locator('#quality').selectOption('160');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('song.mp3');
+  expect((await bytesOf(downloads[0]!)).length).toBe(readFileSync(staticFx('song.mp3')).length);
+  await expect(page.locator('#results-list')).toContainText('kept as it was');
+});
+
+test('Add text to image draws the text at full size where it was dragged, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'add-text-to-image');
+  const net = watchNetwork(page);
+  // plain.jpg: 800x600 of flat red (200, 80, 80).
+  const { downloads } = await run(page, ['plain.jpg'], async () => {
+    await expect(page.locator('#text-panel')).toBeVisible();
+    await page.locator('#text1').fill('HELLO');
+    await page.locator('#effect').selectOption('none');
+    await page.locator('#size').fill('20');
+    await page.locator('#size').dispatchEvent('input');
+    // Drag the text from the middle to the top left quarter.
+    await page.locator('#text-canvas').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const box = (await page.locator('#text-canvas').boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3, { steps: 5 });
+    await page.mouse.up();
+    await expect(page.locator('#pos1')).toHaveValue(/^0\.3\d*,0\.3\d*$/);
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('plain-text.jpg');
+  const out = await bytesOf(downloads[0]!);
+  expect(jpegSize(out)).toEqual({ width: 800, height: 600 });
+  // White letters near the new spot, untouched red far from it.
+  const boxes = JSON.parse((await page.locator('#text-panel').getAttribute('data-boxes'))!) as number[][];
+  const [bx, by, bw, bh] = boxes[0]!;
+  expect(bx! + bw! / 2).toBeCloseTo(0.3, 1);
+  expect(by! + bh! / 2).toBeCloseTo(0.3, 1);
+  let white = 0;
+  for (let i = 0; i < 40; i++) {
+    const [r, g, b] = await pixelAt(page, out, Math.round((bx! + (bw! * i) / 40) * 800), Math.round((by! + bh! / 2) * 600));
+    if (r! > 230 && g! > 230 && b! > 230) white++;
+  }
+  expect(white).toBeGreaterThan(3);
+  const far = await pixelAt(page, out, 700, 550);
+  expect(Math.abs(far[0]! - 200) + Math.abs(far[1]! - 80) + Math.abs(far[2]! - 80)).toBeLessThan(30);
+  net.assertNothingLeft(['plain.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Meme generator opens with top and bottom text in caps and saves both on every image', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/meme-generator');
+  await expect(page.locator('#font')).toHaveValue('impact');
+  await expect(page.locator('#upper')).toBeChecked();
+  const { items } = await run(page, ['plain.jpg', 'photo.jpg'], async () => {
+    await page.locator('#text1').fill('when the build');
+    await page.locator('#text2').fill('is green');
+  });
+  expect(items).toBe(2);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['photo-text.jpg', 'plain-text.jpg']);
+  const boxes = JSON.parse((await page.locator('#text-panel').getAttribute('data-boxes'))!) as number[][];
+  // One block near the top, one near the bottom.
+  expect(boxes[0]![1]!).toBeLessThan(0.2);
+  expect(boxes[1]![1]! + boxes[1]![3]!).toBeGreaterThan(0.85);
+});
+
+test('Add text to image refuses to run with no text', async ({ page }) => {
+  await open(page, 'add-text-to-image');
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg')]);
+  await expect(page.locator('#text-panel')).toBeVisible();
+  await page.locator('#text1').fill('');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Type some text first');
+});
+
+test('Split image cuts a picture into a 2×2 grid of exact tiles, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'split-image');
+  const net = watchNetwork(page);
+  // swatches.png: flat colour blocks, lossless, so tiles can be checked pixel for pixel.
+  const { items } = await run(page, ['swatches.png'], async () => {
+    await expect(page.locator('#grid-panel')).toBeVisible();
+    await page.locator('#layout').selectOption('2x2');
+    await expect(page.locator('#cols')).toHaveValue('2');
+    await expect(page.locator('#grid-hint')).toContainText('4 tiles of 200 × 100 px');
+  });
+  expect(items).toBe(4);
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['swatches-1.png', 'swatches-2.png', 'swatches-3.png', 'swatches-4.png']);
+  for (const f of Object.values(files)) expect(pngSize(f)).toEqual({ width: 200, height: 100 });
+  // Tile 2 is the top right quarter: its top left pixel is the source's pixel at (200, 0).
+  const src = readFileSync(fx('swatches.png'));
+  expect(await pixelAt(page, files['swatches-2.png']!, 5, 5)).toEqual(await pixelAt(page, src, 205, 5));
+  expect(await pixelAt(page, files['swatches-3.png']!, 5, 5)).toEqual(await pixelAt(page, src, 5, 105));
+  net.assertNothingLeft(['swatches.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Instagram grid maker makes 4:5 tiles numbered in posting order', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/instagram-grid-maker');
+  await expect(page.locator('#shape')).toHaveValue('portrait');
+  // photo.jpg shows as 1200 × 1600 (EXIF turns it): nine 4:5 tiles of 400 × 500 from the middle 1200 × 1500.
+  const { items } = await run(page, ['photo.jpg']);
+  expect(items).toBe(9);
+  const files = await zipAll(page);
+  const names = Object.keys(files).sort();
+  expect(names).toHaveLength(9);
+  const size = jpegSize(files[names[0]!]!);
+  expect(size).toEqual({ width: 400, height: 500 });
+  // Tile 1 (post first) is the bottom right piece.
+  await expect(page.locator('#results-list')).toContainText('row 3, column 3');
+  await expect(page.locator('#results-list .result-item').first()).toContainText('post first');
+});
+
+test('Collage maker puts pictures side by side at a shared height, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'collage-maker');
+  const net = watchNetwork(page);
+  // swatches.png is 400 × 200 and graphic.png 640 × 480: side by side at the median height (480).
+  const { downloads } = await run(page, ['swatches.png', 'graphic.png'], async () => {
+    await expect(page.locator('#collage-panel')).toBeVisible();
+    await choose(page.locator('input[name="layout"][value="row"]'));
+    await page.locator('#gap').fill('0');
+    await page.locator('#gap').dispatchEvent('input');
+    await page.locator('#format').selectOption('image/png');
+    await expect(page.locator('#grid-fields')).toBeHidden();
+    await expect(page.locator('#collage-hint')).toContainText('2 pictures, 1600 × 480 px');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('collage.png');
+  const png = await bytesOf(downloads[0]!);
+  expect(pngSize(png)).toEqual({ width: 1600, height: 480 });
+  // The left picture is the swatches scaled 2.4×; the right picture starts at x = 960.
+  const src = readFileSync(fx('swatches.png'));
+  expect(await pixelAt(page, png, 24, 24)).toEqual(await pixelAt(page, src, 10, 10));
+  expect(await pixelAt(page, png, 1280, 240)).toEqual(await pixelAt(page, readFileSync(fx('graphic.png')), 320, 240));
+  net.assertNothingLeft(['swatches.png', 'graphic.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Collage maker makes a grid with spacing on a background colour, and needs two pictures', async ({ page }) => {
+  await open(page, 'collage-maker');
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg')]);
+  await expect(page.locator('#collage-hint')).toContainText('Add at least one more picture');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('at least two pictures');
+  // Files are added to the list, so this makes three.
+  await page.locator('#file-input').setInputFiles([fx('plain.jpg'), fx('plain.jpg')]);
+  await expect(page.locator('#collage-hint')).toContainText('3 pictures');
+  await page.locator('#background').fill('#000000');
+  const [d] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('collage.jpg');
+  const jpg = await bytesOf(d);
+  // Two columns of 800 × 600 cells with 2% (16 px) gaps; the last picture is centred.
+  expect(jpegSize(jpg)).toEqual({ width: 1648, height: 1248 });
+  const corner = await pixelAt(page, jpg, 4, 4);
+  expect(Math.max(...corner.slice(0, 3))).toBeLessThan(30);
+  const inside = await pixelAt(page, jpg, 400, 300);
+  expect(inside[0]).toBeGreaterThan(170);
+});
+
+test('Extract images from PDF saves each stored picture at full size, once, and no bytes leave the tab', async ({ page }) => {
+  // A PDF holding a JPEG photo on two pages, a transparent PNG drawn small, and a 1-pixel spacer.
+  const doc = await PDFDocument.create();
+  const photo = await doc.embedJpg(readFileSync(fx('photo.jpg')));
+  const gradient = await doc.embedPng(readFileSync(fx('gradient.png')));
+  const dot = await doc.embedPng(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC', 'base64'));
+  const p1 = doc.addPage([612, 792]);
+  p1.drawImage(photo, { x: 50, y: 400, width: 320, height: 240 });
+  p1.drawImage(dot, { x: 50, y: 380, width: 500, height: 1 });
+  const p2 = doc.addPage([612, 792]);
+  p2.drawImage(photo, { x: 50, y: 400, width: 160, height: 120 });
+  p2.drawImage(gradient, { x: 50, y: 100, width: 120, height: 80 });
+  const file = join(mkdtempSync(join(tmpdir(), 'pics-')), 'brochure.pdf');
+  writeFileSync(file, await doc.save());
+
+  const errors = await open(page, 'extract-pdf-images');
+  const net = watchNetwork(page);
+  const { items } = await run(page, [file]);
+  expect(items).toBe(2);
+  await expect(page.locator('#results-list')).toContainText('1600×1200, page 1');
+  await expect(page.locator('#results-list')).toContainText('600×400, page 2');
+  const zip = await zipAll(page);
+  expect(Object.keys(zip).sort()).toEqual(['brochure-image-1.png', 'brochure-image-2.png']);
+  expect(pngSize(zip['brochure-image-1.png']!)).toEqual({ width: 1600, height: 1200 });
+  const centre = await pixelAt(page, zip['brochure-image-1.png']!, 800, 600);
+  expect(Math.abs(centre[0]! - 239) + Math.abs(centre[1]! - 200) + Math.abs(centre[2]! - 60)).toBeLessThan(30);
+  // The PNG's transparency survives.
+  expect((await pixelAt(page, zip['brochure-image-2.png']!, 0, 0))[3]).toBe(0);
+  expect((await pixelAt(page, zip['brochure-image-2.png']!, 300, 200))[3]).toBe(255);
+
+  // With both filters off, the repeat and the spacer come out too.
+  await page.locator('#skip-small').uncheck({ force: true });
+  await page.locator('#dedupe').uncheck({ force: true });
+  await page.locator('#run').click();
+  await expect(page.locator('#results-list .result-item')).toHaveCount(4);
+  await expect(page.locator('#results-list')).toContainText('1×1, page 1');
+  net.assertNothingLeft(['brochure.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Extract images from PDF explains when a PDF holds no pictures', async ({ page }) => {
+  await open(page, 'extract-pdf-images');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('No pictures are stored in these pages');
 });

@@ -1,0 +1,96 @@
+---
+/** Option controls for add text to image, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const text1 = defaults.text1 ?? '';
+const text2 = defaults.text2 ?? '';
+const font = defaults.font ?? 'sans';
+const size = defaults.size ?? '8';
+const color = defaults.color ?? '#ffffff';
+const effect = defaults.effect ?? 'outline';
+const opacity = defaults.opacity ?? '100';
+const upper = defaults.upper === 'true';
+const format = defaults.format ?? 'keep';
+const quality = defaults.quality ?? '92';
+const fonts = [
+  ['sans', 'Bold sans'],
+  ['impact', 'Meme (Impact)'],
+  ['serif', 'Serif'],
+  ['hand', 'Handwriting'],
+  ['mono', 'Typewriter'],
+] as const;
+const effects = [
+  ['outline', 'Outline'],
+  ['shadow', 'Shadow'],
+  ['box', 'Box'],
+  ['none', 'None'],
+] as const;
+const swatches = ['#ffffff', '#000000', '#ffd400', '#ff3b30', '#1e90ff'];
+const formats = [
+  ['keep', 'Same as original'],
+  ['image/jpeg', 'JPG'],
+  ['image/png', 'PNG (lossless)'],
+  ['image/webp', 'WebP'],
+] as const;
+---
+<div class="field">
+  <label for="text1">Text</label>
+  <textarea id="text1" rows="2" placeholder="Type your text" spellcheck="true">{text1}</textarea>
+</div>
+<div class="field">
+  <label for="text2">Second text <span class="muted">(optional, for a caption at the other end)</span></label>
+  <textarea id="text2" rows="1" placeholder="Bottom text" spellcheck="true">{text2}</textarea>
+</div>
+<div class="field-row text-style-row">
+  <div class="field">
+    <label for="font">Font</label>
+    <select id="font">
+      {fonts.map(([v, l]) => <option value={v} selected={v === font}>{l}</option>)}
+    </select>
+  </div>
+  <div class="field">
+    <label for="effect">Effect</label>
+    <select id="effect">
+      {effects.map(([v, l]) => <option value={v} selected={v === effect}>{l}</option>)}
+    </select>
+  </div>
+</div>
+<div class="field">
+  <label for="color">Colour</label>
+  <div class="colour-row">
+    <input type="color" id="color" value={color} aria-label="Text colour" />
+    {swatches.map((s) => <button type="button" class="swatch" data-color={s} style={`background:${s}`} aria-label={`Use ${s}`}></button>)}
+  </div>
+</div>
+<div class="field">
+  <label for="size">Size <output id="size-out">{size}</output></label>
+  <input type="range" id="size" min="2" max="20" step="0.5" value={size} />
+</div>
+<div class="field">
+  <label for="opacity">Opacity <output id="opacity-out">{opacity}%</output></label>
+  <input type="range" id="opacity" min="10" max="100" step="5" value={opacity} />
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="upper" checked={upper} /> ALL CAPS</label>
+</div>
+<div class="field">
+  <label for="format">Output format</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="quality">Quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>
+<input type="hidden" id="pos1" value={defaults.pos1 ?? '0.5,0.5'} />
+<input type="hidden" id="pos2" value={defaults.pos2 ?? '0.5,0.88'} />
+<style>
+  .text-style-row { gap: 12px; align-items: end; }
+  .text-style-row .field { flex: 1 1 140px; }
+  textarea { width: 100%; resize: vertical; font: inherit; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); }
+  .colour-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  #color { width: 44px; height: 36px; padding: 2px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); }
+  .swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); cursor: pointer; }
+  .swatch[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--accent); }
+</style>

@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CompressAudio from '../../components/options/CompressAudio.astro';
+const tool = toolBySlug('compress-audio')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><CompressAudio /></Fragment>
+</ToolLayout>
+<script src="../../tools/compress-audio.ts"></script>

@@ -1944,6 +1944,204 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'compress-audio',
+    name: 'Compress audio',
+    title: 'Compress Audio: Reduce MP3 and WAV File Size, No Upload | Stayput',
+    description:
+      'Make MP3, WAV, M4A and other audio files smaller in your browser, or fit them under 8, 16 or 25 MB for Discord, WhatsApp or email. No upload, no sign-up.',
+    heading: 'Compress audio',
+    tagline: 'Shrink recordings, podcasts and songs to send or store. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif',
+    multiple: true,
+    dropLabel: 'Drop audio files to compress',
+    action: 'Compress',
+    keywords: ['compress audio', 'compress mp3', 'reduce mp3 file size', 'audio compressor online', 'reduce audio file size', 'compress wav', 'make mp3 smaller'],
+    steps: [
+      'Drop one or more audio files (MP3, WAV, M4A, FLAC, OGG), or tap to pick them.',
+      'Choose how hard to compress, or a size limit such as 25 MB for email. Tick Mono for a voice recording.',
+      'Compress. One file downloads straight away; several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Nothing is sent anywhere, so there is no size cap and it works offline once the page has loaded.',
+      },
+      {
+        q: 'How much smaller will it get?',
+        a: 'A WAV shrinks to about a tenth at 128 kbps. An MP3 that is already 320 kbps drops to about 40%, and one at 128 kbps only gets smaller at a lower setting. If a file is already smaller than the setting would make it, you get it back unchanged.',
+      },
+      {
+        q: 'How does Fit under work?',
+        a: 'It works out the bitrate that brings the file under the limit from its length, and uses that when it is lower than your chosen setting. An hour of audio needs about 48 kbps to fit in 25 MB, fine for speech. Tick Mono as well for recordings of talk.',
+      },
+      {
+        q: 'MP3 or OGG?',
+        a: 'MP3 plays everywhere. OGG with Opus sounds better at low bitrates, so a voice memo at 48 kbps Opus is as clear as a 96 kbps MP3; Chrome, Firefox, Android, Discord and WhatsApp play it, older iPhones may not.',
+      },
+    ],
+  },
+  {
+    slug: 'add-text-to-image',
+    name: 'Add text to image',
+    title: 'Add Text to Image Online, Free, No Upload | Stayput',
+    description:
+      'Put text on a photo in your browser: drag it into place, pick a font, colour, outline or box, and save full size. Batch captions too. No upload.',
+    heading: 'Add text to an image',
+    tagline: 'Write on a photo, a screenshot or a meme and drag the words where you want them. Done on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop images to add text to',
+    action: 'Add text',
+    keywords: ['add text to image', 'add text to photo', 'write on picture', 'put text on image', 'text on photo online', 'caption photo', 'add words to picture'],
+    steps: [
+      'Drop a photo or screenshot (JPG, PNG, WebP, HEIC and more), or several to caption them all the same way.',
+      'Type your text, then drag it on the preview to place it. Pick a font, colour, size and an outline, shadow or box so it reads on any background. Add a second text for a caption at the other end.',
+      'Save. The text is drawn onto the full-size image; one file downloads straight away, several as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. Your browser decodes the image, draws your text onto it on a canvas in the page, and saves the result. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Does the text stay sharp on a big photo?',
+        a: 'Yes. The preview is scaled down to fit your screen, but the saved file is drawn at the photo’s full size, and the text size is a share of the photo, so it looks the same as the preview.',
+      },
+      {
+        q: 'Can I add the same text to many images?',
+        a: 'Yes. Drop them all at once and the text goes in the same place on each, which is how to caption a set of photos. For a repeated or tiled name across photos, use the watermark tool. The preview shows the first image.',
+      },
+      {
+        q: 'How do I make text readable on a busy photo?',
+        a: 'Use Outline for bold meme-style letters, Shadow for a softer look, or Box to put the text on a dark or light panel. White with an outline reads on almost anything.',
+      },
+      {
+        q: 'Can I edit the text later?',
+        a: 'Not in the saved image: the text becomes part of the picture. Keep your original, which is never changed, and run it again with new text.',
+      },
+    ],
+  },
+  {
+    slug: 'split-image',
+    name: 'Split image',
+    title: 'Split Image into Grid: Instagram Grid Maker, No Upload | Stayput',
+    description:
+      'Cut a picture into a 3×3 grid, a 3-across carousel or any rows and columns in your browser, with square or 4:5 tiles for Instagram. No upload, no watermark.',
+    heading: 'Split an image into tiles',
+    tagline: 'Cut one picture into a grid or a seamless carousel. Done on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop an image to split',
+    action: 'Split image',
+    keywords: ['split image', 'image splitter', 'instagram grid maker', 'split image into grid', 'cut image into pieces', 'grid maker for instagram', 'instagram panorama carousel'],
+    steps: [
+      'Drop a picture (JPG, PNG, WebP, HEIC and more), or tap to pick one.',
+      'Pick a grid: 3 across for a carousel, 3 × 3 for a profile grid, or any rows and columns. Choose square or 4:5 tiles for Instagram; the preview shows the cut lines and dims anything trimmed.',
+      'Split. The tiles download together as a zip, numbered left to right or in the order to post them.',
+    ],
+    faq: [
+      {
+        q: 'Is my picture uploaded?',
+        a: 'No. Your browser decodes the image and cuts the tiles on a canvas in the page. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Which grid for an Instagram profile?',
+        a: 'Instagram shows profiles three posts across, and newer profiles show each post as a 4:5 portrait. Choose 3 × 3 (or 3 × 2) with Portrait 4:5 tiles and In posting order, then post tile 1 first: the last one you post lands top left and completes the picture.',
+      },
+      {
+        q: 'How do I make a seamless carousel?',
+        a: 'Choose 3 across (or 2 across) with Portrait 4:5 or Square tiles and post the tiles as one carousel, in number order. Swiping reveals one wide picture.',
+      },
+      {
+        q: 'Is quality lost?',
+        a: 'No resizing happens: each tile is an exact piece of the original, saved once. Pick PNG for a lossless file, or keep the original format.',
+      },
+    ],
+  },
+  {
+    slug: 'collage-maker',
+    name: 'Collage maker',
+    title: 'Photo Collage Maker: Combine Images, Free, No Upload | Stayput',
+    description:
+      'Combine photos into one image in your browser: a grid, side by side or stacked, with spacing and a background colour. No upload, no watermark, no sign-up.',
+    heading: 'Make a photo collage',
+    tagline: 'Put several pictures into one: a grid, a row or a stack. Done on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop two or more pictures to combine',
+    action: 'Make collage',
+    keywords: ['collage maker', 'photo collage', 'combine images', 'merge images', 'put pictures side by side', 'combine photos into one', 'image grid maker'],
+    steps: [
+      'Drop two or more pictures (JPG, PNG, WebP, HEIC and more), or tap to pick them. Use the arrows in the list to change the order.',
+      'Choose a grid, side by side or stacked. Set the spacing, the background colour and how big the collage should be; the preview updates as you go.',
+      'Make the collage. It downloads straight away as one image.',
+    ],
+    faq: [
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. Your browser decodes the pictures and draws the collage on a canvas in the page. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'Are the pictures cropped?',
+        a: 'Side by side and stacked keep each whole picture, scaled to a shared height or width. A grid gives every picture the same cell: Fill each cell crops the edges to fit, Show whole picture keeps it all with the background around it.',
+      },
+      {
+        q: 'How big is the collage?',
+        a: 'Its longest side is 2400 px by default, enough for sharing and a phone screen. Choose 4000 px for printing, or 1200 px for a small file to send in a message.',
+      },
+      {
+        q: 'Is there a watermark or a limit?',
+        a: 'No watermark, and no limit on the number of pictures beyond your device’s memory.',
+      },
+    ],
+  },
+  {
+    slug: 'extract-pdf-images',
+    name: 'Extract Images from PDF',
+    title: 'Extract Images from PDF at Full Resolution, No Upload | Stayput',
+    description:
+      'Save every photo and picture inside a PDF as PNG or JPG, at the resolution it was stored. Runs in your browser: the PDF is not uploaded. Free, no limits.',
+    heading: 'Extract images from a PDF',
+    tagline: 'Every picture in the file, at its real size, without screenshots and without uploading the PDF.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF here',
+    action: 'Extract images',
+    keywords: ['extract images from pdf', 'pdf image extractor', 'save images from pdf', 'get pictures from pdf', 'export images from pdf', 'pdf to images extract', 'download images from pdf'],
+    steps: [
+      'Drop a PDF.',
+      'Choose all pages or some, PNG or JPG, and whether to leave out icons and repeats.',
+      'Download the pictures one by one or all together as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Are the images at full quality?',
+        a: 'Yes. Each picture comes out at the pixel size it is stored at inside the PDF, which is usually larger than it looks on the page. Choose PNG to keep every pixel exactly; JPG makes smaller files for photos.',
+      },
+      {
+        q: 'How is this different from PDF to Image?',
+        a: 'PDF to Image saves whole pages, text and all, as pictures. This tool pulls out only the photos and pictures placed in the pages, each as its own file, without the text around them.',
+      },
+      {
+        q: 'Why did it find no images?',
+        a: 'Some PDFs have no stored pictures: charts and logos are often drawn as vector shapes, and some scanners store each page as one image. For a scan you get one picture per page. For vector drawings, use PDF to Image to save the page instead.',
+      },
+      {
+        q: 'What about password-protected PDFs?',
+        a: 'A PDF that opens without a password but blocks copying works as normal. If it needs a password to open, remove it first with Unlock PDF, which also runs in your browser.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The file is read by pdf.js running in this tab and the pictures are saved from memory. Nothing is sent to a server, and the page keeps working with the network off once it has loaded.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

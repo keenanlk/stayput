@@ -47,7 +47,7 @@ export function channelsOf(buffer: AudioBuffer, mono: boolean): Float32Array[] {
   return [out];
 }
 
-export type Bitrate = 96 | 128 | 160 | 192 | 256 | 320;
+export type Bitrate = 32 | 48 | 64 | 80 | 96 | 112 | 128 | 160 | 192 | 224 | 256 | 320;
 
 const yieldToUi = () => new Promise<void>((r) => setTimeout(r, 0));
 
