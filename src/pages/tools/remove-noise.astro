@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RemoveNoise from '../../components/options/RemoveNoise.astro';
+const tool = toolBySlug('remove-noise')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><RemoveNoise /></Fragment>
+</ToolLayout>
+<script src="../../tools/remove-noise.ts"></script>

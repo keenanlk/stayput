@@ -1792,6 +1792,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'remove-noise',
+    name: 'Remove background noise',
+    title: 'Remove Background Noise from Audio or Video, No Upload | Stayput',
+    description:
+      'Clean hiss, hum, fans, traffic and room noise out of a voice recording or video in your browser. Batch, keeps the format, nothing uploaded, no sign-up.',
+    heading: 'Remove background noise',
+    tagline: 'Keep the voice, lose the hiss, hum and fan noise. Cleaned on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop recordings or videos to clean',
+    action: 'Remove noise',
+    keywords: ['remove background noise', 'noise reduction', 'remove noise from audio', 'audio noise remover', 'remove background noise from video', 'noise remover', 'reduce background noise', 'clean up audio'],
+    steps: [
+      'Drop one or more recordings (MP3, WAV, M4A, FLAC, OGG, voice memos) or videos (MP4, MOV, WebM), or tap to pick them.',
+      'Keep Strong to leave only the voice, or pick Medium or Light to keep a little of the room. Keep the original format or pick another.',
+      'Run it. Each file is cleaned in your tab; videos keep their picture untouched and get the cleaned sound.',
+    ],
+    faq: [
+      {
+        q: 'Are my recordings uploaded?',
+        a: 'No. The noise remover is a small neural network that runs as WebAssembly inside this page. Your browser decodes the sound, the network cleans it, and the file is written again in your tab. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'What kind of noise does it remove?',
+        a: 'Steady and repeating background sound around a voice: hiss, electrical hum, computer and air-conditioning fans, traffic, rain, keyboard typing and crowd murmur. It is trained on speech, so it keeps voices and treats most other sound as noise.',
+      },
+      {
+        q: 'Can I use it on music?',
+        a: 'Not really. It keeps speech and drops what is not speech, so instruments get thinned or cut. For a voice over quiet music, try Light, which mixes some of the original back in.',
+      },
+      {
+        q: 'Does it work on a video?',
+        a: 'Yes. Drop an MP4, MOV or WebM and the cleaned sound is put back with the original picture, which is copied as it is. The sound is re-encoded as AAC in an MP4, or Opus in a WebM, and stays in sync.',
+      },
+      {
+        q: 'Why does the voice sound a little thin or robotic?',
+        a: 'When the noise is as loud as the voice, removing it takes some of the voice too. Pick Medium or Light, which blend a share of the original back in, or boost a quiet recording with the volume booster afterwards.',
+      },
+    ],
+  },
+  {
     slug: 'merge-audio',
     name: 'Merge audio',
     title: 'Merge Audio Files Online: Join MP3 and WAV, No Upload | Stayput',

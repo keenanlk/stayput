@@ -1,0 +1,31 @@
+---
+/** Option controls for Remove background noise, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const strength = defaults.strength ?? 'strong';
+const format = defaults.format ?? 'same';
+const formats = [
+  ['same', 'Same as the original'],
+  ['mp3', 'MP3'],
+  ['wav', 'WAV'],
+  ['flac', 'FLAC'],
+  ['m4a', 'M4A (AAC)'],
+  ['ogg', 'OGG (Opus)'],
+] as const;
+---
+<div class="field">
+  <label>Strength</label>
+  <div class="segmented" role="radiogroup" aria-label="Strength">
+    <label><input type="radio" name="strength" value="strong" checked={strength === 'strong'} /><span>Strong</span></label>
+    <label><input type="radio" name="strength" value="medium" checked={strength === 'medium'} /><span>Medium</span></label>
+    <label><input type="radio" name="strength" value="light" checked={strength === 'light'} /><span>Light</span></label>
+  </div>
+  <p class="muted small">Strong keeps only the voice. Medium and Light leave a little of the room in, which sounds more natural.</p>
+</div>
+<div class="field" id="format-field">
+  <label for="format">Save as</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+  <p class="muted small">Videos keep their picture untouched and get the cleaned sound.</p>
+</div>
