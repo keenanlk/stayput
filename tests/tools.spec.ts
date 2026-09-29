@@ -147,7 +147,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(16);
+  expect(await page.locator('.tool-card').count()).toBe(17);
   expect(errors).toEqual([]);
 });
 
@@ -350,6 +350,49 @@ test('EXIF remover bakes orientation when asked', async ({ page }) => {
   await expect(page.locator('.result-item .meta')).toContainText('rotation applied');
 });
 
+test('EXIF viewer shows location, device and every field without sending the photo', async ({ page }) => {
+  await open(page, 'exif-viewer');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  const names = ['photo.jpg', 'graphic.png', 'picture.webp', 'iphone.heic', 'plain.jpg'];
+  await page.locator('#file-input').setInputFiles(names.map(fx));
+  const cards = page.locator('#exif-report .exif-card');
+  await expect(cards).toHaveCount(5);
+  for (const i of [0, 1, 2, 3]) {
+    await expect(cards.nth(i).locator('.exif-facts')).toContainText('40.446111, -79.982222');
+    await expect(cards.nth(i).locator('.exif-facts')).toContainText('TestCam Model X');
+  }
+  await expect(cards.nth(0).locator('.exif-facts')).toContainText('25 Sep 2026, 12:00:00');
+  await expect(cards.nth(0).locator('.exif-table')).toContainText('Rotated 90° right');
+  await expect(cards.nth(0).locator('header')).toContainText('Comment');
+  await expect(cards.nth(4).locator('.exif-facts')).toContainText('None stored');
+  await expect(cards.nth(4).locator('.exif-facts')).toContainText('carries no metadata');
+  const map = cards.nth(0).getByRole('link', { name: 'Open map' });
+  await expect(map).toHaveAttribute('href', /mlat=40\.446111&mlon=-79\.982222/);
+
+  const download = page.waitForEvent('download');
+  await page.locator('#run').click();
+  const csv = Buffer.from(await bytesOf(await download)).toString();
+  expect(csv.split('\r\n')[0]).toBe('file,group,field,value');
+  expect(csv).toContain('photo.jpg,Location,Latitude,40.446111');
+  expect(csv).toContain('iphone.heic,Camera,Model,Model X');
+  expect(csv).toContain('plain.jpg,,,no EXIF data');
+  net.assertNothingLeft(names);
+});
+
+test('EXIF viewer reads a stripped photo as clean', async ({ page }) => {
+  await open(page, 'strip-exif');
+  await page.locator('#apply-orientation').uncheck();
+  const { downloads } = await run(page, ['photo.jpg']);
+  const cleaned = join(mkdtempSync(join(tmpdir(), 'exif-')), 'cleaned.jpg');
+  writeFileSync(cleaned, await bytesOf(downloads[0]!));
+  await open(page, 'exif-viewer');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([cleaned]);
+  await expect(page.locator('.exif-facts')).toContainText('None stored');
+  await expect(page.locator('.exif-facts')).toContainText('carries no metadata');
+});
+
 test('Merge PDF combines files in order', async ({ page }) => {
   await open(page, 'merge-pdf');
   const { downloads } = await run(page, ['text.pdf', 'scan.pdf']);
@@ -443,7 +486,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'exif-viewer'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);

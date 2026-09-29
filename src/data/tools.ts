@@ -202,6 +202,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'exif-viewer',
+    name: 'EXIF Viewer',
+    title: 'EXIF Viewer: See Photo Metadata and GPS, No Upload | Stayput',
+    description:
+      'View the EXIF data in a photo: GPS location, camera, date, serial numbers and every other field. Reads JPG, PNG, WebP, HEIC and TIFF in your browser. Nothing uploaded.',
+    heading: 'EXIF viewer: see what a photo reveals',
+    tagline: 'Drop a photo to read its metadata, including the location it was taken. The file is read on this device, so checking a private photo does not share it.',
+    category: 'images',
+    accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif,image/tiff,.jpg,.jpeg,.png,.webp,.heic,.heif,.tif,.tiff,.dng',
+    multiple: true,
+    dropLabel: 'Drop photos here',
+    action: 'Save report as CSV',
+    keywords: ['exif viewer', 'exif data viewer', 'exif viewer online', 'view photo metadata', 'photo location viewer', 'exif reader'],
+    steps: [
+      'Drop one or more photos. Each one is read the moment it is added.',
+      'Check the summary: where it was taken, when, and on which device. Open "All fields" for everything else.',
+      'Save the report as a CSV if you need a record, or remove the metadata with the EXIF remover.',
+    ],
+    faq: [
+      {
+        q: 'Is it safe to check a photo here?',
+        a: 'Yes. The page reads the file with JavaScript in your tab and never sends it anywhere, so you can check a photo you would not want to upload. Most online EXIF viewers upload the photo to their server first, which hands them the very location you are trying to check. Open the network tab while you drop a photo and it stays empty.',
+      },
+      {
+        q: 'Which files can it read?',
+        a: 'JPG, PNG, WebP, HEIC and HEIF (iPhone photos), and TIFF-based files including DNG raw files. It reads the EXIF block, including the GPS block and the embedded thumbnail, and lists which other metadata (XMP, IPTC, color profile, comments) the file carries.',
+      },
+      {
+        q: 'Why does my photo show no location?',
+        a: 'Either location was off in the camera app, or the photo went through something that removed it. Most messaging apps and social networks strip EXIF when you send or post a photo, and iPhones remove location when you turn off Location in the share sheet options. A screenshot never has GPS data.',
+      },
+      {
+        q: 'Can I see where the photo was taken on a map?',
+        a: 'The coordinates are shown as numbers you can copy. The "Open map" link opens OpenStreetMap in a new tab with the point marked; only the coordinates go to OpenStreetMap, and only if you click it.',
+      },
+      {
+        q: 'How do I remove what it found?',
+        a: 'Use the Remove EXIF Data tool (linked under the report). It deletes EXIF, GPS, XMP and IPTC without re-encoding, so the picture is unchanged. Drop the cleaned copy back here to confirm nothing is left.',
+      },
+    ],
+  },
+  {
     slug: 'merge-pdf',
     name: 'Merge PDF',
     title: 'Merge PDF Files Online, Free, No Upload | Stayput',

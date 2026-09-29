@@ -27,6 +27,10 @@ export const engines: Record<string, Engine> = {
     how: 'This tool does not re-encode your photo at all. It reads the JPG, PNG or WebP container byte by byte and removes only the metadata segments (EXIF, XMP, ICC, IPTC), writing the untouched image data back out. That is why the output is pixel-identical and the file only gets smaller.',
     versus: 'Sending a photo to a website to remove its location data is a contradiction: the site has the location the moment you upload it. Here the GPS block is deleted on your device and never travels anywhere.',
   },
+  'exif-viewer': {
+    how: 'The viewer reads the bytes of the photo in your tab and walks its container by hand: JPEG segments, PNG chunks, WebP RIFF chunks, HEIC boxes or the TIFF header of a DNG. It finds the EXIF block, follows its directories (camera, shot settings, GPS, thumbnail) and turns each field into plain words. It is the same parser the EXIF remover uses, a few hundred lines of TypeScript with no library behind it.',
+    versus: 'An online EXIF viewer that uploads your photo has read the location before it shows it to you. Checking a photo for private data by sending it to a stranger defeats the point; here the file is never part of any request.',
+  },
   'merge-pdf': {
     how: 'pdf-lib, an open-source PDF library written in TypeScript, opens each document in your tab and copies its pages into a new PDF, preserving text, vector graphics, links and images as they are. The merged file is assembled in memory and handed to your browser’s download. Password-protected PDFs are unlocked first by qpdf, compiled to WebAssembly and loaded only when needed; the password is checked in your tab and the result is saved without encryption.',
     versus: 'Upload-based mergers cap the number of files, the total size, or the number of merges per day. This one is bound only by your device’s memory, and your contracts, statements and scans are never copied to anyone’s server.',

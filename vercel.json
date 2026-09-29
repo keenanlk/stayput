@@ -66,6 +66,11 @@
       "permanent": true
     },
     {
+      "source": "/exif-viewer",
+      "destination": "/tools/exif-viewer",
+      "permanent": true
+    },
+    {
       "source": "/strip-exif",
       "destination": "/tools/strip-exif",
       "permanent": true

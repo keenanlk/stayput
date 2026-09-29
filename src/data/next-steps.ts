@@ -8,6 +8,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'convert-image': ['compress-image', 'strip-exif'],
   'compress-image': ['strip-exif', 'image-to-pdf'],
   'strip-exif': ['compress-image', 'crop-image'],
+  'exif-viewer': ['strip-exif', 'compress-image'],
   'crop-image': ['compress-image', 'strip-exif'],
   'image-to-pdf': ['compress-pdf', 'merge-pdf'],
   'pdf-to-image': ['compress-image', 'crop-image'],

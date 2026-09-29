@@ -40,7 +40,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Compress and resize images](https://stayput.dev/tools/compress-image) | [Compress PDF](https://stayput.dev/tools/compress-pdf) (lossless cleanup, image recompression, or flatten) |
 | [Remove EXIF and GPS data](https://stayput.dev/tools/strip-exif) (lossless, no re-encode) | [Rotate PDF pages](https://stayput.dev/tools/rotate-pdf) |
 | [Crop image](https://stayput.dev/tools/crop-image) (ratios, exact pixels, circle) | [Images to PDF](https://stayput.dev/tools/image-to-pdf) |
-| | [PDF to images](https://stayput.dev/tools/pdf-to-image) |
+| [EXIF viewer](https://stayput.dev/tools/exif-viewer) (location, camera, date and every field) | [PDF to images](https://stayput.dev/tools/pdf-to-image) |
 | | [Reorder and delete pages](https://stayput.dev/tools/reorder-pdf) |
 | | [Sign PDF](https://stayput.dev/tools/sign-pdf) (draw or type, place on any page) |
 | | [Add page numbers](https://stayput.dev/tools/pdf-page-numbers) |
