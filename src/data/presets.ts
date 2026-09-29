@@ -1923,6 +1923,49 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'gif-compressor',
+    base: 'compress-gif',
+    name: 'GIF compressor',
+    title: 'GIF Compressor Online, Free, No Upload, No Watermark | Stayput',
+    description: 'A free GIF compressor that runs in your browser: optimise frames, reduce colours, resize or drop frames. Animated GIFs stay animated. Nothing uploaded.',
+    heading: 'GIF compressor',
+    tagline: 'Shrink animated GIFs without uploading them to an online optimizer.',
+    keywords: ['gif compressor', 'gif optimizer', 'optimize gif', 'compress animated gif', 'gif compressor online', 'ezgif alternative'],
+    dropLabel: 'Drop GIFs to compress',
+    intro: [
+      'Animated GIFs are one of the least efficient ways to store moving pictures ever invented, which is why a five second reaction GIF or screen capture can weigh 10 MB. Most of that weight is repetition: GIF makers often store every frame in full, even when only a corner of the picture moves.',
+      'This compressor rewrites each frame to hold only what changed since the one before, the same frame optimisation gifsicle does, and at Medium or Strong it also ignores changes too small to see and trims the palette. For bigger savings, shrink the size or drop every second frame; the timing is kept either way.',
+      'Everything runs in your browser. Your GIFs are not uploaded to a website that keeps them for an hour, there is no watermark, and there is no limit on file size or count.',
+    ],
+    steps: ['Drop one or more GIFs.', 'Pick a compression level, and a smaller size or fewer frames if you need to.', 'Press Compress and save the smaller GIFs.'],
+    faq: [
+      { q: 'Should I convert the GIF to MP4 instead?', a: 'Where a video is accepted (Twitter, Slack, most chat apps), yes: an MP4 is often a tenth of the size of the GIF. Use GIF to MP4. Keep a GIF for places that only take images, such as GitHub READMEs, email and forum signatures.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'reduce-gif-size',
+    base: 'compress-gif',
+    name: 'Reduce GIF size',
+    title: 'Reduce GIF Size: Make a GIF Smaller for Discord or Email | Stayput',
+    description: 'Make a GIF smaller in your browser: halve its size and drop frames to fit Discord, Slack or email limits. Timing kept, nothing uploaded.',
+    heading: 'Reduce GIF file size',
+    tagline: 'Bring a GIF under an upload limit by shrinking it, trimming colours and dropping frames, on your own device.',
+    keywords: ['reduce gif size', 'make gif smaller', 'reduce gif file size', 'gif size reducer', 'shrink gif', 'gif too big for discord'],
+    dropLabel: 'Drop GIFs to make smaller',
+    defaults: { level: 'strong', scale: '0.75' },
+    intro: [
+      'A GIF that is too big to post is a common frustration: Discord and Slack reject large uploads, email bounces them, and web pages load them slowly. This page starts with settings that cut most GIFs to a fraction of their size: strong compression and 75% of the original width and height.',
+      'If the result is still too large, lower the size to 50% or drop every second frame and compress again. Each result shows its new size, so you can see when it fits. Dropped frames lend their time to the frame before, so the GIF still plays for as long as it did.',
+      'The GIF is compressed in your browser tab, so it is never uploaded and there is no watermark or limit.',
+    ],
+    steps: ['Drop the GIF.', 'Keep the settings, or choose a smaller size or fewer frames.', 'Press Compress and check the new size.'],
+    faq: [
+      { q: 'What are the common GIF size limits?', a: 'Discord: 10 MB per upload on a free account, 256 KB for a custom emoji and 512 KB for a sticker. Slack: 1 GB, but GIFs over a few MB do not autoplay for everyone. Twitter/X: 15 MB. Most email providers: 25 MB for the whole message.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

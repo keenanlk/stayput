@@ -24,6 +24,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'compress-video': () => import('./compress-video'),
   'video-to-mp4': () => import('./video-to-mp4'),
   'compress-png': () => import('./compress-png'),
+  'compress-gif': () => import('./compress-gif'),
   'trim-video': () => import('./trim-video'),
   'mute-video': () => import('./mute-video'),
   'resize-video': () => import('./resize-video'),

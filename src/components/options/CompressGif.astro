@@ -1,0 +1,44 @@
+---
+/** Option controls for GIF compression, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const level = defaults.level ?? 'medium';
+const scale = defaults.scale ?? '1';
+const frames = defaults.frames ?? '1';
+const levels = [
+  ['light', 'Light (looks the same)'],
+  ['medium', 'Medium (much smaller)'],
+  ['strong', 'Strong (smallest, some grain)'],
+] as const;
+const scales = [
+  ['1', 'Keep the size'],
+  ['0.75', '75%'],
+  ['0.5', '50%'],
+  ['0.33', '33%'],
+] as const;
+const keeps = [
+  ['1', 'Keep every frame'],
+  ['2', 'Drop every second frame'],
+  ['3', 'Keep one frame in three'],
+] as const;
+---
+<div class="field">
+  <label for="level">Compression</label>
+  <select id="level">
+    {levels.map(([v, l]) => <option value={v} selected={v === level}>{l}</option>)}
+  </select>
+  <p class="muted small">Each frame keeps only what changed from the one before. Stronger levels use fewer colours and ignore tiny changes.</p>
+</div>
+<div class="field">
+  <label for="scale">Size</label>
+  <select id="scale">
+    {scales.map(([v, l]) => <option value={v} selected={v === scale}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="frames">Frames</label>
+  <select id="frames">
+    {keeps.map(([v, l]) => <option value={v} selected={v === frames}>{l}</option>)}
+  </select>
+  <p class="muted small">Dropped frames give their time to the frame before, so the GIF plays at the same speed, a little less smoothly.</p>
+</div>

@@ -10,3 +10,13 @@ declare module 'gifenc' {
     bytes(): Uint8Array;
   };
 }
+declare module 'gifenc/src/lzwEncode.js' {
+  /** Writes the LZW minimum code size, the data sub-blocks and the block terminator. */
+  export default function lzwEncode(
+    width: number,
+    height: number,
+    pixels: Uint8Array,
+    colorDepth: number,
+    outStream: { writeByte(b: number): void; writeBytesView(data: Uint8Array, offset?: number, length?: number): void; bytesView(): Uint8Array },
+  ): void;
+}
