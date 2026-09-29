@@ -167,7 +167,7 @@ code { font-family: var(--mono); font-size: 0.9em; background: var(--surface-2);
 .btn-ghost { background: transparent; border-color: transparent; color: var(--ink-2); }
 .btn-ghost:hover { background: var(--surface-2); border-color: transparent; }
 label { font-size: 14px; font-weight: 620; color: var(--ink-2); }
-select, input[type="number"], input[type="text"], input[type="color"] { font: inherit; font-size: 15px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 8px 10px; min-height: 42px; }
+select, input[type="number"], input[type="text"], input[type="password"], input[type="color"] { font: inherit; font-size: 15px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 8px 10px; min-height: 42px; }
 input[type="color"] { padding: 3px; width: 48px; }
 input[type="range"] { accent-color: var(--accent); width: 100%; }
 input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width: 18px; height: 18px; }

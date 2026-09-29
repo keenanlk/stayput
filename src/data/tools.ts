@@ -338,6 +338,74 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'unlock-pdf',
+    name: 'Unlock PDF',
+    title: 'Unlock PDF: Remove a PDF Password, Free and Private | Stayput',
+    description:
+      'Remove the password and restrictions from a PDF you can open. Runs in your browser, so the file and its password are never uploaded.',
+    heading: 'Unlock a PDF',
+    tagline: 'Remove the open password and the print, copy and edit restrictions from a PDF whose password you know.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop password-protected PDFs here',
+    action: 'Remove password',
+    keywords: ['unlock pdf', 'remove password from pdf', 'pdf password remover', 'remove pdf restrictions'],
+    steps: [
+      'Drop one or more PDFs.',
+      'Type the password that opens them. PDFs that only restrict printing or copying need no password.',
+      'Save copies that open without a password and have no restrictions.',
+    ],
+    faq: [
+      {
+        q: 'Can this open a PDF when I don’t know the password?',
+        a: 'No. It removes a password you already have, so you don’t have to type it every time or so other apps can edit the file. It does not guess or crack passwords.',
+      },
+      {
+        q: 'What about PDFs that open fine but won’t let me print or copy?',
+        a: 'Those carry an owner password that only sets restrictions. Drop them in without a password and the restrictions are removed; the text, images and pages are left exactly as they were.',
+      },
+      {
+        q: 'Is my PDF or password sent anywhere?',
+        a: 'No. The PDF is decrypted inside your browser tab by qpdf compiled to WebAssembly. The password is used in the tab and never leaves it, and the page works with the network off after one visit.',
+      },
+    ],
+  },
+  {
+    slug: 'protect-pdf',
+    name: 'Protect PDF',
+    title: 'Password Protect a PDF, Free and Private | Stayput',
+    description:
+      'Add a password to a PDF with AES-256 encryption. Runs in your browser, so the file is encrypted before it ever leaves your device.',
+    heading: 'Password protect a PDF',
+    tagline: 'Lock a PDF with a password and AES-256 encryption, without uploading the file you are trying to keep private.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to protect',
+    action: 'Protect with password',
+    keywords: ['password protect pdf', 'encrypt pdf', 'lock pdf', 'add password to pdf'],
+    steps: [
+      'Drop one or more PDFs.',
+      'Type the password twice.',
+      'Save the protected copies. Anyone opening them is asked for the password.',
+    ],
+    faq: [
+      {
+        q: 'How strong is the protection?',
+        a: 'The PDF is encrypted with AES-256, the strongest standard PDF encryption, which Adobe Acrobat, Preview, Chrome, Edge and Firefox all open. The protection is only as strong as the password, so use a long one.',
+      },
+      {
+        q: 'What if I forget the password?',
+        a: 'The file cannot be recovered, by us or anyone else: there is no copy of the password anywhere. Keep the unprotected original, or store the password in a password manager.',
+      },
+      {
+        q: 'Why not use an online PDF protector?',
+        a: 'Because the reason to add a password is that the file is private, and an online protector has the unprotected file the moment you upload it. Here the encryption happens on your device.',
+      },
+    ],
+  },
+  {
     slug: 'image-to-pdf',
     name: 'Image to PDF',
     title: 'Convert Images to PDF (JPG to PDF, PNG to PDF), Private | Stayput',
