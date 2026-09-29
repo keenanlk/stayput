@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(74);
+  expect(await page.locator('.index .tool-card').count()).toBe(75);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -5180,4 +5180,72 @@ test('GIF maker plays a preview, writes one GIF with every picture in order and 
   expect(frames.every((f) => Math.round(f.ms) === 1000)).toBe(true);
   net.assertNothingLeft(['step-1.png', 'step-2.png', 'step-3.png']);
   expect(errors).toEqual([]);
+});
+
+/** A one-page PDF with a filled-in text field, a drawn box comment, a sticky note with no drawing, and a link. */
+async function markedUpForm(): Promise<string> {
+  const doc = await PDFDocument.create();
+  const page = doc.addPage([600, 800]);
+  const form = doc.getForm();
+  const field = form.createTextField('name');
+  field.addToPage(page, { x: 50, y: 700, width: 200, height: 24 });
+  field.setText('Ada Lovelace');
+  const ctx = doc.context;
+  const box = ctx.register(
+    ctx.stream('1 0 0 rg 0 0 100 50 re f', { Type: 'XObject', Subtype: 'Form', BBox: [0, 0, 100, 50] }),
+  );
+  const square = ctx.register(ctx.obj({ Type: 'Annot', Subtype: 'Square', Rect: [300, 600, 400, 650], AP: { N: box } }));
+  const note = ctx.register(ctx.obj({ Type: 'Annot', Subtype: 'Text', Rect: [50, 500, 70, 520], Contents: ctx.obj('Check this') }));
+  const link = ctx.register(ctx.obj({ Type: 'Annot', Subtype: 'Link', Rect: [50, 400, 150, 420], A: { S: 'URI', URI: ctx.obj('https://example.com') } }));
+  const annots = page.node.Annots()!;
+  annots.push(square);
+  annots.push(note);
+  annots.push(link);
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'application.pdf');
+  writeFileSync(file, await doc.save());
+  return file;
+}
+
+test('Flatten PDF draws fields and comments into the page, keeps links and bare notes, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'flatten-pdf');
+  const net = watchNetwork(page);
+  const file = await markedUpForm();
+  const { downloads } = await run(page, [file]);
+  expect(downloads[0]!.suggestedFilename()).toBe('application-flat.pdf');
+  await expect(page.locator('#results-list')).toContainText('1 form field and 1 annotation flattened into 1 page; 1 note without a drawing kept as a note');
+  const bytes = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(bytes);
+  expect(doc.catalog.get(PDFName.of('AcroForm'))).toBeUndefined();
+  const annots = doc.getPage(0).node.Annots()!.asArray().map((r) => (doc.context.lookup(r) as import('pdf-lib').PDFDict).get(PDFName.of('Subtype'))!.toString());
+  expect(annots.sort()).toEqual(['/Link', '/Text']);
+  // The answer is now page text, still selectable.
+  expect((await textItems(bytes, 1)).map((t) => t.str).join(' ')).toContain('Ada Lovelace');
+  // The red box is drawn into the page where the comment was.
+  const flat = join(mkdtempSync(join(tmpdir(), 'flat-')), 'flat.pdf');
+  writeFileSync(flat, bytes);
+  await page.goto('/tools/crop-pdf');
+  await page.locator('#file-input').setInputFiles([flat]);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  const px = await page.locator('#page-canvas').evaluate((c: HTMLCanvasElement) => {
+    const d = c.getContext('2d')!.getImageData(Math.round(c.width * (350 / 600)), Math.round(c.height * (175 / 800)), 1, 1).data;
+    return [d[0]!, d[1]!, d[2]!];
+  });
+  expect(px[0]).toBeGreaterThan(200);
+  expect(px[1]).toBeLessThan(60);
+  net.assertNothingLeft(['application.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Flatten PDF can turn whole pages into images with no text left', async ({ page }) => {
+  await open(page, 'flatten-pdf');
+  const file = await markedUpForm();
+  const { downloads } = await run(page, [file], async () => {
+    await choose(page.locator('input[name="mode"][value="image"]'));
+  });
+  await expect(page.locator('#results-list')).toContainText('1 page turned into images');
+  const bytes = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(bytes);
+  expect(doc.getPageCount()).toBe(1);
+  expect(doc.getPage(0).getSize()).toEqual({ width: 600, height: 800 });
+  expect(await textItems(bytes, 1)).toEqual([]);
 });

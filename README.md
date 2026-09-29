@@ -77,6 +77,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Image to SVG](https://stayput.dev/tools/image-to-svg) (trace PNG or JPG into vector shapes; black and white, logo or detailed) | |
 | [Remove silence](https://stayput.dev/tools/remove-silence) (shorten pauses, trim quiet ends) | |
 | [Blur faces in video](https://stayput.dev/tools/blur-face-video) (automatic, frame by frame; blur, pixelate, box or emoji) | |
+| [Flatten PDF](https://stayput.dev/tools/flatten-pdf) (form fields, comments, stamps and signatures into the page; text stays selectable) | |
 | [Fill PDF form](https://stayput.dev/tools/fill-pdf-form) (type into fillable fields, tick boxes, optional flatten) | |
 | [Online tuner](https://stayput.dev/tools/tuner) (guitar, bass, ukulele, violin, chromatic; reference notes) | |
 | [Mic test](https://stayput.dev/tools/mic-test) (level meter, verdict, record and play back) | |

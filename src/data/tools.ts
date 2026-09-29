@@ -2466,6 +2466,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'flatten-pdf',
+    name: 'Flatten PDF',
+    title: 'Flatten PDF Online: Lock Form Fields and Comments, No Upload | Stayput',
+    description:
+      'Flatten a filled-in PDF form, comments, stamps and signatures into the page so they show the same everywhere and cannot be edited. Text stays selectable. No upload.',
+    heading: 'Flatten a PDF',
+    tagline: 'Filled-in forms, comments and signatures pressed into the page, on your own device, before you send it.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to flatten',
+    action: 'Flatten PDF',
+    keywords: ['flatten pdf', 'flatten pdf form', 'flatten pdf online', 'lock pdf form fields', 'flatten annotations', 'make pdf non editable', 'flatten fillable pdf'],
+    steps: [
+      'Drop one or more PDFs: a filled-in form, a marked-up draft, a signed contract.',
+      'Choose Fields and annotations to keep the text selectable, or Whole pages as images for a copy with nothing left to edit.',
+      'Press Flatten PDF and send the flattened copy. Keep your original if you might need to change an answer.',
+    ],
+    faq: [
+      {
+        q: 'What does flattening a PDF do?',
+        a: 'Form fields, comments, highlights, stamps, drawings and many electronic signatures sit on top of the page as separate layers that a PDF app can move, change or hide. Flattening draws each one into the page itself and removes the layer, so every reader shows exactly the same thing and the answers can no longer be typed over.',
+      },
+      {
+        q: 'When do I need to flatten?',
+        a: 'When the recipient must see exactly what you filled in. A form filled in one app can show empty boxes in another, and some court e-filing systems and application portals reject PDFs that still have fillable fields. Flattening before you print, merge or upload avoids both.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. pdf-lib and pdf.js run in this tab, so tax forms, contracts and medical paperwork never leave your device.',
+      },
+      {
+        q: 'Can I undo it?',
+        a: 'Not in the flattened copy: the fields are gone and their answers are part of the page. Your original file is not changed, so keep it if you may need to edit the form again.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
