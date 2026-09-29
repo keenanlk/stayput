@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import MergeVideos from '../../components/options/MergeVideos.astro';
+const tool = toolBySlug('merge-videos')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><MergeVideos /></Fragment>
+</ToolLayout>
+<script src="../../tools/merge-videos.ts"></script>

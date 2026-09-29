@@ -33,6 +33,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'rotate-video': ['trim-video', 'compress-video'],
   'crop-video': ['resize-video', 'compress-video'],
   'video-speed': ['compress-video', 'video-to-gif'],
+  'merge-videos': ['compress-video', 'trim-video'],
   'blur-image': ['compress-image', 'crop-image'],
   'rotate-image': ['crop-image', 'compress-image'],
   'video-to-mp3': ['video-to-gif', 'compress-image'],
