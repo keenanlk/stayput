@@ -30,3 +30,13 @@ worker through Transformers.js (Apache-2.0) and onnxruntime-web, served from
 
 Files here are served with a one-year immutable cache and cached by the service
 worker, so a changed model must get a new file name.
+
+`realesr-general-x4v3.onnx` is Real-ESRGAN general x4v3 (SRVGGNetCompact, 1.2M
+parameters) by Xintao Wang and others, released under the BSD 3-Clause
+License (https://github.com/xinntao/Real-ESRGAN). It was exported to ONNX
+(opset 17, float32, dynamic height and width) from the official weights,
+https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-general-x4v3.pth
+(SHA-256 8dc7edb9ac80ccdc30c3a5dca6616509367f05fbc184ad95b731f05bece96292),
+and checked against the PyTorch model (largest difference under 1e-6). The
+image upscaler loads it on the first picture and runs it in a web worker
+through onnxruntime-web, served from /vendor/.

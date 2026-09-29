@@ -1792,6 +1792,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'remove-noise',
+    name: 'Remove background noise',
+    title: 'Remove Background Noise from Audio or Video, No Upload | Stayput',
+    description:
+      'Clean hiss, hum, fans, traffic and room noise out of a voice recording or video in your browser. Batch, keeps the format, nothing uploaded, no sign-up.',
+    heading: 'Remove background noise',
+    tagline: 'Keep the voice, lose the hiss, hum and fan noise. Cleaned on this device, never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop recordings or videos to clean',
+    action: 'Remove noise',
+    keywords: ['remove background noise', 'noise reduction', 'remove noise from audio', 'audio noise remover', 'remove background noise from video', 'noise remover', 'reduce background noise', 'clean up audio'],
+    steps: [
+      'Drop one or more recordings (MP3, WAV, M4A, FLAC, OGG, voice memos) or videos (MP4, MOV, WebM), or tap to pick them.',
+      'Keep Strong to leave only the voice, or pick Medium or Light to keep a little of the room. Keep the original format or pick another.',
+      'Run it. Each file is cleaned in your tab; videos keep their picture untouched and get the cleaned sound.',
+    ],
+    faq: [
+      {
+        q: 'Are my recordings uploaded?',
+        a: 'No. The noise remover is a small neural network that runs as WebAssembly inside this page. Your browser decodes the sound, the network cleans it, and the file is written again in your tab. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+      {
+        q: 'What kind of noise does it remove?',
+        a: 'Steady and repeating background sound around a voice: hiss, electrical hum, computer and air-conditioning fans, traffic, rain, keyboard typing and crowd murmur. It is trained on speech, so it keeps voices and treats most other sound as noise.',
+      },
+      {
+        q: 'Can I use it on music?',
+        a: 'Not really. It keeps speech and drops what is not speech, so instruments get thinned or cut. For a voice over quiet music, try Light, which mixes some of the original back in.',
+      },
+      {
+        q: 'Does it work on a video?',
+        a: 'Yes. Drop an MP4, MOV or WebM and the cleaned sound is put back with the original picture, which is copied as it is. The sound is re-encoded as AAC in an MP4, or Opus in a WebM, and stays in sync.',
+      },
+      {
+        q: 'Why does the voice sound a little thin or robotic?',
+        a: 'When the noise is as loud as the voice, removing it takes some of the voice too. Pick Medium or Light, which blend a share of the original back in, or boost a quiet recording with the volume booster afterwards.',
+      },
+    ],
+  },
+  {
     slug: 'merge-audio',
     name: 'Merge audio',
     title: 'Merge Audio Files Online: Join MP3 and WAV, No Upload | Stayput',
@@ -2948,6 +2990,48 @@ export const tools: Tool[] = [
       {
         q: 'My hair looks cut off at the edges.',
         a: 'Fine, flyaway hair against a busy background is the hardest case for the cut-out. A photo against a plain wall works best. You can also run the photo through the background remover first, adjusting Keep around the edges, and drop the PNG it gives you here.',
+      },
+    ],
+  },
+  {
+    slug: 'upscale-image',
+    name: 'AI image upscaler',
+    title: 'AI Image Upscaler: Enlarge Photos 2×, 3×, 4×, No Upload | Stayput',
+    description:
+      'Make a small or blurry picture 2, 3 or 4 times bigger with an AI upscaler that runs in your browser. Sharper edges, fewer JPEG blocks. Nothing uploaded.',
+    heading: 'Upscale an image with AI',
+    tagline: 'Make a small picture bigger and sharper with a neural network that runs on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop pictures to upscale',
+    action: 'Upscale',
+    keywords: ['ai image upscaler', 'upscale image', 'image upscaler', 'increase image resolution', 'enlarge image without losing quality', 'photo enhancer', 'upscale photo', 'make image bigger'],
+    steps: [
+      'Drop one or more pictures (JPG, PNG, WebP, HEIC, AVIF or JPEG XL).',
+      'Pick 2×, 3× or 4×, and keep the format or choose PNG, JPG or WebP.',
+      'Run it. The upscaling model downloads once (4.9 MB), then each picture is enlarged in your tab.',
+    ],
+    faq: [
+      {
+        q: 'Are my pictures uploaded?',
+        a: 'No. The upscaler is a neural network that runs as WebAssembly inside this page, in a background thread. Your pictures are decoded, enlarged and saved in your tab. The model file is the only thing downloaded, once, from this site.',
+      },
+      {
+        q: 'How is this different from resizing?',
+        a: 'Resizing spreads the same pixels further apart, so a small picture gets soft and blocky. The upscaler is Real-ESRGAN, a network trained on pairs of sharp and degraded photos, so it draws crisp edges and removes JPEG blocks and blur while it enlarges.',
+      },
+      {
+        q: 'Can it recover a face or text that is not in the picture?',
+        a: 'No. It sharpens what is there and fills in plausible fine texture, but it cannot restore detail that was never captured. Tiny faces and small print come out cleaner, not readable if they were not readable before.',
+      },
+      {
+        q: 'How big can the result be?',
+        a: 'Up to 16 megapixels, about 4900 × 3300, because that is the most every browser, including Safari on iPhone, can hold as one image. A larger request is held to that size and the result says so.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'Time grows with the size of the result. A 4× enlargement to about 2000 × 1500 takes around half a minute on a recent laptop and longer on a phone. The page stays usable while it works, and several pictures run one after another.',
       },
     ],
   },

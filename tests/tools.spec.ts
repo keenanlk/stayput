@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(77);
+  expect(await page.locator('.index .tool-card').count()).toBe(79);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'transcribe'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -5298,4 +5298,120 @@ test('Transcribe turns a speech recording into SRT captions with the words spoke
   expect(srt.toLowerCase()).toContain('ask not what your country can do for you');
   net.assertNothingLeft(['jfk.wav']);
   expect(errors).toEqual([]);
+});
+
+/** A 16-bit mono WAV of white noise (a fixed seed, so every run is the same). */
+function noiseWav(seconds: number, rate = 44100, amplitude = 6000): string {
+  const n = Math.round(seconds * rate);
+  const buf = Buffer.alloc(44 + n * 2);
+  buf.write('RIFF', 0);
+  buf.writeUInt32LE(36 + n * 2, 4);
+  buf.write('WAVEfmt ', 8);
+  buf.writeUInt32LE(16, 16);
+  buf.writeUInt16LE(1, 20);
+  buf.writeUInt16LE(1, 22);
+  buf.writeUInt32LE(rate, 24);
+  buf.writeUInt32LE(rate * 2, 28);
+  buf.writeUInt16LE(2, 32);
+  buf.writeUInt16LE(16, 34);
+  buf.write('data', 36);
+  buf.writeUInt32LE(n * 2, 40);
+  let seed = 12345;
+  for (let i = 0; i < n; i++) {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    buf.writeInt16LE(Math.round(amplitude * (seed / 0x7fffffff - 0.5) * 2), 44 + i * 2);
+  }
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'fan.wav');
+  writeFileSync(file, buf);
+  return file;
+}
+
+test('Remove background noise takes steady noise out of a WAV, keeps its length and format, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'remove-noise');
+  const net = watchNetwork(page);
+  const file = noiseWav(2);
+  const before = await levels(page, readFileSync(file));
+  const { downloads } = await run(page, [file]);
+  expect(downloads[0]!.suggestedFilename()).toBe('fan-clean.wav');
+  const after = await levels(page, await bytesOf(downloads[0]!));
+  expect(after.seconds).toBeCloseTo(2, 2);
+  // Noise with no voice in it is turned down by well over 20 dB.
+  expect(after.rms / before.rms).toBeLessThan(0.1);
+  await expect(page.locator('#results-list .result-item')).toContainText('no voice found');
+  net.assertNothingLeft(['fan.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('Remove background noise at Light keeps some of the original sound', async ({ page }) => {
+  await open(page, 'remove-noise');
+  const file = noiseWav(1.5);
+  const before = await levels(page, readFileSync(file));
+  const { downloads } = await run(page, [file], async () => {
+    await page.locator('input[name="strength"][value="light"]').check({ force: true });
+    await page.locator('#format').selectOption('flac');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('fan-clean.flac');
+  const after = await levels(page, await bytesOf(downloads[0]!));
+  // Light mixes 35% of the original back in (a little less once resampled to 48 kHz and back).
+  expect(after.rms / before.rms).toBeGreaterThan(0.2);
+  expect(after.rms / before.rms).toBeLessThan(0.45);
+});
+
+test('Remove background noise from video keeps the picture and the length, and no bytes leave the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/remove-background-noise-from-video');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [staticFx('talk.webm')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('talk-clean.webm');
+  const info = await audioInfo(page, await bytesOf(downloads[0]!));
+  expect(info.duration).toBeGreaterThan(1.8);
+  expect(info.duration).toBeLessThan(2.6);
+  await expect(page.locator('#results-list .result-item')).toContainText('picture copied');
+  net.assertNothingLeft(['talk.webm']);
+});
+
+/** Colours at a few points of an image file, read in the page. */
+async function pixelsOf(page: Page, bytes: Uint8Array, points: [number, number][]): Promise<{ width: number; height: number; px: number[][] }> {
+  return page.evaluate(
+    async ([data, pts]) => {
+      const bmp = await createImageBitmap(new Blob([new Uint8Array(data)]));
+      const c = new OffscreenCanvas(bmp.width, bmp.height);
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(bmp, 0, 0);
+      return { width: bmp.width, height: bmp.height, px: pts.map(([x, y]) => Array.from(ctx.getImageData(x, y, 1, 1).data)) };
+    },
+    [Array.from(bytes), points] as const,
+  );
+}
+
+test('AI image upscaler makes a transparent logo 4× bigger, keeps the transparency and colours, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(120_000);
+  const errors = await open(page, 'upscale-image');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [logoPng()]);
+  expect(downloads[0]!.suggestedFilename()).toBe('logo-4x.png');
+  const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[20, 20], [400, 320], [400, 660]]);
+  expect([out.width, out.height]).toEqual([800, 800]);
+  expect(out.px[0]![3]).toBe(0);
+  const [disc, bar] = [out.px[1]!, out.px[2]!];
+  expect(disc[3]).toBe(255);
+  expect(Math.max(disc[0]!, disc[1]!, disc[2]!)).toBeLessThan(40);
+  expect(bar[0]).toBeGreaterThan(180);
+  expect(bar[1]).toBeLessThan(70);
+  await expect(page.locator('#results-list .result-item')).toContainText('200×200 to 800×800');
+  net.assertNothingLeft(['logo.png']);
+  expect(errors).toEqual([]);
+});
+
+test('Enlarge image opens at 2× and puts a JPG on white', async ({ page }) => {
+  test.setTimeout(120_000);
+  await stubAnalytics(page);
+  await page.goto('/enlarge-image');
+  const { downloads } = await run(page, [logoPng()], async () => {
+    await page.locator('#format').selectOption('image/jpeg');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('logo-2x.jpg');
+  const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[10, 10]]);
+  expect([out.width, out.height]).toEqual([400, 400]);
+  expect(Math.min(...out.px[0]!.slice(0, 3))).toBeGreaterThan(240);
 });

@@ -65,6 +65,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Collage maker](https://stayput.dev/tools/collage-maker) (grids, side by side, stitched screenshots) | |
 | [Split image](https://stayput.dev/tools/split-image) (Instagram grids and carousels) | |
 | [Add text to image](https://stayput.dev/tools/add-text-to-image) (captions, memes, watermarks) | |
+| [AI image upscaler](https://stayput.dev/tools/upscale-image) (2×, 3× or 4× with Real-ESRGAN, on the device) | |
 | [Compress audio](https://stayput.dev/tools/compress-audio) (smaller MP3 or OGG, or fit a size limit) | |
 | [Volume booster](https://stayput.dev/tools/volume-booster) (louder, quieter or normalized audio and video) | |
 | [Pitch and speed changer](https://stayput.dev/tools/pitch-changer) (change key by semitones, speed up or slow down) | |
@@ -77,6 +78,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Image to SVG](https://stayput.dev/tools/image-to-svg) (trace PNG or JPG into vector shapes; black and white, logo or detailed) | |
 | [Transcribe audio to text](https://stayput.dev/tools/transcribe) (Whisper on your device; text, SRT or WebVTT; 16+ languages) | |
 | [Remove silence](https://stayput.dev/tools/remove-silence) (shorten pauses, trim quiet ends) | |
+| [Remove background noise](https://stayput.dev/tools/remove-noise) (hiss, hum, fans and traffic out of voice recordings and videos) | |
 | [Blur faces in video](https://stayput.dev/tools/blur-face-video) (automatic, frame by frame; blur, pixelate, box or emoji) | |
 | [Resize PDF pages](https://stayput.dev/tools/resize-pdf) (A4, Letter, Legal, A3, A5, Tabloid; content scaled to fit, text stays text) | |
 | [Flatten PDF](https://stayput.dev/tools/flatten-pdf) (form fields, comments, stamps and signatures into the page; text stays selectable) | |
