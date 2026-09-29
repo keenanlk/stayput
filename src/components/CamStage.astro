@@ -1,0 +1,67 @@
+---
+/**
+ * The webcam test: a live preview, what the browser reports about the camera
+ * (resolution, frame rate, measured frame rate), a mirror switch and a
+ * snapshot saved as JPG. It replaces the drop zone. Driven by
+ * src/tools/webcam-test.ts.
+ */
+import Icon from './Icon.astro';
+---
+<div id="cam-panel" class="cam-panel" data-state="idle">
+  <div class="cam-screen">
+    <video id="cam-video" class="cam-video" playsinline muted hidden></video>
+    <div class="cam-idle" id="cam-idle">
+      <Icon name="video" />
+      <strong>Check that your webcam works</strong>
+      <span>Your browser asks for the camera. The picture stays in this tab and is never sent anywhere.</span>
+    </div>
+    <p class="cam-verdict" id="cam-verdict" aria-live="polite" hidden></p>
+  </div>
+  <div class="cam-controls">
+    <button type="button" class="btn btn-primary btn-lg" id="cam-start">Test my webcam</button>
+    <button type="button" class="btn btn-lg" id="cam-snap" hidden>Take a photo</button>
+    <button type="button" class="btn btn-lg btn-ghost" id="cam-stop" hidden>Turn off the camera</button>
+  </div>
+  <div class="cam-options">
+    <div class="field">
+      <label for="cam-device">Camera</label>
+      <select id="cam-device"><option value="">Default camera</option></select>
+      <label for="cam-quality">Ask for</label>
+      <select id="cam-quality">
+        <option value="720">720p (1280 × 720)</option>
+        <option value="1080" selected>1080p (1920 × 1080)</option>
+        <option value="2160">4K (3840 × 2160)</option>
+      </select>
+      <label class="check"><input type="checkbox" id="cam-mirror" checked /> Mirror the preview</label>
+    </div>
+    <dl class="cam-facts" id="cam-facts" hidden>
+      <div><dt>Camera</dt><dd id="cam-name">–</dd></div>
+      <div><dt>Resolution</dt><dd id="cam-res">–</dd></div>
+      <div><dt>Frame rate</dt><dd id="cam-fps">–</dd></div>
+      <div><dt>Aspect ratio</dt><dd id="cam-aspect">–</dd></div>
+    </dl>
+  </div>
+  <p class="muted small cam-note" id="cam-note" aria-live="polite"></p>
+</div>
+<style is:global>
+  .tool-panel:has(#cam-panel) #drop,
+  .tool-panel:has(#cam-panel) #file-list,
+  .tool-panel:has(#cam-panel) .run-dock { display: none; }
+  .cam-panel { display: grid; gap: 16px; }
+  .cam-screen { position: relative; min-height: 200px; background: var(--surface-2); border: 1px dashed var(--line-strong); border-radius: var(--radius); display: grid; place-items: center; overflow: hidden; }
+  .cam-panel:not([data-state='idle']) .cam-screen { aspect-ratio: 16 / 9; max-height: 62vh; background: #000; border-style: solid; }
+  .cam-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .cam-panel[data-mirror='true'] .cam-video { transform: scaleX(-1); }
+  .cam-idle { display: grid; justify-items: center; gap: 6px; padding: 20px; text-align: center; color: var(--muted); }
+  .cam-idle strong { color: var(--ink); font-size: 1.05rem; }
+  .cam-idle svg { width: 36px; height: 36px; color: var(--accent); }
+  .cam-verdict { position: absolute; left: 12px; bottom: 12px; margin: 0; padding: 4px 10px; border-radius: 999px; background: rgb(0 0 0 / 0.65); color: #fff; font-weight: 600; font-size: 0.9rem; }
+  .cam-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cam-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px 28px; align-items: start; }
+  .cam-facts { margin: 0; display: grid; gap: 6px; font-size: 14px; }
+  .cam-facts div { display: flex; gap: 10px; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  .cam-facts dt { color: var(--muted); }
+  .cam-facts dd { margin: 0; color: var(--ink); font-weight: 600; text-align: right; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+  .cam-note { margin: 0; }
+  .cam-note.is-warn { color: var(--warn); font-weight: 600; }
+</style>

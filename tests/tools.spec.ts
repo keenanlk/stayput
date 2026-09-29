@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(54);
+  expect(await page.locator('.tool-card').count()).toBe(57);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'screen-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3727,6 +3727,45 @@ test('Screen recorder says when no sound was shared, and the with-audio page tic
   expect((await videoTracks(await bytesOf(download))).audio).toBe(0);
 });
 
+test('Voice recorder records the microphone to an MP3 that keeps the pitch, and no bytes leave the tab', async ({ page }) => {
+  // Stand in for the microphone: a 440 Hz tone.
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async (constraints?: MediaStreamConstraints) => {
+      (window as unknown as { __asked: unknown }).__asked = constraints;
+      const ac = new AudioContext();
+      const osc = ac.createOscillator();
+      osc.frequency.value = 440;
+      const dest = ac.createMediaStreamDestination();
+      osc.connect(dest);
+      osc.start();
+      return dest.stream;
+    };
+  });
+  const errors = await open(page, 'voice-recorder');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#vr-start').click();
+  await expect(page.locator('#vr-deck')).toHaveAttribute('data-state', 'live');
+  const asked = await page.evaluate(() => (window as unknown as { __asked: { audio: MediaTrackConstraints } }).__asked.audio);
+  expect(asked.noiseSuppression).toBe(true);
+  await page.waitForTimeout(1500);
+  await page.locator('#vr-stop').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 30_000 });
+  await expect(page.locator('#vr-audio')).toBeVisible();
+  const item = page.locator('#results-list .result-item');
+  await expect(item.locator('.name')).toHaveText(/^voice-recording-\d{4}-\d{2}-\d{2}-\d{4}\.mp3$/);
+  await expect(item).toContainText('mono');
+  const [download] = await Promise.all([page.waitForEvent('download'), item.getByRole('button', { name: 'Download' }).click()]);
+  const mp3 = await bytesOf(download);
+  const sound = await soundOf(page, mp3);
+  expect(sound.seconds).toBeGreaterThan(1.1);
+  expect(sound.seconds).toBeLessThan(2.2);
+  expect(Math.abs(sound.hz - 440)).toBeLessThan(22);
+  net.assertNothingLeft(['voice-recording']);
+  expect(errors).toEqual([]);
+});
+
 test('Redact PDF removes the text under the boxes, keeps other pages, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'redact-pdf');
   const net = watchNetwork(page);
@@ -3882,6 +3921,61 @@ test('Increase video volume copies the picture and turns up the sound', async ({
   net.assertNothingLeft(['talk.webm']);
 });
 
+test('Crop PDF trims white margins page by page and crops to a drawn box, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'crop-pdf');
+  const net = watchNetwork(page);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  // Running before choosing anything is an error, not a silent copy.
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  await page.locator('#auto-trim').click();
+  await expect(page.locator('#crop-result')).toContainText('Trimmed the white margins on 3 pages');
+  await expect(page.locator('.crop-box')).toHaveCount(1);
+  let [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect(download.suggestedFilename()).toBe('text-cropped.pdf');
+  let doc = await PDFDocument.load(await bytesOf(download));
+  expect(doc.getPageCount()).toBe(3);
+  // Each fixture page holds a heading at y 700 and a box from x 60, y 100, 250 to 350 pt wide:
+  // the crop hugs them with a small margin, so it differs page by page.
+  for (const [i, p] of doc.getPages().entries()) {
+    const c = p.getCropBox();
+    expect(c.x).toBeGreaterThan(40);
+    expect(c.x).toBeLessThan(60);
+    expect(c.y).toBeGreaterThan(80);
+    expect(c.y).toBeLessThan(100);
+    expect(c.y + c.height).toBeLessThan(750);
+    expect(c.x + c.width).toBeGreaterThan(Math.max(260 + (i + 1) * 50, 380));
+    expect(c.x + c.width).toBeLessThan(480);
+    expect(p.getMediaBox()).toEqual(c);
+  }
+  // The text inside the box is untouched.
+  expect((await textItems(await bytesOf(download), 2)).map((t) => t.str).join(' ')).toContain('Page 2 of the fixture');
+
+  // A drawn box on one page only.
+  await page.locator('#crop-reset').click();
+  await expect(page.locator('.crop-box')).toHaveCount(0);
+  await choose(page.locator('input[name="crop-scope"][value="page"]'));
+  await page.locator('#stage').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const s = (await page.locator('#stage').boundingBox())!;
+  await page.mouse.move(s.x + s.width * 0.25, s.y + s.height * 0.25);
+  await page.mouse.down();
+  await page.mouse.move(s.x + s.width * 0.75, s.y + s.height * 0.5, { steps: 6 });
+  await page.mouse.up();
+  await expect(page.locator('#crop-count')).toContainText('1 page cropped');
+  [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  doc = await PDFDocument.load(await bytesOf(download));
+  const c = doc.getPage(0).getCropBox();
+  expect(Math.abs(c.width - 612 * 0.5)).toBeLessThan(8);
+  expect(Math.abs(c.height - 792 * 0.25)).toBeLessThan(8);
+  expect(Math.abs(c.y - 792 * 0.5)).toBeLessThan(8);
+  expect(doc.getPage(1).getCropBox().height).toBe(792);
+  net.assertNothingLeft(['text.pdf']);
+  expect(errors.filter((e) => !e.includes('Choose what to keep first'))).toEqual([]);
+});
+
 test('Merge audio joins files of different formats in order, with silence between, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'merge-audio');
   const net = watchNetwork(page);
@@ -3960,6 +4054,46 @@ test('Mic test shows the level and a verdict, plays back a short recording, and 
   const runs = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run'));
   expect(runs).toHaveLength(1);
   expect(runs[0]!.d.format).toBe('mic');
+  net.assertNothingLeft([]);
+  expect(errors).toEqual([]);
+});
+
+test('Webcam test shows the camera with its real resolution and frame rate, and saves a mirrored snapshot', async ({ page }) => {
+  // Stand in for the camera: a 1280x720 canvas, red on the left half and blue on the right.
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      const c = document.createElement('canvas');
+      c.width = 1280;
+      c.height = 720;
+      const g = c.getContext('2d')!;
+      setInterval(() => {
+        g.fillStyle = '#ff0000';
+        g.fillRect(0, 0, 640, 720);
+        g.fillStyle = '#0000ff';
+        g.fillRect(640, 0, 640, 720);
+      }, 33);
+      return c.captureStream(30);
+    };
+  });
+  const errors = await open(page, 'webcam-test');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#cam-start').click();
+  await expect(page.locator('#cam-panel')).toHaveAttribute('data-state', 'live');
+  await expect(page.locator('#cam-res')).toHaveText('1280 × 720 (720p)');
+  await expect(page.locator('#cam-aspect')).toHaveText('16:9');
+  await expect(page.locator('#cam-fps')).toContainText('measured', { timeout: 10_000 });
+  const [shot] = await Promise.all([page.waitForEvent('download'), page.locator('#cam-snap').click()]);
+  expect(shot.suggestedFilename()).toMatch(/^webcam-\d{4}-\d{2}-\d{2}-\d{6}\.jpg$/);
+  const jpg = await bytesOf(shot);
+  expect(jpegSize(jpg)).toEqual({ width: 1280, height: 720 });
+  // Mirrored like the preview: blue now on the left.
+  const left = await pixelAt(page, jpg, 100, 360);
+  expect(left[2]!).toBeGreaterThan(200);
+  expect(left[0]!).toBeLessThan(60);
+  await page.locator('#cam-stop').click();
+  await expect(page.locator('#cam-start')).toBeVisible();
   net.assertNothingLeft([]);
   expect(errors).toEqual([]);
 });

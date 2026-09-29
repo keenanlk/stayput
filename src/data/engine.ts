@@ -163,6 +163,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser’s own screen picker (getDisplayMedia) lets you choose what to share, and its built-in recorder (MediaRecorder) writes the video in your tab, as MP4 in Chrome, Edge and Safari or WebM in Firefox. When you stop, Mediabunny (MPL-2.0) copies the video into a fresh file without re-encoding so its length is written and players can seek it.',
     versus: 'Online screen recorders make you install an extension or desktop app, sign up, stamp a watermark on free recordings, cap them at a few minutes, and upload the video to their servers to share it. Screens show emails, chats, dashboards and customer data. Here the recording never leaves your device.',
   },
+  'voice-recorder': {
+    how: 'Your browser records the microphone with its built-in recorder (MediaRecorder), with its own noise and echo reduction if you leave it on. When you stop, the sound is decoded and written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, or M4A by the browser’s AAC encoder.',
+    versus: 'Online voice recorders upload the recording to their servers to convert it, show ads around the download, and some keep your recordings in an account. Voice memos, interviews and dictation are private. Here the sound never leaves your device.',
+  },
   'volume-booster': {
     how: 'Your browser decodes the sound with its own audio decoders. Every sample is multiplied by the gain you chose (or the gain that brings the gated loudness to about −14 LUFS), then a look-ahead peak limiter turns down only the moments that would pass −1 dBFS, easing in over 5 ms and out over 150 ms. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders. For a video, Mediabunny (MPL-2.0) copies the picture packets unchanged and adds the new sound.',
     versus: 'Online volume boosters upload the recording or video, cap the file size, and often just multiply the samples so loud parts clip and crackle. Here nothing leaves your device and the limiter keeps boosted sound clean.',
@@ -174,6 +178,10 @@ export const engines: Record<string, Engine> = {
   'mic-test': {
     how: 'Your browser opens the microphone (getUserMedia) with its own clean-up turned off, and the Web Audio API measures the level of each moment of sound in your tab. The play-back check is recorded by the browser’s built-in recorder into memory and played straight back.',
     versus: 'Many online mic tests record you and upload the clip to play it back, or run ads and trackers around the test. Here nothing is stored or sent: the sound goes from your microphone to this tab and nowhere else.',
+  },
+  'webcam-test': {
+    how: 'Your browser opens the camera (getUserMedia) and shows it in a video element on this page. The resolution comes from the picture itself, the frame rate is counted from the frames that actually arrive, and a snapshot is drawn to a canvas and saved as JPG by your browser.',
+    versus: 'Many online webcam tests send your picture to their servers to take a photo or record a clip, and run ads and trackers around the test. Here the picture goes from your camera to this tab and nowhere else.',
   },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
@@ -210,6 +218,10 @@ export const engines: Record<string, Engine> = {
   'remove-pdf-metadata': {
     how: 'pdf-lib (MIT) parses the PDF in your tab (an encrypted file is first decrypted by qpdf, compiled to WebAssembly and served from this site). The trailer’s information dictionary and file ID are dropped, every /Metadata XMP stream and /PieceInfo entry is unlinked from the catalog, pages, images and fonts, and every object nothing refers to any more is deleted before the file is written back out, so the removed data is really gone rather than just hidden.',
     versus: 'The PDFs people clean before sharing are the ones where the author matters: CVs, legal filings, reports sent anonymously, documents for a client who should not see who drafted them. Uploading them to a metadata-removal site hands the full document, name included, to a stranger. Here nothing is sent anywhere.',
+  },
+  'crop-pdf': {
+    how: 'pdf.js (Apache 2.0) draws each page in your tab so you can see what you are keeping. Trim white margins renders every page at 72 dpi and finds the smallest box holding all the ink. When you save, pdf-lib (MIT) sets each page’s media and crop box to that area, mapped through the page’s rotation. The page content itself is not re-rendered, so text stays sharp and selectable and the file barely changes size.',
+    versus: 'Online PDF croppers upload the whole document to change four numbers per page, and several only crop the first pages on a free plan or add a watermark. Here the file never leaves your device, every page is cropped, and nothing is added.',
   },
   'redact-pdf': {
     how: 'pdf.js (Apache 2.0) renders each page in your tab and reads its text layer, so a search finds every match with its position. When you save, each page with a box is rendered at 200 dpi, the boxes are painted onto the pixels, and pdf-lib (MIT) replaces that page’s content with the image. The old text, fonts, links, comments and form values on those pages are then deleted from the file along with its metadata, so nothing is left under the black.',

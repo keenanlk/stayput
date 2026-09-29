@@ -1670,6 +1670,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'voice-recorder',
+    name: 'Voice recorder',
+    title: 'Online Voice Recorder: Record to MP3, No Upload | Stayput',
+    description:
+      'Record your voice with your microphone and save it as MP3, WAV or M4A, right in the browser. No app, no sign-up, no time limit, and nothing is uploaded.',
+    heading: 'Record your voice',
+    tagline: 'A voice memo, a voice-over or a quick demo, recorded in this tab and saved as MP3. The sound never leaves your device.',
+    category: 'media',
+    accept: 'audio/*,.webm,.ogg,.m4a',
+    multiple: false,
+    dropLabel: 'Record your voice',
+    action: 'Save recording',
+    keywords: ['voice recorder', 'online voice recorder', 'record audio', 'record voice', 'mp3 recorder', 'audio recorder online', 'record my voice'],
+    steps: [
+      'Press Start recording and allow the microphone when your browser asks. Choose another microphone from the list if you have more than one.',
+      'Speak. The meter shows the level; pause and resume as often as you like.',
+      'Press Stop and save. Listen back on the page and download the recording as MP3, WAV or M4A.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. The microphone is recorded by your browser in this tab, and the MP3 is written by code in this page. There is no account and no server, so nobody else can hear it, and the page works offline once loaded.',
+      },
+      {
+        q: 'Does it work on my phone?',
+        a: 'Yes, in Safari on iPhone and iPad and in Chrome on Android. Keep the screen on while recording: phones pause web pages when the screen locks.',
+      },
+      {
+        q: 'Why does my voice sound muffled or quiet?',
+        a: 'Noise and echo reduction is on by default, which suits calls and memos. For music or a clean voice-over with a good microphone, untick "Reduce background noise and echo" to record the raw sound, then use the volume booster if it is too quiet.',
+      },
+      {
+        q: 'Is there a time limit?',
+        a: 'No. The recording is held in memory until you save it; an hour of speech is only a few tens of megabytes. Saving a very long recording as MP3 takes a little while, and WAV is fastest.',
+      },
+    ],
+  },
+  {
     slug: 'volume-booster',
     name: 'Volume booster',
     title: 'Volume Booster: Make Audio or Video Louder, No Upload | Stayput',
@@ -1784,6 +1822,44 @@ export const tools: Tool[] = [
       {
         q: 'Why does it sound different in calls?',
         a: 'This test turns off the browser’s noise suppression, echo cancellation and automatic gain, so you hear what the microphone really picks up. Call apps apply their own clean-up, which usually makes voices quieter in the background and more even.',
+      },
+    ],
+  },
+  {
+    slug: 'webcam-test',
+    name: 'Webcam test',
+    title: 'Webcam Test: Check Your Camera Online, Private | Stayput',
+    description:
+      'Test your webcam in the browser: live preview, real resolution and frame rate, mirror view and a snapshot as JPG. The picture never leaves your device.',
+    heading: 'Test your webcam',
+    tagline: 'See your camera, its real resolution and frame rate, before a call or an interview. Nothing is recorded or sent anywhere.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your webcam',
+    action: 'Test',
+    keywords: ['webcam test', 'camera test', 'test my webcam', 'online webcam test', 'is my webcam working', 'check camera', 'webcam resolution test'],
+    steps: [
+      'Press Test my webcam and allow the camera when your browser asks. Choose another camera from the list if you have several.',
+      'Check the picture, then read what the camera really delivers: its resolution, aspect ratio and the frame rate measured in this page.',
+      'Take a photo to save a snapshot as JPG, then press Turn off the camera.',
+    ],
+    faq: [
+      {
+        q: 'Is my picture recorded or uploaded?',
+        a: 'No. The camera shows in this page from a local stream, and nothing is recorded or sent anywhere. A snapshot is only made when you press Take a photo, and it goes straight to your downloads.',
+      },
+      {
+        q: 'My camera is not found or shows black. What is wrong?',
+        a: 'Check the lens cover or privacy switch, that no other app such as Zoom or Teams is using the camera, and that the browser is allowed to use it: on a Mac under System Settings, Privacy and Security, Camera; on Windows under Settings, Privacy, Camera. Some laptops also have a camera key on the keyboard.',
+      },
+      {
+        q: 'Why is the resolution lower than my camera’s box says?',
+        a: 'Browsers ask for 1080p here, and a camera gives the closest mode it has. Many “1080p” webcams only deliver 720p over USB, or drop resolution in apps that request less. Choose 4K under Ask for to see the most your camera offers.',
+      },
+      {
+        q: 'Why is the measured frame rate low?',
+        a: 'Webcams slow down in dim light to let in more light per frame, often from 30 to 15 frames per second. Turn on a lamp facing you and test again.',
       },
     ],
   },
@@ -2152,6 +2228,52 @@ export const tools: Tool[] = [
       {
         q: 'My hair looks cut off at the edges.',
         a: 'Fine, flyaway hair against a busy background is the hardest case for the cut-out. A photo against a plain wall works best. You can also run the photo through the background remover first, adjusting Keep around the edges, and drop the PNG it gives you here.',
+      },
+    ],
+  },
+  {
+    slug: 'crop-pdf',
+    name: 'Crop PDF',
+    title: 'Crop PDF Pages and Trim Margins, Free, No Upload | Stayput',
+    description:
+      'Crop PDF pages to the area you draw, or trim white margins from every page in one click. Text stays sharp and selectable. Runs in your browser, no upload.',
+    heading: 'Crop a PDF',
+    tagline: 'Cut PDF pages down to what matters: draw the area to keep, or trim the white margins automatically.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF to crop',
+    action: 'Download cropped PDF',
+    keywords: ['crop pdf', 'crop pdf pages', 'trim pdf margins', 'remove white margins from pdf', 'cut pdf page', 'resize pdf page', 'crop pdf online free'],
+    steps: [
+      'Drop the PDF. Its pages appear here, drawn in your browser.',
+      'Press Trim white margins to crop each page to its content, or drag on a page to draw the area to keep, for every page or just that one.',
+      'Download the cropped PDF. Text, links and images inside the area stay exactly as they were.',
+    ],
+    faq: [
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The pages are drawn and the crop is written by code running in your browser tab, so the document never leaves your device, and the page works offline once it has loaded.',
+      },
+      {
+        q: 'Does cropping lower the quality?',
+        a: 'No. The pages are not turned into pictures: the tool changes the page boxes that tell every viewer and printer which part of the page to show. Text stays sharp at any zoom and can still be selected and searched.',
+      },
+      {
+        q: 'Is the cropped-off part deleted?',
+        a: 'No, it is hidden. Every PDF viewer and printer shows only the cropped area, but the content outside it is still in the file and a PDF editor can bring it back. To remove something for good, such as an account number in a margin, use the redact PDF tool instead.',
+      },
+      {
+        q: 'What does Trim white margins do?',
+        a: 'It looks at each page on its own and crops it to the smallest box that holds all its text and images, plus a small margin, so a page with a wide border becomes easier to read on a phone or e-reader. Pages that are already full are left alone.',
+      },
+      {
+        q: 'Can I crop pages to different sizes?',
+        a: 'Yes. Choose This page before you draw and the box applies only to the page you are looking at. Trim white margins always works page by page. Go to another page and draw again to crop it differently.',
+      },
+      {
+        q: 'Why is the file almost the same size?',
+        a: 'Because nothing is removed from the pages, only hidden. If you need a smaller file, run the cropped PDF through the compress PDF tool.',
       },
     ],
   },
