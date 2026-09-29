@@ -2515,6 +2515,36 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'whatsapp-sticker-maker',
+    base: 'sticker-maker',
+    name: 'WhatsApp sticker maker',
+    title: 'WhatsApp Sticker Maker from Photos, No Upload | Stayput',
+    description: 'Make a WhatsApp sticker from any photo: background removed, white border, 512 × 512 WebP under 100 KB. Made in your browser; nothing is uploaded.',
+    heading: 'Make a WhatsApp sticker from a photo',
+    tagline: 'Cut out, bordered and sized the way WhatsApp wants it, on your device.',
+    keywords: ['whatsapp sticker maker', 'make whatsapp sticker', 'photo to whatsapp sticker', 'custom whatsapp stickers', 'whatsapp sticker from photo'],
+    dropLabel: 'Drop photos to make WhatsApp stickers',
+    action: 'Make WhatsApp sticker',
+    defaults: { outline: 'thick', size: '512', format: 'image/webp' },
+    intro: [
+      'WhatsApp stickers have simple rules: a 512 × 512 pixel image with a transparent background, saved as WebP, under 100 KB, with a small margin so nothing touches the edge. The best ones are cut-outs of a friend’s face mid-laugh, a pet caught at the right moment or an in-joke object, with the thick white border that makes a sticker look like a sticker.',
+      'This page does all of it in one go. The subject is found by a segmentation model running in your browser, the background is removed, a white die-cut border is drawn around the outline, and the result is placed on a 512 pixel square with WhatsApp’s 16 pixel margin and saved as WebP, stepping the quality down if needed to stay under 100 KB.',
+      'Sticker apps usually upload the photo to cut it out, and they are full of ads. Here nothing leaves your device, which matters when the sticker is of someone who did not ask to be one.',
+    ],
+    steps: [
+      'Drop one or more photos with a clear subject. The first photo downloads the cut-out model once.',
+      'Keep the defaults: thick white border, 512 × 512, WebP.',
+      'Download the stickers, then add them on WhatsApp Web or desktop: sticker panel, Create, upload.',
+    ],
+    faq: [
+      { q: 'How do I add the sticker on my phone?', a: 'The quickest way is WhatsApp Web or the desktop app: open a chat, the sticker panel, choose Create and upload the WebP file; it then syncs to your phone. On the phone itself, custom stickers need a sticker-pack app, which can import these files.' },
+      { q: 'Why does WhatsApp say the sticker is too big?', a: 'WhatsApp rejects stickers over 100 KB. This page lowers the WebP quality until the file fits and says in the results whether it did; a very detailed photo may still come out over, in which case crop it closer to the subject first.' },
+      { q: 'Can I make animated stickers?', a: 'Not here. This makes still stickers from photos. Animated WhatsApp stickers are animated WebP files with extra limits on frame rate and size.' },
+      { q: 'Does the other person see where the photo came from?', a: 'No. The sticker is a new image with no camera details, location or file name from the original photo inside it.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

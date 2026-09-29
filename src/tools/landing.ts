@@ -44,6 +44,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'watermark-image': () => import('./watermark-image'),
   'watermark-pdf': () => import('./watermark-pdf'),
   'remove-pdf-metadata': () => import('./remove-pdf-metadata'),
+  'sticker-maker': () => import('./sticker-maker'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

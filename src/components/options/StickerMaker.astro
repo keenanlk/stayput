@@ -1,0 +1,55 @@
+---
+/** Option controls for the sticker maker, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const outline = defaults.outline ?? 'thick';
+const color = defaults['outline-color'] ?? '#ffffff';
+const size = defaults.size ?? '0';
+const format = defaults.format ?? 'image/png';
+const outlines = [
+  ['none', 'None'],
+  ['thin', 'Thin'],
+  ['thick', 'Thick'],
+] as const;
+const sizes = [
+  ['0', 'Fit the subject'],
+  ['512', '512 × 512 (WhatsApp, Telegram)'],
+] as const;
+const formats = [
+  ['image/png', 'PNG'],
+  ['image/webp', 'WebP (smaller, for WhatsApp)'],
+] as const;
+---
+<div class="field">
+  <label>White border</label>
+  <div class="segmented" role="radiogroup" aria-label="Border">
+    {outlines.map(([v, l]) => <label><input type="radio" name="outline" value={v} checked={v === outline} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field">
+  <label for="outline-color">Border colour</label>
+  <input type="color" id="outline-color" value={color} />
+</div>
+<div class="field">
+  <label for="size">Size</label>
+  <select id="size">
+    {sizes.map(([v, l]) => <option value={v} selected={v === size}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
+<p class="field wide model-note">
+  The first photo downloads the cut-out model (about 46 MB, once). After that it is cached and works offline.
+</p>
+
+<style>
+  .model-note {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+</style>

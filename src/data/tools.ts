@@ -1903,6 +1903,52 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'sticker-maker',
+    name: 'Sticker maker',
+    title: 'Sticker Maker: Photo to Sticker, Free, No Upload | Stayput',
+    description:
+      'Turn a photo into a sticker: the background is removed, a white die-cut border is added, and you get a transparent PNG or a 512 px WebP for WhatsApp. Nothing is uploaded.',
+    heading: 'Make a sticker from a photo',
+    tagline: 'Cut out a person, pet or object, add a white border, and save it as a sticker, on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos to turn into stickers',
+    action: 'Make sticker',
+    keywords: ['sticker maker', 'photo to sticker', 'make sticker from photo', 'whatsapp sticker maker', 'telegram sticker', 'die cut sticker', 'sticker with white border'],
+    steps: [
+      'Drop one or more photos with a clear subject: a face, a pet, a mug, a plant.',
+      'Pick the border (none, thin or thick) and its colour, and the size: fitted to the subject, or 512 × 512 for WhatsApp and Telegram.',
+      'Download the stickers as transparent PNG or WebP, one by one or as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my photo uploaded?',
+        a: 'No. The cut-out model runs inside your browser tab, and the border and file are made there too. Photos of your friends, kids and pets stay on your device. The only download is the model, fetched from this site once and then cached.',
+      },
+      {
+        q: 'How do I use it in WhatsApp?',
+        a: 'Choose 512 × 512 and WebP. On WhatsApp Web or the desktop app, open the sticker panel, choose Create, and upload the file. On a phone, WhatsApp only takes custom stickers through a sticker app or pack, so the desktop route is the quickest. The file is kept under WhatsApp’s 100 KB limit where possible.',
+      },
+      {
+        q: 'And Telegram?',
+        a: 'Telegram stickers are also 512 pixels on the long side, in PNG or WebP. Choose 512 × 512 and send the file to Telegram’s @Stickers bot to add it to a pack.',
+      },
+      {
+        q: 'Can I print the sticker?',
+        a: 'Yes. Choose Fit the subject and PNG for the largest size your photo allows (up to 2048 pixels on the long side). The white border is the classic die-cut look that sticker printers cut along; most print services accept a transparent PNG.',
+      },
+      {
+        q: 'Why does the cut-out miss part of my subject?',
+        a: 'The model works best with one clear subject standing out from its background. If part is missing or bits of background stay, open the background remover with the same photo, adjust Keep around the edges, save the PNG, and drop that here.',
+      },
+      {
+        q: 'Can I make a sticker of a drawing or logo?',
+        a: 'Yes, as long as it stands out from its background. For a logo that is already on transparency, the border is added around its shape directly.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);

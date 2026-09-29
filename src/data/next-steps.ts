@@ -47,6 +47,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'remove-background': ['crop-image', 'compress-image'],
   'watermark-image': ['compress-image', 'strip-exif'],
   'remove-pdf-metadata': ['protect-pdf', 'compress-pdf'],
+  'sticker-maker': ['remove-background', 'compress-image'],
   'watermark-pdf': ['protect-pdf', 'compress-pdf'],
   'passport-photo': ['compress-image', 'image-to-pdf'],
   'unlock-pdf': ['merge-pdf', 'compress-pdf'],

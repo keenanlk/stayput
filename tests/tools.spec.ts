@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(47);
+  expect(await page.locator('.tool-card').count()).toBe(48);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -968,6 +968,7 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['2x2-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('us')],
     ['35x45-photo', 'passport-photo', async () => expect(page.locator('#size')).toHaveValue('eu')],
+    ['whatsapp-sticker-maker', 'sticker-maker', async () => expect(page.locator('#size')).toHaveValue('512')],
     ['pdf-metadata-viewer', 'remove-pdf-metadata', async () => expect(page.locator('#run')).toContainText('Remove metadata')],
     ['confidential-watermark', 'watermark-pdf', async () => expect(page.locator('#wm-text')).toHaveValue('CONFIDENTIAL')],
     ['watermark-id-copy', 'watermark-image', async () => expect(page.locator('input[name="layout"][value="tiled"]')).toBeChecked()],
@@ -3398,6 +3399,61 @@ test('Remove PDF metadata cleans restricted and scanned PDFs without losing page
     expect(after.getPageCount()).toBe(pages);
     expect(after.getProducer()).toBeUndefined();
   }
+  expect(errors).toEqual([]);
+});
+
+test('Sticker maker cuts out the subject with a white border, and makes a WhatsApp-ready WebP', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'sticker-maker');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('pug.jpg')]);
+  const [d] = await Promise.all([page.waitForEvent('download', { timeout: 180_000 }), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('pug-sticker.png');
+  const png = await bytesOf(d);
+  const { width, height } = pngSize(png);
+  // Trimmed to the pug: much smaller than the 640 x 426 photo, taller than wide.
+  expect(width).toBeLessThan(300);
+  expect(height).toBeGreaterThan(width);
+  // Corners are transparent; a white border runs round the subject.
+  expect((await pixelAt(page, png, 1, 1))[3]).toBe(0);
+  const edge = await page.evaluate(async (b64) => {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([arr]));
+    const c = document.createElement('canvas');
+    c.width = bmp.width;
+    c.height = bmp.height;
+    const g = c.getContext('2d')!;
+    g.drawImage(bmp, 0, 0);
+    // First opaque pixel along the middle row, from the left: the border.
+    const y = Math.round(c.height * 0.6);
+    const row = g.getImageData(0, y, c.width, 1).data;
+    for (let x = 0; x < c.width; x++) if (row[x * 4 + 3]! > 250) return [...row.slice(x * 4 + 8, x * 4 + 12)];
+    return [];
+  }, Buffer.from(png).toString('base64'));
+  expect(Math.min(...edge.slice(0, 3))).toBeGreaterThan(235);
+
+  await page.reload();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([staticFx('pug.jpg')]);
+  await page.locator('#size').selectOption('512');
+  await page.locator('#format').selectOption('image/webp');
+  const [w] = await Promise.all([page.waitForEvent('download', { timeout: 180_000 }), page.locator('#run').click()]);
+  expect(w.suggestedFilename()).toBe('pug-sticker.webp');
+  const webp = await bytesOf(w);
+  expect(String.fromCharCode(...webp.subarray(8, 12))).toBe('WEBP');
+  expect(webp.length).toBeLessThanOrEqual(100_000);
+  const dims = await page.evaluate(async (b64) => {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([arr], { type: 'image/webp' }));
+    return [bmp.width, bmp.height];
+  }, Buffer.from(webp).toString('base64'));
+  expect(dims).toEqual([512, 512]);
+  net.assertNothingLeft(['pug.jpg']);
   expect(errors).toEqual([]);
 });
 
