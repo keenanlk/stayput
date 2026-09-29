@@ -19,5 +19,14 @@ also quantises activations; it left speckles on textured backgrounds.) The
 background remover loads it on the first photo and runs it in a web worker
 through onnxruntime-web, served from /vendor/.
 
+`whisper-base/` is OpenAI's Whisper base speech-recognition model
+(https://github.com/openai/whisper), released under the MIT License, as the
+ONNX export published by onnx-community on Hugging Face
+(https://huggingface.co/onnx-community/whisper-base). Only the 8-bit quantised
+encoder and merged decoder are kept, with the tokenizer and config files, 76 MB
+in all. The transcribe tool loads it on the first file and runs it in a web
+worker through Transformers.js (Apache-2.0) and onnxruntime-web, served from
+/vendor/.
+
 Files here are served with a one-year immutable cache and cached by the service
 worker, so a changed model must get a new file name.

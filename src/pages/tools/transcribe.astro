@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import Transcribe from '../../components/options/Transcribe.astro';
+const tool = toolBySlug('transcribe')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><Transcribe /></Fragment>
+</ToolLayout>
+<script src="../../tools/transcribe.ts"></script>

@@ -62,6 +62,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'image-to-svg': () => import('./image-to-svg'),
   'gif-maker': () => import('./gif-maker'),
   'resize-pdf': () => import('./resize-pdf'),
+  'transcribe': () => import('./transcribe'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

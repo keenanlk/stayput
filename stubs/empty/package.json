@@ -1,0 +1,7 @@
+{
+  "name": "empty-node-only-stub",
+  "version": "0.0.0",
+  "description": "Stands in for Node-only dependencies of @huggingface/transformers (onnxruntime-node, sharp) that the browser build never loads, so installs stay small.",
+  "main": "index.js",
+  "license": "MIT"
+}

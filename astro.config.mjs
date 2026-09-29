@@ -22,7 +22,12 @@ export default defineConfig({
       // onnxruntime-web's default wasm entry embeds its 14 MB .wasm as a build asset, which would
       // land in /_astro/ and be precached for every visitor. This entry loads it from /vendor/
       // instead (wasmPaths in src/lib/bg.worker.ts), only when the background remover runs.
-      alias: [{ find: /^onnxruntime-web\/wasm$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.wasm.min.mjs', import.meta.url)) }],
+      // transformers.js (speech to text) imports the WebGPU entry, which needs a 28 MB .wasm of its own;
+      // it is pointed at the same WebAssembly-only build, already cached for the background remover.
+      alias: [
+        { find: /^onnxruntime-web\/wasm$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.wasm.min.mjs', import.meta.url)) },
+        { find: /^onnxruntime-web\/webgpu$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.wasm.min.mjs', import.meta.url)) },
+      ],
     },
   },
 });

@@ -2542,6 +2542,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'transcribe',
+    name: 'Transcribe audio to text',
+    title: 'Transcribe Audio and Video to Text or Subtitles, Private | Stayput',
+    description:
+      'Turn speech in an MP3, WAV, M4A, MP4 or MOV into text, SRT subtitles or WebVTT captions with Whisper running on your device. 16+ languages, no upload, no account.',
+    heading: 'Transcribe audio and video to text',
+    tagline: 'Speech to text and subtitles made by an AI model running in this tab. Interviews, lectures and voice notes are never uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.webm,.mp4,.mov,.m4v,.mkv',
+    multiple: true,
+    dropLabel: 'Drop recordings or videos to transcribe',
+    action: 'Transcribe',
+    keywords: ['transcribe audio to text', 'audio to text', 'speech to text', 'transcribe video', 'mp3 to text', 'voice memo to text', 'whisper transcription online', 'transcription without upload'],
+    steps: [
+      'Drop one or more recordings or videos.',
+      'Pick the spoken language (or let it detect it), and whether you want text, SRT subtitles or WebVTT captions.',
+      'Press Transcribe. The first run downloads the speech model once; the transcript appears with a Copy button and downloads as a file.',
+    ],
+    faq: [
+      {
+        q: 'Is my recording uploaded?',
+        a: 'No. The sound is decoded in this tab and the Whisper speech model runs in your browser, so interviews, medical dictation, meetings and voice notes stay on your device. The only download is the model itself, from this site, the first time.',
+      },
+      {
+        q: 'How accurate is it?',
+        a: 'This is Whisper base, OpenAI’s small multilingual model, compressed to run in a browser. Clear speech in English and other widely spoken languages comes out well; strong accents, crosstalk, music and technical names cause mistakes. Read the transcript through before you publish it.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'It depends on your device. On a recent laptop, ten minutes of sound takes about two to three minutes, plus a few seconds to load the model; on a phone it is several times slower. Keep the tab open while it works.',
+      },
+      {
+        q: 'Can it make subtitles for a video?',
+        a: 'Yes. Choose Subtitles (.srt) for YouTube, Premiere, DaVinci Resolve, VLC and most players, or Web captions (.vtt) for a web page’s track element. Each caption is timed to the speech.',
+      },
+      {
+        q: 'Does it tell speakers apart?',
+        a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph in the text version, which usually falls where the speaker changes.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
