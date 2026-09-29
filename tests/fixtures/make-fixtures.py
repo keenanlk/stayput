@@ -76,3 +76,11 @@ for i in range(4):
     anim.append(f)
 anim[0].save(os.path.join(out, 'anim.webp'), save_all=True, append_images=anim[1:], duration=[100, 150, 200, 250], loop=0, quality=90)
 anim[0].save(os.path.join(out, 'anim-lossless.webp'), save_all=True, append_images=anim[1:], duration=100, loop=0, lossless=True)
+
+# 400x300 PNG of 1 px black and white vertical stripes: any blur or pixelation
+# turns it mid-grey, while untouched pixels stay pure black or white.
+stripes = Image.new('RGB', (400, 300), (255, 255, 255))
+sd = ImageDraw.Draw(stripes)
+for x in range(0, 400, 2):
+    sd.line([(x, 0), (x, 299)], fill=(0, 0, 0))
+stripes.save(os.path.join(out, 'stripes.png'))
