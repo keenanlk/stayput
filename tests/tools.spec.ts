@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(69);
+  expect(await page.locator('.index .tool-card').count()).toBe(70);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -497,7 +497,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4749,4 +4749,106 @@ test('Tap tempo page leads with the tap button and reads the tempo from steady t
   await expect(page.locator('#metro-bpm')).toHaveText('125');
   await expect(page.locator('#metro-tap-note')).toContainText('125 BPM from 6 taps');
   await expect(page.locator('#metro-name')).toHaveText('Allegro');
+});
+
+/** A two-page fillable form: every kind of field, one repeated on both pages, and one read-only. */
+async function makeForm(): Promise<string> {
+  const doc = await PDFDocument.create();
+  const p1 = doc.addPage([612, 792]);
+  const p2 = doc.addPage([612, 792]);
+  p1.drawText('Application form', { x: 72, y: 740, size: 18 });
+  const form = doc.getForm();
+  const name = form.createTextField('applicant.name');
+  name.addToPage(p1, { x: 72, y: 680, width: 300, height: 22 });
+  name.addToPage(p2, { x: 72, y: 700, width: 300, height: 22 });
+  const notes = form.createTextField('notes');
+  notes.enableMultiline();
+  notes.addToPage(p1, { x: 72, y: 560, width: 300, height: 80 });
+  form.createCheckBox('agree').addToPage(p1, { x: 72, y: 520, width: 14, height: 14 });
+  const size = form.createRadioGroup('size');
+  for (const [i, o] of ['S', 'M', 'L'].entries()) size.addOptionToPage(o, p1, { x: 72 + i * 40, y: 480, width: 14, height: 14 });
+  const country = form.createDropdown('country');
+  country.addOptions(['Canada', 'France', 'Japan']);
+  country.addToPage(p1, { x: 72, y: 440, width: 150, height: 20 });
+  const zip = form.createTextField('zip');
+  zip.setMaxLength(5);
+  zip.addToPage(p1, { x: 72, y: 400, width: 80, height: 20 });
+  const ref = form.createTextField('ref');
+  ref.setText('A-1');
+  ref.enableReadOnly();
+  ref.addToPage(p2, { x: 72, y: 600, width: 100, height: 20 });
+  const file = join(mkdtempSync(join(tmpdir(), 'form-')), 'application.pdf');
+  writeFileSync(file, await doc.save());
+  return file;
+}
+
+test('Fill PDF form lays inputs over the fields, keeps a repeated field in step, saves the answers, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'fill-pdf-form');
+  const net = watchNetwork(page);
+  const file = await makeForm();
+  const { downloads } = await run(page, [file], async () => {
+    await expect(page.locator('#form-count')).toHaveText('0 of 6 fields filled, on 2 pages');
+    await expect(page.locator('.form-page')).toHaveCount(2);
+    const names = page.locator('[data-field="applicant.name"]');
+    await expect(names).toHaveCount(2);
+    // The input sits over the field's box: 72 pt from the left of a 612 pt page.
+    const box = await page.locator('.form-page').first().boundingBox();
+    const input = await names.first().boundingBox();
+    expect(Math.abs((input!.x - box!.x) / box!.width - 72 / 612)).toBeLessThan(0.01);
+    await names.first().fill('Ada Lovelace');
+    await expect(names.nth(1)).toHaveValue('Ada Lovelace');
+    await page.locator('[data-field="notes"]').fill('Line one\nLine two');
+    await page.locator('[data-field="agree"]').check();
+    await page.locator('[data-field="size"][value="M"]').check();
+    await page.locator('[data-field="country"]').selectOption('Japan');
+    await page.locator('[data-field="zip"]').fill('1234567');
+    await expect(page.locator('[data-field="zip"]')).toHaveValue('12345');
+    await expect(page.locator('[data-field="ref"]')).toBeDisabled();
+    await expect(page.locator('#form-count')).toHaveText('6 of 6 fields filled, on 2 pages');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('application-filled.pdf');
+  const out = await PDFDocument.load(await bytesOf(downloads[0]!));
+  const form = out.getForm();
+  expect(form.getTextField('applicant.name').getText()).toBe('Ada Lovelace');
+  expect(form.getTextField('notes').getText()).toBe('Line one\nLine two');
+  expect(form.getCheckBox('agree').isChecked()).toBe(true);
+  expect(form.getRadioGroup('size').getSelected()).toBe('M');
+  expect(form.getDropdown('country').getSelected()).toEqual(['Japan']);
+  expect(form.getTextField('zip').getText()).toBe('12345');
+  expect(form.getTextField('ref').getText()).toBe('A-1');
+  net.assertNothingLeft(['application.pdf']);
+  expect(errors).toEqual([]);
+});
+
+test('Fill PDF form can lock the answers into the page, keeps non-Latin answers fillable, and explains a flat PDF', async ({ page }) => {
+  await open(page, 'fill-pdf-form');
+  const file = await makeForm();
+  const { downloads } = await run(page, [file], async () => {
+    await page.locator('[data-field="applicant.name"]').first().fill('Grace Hopper');
+    await page.locator('#flatten').check();
+  });
+  const bytes = await bytesOf(downloads[0]!);
+  expect((await PDFDocument.load(bytes)).getForm().getFields()).toHaveLength(0);
+  expect((await textItems(bytes, 1)).map((t) => t.str).join(' ')).toContain('Grace Hopper');
+
+  // Greek cannot be drawn with the standard font: saved as a fillable form, refused when flattening.
+  await page.goto('/tools/fill-pdf-form');
+  const greek = await run(page, [file], async () => {
+    await page.locator('[data-field="applicant.name"]').first().fill('Ωμέγα');
+  });
+  const kept = await PDFDocument.load(await bytesOf(greek.downloads[0]!));
+  expect(kept.getForm().getTextField('applicant.name').getText()).toBe('Ωμέγα');
+  await page.goto('/tools/fill-pdf-form');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([file]);
+  await page.locator('[data-field="applicant.name"]').first().fill('Ωμέγα');
+  await page.locator('#flatten').check();
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('cannot be flattened');
+
+  await page.goto('/tools/fill-pdf-form');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#form-empty')).toBeVisible();
+  await expect(page.locator('#form-empty a')).toHaveAttribute('href', '/tools/sign-pdf');
 });

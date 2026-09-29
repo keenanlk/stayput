@@ -2268,6 +2268,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'fill-pdf-form',
+    name: 'Fill PDF form',
+    title: 'Fill PDF Forms Online Without Uploading, Free | Stayput',
+    description:
+      'Type into the fields of a fillable PDF form, tick its boxes and pick from its lists, then save the filled PDF. The form never leaves your device.',
+    heading: 'Fill in a PDF form',
+    tagline: 'Tax forms, applications and contracts carry your most personal details. Fill them in here and the file never leaves this device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a fillable PDF form',
+    action: 'Save filled PDF',
+    keywords: ['fill pdf form', 'fill out pdf online', 'pdf form filler', 'fillable pdf', 'fill in pdf', 'type on pdf form', 'complete pdf form online'],
+    steps: [
+      'Drop a PDF form. Each page appears with its fields shaded, ready to type into.',
+      'Click a box and type, tick the check boxes, and choose from the drop-down lists. Tab moves to the next field.',
+      'Save the filled PDF. Tick Lock the answers first if the form should not be edited again.',
+    ],
+    faq: [
+      {
+        q: 'Is my form uploaded anywhere?',
+        a: 'No. The PDF is opened, drawn and filled by code running in this tab, and the filled copy is saved straight to your device. Forms often hold your name, address, date of birth, and tax or ID numbers, which is exactly what should not go to a stranger’s server.',
+      },
+      {
+        q: 'Why are there no boxes to type into?',
+        a: 'The PDF has no fillable fields: it was saved as a flat page, or scanned. Use Sign PDF instead, which lets you type text, add the date and sign anywhere on the page.',
+      },
+      {
+        q: 'What does “Lock the answers” do?',
+        a: 'It flattens the form: the answers are drawn onto the page and the fields are removed, so the PDF looks the same everywhere and nobody can change what you typed. Leave it unticked if you or someone else still needs to edit the form.',
+      },
+      {
+        q: 'Can I sign the form here?',
+        a: 'Signature fields are shown but not filled here. Save the filled form, then open it in Sign PDF to draw or type your signature on the line.',
+      },
+      {
+        q: 'Does it work with tax forms like the IRS W-9 or W-4?',
+        a: 'Yes, the official IRS PDFs are ordinary fillable forms. A few government forms are built with an older Adobe technology (XFA) that only Adobe Reader can fill; for those the page says the PDF has no fillable fields.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
