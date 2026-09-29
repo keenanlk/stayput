@@ -1,0 +1,34 @@
+---
+/** Option controls for merge audio, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'mp3';
+const between = defaults.between ?? 'none';
+const bitrate = defaults.bitrate ?? '192';
+---
+<p class="small muted wide" style="margin:0">Files are joined top to bottom. Use the arrows to reorder them.</p>
+<div class="field">
+  <label for="between">Between files</label>
+  <select id="between">
+    <option value="none" selected={between === 'none'}>Nothing, straight on</option>
+    <option value="gap-1" selected={between === 'gap-1'}>1 second of silence</option>
+    <option value="gap-2" selected={between === 'gap-2'}>2 seconds of silence</option>
+    <option value="fade-2" selected={between === 'fade-2'}>2 second crossfade</option>
+    <option value="fade-5" selected={between === 'fade-5'}>5 second crossfade (DJ mix)</option>
+  </select>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="mp3" selected={format === 'mp3'}>MP3 (plays everywhere)</option>
+    <option value="wav" selected={format === 'wav'}>WAV (no quality loss, larger)</option>
+  </select>
+</div>
+<div class="field" id="bitrate-field">
+  <label for="bitrate">MP3 quality</label>
+  <select id="bitrate">
+    <option value="128" selected={bitrate === '128'}>128 kbps (speech, podcasts)</option>
+    <option value="192" selected={bitrate === '192'}>192 kbps (good default)</option>
+    <option value="320" selected={bitrate === '320'}>320 kbps (highest)</option>
+  </select>
+</div>

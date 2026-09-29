@@ -157,7 +157,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.tool-card').count()).toBe(50);
+  expect(await page.locator('.tool-card').count()).toBe(51);
   expect(errors).toEqual([]);
 });
 
@@ -496,7 +496,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'merge-audio'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3716,4 +3716,43 @@ test('Increase video volume copies the picture and turns up the sound', async ({
   expect(tracks.video).not.toBeNull();
   await expect(page.locator('#results-list .result-item')).toContainText('picture copied');
   net.assertNothingLeft(['talk.webm']);
+});
+
+test('Merge audio joins files of different formats in order, with silence between, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'merge-audio');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [staticFx('song.flac'), 'tone.wav'], async () => {
+    await page.locator('#between').selectOption('gap-1');
+    await page.locator('#format').selectOption('wav');
+    await expect(page.locator('#bitrate-field')).toBeHidden();
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('merged.wav');
+  const wav = await bytesOf(downloads[0]!);
+  const info = await audioInfo(page, wav);
+  // 1 s + 1 s of silence + 1.5 s; the mono FLAC is spread to both channels to match the stereo WAV.
+  expect(info.duration).toBeCloseTo(3.5, 1);
+  expect(info.channels).toBe(2);
+  const silent = await page.evaluate(async (arr) => {
+    const buf = await new OfflineAudioContext(2, 1, 44100).decodeAudioData(new Uint8Array(arr).buffer);
+    const d = buf.getChannelData(0);
+    const peak = (from: number, to: number) => d.subarray(Math.round(from * 44100), Math.round(to * 44100)).reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+    return { song: peak(0.2, 0.8), gap: peak(1.1, 1.9), tone: peak(2.2, 3.3) };
+  }, Array.from(wav));
+  expect(silent.gap).toBe(0);
+  expect(silent.song).toBeGreaterThan(0.05);
+  expect(silent.tone).toBeGreaterThan(0.05);
+  await expect(page.locator('#results-list .result-item')).toContainText('2 files joined');
+  net.assertNothingLeft(['song.flac', 'tone.wav']);
+  expect(errors).toEqual([]);
+});
+
+test('Merge MP3 joins two MP3s into one MP3', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/merge-mp3');
+  await expect(page.locator('#format')).toHaveValue('mp3');
+  const { downloads } = await run(page, [staticFx('song.mp3'), staticFx('song.mp3')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('merged.mp3');
+  const sound = await soundOf(page, await bytesOf(downloads[0]!));
+  expect(sound.seconds).toBeGreaterThan(1.95);
+  expect(sound.seconds).toBeLessThan(2.2);
 });
