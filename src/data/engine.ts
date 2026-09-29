@@ -87,6 +87,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser decodes the picture, then Stayput draws it on a transparent square canvas once for every icon size, halving the resolution step by step so the small sizes stay crisp. Each size is saved as a PNG and a small encoder in the page writes the ICO header and size directory around them. The whole file is assembled in memory in your tab.',
     versus: 'Icon converters that upload your image often hand back a single 32 pixel frame or a blurry resize, and keep a copy of your logo on their server. Here every size is drawn locally from your original, and nothing leaves the device.',
   },
+  'video-to-gif': {
+    how: 'Your browser opens the video with its own built-in decoder, the same one that plays it in the player above. Stayput seeks to each moment you asked for, copies that frame onto a canvas at the width you chose, and gifenc (MIT) picks the best 256 colours for it and compresses it. The GIF is assembled frame by frame in memory in your tab.',
+    versus: 'Online GIF makers upload the whole video to trim a few seconds of it, cap the file size, and often stamp a watermark on the result. Personal clips of family, pets or a screen with your inbox on it are exactly what should not sit on a stranger’s server. Here the video never leaves your device, whatever its size.',
+  },
   'favicon-generator': {
     how: 'Your browser decodes the logo (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and Stayput centres it on a 512 pixel square canvas, with your padding and background. Every icon is resized from that square with stepped downscaling so small sizes stay crisp. favicon.ico is written byte by byte by a small encoder in the page, and the manifest and HTML are plain text built in your tab.',
     versus: 'The logo you turn into a favicon is often for a site that has not launched yet. Upload-based generators take a copy of it, and at least one was caught sending logos to a third-party analytics service. Here there is no server to send it to.',

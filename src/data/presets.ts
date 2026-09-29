@@ -588,6 +588,60 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'mp4-to-gif',
+    base: 'video-to-gif',
+    name: 'MP4 to GIF',
+    title: 'MP4 to GIF Converter, Free, No Upload | Stayput',
+    description: 'Convert an MP4 clip to an animated GIF in your browser. Trim the part you want, choose width and frame rate. No upload, no watermark, no size cap.',
+    heading: 'Convert MP4 to GIF',
+    tagline: 'Pick the seconds you want from an MP4 and get a looping GIF, made on your device.',
+    keywords: ['mp4 to gif', 'convert mp4 to gif', 'mp4 to gif converter', 'mp4 to gif no watermark', 'mp4 to animated gif', 'mp4 to gif high quality'],
+    dropLabel: 'Drop an MP4 to turn into a GIF',
+    intro: [
+      'MP4 is what phones, screen recorders and most download buttons produce, and a GIF is still what plays everywhere without a click: in a README, a support ticket, a Slack thread, an email or a slide. Most MP4 to GIF sites make you upload the whole video first, often with a 100 or 200 MB cap, then queue it on a server and hand back a GIF with their logo in the corner. This page does the conversion inside your browser instead, so there is no upload to wait for and no limit on the size of the MP4.',
+      'Drop the file and it opens in a player. Scrub to the first moment you want and press Set start, then to the last and press Set end. The width and frame rate decide almost everything about the size of the GIF: 480 pixels wide at 10 frames per second is small enough for chat and sharp enough for a screen recording, while 640 pixels at 15 frames per second suits a product demo. The line under the options tells you how many frames the GIF will have before you make it.',
+      'Your browser decodes the MP4 with the same H.264 decoder it uses to play video on any website, and each frame is reduced to its best 256 colours before it is written into the GIF. A 5 second clip usually takes a few seconds on a laptop and a little longer on a phone. Nothing about the video, not even its name, is sent anywhere.',
+    ],
+    steps: [
+      'Drop an MP4, or tap to pick one from your files or camera roll.',
+      'Scrub to the part you want and press Set start and Set end, or type the times in seconds. Choose a width and frame rate.',
+      'Make the GIF. It downloads from your browser when the last frame is written.',
+    ],
+    faq: [
+      { q: 'How do I make the GIF smaller?', a: 'Shorten the clip first, then lower the width and the frame rate: halving the width makes each frame about four times smaller, and going from 20 to 10 frames per second halves the frame count. Busy footage with camera shake compresses far worse than a screen recording, so aim for 2 to 6 seconds of it.' },
+      { q: 'Does the GIF keep the sound?', a: 'No. GIF is an image format and has no audio track. If you need sound, keep the MP4; if you need something that autoplays silently in a document or chat, the GIF is the right choice.' },
+      { q: 'Can I convert a long MP4, like a whole screen recording?', a: 'Yes, the file can be as long as you like, because only the frames between your start and end are read. The GIF itself is capped at 600 frames, for example one minute at 10 frames per second.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'mov-to-gif',
+    base: 'video-to-gif',
+    name: 'MOV to GIF',
+    title: 'MOV to GIF: iPhone and Mac Video to GIF, No Upload | Stayput',
+    description: 'Turn a MOV video from an iPhone, a Mac screen recording or QuickTime into an animated GIF in your browser. Trim it, size it. Nothing is uploaded.',
+    heading: 'Convert MOV to GIF',
+    tagline: 'Turn an iPhone clip or a Mac screen recording into a GIF without sending it anywhere.',
+    keywords: ['mov to gif', 'convert mov to gif', 'quicktime to gif', 'iphone video to gif', 'screen recording to gif', 'mac screen recording to gif'],
+    dropLabel: 'Drop a MOV to turn into a GIF',
+    intro: [
+      'MOV is the QuickTime container Apple uses for iPhone videos and for screen recordings made with Shift Command 5 on a Mac. Both are exactly the kind of file you would rather not upload to a converter: a clip of your kids, or a recording of your screen with your inbox, your bank tab or a customer’s data on it. Here the MOV is opened by your own browser and the GIF is written on your device.',
+      'Whether a MOV opens depends on the video codec inside it, not on the .mov extension. Mac screen recordings and iPhone videos saved as Most Compatible use H.264, which every modern browser can decode. iPhone videos recorded in High Efficiency mode use HEVC (H.265): Safari on a Mac, iPhone or iPad plays those, but Chrome and Firefox on Windows usually cannot. If the video will not open, try this page in Safari, or send yourself the clip from Photos with the Most Compatible option.',
+      'Once it is open, scrub to the part you want and use Set start and Set end. Screen recordings make excellent GIFs at 800 pixels wide and 10 frames per second, because flat interface colours fit comfortably in a GIF’s 256-colour palette. For camera footage, 480 pixels at 15 frames per second keeps the file shareable.',
+    ],
+    steps: [
+      'Drop a MOV file (an iPhone video or a Mac screen recording), or tap to pick one.',
+      'Scrub to the moments you want and press Set start and Set end. Choose the width and frame rate.',
+      'Make the GIF and it downloads. The video never leaves your device.',
+    ],
+    faq: [
+      { q: 'Why does my iPhone MOV say it cannot be played?', a: 'It is probably HEVC (H.265), the iPhone default since 2017. Your browser has to decode it, and Chrome and Firefox on Windows or Linux usually cannot. Open this page in Safari, or on the iPhone go to Settings, Camera, Formats and pick Most Compatible for future videos.' },
+      { q: 'How do I turn a Mac screen recording into a GIF?', a: 'Record with Shift Command 5, drop the .mov from your desktop onto this page, and trim it to the part that matters. 800 pixels wide at 10 frames per second keeps interface text sharp while keeping the GIF small enough for a pull request or a help article.' },
+      { q: 'Is a Live Photo a MOV?', a: 'Partly. A Live Photo is a still HEIC plus a short MOV clip. Export it from Photos as a video (or share it as a video) and drop the resulting file here to turn it into a GIF.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);
