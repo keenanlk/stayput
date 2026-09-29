@@ -374,6 +374,11 @@
       "source": "/image-to-svg",
       "destination": "/tools/image-to-svg",
       "permanent": true
+    },
+    {
+      "source": "/gif-maker",
+      "destination": "/tools/gif-maker",
+      "permanent": true
     }
   ],
   "headers": [

@@ -48,6 +48,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'blur-face-video': ['compress-video', 'trim-video'],
   'remove-silence': ['compress-audio', 'trim-audio'],
   'image-to-svg': ['remove-background', 'favicon-generator'],
+  'gif-maker': ['compress-gif', 'gif-to-mp4'],
   'metronome': ['tuner', 'voice-recorder'],
   'tuner': ['metronome', 'pitch-changer'],
   'mic-test': ['merge-audio', 'audio-converter'],

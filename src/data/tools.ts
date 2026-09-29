@@ -2428,6 +2428,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'gif-maker',
+    name: 'GIF maker',
+    title: 'GIF Maker: Make an Animated GIF from Images, No Upload | Stayput',
+    description:
+      'Make an animated GIF from photos, screenshots or drawings. Set the order, the time per picture, the size and the loop, with a live preview. Nothing is uploaded.',
+    heading: 'Make a GIF from images',
+    tagline: 'Your pictures turned into one looping GIF, put together on this device, with no watermark.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop the pictures for your GIF',
+    action: 'Make GIF',
+    keywords: ['gif maker', 'make a gif', 'animated gif maker', 'create gif from images', 'photo to gif', 'gif creator', 'make gif from pictures'],
+    steps: [
+      'Drop two or more pictures. Put them in order with the arrows in the list.',
+      'Choose the time each picture stays on screen, the width, and whether the GIF loops. The preview plays as the GIF will.',
+      'Press Make GIF and download it.',
+    ],
+    faq: [
+      {
+        q: 'Are my pictures uploaded?',
+        a: 'No. They are decoded, resized and turned into GIF frames by code in this tab. Family photos, screenshots of work and unreleased product shots stay on your device.',
+      },
+      {
+        q: 'Why do the colours look a little grainy?',
+        a: 'A GIF frame can hold at most 256 colours, so a photo with smooth gradients, such as a sky, shows some banding. Each frame gets its own best 256 colours, which keeps faces and products close to the original. For full colour, a short MP4 is the better format; make the GIF, then turn it into a video with GIF to MP4.',
+      },
+      {
+        q: 'My pictures are different sizes. What happens?',
+        a: 'The GIF takes the shape of the first picture. Others are either shown whole with a background colour around them, or scaled up to fill the frame with their edges cropped; you choose which. Put the picture whose shape you want first.',
+      },
+      {
+        q: 'How big will the GIF be?',
+        a: 'Roughly the number of frames times the frame size, since GIF compression is weak on photos. Twenty photos at 480 pixels wide come to about 1 to 3 MB. Choose 320 pixels for a smaller file, or fewer pictures; the note under the download gives the exact size.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

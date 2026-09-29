@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(73);
+  expect(await page.locator('.index .tool-card').count()).toBe(74);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -975,6 +975,10 @@ test('preset landing pages render, run their base tool with the preset options a
     ['pdf-metadata-viewer', 'remove-pdf-metadata', async () => expect(page.locator('#run')).toContainText('Remove metadata')],
     ['black-and-white-pdf', 'grayscale-pdf', async () => expect(page.locator('#run')).toContainText('Make black and white')],
     ['sepia-filter', 'black-and-white-image', async () => expect(page.locator('input[name="mode"][value="sepia"]')).toBeChecked()],
+    ['images-to-gif', 'gif-maker', async () => {
+      await expect(page.locator('#delay')).toHaveValue('1');
+      await expect(page.locator('#width')).toHaveValue('640');
+    }],
     ['png-to-svg', 'image-to-svg', async () => {
       await expect(page.locator('input[name="mode"][value="logo"]')).toBeChecked();
       await expect(page.locator('#drop-white')).not.toBeChecked();
@@ -5099,5 +5103,81 @@ test('Image to SVG previews the trace, writes real vector paths at the image siz
   expect(bar!.slice(0, 3).every((v) => v < 40)).toBe(true);
   expect(corner![3]).toBe(0);
   net.assertNothingLeft(['logo.png']);
+  expect(errors).toEqual([]);
+});
+
+/** A flat-colour PNG of `w`×`h`, all one colour. */
+function solidPng(name: string, w: number, h: number, rgb: [number, number, number]): string {
+  const raw = Buffer.alloc(h * (w * 3 + 1));
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) raw.set(rgb, y * (w * 3 + 1) + 1 + x * 3);
+  const crcTable = Array.from({ length: 256 }, (_, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    return c >>> 0;
+  });
+  const crc = (b: Buffer) => {
+    let c = 0xffffffff;
+    for (const v of b) c = crcTable[(c ^ v) & 0xff]! ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const chunk = (type: string, data: Buffer) => {
+    const len = Buffer.alloc(4);
+    len.writeUInt32BE(data.length);
+    const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+    const sum = Buffer.alloc(4);
+    sum.writeUInt32BE(crc(body));
+    return Buffer.concat([len, body, sum]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(w, 0);
+  ihdr.writeUInt32BE(h, 4);
+  ihdr.set([8, 2, 0, 0, 0], 8);
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), name);
+  writeFileSync(file, Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]));
+  return file;
+}
+
+test('GIF maker plays a preview, writes one GIF with every picture in order and the chosen timing, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'gif-maker');
+  const net = watchNetwork(page);
+  const red = solidPng('step-1.png', 600, 400, [220, 20, 20]);
+  const green = solidPng('step-2.png', 600, 400, [20, 200, 20]);
+  // A tall picture in a wide frame: shown whole, with the background either side.
+  const blue = solidPng('step-3.png', 200, 400, [20, 20, 220]);
+  const { downloads } = await run(page, [red, green, blue], async () => {
+    await expect(page.locator('#gif-panel')).toBeVisible();
+    await expect(page.locator('#gif-hint')).toContainText('3 pictures, 0.5 s each: 1.5 s on a loop');
+    await page.locator('#delay').selectOption('1');
+    await choose(page.locator('#bounce'));
+    await expect(page.locator('#gif-hint')).toContainText('3 pictures, 1 s each: 4.0 s on a loop');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('animation.gif');
+  await expect(page.locator('#results-list')).toContainText('480×320, 4 frames, 1 s each, loops');
+  const info = gifInfo(await bytesOf(downloads[0]!));
+  expect(info.frames).toBe(4);
+  expect(info.loops).toBe(true);
+  expect([info.width, info.height]).toEqual([480, 320]);
+  const frames = await page.evaluate(async (b64) => {
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const dec = new ImageDecoder({ data: bytes, type: 'image/gif' });
+    await dec.tracks.ready;
+    const out: { centre: number[]; edge: number[]; ms: number }[] = [];
+    for (let i = 0; i < dec.tracks.selectedTrack!.frameCount; i++) {
+      const { image } = await dec.decode({ frameIndex: i });
+      const c = new OffscreenCanvas(image.displayWidth, image.displayHeight);
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(image, 0, 0);
+      const px = (x: number, y: number) => Array.from(ctx.getImageData(x, y, 1, 1).data.slice(0, 3));
+      out.push({ centre: px(240, 160), edge: px(10, 160), ms: (image.duration ?? 0) / 1000 });
+      image.close();
+    }
+    return out;
+  }, Buffer.from(await bytesOf(downloads[0]!)).toString('base64'));
+  // Red, green, blue, then green again on the way back.
+  expect(frames.map((f) => dominant(f.centre))).toEqual(['red', 'green', 'blue', 'green']);
+  // The tall blue picture leaves the white background at the sides.
+  expect(frames[2]!.edge.every((v) => v > 230)).toBe(true);
+  expect(frames.every((f) => Math.round(f.ms) === 1000)).toBe(true);
+  net.assertNothingLeft(['step-1.png', 'step-2.png', 'step-3.png']);
   expect(errors).toEqual([]);
 });

@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import GifMaker from '../../components/options/GifMaker.astro';
+import GifStage from '../../components/GifStage.astro';
+const tool = toolBySlug('gif-maker')!;
+---
+<ToolLayout tool={tool}>
+  <GifStage slot="panel" />
+  <Fragment slot="options"><GifMaker /></Fragment>
+</ToolLayout>
+<script src="../../tools/gif-maker.ts"></script>

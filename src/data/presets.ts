@@ -3416,6 +3416,35 @@ export const presets: Preset[] = [
       noUpload,
     ],
   },
+  {
+    slug: 'images-to-gif',
+    base: 'gif-maker',
+    name: 'Images to GIF',
+    title: 'Images to GIF: Combine Screenshots or Photos into a GIF | Stayput',
+    description: 'Combine PNG screenshots or JPG photos into one animated GIF for a README, a help article, an email or a chat. One second per image by default. No upload.',
+    heading: 'Combine images into a GIF',
+    tagline: 'A handful of screenshots or photos stitched into a single animation you can drop anywhere an image goes.',
+    keywords: ['images to gif', 'png to gif animation', 'combine images into gif', 'screenshots to gif', 'jpg to gif animation', 'multiple images to gif'],
+    dropLabel: 'Drop the images to combine',
+    defaults: { delay: '1', width: '640' },
+    intro: [
+      'An animated GIF plays anywhere a plain image is allowed: a GitHub README, a help-centre article, a Slack or Teams message, a product listing, a slide. That makes it the easiest way to show a few steps in order without hosting a video or asking anyone to press play.',
+      'A worked example: you want to show a colleague how to export a report in four clicks. Take four screenshots, one per click, and drop them here. They are listed in the order you took them; move one with the arrows if needed. One second per image and 640 pixels wide are already set, which keeps menu text readable. The preview plays the four steps on a loop. If a step goes by too fast to read, choose 2 seconds, then press Make GIF and paste the result into the ticket or the document.',
+      'Screenshots of software have flat colours, so they compress well as GIF and stay crisp. Photos with gradients do not, and a GIF of twenty full-colour photos at this width can pass 2 MB; for that, choose 320 pixels or fewer photos. Crop the screenshots to the same window first, so nothing jumps between frames.',
+    ],
+    steps: [
+      'Drop the screenshots or photos, and put them in order with the arrows.',
+      'Check the timing in the preview; 1 second per image is set, with a width of 640 pixels.',
+      'Press Make GIF and paste or attach the file where you need it.',
+    ],
+    faq: [
+      { q: 'Will it play in an email?', a: 'In most mail apps, including Gmail, Apple Mail and Outlook on the web, yes. Some desktop versions of Outlook for Windows show only the first frame, so put the most important step first.' },
+      { q: 'Can I add a pause on the last image?', a: 'Every picture shows for the same time. To hold the last step longer, add the same screenshot two or three times at the end of the list.' },
+      { q: 'Does it work with PNG screenshots that have transparent corners?', a: 'Yes. Transparent areas are filled with the background colour you pick, white by default, because a GIF frame made from a photo-quality palette has no partial transparency.' },
+      { q: 'Should I use a GIF or a video?', a: 'A GIF for a few steps where people will not press play: docs, tickets and chat. A video (MP4) for anything longer than about ten seconds, with sound, or in full colour; it is also much smaller.' },
+      noUpload,
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

@@ -60,6 +60,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'grayscale-pdf': () => import('./grayscale-pdf'),
   'black-and-white-image': () => import('./black-and-white-image'),
   'image-to-svg': () => import('./image-to-svg'),
+  'gif-maker': () => import('./gif-maker'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

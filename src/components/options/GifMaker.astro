@@ -1,0 +1,62 @@
+---
+/** Option controls for the GIF maker, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const delay = defaults.delay ?? '0.5';
+const width = defaults.width ?? '480';
+const fit = defaults.fit ?? 'contain';
+const background = defaults.background ?? '#ffffff';
+const loop = (defaults.loop ?? 'true') === 'true';
+const bounce = defaults.bounce === 'true';
+const delays = [
+  ['0.1', '0.1 s (fast, 10 per second)'],
+  ['0.2', '0.2 s (stop motion)'],
+  ['0.5', '0.5 s'],
+  ['1', '1 s'],
+  ['2', '2 s (slideshow)'],
+  ['3', '3 s'],
+] as const;
+const widths = [
+  ['320', '320 px (chat, small)'],
+  ['480', '480 px (good default)'],
+  ['640', '640 px'],
+  ['800', '800 px (large file)'],
+] as const;
+---
+<div class="field">
+  <label for="delay">Time per picture</label>
+  <select id="delay">
+    {delays.map(([v, l]) => <option value={v} selected={v === delay}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="width">Width</label>
+  <select id="width">
+    {widths.map(([v, l]) => <option value={v} selected={v === width}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="fit">Pictures of another shape</label>
+  <select id="fit">
+    <option value="contain" selected={fit === 'contain'}>Show whole picture</option>
+    <option value="cover" selected={fit === 'cover'}>Fill the frame (crop edges)</option>
+  </select>
+</div>
+<div class="field">
+  <label for="background">Background</label>
+  <div class="colour-row">
+    <input type="color" id="background" value={background} aria-label="Background colour" />
+    <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White"></button>
+    <button type="button" class="swatch" data-color="#000000" style="background:#000000" aria-label="Black"></button>
+  </div>
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="loop" checked={loop} /> Loop forever</label>
+  <label class="check"><input type="checkbox" id="bounce" checked={bounce} /> Play forward, then back</label>
+</div>
+<p class="muted small">Pictures play in the order they are listed. Use the arrows in the list to move them.</p>
+<style>
+  .colour-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  #background { width: 44px; height: 36px; padding: 2px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); }
+  .swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); cursor: pointer; }
+</style>
