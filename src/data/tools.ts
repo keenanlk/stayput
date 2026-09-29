@@ -2190,6 +2190,52 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'grayscale-pdf',
+    name: 'Grayscale PDF',
+    title: 'Convert PDF to Grayscale, Text Kept, No Upload | Stayput',
+    description:
+      'Turn a colour PDF into grayscale for printing or submission. Text stays selectable and sharp, and the file barely grows. Runs in your browser; nothing is uploaded.',
+    heading: 'Convert a PDF to grayscale',
+    tagline: 'Every colour becomes its own shade of grey, and the text stays text.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to convert to grayscale',
+    action: 'Convert to grayscale',
+    keywords: ['pdf to grayscale', 'grayscale pdf', 'convert pdf to grayscale', 'pdf black and white', 'remove color from pdf', 'greyscale pdf', 'print pdf in grayscale'],
+    steps: [
+      'Drop one or more PDFs, or tap to pick them.',
+      'Press Convert to grayscale.',
+      'Download the grayscale copies. Pages, text, links and bookmarks are kept.',
+    ],
+    faq: [
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The conversion runs in your browser tab, so the document stays on your device, and the page works offline once it has loaded.',
+      },
+      {
+        q: 'Will the text still be selectable?',
+        a: 'Yes. The pages are not turned into pictures. A grey layer that removes colour is placed over each page, so text can still be selected, searched and copied, and it stays sharp at any zoom.',
+      },
+      {
+        q: 'Why would I need a grayscale PDF?',
+        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo.',
+      },
+      {
+        q: 'Do different colours stay distinguishable?',
+        a: 'Colours of different brightness become different greys; colours of similar brightness, such as a mid red and a mid green, can end up almost the same grey. Check charts and colour-coded tables in the result before you send it.',
+      },
+      {
+        q: 'Are comments and form fields converted too?',
+        a: 'Highlights, sticky notes and form fields are drawn by your PDF reader on top of the page, so they keep their colour. Flatten them into the page first if they must be grey as well.',
+      },
+      {
+        q: 'Does the file get bigger?',
+        a: 'Only by a few hundred bytes per document. Nothing is re-rendered, so there are no page images to add, unlike converters that rasterise every page.',
+      },
+    ],
+  },
+  {
     slug: 'crop-pdf',
     name: 'Crop PDF',
     title: 'Crop PDF Pages and Trim Margins, Free, No Upload | Stayput',

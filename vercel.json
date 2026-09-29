@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/grayscale-pdf",
+      "destination": "/tools/grayscale-pdf",
+      "permanent": true
+    },
+    {
       "source": "/crop-pdf",
       "destination": "/tools/crop-pdf",
       "permanent": true
