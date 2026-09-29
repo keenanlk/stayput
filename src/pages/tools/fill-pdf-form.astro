@@ -1,0 +1,13 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import FormStage from '../../components/FormStage.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('fill-pdf-form')!;
+---
+<ToolLayout tool={tool}>
+  <FormStage slot="panel" />
+  <Fragment slot="options">
+    <label class="check"><input type="checkbox" id="flatten" /> Lock the answers (flatten the form so they can’t be changed)</label>
+  </Fragment>
+</ToolLayout>
+<script src="../../tools/fill-pdf-form.ts"></script>

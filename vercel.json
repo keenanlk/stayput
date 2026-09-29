@@ -354,6 +354,11 @@
       "source": "/metronome",
       "destination": "/tools/metronome",
       "permanent": true
+    },
+    {
+      "source": "/fill-pdf-form",
+      "destination": "/tools/fill-pdf-form",
+      "permanent": true
     }
   ],
   "headers": [

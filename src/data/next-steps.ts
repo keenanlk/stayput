@@ -19,6 +19,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'rotate-pdf': ['compress-pdf', 'merge-pdf'],
   'reorder-pdf': ['compress-pdf', 'pdf-page-numbers'],
   'sign-pdf': ['compress-pdf', 'merge-pdf'],
+  'fill-pdf-form': ['sign-pdf', 'compress-pdf'],
   'pdf-page-numbers': ['compress-pdf', 'sign-pdf'],
   'pdf-to-word': ['split-pdf', 'compress-pdf'],
   'favicon-generator': ['crop-image', 'compress-image'],

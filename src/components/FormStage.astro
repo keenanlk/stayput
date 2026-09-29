@@ -1,0 +1,40 @@
+---
+/**
+ * The fill-in stage for Fill PDF form: each page of the PDF drawn in full with
+ * the form's own fields laid over it as inputs. Driven by
+ * src/tools/fill-pdf-form.ts.
+ */
+---
+<div id="form-panel" class="form-panel" hidden>
+  <div class="form-bar">
+    <p class="form-count" id="form-count" aria-live="polite"></p>
+    <button type="button" class="btn btn-sm btn-ghost" id="form-reset">Clear my answers</button>
+  </div>
+  <p class="form-empty" id="form-empty" hidden>
+    This PDF has no fillable fields, so there are no boxes to type into. To write on it anyway, use
+    <a href="/tools/sign-pdf">Sign PDF</a>, which adds typed text, dates and signatures anywhere on a page.
+  </p>
+  <div class="form-pages" id="form-pages"></div>
+</div>
+<style is:global>
+  .form-panel { display: grid; gap: 12px; }
+  .form-bar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+  .form-count { margin: 0; font-weight: 700; color: var(--ink); }
+  .form-empty { margin: 0; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); border-left: 4px solid var(--warn); }
+  .form-pages { display: grid; gap: 16px; max-height: 78vh; overflow: auto; padding: 12px; background: var(--surface-2); border-radius: var(--radius); border: 1px solid var(--line); }
+  .form-page { position: relative; margin: 0 auto; width: 100%; max-width: 860px; box-shadow: 0 1px 4px rgb(0 0 0 / 0.18); background: #fff; }
+  .form-page canvas { display: block; width: 100%; height: auto; }
+  .form-page-label { position: absolute; top: 6px; right: 8px; font-size: 12px; color: #555; background: rgb(255 255 255 / 0.85); padding: 1px 6px; border-radius: 4px; pointer-events: none; }
+  /* Two classes, so the site's own input styles (padding, min-height, rounded corners) do not apply. */
+  .form-page .form-field { position: absolute; box-sizing: border-box; margin: 0; min-height: 0; border: 1px solid rgb(31 111 95 / 0.55); background: rgb(220 239 232 / 0.55); color: #111; font-family: Helvetica, Arial, sans-serif; line-height: 1.1; padding: 0 2px; border-radius: 2px; }
+  .form-page .form-field:hover { background: rgb(220 239 232 / 0.85); }
+  .form-page .form-field:focus { outline: 2px solid var(--accent); outline-offset: 0; background: #fff; }
+  .form-page textarea.form-field { resize: none; padding: 1px 2px; line-height: 1.15; }
+  .form-page select.form-field { padding: 0; }
+  .form-page .form-field[type='checkbox'], .form-page .form-field[type='radio'] { appearance: none; -webkit-appearance: none; cursor: pointer; display: grid; place-items: center; }
+  .form-page .form-field[type='radio'] { border-radius: 50%; }
+  .form-page .form-field[type='checkbox']:checked::after { content: '✓'; font-weight: 700; line-height: 1; color: #111; font-size: var(--mark, 12px); }
+  .form-page .form-field[type='radio']:checked::after { content: ''; width: 55%; height: 55%; border-radius: 50%; background: #111; }
+  .form-page .form-field:disabled { background: transparent; border-color: rgb(0 0 0 / 0.15); cursor: not-allowed; }
+  .form-page .form-field.is-signature { background: rgb(255 200 0 / 0.18); border-style: dashed; cursor: default; }
+</style>

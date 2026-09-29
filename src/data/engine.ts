@@ -223,6 +223,10 @@ export const engines: Record<string, Engine> = {
     how: 'A Web Audio oscillator makes each click, shaped by a gain envelope a few milliseconds long. Every 25 ms the page schedules the clicks due in the next 120 ms at exact times on the audio clock, which is driven by your sound card rather than the page’s timers, and the beat lights are drawn from the same clock. Tap tempo takes the median gap between your last eight taps.',
     versus: 'Metronome apps want an install and often a subscription for odd time signatures or subdivisions, and metronome websites run ads and trackers that can make the page stutter. This one has every setting free, no ads, and keeps working offline.',
   },
+  'fill-pdf-form': {
+    how: 'pdf-lib reads the form’s fields (AcroForm) and where each one sits on the page, and pdf.js draws every page in your tab with the fields left off. The fields are laid over the pages as ordinary inputs. When you save, pdf-lib writes your answers into the same fields, draws their appearance with the standard Helvetica font, and, if you ask, flattens them into the page.',
+    versus: 'Online form fillers upload the whole form, answers included, and many keep it on their servers or put the download behind an account. Here the form and everything you type into it stay on your device.',
+  },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',
