@@ -310,7 +310,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 
 /* Tool list: rows, not cards. Used on the home index and "More tools". */
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); column-gap: 40px; border-top: 1px solid var(--line); }
-.tool-card { display: grid; grid-template-columns: 22px minmax(0, 1fr) 18px; gap: 4px 14px; align-items: start; padding: 16px 4px; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: background 0.2s var(--ease-out); }
+.tool-card { display: grid; align-content: start; grid-template-columns: 22px minmax(0, 1fr) 18px; gap: 4px 14px; align-items: start; padding: 16px 4px; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: background 0.2s var(--ease-out); }
 .tool-card .icon { grid-row: 1 / span 2; color: var(--accent); padding-top: 2px; }
 .tool-card .icon svg { width: 22px; height: 22px; }
 .tool-card h3 { font-size: 18px; font-stretch: 106%; }
@@ -335,12 +335,26 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .hero figcaption { margin-top: 14px; font-size: 13.5px; color: var(--on-field-2); max-width: 52ch; }
 .hero .devtools { box-shadow: var(--shadow-lift); }
 
-.index { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 56px; margin-top: 88px; }
+/* Home: six rich cards first, then every tool as a compact name list in three
+   category columns. Names only keeps the index short as tools are added. */
+.popular { margin-top: 88px; }
+.popular .tool-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.index { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 40px; margin-top: 72px; }
 .index .tool-grid { grid-template-columns: 1fr; }
-/* Image and video tools stack in the left column, PDF tools fill the right, so no row leaves a hole. */
-.index #image-tools { grid-column: 1; grid-row: 1; }
-.index #media-tools { grid-column: 1; grid-row: 2; }
-.index #pdf-tools { grid-column: 2; grid-row: 1 / span 2; }
+.index h2 { font-size: clamp(26px, 2.5vw, 32px); }
+.index-head .count, .hub-group h2 + .count { font-size: 0.55em; font-weight: 600; color: var(--muted); letter-spacing: 0; vertical-align: 0.3em; margin-left: 4px; }
+.tool-card.compact { grid-template-columns: 20px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 4px; }
+.tool-card.compact .icon { grid-row: auto; padding-top: 0; }
+.tool-card.compact .icon svg { width: 20px; height: 20px; }
+.tool-card.compact h3 { font-size: 16px; font-weight: 600; font-stretch: 100%; line-height: 1.3; }
+.more-link { margin: 18px 0 0; font-weight: 620; }
+
+/* Grouped hub lists (/conversions, /guides). */
+.hub-jump { margin: 8px 0 12px; }
+.hub-jump a span { color: var(--muted); font-weight: 500; margin-left: 2px; }
+.hub-group { margin-top: 44px; scroll-margin-top: 80px; }
+.hub-group h2 { font-size: clamp(22px, 2.4vw, 28px); margin-bottom: 14px; }
+.guide-list.hub-dense { grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
 .index-head { display: grid; gap: 6px; margin-bottom: 20px; }
 .index-head p { margin: 0; color: var(--muted); font-size: 15px; }
 
@@ -422,11 +436,22 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; gap: 44px; padding: 56px 0 64px; }
-  .index { grid-template-columns: 1fr; gap: 56px; }
-  .index #image-tools, .index #media-tools, .index #pdf-tools { grid-column: auto; grid-row: auto; }
+  .index { grid-template-columns: 1fr; gap: 48px; }
+  .index .tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
+  .tool-card.compact h3 { font-size: 15px; }
+  /* Conversion names say what they do; drop the taglines on small screens. */
+  .guide-list.hub-dense { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
+  .hub-dense li { padding: 12px 0; }
+  .hub-dense a { font-size: 15.5px; }
+  .hub-dense span { display: none; }
   .split { grid-template-columns: 1fr; }
   .site-footer .cols { grid-template-columns: 1fr 1fr; }
   .site-footer .cols > div:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  /* Guide titles are full questions; on a phone the title alone is enough to pick one. */
+  .guides-index .guide-list span { display: none; }
+  .guides-index .guide-list li { padding: 12px 0; }
 }
 
 @media (max-width: 720px) {
@@ -587,7 +612,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .guide-cta :focus-visible { outline-color: var(--on-field); }
 .guides-index .dek { max-width: 62ch; margin-bottom: 36px; }
 .guide-list { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--line); column-gap: 40px; }
-.guide-list li { display: grid; gap: 3px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.guide-list li { display: grid; align-content: start; gap: 3px; padding: 16px 0; border-bottom: 1px solid var(--line); }
 .guide-list a { font-weight: 680; font-size: 17px; text-decoration: none; color: var(--ink); }
 .guide-list a:hover { color: var(--accent-ink); text-decoration: underline; }
 .guide-list span { font-size: 14.5px; }

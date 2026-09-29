@@ -33,7 +33,7 @@ createShell({
         const out: OutputFile = { name: file.name, blob: file, originalSize: file.size, note: `already smaller than ${kbps} kbps would make it, kept as it was` };
         return out;
       }
-      const missed = limit && r.blob.size > limit * 1_000_000 ? `, still over ${limit} MB (${formatBytes(r.blob.size)}): trim it or choose mono` : '';
+      const missed = limit && r.blob.size > limit * 1_000_000 ? `, still over ${limit} MB (${formatBytes(r.blob.size)}): trim it or split it into parts` : '';
       const out: OutputFile = { name: suffixName(file.name, '-compressed', fmt), blob: r.blob, originalSize: file.size, note: detail + missed };
       return out;
     });

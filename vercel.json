@@ -18,6 +18,8 @@
     {
       "source": "/pitch-changer",
       "destination": "/tools/pitch-changer",
+      "source": "/black-and-white-image",
+      "destination": "/tools/black-and-white-image",
       "permanent": true
     },
     {

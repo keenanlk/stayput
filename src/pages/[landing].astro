@@ -62,6 +62,7 @@ import Watermark from '../components/options/Watermark.astro';
 import WatermarkPdf from '../components/options/WatermarkPdf.astro';
 import StickerMaker from '../components/options/StickerMaker.astro';
 import ProfilePicture from '../components/options/ProfilePicture.astro';
+import BlackAndWhite from '../components/options/BlackAndWhite.astro';
 import WatermarkStage from '../components/WatermarkStage.astro';
 import ColorStage from '../components/ColorStage.astro';
 import CropStage from '../components/CropStage.astro';
@@ -70,6 +71,7 @@ import SignStage from '../components/SignStage.astro';
 import VideoStage from '../components/VideoStage.astro';
 import BlurStage from '../components/BlurStage.astro';
 import RotateStage from '../components/RotateStage.astro';
+import MonoStage from '../components/MonoStage.astro';
 
 export function getStaticPaths() {
   return [
@@ -132,6 +134,7 @@ const options = {
   'grayscale-pdf': null,
   'sticker-maker': StickerMaker,
   'profile-picture-maker': ProfilePicture,
+  'black-and-white-image': BlackAndWhite,
   // Sign PDF, the QR code generator and the screen recorder have no option controls outside their stages.
   'sign-pdf': null,
   'qr-code-generator': null,
@@ -151,6 +154,7 @@ const Options = options[base as keyof typeof options];
   {base === 'screen-recorder' && <RecordStage slot="panel" defaults={defaults} />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
+  {base === 'black-and-white-image' && <MonoStage slot="panel" />}
   {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}
   {base === 'collage-maker' && <CollageStage slot="panel" />}
   {base === 'split-image' && <GridStage slot="panel" />}

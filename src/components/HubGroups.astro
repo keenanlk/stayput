@@ -1,0 +1,24 @@
+---
+// A long hub list split into labelled groups, with jump links and counts at
+// the top, so /conversions and /guides stay scannable as they grow.
+interface Item { href: string; label: string; sub: string }
+interface Props { groups: { id: string; label: string; items: Item[] }[]; dense?: boolean }
+const { groups, dense = false } = Astro.props;
+const shown = groups.filter((g) => g.items.length);
+---
+<nav class="hub-jump" aria-label="Jump to a group">
+  <ul class="chips">{shown.map((g) => <li><a href={`#${g.id}`}>{g.label} <span>{g.items.length}</span></a></li>)}</ul>
+</nav>
+{shown.map((g) => (
+  <section class="hub-group" id={g.id} aria-labelledby={`${g.id}-h`}>
+    <h2 id={`${g.id}-h`}>{g.label}</h2>
+    <ul class:list={['guide-list', 'guide-grid', 'guide-index', { 'hub-dense': dense }]}>
+      {g.items.map((i) => (
+        <li>
+          <a href={i.href}>{i.label}</a>
+          <span class="muted">{i.sub}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+))}

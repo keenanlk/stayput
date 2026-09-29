@@ -3,10 +3,12 @@ import Base from '../layouts/Base.astro';
 import ToolCard from '../components/ToolCard.astro';
 import ConversionMap from '../components/ConversionMap.astro';
 import { tools, categories } from '../data/tools';
-import { pairs } from '../data/pairs';
-import { presets } from '../data/presets';
+import { conversions, popularConversions, popularTools } from '../data/hubs';
 import { guides } from '../data/guides';
 import { profiles } from '../data/site';
+
+// Short column headings so the three tool columns line up on one line.
+const shortLabel = { images: 'Images', pdf: 'PDFs', media: 'Video and audio' };
 
 const title = 'Stayput: Free File Tools That Never Upload Your Files';
 const description =
@@ -46,7 +48,7 @@ const jsonLd = [
       <div>
         <h1>Your files stay put.</h1>
         <p class="lede">
-          Convert, compress and clean images and PDFs right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off.
+          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off.
         </p>
         <div class="hero-actions">
           <a class="btn btn-invert btn-lg" href="/tools/heic-to-jpg">Convert a HEIC photo</a>
@@ -71,16 +73,27 @@ const jsonLd = [
     </div>
   </section>
 
-  <div class="wrap index" id="tools">
-    {categories.map((c) => (
-      <section id={`${c.id === 'images' ? 'image' : c.id}-tools`} aria-labelledby={`${c.id}-h`}>
-        <div class="index-head">
-          <h2 id={`${c.id}-h`}>{c.label}</h2>
-          <p>{c.blurb}</p>
-        </div>
-        <div class="tool-grid">{tools.filter((t) => t.category === c.id).map((t) => <ToolCard tool={t} />)}</div>
-      </section>
-    ))}
+  <section class="wrap popular" id="tools" aria-labelledby="popular-h">
+    <div class="index-head">
+      <h2 id="popular-h">Most used</h2>
+      <p>The tools people open first. All {tools.length} are listed below.</p>
+    </div>
+    <div class="tool-grid">{popularTools.map((t) => <ToolCard tool={t} />)}</div>
+  </section>
+
+  <div class="wrap index" aria-label={`All ${tools.length} tools`}>
+    {categories.map((c) => {
+      const list = tools.filter((t) => t.category === c.id);
+      return (
+        <section id={`${c.id === 'images' ? 'image' : c.id}-tools`} aria-labelledby={`${c.id}-h`}>
+          <div class="index-head">
+            <h2 id={`${c.id}-h`}>{shortLabel[c.id]} <span class="count">{list.length}</span></h2>
+            <p>{c.blurb}</p>
+          </div>
+          <div class="tool-grid">{list.map((t) => <ToolCard tool={t} compact />)}</div>
+        </section>
+      );
+    })}
   </div>
 
   <section class="wrap section split" aria-labelledby="spec-h">
@@ -106,10 +119,13 @@ const jsonLd = [
   <section class="wrap section split" aria-labelledby="conv-h">
     <div class="conv-intro">
       <h2 id="conv-h">Popular conversions</h2>
-      <p class="muted">{pairs.length + presets.length} conversions, each with its own page. Every one runs in this tab.</p>
+      <p class="muted">{conversions.length} conversions, each with its own page. Every one runs in this tab.</p>
       <ConversionMap />
     </div>
-    <ul class="chips">{pairs.map((p) => <li><a href={`/${p.slug}`}>{p.from} to {p.to}</a></li>)}{presets.map((p) => <li><a href={`/${p.slug}`}>{p.name}</a></li>)}</ul>
+    <div>
+      <ul class="chips">{popularConversions.map((c) => <li><a href={`/${c.slug}`}>{c.label}</a></li>)}</ul>
+      <p class="more-link"><a href="/conversions">See all {conversions.length} conversions</a></p>
+    </div>
   </section>
 
   <section class="wrap section split" aria-labelledby="guides-h">
