@@ -64,6 +64,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'upscale-image': () => import('./upscale-image'),
   'remove-object': () => import('./remove-object'),
   'adjust-image': () => import('./adjust-image'),
+  'emote-resizer': () => import('./emote-resizer'),
   'image-to-svg': () => import('./image-to-svg'),
   'gif-maker': () => import('./gif-maker'),
   'resize-pdf': () => import('./resize-pdf'),

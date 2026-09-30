@@ -1,0 +1,31 @@
+---
+/** Option controls for the emote resizer, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const platform = defaults.platform ?? 'twitch-emote';
+const fit = defaults.fit ?? 'contain';
+const platforms = [
+  ['twitch-emote', 'Twitch emote: 112, 56 and 28 px'],
+  ['twitch-badge', 'Twitch sub badge: 72, 36 and 18 px'],
+  ['discord-emoji', 'Discord emoji: 128 px, under 256 KB'],
+  ['discord-sticker', 'Discord sticker: 320 px, under 512 KB'],
+  ['slack-emoji', 'Slack emoji: 128 px, under 128 KB'],
+] as const;
+---
+<div class="field wide">
+  <label for="platform">Make it for</label>
+  <select id="platform">
+    {platforms.map(([v, l]) => <option value={v} selected={v === platform}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label>Shape</label>
+  <div class="segmented" role="radiogroup" aria-label="Shape">
+    <label><input type="radio" name="fit" value="contain" checked={fit === 'contain'} /><span>Fit inside</span></label>
+    <label><input type="radio" name="fit" value="cover" checked={fit === 'cover'} /><span>Crop to square</span></label>
+  </div>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="trim" checked={defaults.trim !== 'false'} /> Trim empty transparent edges</label>
+  <label class="check"><input type="checkbox" id="sharpen" checked={defaults.sharpen !== 'false'} /> Sharpen the smallest sizes</label>
+</div>

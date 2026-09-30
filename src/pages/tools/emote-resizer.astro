@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import EmoteResizer from '../../components/options/EmoteResizer.astro';
+const tool = toolBySlug('emote-resizer')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><EmoteResizer /></Fragment>
+</ToolLayout>
+<script src="../../tools/emote-resizer.ts"></script>
