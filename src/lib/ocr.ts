@@ -82,3 +82,48 @@ export function unwrap(text: string): string {
     .map((p) => p.replace(/(\w)-\n(\w)/g, '$1$2').replace(/\s*\n\s*/g, ' '))
     .join('\n\n');
 }
+
+export interface OcrWord {
+  text: string;
+  /** Pixels in the image given, top-left origin. */
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  /** Height of the word's line, in pixels: a steadier guide to the font size than the word's own box. */
+  lineHeight: number;
+  /**
+   * The line's baseline under the word's left and right edges, in pixels. It
+   * keeps every word of a line on one baseline (a word's own box ends lower
+   * when it has a descender) and follows a slightly skewed scan.
+   */
+  baseline?: [number, number];
+}
+
+/** Every word Tesseract finds in the canvas, with its box, plus the page's text and mean confidence. */
+export async function readWords(
+  canvas: HTMLCanvasElement,
+  onLoading?: (f: number) => void,
+): Promise<OcrResult & { words: OcrWord[] }> {
+  const w = await load(onLoading);
+  const { data } = await w.recognize(canvas, {}, { text: true, blocks: true });
+  const words: OcrWord[] = [];
+  for (const block of data.blocks ?? []) {
+    for (const para of block.paragraphs) {
+      for (const line of para.lines) {
+        const lineHeight = line.bbox.y1 - line.bbox.y0;
+        const b = line.baseline as { x0: number; y0: number; x1: number; y1: number; has_baseline?: boolean } | undefined;
+        const at = (x: number) => b!.y0 + ((b!.y1 - b!.y0) * (x - b!.x0)) / (b!.x1 - b!.x0);
+        // Trust the baseline only when it is there and runs through the line's box.
+        const usable = !!b && b.has_baseline !== false && b.x1 > b.x0 && [b.y0, b.y1].every((y) => Number.isFinite(y) && y > line.bbox.y0 && y <= line.bbox.y1 + 1);
+        for (const word of line.words) {
+          const text = word.text.trim();
+          if (!text || word.confidence <= 20) continue;
+          const baseline: [number, number] | undefined = usable ? [at(word.bbox.x0), at(word.bbox.x1)] : undefined;
+          words.push({ text, ...word.bbox, lineHeight, baseline });
+        }
+      }
+    }
+  }
+  return { text: data.text.replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim(), confidence: data.confidence, words };
+}

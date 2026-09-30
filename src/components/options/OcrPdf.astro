@@ -1,0 +1,18 @@
+---
+/** Option controls for OCR PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const pages = defaults.pages ?? 'scans';
+const saveText = defaults['save-text'] === 'true';
+---
+<div class="field wide">
+  <label>Pages to read</label>
+  <div class="segmented" role="radiogroup" aria-label="Pages to read">
+    <label><input type="radio" name="pages" value="scans" checked={pages === 'scans'} /><span>Scanned pages only</span></label>
+    <label><input type="radio" name="pages" value="all" checked={pages === 'all'} /><span>Every page</span></label>
+  </div>
+  <p class="muted small">Pages that already have selectable text are left alone unless you choose Every page. Reads English text.</p>
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="save-text" checked={saveText} /> Also save the text as a .txt file</label>
+</div>

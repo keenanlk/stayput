@@ -743,7 +743,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is my output empty or garbled?',
-        a: 'A scanned PDF has no text layer: each page is a picture of text, so there is nothing to extract without OCR. The tool tells you when that is the case. Garbled text usually means the PDF embeds fonts with a custom encoding; nothing browser-side can fix that without OCR.',
+        a: 'A scanned PDF has no text layer: each page is a picture of text, so there is nothing to extract without OCR. The tool tells you when that is the case; run the file through OCR PDF first, then convert the searchable copy. Garbled text usually means the PDF embeds fonts with a custom encoding; nothing browser-side can fix that without OCR.',
       },
       {
         q: 'How are paragraphs and headings detected?',
@@ -965,7 +965,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can it read a scanned PDF?',
-        a: 'Not directly yet. Turn the pages into images with PDF to JPG first, then drop them here. If the PDF already has selectable text, PDF to Word gets it out faster and keeps the paragraphs.',
+        a: 'Use OCR PDF for that: it reads every page of the scan, gives you the text, and makes the PDF itself searchable. If the PDF already has selectable text, PDF to Word gets it out faster and keeps the paragraphs.',
       },
       {
         q: 'Why is the first run slower?',
@@ -2748,6 +2748,44 @@ export const tools: Tool[] = [
       {
         q: 'How long does it take?',
         a: 'Every frame is examined and encoded again, so it depends on the length and resolution of the video and on your device. Keep the tab open while it works; the progress bar shows how far it has got.',
+      },
+    ],
+  },
+  {
+    slug: 'ocr-pdf',
+    name: 'OCR PDF',
+    title: 'OCR PDF Online: Make a Scanned PDF Searchable, No Upload | Stayput',
+    description:
+      'Turn a scanned PDF into a searchable one: the text is read on your device and laid invisibly over each page, so you can search, select and copy it. Free, no upload, no page limit.',
+    heading: 'Make a scanned PDF searchable',
+    tagline: 'Text recognition for scanned pages, run on your own device: the PDF looks the same, but now you can search it and copy from it.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop scanned PDFs',
+    action: 'Read text',
+    keywords: ['ocr pdf', 'make pdf searchable', 'searchable pdf', 'ocr pdf online free', 'scanned pdf to searchable pdf', 'pdf text recognition', 'ocr scanned pdf'],
+    steps: [
+      'Drop one or more scanned PDFs: a contract from the office scanner, receipts photographed with a scanning app, an old manual.',
+      'Leave Scanned pages only chosen, so pages that already have text stay as they are. Tick the box to get the text as a .txt file too.',
+      'Press Read text. Each page takes a few seconds; the note says how many words were found.',
+    ],
+    faq: [
+      {
+        q: 'What does OCR do to my PDF?',
+        a: 'A scanned page is a photograph of paper, so a PDF reader cannot search it or copy from it. OCR (optical character recognition) reads the letters in that picture and places the words as invisible text exactly over where they appear. The page looks unchanged, but Ctrl+F finds words and you can select and copy them.',
+      },
+      {
+        q: 'Which languages does it read?',
+        a: 'English. Other languages in Latin letters are read with the English model, so expect mistakes, especially in accented letters. Cyrillic, Greek, Arabic, Chinese and other scripts are not read yet.',
+      },
+      {
+        q: 'How accurate is it?',
+        a: 'Clean printed text on a straight, sharp scan reads well. Handwriting, faint photocopies, tables with tight lines and photos of pages taken at an angle read worse. The note under the download gives Tesseract’s average confidence, a rough guide to how well it went.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. The pages are rendered and read in this tab by Tesseract, an open-source OCR engine, so scanned IDs, bank statements and signed contracts never leave your device.',
       },
     ],
   },

@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(84);
+  expect(await page.locator('.index .tool-card').count()).toBe(85);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -992,6 +992,11 @@ test('preset landing pages render, run their base tool with the preset options a
     ['green-screen-video', 'video-background-remover', async () => {
       await expect(page.locator('input[name="bg"][value="color"]')).toBeChecked();
       await expect(page.locator('#bg-color')).toHaveValue('#00b140');
+    }],
+    ['make-pdf-searchable', 'ocr-pdf', async () => expect(page.locator('input[name="pages"][value="scans"]')).toBeChecked()],
+    ['scanned-pdf-to-text', 'ocr-pdf', async () => {
+      await expect(page.locator('input[name="pages"][value="all"]')).toBeChecked();
+      await expect(page.locator('#save-text')).toBeChecked();
     }],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
@@ -2153,6 +2158,61 @@ test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, 
   expect(Object.keys(files).sort()).toEqual(['ocr-letter.txt', 'ocr-note.txt']);
   expect(new TextDecoder().decode(files['ocr-note.txt'])).toBe(note + '\n');
   net.assertNothingLeft(['ocr-note.png', 'ocr-letter.jpg']);
+  expect(errors).toEqual([]);
+});
+
+/**
+ * A three-page "scan": the letter image on an upright page, a page that
+ * already has typed text, and the letter again on a page stored sideways
+ * (/Rotate 90) with the picture drawn turned so it displays upright.
+ */
+async function scannedPdf(): Promise<string> {
+  const doc = await PDFDocument.create();
+  const jpg = await doc.embedJpg(readFileSync(staticFx('ocr-letter.jpg')));
+  const upright = doc.addPage([612, 792]);
+  upright.drawImage(jpg, { x: 6, y: 500, width: 600, height: 252 });
+  const typed = doc.addPage([612, 792]);
+  typed.drawText('This page was typed and already has its own text.', { x: 50, y: 700, size: 12 });
+  const sideways = doc.addPage([612, 792]);
+  sideways.setRotation(degrees(90));
+  sideways.drawImage(jpg, { x: 400, y: 100, width: 600, height: 252, rotate: degrees(90) });
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'scan.pdf');
+  writeFileSync(file, await doc.save());
+  return file;
+}
+
+test('OCR PDF adds invisible text over scanned pages, upright and rotated, skips typed pages, and no bytes leave the tab', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = await open(page, 'ocr-pdf');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(await scannedPdf());
+  await choose(page.locator('#save-text'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  await expect(page.locator('#results-list')).toContainText(/\d+ words found on 2 pages; 1 page already had text and was left as it was; \d+% average confidence/);
+  expect(await page.locator('#results-list .result-text').inputValue()).toContain('quick brown fox');
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['scan-searchable.pdf', 'scan.txt']);
+  const pdf = files['scan-searchable.pdf']!;
+  // The words sit over the picture of them, on both scanned pages.
+  const first = await textItems(pdf, 1);
+  expect(first.map((t) => t.str).join(' ')).toContain('quick brown fox');
+  const fox = first.find((t) => t.str.includes('fox'))!;
+  expect(fox.x).toBeGreaterThan(6);
+  expect(fox.x).toBeLessThan(606);
+  expect(fox.y).toBeGreaterThan(500);
+  expect(fox.y).toBeLessThan(752);
+  expect((await textItems(pdf, 2)).map((t) => t.str).join(' ')).toBe('This page was typed and already has its own text.');
+  const third = await textItems(pdf, 3);
+  expect(third.map((t) => t.str).join(' ')).toContain('quick brown fox');
+  const fox3 = third.find((t) => t.str.includes('fox'))!;
+  expect(fox3.x).toBeGreaterThan(148);
+  expect(fox3.x).toBeLessThan(400);
+  expect(fox3.y).toBeGreaterThan(100);
+  expect(fox3.y).toBeLessThan(700);
+  net.assertNothingLeft(['scan.pdf']);
   expect(errors).toEqual([]);
 });
 
