@@ -88,6 +88,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'upscale-image': ['compress-image', 'remove-background'],
   'remove-object': ['upscale-image', 'strip-exif'],
   'adjust-image': ['compress-image', 'crop-image'],
+  'emote-resizer': ['remove-background', 'upscale-image'],
   'sticker-maker': ['remove-background', 'compress-image'],
   'profile-picture-maker': ['compress-image', 'strip-exif'],
   'watermark-pdf': ['protect-pdf', 'compress-pdf'],
