@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(85);
+  expect(await page.locator('.index .tool-card').count()).toBe(86);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -998,6 +998,8 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('input[name="pages"][value="all"]')).toBeChecked();
       await expect(page.locator('#save-text')).toBeChecked();
     }],
+    ['scan-to-pdf', 'document-scanner', async () => expect(page.locator('input[name="look"][value="bw"]')).toBeChecked()],
+    ['receipt-scanner', 'document-scanner', async () => expect(page.locator('input[name="look"][value="gray"]')).toBeChecked()],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
     ['png-to-svg', 'image-to-svg', async () => {
@@ -2131,6 +2133,122 @@ test('Surround audio is mixed down to stereo with the centre channel kept', asyn
   const info = await audioInfo(page, wav);
   expect(info.channels).toBe(2);
   expect(info.rms).toBeGreaterThan(0.05);
+});
+
+/**
+ * A phone-style photo of a sheet of paper: a 600×800 page with black bars for
+ * lines of text, tilted and shrunk onto a dark, speckled table, with a shadow
+ * falling across the right side. Drawn in the page, saved as a JPG.
+ */
+async function paperPhoto(page: Page, name: string): Promise<string> {
+  const b64 = await page.evaluate(() => {
+    const sheet = document.createElement('canvas');
+    sheet.width = 600;
+    sheet.height = 800;
+    const s = sheet.getContext('2d')!;
+    s.fillStyle = '#f2efe6';
+    s.fillRect(0, 0, 600, 800);
+    s.fillStyle = '#222';
+    for (let y = 100; y < 700; y += 60) s.fillRect(60, y, 480, 12);
+    const photo = document.createElement('canvas');
+    photo.width = 1200;
+    photo.height = 900;
+    const c = photo.getContext('2d')!;
+    c.fillStyle = '#3b3530';
+    c.fillRect(0, 0, 1200, 900);
+    for (let i = 0; i < 4000; i++) {
+      c.fillStyle = i % 2 ? '#463f38' : '#302b27';
+      c.fillRect((i * 7919) % 1200, (i * 104729) % 900, 3, 3);
+    }
+    c.save();
+    c.translate(600, 450);
+    c.rotate((8 * Math.PI) / 180);
+    c.scale(0.95, 0.95);
+    c.drawImage(sheet, -300, -400);
+    c.restore();
+    // A shadow across the right of the photo, as from a hand or a lamp.
+    const g = c.createLinearGradient(600, 0, 1000, 0);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,0.35)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, 1200, 900);
+    return photo.toDataURL('image/jpeg', 0.9).split(',')[1]!;
+  });
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), name);
+  writeFileSync(file, Buffer.from(b64, 'base64'));
+  return file;
+}
+
+test('Document scanner cuts out the page, straightens it, whitens the shadow, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'document-scanner');
+  const net = watchNetwork(page);
+  const photo = await paperPhoto(page, 'form.jpg');
+  const { downloads } = await run(page, [photo], async () => {
+    await choose(page.locator('input[name="look"][value="gray"]'));
+    await choose(page.locator('input[name="output"][value="images"]'));
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('form-scan.jpg');
+  const bytes = await bytesOf(downloads[0]!);
+  const probe = await page.evaluate(async (b64) => {
+    const bmp = await createImageBitmap(new Blob([Uint8Array.from(atob(b64), (ch) => ch.charCodeAt(0))], { type: 'image/jpeg' }));
+    const c = new OffscreenCanvas(bmp.width, bmp.height);
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(bmp, 0, 0);
+    // Luminance at fractions of the page: text lines sit at 100 + 60k of 800, 12 high, from 60 to 540 of 600.
+    const at = (fx: number, fy: number) => ctx.getImageData(Math.round(fx * bmp.width), Math.round(fy * bmp.height), 1, 1).data[0]!;
+    return {
+      w: bmp.width,
+      h: bmp.height,
+      corners: [at(0.03, 0.03), at(0.97, 0.03), at(0.97, 0.97), at(0.03, 0.97)],
+      gapLeft: at(0.2, 136 / 800),
+      gapRight: at(0.85, 136 / 800),
+      inkLeft: at(0.2, 106 / 800),
+      inkRight: at(0.85, 466 / 800),
+      margin: at(0.05, 0.5),
+    };
+  }, Buffer.from(bytes).toString('base64'));
+  // The page is 600 × 800 × 0.95 in the photo, so the scan is about 570 × 760.
+  expect(probe.w / probe.h).toBeCloseTo(0.75, 1);
+  expect(Math.abs(probe.w - 570)).toBeLessThan(20);
+  // No table left in the corners, the shadowed side as white as the lit side, the text still black.
+  for (const v of probe.corners) expect(v).toBeGreaterThan(200);
+  expect(probe.gapLeft).toBeGreaterThan(235);
+  expect(probe.gapRight).toBeGreaterThan(235);
+  expect(probe.margin).toBeGreaterThan(235);
+  expect(probe.inkLeft).toBeLessThan(80);
+  expect(probe.inkRight).toBeLessThan(80);
+  net.assertNothingLeft(['form.jpg']);
+  expect(errors).toEqual([]);
+});
+
+test('Scan to PDF puts two photos on two pages of one PDF, and keeps a photo with no page whole', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/scan-to-pdf');
+  const a = await paperPhoto(page, 'page1.jpg');
+  const b = await paperPhoto(page, 'page2.jpg');
+  const { downloads } = await run(page, [a, b]);
+  await expect(page.locator('#results-list')).toContainText(/2 pages on (A4|US Letter)/);
+  const doc = await PDFDocument.load(await bytesOf(downloads[0]!));
+  expect(doc.getPageCount()).toBe(2);
+  // A picture of speckle has no page to find.
+  await page.goto('/tools/document-scanner');
+  const grey = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'blank.png');
+  writeFileSync(grey, Buffer.from(await page.evaluate(() => {
+    const c = document.createElement('canvas');
+    c.width = 300;
+    c.height = 200;
+    const x = c.getContext('2d')!;
+    for (let y = 0; y < 200; y += 4) {
+      for (let i = 0; i < 300; i += 4) {
+        const v = (((i * 31 + y * 17) * 2654435761) >>> 0) % 256;
+        x.fillStyle = `rgb(${v},${v},${v})`;
+        x.fillRect(i, y, 4, 4);
+      }
+    }
+    return c.toDataURL('image/png').split(',')[1]!;
+  }), 'base64'));
+  await run(page, [grey]);
+  await expect(page.locator('#results-list')).toContainText('page edges not found in 1 photo, kept whole');
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {

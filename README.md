@@ -83,6 +83,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Vocal remover](https://stayput.dev/tools/vocal-remover) (karaoke instrumental or acapella, AI model on your device) | |
 | [Video background remover](https://stayput.dev/tools/video-background-remover) (blur, colour or a picture behind the person) | |
 | [OCR PDF](https://stayput.dev/tools/ocr-pdf) (make a scanned PDF searchable) | |
+| [Document scanner](https://stayput.dev/tools/document-scanner) (phone photos of paper to a clean PDF) | |
 | [Remove silence](https://stayput.dev/tools/remove-silence) (shorten pauses, trim quiet ends) | |
 | [Remove background noise](https://stayput.dev/tools/remove-noise) (hiss, hum, fans and traffic out of voice recordings and videos) | |
 | [Blur faces in video](https://stayput.dev/tools/blur-face-video) (automatic, frame by frame; blur, pixelate, box or emoji) | |

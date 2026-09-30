@@ -434,6 +434,11 @@
       "source": "/ocr-pdf",
       "destination": "/tools/ocr-pdf",
       "permanent": true
+    },
+    {
+      "source": "/document-scanner",
+      "destination": "/tools/document-scanner",
+      "permanent": true
     }
   ],
   "headers": [

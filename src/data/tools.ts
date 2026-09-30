@@ -563,6 +563,10 @@ export const tools: Tool[] = [
         q: 'Is anything uploaded?',
         a: 'No. The PDF is assembled by pdf-lib in your browser.',
       },
+      {
+        q: 'My photos are of paper documents. Can they look scanned?',
+        a: 'Use Document scanner instead: it cuts each page out of the photo, straightens it and turns the paper white before making the PDF.',
+      },
     ],
   },
   {
@@ -2786,6 +2790,44 @@ export const tools: Tool[] = [
       {
         q: 'Is my PDF uploaded?',
         a: 'No. The pages are rendered and read in this tab by Tesseract, an open-source OCR engine, so scanned IDs, bank statements and signed contracts never leave your device.',
+      },
+    ],
+  },
+  {
+    slug: 'document-scanner',
+    name: 'Document scanner',
+    title: 'Document Scanner Online: Photo of Paper to Clean PDF, No Upload | Stayput',
+    description:
+      'Turn phone photos of documents into a clean, straight PDF: the page is found, flattened and the shadows lifted, on your device. Free, no app, no account, no upload.',
+    heading: 'Scan documents with your phone camera',
+    tagline: 'A photo of a sheet of paper becomes a flat, white, straight scan, without a scanner app and without sending the page anywhere.',
+    category: 'pdf',
+    accept: 'image/*,.heic,.heif',
+    multiple: true,
+    dropLabel: 'Drop photos of documents',
+    action: 'Scan',
+    keywords: ['document scanner', 'scan document online', 'phone photo to pdf scan', 'scan paper with phone', 'free document scanner no app', 'make photo look scanned'],
+    steps: [
+      'Photograph each page flat on a darker table, with all four corners in the picture, then drop the photos here in page order. On a phone, choose the camera or your photo library.',
+      'Check the green outline on each preview, pick a look (Black and white is crispest for typed pages) and choose one PDF or separate images.',
+      'Press Scan. Each page is straightened to a rectangle, the paper turned white and the pages put into one PDF.',
+    ],
+    faq: [
+      {
+        q: 'How is this different from just putting the photo in a PDF?',
+        a: 'A photo shows the table around the page, the page is a trapezoid because the phone was at an angle, and the paper is grey or yellow with a shadow of your hand. This cuts the page out, pulls its corners back into a rectangle and divides out the uneven light, so it looks like it came off a flatbed scanner.',
+      },
+      {
+        q: 'What if it cannot find the page?',
+        a: 'Then the whole photo is kept and cleaned up, and the note says so. Detection needs the paper to be lighter than what it lies on and all four corners in view: white paper on a white desk, or a page cut off at the edge, cannot be found. Take the photo again on a darker surface.',
+      },
+      {
+        q: 'Can I search the text in the scan?',
+        a: 'Not yet: a scan is a picture of the words. Run the PDF through OCR PDF next, which reads the text on your device and makes the PDF searchable.',
+      },
+      {
+        q: 'Are my documents uploaded?',
+        a: 'No. The photos are decoded, straightened and saved in this tab. IDs, contracts and medical forms never leave your phone or computer.',
       },
     ],
   },
