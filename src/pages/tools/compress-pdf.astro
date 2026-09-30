@@ -1,43 +1,10 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import { toolBySlug } from '../../data/tools';
+import CompressPdf from '../../components/options/CompressPdf.astro';
 const tool = toolBySlug('compress-pdf')!;
 ---
 <ToolLayout tool={tool}>
-  <Fragment slot="options">
-    <div class="field wide">
-      <label>Level</label>
-      <div class="segmented" role="radiogroup" aria-label="Compression level">
-        <label><input type="radio" name="mode" value="lossless" /><span>Lossless cleanup</span></label>
-        <label><input type="radio" name="mode" value="images" checked /><span>Recompress images</span></label>
-        <label><input type="radio" name="mode" value="flatten" /><span>Flatten pages</span></label>
-      </div>
-    </div>
-    <div class="field" id="quality-field">
-      <label for="quality">Image quality <output id="quality-out">70</output></label>
-      <input type="range" id="quality" min="20" max="95" value="70" />
-    </div>
-    <div class="field" id="maxpx-field">
-      <label for="maxpx">Limit image resolution</label>
-      <select id="maxpx">
-        <option value="1200">1200 px (screen)</option>
-        <option value="1600" selected>1600 px (good for print)</option>
-        <option value="2400">2400 px (high quality)</option>
-        <option value="0">Keep original size</option>
-      </select>
-    </div>
-    <div class="field" id="dpi-field" hidden>
-      <label for="dpi">Page resolution</label>
-      <select id="dpi">
-        <option value="72">72 DPI (smallest)</option>
-        <option value="110" selected>110 DPI (readable)</option>
-        <option value="150">150 DPI (sharp)</option>
-        <option value="200">200 DPI (print)</option>
-      </select>
-    </div>
-    <div class="field" id="gray-field" hidden>
-      <label class="check"><input type="checkbox" id="grayscale" /> Convert to grayscale</label>
-    </div>
-  </Fragment>
+  <Fragment slot="options"><CompressPdf /></Fragment>
 </ToolLayout>
 <script src="../../tools/compress-pdf.ts"></script>
