@@ -55,6 +55,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'document-scanner': ['ocr-pdf', 'merge-pdf'],
   'epub-to-pdf': ['compress-pdf', 'split-pdf'],
   'pdf-to-epub': ['ocr-pdf', 'pdf-to-word'],
+  'archive-extractor': ['compress-image', 'compress-pdf'],
   'resize-pdf': ['merge-pdf', 'pdf-page-numbers'],
   'transcribe': ['add-subtitles-to-video', 'remove-silence'],
   'add-subtitles-to-video': ['compress-video', 'trim-video'],

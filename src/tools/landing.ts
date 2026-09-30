@@ -74,6 +74,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'document-scanner': () => import('./document-scanner'),
   'epub-to-pdf': () => import('./epub-to-pdf'),
   'pdf-to-epub': () => import('./pdf-to-epub'),
+  'archive-extractor': () => import('./archive-extractor'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

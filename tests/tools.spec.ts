@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(88);
+  expect(await page.locator('.index .tool-card').count()).toBe(89);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -1001,6 +1001,8 @@ test('preset landing pages render, run their base tool with the preset options a
     ['scan-to-pdf', 'document-scanner', async () => expect(page.locator('input[name="look"][value="bw"]')).toBeChecked()],
     ['receipt-scanner', 'document-scanner', async () => expect(page.locator('input[name="look"][value="gray"]')).toBeChecked()],
     ['pdf-to-kindle', 'pdf-to-epub', async () => expect(page.locator('#language')).toHaveValue('en')],
+    ['rar-extractor', 'archive-extractor', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /\.rar/)],
+    ['open-7z-file', 'archive-extractor', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /\.7z/)],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
     ['png-to-svg', 'image-to-svg', async () => {
@@ -2385,6 +2387,37 @@ test('PDF to EPUB drops headers and page numbers, rejoins a split paragraph, mak
   const back = await run(page, [epub]);
   expect(back.downloads[0]!.suggestedFilename()).toBe('report.pdf');
   expect(errors).toEqual([]);
+});
+
+test('Archive extractor opens RAR, 7z and TAR.GZ archives with their folders, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'archive-extractor');
+  const net = watchNetwork(page);
+  await run(page, [staticFx('sample.rar'), staticFx('sample.7z'), staticFx('bundle.tar.gz')]);
+  await expect(page.locator('#results')).toContainText('5 files extracted');
+  const files = await zipAll(page);
+  expect(Object.keys(files).sort()).toEqual(['file1', 'notes.txt', 'photos/beach.jpg', 'test.txt', 'testdir/test.txt']);
+  expect(new TextDecoder().decode(files['notes.txt'])).toBe('Meeting notes\n');
+  expect(new TextDecoder().decode(files['testdir/test.txt'])).toContain('test text document');
+  expect(new TextDecoder().decode(files['file1'])).toMatch(/^The libarchive distribution/);
+  expect(files['file1']!.length).toBe(2844);
+  // The engine is served from this site.
+  net.assertNothingLeft(['sample.rar', 'sample.7z', 'bundle.tar.gz']);
+  expect(errors).toEqual([]);
+});
+
+test('Archive extractor asks for the password of a locked ZIP, rejects a wrong one and opens it with the right one', async ({ page }) => {
+  await open(page, 'archive-extractor');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(staticFx('locked.zip'));
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('password-protected', { timeout: 30_000 });
+  await page.locator('#password').fill('wrong');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('password is wrong', { timeout: 30_000 });
+  await page.locator('#password').fill('tide-pool');
+  const [d] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('notes.txt');
+  expect(new TextDecoder().decode(await bytesOf(d))).toBe('Meeting notes\n');
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {

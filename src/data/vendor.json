@@ -52,6 +52,12 @@
     "entry": "mp3.wasm",
     "files": { "mp3.wasm": "wasm/mp3.wasm", "LICENSE": "LICENSE" }
   },
+  "libarchive": {
+    "package": "libarchive.js",
+    "version": "2.0.2",
+    "entry": "worker-bundle.js",
+    "files": { "worker-bundle.js": "dist/worker-bundle.js", "libarchive.wasm": "dist/libarchive.wasm", "LICENSE": "LICENSE" }
+  },
   "tesseract": {
     "package": "tesseract.js",
     "version": "7.0.0",

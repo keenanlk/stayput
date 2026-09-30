@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ArchiveExtractor from '../../components/options/ArchiveExtractor.astro';
+const tool = toolBySlug('archive-extractor')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ArchiveExtractor /></Fragment>
+</ToolLayout>
+<script src="../../tools/archive-extractor.ts"></script>
