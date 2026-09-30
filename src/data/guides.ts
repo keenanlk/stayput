@@ -3100,6 +3100,227 @@ export const guides: Guide[] = [
       { q: 'Can I make a GIF without uploading the video?', a: 'Yes, a browser-based converter like Stayput\'s Video to GIF processes the clip on your device; switching on airplane mode after the page loads confirms it keeps working.' },
     ],
   },
+  {
+    slug: 'how-to-scan-a-document-with-your-phone',
+    title: 'How to Scan a Document With Your Phone (No App)',
+    description: 'iPhone and Android can both turn a photo of paper into a flat, clean scan, but the built-in tools are scattered across different apps. Here is where to find them, and a browser tool that needs no app at all.',
+    heading: 'How to scan a document with your phone',
+    dek: 'Both iPhone and Android can scan paper into a clean PDF without a dedicated app, if you know where to look. Here is where, plus a browser option for when you would rather not.',
+    keywords: ['how to scan a document with your phone', 'scan document with iphone no app', 'scan paper to pdf android', 'phone photo to scanned pdf', 'document scanner online free'],
+    updated: '2026-09-30',
+    tools: ['document-scanner', 'scan-to-pdf', 'receipt-scanner'],
+    sections: [
+      {
+        h: 'What separates a scan from a photo',
+        p: [
+          'A photo of a document shows the table around it, the page as a trapezoid because the phone was held at an angle, and the paper tinted grey or yellow by the room\'s light and your own shadow. A real scan corrects all three: it finds the page\'s edges, straightens them back into a rectangle, and evens out the lighting so the paper reads as flat white.',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The **Notes** app has a scanner built in: open a note, tap the camera icon, then **Scan Documents**. It detects the page automatically, lets you adjust the corners, and saves as a PDF or images you can share from Notes. Files app also has a **Scan Documents** option under its "+" menu, which saves straight to a folder instead of a note.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Google Drive has a built-in scanner: tap the **+** button, choose **Scan**, and it works the same way as the iPhone version, saving the result to Drive as a PDF. Samsung phones have a similar scanner inside Samsung Notes. Stock Android without either app has no system-wide scan option.',
+        ],
+      },
+      {
+        h: 'Dedicated scanner apps',
+        p: [
+          'Adobe Scan and CamScanner both scan well and add automatic text recognition, but push a subscription for features like unlimited pages, no watermark, or exporting to Word. For an occasional scan, that is more than most people need to pay for.',
+        ],
+      },
+      {
+        h: 'Scanning a photo you already took, without an app',
+        p: [
+          'Stayput\'s [document scanner](/tools/document-scanner) tool takes photos you have already taken (from your camera roll, not live camera capture) and does the same correction in the browser: it finds the page\'s edges, straightens it, and lifts the shadows so the result reads like it came off a flatbed scanner. It works for a [single receipt](/receipt-scanner) or a stack of pages combined into [one PDF](/scan-to-pdf), with a choice of black-and-white, greyscale or colour output, and no upload, account or watermark. It needs the paper to be lighter than the surface it sits on so it can find the corners; the tool says when it could not detect a page and falls back to the whole photo, cleaned up.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I scan a document on my iPhone without downloading an app?', a: 'Yes. The Notes app and the Files app both have a built-in Scan Documents option under their camera or "+" menu.' },
+      { q: 'Does Android have a built-in document scanner?', a: 'Not system-wide on stock Android, but Google Drive\'s Scan option and Samsung Notes on Samsung phones both scan without a separate app.' },
+      { q: 'How is a browser-based scanner different from a phone\'s built-in one?', a: 'A phone scanner uses the live camera; a browser tool like Stayput\'s works from photos you already took, which is useful when the pictures came from someone else or an older phone.' },
+      { q: 'Can I turn several scanned photos into one PDF?', a: 'Yes. Stayput\'s document scanner combines multiple photos, in the order you drop them, into one PDF.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-epub-to-pdf',
+    title: 'How to Convert EPUB to PDF (Free, No Email Required)',
+    description: 'Some tools email you the file, cap the size, or need Calibre installed. Here is how to convert EPUB to PDF a few different ways, and a browser tool with none of those catches.',
+    heading: 'How to convert EPUB to PDF',
+    dek: 'A few tools do this conversion, each with a catch: an email delivery, a size cap, or an app to install. Here is a browser one with none of those.',
+    keywords: ['how to convert epub to pdf', 'epub to pdf converter free', 'convert epub to pdf online free', 'epub to pdf no email', 'ebook to pdf converter'],
+    updated: '2026-09-30',
+    tools: ['epub-to-pdf', 'pdf-to-epub', 'pdf-to-kindle'],
+    sections: [
+      {
+        h: 'Why convert an EPUB to PDF at all',
+        p: [
+          'An EPUB reflows to fit whatever screen it is on, which is ideal for reading, but that same flexibility makes it print inconsistently and awkward to annotate with a fixed page reference. A PDF fixes the layout in place, which is what a printer, a professor grading page numbers, or an annotation tool that expects stable pages actually needs.',
+        ],
+      },
+      {
+        h: 'With Calibre',
+        p: [
+          'Calibre, the free desktop ebook manager, converts EPUB to PDF with the most control over margins, fonts and page size, but it is a full application to install and learn, which is a lot for a single conversion.',
+        ],
+      },
+      {
+        h: 'Web converters',
+        p: [
+          'Sites like CloudConvert and various "epub to pdf" converters handle the format but usually cap the free file size or the number of conversions per day, and a few older ones ask for an email address to send the result to rather than downloading it directly.',
+        ],
+      },
+      {
+        h: 'Converting without installing anything or giving an email',
+        p: [
+          'Stayput\'s [EPUB to PDF](/tools/epub-to-pdf) tool unzips and lays out the book directly in the browser: chapters start on new pages, with page numbers and a contents page, in a choice of page size for reading (A5) or printing (A4 or Letter) at home. It works only on DRM-free EPUBs, the kind from Project Gutenberg, Standard Ebooks and many small publishers; a book bought from a store that locks its files cannot be converted by any tool without breaking that lock, which is illegal in many countries. Going the other way, [PDF to EPUB](/tools/pdf-to-epub) turns a PDF into a reflowable ebook for a [Kindle](/pdf-to-kindle), phone or e-reader, though it works on the text alone and drops pictures and tables, since an EPUB made from a PDF is built for reading the words on a small screen.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I convert an EPUB to PDF for free without an email?', a: 'Yes. A browser-based converter, like Stayput\'s EPUB to PDF, downloads the result directly with no email required and no server involved.' },
+      { q: 'Does converting EPUB to PDF keep the pictures?', a: 'EPUB to PDF keeps pictures, since it is laying the same book out with fixed pages. Converting the other way, PDF to EPUB, drops pictures and tables because it extracts the text for reflow.' },
+      { q: 'Can I convert a book I bought from an ebook store?', a: 'Only if it is DRM-free. Most store-bought ebooks are locked, and removing that lock is illegal in many places, so no legitimate converter, including this one, can convert them.' },
+      { q: 'Why would I convert a PDF to EPUB instead of just reading the PDF?', a: 'A PDF has fixed pages, which are tiny or require panning around on a phone or e-reader; an EPUB reflows the text to fit the screen instead.' },
+    ],
+  },
+  {
+    slug: 'how-to-resize-an-image-to-exact-pixels',
+    title: 'How to Resize an Image to Exact Pixels',
+    description: 'A form or upload field that asks for an exact pixel size, like 1920x1080 or 512x512, needs more than a plain resize. Here is how to hit an exact size without stretching or cropping wrong, in the browser.',
+    heading: 'How to resize an image to exact pixels',
+    dek: 'Getting a photo to an exact width and height, not just smaller, needs a different setting than a normal resize. Here is how, with no software to install.',
+    keywords: ['how to resize an image to exact pixels', 'resize image to exact pixels online', 'resize photo to exact dimensions', 'resize image to 1920x1080', 'resize image to 512x512'],
+    updated: '2026-09-30',
+    tools: ['resize-image', 'resize-image-to-1920x1080', 'resize-image-to-1024x1024'],
+    sections: [
+      {
+        h: 'Why "resize" alone is not enough',
+        p: [
+          'Most resize tools, including phone Photos apps, scale an image down to fit inside a maximum width or height while keeping its original proportions. That is the right behavior for shrinking a photo for the web, but a field that asks for an exact size, such as a 1920x1080 banner or a 512x512 app icon, means the output must be precisely that width and height, whatever shape the source photo started as. A plain resize that respects the aspect ratio cannot hit an odd exact size on its own; the image has to be cropped, padded, or stretched to fit.',
+        ],
+      },
+      {
+        h: 'The three ways to force an exact size',
+        p: [
+          'There is more than one way to fill an exact box, and the right choice depends on whether cropping or distortion is the lesser problem for that photo:',
+        ],
+        list: [
+          'Crop to fill: scale the image up until it covers the exact box, then cut off whatever hangs over the edges. No blank space, but some of the photo is lost at the sides or top and bottom.',
+          'Fit inside with padding: scale the image down until it fits entirely inside the box, then fill the leftover space with a background colour (usually white or black). Nothing is cropped, but bars appear on two sides unless the source is already the right shape.',
+          'Stretch: force the image to the exact width and height regardless of its original proportions, which distorts anything that is not already close to that shape.',
+        ],
+      },
+      {
+        h: 'In Photoshop or a phone editor',
+        p: [
+          'Photoshop\'s Image Size dialog can set exact pixel dimensions but needs the constrain-proportions box unchecked to avoid stretching, and does not crop or pad automatically, so getting a non-matching aspect ratio to look right still takes manual cropping first. Most phone editors only offer preset crop ratios (1:1, 4:5, 16:9), not an arbitrary exact pixel size.',
+        ],
+      },
+      {
+        h: 'Setting an exact size in the browser',
+        p: [
+          'Stayput\'s [resize image](/resize-image) tool has an **Exact size** mode: type the width and height you need, and choose whether a mismatched photo is cropped to fill, fit with padding, or stretched. Ready-made pages cover the sizes people ask for most, such as [1920 by 1080](/resize-image-to-1920x1080) for a banner or wallpaper and [1024 by 1024](/resize-image-to-1024x1024) for an app icon, with the exact size already set. Everything happens in the browser, so a batch of photos resizes at once with nothing uploaded.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the difference between resizing and cropping to an exact size?', a: 'Resizing to a maximum keeps the photo\'s original shape and only makes it smaller; forcing an exact size (like 1920x1080) usually needs cropping, padding or stretching, since the source photo is rarely already that exact shape.' },
+      { q: 'Will resizing to an exact size distort my photo?', a: 'Only if you choose Stretch. Crop to fill and Fit with padding both keep the photo\'s proportions intact; they just handle the leftover space differently, by cutting it off or by adding a border.' },
+      { q: 'Can I resize many photos to the same exact size at once?', a: 'Yes, with a browser tool like Stayput\'s resize image, which applies the same exact-size setting to every photo you drop.' },
+      { q: 'Can this make a small image bigger to hit the exact size?', a: 'A plain resize does not enlarge, since upscaling invents pixels and looks soft; for a photo smaller than the target size, run it through an AI image upscaler first, then resize to the exact dimensions.' },
+    ],
+  },
+  {
+    slug: 'otter-ai-alternative',
+    title: 'A Free Otter.ai Alternative With No Monthly Minute Cap',
+    description: 'Otter.ai\'s free plan limits monthly transcription minutes and caps recording length; a Pro subscription lifts both for a monthly fee. Here is a browser-based alternative with neither limit.',
+    heading: 'A free Otter.ai alternative with no monthly minute cap',
+    dek: 'Otter.ai\'s free tier meters your minutes each month and caps how long a single recording can run. Here is what that looks like, and an alternative with nothing to meter.',
+    keywords: ['otter.ai alternative', 'otter ai alternative free', 'free alternative to otter ai', 'otter ai alternative no limit', 'transcription app without subscription'],
+    updated: '2026-09-30',
+    tools: ['transcribe', 'video-to-subtitles', 'mp3-to-text'],
+    sections: [
+      {
+        h: 'What Otter.ai does well',
+        p: [
+          'Otter.ai is a well-established transcription service with live transcription during meetings, speaker labels, and integrations with Zoom, Google Meet and Teams that go well beyond converting a single file. For ongoing meeting notes with speaker attribution, it does a job a plain file transcriber does not attempt.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'Otter\'s free plan meters transcription in minutes per month, and, as of when this page was checked, capped a single recording\'s length; going over either needs a paid Pro or Business plan. For someone who wants to transcribe an occasional long interview or a batch of old voice memos, hitting a monthly cap partway through, or being capped on the length of one file, is the usual friction.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s [transcribe](/tools/transcribe) tool runs Whisper directly in the browser tab, so there is no monthly minute budget and no per-recording length cap beyond what your device can hold in memory: drop an MP3, WAV, M4A, MP4 or MOV file and it downloads the speech model once, then transcribes entirely on your device into plain text, [SRT subtitles for video](/video-to-subtitles), or WebVTT captions. There is no account and no subscription, because a tenth file costs nothing more to process than the first.',
+        ],
+      },
+      {
+        h: 'Where Otter.ai still has the edge',
+        p: [
+          'Otter\'s live meeting transcription, speaker labels, and calendar and video-call integrations are beyond what a single-file browser tool does. For transcribing files you already have, without a monthly limit, a local tool covers the common case.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is Otter.ai\'s free plan limit?', a: 'As of when this page was checked, Otter\'s free plan metered transcription minutes per month and capped the length of a single recording, with a paid plan needed to lift either.' },
+      { q: 'Is there a transcription tool with no monthly minute cap?', a: 'Yes. A tool that runs the transcription model in your browser, like Stayput\'s, has no server-side minutes to meter, so there is no natural reason to cap monthly use.' },
+      { q: 'Does a free Otter.ai alternative include speaker labels?', a: 'Not the browser-based ones generally, including Stayput\'s: they write what was said, not who said it. Otter\'s speaker labelling remains an advantage for meeting notes specifically.' },
+      { q: 'Can I get subtitles from an Otter.ai alternative?', a: 'Yes, Stayput\'s transcribe tool can output SRT subtitles or WebVTT captions timed to the speech, which Otter does not offer directly.' },
+    ],
+  },
+  {
+    slug: 'camscanner-alternative',
+    title: 'A Free CamScanner Alternative With No Watermark',
+    description: 'CamScanner\'s free tier watermarks PDFs and limits pages; unlocking both needs a subscription. Here is a browser-based scanning alternative with neither restriction.',
+    heading: 'A free CamScanner alternative with no watermark',
+    dek: 'CamScanner\'s free version puts a watermark on your scans and links a subscription to remove it. Here is a scanning alternative with no watermark to begin with.',
+    keywords: ['camscanner alternative', 'camscanner alternative free', 'camscanner alternative no watermark', 'free document scanner no watermark', 'scan document without app'],
+    updated: '2026-09-30',
+    tools: ['document-scanner', 'scan-to-pdf', 'receipt-scanner'],
+    sections: [
+      {
+        h: 'What CamScanner does well',
+        p: [
+          'CamScanner is one of the most downloaded scanning apps for a reason: fast page detection, built-in OCR, cloud sync across devices and batch scanning to one PDF. For scanning on the go from a phone camera, it is a capable, mature app.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'As of when this page was checked, CamScanner\'s free tier stamped a watermark across every exported PDF and image, and capped features like OCR and batch export behind a subscription. For a one-off scan of a form or a receipt, paying monthly to remove a watermark from a single document feels disproportionate. CamScanner has also drawn scrutiny in the past over its handling of user data on some of its app versions, which matters for scanning IDs and personal documents.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s [document scanner](/tools/document-scanner) tool takes photos you have already taken and straightens, flattens and cleans them up entirely in the browser, with no watermark on the result at any tier, because there is no tier: [scan a stack of pages into one PDF](/scan-to-pdf) or [a single receipt](/receipt-scanner), in colour, greyscale or black-and-white, for free. Since nothing is uploaded, there is also nothing sent to a third-party server to scan an ID or a signed contract.',
+        ],
+      },
+      {
+        h: 'Where CamScanner still has the edge',
+        p: [
+          'CamScanner\'s live camera capture with instant edge detection while you are holding the phone over the page is more convenient in the moment than taking a photo first and then processing it in a browser. For occasional scans of photos you have already taken, though, a free tool with no watermark and no upload covers the job.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does CamScanner put a watermark on free scans?', a: 'Yes, as of when this page was checked, CamScanner\'s free tier watermarked exported PDFs and images, with a subscription needed to remove it.' },
+      { q: 'Is there a document scanner with no watermark and no subscription?', a: 'Yes. A browser-based scanner like Stayput\'s document scanner has no paid tier to gate a watermark behind, since it has no server cost to recover.' },
+      { q: 'Is it safe to scan an ID or personal document without an app?', a: 'A tool that processes the photo entirely in your browser, without uploading it anywhere, avoids sending the document to any third-party server at all.' },
+      { q: 'Can a browser scanner combine multiple pages into one PDF?', a: 'Yes, Stayput\'s document scanner combines several scanned photos, in the order you drop them, into a single PDF.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
