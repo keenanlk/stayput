@@ -2950,6 +2950,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'create-zip',
+    name: 'Create ZIP',
+    title: 'Create a ZIP File Online, With an Optional Password, No Upload | Stayput',
+    description:
+      'Zip files or whole folders into one ZIP in your browser, and lock it with an AES-256 password if you like. Nothing is uploaded, so private files stay on your device.',
+    heading: 'Create a ZIP file',
+    tagline: 'Files and folders packed into one ZIP on your own device, locked with a password when they are private.',
+    category: 'pdf',
+    accept: '',
+    multiple: true,
+    dropLabel: 'Drop files or folders to zip',
+    action: 'Create ZIP',
+    keywords: ['create zip file', 'zip files online', 'password protect zip file', 'zip folder', 'compress files to zip', 'encrypted zip'],
+    steps: [
+      'Drop files or a folder, or press Add a folder.',
+      'Tick Lock with a password and type one if the files are private.',
+      'Press Create ZIP; the ZIP downloads straight away.',
+    ],
+    faq: [
+      {
+        q: 'How strong is the password lock?',
+        a: 'Each file is encrypted with AES-256 in the WinZip format, with a key made from your password and a random salt. That is the strong kind of ZIP encryption, not the old ZipCrypto scheme that tools can break in minutes. The lock is only as good as the password, so use a long one and send it separately from the ZIP.',
+      },
+      {
+        q: 'Can everyone open a password-protected ZIP?',
+        a: '7-Zip, WinRAR, PeaZip, The Unarchiver, Keka and our own archive opener all can. The zip openers built into Windows and macOS may refuse AES-locked ZIPs, so tell the person you send it to which app to use. ZIPs without a password open everywhere.',
+      },
+      {
+        q: 'Why are photos and videos barely smaller in the ZIP?',
+        a: 'JPEG, PNG, MP4 and similar files are already compressed, so they are stored as they are rather than squeezed again, which saves time. Text, documents, spreadsheets and code usually shrink a lot.',
+      },
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. The ZIP is built in this tab with fflate, and the encryption runs here too, so neither the files nor the password leave your device.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

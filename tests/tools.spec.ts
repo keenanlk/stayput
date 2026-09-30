@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Download, type Locator } from '@playwright/test';
-import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync, mkdirSync } from 'node:fs';
 import { execSync, execFileSync } from 'node:child_process';
 import { deflateSync } from 'node:zlib';
 import { join } from 'node:path';
@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(89);
+  expect(await page.locator('.index .tool-card').count()).toBe(90);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -1003,6 +1003,7 @@ test('preset landing pages render, run their base tool with the preset options a
     ['pdf-to-kindle', 'pdf-to-epub', async () => expect(page.locator('#language')).toHaveValue('en')],
     ['rar-extractor', 'archive-extractor', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /\.rar/)],
     ['open-7z-file', 'archive-extractor', async () => expect(page.locator('#file-input')).toHaveAttribute('accept', /\.7z/)],
+    ['password-protect-zip-file', 'create-zip', async () => expect(page.locator('#lock')).toBeChecked()],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
     ['png-to-svg', 'image-to-svg', async () => {
@@ -2418,6 +2419,62 @@ test('Archive extractor asks for the password of a locked ZIP, rejects a wrong o
   const [d] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
   expect(d.suggestedFilename()).toBe('notes.txt');
   expect(new TextDecoder().decode(await bytesOf(d))).toBe('Meeting notes\n');
+});
+
+test('Create ZIP packs a picked folder with its subfolders plus loose files, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'create-zip');
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const root = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'Trip');
+  mkdirSync(join(root, 'day 1'), { recursive: true });
+  writeFileSync(join(root, 'plan.txt'), 'Leave at seven. '.repeat(200));
+  writeFileSync(join(root, 'day 1', 'notes.txt'), 'Low tide at noon');
+  await page.locator('#folder-input').setInputFiles(root);
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '2');
+  await page.locator('#zip-name').fill('holiday');
+  const [d] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('holiday.zip');
+  const bytes = await bytesOf(d);
+  const files = unzipSync(bytes);
+  expect(Object.keys(files).sort()).toEqual(['Trip/day 1/notes.txt', 'Trip/plan.txt']);
+  expect(new TextDecoder().decode(files['Trip/day 1/notes.txt'])).toBe('Low tide at noon');
+  // Text is deflated, so the ZIP is far smaller than the 3,200-byte plan.
+  expect(bytes.length).toBeLessThan(1000);
+  net.assertNothingLeft(['plan.txt', 'notes.txt']);
+  expect(errors).toEqual([]);
+});
+
+test('Create ZIP locks files with AES-256 that the archive extractor opens only with the right password', async ({ page }) => {
+  await open(page, 'create-zip');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([
+    { name: 'tax-form.txt', mimeType: 'text/plain', buffer: Buffer.from('Income 48,213') },
+    { name: 'scan.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('not really a jpeg') },
+  ]);
+  await expect(page.locator('#password')).toBeHidden();
+  await page.locator('#lock').check();
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Type a password');
+  await page.locator('#password').fill('tide-pool line');
+  const [d] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(d.suggestedFilename()).toBe('files.zip');
+  const bytes = await bytesOf(d);
+  expect(Buffer.from(bytes).includes('Income')).toBe(false);
+
+  const zip = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'files.zip');
+  writeFileSync(zip, bytes);
+  await open(page, 'archive-extractor');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(zip);
+  await page.locator('#password').fill('wrong');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('password is wrong', { timeout: 30_000 });
+  await page.locator('#password').fill('tide-pool line');
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toContainText('2 files extracted', { timeout: 30_000 });
+  const files = await zipAll(page);
+  expect(new TextDecoder().decode(files['tax-form.txt'])).toBe('Income 48,213');
+  expect(new TextDecoder().decode(files['scan.jpg'])).toBe('not really a jpeg');
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {

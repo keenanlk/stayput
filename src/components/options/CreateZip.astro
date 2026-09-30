@@ -1,0 +1,49 @@
+---
+/** Option controls for Create ZIP, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const lock = defaults.lock === 'true';
+---
+<div class="field wide">
+  <button type="button" class="btn btn-sm" id="add-folder" style="justify-self: start">Add a folder</button>
+  <input type="file" id="folder-input" webkitdirectory multiple hidden />
+  <p class="muted small">Or drop a folder on the page. Its subfolders are kept inside the ZIP.</p>
+</div>
+<div class="field">
+  <label for="zip-name">ZIP name</label>
+  <input type="text" id="zip-name" placeholder="Named after the files" autocomplete="off" spellcheck="false" />
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="lock" checked={lock} /> Lock with a password (AES-256)</label>
+</div>
+<div class="field" id="password-field" hidden={!lock}>
+  <label for="password">Password</label>
+  <input type="password" id="password" autocomplete="new-password" spellcheck="false" />
+  <label class="check small"><input type="checkbox" id="show-password" /> Show password</label>
+</div>
+<p class="muted small" id="lock-note" hidden={!lock}>7-Zip, WinRAR, The Unarchiver, Keka and this site's archive opener open AES-locked ZIPs. The zip openers built into Windows and macOS may not, so tell the person you send it to.</p>
+<script>
+  const lock = document.getElementById('lock') as HTMLInputElement;
+  const field = document.getElementById('password-field')!;
+  const note = document.getElementById('lock-note')!;
+  const password = document.getElementById('password') as HTMLInputElement;
+  lock.addEventListener('change', () => {
+    field.hidden = note.hidden = !lock.checked;
+    if (lock.checked) password.focus();
+  });
+  document.getElementById('show-password')!.addEventListener('change', (e) => {
+    password.type = (e.target as HTMLInputElement).checked ? 'text' : 'password';
+  });
+  // Hand files from the folder picker to the tool's own file input, keeping their folder paths.
+  const folder = document.getElementById('folder-input') as HTMLInputElement;
+  document.getElementById('add-folder')!.addEventListener('click', () => folder.click());
+  folder.addEventListener('change', () => {
+    const input = document.getElementById('file-input') as HTMLInputElement | null;
+    if (!input || !folder.files?.length) return;
+    const dt = new DataTransfer();
+    for (const f of folder.files) dt.items.add(f);
+    input.files = dt.files;
+    input.dispatchEvent(new Event('change'));
+    folder.value = '';
+  });
+</script>

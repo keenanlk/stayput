@@ -454,6 +454,11 @@
       "source": "/archive-extractor",
       "destination": "/tools/archive-extractor",
       "permanent": true
+    },
+    {
+      "source": "/create-zip",
+      "destination": "/tools/create-zip",
+      "permanent": true
     }
   ],
   "headers": [
