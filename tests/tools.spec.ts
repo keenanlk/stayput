@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { unzipSync, zipSync } from 'fflate';
-import { PDFDocument, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees, StandardFonts } from 'pdf-lib';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { inspect, sniffFormat } from '../src/lib/exif';
@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(87);
+  expect(await page.locator('.index .tool-card').count()).toBe(88);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -1000,6 +1000,7 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['scan-to-pdf', 'document-scanner', async () => expect(page.locator('input[name="look"][value="bw"]')).toBeChecked()],
     ['receipt-scanner', 'document-scanner', async () => expect(page.locator('input[name="look"][value="gray"]')).toBeChecked()],
+    ['pdf-to-kindle', 'pdf-to-epub', async () => expect(page.locator('#language')).toHaveValue('en')],
     ['a4-to-letter', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('letter')],
     ['letter-to-a4', 'resize-pdf', async () => expect(page.locator('#size')).toHaveValue('a4')],
     ['png-to-svg', 'image-to-svg', async () => {
@@ -2310,6 +2311,80 @@ test('EPUB to PDF explains DRM instead of failing silently', async ({ page }) =>
   await page.locator('#file-input').setInputFiles(epubFixture('locked.epub', { drm: true }));
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('protected by DRM', { timeout: 30_000 });
+});
+
+/**
+ * A three-page report with a running header, page numbers, three chapter
+ * headings and a paragraph that runs over a page break mid-sentence.
+ */
+async function reportPdf(): Promise<string> {
+  const doc = await PDFDocument.create();
+  doc.setTitle('Annual Report');
+  doc.setAuthor('Ada Writer');
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const lines = (page: import('pdf-lib').PDFPage, y: number, text: string[]) => {
+    for (const l of text) {
+      page.drawText(l, { x: 72, y, size: 11, font });
+      y -= 15;
+    }
+    return y - 12;
+  };
+  const pages = [doc.addPage([612, 792]), doc.addPage([612, 792]), doc.addPage([612, 792])];
+  pages.forEach((p, i) => {
+    p.drawText('Annual Report 2026', { x: 72, y: 750, size: 9, font });
+    p.drawText(String(i + 1), { x: 300, y: 40, size: 9, font });
+  });
+  let y = pages[0]!.getHeight() - 110;
+  pages[0]!.drawText('Introduction', { x: 72, y, size: 20, font });
+  y = lines(pages[0]!, y - 36, [
+    'This report describes the work of the past year in some detail, with the numbers',
+    'that matter most and the plans that follow from them for the coming year.',
+    'It is short.',
+  ]);
+  lines(pages[0]!, y, [
+    'The second paragraph starts on the first page and keeps going for a while, long',
+    'enough to fill the line, and then it is cut off by the end of the page in the',
+  ]);
+  y = lines(pages[1]!, 700, [
+    'middle of a sentence, which carries on at the top of the next page and ends here.',
+  ]);
+  pages[1]!.drawText('Findings', { x: 72, y: y - 10, size: 20, font });
+  lines(pages[1]!, y - 46, ['Sales grew in every region, and costs stayed flat through the year.']);
+  pages[2]!.drawText('Next steps', { x: 72, y: 682, size: 20, font });
+  lines(pages[2]!, 646, ['We will open two new offices and hire twelve people.']);
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'report.pdf');
+  writeFileSync(file, await doc.save());
+  return file;
+}
+
+test('PDF to EPUB drops headers and page numbers, rejoins a split paragraph, makes chapters, and the book opens again', async ({ page }) => {
+  const errors = await open(page, 'pdf-to-epub');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [await reportPdf()]);
+  expect(downloads[0]!.suggestedFilename()).toBe('report.epub');
+  await expect(page.locator('#results-list')).toContainText('in 3 chapters from 3 pages');
+  const bytes = await bytesOf(downloads[0]!);
+  // The mimetype comes first, stored uncompressed, as readers require.
+  expect(new TextDecoder().decode(bytes.subarray(30, 38))).toBe('mimetype');
+  expect(new TextDecoder().decode(bytes.subarray(38, 58))).toBe('application/epub+zip');
+  const files = unzipSync(bytes);
+  const text = (name: string) => new TextDecoder().decode(files[name]);
+  expect(text('OEBPS/content.opf')).toContain('<dc:title>Annual Report</dc:title>');
+  expect(text('OEBPS/content.opf')).toContain('<dc:creator>Ada Writer</dc:creator>');
+  expect(text('OEBPS/nav.xhtml')).toMatch(/Introduction[\s\S]*Findings[\s\S]*Next steps/);
+  const all = Object.keys(files).filter((k) => k.includes('chapter-')).sort().map(text).join('');
+  expect(all).not.toContain('Annual Report 2026');
+  expect(all).not.toMatch(/<p>\d<\/p>/);
+  expect(all).toContain('cut off by the end of the page in the middle of a sentence, which carries on');
+  expect(all).toContain('<h1>Findings</h1>');
+  net.assertNothingLeft(['report.pdf']);
+  // The EPUB is valid enough for the EPUB to PDF tool to read back.
+  const epub = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'report.epub');
+  writeFileSync(epub, bytes);
+  await page.goto('/tools/epub-to-pdf');
+  const back = await run(page, [epub]);
+  expect(back.downloads[0]!.suggestedFilename()).toBe('report.pdf');
+  expect(errors).toEqual([]);
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {

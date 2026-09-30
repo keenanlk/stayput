@@ -444,6 +444,11 @@
       "source": "/epub-to-pdf",
       "destination": "/tools/epub-to-pdf",
       "permanent": true
+    },
+    {
+      "source": "/pdf-to-epub",
+      "destination": "/tools/pdf-to-epub",
+      "permanent": true
     }
   ],
   "headers": [

@@ -85,6 +85,7 @@ That is the whole pitch, and you can check it in three ways:
 | [OCR PDF](https://stayput.dev/tools/ocr-pdf) (make a scanned PDF searchable) | |
 | [Document scanner](https://stayput.dev/tools/document-scanner) (phone photos of paper to a clean PDF) | |
 | [EPUB to PDF](https://stayput.dev/tools/epub-to-pdf) (DRM-free ebooks to a paginated PDF) | |
+| [PDF to EPUB](https://stayput.dev/tools/pdf-to-epub) (reflowable ebook from a PDF's text) | |
 | [Remove silence](https://stayput.dev/tools/remove-silence) (shorten pauses, trim quiet ends) | |
 | [Remove background noise](https://stayput.dev/tools/remove-noise) (hiss, hum, fans and traffic out of voice recordings and videos) | |
 | [Blur faces in video](https://stayput.dev/tools/blur-face-video) (automatic, frame by frame; blur, pixelate, box or emoji) | |

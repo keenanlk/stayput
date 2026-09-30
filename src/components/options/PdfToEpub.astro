@@ -1,0 +1,17 @@
+---
+/** Option controls for PDF to EPUB, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const language = defaults.language ?? 'en';
+const languages = [
+  ['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['it', 'Italian'], ['pt', 'Portuguese'],
+  ['nl', 'Dutch'], ['pl', 'Polish'], ['sv', 'Swedish'], ['ru', 'Russian'], ['ja', 'Japanese'], ['zh', 'Chinese'],
+] as const;
+---
+<div class="field">
+  <label for="language">Language of the book</label>
+  <select id="language">
+    {languages.map(([v, l]) => <option value={v} selected={v === language}>{l}</option>)}
+  </select>
+  <p class="muted small">E-readers use it for hyphenation, dictionaries and read-aloud voices.</p>
+</div>
