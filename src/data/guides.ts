@@ -3101,6 +3101,235 @@ export const guides: Guide[] = [
     ],
   },
   {
+    slug: 'how-to-transcribe-audio-to-text',
+    title: 'How to Transcribe Audio to Text (iPhone, Android, Windows, Mac)',
+    description: 'Turning a recording into text used to mean typing it out by hand or paying per minute. Here is how to transcribe audio on each platform, plus a free browser tool with no upload and no per-minute charge.',
+    heading: 'How to transcribe audio to text',
+    dek: 'Every platform has a way to turn speech into text now, at very different prices. Here is what each one offers, and a free option that never uploads the recording.',
+    keywords: ['how to transcribe audio to text', 'transcribe audio to text free', 'transcribe audio to text iphone', 'how to transcribe an interview', 'voice memo to text'],
+    updated: '2026-09-30',
+    tools: ['transcribe', 'video-to-subtitles', 'mp3-to-text'],
+    sections: [
+      {
+        h: 'What you are choosing between',
+        p: [
+          'An interview, a lecture, a voice memo or a meeting recording all turn into text the same way underneath: a speech-recognition model listens and writes down what it hears. Where that model runs, and who pays for it, is what actually differs between the options below: on the device for free, in the cloud for a subscription, or by a person for a fee.',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The Voice Memos app transcribes its own recordings automatically on-device (iOS 17 and later): open the recording and tap the transcript icon. It only works for audio recorded in Voice Memos itself, not a file someone sent you, and there is no SRT or VTT export for video captions. Live Speech and Dictation cover live transcription while you talk, not an existing file.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Google\'s Recorder app (on Pixel and some other phones) transcribes as you record and lets you search the text afterward, on-device. Outside Recorder, Android has no system-wide "transcribe this file" option; Google Docs voice typing only works live through the microphone, not on an existing recording.',
+        ],
+      },
+      {
+        h: 'On Windows or a Mac',
+        p: [
+          'Word\'s **Transcribe** feature (Microsoft 365, in Word on the web) uploads the file to Microsoft and returns text with speaker labels, with a monthly transcription-minutes cap on most plans. Apps like Otter.ai and Rev do the same over the web, priced by the minute or by a subscription tier; Rev\'s human transcription is more accurate for difficult audio but costs several dollars per minute.',
+        ],
+      },
+      {
+        h: 'Transcribing without uploading or paying per minute',
+        p: [
+          'Stayput\'s [transcribe](/tools/transcribe) tool runs Whisper, OpenAI\'s speech-recognition model, directly in the browser tab: drop an MP3, WAV, M4A, MP4 or MOV file, and the model downloads once and then works entirely on your device. It writes plain text, or timed [SRT subtitles](/video-to-subtitles) and WebVTT captions for a video, in over a dozen languages, with no per-minute cost and no upload of the recording itself.',
+          'It does not label who is speaking, and it struggles with the same things every automatic transcriber does: heavy accents, overlapping speech, and specialist terms. For a recording where the wording actually matters, read the result against the audio before using it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I transcribe audio for free without a time limit?', a: 'Yes, with a tool that runs the speech model in the browser rather than metering server time; Stayput\'s transcribe tool has no per-minute cost because nothing is processed on a server.' },
+      { q: 'How accurate is automatic transcription?', a: 'Clear speech in a widely spoken language comes out well. Strong accents, background noise, crosstalk and technical vocabulary reduce accuracy with any automatic transcriber, free or paid.' },
+      { q: 'Does transcribing a recording upload it anywhere?', a: 'With cloud services like Word\'s Transcribe or Otter.ai, yes, the audio is sent to their servers. A browser-based tool that runs the model on your device, like Stayput\'s, never uploads the file.' },
+      { q: 'Can I get subtitles, not just plain text?', a: 'Yes. Stayput\'s transcribe tool can output SRT subtitles or WebVTT captions timed to the speech, ready to load into a video editor or a web page.' },
+    ],
+  },
+  {
+    slug: 'how-to-add-subtitles-to-a-video',
+    title: 'How to Add Subtitles to a Video (Free, No Watermark)',
+    description: 'Auto captions on TikTok and YouTube style tools often watermark the free tier or cap the length. Here is how burned-in subtitles work, and a browser tool that writes and burns them in for free.',
+    heading: 'How to add subtitles to a video',
+    dek: 'Captions written from the speech and burned into the picture, without a watermark or a length cap. Here is how, and a tool that does both steps on your own device.',
+    keywords: ['how to add subtitles to a video', 'add subtitles to video free', 'burn subtitles into video', 'auto caption video free no watermark', 'add captions to video'],
+    updated: '2026-09-30',
+    tools: ['add-subtitles-to-video', 'auto-caption-video', 'burn-subtitles-into-video'],
+    sections: [
+      {
+        h: 'Soft subtitles vs burned-in captions',
+        p: [
+          'A subtitle file (SRT or VTT) is a separate track a player can turn on or off, the way Netflix or YouTube captions work. Burned-in (or "hardcoded" and "open") captions are drawn directly into the video frames, so they show on any player, including Instagram, TikTok and a video sent as a plain file, with no viewer setting to toggle. Social platforms need the burned-in kind because their own players do not read an attached SRT reliably.',
+        ],
+      },
+      {
+        h: 'Editing apps and their free-tier catches',
+        p: [
+          'CapCut, Premiere Pro and DaVinci Resolve can all auto-caption and burn in subtitles. CapCut\'s free tier is the most accessible on a phone, but exporting without its watermark, and some caption styles, sit behind CapCut Pro. Premiere and Resolve have no watermark but need buying or learning a full editor for what is otherwise a single, short task.',
+        ],
+      },
+      {
+        h: 'Web-based auto-caption tools',
+        p: [
+          'Kapwing, VEED and similar web tools auto-caption from the speech and are quick to use, but most cap free exports at a short length (often under a minute), add a watermark, or both, with the unlocked version behind a monthly subscription.',
+        ],
+      },
+      {
+        h: 'Captioning without a watermark or length cap',
+        p: [
+          'Stayput\'s [add subtitles to video](/tools/add-subtitles-to-video) tool writes the captions itself, using the same on-device Whisper model as the [transcribe](/tools/transcribe) tool, or burns in an SRT or VTT file you already have, and draws them into the video with a choice of three caption styles. It runs entirely in the browser tab, so there is no length cap beyond what your device can hold in memory, no watermark, and no upload of the video.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the difference between subtitles and captions burned in?', a: 'Subtitles are a separate file a player can switch on or off. Burned-in captions are part of the video image itself, so they show up everywhere, which is what most social platforms need.' },
+      { q: 'Can I add subtitles to a video for free with no watermark?', a: 'Yes, with a tool that processes the video in your browser rather than a server, since there is no hosting cost to recover with a watermark or a paid tier.' },
+      { q: 'Do auto-captions need an internet connection?', a: 'A browser-based tool downloads its speech model once and then works offline; a cloud-based captioning site needs a connection for every video.' },
+      { q: 'Can I burn in subtitles I already wrote as an SRT file?', a: 'Yes. Stayput\'s add subtitles tool accepts an existing SRT or VTT file and burns those exact captions into the video instead of generating new ones from the speech.' },
+    ],
+  },
+  {
+    slug: 'how-to-remove-vocals-from-a-song',
+    title: 'How to Remove Vocals From a Song for Karaoke',
+    description: 'Removing vocals used to mean finding a rare instrumental version. AI source separation now does it from any song. Here is how it works and a free browser tool with no upload.',
+    heading: 'How to remove vocals from a song',
+    dek: 'AI vocal removers pull the voice out of almost any song now, not just tracks with a lucky stereo mix. Here is how they work, and a free browser-based one.',
+    keywords: ['how to remove vocals from a song', 'vocal remover free', 'make a song instrumental', 'karaoke maker online free', 'acapella extractor'],
+    updated: '2026-09-30',
+    tools: ['vocal-remover', 'karaoke-maker', 'acapella-extractor'],
+    sections: [
+      {
+        h: 'Why "reduce the centre channel" mostly does not work anymore',
+        p: [
+          'The old trick, cancelling the parts identical in both stereo channels, only works on songs mixed with vocals dead-centre and nothing else sharing that spot, and it usually dulls the bass and drums along with the voice. Most modern songs are not mixed that forgivingly, so this method quietly went from a common tip to a mostly unreliable one.',
+        ],
+      },
+      {
+        h: 'What AI source separation does instead',
+        p: [
+          'A source-separation model, the kind used by apps like Ultimate Vocal Remover and vocalremover.org, is trained on thousands of songs to recognize what a human voice sounds like versus instruments, and can pull one out of an ordinary stereo (or even mono) mix without relying on how it was panned. It is the same category of technology used to make karaoke tracks and acapellas from songs that never had separate stems released.',
+        ],
+      },
+      {
+        h: 'Where the free web tools fall short',
+        p: [
+          'Sites like vocalremover.org and similar free separators typically cap the file length or size, queue you behind other users, or upload the song to run the separation, which is a real concern for an unreleased demo or a client\'s stems. Reverb, heavily processed vocals and dense mixes also trip up any separation model, free or paid.',
+        ],
+      },
+      {
+        h: 'Separating a song without uploading it',
+        p: [
+          'Stayput\'s [vocal remover](/tools/vocal-remover) runs UVR-MDX-NET Inst HQ 3, one of the models behind Ultimate Vocal Remover, directly in the browser: drop a song and get the [instrumental for karaoke](/karaoke-maker), the [isolated vocals as an acapella](/acapella-extractor), or both, with no file uploaded and no queue. A computer with WebGPU (recent Chrome or Edge, or Safari 26) separates a song in well under its own length; without it, the CPU takes noticeably longer, and the tab needs to stay open until it finishes.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I remove vocals from any song?', a: 'Mostly, with an AI separation model. Heavy reverb, vocals mixed to sound like an instrument, and very dense or distorted mixes still leave some trace of voice behind.' },
+      { q: 'Is there a free vocal remover with no upload?', a: 'Yes. A tool that runs the separation model in your browser, like Stayput\'s vocal remover, processes the song on your device instead of sending it to a server.' },
+      { q: 'Can I use the instrumental I make this way?', a: 'For personal karaoke, practice and remixing your own songs, yes. The tool changes only the audio file, not who owns the underlying song, so publishing an instrumental or acapella of someone else\'s track still needs their permission.' },
+      { q: 'Why does the separated vocal sound a bit thin or watery?', a: 'That artifact comes from the separation model itself, not the file format; it is more noticeable on tracks with heavy reverb or a dense mix, where the model has less to go on to isolate the voice cleanly.' },
+    ],
+  },
+  {
+    slug: 'how-to-remove-an-object-from-a-photo',
+    title: 'How to Remove an Object From a Photo (Free, No App)',
+    description: 'A stranger in the background, a bin, a wire or a date stamp can usually be painted out with an AI inpainting tool rather than cropped around. Here is how, on each platform and in the browser.',
+    heading: 'How to remove an object from a photo',
+    dek: 'Painting out an unwanted object usually beats cropping around it. Here is how to do it on your phone, and a free browser tool with no upload.',
+    keywords: ['how to remove object from photo', 'remove object from photo free', 'remove person from photo', 'photo object eraser', 'magic eraser online free'],
+    updated: '2026-09-30',
+    tools: ['remove-object', 'magic-eraser', 'remove-person-from-photo'],
+    sections: [
+      {
+        h: 'Why painting it out beats cropping',
+        p: [
+          'Cropping to cut out a stranger, a bin or a car in the background often ruins the framing or leaves too little of the actual subject. An inpainting tool instead paints over just that area with a plausible guess at what belongs there, based on the pixels around it, so the rest of the photo, including its framing, stays exactly as shot.',
+        ],
+      },
+      {
+        h: 'On an iPhone',
+        p: [
+          'The Photos app\'s **Clean Up** tool (iOS 18 and later, or Magic Eraser on older models with limited support) circles or brushes over an object and an on-device model fills it in, similar to Google\'s Magic Eraser. It works well for a single distinct object against a simple background and is built into every photo, no separate app needed.',
+        ],
+      },
+      {
+        h: 'On Android',
+        p: [
+          'Google Photos\' **Magic Eraser** does the same job: tap suggested objects or draw around one, and it fills in the gap. On Pixel phones it runs on-device or in the cloud depending on the model; on other Android phones it usually needs a Google One subscription for full access.',
+        ],
+      },
+      {
+        h: 'On a computer, without an editor',
+        p: [
+          'Photoshop\'s **Generative Fill** and Lightroom\'s **Remove** tool do this well but need a Creative Cloud subscription. Free web tools like cleanup.pictures work for quick jobs but usually cap resolution or the number of free uses per day, and the photo is uploaded to their server to be processed.',
+        ],
+      },
+      {
+        h: 'Removing an object without uploading the photo',
+        p: [
+          'Stayput\'s [remove object from photo](/tools/remove-object) tool uses MI-GAN, a small open-source inpainting model, running as WebAssembly directly in the browser tab: paint over the thing to remove and it fills in the gap on your own device, with no account, no daily limit and no upload. It is best at objects on a background that repeats, like a person on a beach or a wire across the sky; a large object in front of something unique, like a face, comes back as a plausible blur rather than the real thing underneath.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I remove a person from a photo for free?', a: 'Yes, with an inpainting tool such as your phone\'s built-in eraser or a browser-based one like Stayput\'s, which paints over the person with a guess at what is behind them.' },
+      { q: 'Does removing an object upload my photo anywhere?', a: 'Not with a tool that runs the inpainting model in your browser or on-device on your phone. Many free web tools do upload the photo to process it, so check before using one for a private picture.' },
+      { q: 'Why does the filled-in area look smudged?', a: 'The model is guessing what belongs there from the surrounding pixels, so a smooth, repeating background (sky, grass, pavement) fills in convincingly, while a busy or unique background leaves a softer, less exact patch.' },
+      { q: 'Can I remove more than one object?', a: 'Yes, one at a time. Painting and erasing a smaller area at a time generally gives a cleaner result than one large stroke covering several things.' },
+    ],
+  },
+  {
+    slug: 'how-to-make-a-pdf-searchable',
+    title: 'How to Make a Scanned PDF Searchable (OCR, Free)',
+    description: 'A scanned PDF is a picture of a page, so Ctrl+F finds nothing in it. Here is how OCR fixes that, and a free browser tool that does it with no upload and no page limit.',
+    heading: 'How to make a scanned PDF searchable',
+    dek: 'A scan is a photograph of paper, not text, which is why you cannot search it. Here is how OCR adds a text layer, and a free browser tool for it.',
+    keywords: ['how to make a pdf searchable', 'ocr pdf free', 'make scanned pdf searchable', 'scanned pdf to text', 'pdf text recognition online'],
+    updated: '2026-09-30',
+    tools: ['ocr-pdf', 'make-pdf-searchable', 'scanned-pdf-to-text'],
+    sections: [
+      {
+        h: 'Why a scanned PDF cannot be searched',
+        p: [
+          'A PDF made by scanning paper, or by photographing it with a scanning app, stores each page as an image, the same as a JPG would. A PDF reader can only search for text it actually contains, so pressing Ctrl+F on a scanned document finds nothing, however clearly the words are printed on the page.',
+        ],
+      },
+      {
+        h: 'What OCR actually changes',
+        p: [
+          'Optical character recognition (OCR) reads the letters in that image and places matching, invisible text exactly on top of where each word sits. The page still looks like the original scan, but a reader can now find, select and copy the words, because there is real text there for it to match against.',
+        ],
+      },
+      {
+        h: 'In Adobe Acrobat',
+        p: [
+          'Acrobat Pro\'s **Scan & OCR** tool does this well and keeps formatting closely, but it needs a paid Acrobat subscription; the free Acrobat Reader cannot add OCR text to a PDF, only read PDFs that already have it.',
+        ],
+      },
+      {
+        h: 'On a phone, while scanning',
+        p: [
+          'Apps like Adobe Scan and Microsoft Lens can OCR a page as part of scanning it, which is convenient for a fresh document but does nothing for a PDF you already have from somewhere else, such as an old scanned manual or a document someone emailed you.',
+        ],
+      },
+      {
+        h: 'Making an existing scan searchable without uploading it',
+        p: [
+          'Stayput\'s [OCR PDF](/tools/ocr-pdf) tool runs Tesseract, an open-source OCR engine, directly in the browser: drop a scanned PDF and it reads the text on your device, adds it invisibly over each page, and gives back a searchable PDF, with an option to also save the text as a plain .txt file. It reads English text; other Latin-alphabet languages are read with the English model and come out less accurately, and it does not yet read Cyrillic, Arabic or Asian scripts. Clean, straight, sharply printed pages read best; faint photocopies and pages photographed at an angle read worse, so scanning them with a [document scanner](/tools/document-scanner) first, which straightens and flattens the page, generally improves the result.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why can\'t I search or copy text in a scanned PDF?', a: 'A scanned PDF stores each page as an image, not text, so there is nothing for a search or a copy command to match against until OCR adds a text layer.' },
+      { q: 'Is there a free OCR tool with no page limit?', a: 'Yes, a browser-based one. Since Stayput\'s OCR PDF tool reads the pages on your device instead of a metered server, there is no natural reason to cap how many pages it processes.' },
+      { q: 'Does OCR upload my document anywhere?', a: 'Cloud OCR services do send the file to their servers. A browser-based tool that runs the OCR engine locally, like Stayput\'s, keeps the PDF on your device the whole time.' },
+      { q: 'Will OCR work on handwriting?', a: 'Poorly. OCR engines like Tesseract are trained mainly on printed text; handwriting recognition is a different, much harder problem and results are generally unreliable.' },
+    ],
+  },
+  {
     slug: 'how-to-scan-a-document-with-your-phone',
     title: 'How to Scan a Document With Your Phone (No App)',
     description: 'iPhone and Android can both turn a photo of paper into a flat, clean scan, but the built-in tools are scattered across different apps. Here is where to find them, and a browser tool that needs no app at all.',

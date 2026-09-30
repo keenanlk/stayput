@@ -1,0 +1,59 @@
+---
+/** Option controls for Compress PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const mode = defaults.mode ?? 'images';
+const targetSize = defaults['target-size'] ?? '1';
+const targetUnit = defaults['target-unit'] ?? 'MB';
+const quality = defaults.quality ?? '70';
+---
+<div class="field wide">
+  <label>Level</label>
+  <div class="segmented" role="radiogroup" aria-label="Compression level">
+    <label><input type="radio" name="mode" value="lossless" checked={mode === 'lossless'} /><span>Lossless cleanup</span></label>
+    <label><input type="radio" name="mode" value="images" checked={mode === 'images'} /><span>Recompress images</span></label>
+    <label><input type="radio" name="mode" value="flatten" checked={mode === 'flatten'} /><span>Flatten pages</span></label>
+    <label><input type="radio" name="mode" value="size" checked={mode === 'size'} /><span>Fit a file size</span></label>
+  </div>
+</div>
+<div class="field" id="target-field" hidden={mode !== 'size'}>
+  <label for="target-size">Largest file size</label>
+  <div class="target-row">
+    <input type="number" id="target-size" min="1" step="1" value={targetSize} />
+    <select id="target-unit" aria-label="Unit">
+      <option value="KB" selected={targetUnit === 'KB'}>KB</option>
+      <option value="MB" selected={targetUnit === 'MB'}>MB</option>
+    </select>
+  </div>
+  <p class="muted small">The gentlest setting that fits is used: lossless first, then lighter image compression, and only then pages turned into pictures.</p>
+</div>
+<div class="field" id="quality-field">
+  <label for="quality">Image quality <output id="quality-out">{quality}</output></label>
+  <input type="range" id="quality" min="20" max="95" value={quality} />
+</div>
+<div class="field" id="maxpx-field">
+  <label for="maxpx">Limit image resolution</label>
+  <select id="maxpx">
+    <option value="1200">1200 px (screen)</option>
+    <option value="1600" selected>1600 px (good for print)</option>
+    <option value="2400">2400 px (high quality)</option>
+    <option value="0">Keep original size</option>
+  </select>
+</div>
+<div class="field" id="dpi-field" hidden>
+  <label for="dpi">Page resolution</label>
+  <select id="dpi">
+    <option value="72">72 DPI (smallest)</option>
+    <option value="110" selected>110 DPI (readable)</option>
+    <option value="150">150 DPI (sharp)</option>
+    <option value="200">200 DPI (print)</option>
+  </select>
+</div>
+<div class="field" id="gray-field" hidden>
+  <label class="check"><input type="checkbox" id="grayscale" /> Convert to grayscale</label>
+</div>
+<style>
+  .target-row { display: flex; gap: 6px; }
+  .target-row input { flex: 1 1 auto; min-width: 0; }
+  .target-row select { flex: 0 0 auto; width: auto; }
+</style>
