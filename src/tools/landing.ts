@@ -10,6 +10,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'strip-exif': () => import('./strip-exif'),
   'merge-pdf': () => import('./merge-pdf'),
   'split-pdf': () => import('./split-pdf'),
+  'compress-pdf': () => import('./compress-pdf'),
   'image-to-pdf': () => import('./image-to-pdf'),
   'pdf-to-image': () => import('./pdf-to-image'),
   'extract-pdf-images': () => import('./extract-pdf-images'),

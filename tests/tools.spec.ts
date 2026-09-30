@@ -6215,3 +6215,30 @@ test('Compress image to 20 KB gets a PNG under the limit as a JPG', async ({ pag
   expect(downloads[0]!.suggestedFilename()).toBe('logo.jpg');
   expect((await bytesOf(downloads[0]!)).length).toBeLessThanOrEqual(20_000);
 });
+
+test('Compress PDF fits a file size with the gentlest step, and says when a limit cannot be met', async ({ page }) => {
+  test.setTimeout(120_000);
+  await stubAnalytics(page);
+  // scan.pdf is about 250 KB: two pages with one large photo.
+  await page.goto('/compress-pdf-to-100kb');
+  const net = watchNetwork(page);
+  await expect(page.locator('#target-size')).toHaveValue('100');
+  await expect(page.locator('#quality-field')).toBeHidden();
+  const { downloads } = await run(page, ['scan.pdf']);
+  const out = await bytesOf(downloads[0]!);
+  expect(out.length).toBeLessThanOrEqual(100_000);
+  expect((await PDFDocument.load(out)).getPageCount()).toBe(2);
+  await expect(page.locator('#results-list')).toContainText('under 100 KB:');
+  // A limit above the file's size hands the original back untouched.
+  await page.locator('#clear').click();
+  await page.locator('#target-size').fill('500');
+  const kept = await run(page, ['scan.pdf']);
+  expect((await bytesOf(kept.downloads[0]!)).length).toBe(readFileSync(fx('scan.pdf')).length);
+  await expect(page.locator('#results-list')).toContainText('already under 500 KB');
+  // An impossible limit returns the smallest attempt and says so.
+  await page.locator('#clear').click();
+  await page.locator('#target-size').fill('1');
+  await run(page, ['scan.pdf']);
+  await expect(page.locator('#results-list')).toContainText('could not get under 1 KB');
+  net.assertNothingLeft(['scan.pdf']);
+});

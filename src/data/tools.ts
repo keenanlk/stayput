@@ -408,7 +408,7 @@ export const tools: Tool[] = [
     name: 'Compress PDF',
     title: 'Compress PDF Online Without Uploading, Free | Stayput',
     description:
-      'Reduce PDF file size in your browser. Recompress images, remove unused data, or flatten pages. No upload, no limits, no watermark.',
+      'Reduce PDF file size in your browser, or fit it under a limit like 1 MB or 200 KB. Recompress images, remove unused data, or flatten pages. No upload, no watermark.',
     heading: 'Compress a PDF',
     tagline: 'Shrink PDFs for email or upload limits. Three levels, from lossless cleanup to aggressive. Processed on your device.',
     category: 'pdf',
@@ -419,13 +419,17 @@ export const tools: Tool[] = [
     keywords: ['compress pdf', 'reduce pdf size', 'shrink pdf', 'pdf compressor', 'make pdf smaller'],
     steps: [
       'Drop one or more PDFs.',
-      'Pick a level. "Recompress images" is the default and keeps text selectable.',
+      'Pick a level, or choose "Fit a file size" and type the limit. "Recompress images" is the default and keeps text selectable.',
       'Compare the before and after sizes and download.',
     ],
     faq: [
       {
         q: 'How does each level work?',
         a: '"Lossless cleanup" rewrites the file with compressed object streams and drops unused data; text and images stay identical. "Recompress images" additionally re-encodes embedded photos at a lower JPG quality and caps their resolution, which is where most of the savings come from in scanned or photo-heavy PDFs. "Flatten pages" renders each page to an image at the resolution you choose. It gives the smallest files for scans but text is no longer selectable.',
+      },
+      {
+        q: 'Can it get a PDF under a set size, like 1 MB?',
+        a: 'Yes. Choose "Fit a file size" and type the limit in KB or MB. The page tries the gentlest settings first (a lossless rewrite, then lighter image compression that keeps text selectable) and flattens pages to pictures only when nothing else fits. The result says which step it took. 1 MB counts as 1,000,000 bytes, so the file passes however a form counts.',
       },
       {
         q: 'Why did my PDF barely shrink?',
