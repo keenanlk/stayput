@@ -1,0 +1,28 @@
+---
+/** Option controls for EPUB to PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const paper = defaults.paper ?? 'a5';
+const typeSize = defaults['type-size'] ?? 'medium';
+const contents = defaults.contents !== 'false';
+---
+<div class="field">
+  <label for="paper">Page size</label>
+  <select id="paper">
+    <option value="a5" selected={paper === 'a5'}>A5, like a paperback</option>
+    <option value="a4" selected={paper === 'a4'}>A4</option>
+    <option value="letter" selected={paper === 'letter'}>US Letter</option>
+  </select>
+</div>
+<div class="field">
+  <label>Text size</label>
+  <div class="segmented" role="radiogroup" aria-label="Text size">
+    <label><input type="radio" name="type-size" value="small" checked={typeSize === 'small'} /><span>Small</span></label>
+    <label><input type="radio" name="type-size" value="medium" checked={typeSize === 'medium'} /><span>Medium</span></label>
+    <label><input type="radio" name="type-size" value="large" checked={typeSize === 'large'} /><span>Large</span></label>
+  </div>
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="contents" checked={contents} /> Add a contents page listing the chapters</label>
+  <p class="muted small">Only DRM-free books can be converted: ones from Project Gutenberg, Standard Ebooks, Humble Bundle, many publishers and authors. Books locked with DRM, as most bought from Kobo, Apple Books or Google Play are, cannot be read.</p>
+</div>
