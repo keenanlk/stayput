@@ -5,7 +5,7 @@ import { deflateSync } from 'node:zlib';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { unzipSync } from 'fflate';
+import { unzipSync, zipSync } from 'fflate';
 import { PDFDocument, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees } from 'pdf-lib';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(86);
+  expect(await page.locator('.index .tool-card').count()).toBe(87);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2249,6 +2249,67 @@ test('Scan to PDF puts two photos on two pages of one PDF, and keeps a photo wit
   }), 'base64'));
   await run(page, [grey]);
   await expect(page.locator('#results-list')).toContainText('page edges not found in 1 photo, kept whole');
+});
+
+/** A small DRM-free EPUB 3: a cover picture, three chapters with inline styling, a list, a quote and a table. */
+function epubFixture(name: string, opts: { drm?: boolean } = {}): string {
+  const enc = (s: string) => new TextEncoder().encode(s);
+  const page = (title: string, body: string) => enc(`<?xml version="1.0" encoding="utf-8"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>${title}</title></head><body>${body}</body></html>`);
+  const files: Record<string, Uint8Array> = {
+    mimetype: enc('application/epub+zip'),
+    'META-INF/container.xml': enc('<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'),
+    'OEBPS/content.opf': enc(`<?xml version="1.0"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="id"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="id">test</dc:identifier><dc:title>The Test Voyage</dc:title><dc:creator>Ada Writer</dc:creator><dc:language>en</dc:language></metadata><manifest>
+      <item id="cover" href="images/cover%20art.png" media-type="image/png" properties="cover-image"/>
+      <item id="c0" href="text/cover.xhtml" media-type="application/xhtml+xml"/>
+      <item id="c1" href="text/one.xhtml" media-type="application/xhtml+xml"/>
+      <item id="c2" href="text/two.xhtml" media-type="application/xhtml+xml"/>
+      <item id="c3" href="text/three.xhtml" media-type="application/xhtml+xml"/>
+      </manifest><spine><itemref idref="c0"/><itemref idref="c1"/><itemref idref="c2"/><itemref idref="c3"/></spine></package>`),
+    'OEBPS/images/cover art.png': readFileSync(staticFx('ocr-note.png')),
+    'OEBPS/text/cover.xhtml': page('Cover', '<div><img src="../images/cover%20art.png" alt="Cover"/></div>'),
+    'OEBPS/text/one.xhtml': page('One', '<h1>Chapter One: Departure</h1><p>Call me <em>Ishmael</em>. Some years ago, never mind how long precisely, I thought I would sail about a little.</p><p>The <strong>harbour</strong> was quiet&#160;that morning.</p>'),
+    'OEBPS/text/two.xhtml': page('Two', '<h1>Chapter Two: The Crew</h1><ul><li>A cook named Fleece</li><li>A harpooneer named Queequeg</li></ul><blockquote><p>All men live enveloped in whale-lines.</p></blockquote><table><tr><td>Ship</td><td>Pequod</td></tr></table>'),
+    'OEBPS/text/three.xhtml': page('Three', '<h1>Chapter Three: Home</h1><p>And then the voyage ended, <span>with a line</span><br/>broken in two.</p>'),
+  };
+  if (opts.drm) files['META-INF/encryption.xml'] = enc('<encryption xmlns="urn:oasis:names:tc:opendocument:xmlns:container" xmlns:enc="http://www.w3.org/2001/04/xmlenc#"><enc:EncryptedData><enc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/><enc:CipherData><enc:CipherReference URI="OEBPS/text/one.xhtml"/></enc:CipherData></enc:EncryptedData></encryption>');
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), name);
+  writeFileSync(file, zipSync(files));
+  return file;
+}
+
+test('EPUB to PDF lays out chapters on new pages with a contents page and the cover, and no bytes leave the tab', async ({ page }) => {
+  const errors = await open(page, 'epub-to-pdf');
+  const net = watchNetwork(page);
+  const { downloads } = await run(page, [epubFixture('voyage.epub')]);
+  expect(downloads[0]!.suggestedFilename()).toBe('voyage.pdf');
+  await expect(page.locator('#results-list')).toContainText(/\d+ pages from 3 chapters, 1 picture/);
+  const bytes = await bytesOf(downloads[0]!);
+  const doc = await PDFDocument.load(bytes);
+  // Cover, contents, then one page per chapter.
+  expect(doc.getPageCount()).toBe(5);
+  expect(doc.getTitle()).toBe('The Test Voyage');
+  expect(doc.getAuthor()).toBe('Ada Writer');
+  // A5 by default.
+  expect(Math.round(doc.getPage(0).getWidth())).toBe(420);
+  const pageText = async (n: number) => (await textItems(bytes, n)).map((t) => t.str).join('');
+  expect(await pageText(2)).toMatch(/Contents.*Chapter One: Departure.*3.*Chapter Two: The Crew.*4.*Chapter Three: Home.*5/);
+  expect(await pageText(3)).toContain('Call me Ishmael');
+  expect(await pageText(3)).toContain('The harbour was quiet that morning.');
+  const two = await pageText(4);
+  expect(two).toContain('A harpooneer named Queequeg');
+  expect(two).toContain('All men live enveloped in whale-lines.');
+  expect(two).toMatch(/Ship\s+Pequod/);
+  expect(await pageText(5)).toContain('broken in two.');
+  net.assertNothingLeft(['voyage.epub']);
+  expect(errors).toEqual([]);
+});
+
+test('EPUB to PDF explains DRM instead of failing silently', async ({ page }) => {
+  await open(page, 'epub-to-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(epubFixture('locked.epub', { drm: true }));
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('protected by DRM', { timeout: 30_000 });
 });
 
 test('Image to text reads a PNG and a JPG in one batch, shows the text to copy, and no bytes leave the tab', async ({ page }) => {

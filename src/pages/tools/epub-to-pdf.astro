@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import EpubToPdf from '../../components/options/EpubToPdf.astro';
+const tool = toolBySlug('epub-to-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><EpubToPdf /></Fragment>
+</ToolLayout>
+<script src="../../tools/epub-to-pdf.ts"></script>

@@ -2832,6 +2832,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'epub-to-pdf',
+    name: 'EPUB to PDF',
+    title: 'EPUB to PDF Converter: Free, No Upload, No Email | Stayput',
+    description:
+      'Convert an EPUB ebook to a PDF you can print, annotate or read anywhere, with chapters on new pages, pictures, italics and a contents page. Runs in your browser; the book is never uploaded.',
+    heading: 'Convert EPUB to PDF',
+    tagline: 'A DRM-free ebook turned into a paginated PDF, laid out on your own device.',
+    category: 'pdf',
+    accept: '.epub,application/epub+zip',
+    multiple: true,
+    dropLabel: 'Drop EPUB books',
+    action: 'Convert to PDF',
+    keywords: ['epub to pdf', 'epub to pdf converter', 'convert epub to pdf', 'epub to pdf free', 'ebook to pdf', 'epub to pdf no upload'],
+    steps: [
+      'Drop one or more DRM-free EPUB files, from Project Gutenberg, Standard Ebooks, a Humble Bundle or a publisher that sells without DRM.',
+      'Pick a page size (A5 reads like a paperback; A4 or Letter for printing at home) and a text size.',
+      'Press Convert to PDF. Each chapter starts on a new page, with page numbers and a contents page.',
+    ],
+    faq: [
+      {
+        q: 'Will the PDF look like the book in my e-reader?',
+        a: 'The structure carries over: chapters, headings, paragraphs, italics and bold, lists, quotations and pictures. The book’s own fonts and fine styling do not: the text is set in Roboto, justified, at the size you pick. Tables come out as plain paragraphs and footnote links as ordinary text.',
+      },
+      {
+        q: 'Why does it say my book is protected by DRM?',
+        a: 'Books bought from stores that lock them (with Adobe DRM, for example) have their chapters encrypted, so no converter can read them without the store’s key. Removing DRM is illegal in many countries, and this tool does not try. Books from Project Gutenberg, Standard Ebooks, Tor, Humble Bundle and many small publishers are DRM-free and work.',
+      },
+      {
+        q: 'Which languages work?',
+        a: 'Books in Latin, Greek and Cyrillic letters, which covers English and most European languages. Chinese, Japanese, Korean, Arabic, Hebrew, Thai and Indian scripts cannot be shown by the built-in font yet, and the tool says so instead of making a PDF of empty boxes.',
+      },
+      {
+        q: 'Is my book uploaded?',
+        a: 'No. The EPUB is unzipped and laid out in this tab, so your library, including books you wrote or were sent in confidence, never leaves your device.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',

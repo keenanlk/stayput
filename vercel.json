@@ -439,6 +439,11 @@
       "source": "/document-scanner",
       "destination": "/tools/document-scanner",
       "permanent": true
+    },
+    {
+      "source": "/epub-to-pdf",
+      "destination": "/tools/epub-to-pdf",
+      "permanent": true
     }
   ],
   "headers": [
