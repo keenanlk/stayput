@@ -3839,6 +3839,6 @@ export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => 
 
 export const categories: { id: Category; label: string; blurb: string }[] = [
   { id: 'images', label: 'Image tools', blurb: 'Convert, shrink and clean photos.' },
-  { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress, sign and convert.' },
+  { id: 'pdf', label: 'PDF tools', blurb: 'Merge, split, compress, sign; open archives.' },
   { id: 'media', label: 'Video and audio tools', blurb: 'Trim, compress and convert clips, make GIFs.' },
 ];

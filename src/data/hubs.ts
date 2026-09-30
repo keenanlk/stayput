@@ -26,12 +26,24 @@ export const conversions: ConversionItem[] = [
   ...presets.map((p) => ({ slug: p.slug, label: p.name, tagline: p.tagline, category: categoryOf(p.slug) ?? 'images' })),
 ];
 
-const conversionLabels: Record<Category, string> = { images: 'Images', pdf: 'PDFs', media: 'Video and audio' };
-export const conversionGroups = categories.map((c) => ({
-  id: c.id === 'images' ? 'image' : c.id,
-  label: conversionLabels[c.id],
-  items: conversions.filter((i) => i.category === c.id),
-}));
+// Each category is split into smaller groups so no list on /conversions runs
+// past a few dozen links as presets are added.
+const target = (slug: string) => slug.split('-to-')[1] ?? '';
+const isAudio = (slug: string) =>
+  !/screen-recorder|video/.test(slug) &&
+  (/^(mp3|wav|m4a|ogg|flac)$/.test(target(slug)) || slug === 'mp3-to-text' || (!target(slug) && /audio|mp3|wav|tuner|tempo|karaoke|acapella/.test(slug)));
+const isImageFormat = (slug: string) => pairs.some((p) => p.slug === slug) || /^[a-z0-9]+-to-(svg|gif)$/.test(slug);
+const isImageSize = (slug: string) => /compress|resize|reduce|enlarge|resolution|crop|2x2|35x45/.test(slug);
+
+const conversionSplits: { id: string; label: string; test: (i: ConversionItem) => boolean }[] = [
+  { id: 'image-formats', label: 'Image formats', test: (i) => i.category === 'images' && isImageFormat(i.slug) },
+  { id: 'image-size', label: 'Resize and compress', test: (i) => i.category === 'images' && !isImageFormat(i.slug) && isImageSize(i.slug) },
+  { id: 'image-edits', label: 'Edit and create', test: (i) => i.category === 'images' && !isImageFormat(i.slug) && !isImageSize(i.slug) },
+  { id: 'pdf', label: 'PDFs and files', test: (i) => i.category === 'pdf' },
+  { id: 'video', label: 'Video', test: (i) => i.category === 'media' && !isAudio(i.slug) },
+  { id: 'audio', label: 'Audio', test: (i) => i.category === 'media' && isAudio(i.slug) },
+];
+export const conversionGroups = conversionSplits.map(({ id, label, test }) => ({ id, label, items: conversions.filter(test) }));
 
 /** A capped, mixed set for the home page chips; the rest live on /conversions. */
 export const popularConversions = [
