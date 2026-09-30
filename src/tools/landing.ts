@@ -70,6 +70,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'add-subtitles-to-video': () => import('./add-subtitles'),
   'vocal-remover': () => import('./vocal-remover'),
   'video-background-remover': () => import('./video-background'),
+  'ocr-pdf': () => import('./ocr-pdf'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

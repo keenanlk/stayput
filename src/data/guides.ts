@@ -1927,7 +1927,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Can I convert a scanned PDF to Word?', a: 'Only after it has gone through OCR to create a text layer; a scan is just an image until then, so any converter starts by guessing text from pixels, and it is only as good as the OCR behind it.' },
+      { q: 'Can I convert a scanned PDF to Word?', a: 'Only after it has gone through OCR to create a text layer; a scan is just an image until then, so any converter starts by guessing text from pixels, and it is only as good as the OCR behind it. [OCR PDF](/tools/ocr-pdf) adds that text layer on your device; convert the searchable copy afterwards.' },
       { q: 'Why did the formatting change after converting?', a: 'The converter is reconstructing structure (columns, headings, spacing) from where text sits on the page, which is an approximation rather than a copy of the original document\'s actual layout.' },
       { q: 'Is there a free way to convert PDF to Word without installing anything?', a: 'Yes. Opening the PDF directly in Word or Google Docs (both already have this built in) or using a browser-based converter both avoid installing separate software.' },
       { q: 'Does converting a PDF to Word online upload my document?', a: 'It depends on the tool. Google Docs\' conversion uploads it to Google Drive by definition; a browser-based tool that processes the file locally does not upload it anywhere.' },

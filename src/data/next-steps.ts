@@ -51,6 +51,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'image-to-svg': ['remove-background', 'favicon-generator'],
   'gif-maker': ['compress-gif', 'gif-to-mp4'],
   'flatten-pdf': ['merge-pdf', 'compress-pdf'],
+  'ocr-pdf': ['compress-pdf', 'pdf-to-word'],
   'resize-pdf': ['merge-pdf', 'pdf-page-numbers'],
   'transcribe': ['add-subtitles-to-video', 'remove-silence'],
   'add-subtitles-to-video': ['compress-video', 'trim-video'],

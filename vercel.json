@@ -429,6 +429,11 @@
       "source": "/video-background-remover",
       "destination": "/tools/video-background-remover",
       "permanent": true
+    },
+    {
+      "source": "/ocr-pdf",
+      "destination": "/tools/ocr-pdf",
+      "permanent": true
     }
   ],
   "headers": [
