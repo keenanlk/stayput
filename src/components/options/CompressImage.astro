@@ -7,17 +7,29 @@ const quality = defaults.quality ?? '80';
 const format = defaults.format ?? 'keep';
 const maxWidth = defaults['max-width'] ?? '2000';
 const maxHeight = defaults['max-height'] ?? '2000';
+const exactWidth = defaults['exact-width'] ?? '1920';
+const exactHeight = defaults['exact-height'] ?? '1080';
+const fit = defaults.fit ?? 'cover';
+const aim = defaults.aim ?? 'quality';
+const targetSize = defaults['target-size'] ?? '100';
+const targetUnit = defaults['target-unit'] ?? 'KB';
 const formats = [
   ['keep', 'Same as original'],
   ['image/jpeg', 'JPG'],
   ['image/webp', 'WebP (smallest)'],
   ['image/png', 'PNG (lossless)'],
 ] as const;
+const fits = [
+  ['cover', 'Crop to fill (no bars)'],
+  ['contain', 'Fit inside (add bars)'],
+  ['stretch', 'Stretch to fit'],
+] as const;
 ---
 <div class="field wide">
   <label>Resize</label>
   <div class="segmented" role="radiogroup" aria-label="Resize mode">
     <label><input type="radio" name="resize-mode" value="max" checked={mode === 'max'} /><span>Limit dimensions</span></label>
+    <label><input type="radio" name="resize-mode" value="exact" checked={mode === 'exact'} /><span>Exact size</span></label>
     <label><input type="radio" name="resize-mode" value="percent" checked={mode === 'percent'} /><span>Percentage</span></label>
     <label><input type="radio" name="resize-mode" value="none" checked={mode === 'none'} /><span>Keep size</span></label>
   </div>
@@ -26,13 +38,41 @@ const formats = [
   <div class="field"><label for="max-width">Max width (px)</label><input type="number" id="max-width" min="1" step="1" value={maxWidth} /></div>
   <div class="field"><label for="max-height">Max height (px)</label><input type="number" id="max-height" min="1" step="1" value={maxHeight} /></div>
 </div>
+<div class="field-row wide" id="exact-fields" hidden>
+  <div class="field"><label for="exact-width">Width (px)</label><input type="number" id="exact-width" min="1" max="10000" step="1" value={exactWidth} /></div>
+  <div class="field"><label for="exact-height">Height (px)</label><input type="number" id="exact-height" min="1" max="10000" step="1" value={exactHeight} /></div>
+  <div class="field">
+    <label for="fit">When the shape differs</label>
+    <select id="fit">
+      {fits.map(([v, l]) => <option value={v} selected={v === fit}>{l}</option>)}
+    </select>
+  </div>
+</div>
 <div class="field" id="percent-field" hidden>
   <label for="percent">Scale <output id="percent-out">50%</output></label>
   <input type="range" id="percent" min="5" max="100" value="50" />
 </div>
-<div class="field">
+<div class="field wide">
+  <label>Compression</label>
+  <div class="segmented" role="radiogroup" aria-label="Compression">
+    <label><input type="radio" name="aim" value="quality" checked={aim === 'quality'} /><span>Set the quality</span></label>
+    <label><input type="radio" name="aim" value="size" checked={aim === 'size'} /><span>Fit a file size</span></label>
+  </div>
+</div>
+<div class="field" id="quality-field">
   <label for="quality">Quality <output id="quality-out">{quality}</output></label>
   <input type="range" id="quality" min="30" max="100" value={quality} />
+</div>
+<div class="field" id="target-field" hidden>
+  <label for="target-size">Largest file size</label>
+  <div class="target-row">
+    <input type="number" id="target-size" min="1" step="1" value={targetSize} />
+    <select id="target-unit" aria-label="Unit">
+      <option value="KB" selected={targetUnit === 'KB'}>KB</option>
+      <option value="MB" selected={targetUnit === 'MB'}>MB</option>
+    </select>
+  </div>
+  <p class="muted small">The highest quality that fits is picked for each image; if even the lowest does not fit, the picture is made smaller.</p>
 </div>
 <div class="field">
   <label for="format">Output format</label>
@@ -40,3 +80,8 @@ const formats = [
     {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
   </select>
 </div>
+<style>
+  .target-row { display: flex; gap: 6px; }
+  .target-row input { flex: 1 1 auto; min-width: 0; }
+  .target-row select { flex: 0 0 auto; width: auto; }
+</style>

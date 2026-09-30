@@ -43,9 +43,13 @@ const shares = (slug: string) => Number(slug.startsWith(`${fromExt}-to-`)) + Num
 const formatWords = new Set(tool.slug.includes('-to-') ? tool.slug.split('-to-').map((part) => part.split('-').pop()!) : []);
 const sharesFormat = (slug: string) => (slug.includes('-to-') ? slug.split('-to-').filter((part) => formatWords.has(part.split('-').pop()!)).length : 0);
 // Image pages list the format pairs; any other page lists only the pairs sharing a format with it (WebP to PDF shows WebP to PNG).
-const conversions = pairs
-  .filter((p) => p.slug !== tool.slug && (tool.category === 'images' || sharesFormat(p.slug) > 0))
-  .sort((a, b) => shares(b.slug) - shares(a.slug) || sharesFormat(b.slug) - sharesFormat(a.slug))
+// Ties rotate from the per-page start too, so sibling pages do not all list the same ten.
+const pairsInScope = pairs.filter((p) => p.slug !== tool.slug && (tool.category === 'images' || sharesFormat(p.slug) > 0));
+const pairTurn = (i: number) => (i - (spin % Math.max(1, pairsInScope.length)) + pairsInScope.length) % Math.max(1, pairsInScope.length);
+const conversions = pairsInScope
+  .map((p, i) => ({ p, i: pairTurn(i) }))
+  .sort((a, b) => shares(b.p.slug) - shares(a.p.slug) || sharesFormat(b.p.slug) - sharesFormat(a.p.slug) || a.i - b.i)
+  .map(({ p }) => p)
   .slice(0, 10);
 // Landing pages that are presets of tools in this category, so "JPG to PDF" is reachable from the PDF tools.
 // Presets of the same tool come first, then those sharing a format with this page.
@@ -53,11 +57,13 @@ const presetScore = (p: (typeof presets)[number]) => 2 * Number(p.base === (base
 // Ties are broken by rotating from a per-page start, so each page shows a different dozen.
 const inScope = presets.filter((p) => p.slug !== tool.slug && (tools.find((t) => t.slug === p.base)?.category === tool.category || sharesFormat(p.slug) > 0));
 const turn = (i: number) => (i - (spin % Math.max(1, inScope.length)) + inScope.length) % Math.max(1, inScope.length);
-const presetLinks = inScope
+// At most six siblings of the same tool, so a tool with many landing pages does not give them all the same list.
+const ranked = inScope
   .map((p, i) => ({ p, i: turn(i) }))
   .sort((a, b) => presetScore(b.p) - presetScore(a.p) || a.i - b.i)
-  .map(({ p }) => p)
-  .slice(0, 12);
+  .map(({ p }) => p);
+const siblings = ranked.filter((p) => p.base === (base ?? tool.slug)).slice(0, 6);
+const presetLinks = [...siblings, ...ranked.filter((p) => p.base !== (base ?? tool.slug))].slice(0, 12);
 // File labels for the upload-vs-local diagram: the format pair when the slug names one, else the category's usual file.
 const labels: Record<string, string> = { jpg: 'JPG', jpeg: 'JPG', png: 'PNG', webp: 'WebP', heic: 'HEIC', avif: 'AVIF', svg: 'SVG', jxl: 'JXL', jfif: 'JFIF', gif: 'GIF', ico: 'ICO', bmp: 'BMP', tiff: 'TIFF', pdf: 'PDF', mp4: 'MP4', mov: 'MOV', mp3: 'MP3', m4a: 'M4A', wav: 'WAV', text: 'TXT', word: 'DOCX', image: 'Photo', picture: 'Photo', screenshot: 'PNG', video: 'Video' };
 const fallback = tool.category === 'pdf' ? 'PDF' : tool.category === 'media' ? 'Video' : 'Photo';
