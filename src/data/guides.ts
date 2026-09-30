@@ -3760,6 +3760,162 @@ export const guides: Guide[] = [
       { q: 'Can I put a green background behind someone instead of blurring it?', a: 'Yes, Stayput\'s green screen video option paints a solid green behind the person instead, ready to key out in an editor like Premiere or OBS.' },
     ],
   },
+  {
+    slug: 'how-to-fill-out-a-pdf-form',
+    title: 'How to Fill Out a PDF Form Without Uploading It',
+    description: 'A tax form, a job application or a rental contract asks for personal details, and most free "fill PDF" sites are upload-first. Here is how to fill one out, and a tool that never sends the file anywhere.',
+    heading: 'How to fill out a PDF form',
+    dek: 'Filling in a form that carries your income, your ID number or your address means thinking about where that file goes. Here is how to fill it out on your own device instead.',
+    keywords: ['how to fill out a pdf form', 'fill pdf form online free', 'fill in pdf form without printing', 'edit pdf form fields', 'fill pdf form no upload'],
+    updated: '2026-09-30',
+    tools: ['fill-pdf-form'],
+    sections: [
+      {
+        h: 'Fillable vs. flat PDFs',
+        p: [
+          'A "fillable" PDF has real form fields built in: text boxes, checkboxes and dropdowns the file itself defines, which is why clicking into one in a PDF reader shows a cursor and a box outline. A "flat" PDF, often an old scanned form, has none of that: the fields are just printed lines and boxes with no way to type into them directly, so filling one out means either printing it or placing text over the image by hand.',
+        ],
+      },
+      {
+        h: 'In Adobe Acrobat',
+        p: [
+          'Acrobat Reader (free) can fill in a form that already has fields, tick its boxes and save the result, which covers most fillable government and business forms. For a flat PDF with no real fields, Acrobat needs the paid Pro tier\'s **Prepare Form** tool to add them first.',
+        ],
+      },
+      {
+        h: 'Printing and scanning back',
+        p: [
+          'The older method, printing the PDF, filling it by hand and scanning it back, still works for a flat form but produces a lower-quality result than typed text, and needs both a printer and a scanner (or a phone scanning app) on hand.',
+        ],
+      },
+      {
+        h: 'Filling a form without uploading it',
+        p: [
+          'Stayput\'s [fill PDF form](/tools/fill-pdf-form) tool opens the document in the browser tab: type into its fields, tick its boxes and choose from its dropdowns if it already has them, or place typed text anywhere on a flat, scanned form that does not. The filled PDF saves straight from the tab, with the original file never uploaded to a server at any point, which matters for a form asking for a Social Security number, a bank account or a signature.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the difference between a fillable and a flat PDF?', a: 'A fillable PDF has real form fields built in, so a reader can type directly into it. A flat PDF, often an old scan, is just an image of a form with no fields, so text has to be placed over it by hand instead.' },
+      { q: 'Can I fill out a PDF form for free without uploading it?', a: 'Yes, Stayput\'s fill PDF form tool works on the document in your browser tab and never sends the file to a server.' },
+      { q: 'Can I fill in a scanned form that has no real fields?', a: 'Yes, by placing typed text directly onto the page at the right spot, which Stayput\'s tool supports for forms without built-in fields.' },
+      { q: 'Does filling out a form this way keep my answers editable later?', a: 'It depends on whether the form\'s fields stay live in the saved file or get flattened into the page; check the tool\'s save option if you need to come back and change an answer.' },
+    ],
+  },
+  {
+    slug: 'how-to-record-your-screen',
+    title: 'How to Record Your Screen (Free, No Software to Install)',
+    description: 'Recording your screen used to mean installing an app with a watermark or a time limit on its free tier. Here is how to do it from the browser instead, with no install and no cap.',
+    heading: 'How to record your screen',
+    dek: 'A quick screen recording for a bug report, a tutorial or a demo does not need a downloaded app. Here is how to record it straight from your browser, free.',
+    keywords: ['how to record your screen', 'screen recorder online free', 'record screen without downloading software', 'free screen recorder no watermark', 'record browser tab with audio'],
+    updated: '2026-09-30',
+    tools: ['screen-recorder', 'screen-recorder-with-audio'],
+    sections: [
+      {
+        h: 'Built into Windows and macOS',
+        p: [
+          'Windows has the **Xbox Game Bar** (Win+G) for recording a single app window, though it cannot record the desktop or File Explorer. macOS has **Screenshot** (Shift+Cmd+5), which records the whole screen, a window, or a selected area, with audio, and needs no extra app. Both are solid for a quick local recording saved straight to disk.',
+        ],
+      },
+      {
+        h: 'Downloaded recording apps',
+        p: [
+          'OBS Studio is free, open-source and does everything a screen recorder needs, plus live streaming, but it has a real learning curve for a one-off recording: scenes, sources and audio mixing are more setup than most quick tutorials need. Loom and Camtasia are easier to start with but gate features like unlimited length or removing a watermark behind a paid plan.',
+        ],
+      },
+      {
+        h: 'Recording in the browser',
+        p: [
+          'Stayput\'s [screen recorder](/tools/screen-recorder) uses the browser\'s own screen-sharing permission to capture your whole screen, one window, or a browser tab, and can [record its audio plus your microphone at the same time](/screen-recorder-with-audio) for a narrated walkthrough. The video is written to a file directly in the tab as you record, with no length cap beyond your device\'s storage, no watermark, and no account, since nothing is uploaded to a server to make the recording.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I record my screen without installing anything?', a: 'Yes, a browser-based recorder like Stayput\'s uses the browser\'s built-in screen-sharing permission, so there is nothing to download or install.' },
+      { q: 'Can I record my microphone along with the screen?', a: 'Yes, Stayput\'s screen recorder with audio option captures your microphone alongside the screen and its own sound for a narrated recording.' },
+      { q: 'Is there a time limit on free screen recording?', a: 'Not with a browser-based tool like Stayput\'s: since nothing is uploaded or processed on a server, the only limit is how much storage your device has for the resulting file.' },
+      { q: 'Does a browser screen recorder add a watermark?', a: 'No. Watermarks on free screen recorders are usually there to push a paid upgrade for hosted, server-processed recordings; a tool that just captures locally in the browser has no such tier to gate.' },
+    ],
+  },
+  {
+    slug: 'how-to-resize-a-video',
+    title: 'How to Resize a Video (Change Its Resolution)',
+    description: 'A platform that rejects a video for being too large in resolution or file size needs the actual pixel dimensions changed, not just compressed. Here is how, free and without uploading the file.',
+    heading: 'How to resize a video',
+    dek: 'Getting a video down from 4K to 1080p, or to an exact width and height a platform expects, is a different setting than just compressing it. Here is how, in the browser.',
+    keywords: ['how to resize a video', 'resize video online free', 'change video resolution free', 'resize video to 1080p', 'video resizer no upload'],
+    updated: '2026-09-30',
+    tools: ['resize-video', 'compress-video'],
+    sections: [
+      {
+        h: 'Resizing vs. compressing a video',
+        p: [
+          'Resizing changes a video\'s actual pixel dimensions, such as scaling 3840×2160 (4K) down to 1920×1080, which reduces file size as a side effect but is really about matching what a platform, a screen or an upload limit expects. Compressing keeps the same dimensions and instead reduces the bitrate or re-encodes more efficiently to shrink the file size. A video that is both too large in resolution and too big in file size usually benefits from both, in that order.',
+        ],
+      },
+      {
+        h: 'In a phone editing app',
+        p: [
+          'CapCut and iMovie can export at a lower resolution, but the option is usually tucked into export settings rather than presented as a plain resize, and iMovie in particular does not let you type an arbitrary custom width and height, only its own preset options.',
+        ],
+      },
+      {
+        h: 'With desktop software',
+        p: [
+          'HandBrake, a free open-source video transcoder, resizes and compresses in one pass with fine control, but it is a full application to download and learn for what might be a single video, and its many options can be confusing for someone who just wants "smaller, same video."',
+        ],
+      },
+      {
+        h: 'Resizing without uploading the video',
+        p: [
+          'Stayput\'s [resize video](/tools/resize-video) tool scales a video down (or to an exact width and height) directly in the browser tab: pick a common target like 1080p or 720p, or type exact dimensions, and it processes the file on your device with nothing uploaded. Pairing it with [compress video](/tools/compress-video) afterward, if the file is still too large for an upload limit, handles both problems without needing a full editor.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the difference between resizing and compressing a video?', a: 'Resizing changes the actual pixel dimensions (like 4K to 1080p); compressing keeps the same dimensions but reduces bitrate or re-encodes to shrink the file size. A too-large video sometimes needs both.' },
+      { q: 'Can I resize a video to an exact width and height, not just a preset?', a: 'Yes, Stayput\'s resize video tool accepts common presets like 1080p and 720p, or a custom width and height you type in.' },
+      { q: 'Does resizing a video lose quality?', a: 'Scaling down loses some fine detail, the same as with a photo, but a well-chosen resolution for the video\'s content and viewing size is usually not noticeable; scaling up does not add real detail, only makes the file bigger.' },
+      { q: 'Is there a video resizer with no upload and no watermark?', a: 'Yes, a browser-based one like Stayput\'s processes the video on your device and adds no watermark, since there is no server cost to recover.' },
+    ],
+  },
+  {
+    slug: 'how-to-make-a-photo-collage',
+    title: 'How to Make a Photo Collage (Free, No Watermark)',
+    description: 'Many free collage makers watermark the download or cap how many photos you can combine. Here is how to lay out a grid or a stack of photos without either limit.',
+    heading: 'How to make a photo collage',
+    dek: 'A free collage app often means a watermark on the download, or a small cap on how many photos fit. Here is a browser-based option with neither limit.',
+    keywords: ['how to make a photo collage', 'photo collage maker free no watermark', 'combine photos into one image free', 'collage maker online free', 'make a picture grid online'],
+    updated: '2026-09-30',
+    tools: ['collage-maker', 'combine-images', 'stitch-screenshots'],
+    sections: [
+      {
+        h: 'Phone collage apps',
+        p: [
+          'Instagram\'s Layout app and similar phone apps make quick grid collages and are convenient since the photos are already on the phone, but most cap the free layout options or add a watermark or a small logo to the corner of the result unless you pay to remove it.',
+        ],
+      },
+      {
+        h: 'In Canva',
+        p: [
+          'Canva has ready-made collage templates and a lot of layout flexibility, but its free tier limits some templates and elements to Canva Pro, and it is more tool than needed for a simple grid of photos.',
+        ],
+      },
+      {
+        h: 'Making a collage in the browser',
+        p: [
+          'Stayput\'s [collage maker](/tools/collage-maker) arranges dropped photos into a [grid, a row, or a stack](/combine-images) with adjustable spacing and a background colour, entirely in the browser, with no watermark and no cap on how many photos go in beyond what your device can hold in memory. A specialised layout, [stitching screenshots together](/stitch-screenshots) end to end rather than in a grid, covers a long scrolling capture split across several images.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is there a photo collage maker with no watermark?', a: 'Yes, Stayput\'s collage maker adds no watermark or logo to the result, since it has no paid tier to gate that behind.' },
+      { q: 'How many photos can I put in one collage?', a: 'There is no fixed cap; the practical limit is how many photos your device can hold in memory at once while it lays out the grid.' },
+      { q: 'Can I stack photos vertically instead of a grid?', a: 'Yes, Stayput\'s collage maker offers a grid, a row, or a vertical stack layout, with adjustable spacing between photos.' },
+      { q: 'Can I combine several screenshots into one long image?', a: 'Yes, the stitch screenshots page joins them end to end in order, which suits a long scrolling capture split across multiple images better than a grid layout does.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
