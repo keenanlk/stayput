@@ -1,0 +1,16 @@
+---
+/** Live preview of the first image with the current options, for canvas effect tools (pixel art, sketch, border). Driven by src/lib/effect-preview.ts. */
+interface Props { label: string }
+const { label } = Astro.props;
+---
+<div id="fx-panel" class="rotate-panel" hidden>
+  <div class="rotate-stage"><canvas id="fx-canvas" aria-label={label}></canvas></div>
+  <p class="muted small rotate-hint" id="fx-hint"></p>
+</div>
+<style is:global>
+  .rotate-panel { display: grid; gap: 8px; }
+  .rotate-stage { line-height: 0; justify-self: start; max-width: 100%; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .rotate-stage canvas { display: block; max-width: 100%; max-height: 55vh; width: auto; height: auto; }
+  .rotate-hint { margin: 0; }
+  #fx-canvas.pixelated { image-rendering: pixelated; }
+</style>

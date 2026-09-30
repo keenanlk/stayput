@@ -1,0 +1,35 @@
+---
+/** Option controls for photo to sketch, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const style = defaults.style ?? 'pencil';
+const strokes = defaults.strokes ?? '8';
+const darkness = defaults.darkness ?? '30';
+const format = defaults.format ?? 'image/jpeg';
+const styles = [
+  ['pencil', 'Pencil'],
+  ['charcoal', 'Charcoal'],
+  ['color', 'Coloured pencil'],
+] as const;
+---
+<div class="field wide">
+  <label>Style</label>
+  <div class="segmented" role="radiogroup" aria-label="Style">
+    {styles.map(([v, l]) => <label><input type="radio" name="style" value={v} checked={v === style} /><span>{l}</span></label>)}
+  </div>
+</div>
+<div class="field">
+  <label for="strokes">Stroke width <output id="strokes-out">{strokes}</output></label>
+  <input type="range" id="strokes" min="1" max="30" value={strokes} />
+</div>
+<div class="field">
+  <label for="darkness">Darkness <output id="darkness-out">{darkness}</output></label>
+  <input type="range" id="darkness" min="0" max="100" value={darkness} />
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="image/jpeg" selected={format === 'image/jpeg'}>JPG</option>
+    <option value="image/png" selected={format === 'image/png'}>PNG</option>
+  </select>
+</div>

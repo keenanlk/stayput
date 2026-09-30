@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import PixelArt from '../../components/options/PixelArt.astro';
+import EffectStage from '../../components/EffectStage.astro';
+const tool = toolBySlug('pixel-art-converter')!;
+---
+<ToolLayout tool={tool}>
+  <EffectStage slot="panel" label="Preview of the pixel art" />
+  <Fragment slot="options"><PixelArt /></Fragment>
+</ToolLayout>
+<script src="../../tools/pixel-art-converter.ts"></script>

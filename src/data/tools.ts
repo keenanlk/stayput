@@ -3490,6 +3490,132 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'pixel-art-converter',
+    name: 'Pixel art converter',
+    title: 'Pixel Art Converter: Turn a Picture into Pixel Art | Stayput',
+    description:
+      'Turn any photo or drawing into pixel art: pick how many pixels across, a colour count or a retro palette like Game Boy or PICO-8, dithering and a grid. No upload.',
+    heading: 'Pixel art converter',
+    tagline: 'Chunky pixels and a limited palette from any picture, previewed live and made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    multiple: true,
+    dropLabel: 'Drop pictures to pixelate',
+    action: 'Make pixel art',
+    keywords: ['pixel art converter', 'picture to pixel art converter', 'image to pixel art', 'photo to pixel art', 'pixel art maker from image', 'pixel art converter with grid', '8 bit image converter'],
+    steps: [
+      'Drop a photo, drawing or logo (JPG, PNG, WebP, HEIC or SVG).',
+      'Set how many pixels across and pick a palette; the preview updates as you go.',
+      'Press Make pixel art and download a crisp PNG, enlarged or at one pixel per block.',
+    ],
+    faq: [
+      {
+        q: 'How many pixels across should I use?',
+        a: 'For a sprite or avatar, 32 to 64. For a recognisable portrait or landscape, 96 to 128. A face that is small in the photo turns into a few blocks, so crop close to it before converting.',
+      },
+      {
+        q: 'What do the palettes do?',
+        a: 'The picture’s own colours pick the 8 to 64 shades that represent it best, which keeps it natural. Game Boy maps everything to four greens, PICO-8 to the fantasy console’s 16 fixed colours, and the grey and black-and-white sets suit prints and stamps. Dithering mixes neighbouring colours in a checker pattern to fake shades the palette lacks.',
+      },
+      {
+        q: 'Why is the result a PNG?',
+        a: 'Pixel art is flat blocks of exact colour. JPG blurs those edges and adds speckles, while PNG keeps every block sharp and is small for this kind of image. Transparent areas in the source stay transparent.',
+      },
+      {
+        q: 'Can I use it as a pattern for beads or cross-stitch?',
+        a: 'Yes. Turn on grid lines and save enlarged: each square is one bead or stitch. Pick a small palette so you need few thread or bead colours, and set pixels across to your pegboard or fabric width, for example 29 for a small Perler board.',
+      },
+      {
+        q: 'Is my picture uploaded?',
+        a: 'No. The picture is shrunk, recoloured and enlarged on a canvas in your browser tab, and the PNG is saved from there. Nothing is sent anywhere, and it works offline once the page has loaded.',
+      },
+    ],
+  },
+  {
+    slug: 'photo-to-sketch',
+    name: 'Photo to sketch',
+    title: 'Photo to Sketch: Pencil Drawing from a Photo, Free | Stayput',
+    description:
+      'Turn a photo into a pencil sketch, charcoal drawing or coloured pencil sketch with a live preview. Full resolution, batches, in your browser, nothing uploaded.',
+    heading: 'Turn a photo into a sketch',
+    tagline: 'Pencil, charcoal or coloured pencil from any photo, previewed live and drawn on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop photos to sketch',
+    action: 'Make the sketch',
+    keywords: ['photo to sketch', 'photo to sketch converter', 'photo to pencil sketch', 'convert photo to drawing', 'picture to sketch', 'photo to line drawing', 'pencil sketch effect'],
+    steps: [
+      'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL).',
+      'Pick pencil, charcoal or coloured pencil and adjust stroke width and darkness while you watch the preview.',
+      'Press Make the sketch and download the drawings, one by one or as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Which photos make the best sketches?',
+        a: 'Photos with clear edges and even light: a portrait by a window, a building, a pet against a plain wall. Busy backgrounds turn into scribbles, so crop tight or remove the background first. Very dark photos give heavy, smudgy sketches; brighten them first.',
+      },
+      {
+        q: 'What do stroke width and darkness change?',
+        a: 'Stroke width sets how far the effect looks around each edge: low values give fine pen-like lines, high values soft, shaded pencil. Darkness presses harder on every line. Charcoal starts darker and more contrasted than pencil.',
+      },
+      {
+        q: 'Is this AI?',
+        a: 'No. It is the classic colour dodge technique artists use in Photoshop: a grey copy of the photo is divided by a blurred negative of itself, so flat areas go white and edges stay as strokes. That is why it runs instantly on any device and gives the same result every time.',
+      },
+      {
+        q: 'Can I print the sketch?',
+        a: 'Yes. The sketch keeps the photo’s full resolution, so a 12 megapixel phone photo prints sharply at A4 or letter size. Save as PNG for printing line art without JPG speckles.',
+      },
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. Each photo is turned into a sketch pixel by pixel in your browser tab and saved from there. Family photos and portraits stay on your device.',
+      },
+    ],
+  },
+  {
+    slug: 'add-border-to-image',
+    name: 'Add border to image',
+    title: 'Add a Border or Rounded Corners to an Image, Free | Stayput',
+    description:
+      'Put a white, black or coloured border around a picture and round its corners, from a subtle frame to a circle. Live preview, batches, no upload.',
+    heading: 'Add a border to an image',
+    tagline: 'A clean frame and rounded corners for photos, screenshots and product shots, made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop pictures to frame',
+    action: 'Add the border',
+    keywords: ['add border to image', 'add border to photo', 'image border', 'white border for photo', 'rounded corners image', 'round image corners', 'photo frame online'],
+    steps: [
+      'Drop one or more pictures.',
+      'Set the border width and colour, and round the corners if you like; the preview shows the first picture.',
+      'Press Add the border and download the framed pictures.',
+    ],
+    faq: [
+      {
+        q: 'How is the border width measured?',
+        a: 'As a share of the picture’s shorter side, added on every edge, so a batch of different sizes gets frames that look the same. 3 to 5% is a gallery-style mat; 10% or more is a thick polaroid-like frame.',
+      },
+      {
+        q: 'Why is my rounded image a PNG?',
+        a: 'The corners outside the curve need to be transparent so the picture sits cleanly on any background. JPG cannot store transparency, so with rounded corners the automatic setting saves PNG. Choose JPG to put the corners on white instead.',
+      },
+      {
+        q: 'Can I make a circle?',
+        a: 'Set rounded corners to 50%. A square picture becomes a circle and a rectangle becomes a pill shape. For a circular profile picture cropped to the face, the crop tool’s circle shape is quicker.',
+      },
+      {
+        q: 'Does it change the picture itself?',
+        a: 'No. The picture is drawn at full size inside the frame; only the new border and corners are added. The output is larger by the border on each side.',
+      },
+      {
+        q: 'Are my pictures uploaded?',
+        a: 'No. The frame is drawn on a canvas in your browser tab and saved from there. Nothing is sent anywhere.',
+      },
+    ],
+  },
+  {
     slug: 'black-and-white-image',
     name: 'Black and white photo',
     title: 'Make a Photo Black and White, Free, No Upload | Stayput',

@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import PhotoToSketch from '../../components/options/PhotoToSketch.astro';
+import EffectStage from '../../components/EffectStage.astro';
+const tool = toolBySlug('photo-to-sketch')!;
+---
+<ToolLayout tool={tool}>
+  <EffectStage slot="panel" label="Preview of the sketch" />
+  <Fragment slot="options"><PhotoToSketch /></Fragment>
+</ToolLayout>
+<script src="../../tools/photo-to-sketch.ts"></script>
