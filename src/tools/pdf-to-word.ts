@@ -32,7 +32,7 @@ createShell({
       const paragraphs = pages.reduce((n, p) => n + p.paragraphs.length, 0);
       const words = pages.reduce((n, p) => n + p.paragraphs.reduce((m, q) => m + q.text.split(/\s+/).length, 0), 0);
       if (paragraphs === 0) {
-        throw new Error('This PDF has no text layer, so there is nothing to extract. It is probably a scan: each page is a picture of text. Use PDF to images to get the pages as pictures, or run OCR software on it first.');
+        throw new Error('This PDF has no text layer, so there is nothing to extract. It is probably a scan: each page is a picture of text. Run it through OCR PDF first to add a text layer, then convert the searchable copy.');
       }
       const text = toPlainText(pages, pageBreaks);
       preview.textContent = text.slice(0, 1200) + (text.length > 1200 ? '\n…' : '');

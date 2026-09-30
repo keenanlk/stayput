@@ -4102,6 +4102,36 @@ export const presets: Preset[] = [
       { q: 'Are my receipts uploaded?', a: 'No. They are processed in this tab, and card digits, addresses and what you bought stay on your device.' },
     ],
   },
+  {
+    slug: 'pdf-to-kindle',
+    base: 'pdf-to-epub',
+    name: 'PDF to Kindle',
+    title: 'PDF to Kindle: Make a PDF Readable on Kindle, Free, No Upload | Stayput',
+    description: 'PDFs on a Kindle show whole pages in tiny text. Convert the PDF to an EPUB here, then Send to Kindle turns it into a book whose text you can resize. Converted on your device.',
+    heading: 'Make a PDF readable on a Kindle',
+    tagline: 'Turn a PDF into an EPUB, then send it to your Kindle as a real ebook with text you can resize.',
+    keywords: ['pdf to kindle', 'send pdf to kindle', 'read pdf on kindle', 'pdf to kindle format', 'convert pdf for kindle'],
+    accept: 'application/pdf,.pdf',
+    dropLabel: 'Drop the PDF for your Kindle',
+    action: 'Convert for Kindle',
+    defaults: { language: 'en' },
+    intro: [
+      'Sending a PDF straight to a Kindle keeps its fixed pages, so a Letter or A4 page is shrunk onto a 6-inch screen and the font size buttons do nothing. Amazon’s Send to Kindle accepts EPUB files and converts them into Kindle books, whose text reflows and can be resized like anything bought from the Kindle store. This page makes that EPUB from your PDF.',
+      'A worked example: a 60-page research report, report.pdf, that you want to read on a Paperwhite. Drop it here and press Convert for Kindle; the running header with the report title and the page numbers are dropped, and each main heading becomes a chapter. Then send report.epub to Kindle: drag it onto amazon.com/sendtokindle, use the Send to Kindle app, or email it to your Kindle’s @kindle.com address from an approved sender. It arrives as a book with a table of contents.',
+      'Scanned PDFs have no text to convert: run them through OCR PDF first. Pictures and tables are not carried into the EPUB, so for a document that is mostly charts, reading the PDF itself on a tablet works better.',
+    ],
+    steps: [
+      'Drop the PDF and press Convert for Kindle.',
+      'Send the .epub with Send to Kindle (web, app or email).',
+      'Open it on the Kindle and pick your font size.',
+    ],
+    faq: [
+      { q: 'Why EPUB and not MOBI or AZW3?', a: 'Amazon stopped accepting MOBI through Send to Kindle and now asks for EPUB, which it converts to its own format on the way to your device.' },
+      { q: 'Where do I find my Kindle email address?', a: 'On amazon.com under Manage Your Content and Devices, then Preferences, Personal Document Settings. Add the address you send from to the approved list there too.' },
+      { q: 'The chapters are called Pages 1 to 20. Why?', a: 'The PDF had no headings in larger type to split on, so the book is cut every 20 pages to keep each part quick to open. The text itself is complete.' },
+      { q: 'Is the PDF uploaded?', a: 'Not here: it is converted in this tab. Sending it to your Kindle afterwards goes through Amazon, as every personal document on a Kindle does.' },
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

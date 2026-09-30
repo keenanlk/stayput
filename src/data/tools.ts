@@ -2870,6 +2870,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'pdf-to-epub',
+    name: 'PDF to EPUB',
+    title: 'PDF to EPUB Converter: Reflowable Ebook, Free, No Upload | Stayput',
+    description:
+      'Convert a PDF into an EPUB ebook whose text reflows to fit a phone, Kindle or Kobo screen, with chapters and a table of contents. Runs in your browser; the PDF is never uploaded.',
+    heading: 'Convert PDF to EPUB',
+    tagline: 'A PDF made for paper turned into an ebook that reflows on a small screen, on your own device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: true,
+    dropLabel: 'Drop PDFs to turn into ebooks',
+    action: 'Convert to EPUB',
+    keywords: ['pdf to epub', 'pdf to epub converter', 'convert pdf to epub', 'pdf to ebook', 'pdf to epub free', 'reflow pdf'],
+    steps: [
+      'Drop one or more PDFs with real text in them: a report, a novel exported from a writing app, a long article saved as PDF.',
+      'Pick the language of the text, so the e-reader hyphenates and looks words up correctly.',
+      'Press Convert to EPUB and open the book in Apple Books, Google Play Books, a Kobo, or send it to a Kindle.',
+    ],
+    faq: [
+      {
+        q: 'What survives the conversion?',
+        a: 'The text, paragraph by paragraph, and the headings, which become chapters and the table of contents. Page headers, footers and page numbers are removed, and paragraphs split by a page break are joined. Pictures, tables, columns of numbers and footnote layout do not carry over: an EPUB made from a PDF is for reading the words.',
+      },
+      {
+        q: 'Why convert at all instead of reading the PDF?',
+        a: 'A PDF has fixed pages, so on a 6-inch e-reader or a phone the text is tiny or you pan around each page. An EPUB reflows: the reader picks the font size and the lines rewrap to fit the screen.',
+      },
+      {
+        q: 'Does it work on scanned PDFs?',
+        a: 'Not directly, because a scan has no text, only pictures of pages. Run it through OCR PDF first to add a text layer, then convert that copy here.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. pdf.js reads the text in this tab and the EPUB is zipped here too, so a manuscript or a confidential report stays on your device.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
