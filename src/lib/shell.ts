@@ -241,6 +241,7 @@ export function createShell(opts: ShellOptions) {
       if (entry.thumb) thumb.innerHTML = `<img src="${entry.thumb}" alt="">`;
       else thumb.textContent = (entry.file.name.split('.').pop() ?? '').slice(0, 4).toUpperCase();
       const info = document.createElement('div');
+      info.className = 'info';
       const name = document.createElement('div');
       name.className = 'name';
       name.textContent = entry.file.name;
@@ -323,6 +324,7 @@ export function createShell(opts: ShellOptions) {
       if (o.previewUrl) thumb.innerHTML = `<img src="${o.previewUrl}" alt="">`;
       else thumb.textContent = o.badge ?? (o.name.split('.').pop() ?? '').slice(0, 4).toUpperCase();
       const info = document.createElement('div');
+      info.className = 'info';
       const name = document.createElement('div');
       name.className = 'name';
       name.textContent = o.name;
