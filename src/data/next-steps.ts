@@ -53,6 +53,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'flatten-pdf': ['merge-pdf', 'compress-pdf'],
   'ocr-pdf': ['compress-pdf', 'pdf-to-word'],
   'document-scanner': ['ocr-pdf', 'merge-pdf'],
+  'epub-to-pdf': ['compress-pdf', 'split-pdf'],
   'resize-pdf': ['merge-pdf', 'pdf-page-numbers'],
   'transcribe': ['add-subtitles-to-video', 'remove-silence'],
   'add-subtitles-to-video': ['compress-video', 'trim-video'],
