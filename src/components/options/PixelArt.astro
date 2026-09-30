@@ -1,0 +1,39 @@
+---
+/** Option controls for the pixel art converter, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const grid = defaults.grid ?? '64';
+const palette = defaults.palette ?? 'auto-16';
+const output = defaults.output ?? 'large';
+const palettes = [
+  ['auto-8', '8 colours from the picture'],
+  ['auto-16', '16 colours from the picture'],
+  ['auto-32', '32 colours from the picture'],
+  ['auto-64', '64 colours from the picture'],
+  ['gameboy', 'Game Boy (4 greens)'],
+  ['pico8', 'PICO-8 (16 colours)'],
+  ['gray', '4 greys'],
+  ['bw', 'Black and white'],
+] as const;
+---
+<div class="field">
+  <label for="grid">Pixels across <output id="grid-out">{grid}</output></label>
+  <input type="range" id="grid" min="8" max="256" step="4" value={grid} />
+</div>
+<div class="field">
+  <label for="palette">Colours</label>
+  <select id="palette">
+    {palettes.map(([v, l]) => <option value={v} selected={v === palette}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="output">Save at</label>
+  <select id="output">
+    <option value="large" selected={output === 'large'}>Enlarged, about 1024 px, crisp blocks</option>
+    <option value="actual" selected={output === 'actual'}>Actual size, one pixel per block</option>
+  </select>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="dither" checked={defaults.dither === 'true'} /> Dither (mix colours in a pattern)</label>
+  <label class="check"><input type="checkbox" id="grid-lines" checked={defaults['grid-lines'] === 'true'} /> Draw grid lines</label>
+</div>

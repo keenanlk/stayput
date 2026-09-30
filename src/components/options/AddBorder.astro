@@ -1,0 +1,30 @@
+---
+/** Option controls for add border and rounded corners, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const border = defaults.border ?? '4';
+const color = defaults['border-color'] ?? '#ffffff';
+const radius = defaults.radius ?? '0';
+const format = defaults.format ?? 'auto';
+---
+<div class="field">
+  <label for="border">Border <output id="border-out">{border}%</output></label>
+  <input type="range" id="border" min="0" max="30" value={border} />
+</div>
+<div class="field">
+  <label for="border-color">Border colour</label>
+  <input type="color" id="border-color" value={color} />
+</div>
+<div class="field">
+  <label for="radius">Rounded corners <output id="radius-out">{radius}%</output></label>
+  <input type="range" id="radius" min="0" max="50" value={radius} />
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="auto" selected={format === 'auto'}>Automatic (PNG when corners are rounded)</option>
+    <option value="image/png" selected={format === 'image/png'}>PNG</option>
+    <option value="image/jpeg" selected={format === 'image/jpeg'}>JPG (corners on white)</option>
+    <option value="image/webp" selected={format === 'image/webp'}>WebP</option>
+  </select>
+</div>

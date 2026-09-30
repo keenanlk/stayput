@@ -31,6 +31,21 @@
       "permanent": true
     },
     {
+      "source": "/pixel-art-converter",
+      "destination": "/tools/pixel-art-converter",
+      "permanent": true
+    },
+    {
+      "source": "/photo-to-sketch",
+      "destination": "/tools/photo-to-sketch",
+      "permanent": true
+    },
+    {
+      "source": "/add-border-to-image",
+      "destination": "/tools/add-border-to-image",
+      "permanent": true
+    },
+    {
       "source": "/emote-resizer",
       "destination": "/tools/emote-resizer",
       "permanent": true

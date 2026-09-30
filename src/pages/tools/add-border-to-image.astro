@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import AddBorder from '../../components/options/AddBorder.astro';
+import EffectStage from '../../components/EffectStage.astro';
+const tool = toolBySlug('add-border-to-image')!;
+---
+<ToolLayout tool={tool}>
+  <EffectStage slot="panel" label="Preview of the framed picture" />
+  <Fragment slot="options"><AddBorder /></Fragment>
+</ToolLayout>
+<script src="../../tools/add-border-to-image.ts"></script>

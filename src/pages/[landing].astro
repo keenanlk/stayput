@@ -70,6 +70,10 @@ import RemoveObject from '../components/options/RemoveObject.astro';
 import EraseStage from '../components/EraseStage.astro';
 import AdjustImage from '../components/options/AdjustImage.astro';
 import EmoteResizer from '../components/options/EmoteResizer.astro';
+import PixelArt from '../components/options/PixelArt.astro';
+import PhotoToSketch from '../components/options/PhotoToSketch.astro';
+import AddBorder from '../components/options/AddBorder.astro';
+import EffectStage from '../components/EffectStage.astro';
 import AdjustStage from '../components/AdjustStage.astro';
 import ImageToSvg from '../components/options/ImageToSvg.astro';
 import GifMaker from '../components/options/GifMaker.astro';
@@ -166,6 +170,9 @@ const options = {
   'remove-object': RemoveObject,
   'adjust-image': AdjustImage,
   'emote-resizer': EmoteResizer,
+  'pixel-art-converter': PixelArt,
+  'photo-to-sketch': PhotoToSketch,
+  'add-border-to-image': AddBorder,
   'image-to-svg': ImageToSvg,
   'gif-maker': GifMaker,
   'resize-pdf': ResizePdf,
@@ -202,6 +209,7 @@ const Options = options[base as keyof typeof options];
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'remove-object' && <EraseStage slot="panel" />}
   {base === 'adjust-image' && <AdjustStage slot="panel" />}
+  {(base === 'pixel-art-converter' || base === 'photo-to-sketch' || base === 'add-border-to-image') && <EffectStage slot="panel" label="Preview of the result" />}
   {base === 'rotate-image' && <RotateStage slot="panel" />}
   {base === 'black-and-white-image' && <MonoStage slot="panel" />}
   {base === 'image-to-svg' && <SvgStage slot="panel" />}

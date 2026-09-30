@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(91);
+  expect(await page.locator('.index .tool-card').count()).toBe(94);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -6387,4 +6387,35 @@ test('Animated emote page turns a GIF into three animated Twitch sizes with ever
   expect(dominant(px[0]!.slice(0, 3))).toBe('red');
   expect(px[1]![3]).toBe(0);
   net.assertNothingLeft(['anim.gif']);
+});
+
+test('Pixel art, photo to sketch and rounded corners make the expected images', async ({ page }) => {
+  // Pixel art: logo.png (200 px) at 20 across on the black-and-white palette, one pixel per block.
+  const errors = await open(page, 'pixel-art-converter');
+  const net = watchNetwork(page);
+  await page.locator('#grid').fill('20');
+  await page.locator('#palette').selectOption('bw');
+  await page.locator('#output').selectOption('actual');
+  const art = await run(page, [logoPng()]);
+  const px = await pixelsOf(page, await bytesOf(art.downloads[0]!), [[10, 8], [0, 0]]);
+  expect(px).toMatchObject({ width: 20, height: 20 });
+  expect(px.px[0]!.slice(0, 4)).toEqual([0, 0, 0, 255]);
+  expect(px.px[1]![3]).toBe(0);
+  net.assertNothingLeft(['logo.png']);
+  expect(errors).toEqual([]);
+
+  // Sketch: same size as the source, flat white stays white.
+  await page.goto('/tools/photo-to-sketch');
+  const sk = await run(page, ['big.jpg']);
+  const s = await pixelsOf(page, await bytesOf(sk.downloads[0]!), [[5, 5]]);
+  expect(s).toMatchObject({ width: 4000, height: 3000 });
+
+  // Rounded corners page: transparent PNG corner, opaque centre, same size.
+  await page.goto('/rounded-corners-image');
+  const rc = await run(page, ['big.jpg']);
+  expect(rc.downloads[0]!.suggestedFilename()).toBe('big-rounded.png');
+  const r = await pixelsOf(page, await bytesOf(rc.downloads[0]!), [[1, 1], [2000, 1500]]);
+  expect(r).toMatchObject({ width: 4000, height: 3000 });
+  expect(r.px[0]![3]).toBe(0);
+  expect(r.px[1]![3]).toBe(255);
 });
