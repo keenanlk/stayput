@@ -3550,6 +3550,216 @@ export const guides: Guide[] = [
       { q: 'Can a browser scanner combine multiple pages into one PDF?', a: 'Yes, Stayput\'s document scanner combines several scanned photos, in the order you drop them, into a single PDF.' },
     ],
   },
+  {
+    slug: 'how-to-redact-a-pdf',
+    title: 'How to Redact a PDF So the Text Is Actually Gone',
+    description: 'A black box drawn over text in most PDF viewers only hides it visually; the words are still in the file underneath. Here is how real redaction works, and a free browser tool that removes the text itself.',
+    heading: 'How to redact a PDF',
+    dek: 'Painting a black rectangle over a name in a PDF usually just covers it, since the text is still selectable underneath. Here is how to actually delete it, for free, without uploading the document.',
+    keywords: ['how to redact a pdf', 'redact pdf free', 'redact pdf online free', 'black out text in pdf', 'remove text from pdf permanently'],
+    updated: '2026-09-30',
+    tools: ['redact-pdf'],
+    sections: [
+      {
+        h: 'Why a black box is not redaction',
+        p: [
+          'Drawing a black rectangle in a PDF viewer, or even in some "highlight" annotation tools, adds a shape on top of the page; the text underneath is untouched. Select-all-and-copy, or opening the file in a text editor, can still pull out a name, an account number or a social security number sitting right behind the box. Real redaction removes the underlying text and any image data at that spot, not just what is visible.',
+        ],
+      },
+      {
+        h: 'In Adobe Acrobat',
+        p: [
+          'Acrobat Pro has a dedicated **Redact** tool that marks text or areas for removal, then a separate **Apply** step that deletes the underlying content and can also search the whole document for a pattern, like every occurrence of a phone number. It does the job properly but needs a paid Acrobat subscription; the free Acrobat Reader has no redaction tool at all.',
+        ],
+      },
+      {
+        h: 'Government and legal redaction tools',
+        p: [
+          'Courts and agencies that handle sensitive documents often use dedicated redaction software, or the redaction feature built into case-management systems, because getting this wrong in a public filing has real consequences. For a one-off document, installing that kind of software is a lot of overhead.',
+        ],
+      },
+      {
+        h: 'Redacting without uploading the document',
+        p: [
+          'Stayput\'s [redact PDF](/tools/redact-pdf) tool works on the document in the browser tab: search for a word or number and it finds every match, or draw boxes by hand over anything else, like a signature or a photo. Confirming the redaction deletes the underlying text and image data at each marked spot before saving, not just draws over it, and the file is never uploaded to check it against a server-side pattern list.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does drawing a black box in a PDF viewer count as redaction?', a: 'No. It only covers the text visually; selecting or copying the area, or opening the file in another program, can still reveal the text underneath unless it was actually deleted.' },
+      { q: 'Can I redact a PDF for free without uploading it?', a: 'Yes. A browser-based redaction tool, like Stayput\'s, deletes the underlying text and image data on your device and never sends the document anywhere.' },
+      { q: 'Can I search for a name and redact every occurrence at once?', a: 'Yes, Stayput\'s redact PDF tool can search the document for a word or number and mark every match for removal in one pass.' },
+      { q: 'Can I redact something that is not text, like a signature?', a: 'Yes, by drawing a box over it by hand; the tool removes whatever image or text data sits under the box you draw, not only searchable text.' },
+    ],
+  },
+  {
+    slug: 'how-to-crop-a-pdf',
+    title: 'How to Crop a PDF (Trim Margins or Cut to an Area)',
+    description: 'A scanned page with wide white margins, or a PDF that needs just one part of each page kept, both need cropping rather than resizing. Here is how, free and without uploading the file.',
+    heading: 'How to crop a PDF',
+    dek: 'Trimming a PDF down to what matters, whether that is shrinking wide margins or cutting every page to one area, works differently from resizing. Here is how, in the browser.',
+    keywords: ['how to crop a pdf', 'crop pdf free', 'crop pdf online free', 'trim pdf margins', 'cut pdf page to size'],
+    updated: '2026-09-30',
+    tools: ['crop-pdf'],
+    sections: [
+      {
+        h: 'Cropping vs resizing a PDF',
+        p: [
+          'Resizing a PDF scales the whole page, content included, up or down to a new paper size. Cropping instead keeps the content at its original scale and simply changes which part of the page is kept, cutting off everything outside the box: wide margins, a header repeated on every page, or a sidebar you do not need. The two solve different problems and are often confused because both change the page\'s dimensions.',
+        ],
+      },
+      {
+        h: 'In Adobe Acrobat',
+        p: [
+          'Acrobat Pro\'s **Crop Pages** tool sets an exact crop box in inches or points, applied to one page, a range, or the whole document, with fine control over how many points to trim from each side. It needs a paid subscription, and the free Acrobat Reader has no crop tool.',
+        ],
+      },
+      {
+        h: 'Printing "shrink to fit" as a workaround',
+        p: [
+          'Printing a PDF to a virtual PDF printer with a smaller paper size crops or scales the page depending on the setting chosen, but it is an indirect way to do something a dedicated crop tool does in one step, and it is easy to end up scaling when you meant to crop, or the other way round.',
+        ],
+      },
+      {
+        h: 'Cropping in the browser',
+        p: [
+          'Stayput\'s [crop PDF](/tools/crop-pdf) tool draws a box over a preview of the page to keep, or trims the white margins from every page automatically in one click, and applies the same crop to the whole document or just the pages you choose. The text inside the kept area stays sharp and selectable, since the underlying page is not re-rendered as an image, and nothing is uploaded to do it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does cropping a PDF change its content, or just what is shown?', a: 'A crop hides everything outside the box permanently in the saved file; the page\'s effective size shrinks to the cropped area. It differs from resizing, which scales the content itself.' },
+      { q: 'Can I crop just the white margins automatically?', a: 'Yes, Stayput\'s crop PDF tool has a one-click auto-trim that finds and removes the white space around the content on every page.' },
+      { q: 'Will the text still be selectable after cropping?', a: 'Yes, cropping only changes which part of the page is visible; the text within the kept area stays as real, selectable text rather than turning into an image.' },
+      { q: 'Can I crop only some pages and leave others full-size?', a: 'Yes, Stayput\'s crop PDF tool lets you choose which pages the crop applies to, rather than forcing it onto the whole document.' },
+    ],
+  },
+  {
+    slug: 'how-to-upscale-an-image',
+    title: 'How to Upscale an Image Without It Looking Blurry',
+    description: 'Stretching a small picture in an editor makes it soft; an AI upscaler redraws detail instead of just blending pixels. Here is how each approach compares, and a free browser-based upscaler.',
+    heading: 'How to upscale an image',
+    dek: 'Making a small picture bigger the old way just blurs it further. Here is what an AI upscaler does differently, and a free one that runs in the browser.',
+    keywords: ['how to upscale an image', 'upscale image online free', 'ai image upscaler free', 'enlarge image without losing quality', 'increase image resolution free'],
+    updated: '2026-09-30',
+    tools: ['upscale-image', 'increase-image-resolution', 'enlarge-image'],
+    sections: [
+      {
+        h: 'Why stretching a small picture looks bad',
+        p: [
+          'Ordinary resizing, whether in an editor, a browser or a phone\'s Photos app, works by blending the colours of neighbouring pixels to fill in the new, larger space. It has no more real detail to work with than the original had, so the bigger the enlargement, the softer and blockier the result looks, especially around edges and text.',
+        ],
+      },
+      {
+        h: 'What an AI upscaler does instead',
+        p: [
+          'A model like Real-ESRGAN is trained on millions of pairs of sharp and degraded images, so instead of blending pixels it predicts what the sharp version of a small or JPEG-compressed picture probably looked like: it draws cleaner edges, smoother gradients, and plausible fine texture in skin, fabric or foliage, while removing JPEG blocking as it goes.',
+        ],
+      },
+      {
+        h: 'In Photoshop',
+        p: [
+          'Photoshop\'s **Super Resolution**, built on similar AI upscaling, does a comparable job to a dedicated web upscaler but needs a Creative Cloud subscription and the desktop app open, which is a lot of overhead for enlarging one photo or logo.',
+        ],
+      },
+      {
+        h: 'Upscaling without uploading the photo',
+        p: [
+          'Stayput\'s [AI image upscaler](/tools/upscale-image) runs Real-ESRGAN directly in the browser tab: drop a picture and enlarge it 2×, 3× or 4×, with the result held under 16 megapixels, the largest size a browser can reliably hold and save. Ready-made pages are set up for the common cases, [increasing resolution for print](/increase-image-resolution) or [enlarging a small logo or thumbnail](/enlarge-image) at 2× by default, and PNG or WebP output keeps a transparent background intact.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does upscaling actually add detail, or just make the picture bigger?', a: 'An AI upscaler adds plausible detail, sharp edges and reduced compression artefacts, unlike a plain resize which only spreads existing pixels thinner. It cannot recover detail that was never captured, such as text too small to read in the original.' },
+      { q: 'Is there a free AI upscaler with no upload?', a: 'Yes, Stayput\'s upscaler runs the model in the browser, so the photo is processed and enlarged on your own device rather than sent to a server.' },
+      { q: 'What is the biggest size it can output?', a: 'Results are capped around 16 megapixels, the largest image size browsers can reliably hold in memory and save; a very large source photo may reach that cap before the full 4× factor.' },
+      { q: 'Does it keep a transparent background?', a: 'Yes, when saving as PNG or WebP; choosing JPG puts the picture on a white background instead, since JPG cannot store transparency.' },
+    ],
+  },
+  {
+    slug: 'how-to-make-a-qr-code',
+    title: 'How to Make a QR Code That Never Expires',
+    description: 'Some QR generators quietly turn your code into a short link that goes dead if the account lapses. Here is how to spot that, and a free tool that makes a code that works forever.',
+    heading: 'How to make a QR code',
+    dek: 'A QR code from some free generators stops working the moment their account expires, because it points at a short link, not your content. Here is how to make one that never does.',
+    keywords: ['how to make a qr code', 'qr code generator free', 'make a qr code for wifi', 'free qr code generator no expiration', 'static qr code generator'],
+    updated: '2026-09-30',
+    tools: ['qr-code-generator', 'wifi-qr-code-generator', 'vcard-qr-code-generator'],
+    sections: [
+      {
+        h: 'Static vs dynamic QR codes',
+        p: [
+          'A static QR code encodes your actual content, a URL, Wi-Fi details or a contact card, directly in its pattern; it works forever because there is no server involved in reading it. A dynamic QR code instead encodes a short link the generator controls, which redirects to your real content; that lets the company track scans and let you change the destination later, but the code stops working the moment their service goes down or your free plan expires.',
+        ],
+      },
+      {
+        h: 'Free QR generators that expire',
+        p: [
+          'Many popular QR code sites default to a dynamic code without saying so clearly, and print a warning only after your free trial ends: the printed poster or menu with that code now leads nowhere, because the underlying redirect was switched off. For anything printed and left up for months or years, like a menu, a plaque or packaging, that is a real risk.',
+        ],
+      },
+      {
+        h: 'In design software',
+        p: [
+          'Canva and similar design tools can generate a QR code inside a design, which is convenient when the code is already part of a flyer, but most route through the same kind of short-link service under the hood, with the same expiry risk if you later cancel a plan tied to it.',
+        ],
+      },
+      {
+        h: 'Making a code that never expires',
+        p: [
+          'Stayput\'s [QR code generator](/tools/qr-code-generator) builds a static code directly in the browser: for a link, [Wi-Fi network](/wifi-qr-code-generator), [contact card](/vcard-qr-code-generator), email or phone number. Nothing is sent to a server to generate it, so there is no account to lapse and no redirect to go dark; the code is only as permanent as the content stays valid, such as a Wi-Fi password that later changes.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why did my QR code stop working after a year?', a: 'It was likely a dynamic code pointing at a short link controlled by the generator\'s service; once that service stopped redirecting, whether from an expired plan or the company shutting down, the code led nowhere.' },
+      { q: 'How can I tell if a QR code generator makes a static or dynamic code?', a: 'Scan the result before printing anything: if the URL shown is the generator\'s own short domain rather than your actual link, it is dynamic. A tool that builds the code entirely in your browser, with no account, is generating a static one.' },
+      { q: 'Can I make a Wi-Fi QR code without typing my password into a website?', a: 'Yes, with a browser-based generator like Stayput\'s Wi-Fi QR code page, which builds the code on your device and never sends the password anywhere.' },
+      { q: 'Does a static QR code cost anything or need an account?', a: 'No. Since nothing is generated or stored on a server, there is no plan to pay for and no account needed to keep it working.' },
+    ],
+  },
+  {
+    slug: 'how-to-blur-a-video-background',
+    title: 'How to Blur a Video Background Without a Green Screen',
+    description: 'Video calls blur backgrounds live, but a video you already recorded keeps every detail of the room. Here is how to blur it after the fact, free and without uploading the clip.',
+    heading: 'How to blur a video background',
+    dek: 'Portrait-mode blur for video calls exists, but a clip you already filmed keeps the room in full detail. Here is how to blur it afterward, for free, on your own device.',
+    keywords: ['how to blur a video background', 'blur video background free', 'blur background of video online', 'portrait mode video editor', 'blur video background without green screen'],
+    updated: '2026-09-30',
+    tools: ['video-background-remover', 'blur-video-background', 'green-screen-video'],
+    sections: [
+      {
+        h: 'Why live blur does not help an already-recorded clip',
+        p: [
+          'Zoom, Teams and Meet blur the background live during a call using the person\'s outline detected frame by frame, but that only applies while the call is running; a video already saved to your camera roll, like a selfie clip for a job application or a recording of an old call, has no such option built in.',
+        ],
+      },
+      {
+        h: 'In a video editor',
+        p: [
+          'Premiere Pro and DaVinci Resolve can key out or blur a background using masking and tracking, and do it well, but need a green screen for a clean result, or a lot of manual masking work without one, plus the time to learn a full editor for what might be a single clip.',
+        ],
+      },
+      {
+        h: 'Mobile apps',
+        p: [
+          'Some phone camera apps offer a portrait-mode video option, but only while recording; it cannot be applied afterward to a video shot without it, and the effect is usually locked to that phone\'s specific camera app rather than any video you drop in.',
+        ],
+      },
+      {
+        h: 'Blurring an existing video without uploading it',
+        p: [
+          'Stayput\'s [video background remover](/tools/video-background-remover) finds the person in each frame with an AI model running in the browser tab, then [blurs everything else](/blur-video-background), fills it with a flat colour, or puts a picture behind them, with no green screen needed and no upload. It can also do the opposite: [paint the background solid green](/green-screen-video) so the result can be keyed out properly in a real video editor afterward.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I blur the background of a video I already recorded?', a: 'Yes, with a tool that finds the person in each frame after the fact, like Stayput\'s video background remover, rather than only during a live call.' },
+      { q: 'Do I need a green screen to blur a video background?', a: 'No. An AI person-detection model finds the outline of the person without one; a physical green screen is only needed for the cleanest results in a traditional chroma-key workflow.' },
+      { q: 'Does it work with more than one person in frame?', a: 'Yes, everyone the model recognizes as a person stays sharp; everything else is treated as background.' },
+      { q: 'Can I put a green background behind someone instead of blurring it?', a: 'Yes, Stayput\'s green screen video option paints a solid green behind the person instead, ready to key out in an editor like Premiere or OBS.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
