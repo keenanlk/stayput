@@ -30,6 +30,10 @@ export interface GifCompressOptions {
   scale: number;
   /** Keep every frame (1), every second (2) or every third (3). */
   keepEvery: number;
+  /** Draw every frame into an exact box instead of scaling: fitted inside (transparent bars) or cropped around the centre. */
+  box?: { width: number; height: number; fit: 'contain' | 'cover' };
+  /** Always return the rewritten GIF, even if it is not smaller than the input. */
+  force?: boolean;
   onProgress?: (fraction: number) => void;
 }
 
@@ -83,8 +87,23 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
   if (!frames.length || !gw || !gh) throw new Error('This GIF has no frames.');
   const { colors, fuzz } = LEVELS[opts.level];
   const scale = Math.min(1, Math.max(0.05, opts.scale));
-  const width = Math.max(1, Math.round(gw * scale));
-  const height = Math.max(1, Math.round(gh * scale));
+  const box = opts.box;
+  const width = box ? box.width : Math.max(1, Math.round(gw * scale));
+  const height = box ? box.height : Math.max(1, Math.round(gh * scale));
+  // Source and destination rectangles for each frame: the whole GIF, unless it is fitted into or cropped to a box.
+  let src = [0, 0, gw, gh];
+  let dst = [0, 0, width, height];
+  if (box?.fit === 'cover') {
+    const k = Math.max(width / gw, height / gh);
+    const sw = Math.min(gw, width / k);
+    const sh = Math.min(gh, height / k);
+    src = [(gw - sw) / 2, (gh - sh) / 2, sw, sh];
+  } else if (box) {
+    const k = Math.min(width / gw, height / gh);
+    const dw = Math.max(1, Math.round(gw * k));
+    const dh = Math.max(1, Math.round(gh * k));
+    dst = [Math.floor((width - dw) / 2), Math.floor((height - dh) / 2), dw, dh];
+  }
   const keepEvery = Math.max(1, Math.round(opts.keepEvery));
 
   // The GIF's own canvas, with each frame's patch composited in order.
@@ -114,7 +133,7 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
     const delay = frameDelay(f.delay || 0);
     if (i % keepEvery === 0 || !full.length) {
       octx.clearRect(0, 0, width, height);
-      octx.drawImage(comp, 0, 0, width, height);
+      octx.drawImage(comp, src[0]!, src[1]!, src[2]!, src[3]!, dst[0]!, dst[1]!, dst[2]!, dst[3]!);
       const rgba = octx.getImageData(0, 0, width, height).data;
       for (let p = 3; p < rgba.length && !transparent; p += 4) if (rgba[p]! < 128) transparent = true;
       full.push({ rgba, delay });
@@ -188,7 +207,7 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
   }
 
   const bytes = writeGif(width, height, written, loopCount(gif));
-  const unchanged = bytes.length >= input.byteLength;
+  const unchanged = !opts.force && bytes.length >= input.byteLength;
   return {
     bytes: unchanged ? new Uint8Array(input) : bytes,
     width: unchanged ? gw : width,
@@ -268,4 +287,9 @@ function lzwStream() {
     bytesView: () => buf.subarray(0, n),
     bytes: () => buf.slice(0, n),
   };
+}
+
+/** How many image frames a GIF holds (1 for a still GIF). */
+export function gifFrameCount(input: ArrayBuffer): number {
+  return parseGIF(input).frames.filter((f) => 'image' in f).length;
 }

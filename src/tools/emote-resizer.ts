@@ -4,12 +4,21 @@ import { adjust, NEUTRAL } from '../lib/adjust';
 import { replaceExt, suffixName, type OutputFile } from '../lib/files';
 
 /** Sizes each platform asks for, largest first, and its per-file limit in bytes (1 KB = 1000 bytes, as the platforms count). */
-const PLATFORMS: Record<string, { sizes: number[]; limit: number; label: string; limitLabel: string }> = {
-  'twitch-emote': { sizes: [112, 56, 28], limit: 1_000_000, label: 'Twitch', limitLabel: '1 MB' },
+interface Platform {
+  sizes: number[];
+  limit: number;
+  label: string;
+  limitLabel: string;
+  /** Set when the platform takes animated GIFs: its frame cap, if any. */
+  animated?: { maxFrames: number };
+}
+
+const PLATFORMS: Record<string, Platform> = {
+  'twitch-emote': { sizes: [112, 56, 28], limit: 1_000_000, label: 'Twitch', limitLabel: '1 MB', animated: { maxFrames: 60 } },
   'twitch-badge': { sizes: [72, 36, 18], limit: 25_000, label: 'Twitch', limitLabel: '25 KB' },
-  'discord-emoji': { sizes: [128], limit: 256_000, label: 'Discord', limitLabel: '256 KB' },
+  'discord-emoji': { sizes: [128], limit: 256_000, label: 'Discord', limitLabel: '256 KB', animated: { maxFrames: Infinity } },
   'discord-sticker': { sizes: [320], limit: 512_000, label: 'Discord', limitLabel: '512 KB' },
-  'slack-emoji': { sizes: [128], limit: 128_000, label: 'Slack', limitLabel: '128 KB' },
+  'slack-emoji': { sizes: [128], limit: 128_000, label: 'Slack', limitLabel: '128 KB', animated: { maxFrames: Infinity } },
 };
 
 /** Sizes at or below this get a light unsharp mask, since downscaling softens fine lines most there. */
@@ -52,6 +61,46 @@ function sharpened(canvas: HTMLCanvasElement | OffscreenCanvas): HTMLCanvasEleme
   return out;
 }
 
+/** Resize an animated GIF into each square, stepping up compression and dropping frames until it fits the limit. */
+async function animated(file: File, platform: Platform, fit: Fit, frames: number): Promise<OutputFile[]> {
+  const { compressGif } = await import('../lib/gif-compress');
+  const input = await file.arrayBuffer();
+  const base = Math.max(1, Math.ceil(frames / platform.animated!.maxFrames));
+  const tries = [
+    { level: 'light', keepEvery: base },
+    { level: 'medium', keepEvery: base },
+    { level: 'strong', keepEvery: base },
+    { level: 'strong', keepEvery: base * 2 },
+    { level: 'strong', keepEvery: base * 3 },
+  ] as const;
+  const outs: OutputFile[] = [];
+  for (const size of platform.sizes) {
+    let best: { bytes: Uint8Array<ArrayBuffer>; framesOut: number } | undefined;
+    for (const t of tries) {
+      const r = await compressGif(input, { ...t, scale: 1, box: { width: size, height: size, fit: fit === 'cover' ? 'cover' : 'contain' }, force: true });
+      if (!best || r.bytes.length < best.bytes.length) best = r;
+      if (r.bytes.length <= platform.limit) break;
+    }
+    const blob = new Blob([best!.bytes], { type: 'image/gif' });
+    const notes = [`${size}×${size}`, best!.framesOut === frames ? `${frames} frames` : `${best!.framesOut} of ${frames} frames`];
+    if (blob.size > platform.limit) notes.push(`over ${platform.label}’s ${platform.limitLabel} limit; use a shorter GIF`);
+    const name = platform.sizes.length > 1 ? suffixName(file.name, `-${size}`, 'gif') : replaceExt(file.name, 'gif');
+    outs.push({ name, blob, previewUrl: URL.createObjectURL(blob), note: notes.join(' · ') });
+  }
+  return outs;
+}
+
+async function isAnimatedGif(file: File): Promise<number> {
+  if (file.type !== 'image/gif' && !/\.gif$/i.test(file.name)) return 0;
+  const { gifFrameCount } = await import('../lib/gif-compress');
+  try {
+    const n = gifFrameCount(await file.arrayBuffer());
+    return n > 1 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
 createShell({
   resultsTitle: (outs) => `Done: ${outs.length} ${outs.length === 1 ? 'image' : 'images'}`,
   async process(files, progress) {
@@ -60,6 +109,8 @@ createShell({
     const trim = bool('trim');
     const sharpen = bool('sharpen');
     return processEach(files, progress, 'Resizing', async (entry) => {
+      const frames = platform.animated ? await isAnimatedGif(entry.file) : 0;
+      if (frames) return animated(entry.file, platform, fit, frames);
       const decoded = await decodeImage(entry.file);
       const cut = trim ? await trimmed(decoded.bitmap) : undefined;
       const source = cut ?? decoded.bitmap;
