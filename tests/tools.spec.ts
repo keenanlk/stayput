@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(89);
+  expect(await page.locator('.index .tool-card').count()).toBe(90);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -498,7 +498,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'emote-resizer'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -6274,4 +6274,41 @@ test('Compress PDF fits a file size with the gentlest step, and says when a limi
   await run(page, ['scan.pdf']);
   await expect(page.locator('#results-list')).toContainText('could not get under 1 KB');
   net.assertNothingLeft(['scan.pdf']);
+});
+
+test('Emote resizer makes the three Twitch sizes from trimmed art, and the Discord page one 128 px emoji', async ({ page }) => {
+  const errors = await open(page, 'emote-resizer');
+  const net = watchNetwork(page);
+  const { items } = await run(page, [logoPng()]);
+  expect(items).toBe(3);
+  const zip = await zipAll(page);
+  const names = Object.keys(zip).sort();
+  expect(names).toHaveLength(3);
+  const bySize = Object.fromEntries(names.map((n) => [pngSize(zip[n]!).width, zip[n]!]));
+  expect(Object.keys(bySize).map(Number).sort((a, b) => a - b)).toEqual([28, 56, 112]);
+  for (const s of [28, 56, 112]) expect(pngSize(bySize[s]!)).toEqual({ width: s, height: s });
+  // The art starts 30 px down in a 200 px canvas; trimmed, the disc touches the top edge while the corners stay clear.
+  const { px } = await pixelsOf(page, bySize[112]!, [[56, 3], [0, 0], [111, 111]]);
+  expect(px[0]![3]).toBeGreaterThan(0);
+  expect(px[1]![3]).toBe(0);
+  expect(px[2]![3]).toBe(0);
+  net.assertNothingLeft(['logo.png']);
+  expect(errors).toEqual([]);
+
+  await page.goto('/discord-emoji-resizer');
+  await expect(page.locator('#platform')).toHaveValue('discord-emoji');
+  const single = await run(page, [logoPng()]);
+  expect(single.items).toBe(1);
+  const png = await bytesOf(single.downloads[0]!);
+  expect(pngSize(png)).toEqual({ width: 128, height: 128 });
+  expect(png.length).toBeLessThan(256_000);
+});
+
+test('YouTube thumbnail page makes 1280×720 under 2 MB', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/youtube-thumbnail-resizer');
+  const { downloads } = await run(page, ['big.jpg']);
+  const jpg = await bytesOf(downloads[0]!);
+  expect(jpegSize(jpg)).toEqual({ width: 1280, height: 720 });
+  expect(jpg.length).toBeLessThanOrEqual(2_000_000);
 });

@@ -3448,6 +3448,48 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'emote-resizer',
+    name: 'Emote resizer',
+    title: 'Emote Resizer for Twitch, Discord and Slack, No Upload | Stayput',
+    description:
+      'Resize art into Twitch emotes (112, 56, 28 px), sub badges (72, 36, 18), Discord emoji and stickers or Slack emoji, as transparent PNGs under each limit. Nothing uploaded.',
+    heading: 'Emote resizer',
+    tagline: 'Every size Twitch, Discord or Slack asks for from one drawing, with transparency kept, made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    multiple: true,
+    dropLabel: 'Drop emote artwork',
+    action: 'Make the emotes',
+    keywords: ['emote resizer', 'twitch emote resizer', 'discord emoji resizer', 'twitch badge resizer', 'discord sticker resizer', 'resize emote 112x112', 'slack emoji resizer'],
+    steps: [
+      'Drop one or more drawings, ideally square transparent PNGs at 500 px or larger.',
+      'Pick the platform; empty transparent edges are trimmed so the art fills the square.',
+      'Download the PNGs, one by one or as a zip, and upload them in the platform’s emote settings.',
+    ],
+    faq: [
+      {
+        q: 'Which sizes do I get?',
+        a: 'Twitch emotes come out at 112, 56 and 28 pixels, sub badges at 72, 36 and 18, Discord emoji at 128, Discord stickers at 320 and Slack emoji at 128. Each is a transparent PNG, checked against the platform’s file size limit, and the result list says if one is over.',
+      },
+      {
+        q: 'Why does my emote look blurry at 28 pixels?',
+        a: 'At that size there are too few pixels for thin lines. The smallest sizes get a light sharpening pass here, but the real fix is in the art: thick outlines, one bold shape and little text. Twitch’s own guidance is to check that an emote still reads at 28 pixels before you submit it.',
+      },
+      {
+        q: 'Can I resize an animated GIF emote?',
+        a: 'Not yet. This page saves the first frame of a GIF as a still PNG, which works as a normal emote but does not move.',
+      },
+      {
+        q: 'What does trimming the edges do?',
+        a: 'Drawings are often exported with a wide transparent margin, which makes the finished emote look tiny in chat. Trimming crops those empty rows and columns first, so the art fills the square. Untick it if the margin is deliberate.',
+      },
+      {
+        q: 'Is my artwork uploaded?',
+        a: 'No. The image is decoded, trimmed, resized and saved as PNG on a canvas in your tab. Commissioned emotes and unreleased sub badges stay on your device, and the page works offline once loaded.',
+      },
+    ],
+  },
+  {
     slug: 'black-and-white-image',
     name: 'Black and white photo',
     title: 'Make a Photo Black and White, Free, No Upload | Stayput',
