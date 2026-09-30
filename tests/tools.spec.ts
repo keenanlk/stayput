@@ -329,6 +329,18 @@ test('Compress and resize shrinks a large photo and records a bucketed event', a
   await expect(page.locator('.result-item .saving')).toBeVisible();
 });
 
+test('a long file name in the result card never widens the page on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await open(page, 'compress-image');
+  const dir = mkdtempSync(join(tmpdir(), 'stayput-'));
+  const renamed = join(dir, 'Hotel Lobby Character Swap (2)-new-background-a-very-long-descriptive-name.jpg');
+  copyFileSync(fx('big.jpg'), renamed);
+  await run(page, [renamed]);
+  await expect(page.locator('.result-item .name')).toBeVisible();
+  const width = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(width).toBeLessThanOrEqual(390);
+});
+
 test('EXIF remover reports GPS and strips losslessly', async ({ page }) => {
   await open(page, 'strip-exif');
   await page.locator('#file-input').setInputFiles([fx('photo.jpg'), fx('graphic.png'), fx('picture.webp')]);
