@@ -3,3 +3,5 @@
 - `pug.jpg`: "Pug in a warm sweater (Unsplash)", Wikimedia Commons, CC0. Resized to 640 px.
 - `frenchie.jpg`: "French Bulldog Puppy (Unsplash)", Wikimedia Commons, CC0. Resized to 640 px.
 - `jfk.wav`: 11 s from John F. Kennedy's inaugural address (1961), a US government work in the public domain; the 16 kHz sample distributed with whisper.cpp.
+- `sample.rar` and `sample.7z`: `test_read_format_rar.rar` and `test_read_format_7zip_lzma2.7z` from libarchive's own test suite (https://github.com/libarchive/libarchive, BSD-2-Clause), decoded from their `.uu` files.
+- `plain.zip`, `locked.zip` (password `tide-pool`) and `bundle.tar.gz`: made for these tests with Info-ZIP and tar.

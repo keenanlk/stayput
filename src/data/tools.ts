@@ -2908,6 +2908,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'archive-extractor',
+    name: 'Open ZIP, RAR and 7z',
+    title: 'Open RAR, ZIP and 7z Files Online: Extract Without Uploading | Stayput',
+    description:
+      'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ones, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
+    heading: 'Open ZIP, RAR and 7z files',
+    tagline: 'The files inside an archive, unpacked on your own device, without installing WinRAR or 7-Zip.',
+    category: 'pdf',
+    accept: '.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.tbz2,.xz,.txz,.iso,.cab,application/zip,application/x-rar-compressed,application/vnd.rar,application/x-7z-compressed,application/x-tar,application/gzip',
+    multiple: true,
+    dropLabel: 'Drop archives to open',
+    action: 'Extract',
+    keywords: ['rar extractor', 'open rar file', 'zip file opener', 'unzip files online', '7z extractor', 'extract rar online', 'open 7z file'],
+    steps: [
+      'Drop a ZIP, RAR, 7z or TAR archive, or several.',
+      'If the archive is locked, type its password.',
+      'Press Extract, then download the files you need, or all of them as one ZIP.',
+    ],
+    faq: [
+      {
+        q: 'Why would I open a RAR here instead of installing WinRAR or 7-Zip?',
+        a: 'On a work laptop where you cannot install software, on a Chromebook, or on a phone, this is the quickest way to get at the files. On your own computer a desktop app is a fine choice too; both keep the files local, unlike online extractors that upload the archive.',
+      },
+      {
+        q: 'Which formats open?',
+        a: 'ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms (TAR.GZ, TGZ, TAR.BZ2, TAR.XZ), ISO disc images and CAB. Archives split into parts (.part1.rar, .7z.001) must be joined first and are not supported yet.',
+      },
+      {
+        q: 'Can it open password-protected archives?',
+        a: 'Yes, if you know the password: type it before pressing Extract. It cannot guess or remove a password you do not have.',
+      },
+      {
+        q: 'Is the archive uploaded?',
+        a: 'No. libarchive, the same open-source code behind the tar command on macOS and FreeBSD, runs in this tab as WebAssembly, so the archive and everything in it stay on your device.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
