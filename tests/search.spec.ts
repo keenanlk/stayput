@@ -38,7 +38,10 @@ test.describe('search ranking', () => {
     expect(top('iphone photo', 3)).toContain('/tools/heic-to-jpg');
     expect(top('remove password')).toEqual(['/tools/unlock-pdf']);
     expect(top('gps', 3)).toContain('/tools/strip-exif');
-    expect(top('ocr')).toEqual(['/tools/image-to-text']);
+    // OCR of an image and OCR of a scanned PDF both come up for the bare word.
+    expect(top('ocr', 2)).toEqual(expect.arrayContaining(['/tools/image-to-text', '/tools/ocr-pdf']));
+    expect(top('ocr pdf')).toEqual(['/tools/ocr-pdf']);
+    expect(top('image ocr')).toEqual(['/tools/image-to-text']);
     // Both ways of making a GIF come up for the bare word.
     expect(top('gif', 4)).toEqual(expect.arrayContaining(['/tools/video-to-gif', '/tools/gif-maker']));
     expect(top('jpeg to png')).toEqual(['/jpg-to-png']);
