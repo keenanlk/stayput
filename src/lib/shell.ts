@@ -9,6 +9,7 @@ import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
 import { warmDecoders } from './vendor';
+import { droppedFiles } from './folder-drop';
 
 export interface ShellFile {
   id: number;
@@ -43,6 +44,8 @@ export interface ShellOptions {
   outputFormat?: () => string;
   /** Automatically download when there is exactly one output. Default true. */
   autoDownloadSingle?: boolean;
+  /** Open dropped folders and add the files inside them (see folder-drop.ts). Default false. */
+  folders?: boolean;
 }
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -433,6 +436,12 @@ export function createShell(opts: ShellOptions) {
     }
   }
 
+  function dropped(dt: DataTransfer) {
+    const walking = opts.folders ? droppedFiles(dt) : undefined;
+    if (!walking) return void addFiles(dt.files);
+    walking.then(addFiles, (e) => showError(`That folder could not be read: ${e instanceof Error ? e.message : String(e)}`));
+  }
+
   // Wiring
   drop.addEventListener('click', () => input.click());
   drop.addEventListener('keydown', (e) => {
@@ -455,14 +464,14 @@ export function createShell(opts: ShellOptions) {
   drop.addEventListener('drop', (e) => {
     e.preventDefault();
     drop.classList.remove('is-over');
-    if (e.dataTransfer?.files) void addFiles(e.dataTransfer.files);
+    if (e.dataTransfer) dropped(e.dataTransfer);
   });
   // Allow dropping anywhere on the page.
   document.addEventListener('dragover', (e) => e.preventDefault());
   document.addEventListener('drop', (e) => {
     if (drop.contains(e.target as Node)) return;
     e.preventDefault();
-    if (e.dataTransfer?.files?.length) void addFiles(e.dataTransfer.files);
+    if (e.dataTransfer?.files?.length) dropped(e.dataTransfer);
   });
   // Paste images from the clipboard.
   document.addEventListener('paste', (e) => {

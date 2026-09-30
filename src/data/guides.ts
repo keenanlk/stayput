@@ -3916,6 +3916,174 @@ export const guides: Guide[] = [
       { q: 'Can I combine several screenshots into one long image?', a: 'Yes, the stitch screenshots page joins them end to end in order, which suits a long scrolling capture split across multiple images better than a grid layout does.' },
     ],
   },
+  {
+    slug: 'how-to-extract-images-from-a-pdf',
+    title: 'How to Extract Images From a PDF at Full Resolution',
+    description: 'Screenshotting a picture inside a PDF loses quality and adds compression artefacts. Here is how to pull out the original image files instead, free and without uploading the document.',
+    heading: 'How to extract images from a PDF',
+    dek: 'A screenshot of a picture inside a PDF is a blurry copy of a copy. Here is how to get the original image file out instead, at its real resolution.',
+    keywords: ['how to extract images from a pdf', 'extract images from pdf free', 'save images from pdf as jpg', 'extract pictures from pdf online', 'pull images out of pdf'],
+    updated: '2026-09-30',
+    tools: ['extract-pdf-images'],
+    sections: [
+      {
+        h: 'Why a screenshot is the wrong way to do this',
+        p: [
+          'Taking a screenshot of a photo or chart inside a PDF captures it at your screen\'s resolution and re-compresses it as a new image, which is always a downgrade from what is actually stored in the file. A PDF stores each embedded image as its own file internally, usually a JPEG or PNG, at whatever resolution it was placed at, often much higher than a screenshot could ever capture.',
+        ],
+      },
+      {
+        h: 'In Adobe Acrobat',
+        p: [
+          'Acrobat Pro can export images from a PDF via **File → Export To → Image**, which pulls out embedded pictures at their stored resolution, but the feature needs a paid Acrobat subscription; the free Acrobat Reader has no image export option.',
+        ],
+      },
+      {
+        h: 'Command-line tools',
+        p: [
+          'Tools like `pdfimages`, part of the free Poppler utilities, extract every embedded image from a PDF at full resolution from the command line, which works well for someone comfortable with a terminal but is more setup than most people want for a single document.',
+        ],
+      },
+      {
+        h: 'Extracting images without uploading the PDF',
+        p: [
+          'Stayput\'s [extract images from PDF](/tools/extract-pdf-images) tool scans the document in the browser tab and saves every embedded picture as a separate PNG or JPG, at the resolution it was actually stored in the file, not a screenshot\'s resolution. It works on every image in the document at once, with nothing uploaded to a server to do it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why is a screenshot of a PDF image lower quality than the original?', a: 'A screenshot captures the image at your screen\'s resolution and re-compresses it, while the PDF itself stores the picture as its own file, usually at a higher resolution than any screenshot could reach.' },
+      { q: 'Can I extract every image from a PDF at once?', a: 'Yes, Stayput\'s extract images from PDF tool finds and saves every embedded picture in the document in one pass.' },
+      { q: 'What format do the extracted images come out as?', a: 'PNG or JPG, matching or closely approximating how the picture was originally stored in the PDF.' },
+      { q: 'Does this work on a PDF made from a scan?', a: 'A scanned PDF is usually one full-page image per page rather than several embedded pictures, so extracting images from it saves each page as a picture rather than pulling out separate photos.' },
+    ],
+  },
+  {
+    slug: 'how-to-flatten-a-pdf',
+    title: 'How to Flatten a PDF (Lock Form Fields and Signatures)',
+    description: 'A filled-in PDF form or a signed contract can still be edited until it is flattened into the page. Here is what flattening actually does, and a free tool that does it without uploading the file.',
+    heading: 'How to flatten a PDF',
+    dek: 'A form you just filled in, or a document you just signed, stays editable until it is flattened. Here is what that means, and how to do it for free.',
+    keywords: ['how to flatten a pdf', 'flatten pdf online free', 'lock pdf form fields', 'flatten pdf form fields', 'make pdf uneditable'],
+    updated: '2026-09-30',
+    tools: ['flatten-pdf', 'fill-pdf-form', 'sign-pdf'],
+    sections: [
+      {
+        h: 'What flattening actually changes',
+        p: [
+          'A filled-in form field, a typed comment, a stamp or a drawn signature in a PDF usually stays as a separate, still-editable layer on top of the page, the way a sticky note sits on a document rather than being part of it. Flattening presses that layer permanently into the page itself, so it displays identically everywhere and can no longer be edited, moved or deleted, only viewed as part of the page content from then on.',
+        ],
+      },
+      {
+        h: 'Why it matters before sending a document',
+        p: [
+          'A form field or signature that has not been flattened can, depending on the PDF viewer, still be clicked into and changed by whoever receives the file, which is not what you want for a signed contract or a completed application. Flattening turns those interactive elements into plain, fixed page content before it goes out.',
+        ],
+      },
+      {
+        h: 'In Adobe Acrobat',
+        p: [
+          'Acrobat Pro has a **Flatten** option, usually reached through Print to PDF or a dedicated menu action depending on the version, which does the job well but needs a paid subscription; the free Acrobat Reader does not offer it.',
+        ],
+      },
+      {
+        h: 'Flattening without uploading the document',
+        p: [
+          'Stayput\'s [flatten PDF](/tools/flatten-pdf) tool presses filled [form fields](/tools/fill-pdf-form), comments, stamps and [signatures](/tools/sign-pdf) into the page directly in the browser tab, so the result looks the same in any viewer and cannot be edited back out. The underlying text elsewhere in the document stays selectable; only the interactive elements are locked in, and the file is never uploaded to do it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What does flattening a PDF actually do?', a: 'It presses interactive elements like filled form fields, comments and signatures permanently into the page, so they display the same everywhere and can no longer be edited or moved.' },
+      { q: 'Why would I flatten a PDF before sending it?', a: 'An unflattened form field or signature can sometimes still be edited by whoever opens the file, depending on their PDF viewer; flattening locks it in as fixed page content first.' },
+      { q: 'Does flattening make the rest of the text uneditable too?', a: 'No, flattening specifically affects interactive elements like form fields and annotations; ordinary text in the document is unaffected and stays as it was.' },
+      { q: 'Can I flatten a PDF for free without uploading it?', a: 'Yes, Stayput\'s flatten PDF tool works on the document in your browser tab and never sends it to a server.' },
+    ],
+  },
+  {
+    slug: 'how-to-increase-audio-volume',
+    title: 'How to Increase the Volume of an Audio File Without Distortion',
+    description: 'Cranking a volume slider on a quiet recording usually distorts the loud parts before the quiet parts become audible. Here is how normalization avoids that, and a free browser tool for it.',
+    heading: 'How to increase audio volume',
+    dek: 'Simply turning up a quiet recording clips the loud parts before the quiet parts get loud enough. Here is a better way, and a free tool that does it without uploading the file.',
+    keywords: ['how to increase volume of audio', 'increase mp3 volume free', 'make audio louder online', 'normalize audio volume free', 'boost quiet recording volume'],
+    updated: '2026-09-30',
+    tools: ['volume-booster'],
+    sections: [
+      {
+        h: 'Why a flat volume boost distorts the loud parts',
+        p: [
+          'Multiplying every sample in a recording by the same factor, which is what a plain "increase volume" slider does, raises the loudest parts as much as the quietest ones. If the quiet parts need much amplification to become audible, the already-loud parts get pushed past the maximum the format can represent and clip, producing a harsh, crackling distortion.',
+        ],
+      },
+      {
+        h: 'Normalization vs. a flat boost',
+        p: [
+          'Normalizing instead finds the loudest peak in the recording and raises the whole file only as much as that peak allows without clipping, which is safe but limited: a recording with one loud spike and mostly quiet speech still ends up quiet overall, since that one peak sets the ceiling. Dynamic range compression goes further, reducing the gap between loud and quiet parts first so the whole thing can then be pushed louder evenly, which is what most "loudness" tools actually do under the hood.',
+        ],
+      },
+      {
+        h: 'In a full audio editor',
+        p: [
+          'Audacity, free and open-source, has both a Normalize and an Amplify effect and does this properly, but it is a full application to download, install and learn for a job that is often just "make this one voice memo louder."',
+        ],
+      },
+      {
+        h: 'Boosting volume without uploading the file',
+        p: [
+          'Stayput\'s [volume booster](/tools/volume-booster) raises or lowers the loudness of an MP3, voice memo or video directly in the browser tab, with a normalize option that brings quiet audio up to a target loudness without clipping the peaks, and a batch mode that evens out a folder of recordings to the same level. Nothing is uploaded to process it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why does my quiet recording distort when I turn up the volume?', a: 'A flat volume increase raises loud and quiet parts by the same amount, so by the time the quiet parts are audible, the loud parts have been pushed past the format\'s maximum and clip into distortion.' },
+      { q: 'What is audio normalization?', a: 'Raising a whole recording\'s volume by the largest amount possible without its loudest peak clipping, which is safer than a flat boost but still limited by that one peak.' },
+      { q: 'Can I make several recordings the same volume at once?', a: 'Yes, Stayput\'s volume booster has a batch mode that normalizes a group of files to a matching loudness level in one pass.' },
+      { q: 'Does boosting the volume work on a video\'s audio too?', a: 'Yes, Stayput\'s volume booster accepts video files and adjusts the audio track without needing to extract it first.' },
+    ],
+  },
+  {
+    slug: 'how-to-convert-a-photo-to-black-and-white',
+    title: 'How to Convert a Photo to Black and White (Not Just Desaturated)',
+    description: 'Removing the colour from a photo is only the first step; a genuinely good black-and-white photo also needs its tones remapped. Here is the difference, and a free browser tool that does both.',
+    heading: 'How to convert a photo to black and white',
+    dek: 'Just desaturating a colour photo often looks flat in black and white, because colours that looked different can turn into the same shade of grey. Here is why, and a free tool that fixes it.',
+    keywords: ['how to convert photo to black and white', 'black and white photo converter free', 'convert image to grayscale online', 'make photo black and white free', 'photo to grayscale converter'],
+    updated: '2026-09-30',
+    tools: ['black-and-white-image'],
+    sections: [
+      {
+        h: 'Why plain desaturation can look flat',
+        p: [
+          'The simplest way to remove colour, averaging the red, green and blue values of each pixel, ignores that the human eye does not perceive those colours as equally bright: a saturated red and a saturated green can average out to nearly the same grey even though they looked completely different in colour, which flattens contrast that was doing real work in the original photo.',
+        ],
+      },
+      {
+        h: 'How a proper conversion handles this',
+        p: [
+          'A weighted grayscale conversion, the kind built into most photo editors, gives more weight to green and less to blue when computing brightness, matching how human vision actually works, which keeps more of the original contrast intact. Beyond that, black-and-white photography traditionally used coloured filters (a red filter to darken blue sky, for example) to control how colours map to tones, an effect some black-and-white converters replicate digitally.',
+        ],
+      },
+      {
+        h: 'In Photoshop or Lightroom',
+        p: [
+          'Photoshop\'s **Black & White** adjustment layer and Lightroom\'s black-and-white panel both let you push individual colour channels lighter or darker in the conversion, which gives the most control, but both need a Creative Cloud subscription and some skill to use the sliders well.',
+        ],
+      },
+      {
+        h: 'Converting in the browser',
+        p: [
+          'Stayput\'s [black and white photo](/tools/black-and-white-image) tool offers grayscale, a higher-contrast look, pure black-and-white for scans and signatures, and a sepia tone, with a live preview so you can compare options before saving, and batch processing for more than one photo at a time. It runs entirely in the browser, so nothing is uploaded.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why does my black and white photo look flat or low-contrast?', a: 'A simple desaturation can average different colours into nearly the same shade of grey, losing the contrast that was visible in the original. A weighted conversion that accounts for how the eye perceives colour keeps more of that contrast.' },
+      { q: 'What is the difference between grayscale and pure black and white?', a: 'Grayscale keeps a full range of grey tones between black and white; pure black and white (sometimes called "threshold" or "1-bit") maps every pixel to either fully black or fully white, which suits scanned documents and signatures better than photos.' },
+      { q: 'Can I convert several photos to black and white at once?', a: 'Yes, Stayput\'s black and white photo tool supports batch processing for multiple photos in one pass.' },
+      { q: 'Does converting to black and white reduce the file size?', a: 'Slightly, since a grayscale image needs less colour data than a full-colour one, though the effect on file size is usually modest compared to other compression.' },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);

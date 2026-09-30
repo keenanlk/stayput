@@ -91,6 +91,7 @@ That is the whole pitch, and you can check it in three ways:
 | [EPUB to PDF](https://stayput.dev/tools/epub-to-pdf) (DRM-free ebooks to a paginated PDF) | |
 | [PDF to EPUB](https://stayput.dev/tools/pdf-to-epub) (reflowable ebook from a PDF's text) | |
 | [Open ZIP, RAR and 7z](https://stayput.dev/tools/archive-extractor) (extract archives, password-protected too) | |
+| [Create ZIP](https://stayput.dev/tools/create-zip) (files or folders, optional AES-256 password) | |
 | [Remove silence](https://stayput.dev/tools/remove-silence) (shorten pauses, trim quiet ends) | |
 | [Remove background noise](https://stayput.dev/tools/remove-noise) (hiss, hum, fans and traffic out of voice recordings and videos) | |
 | [Blur faces in video](https://stayput.dev/tools/blur-face-video) (automatic, frame by frame; blur, pixelate, box or emoji) | |

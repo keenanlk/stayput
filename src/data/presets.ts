@@ -4860,6 +4860,35 @@ export const presets: Preset[] = [
       { q: 'Is the file uploaded?', a: 'No. The archive is read by libarchive running in this tab.' },
     ],
   },
+  {
+    slug: 'password-protect-zip-file',
+    base: 'create-zip',
+    name: 'Password protect ZIP',
+    title: 'Password Protect a ZIP File (AES-256) Without Uploading It | Stayput',
+    description: 'Make a password-protected ZIP of your files or a folder with AES-256 encryption, in your browser on Windows, Mac or a Chromebook. The files and the password never leave your device.',
+    heading: 'Password protect a ZIP file',
+    tagline: 'An AES-256 locked ZIP, made on your device, for files you would rather not hand to a website.',
+    keywords: ['password protect zip file', 'encrypt zip file', 'zip with password', 'password protect folder zip', 'aes zip'],
+    dropLabel: 'Drop the files or folder to lock',
+    action: 'Create locked ZIP',
+    defaults: { lock: 'true' },
+    intro: [
+      'Windows can make a ZIP but cannot put a password on it, and neither can the Finder on a Mac, which is why people search for a way to do it. The usual answers are to install 7-Zip or to upload the files to a website, and uploading private files to a stranger’s server so it can lock them for you is exactly the risk the password was meant to remove. This page builds the ZIP and encrypts it in the browser tab instead.',
+      'A worked example: you need to email three scanned tax forms to your accountant. Drop the PDFs here, type a long password such as a line from a song, and press Create locked ZIP. You get tax-forms.zip if you named it, or files.zip, with every PDF encrypted with AES-256. Email the ZIP, then send the password by text message rather than in the same email, so someone who gets into one inbox does not get both.',
+      'Your accountant opens it with 7-Zip or WinRAR on Windows, or The Unarchiver or Keka on a Mac, all free; the zip opener built into Windows and macOS may not accept the AES format. The names of the files inside stay visible without the password, as in every ZIP, so do not put secrets in the file names.',
+    ],
+    steps: [
+      'Drop the files or the folder.',
+      'Type a password, and tick Show password to check it.',
+      'Press Create locked ZIP and send the password separately.',
+    ],
+    faq: [
+      { q: 'Can I add a password to a ZIP I already have?', a: 'Open it with our archive opener, download all the files, then drop them here to make a new locked ZIP. A ZIP cannot be locked in place without being rebuilt.' },
+      { q: 'What if I forget the password?', a: 'The files cannot be recovered: nothing about the password is stored anywhere, here or in the ZIP. Keep the original files until you know the person got them.' },
+      { q: 'Are the file names hidden?', a: 'No. ZIP encryption covers the contents of each file but not its name or size. If the names give something away, rename the files before zipping, or zip them in a folder called something plain.' },
+      { q: 'Is anything uploaded?', a: 'No. The files are read, compressed and encrypted in this tab, and the password never leaves it.' },
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

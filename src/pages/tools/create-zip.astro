@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CreateZip from '../../components/options/CreateZip.astro';
+const tool = toolBySlug('create-zip')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><CreateZip /></Fragment>
+</ToolLayout>
+<script src="../../tools/create-zip.ts"></script>
