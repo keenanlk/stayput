@@ -130,7 +130,7 @@ export const tools: Tool[] = [
     name: 'Compress & Resize Images',
     title: 'Compress and Resize Images Online Without Uploading | Stayput',
     description:
-      'Shrink JPG, PNG and WebP images for email or the web. Resize by width or percentage, set quality, batch process. Nothing leaves your browser.',
+      'Shrink JPG, PNG and WebP images for email, forms or the web. Fit a file size like 100 KB, resize to exact pixels or a maximum, batch process. Nothing leaves your browser.',
     heading: 'Compress and resize images',
     tagline: 'Make photos small enough to email or upload. Batch resize, set a quality, see the savings before you download.',
     category: 'images',
@@ -141,7 +141,7 @@ export const tools: Tool[] = [
     keywords: ['compress image', 'resize image', 'reduce image size', 'compress jpg', 'compress png', 'image compressor'],
     steps: [
       'Drop the images you want to shrink.',
-      'Set a maximum width or height, or a percentage, and pick a quality.',
+      'Set a maximum width and height, an exact size or a percentage; then pick a quality, or a file size to stay under.',
       'Compare the before and after sizes, then download.',
     ],
     faq: [
@@ -155,7 +155,11 @@ export const tools: Tool[] = [
       },
       {
         q: 'Does resizing keep the aspect ratio?',
-        a: 'Yes. The image is scaled so that neither side exceeds the limits you set, and the proportions never change.',
+        a: 'With Limit dimensions and Percentage, yes: the image is scaled so neither side exceeds the limits and the proportions never change. Exact size gives precisely the width and height you type; when the shape differs you choose to crop the centre, add bars, or stretch.',
+      },
+      {
+        q: 'Can it make an image smaller than a set file size, like 50 KB?',
+        a: 'Yes. Choose Fit a file size and type the limit in KB or MB. Each image gets the highest quality that stays under it; if even the lowest quality is too big, the picture is scaled down until it fits. Sizes count 1 KB as 1000 bytes, so the result is under the limit whichever way a form counts.',
       },
       {
         q: 'Is metadata kept?',
