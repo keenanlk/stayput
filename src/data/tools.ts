@@ -3452,7 +3452,7 @@ export const tools: Tool[] = [
     name: 'Emote resizer',
     title: 'Emote Resizer for Twitch, Discord and Slack, No Upload | Stayput',
     description:
-      'Resize art into Twitch emotes (112, 56, 28 px), sub badges (72, 36, 18), Discord emoji and stickers or Slack emoji, as transparent PNGs under each limit. Nothing uploaded.',
+      'Resize art or animated GIFs into Twitch emotes (112, 56, 28 px), sub badges, Discord emoji and stickers or Slack emoji, under each size limit. Nothing is uploaded.',
     heading: 'Emote resizer',
     tagline: 'Every size Twitch, Discord or Slack asks for from one drawing, with transparency kept, made on this device.',
     category: 'images',
@@ -3477,7 +3477,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I resize an animated GIF emote?',
-        a: 'Not yet. This page saves the first frame of a GIF as a still PNG, which works as a normal emote but does not move.',
+        a: 'Yes, for Twitch emotes, Discord emoji and Slack emoji. An animated GIF comes out as animated GIFs at each size, with compression stepped up and frames thinned only as far as needed to get under the limit, and Twitch’s 60 frame cap applied. Sub badges and Discord stickers cannot move, so a GIF becomes a still PNG there.',
       },
       {
         q: 'What does trimming the edges do?',

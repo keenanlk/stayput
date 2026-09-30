@@ -6312,3 +6312,22 @@ test('YouTube thumbnail page makes 1280×720 under 2 MB', async ({ page }) => {
   expect(jpegSize(jpg)).toEqual({ width: 1280, height: 720 });
   expect(jpg.length).toBeLessThanOrEqual(2_000_000);
 });
+
+test('Animated emote page turns a GIF into three animated Twitch sizes with every frame and its timing', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/animated-emote-resizer');
+  const net = watchNetwork(page);
+  const { items } = await run(page, ['anim.gif']);
+  expect(items).toBe(3);
+  await expect(page.locator('#results-list .result-item').first()).toContainText('3 frames');
+  const zip = await zipAll(page);
+  expect(Object.keys(zip).sort()).toEqual(['anim-112.gif', 'anim-28.gif', 'anim-56.gif']);
+  for (const s of [112, 56, 28]) {
+    expect(gifCompare(zip[`anim-${s}.gif`]!, fx('anim.gif'), 1)).toMatchObject({ frames: 3, size: [s, s], duration: 1000 });
+  }
+  // A 121×81 GIF fitted into 112 px leaves transparent bands above and below; the middle is the red first frame.
+  const { px } = await pixelsOf(page, zip['anim-112.gif']!, [[56, 56], [56, 2]]);
+  expect(dominant(px[0]!.slice(0, 3))).toBe('red');
+  expect(px[1]![3]).toBe(0);
+  net.assertNothingLeft(['anim.gif']);
+});
