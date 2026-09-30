@@ -204,3 +204,37 @@ export async function thumbnail(bitmap: ImageBitmap, size = 96): Promise<string>
   const blob = await canvasToBlob(canvas, 'image/png');
   return URL.createObjectURL(blob);
 }
+
+export type Fit = 'cover' | 'contain' | 'stretch';
+
+/**
+ * Draw a bitmap at exactly `width`×`height`. `cover` crops the centre to the
+ * new shape, `contain` fits it inside with bars of `background` (transparent
+ * when none), `stretch` distorts it to fill.
+ */
+export async function drawExact(bitmap: ImageBitmap, width: number, height: number, fit: Fit, background?: string): Promise<HTMLCanvasElement | OffscreenCanvas> {
+  if (fit === 'stretch') return drawScaled(bitmap, width, height, background);
+  if (fit === 'cover') {
+    const scale = Math.max(width / bitmap.width, height / bitmap.height);
+    const sw = Math.min(bitmap.width, Math.round(width / scale));
+    const sh = Math.min(bitmap.height, Math.round(height / scale));
+    const cropped = await createImageBitmap(bitmap, Math.floor((bitmap.width - sw) / 2), Math.floor((bitmap.height - sh) / 2), sw, sh);
+    try {
+      return drawScaled(cropped, width, height, background);
+    } finally {
+      cropped.close();
+    }
+  }
+  const scale = Math.min(width / bitmap.width, height / bitmap.height);
+  const w = Math.max(1, Math.round(bitmap.width * scale));
+  const h = Math.max(1, Math.round(bitmap.height * scale));
+  const inner = drawScaled(bitmap, w, h);
+  const canvas = makeCanvas(width, height);
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  if (background) {
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, width, height);
+  }
+  ctx.drawImage(inner, Math.floor((width - w) / 2), Math.floor((height - h) / 2));
+  return canvas;
+}

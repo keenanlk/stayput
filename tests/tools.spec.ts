@@ -6201,3 +6201,50 @@ test('Video background remover puts a dropped picture behind the person', async 
   expect(downloads[0]!.suggestedFilename()).toBe('call-new-background.mp4');
   await expect(page.locator('#results-list')).toContainText('background from swatches.png');
 });
+
+test('Compress image fits a file size, and exact-size pages crop or pad to the pixel', async ({ page }) => {
+  const errors = await open(page, 'compress-image');
+  const net = watchNetwork(page);
+  // Fit a file size: the highest quality under 50 KB, shrinking only when needed.
+  const { downloads } = await run(page, ['big.jpg'], async () => {
+    await choose(page.locator('input[name="aim"][value="size"]'));
+    await expect(page.locator('#target-field')).toBeVisible();
+    await expect(page.locator('#quality-field')).toBeHidden();
+    await page.locator('#target-size').fill('50');
+  });
+  const small = await bytesOf(downloads[0]!);
+  expect(small.length).toBeLessThanOrEqual(50_000);
+  expect(small.length).toBeGreaterThan(30_000);
+  await expect(page.locator('#results-list')).toContainText('50 KB');
+  net.assertNothingLeft(['big.jpg']);
+  expect(errors).toEqual([]);
+
+  // 1920x1080 page: exact size, cropped to fill.
+  await page.goto('/resize-image-to-1920x1080');
+  await expect(page.locator('#exact-fields')).toBeVisible();
+  const hd = await run(page, ['big.jpg']);
+  expect(hd.downloads[0]!.suggestedFilename()).toBe('big.jpg');
+  const out = await pixelsOf(page, await bytesOf(hd.downloads[0]!), [[0, 0]]);
+  expect([out.width, out.height]).toEqual([1920, 1080]);
+  await expect(page.locator('#results-list')).toContainText('1920×1080');
+
+  // 512x512 page: fit inside with transparent bars, as PNG.
+  await page.goto('/resize-image-to-512x512');
+  const icon = await run(page, ['big.jpg']);
+  expect(icon.downloads[0]!.suggestedFilename()).toBe('big.png');
+  const px = await pixelsOf(page, await bytesOf(icon.downloads[0]!), [[256, 2], [256, 256]]);
+  expect([px.width, px.height]).toEqual([512, 512]);
+  expect(px.px[0]![3]).toBe(0);
+  expect(px.px[1]![3]).toBe(255);
+});
+
+test('Compress image to 20 KB gets a PNG under the limit as a JPG', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/compress-image-to-20kb');
+  await expect(page.locator('#target-size')).toHaveValue('20');
+  const { downloads } = await run(page, [logoPng()], async () => {
+    await page.locator('#format').selectOption('keep');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('logo.jpg');
+  expect((await bytesOf(downloads[0]!)).length).toBeLessThanOrEqual(20_000);
+});
