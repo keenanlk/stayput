@@ -1,0 +1,41 @@
+---
+/** Option controls for Document scanner, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const look = defaults.look ?? 'color';
+const output = defaults.output ?? 'pdf';
+const pageSize = defaults['page-size'] ?? 'auto';
+const crop = defaults.crop !== 'false';
+const looks = [
+  ['color', 'Colour'],
+  ['gray', 'Grey'],
+  ['bw', 'Black and white'],
+  ['original', 'As photographed'],
+] as const;
+---
+<div class="field wide">
+  <label>Look</label>
+  <div class="segmented" role="radiogroup" aria-label="Look">
+    {looks.map(([v, l]) => <label><input type="radio" name="look" value={v} checked={v === look} /><span>{l}</span></label>)}
+  </div>
+  <p class="muted small">Colour, Grey and Black and white turn the paper white and lift shadows. Black and white is the sharpest for typed text; keep Colour for stamps, signatures in blue ink and highlighter.</p>
+</div>
+<div class="field">
+  <label>Save as</label>
+  <div class="segmented" role="radiogroup" aria-label="Save as">
+    <label><input type="radio" name="output" value="pdf" checked={output === 'pdf'} /><span>One PDF</span></label>
+    <label><input type="radio" name="output" value="images" checked={output === 'images'} /><span>Images</span></label>
+  </div>
+</div>
+<div class="field">
+  <label for="page-size">PDF paper</label>
+  <select id="page-size">
+    <option value="auto" selected={pageSize === 'auto'}>Usual size where I live</option>
+    <option value="a4" selected={pageSize === 'a4'}>A4</option>
+    <option value="letter" selected={pageSize === 'letter'}>US Letter</option>
+  </select>
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="crop" checked={crop} /> Find the page and straighten it</label>
+  <p class="muted small">Works best with the paper on a darker surface, all four corners in the photo. The preview outlines the page it found.</p>
+</div>

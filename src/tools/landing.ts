@@ -71,6 +71,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'vocal-remover': () => import('./vocal-remover'),
   'video-background-remover': () => import('./video-background'),
   'ocr-pdf': () => import('./ocr-pdf'),
+  'document-scanner': () => import('./document-scanner'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
 };

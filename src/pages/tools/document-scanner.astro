@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import DocumentScanner from '../../components/options/DocumentScanner.astro';
+const tool = toolBySlug('document-scanner')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><DocumentScanner /></Fragment>
+</ToolLayout>
+<script src="../../tools/document-scanner.ts"></script>
