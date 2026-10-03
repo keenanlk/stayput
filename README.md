@@ -7,7 +7,7 @@
 **Your files stay put.**
 
 Free, open-source tools for images, PDFs, video and audio that run entirely in your browser.<br>
-Nothing is uploaded, there are no accounts or file size caps, and it works offline.
+Nothing is uploaded, there are no accounts or file size caps beyond what your device can hold, and it works offline.
 
 **[Open stayput.dev](https://stayput.dev)** · [Tools](#tools) · [Verify the claim](#open-the-network-tab-it-stays-empty) · [How it works](#how-it-works) · [MCP server](#mcp-server) · [Privacy](https://stayput.dev/privacy)
 
@@ -15,7 +15,7 @@ Nothing is uploaded, there are no accounts or file size caps, and it works offli
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f6f5f.svg)](LICENSE)
 [![No backend](https://img.shields.io/badge/backend-none-1f6f5f.svg)](#how-it-works)
 
-<a href="https://stayput.dev"><img src="docs/readme/home.png" width="800" alt="The Stayput home page: Your files stay put. Convert, compress and clean images and PDFs right here in your browser."></a>
+<a href="https://stayput.dev"><img src="docs/readme/home.png" width="800" alt="The Stayput home page: Your files stay put. Convert, compress and clean images, PDFs, video and audio right here in your browser."></a>
 
 </div>
 

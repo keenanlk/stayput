@@ -41,7 +41,7 @@ export const tools: Tool[] = [
     name: 'HEIC to JPG',
     title: 'HEIC to JPG Converter, Free and Private | Stayput',
     description:
-      'Convert iPhone HEIC photos to JPG or PNG in your browser. No upload, no limits, no watermark. Batch convert hundreds of photos offline.',
+      'Convert iPhone HEIC photos to JPG or PNG in your browser. No upload, no size caps, no watermark. Batch convert hundreds of photos offline.',
     heading: 'Convert HEIC to JPG',
     tagline:
       'Turn iPhone and iPad photos into JPG or PNG files that open anywhere. Your photos never leave this device.',
@@ -338,7 +338,7 @@ export const tools: Tool[] = [
     description:
       'Combine multiple PDF files into one in your browser. Reorder pages, no size limit, no watermark, no account. Your documents never leave your device.',
     heading: 'Merge PDF files',
-    tagline: 'Combine PDFs into a single document. Drag to reorder. No file limits, no watermark, nothing uploaded.',
+    tagline: 'Combine PDFs into a single document. Drag to reorder. No file size caps beyond what your device can hold, no watermark, nothing uploaded.',
     category: 'pdf',
     accept: 'application/pdf,.pdf',
     multiple: true,
@@ -374,7 +374,7 @@ export const tools: Tool[] = [
     name: 'Split PDF',
     title: 'Split PDF or Extract Pages Online, Private | Stayput',
     description:
-      'Split a PDF into separate pages, extract a page range, or break it into chunks. Runs in your browser, no upload, no limits.',
+      'Split a PDF into separate pages, extract a page range, or break it into chunks. Runs in your browser, no upload, no size caps.',
     heading: 'Split a PDF or extract pages',
     tagline: 'Pull out the pages you need, or break a document into single pages. Done on your device.',
     category: 'pdf',
@@ -582,7 +582,7 @@ export const tools: Tool[] = [
     name: 'PDF to Image',
     title: 'Convert PDF to JPG or PNG Online, Private | Stayput',
     description:
-      'Turn PDF pages into high-resolution JPG or PNG images in your browser. Pick the pages and DPI. No upload, no limits, free.',
+      'Turn PDF pages into high-resolution JPG or PNG images in your browser. Pick the pages and DPI. No upload, no size caps, free.',
     heading: 'Convert PDF pages to images',
     tagline: 'Export every page, or just some, as JPG or PNG at the resolution you need. Rendered on your device.',
     category: 'pdf',
@@ -612,7 +612,7 @@ export const tools: Tool[] = [
     name: 'Reorder & Delete Pages',
     title: 'Reorder, Rearrange and Delete PDF Pages Online, Private | Stayput',
     description:
-      'Drag PDF pages into a new order, delete the ones you do not need, and save. Runs in your browser: no upload, no limits, free.',
+      'Drag PDF pages into a new order, delete the ones you do not need, and save. Runs in your browser: no upload, no size caps, free.',
     heading: 'Reorder and delete PDF pages',
     tagline: 'See every page as a thumbnail, drag them into the order you want, remove the extras. Saved on your device.',
     category: 'pdf',
@@ -1850,7 +1850,7 @@ export const tools: Tool[] = [
     name: 'Merge audio',
     title: 'Merge Audio Files Online: Join MP3 and WAV, No Upload | Stayput',
     description:
-      'Join two or more audio files into one MP3 or WAV in your browser, in the order you choose, with silence or a crossfade between them. No upload, no limits.',
+      'Join two or more audio files into one MP3 or WAV in your browser, in the order you choose, with silence or a crossfade between them. No upload, no size caps.',
     heading: 'Merge audio files',
     tagline: 'Combine songs, voice notes or podcast segments into one file. Done on this device, never uploaded.',
     category: 'media',
@@ -2158,7 +2158,7 @@ export const tools: Tool[] = [
     name: 'Extract Images from PDF',
     title: 'Extract Images from PDF at Full Resolution, No Upload | Stayput',
     description:
-      'Save every photo and picture inside a PDF as PNG or JPG, at the resolution it was stored. Runs in your browser: the PDF is not uploaded. Free, no limits.',
+      'Save every photo and picture inside a PDF as PNG or JPG, at the resolution it was stored. Runs in your browser: the PDF is not uploaded. Free, no size caps.',
     heading: 'Extract images from a PDF',
     tagline: 'Every picture in the file, at its real size, without screenshots and without uploading the PDF.',
     category: 'pdf',
