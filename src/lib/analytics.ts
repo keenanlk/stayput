@@ -21,6 +21,7 @@
  *   files_added and tool_run on the page it opens carry via=search (E18).
  */
 import { journey, recordRun } from './journey';
+import { beforeSend, BEFORE_SEND_HOOK } from './analytics-payload';
 declare global {
   interface Window {
     umami?: { track: (name: string, data?: Record<string, string | number>) => void };
@@ -57,9 +58,11 @@ const UMAMI_WEBSITE = '52e5e00a-c867-497a-9f44-14c769361768';
  * Add the Umami script unless this visit should not be counted:
  * - automated browsers (Playwright, Puppeteer, Selenium set navigator.webdriver),
  *   so our own tests, audits and checks never count as visitors;
+ * - browsers sending Global Privacy Control (Do Not Track is left to Umami, below);
  * - browsers opted out with stayput.dev/#notrack (sets Umami's own
  *   "umami.disabled" flag; #track undoes it).
- * Umami itself also drops known bot user agents and honours Do Not Track.
+ * Umami itself also drops known bot user agents and honours Do Not Track (data-do-not-track).
+ * What is sent is limited by beforeSend (analytics-payload.ts).
  */
 export function loadAnalytics(): void {
   try {
@@ -70,7 +73,7 @@ export function loadAnalytics(): void {
       history.replaceState(null, '', location.pathname + location.search);
       alert(off ? 'Visits from this browser will not be counted.' : 'Visits from this browser will be counted again.');
     }
-    if (navigator.webdriver || localStorage.getItem('umami.disabled')) return;
+    if (navigator.webdriver || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl || localStorage.getItem('umami.disabled')) return;
   } catch {
     // Storage blocked: fall through and let Umami decide.
   }
@@ -80,6 +83,11 @@ export function loadAnalytics(): void {
   s.dataset.websiteId = UMAMI_WEBSITE;
   s.dataset.doNotTrack = 'true';
   s.dataset.domains = 'stayput.dev';
+  // Keep the page path only, and drop screen, language, title, referrer, id and tag.
+  s.dataset.excludeSearch = 'true';
+  s.dataset.excludeHash = 'true';
+  (window as unknown as Record<string, unknown>)[BEFORE_SEND_HOOK] = beforeSend;
+  s.dataset.beforeSend = BEFORE_SEND_HOOK;
   document.head.append(s);
 }
 
