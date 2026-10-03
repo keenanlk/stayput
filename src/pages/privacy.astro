@@ -16,7 +16,7 @@ import Base from '../layouts/Base.astro';
     <p>That is the complete list. There are no advertising scripts, no fonts from third parties and no cookies.</p>
     <h2>Usage counting</h2>
     <p>To know whether Stayput is useful, we count page views and a few anonymous events with Umami, an open-source analytics tool we host ourselves. It sets no cookies, stores no identifier for you and does not follow you across sites. If your browser sends a Do Not Track or Global Privacy Control signal, nothing is recorded at all.</p>
-    <p>Exactly what the events contain:</p>
+    <p>Every event, page views included, carries the site's address (stayput.dev) and the path of the page it happened on, such as "/tools/strip-exif". It never carries the query string or fragment of the address, the page title, your screen size, your browser language or the address of the page you came from. The details below are added for the events that have them:</p>
     <ul>
       <li><strong>Visit start</strong>, once per visit: the page you arrived on, the name of the site that linked you here if it is a well-known one (for example "google" or "reddit"; otherwise "other" or "direct", never the full link), and roughly how long since your last visit ("new", "same day", "1 day", "2-7 days", "8-30 days" or "31+ days").</li>
       <li><strong>Files added</strong>, when you first add files to a tool: which tool, the number of files as a range (for example "2-5"), their total size as a range (for example "1-10MB"), the previous page you looked at on this site, and the three visit details above.</li>
@@ -24,12 +24,14 @@ import Base from '../layouts/Base.astro';
       <li><strong>Next step click</strong>, when you click a suggested next tool after a job: which tool you were on, which one you picked, and the experiment group.</li>
     </ul>
     <p>File names, file types, exact sizes and file contents are never recorded. To work out the "since your last visit" and "tools used" ranges, the site keeps a small note in your browser's own storage: the date of your last visit, the date of your last run and the list of Stayput tools you have used. That note never leaves your device as-is; only the ranges above are sent. We also test whether suggesting a next tool after a job is useful: each visit is placed at random in one of two groups, one that sees the suggestions and one that does not. The group is a coin flip kept in this tab only and forgotten when you close it. Clearing site data for stayput.dev removes it.</p>
+    <h2>What the stats server can see</h2>
+    <p>Like any web server, our Umami server sees the IP address and browser user agent of each request that reaches it. From these it works out a country (and, if its location data allows, a region and city), your browser, operating system and device type. The IP address is not stored. It is combined with the user agent and a rotating secret into a one-way hash that groups the events of one browser into a session; the hash cannot be turned back into your address. This is how Umami's own code works, as described in its <a href="https://github.com/umami-software/umami" rel="noopener">open source</a>.</p>
     <h2>What we can see</h2>
     <p>Our host keeps standard, short-lived server logs of page requests (the page URL, your IP address and browser type) for security and capacity purposes. We do not add anything to that. We cannot see which files you use, how many, or what is in them, because that information never reaches a server.</p>
     <h2>Offline storage</h2>
     <p>To work offline, the site asks your browser to cache its own pages and scripts using a service worker. This cache contains only the site's code, never your files. You can clear it at any time from your browser's site settings.</p>
     <h2>Open source</h2>
     <p>The full source code is at <a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>, so anyone can confirm the above.</p>
-    <p class="muted small">Last updated September 26, 2026.</p>
+    <p class="muted small">Last updated October 3, 2026.</p>
   </article>
 </Base>
