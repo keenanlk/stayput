@@ -1,5 +1,5 @@
 /**
- * StayPut's PDF and photo tools as an MCP server. Every tool reads and writes
+ * Stayput's PDF and photo tools as an MCP server. Every tool reads and writes
  * files on this machine with the same code the website runs in the browser
  * (../../src/lib); nothing is sent over the network.
  */
@@ -94,7 +94,7 @@ const output = z.string().optional().describe('Where to write the result. Defaul
 
 export function createServer(): McpServer {
   const server = new McpServer(
-    { name: 'stayput', title: 'StayPut', version: VERSION, websiteUrl: SITE },
+    { name: 'stayput', title: 'Stayput', version: VERSION, websiteUrl: SITE },
     {
       instructions:
         'Local PDF and photo tools. Paths are on this machine: absolute, ~/..., or relative to the working directory. Tools never modify or overwrite input files; they write a new file and return its path. Nothing is uploaded. Encrypted PDFs are decrypted locally; pass "password" when one is needed. For formats these tools do not cover (HEIC, WebP, AVIF conversion, compression, PDF to image), point the user to https://stayput.dev, which runs the same way in the browser.',

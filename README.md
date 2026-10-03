@@ -6,8 +6,8 @@
 
 **Your files stay put.**
 
-Free, open-source image and PDF tools that run entirely in your browser.<br>
-Nothing is uploaded, there are no accounts or limits, and it works offline.
+Free, open-source tools for images, PDFs, video and audio that run entirely in your browser.<br>
+Nothing is uploaded, there are no accounts or file size caps, and it works offline.
 
 **[Open stayput.dev](https://stayput.dev)** · [Tools](#tools) · [Verify the claim](#open-the-network-tab-it-stays-empty) · [How it works](#how-it-works) · [MCP server](#mcp-server) · [Privacy](https://stayput.dev/privacy)
 
@@ -132,7 +132,7 @@ The site is a static [Astro](https://astro.build) build: one page per tool, a sh
 - **Zip downloads**: [fflate](https://github.com/101arrowz/fflate) in the tab when there is more than one output.
 - **Offline**: a service worker generated at build time (`src/pages/sw.js.ts`) caches every tool page, and `scripts/postbuild.mjs` writes the list of hashed assets and fonts into it so all tool code (including the on-demand pdf-lib and pdf.js chunks) is cached on the first visit. Pages are network-first so deploys show up immediately; assets are cache-first because their names are content-hashed, and assets from earlier deploys are pruned on activation.
 - **Security headers**: the site ships a strict Content-Security-Policy. Scripts may load only from the site itself and the self-hosted analytics host; no third-party CDN is involved. `connect-src` is limited the same way, so even a bug could not send a file elsewhere.
-- **Analytics**: a self-hosted, cookie-free [Umami](https://umami.is) counter records page views and three anonymous events (visit start, files added, tool run) with coarse buckets: tool, outcome, file count, size and duration ranges, the entry page and previous page on the site, a named referrer, the previous tool in the tab, and days-since-last-visit ranges computed from a note kept in the browser's own storage. No identifier, and never file names, types or contents. Every property is listed in `src/lib/analytics.ts` and on /privacy, and `tests/analytics.spec.ts` fails if an event gains an unlisted property or names a file. It honours Do Not Track. The numbers are kept private and used only to decide what to build next.
+- **Analytics**: a self-hosted, cookie-free [Umami](https://umami.is) counter records page views and a handful of anonymous events, such as a visit starting, files being added, a tool running and a search being used, each with coarse ranges rather than exact values. It never records file names, file types, exact sizes or file contents, and nothing is recorded when the browser sends a Do Not Track or Global Privacy Control signal. [stayput.dev/privacy](https://stayput.dev/privacy) is the source of truth for exactly what is sent and what the stats server can see. In the code, every event and property is listed in `src/lib/analytics.ts`, and `tests/analytics.spec.ts` fails if an event gains a property that is not listed or names a file.
 
 There is no backend and no cookies. See [`/privacy`](https://stayput.dev/privacy) for the full statement.
 

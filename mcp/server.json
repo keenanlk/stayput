@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.keenanlk/stayput",
-  "title": "StayPut",
+  "title": "Stayput",
   "description": "Local PDF and photo tools: merge, split, rotate, number PDFs; strip photo GPS. No uploads.",
   "websiteUrl": "https://stayput.dev/mcp",
   "repository": {
