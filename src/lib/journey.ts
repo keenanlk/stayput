@@ -75,6 +75,20 @@ const SOURCES: [RegExp, string][] = [
   [/(^|\.)dev\.to$/, 'devto'],
   [/(^|\.)alternativeto\.net$/, 'alternativeto'],
   [/(^|\.)indiehackers\.com$/, 'indiehackers'],
+  [/(^|\.)instagram\.com$/, 'instagram'],
+  [/(^|\.)youtube\.com$|^youtu\.be$/, 'youtube'],
+  [/(^|\.)tiktok\.com$/, 'tiktok'],
+  [/^(mastodon\.social|fosstodon\.org|mastodon\.online)$/, 'mastodon'],
+  [/^registry\.modelcontextprotocol\.io$/, 'mcpregistry'],
+  [/(^|\.)glama\.ai$/, 'glama'],
+  [/(^|\.)mcp\.so$/, 'mcpso'],
+  [/(^|\.)smithery\.ai$/, 'smithery'],
+  [/(^|\.)nologin\.tools$/, 'nologin'],
+  [/(^|\.)openalternative\.co$/, 'openalternative'],
+  [/(^|\.)opensourcealternative\.to$/, 'opensourcealternative'],
+  [/(^|\.)uneed\.best$/, 'uneed'],
+  [/(^|\.)peerlist\.io$/, 'peerlist'],
+  [/^discuss\.privacyguides\.net$/, 'privacyguides'],
 ];
 
 /** Name the referring site, or "direct"/"internal"/"other". Never returns a raw URL. */

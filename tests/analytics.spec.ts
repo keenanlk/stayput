@@ -105,6 +105,17 @@ test('the referring site is reduced to a known name', async ({ page }) => {
   expect(sourceOf('https://www.google.com/', 'stayput.dev')).toBe('google');
   expect(sourceOf('https://old.reddit.com/r/privacy/comments/abc/some_title/', 'stayput.dev')).toBe('reddit');
   expect(sourceOf('https://news.ycombinator.com/item?id=1', 'stayput.dev')).toBe('hackernews');
+  const named: [string, string][] = [
+    ['https://www.instagram.com/', 'instagram'], ['https://www.youtube.com/watch?v=1', 'youtube'], ['https://youtu.be/x', 'youtube'],
+    ['https://www.tiktok.com/@a', 'tiktok'], ['https://mastodon.social/@a/1', 'mastodon'], ['https://fosstodon.org/', 'mastodon'],
+    ['https://mastodon.online/', 'mastodon'], ['https://registry.modelcontextprotocol.io/', 'mcpregistry'], ['https://glama.ai/mcp', 'glama'],
+    ['https://mcp.so/server/x', 'mcpso'], ['https://smithery.ai/', 'smithery'], ['https://nologin.tools/', 'nologin'],
+    ['https://openalternative.co/', 'openalternative'], ['https://www.opensourcealternative.to/', 'opensourcealternative'],
+    ['https://uneed.best/', 'uneed'], ['https://peerlist.io/x', 'peerlist'], ['https://discuss.privacyguides.net/t/1', 'privacyguides'],
+    ['https://github.com/keenanlk/stayput', 'github'],
+  ];
+  for (const [url, name] of named) expect(sourceOf(url, 'stayput.dev'), url).toBe(name);
+  expect(sourceOf('https://notmastodon.social.example/', 'stayput.dev')).toBe('other');
   expect(sourceOf('https://someones-blog.example/post', 'stayput.dev')).toBe('other');
   expect(sourceOf('https://stayput.dev/guides', 'stayput.dev')).toBe('internal');
   void page;

@@ -16,6 +16,14 @@ const DATA_KEYS = new Set([
   'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format', 'error_class', 'page', 'kind', 'rank', 'via',
 ]);
 
+/** The values `ref` may take: a short source name, never a URL. */
+const REFS = new Set([
+  'direct', 'internal', 'other', 'google', 'bing', 'duckduckgo', 'yahoo', 'ecosia', 'brave', 'yandex', 'kagi', 'startpage', 'qwant',
+  'perplexity', 'chatgpt', 'claude', 'reddit', 'hackernews', 'producthunt', 'github', 'bluesky', 'x', 'facebook', 'linkedin', 'devto',
+  'alternativeto', 'indiehackers', 'instagram', 'youtube', 'tiktok', 'mastodon', 'mcpregistry', 'glama', 'mcpso', 'smithery', 'nologin',
+  'openalternative', 'opensourcealternative', 'uneed', 'peerlist', 'privacyguides',
+]);
+
 type Sent = { type: string; payload: Record<string, unknown> };
 
 /** Everything wrong with one analytics request body; empty when it is clean. */
@@ -28,6 +36,7 @@ function violations({ type, payload }: Sent): string[] {
   if (payload.hostname !== 'stayput.dev') bad.push(`hostname ${String(payload.hostname)}`);
   const data = (payload.data ?? {}) as Record<string, unknown>;
   for (const k of Object.keys(data)) if (!DATA_KEYS.has(k)) bad.push(`data.${k}`);
+  if ('ref' in data && !REFS.has(String(data.ref))) bad.push(`data.ref ${String(data.ref)}`);
   return bad;
 }
 
@@ -99,6 +108,8 @@ test('the checker rejects each kind of leak', () => {
     ['query string', { url: '/tools/x?q=1' }],
     ['fragment', { url: '/tools/x#top' }],
     ['full url', { url: 'https://stayput.dev/tools/x' }],
+    ['referrer url in ref', { data: { tool: 'x', ref: 'https://www.example.com/a' } }],
+    ['unknown ref name', { data: { tool: 'x', ref: 'example.com' } }],
     ['unlisted data key', { data: { tool: 'x', file_name: 'a.jpg' } }],
   ];
   for (const [what, extra] of leaks) expect(violations({ ...ok, payload: { ...ok.payload, ...extra } }), what).not.toEqual([]);
