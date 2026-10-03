@@ -1,4 +1,4 @@
-# StayPut MCP server
+# Stayput MCP server
 
 Local PDF and photo tools for Claude, Cursor, VS Code and any other app that speaks the [Model Context Protocol](https://modelcontextprotocol.io). Ask your assistant to merge PDFs, pull out pages, or remove the GPS location from a photo, and it does the work on your own machine.
 

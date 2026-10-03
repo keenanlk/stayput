@@ -12,13 +12,13 @@ const tools = [
   ['inspect_image_metadata', 'Show the GPS location, camera, capture time and other data hidden in a photo.'],
   ['strip_image_metadata', 'Write a copy of a photo with EXIF, GPS and XMP removed, without re-encoding it.'],
 ];
-const title = 'StayPut MCP Server: Local PDF and Photo Tools for AI Assistants';
+const title = 'Stayput MCP Server: Local PDF and Photo Tools for AI Assistants';
 const description = 'Let Claude, Cursor or VS Code merge, split and rotate PDFs and strip photo GPS data on your own machine. Free, open source, nothing uploaded.';
 const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'StayPut MCP server',
+    name: 'Stayput MCP server',
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Windows, macOS, Linux',
     description,
@@ -31,8 +31,8 @@ const jsonLd = [
 ---
 <Base title={title} description={description} jsonLd={jsonLd}>
   <article class="wrap-narrow prose page">
-    <h1>StayPut for AI assistants</h1>
-    <p>StayPut’s PDF and photo tools also come as an <a href="https://modelcontextprotocol.io" rel="noopener">MCP server</a>, so Claude, Cursor, VS Code and other assistants can use them on the files on your computer. Ask “merge the two invoices in Downloads” or “does this photo have my location in it?” and the work happens on your machine.</p>
+    <h1>Stayput for AI assistants</h1>
+    <p>Stayput’s PDF and photo tools also come as an <a href="https://modelcontextprotocol.io" rel="noopener">MCP server</a>, so Claude, Cursor, VS Code and other assistants can use them on the files on your computer. Ask “merge the two invoices in Downloads” or “does this photo have my location in it?” and the work happens on your machine.</p>
     <p>It runs the same code as this website. Your files are read from disk and written back to disk. <strong>Nothing is uploaded, and the server makes no network requests at all.</strong> It is free, open source and needs no account or API key.</p>
 
     <figure class="mcp-flow">

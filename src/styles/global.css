@@ -295,6 +295,13 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .privacy-note { font-size: 13.5px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
 .privacy-note svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--accent); }
 
+/* Home page demo video */
+.demo { margin-top: 64px; max-width: 900px; }
+.demo h2 { margin-bottom: 20px; }
+.demo figure { margin: 0; }
+.demo video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--field-deep); border-radius: var(--radius); }
+.demo figcaption { margin-top: 14px; font-size: 14px; color: var(--muted); max-width: 70ch; }
+
 /* Content sections: a heading column and a content column on wide screens */
 .section { margin-top: 88px; }
 .section > h2 { margin-bottom: 20px; }

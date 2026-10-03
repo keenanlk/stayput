@@ -53,7 +53,7 @@ test('llms.txt lists every tool and guide with working links', async ({ request 
   expect(res.status()).toBe(200);
   expect(res.headers()['content-type']).toContain('text/plain');
   const body = await res.text();
-  expect(body.startsWith('# StayPut\n\n> ')).toBe(true);
+  expect(body.startsWith('# Stayput\n\n> ')).toBe(true);
   for (const t of tools) expect(body).toContain(`](https://stayput.dev${toolPath(t)})`);
   for (const g of guides) expect(body).toContain(`](https://stayput.dev/guides/${g.slug})`);
   const paths = [...body.matchAll(/\]\(https:\/\/stayput\.dev(\/[^)]*)\)/g)].map((m) => m[1]!);

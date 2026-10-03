@@ -3,9 +3,9 @@ import Base from '../layouts/Base.astro';
 import { tools } from '../data/tools';
 
 const toolCount = tools.length;
-const oneLine = 'Free file tools that run in your browser. Nothing is uploaded.';
-const short = `Stayput is ${toolCount} free, open-source image and PDF tools that run entirely in the browser: HEIC to JPG, image conversion, EXIF removal, PDF merge, split, compress and sign. Nothing is uploaded.`;
-const paragraph = 'Stayput is a free, open-source toolkit for the file chores people search for every day: converting iPhone HEIC photos, converting, cropping and compressing images, removing location data from photos, and merging, splitting, compressing, rotating, reordering, signing and numbering PDFs. Every tool runs inside the browser tab using WebAssembly builds of well-known open-source libraries. There is no server doing the work, so files are never uploaded, there are no accounts, file limits or watermarks, and the site keeps working with the network off. The code is MIT-licensed on GitHub.';
+const oneLine = 'Convert HEIC and fix PDFs in your browser. Nothing uploaded.';
+const short = `${toolCount} free, open-source tools for images, PDFs, video and audio. They run in your browser, so your files are not uploaded. Works offline.`;
+const paragraph = `Stayput is a free, open-source toolkit of ${toolCount} tools for the file jobs people search for every day: converting HEIC photos, converting and compressing images, removing EXIF and GPS data, merging, splitting, compressing, signing and numbering PDFs, and compressing, trimming and converting video and audio. Every tool runs inside the browser tab. There is no backend, so your files are not uploaded. There are no accounts, no watermarks and no file size caps beyond what your device can hold. After one visit the site keeps working with the network off. The code is MIT on GitHub.`;
 
 const logos = [
   { file: 'stayput-wordmark-light', label: 'Wordmark, for light backgrounds', ground: 'light', wide: true },
@@ -87,8 +87,8 @@ const colors = [
       <dl class="press-facts">
         <dt>Site</dt><dd><a href="https://stayput.dev">stayput.dev</a></dd>
         <dt>Source code</dt><dd><a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>, MIT license</dd>
-        <dt>Tools</dt><dd>{toolCount} image and PDF tools, plus format-specific converters</dd>
-        <dt>Price</dt><dd>Free. No accounts, no ads, no paid tier, no file limits, no watermarks.</dd>
+        <dt>Tools</dt><dd>{toolCount} tools for images, PDFs, video and audio, plus format-specific converters</dd>
+        <dt>Price</dt><dd>Free. No accounts, no ads, no paid tier, no watermarks, and no file size caps beyond what your device can hold.</dd>
         <dt>Offline</dt><dd>Works offline after the first visit and installs as an app.</dd>
         <dt>How</dt><dd>A static site. The work happens in the browser with WebAssembly builds of libheif, pdf.js, pdf-lib and other open-source code.</dd>
         <dt>Analytics</dt><dd>Self-hosted and cookie-free; never sees files or file names. Details on the <a href="/privacy">privacy page</a>.</dd>

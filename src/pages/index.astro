@@ -73,6 +73,18 @@ const jsonLd = [
     </div>
   </section>
 
+  <section class="wrap demo" aria-labelledby="demo-h">
+    <h2 id="demo-h">Watch it with the network tab open</h2>
+    <figure>
+      <video controls muted playsinline preload="none" width="1280" height="720" data-poster="/media/stayput-network-tab-poster.webp" aria-label="Demo: three photos convert on Stayput while a network panel lists every request, then the same conversion runs again offline">
+        <source src="/media/stayput-network-tab.webm" type="video/webm" />
+        <source src="/media/stayput-network-tab.mp4" type="video/mp4" />
+        Your browser can't play this video. The text below describes it.
+      </video>
+      <figcaption>Three HEIC photos convert to JPG while a network panel lists every request the page makes. None of the requests carries a photo. Then the network is switched off and the same photos convert again. The video has captions and no sound; it runs 23 seconds.</figcaption>
+    </figure>
+  </section>
+
   <section class="wrap popular" id="tools" aria-labelledby="popular-h">
     <div class="index-head">
       <h2 id="popular-h">Most used</h2>
@@ -136,3 +148,26 @@ const jsonLd = [
     <ul class="guide-list guide-grid">{guides.slice(0, 6).map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}</ul>
   </section>
 </Base>
+
+<script>
+  // The poster is a 100 kB image below the fold; fetch it only when the visitor scrolls near it,
+  // so it does not compete with the hero for bandwidth.
+  const video = document.querySelector<HTMLVideoElement>('.demo video[data-poster]');
+  if (video) {
+    const load = () => {
+      video.poster = video.dataset.poster!;
+      video.removeAttribute('data-poster');
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          load();
+        }
+      }, { rootMargin: '400px' });
+      io.observe(video);
+    } else {
+      load();
+    }
+  }
+</script>

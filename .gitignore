@@ -11,3 +11,6 @@ tests/fixtures/generated/
 # launch asset output (npm run launch-assets); kept outside this repo
 /launch/
 public/vendor/
+
+# internal work log written by outside tooling
+worklog.jsonl
