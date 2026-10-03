@@ -425,7 +425,7 @@ export const guides: Guide[] = [
       {
         h: 'What Stayput looks like in the panel',
         p: [
-          'On any Stayput tool you will see the page and its scripts load, on the HEIC and JPEG XL pages one larger GET for the decoder program, and one small anonymous page-count request. After you add files: nothing, apart from that same small count when a tool finishes, which names the tool and a size bucket and never a file name. Each tool page also runs this count for you and lists the requests under "Open the network tab. Your files never appear in it." The site is [open source](https://github.com/keenanlk/stayput), so the third check is reading the code.',
+          'On any Stayput tool you will see the page and its scripts load, on the HEIC and JPEG XL pages one larger GET for the decoder program, and a few small anonymous usage-count requests to our own stats server. After you add files: nothing, apart from the same small counts when you add files and when a tool finishes, which name the tool and give size ranges and never a file name. Each tool page also runs this count for you and lists the requests under "Open the network tab. Your files never appear in it." The site is [open source](https://github.com/keenanlk/stayput), so the third check is reading the code.',
         ],
       },
       {
@@ -2788,7 +2788,7 @@ export const guides: Guide[] = [
       {
         h: 'Where iLovePDF still has the edge',
         p: [
-          'iLovePDF\'s OCR, Office document conversion and legally binding e-signature workflow are more capable than what runs client-side today, and its desktop app is a reasonable private option if you need those specifically. For everyday merging, splitting, compressing, signing and organizing PDFs, a browser tool with no limits covers most of what people actually search for iLovePDF to do.',
+          'iLovePDF\'s OCR, Office document conversion and legally binding e-signature workflow are more capable than what runs client-side today, and its desktop app is a reasonable private option if you need those specifically. For everyday merging, splitting, compressing, signing and organizing PDFs, a browser tool with no file size caps covers most of what people actually search for iLovePDF to do.',
         ],
       },
     ],

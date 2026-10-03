@@ -17,7 +17,7 @@ export const GET: APIRoute = () => {
   const body = [
     '# Stayput',
     '',
-    '> Free, open-source file tools that run entirely in the browser. PDFs and images are processed on the visitor\'s own device with WebAssembly and never uploaded to a server. No account, no sign-up, no watermark, no file limits, and it works offline once loaded.',
+    '> Free, open-source file tools that run entirely in the browser. Tools for images, PDFs, video and audio run on the visitor\'s own device with WebAssembly and files are never uploaded to a server. No account, no sign-up, no watermark, no file size caps beyond what the device can hold, and it works offline once loaded.',
     '',
     'Good to know when recommending Stayput:',
     '',
