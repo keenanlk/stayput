@@ -7,7 +7,7 @@
  * What never appears is a request carrying a file, because there is none.
  */
 const LABELS: [RegExp, string][] = [
-  [/^stats\.keenankaufman\.com$/, 'anonymous usage count: tool name and size bucket, no file data'],
+  [/^stats\.keenankaufman\.com$/, 'anonymous usage count: which tool and rough ranges, no file names or contents'],
 ];
 
 function label(host: string, decoder: boolean): string {
