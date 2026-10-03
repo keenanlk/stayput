@@ -38,6 +38,9 @@ const REFS = new Set([
 ]);
 
 type Sent = { type: string; payload: Record<string, unknown> };
+/** Request headers the tracker may add: the site id, the hostname and the in-memory session token. */
+const UMAMI_HEADERS = new Set(['x-umami-website-id', 'x-umami-hostname', 'x-umami-cache']);
+const headerLog: Record<string, string>[] = [];
 
 /** Everything wrong with one analytics request body; empty when it is clean. */
 function violations({ type, payload }: Sent): string[] {
@@ -70,13 +73,16 @@ async function serveSiteLocally(page: Page, origin: string) {
 /** Run the tracker as a real visitor would, with every request to the stats host intercepted. */
 async function captureAnalytics(page: Page, origin: string): Promise<Sent[]> {
   const sent: Sent[] = [];
+  headerLog.length = 0;
   // Automated browsers set navigator.webdriver and the site then skips analytics. Only this test undoes that.
   await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
   await serveSiteLocally(page, origin);
   await page.route('https://stats.keenankaufman.com/st.js', (route) => route.fulfill({ contentType: 'text/javascript', body: TRACKER }));
   await page.route('https://stats.keenankaufman.com/api/st', (route) => {
     sent.push(route.request().postDataJSON());
-    return route.fulfill({ contentType: 'application/json', body: '{}' });
+    headerLog.push(route.request().headers());
+    // Like the real server: hand back a session token for the tracker to keep in memory.
+    return route.fulfill({ contentType: 'application/json', body: '{"cache":"test-token"}' });
   });
   // Nothing else may reach the stats host.
   await page.route(/^https:\/\/stats\.keenankaufman\.com\/(?!st\.js$|api\/st$)/, (route) => route.abort());
@@ -102,6 +108,10 @@ test('page view, files added and tool run send only the documented fields', asyn
     expect(s.payload.website).toBe('52e5e00a-c867-497a-9f44-14c769361768');
     expect(s.payload.url).toBe('/tools/strip-exif');
   }
+  // Only the documented request headers, and the token goes back after the first reply.
+  for (const h of headerLog) for (const k of Object.keys(h)) if (k.startsWith('x-umami-')) expect(UMAMI_HEADERS.has(k), k).toBe(true);
+  expect(headerLog[0]!['x-umami-cache']).toBeUndefined();
+  expect(headerLog.at(-1)!['x-umami-cache']).toBe('test-token');
   const raw = JSON.stringify(sent);
   for (const secret of ['example.com', 'secret-term', 'token=abc', 'section', 'photo']) expect(raw).not.toContain(secret);
 });
@@ -123,6 +133,8 @@ test('search and next-step events send only what /privacy lists, and never the t
   await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBeGreaterThan(0);
   await page.locator('#next-steps a').first().click();
   await expect.poll(() => sent.filter((s) => s.payload.name === 'next_step').length).toBeGreaterThan(0);
+  await page.waitForURL((u) => !u.pathname.endsWith('/tools/strip-exif'));
+  await page.waitForLoadState('load');
   await page.waitForFunction(() => 'umami' in window);
   // The install prompt cannot be triggered in a test; send the event the way install.ts does.
   await page.evaluate(() => (window as unknown as { umami: { track(n: string): void } }).umami.track('pwa_install'));
