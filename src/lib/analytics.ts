@@ -58,9 +58,10 @@ const UMAMI_WEBSITE = '52e5e00a-c867-497a-9f44-14c769361768';
  * Add the Umami script unless this visit should not be counted:
  * - automated browsers (Playwright, Puppeteer, Selenium set navigator.webdriver),
  *   so our own tests, audits and checks never count as visitors;
+ * - browsers sending Global Privacy Control (Do Not Track is left to Umami, below);
  * - browsers opted out with stayput.dev/#notrack (sets Umami's own
  *   "umami.disabled" flag; #track undoes it).
- * Umami itself also drops known bot user agents and honours Do Not Track.
+ * Umami itself also drops known bot user agents and honours Do Not Track (data-do-not-track).
  * What is sent is limited by beforeSend (analytics-payload.ts).
  */
 export function loadAnalytics(): void {
@@ -72,7 +73,7 @@ export function loadAnalytics(): void {
       history.replaceState(null, '', location.pathname + location.search);
       alert(off ? 'Visits from this browser will not be counted.' : 'Visits from this browser will be counted again.');
     }
-    if (navigator.webdriver || localStorage.getItem('umami.disabled')) return;
+    if (navigator.webdriver || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl || localStorage.getItem('umami.disabled')) return;
   } catch {
     // Storage blocked: fall through and let Umami decide.
   }
