@@ -118,7 +118,7 @@ export const guides: Guide[] = [
       {
         h: 'On Android',
         p: [
-          'In the Camera app settings, turn off **Location tags** (Samsung) or **Save location** (Pixel). For an existing photo in Google Photos, open it, swipe up or tap the info button, tap the pencil next to the location, and choose **Remove location**. Some manufacturers\' gallery apps have the same option under Details.',
+          'In the Camera app settings, turn off **Location tags** (Samsung) or **Save location** (Pixel). Google Photos can change or remove only estimated locations and ones you added yourself; a location your camera recorded cannot be removed there. On Samsung, tick **Remove Location data** in the share options in Gallery to leave it out of what you send. The [Android guide](/guides/remove-exif-data-from-android-photos) has the details.',
         ],
       },
       {
@@ -4082,6 +4082,244 @@ export const guides: Guide[] = [
       { q: 'What is the difference between grayscale and pure black and white?', a: 'Grayscale keeps a full range of grey tones between black and white; pure black and white (sometimes called "threshold" or "1-bit") maps every pixel to either fully black or fully white, which suits scanned documents and signatures better than photos.' },
       { q: 'Can I convert several photos to black and white at once?', a: 'Yes, Stayput\'s black and white photo tool supports batch processing for multiple photos in one pass.' },
       { q: 'Does converting to black and white reduce the file size?', a: 'Slightly, since a grayscale image needs less colour data than a full-colour one, though the effect on file size is usually modest compared to other compression.' },
+    ],
+  },
+  {
+    slug: "remove-exif-data-from-photos-on-windows",
+    title: "How to Remove Metadata (EXIF) From a Photo on Windows",
+    description: "Remove metadata, EXIF and GPS data from photos on Windows: the File Explorer option, what it leaves alone, and a lossless way to clean a whole folder in your browser.",
+    heading: "How to remove metadata from a photo on Windows",
+    dek: "File Explorer can strip some metadata from a photo. Here is how, what it does not promise, and how to clean a whole folder without re-saving the pictures.",
+    keywords: ["remove metadata from photo windows","remove exif data windows", "remove exif data windows 11", "remove metadata from photo windows 10", "strip exif windows", "delete exif data from image windows"],
+    updated: "2026-10-03",
+    tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
+    sections: [
+      {
+        h: "The built-in way: Remove Properties and Personal Information",
+        p: ["File Explorer has a metadata scrubber, and it works on several photos at once. Select one or more photos, right-click and choose **Properties**, open the **Details** tab and click **Remove Properties and Personal Information** at the bottom. Microsoft's only published description of this dialog that we found is an archived tip written for Windows 7, so what you see may differ a little on your version of Windows.", "The dialog gives you two choices:"],
+        list: ["**Create a copy with all possible properties removed.** The default. Windows makes a copy with the word Copy added to the file name and strips every property it is able to change for that file type. Your original keeps its metadata.", "**Remove the following properties from this file.** You tick the properties to delete and click OK, and they are removed from the original permanently. A property with no check box next to it is one Windows cannot edit."],
+      },
+      {
+        h: "What it does not do",
+        p: ["Explorer only removes the properties it knows how to edit. Microsoft's own description is that it \"zeroes out metadata\" and does nothing about the contents of the picture, and anything it does not list stays in the file. It is a reasonable first pass for sharing a photo with a friend. For a photo where the location matters, do not take the result on trust: look at the copy's Details tab, or drop it on the [EXIF viewer](/tools/exif-viewer), which also lists fields Explorer does not show.", "If the Details tab shows few properties, or a HEIC photo from an iPhone will not open at all, see [how to open HEIC files on Windows](/guides/open-heic-files-on-windows)."],
+      },
+      {
+        h: "Cleaning a whole folder without re-saving the pictures",
+        p: ["To remove everything in one pass, open the [EXIF remover](/tools/strip-exif), then drop in the photos, or click the drop area and press Ctrl-A in the file picker to choose the whole folder. Before anything is changed, the page lists what each photo contains and whether it has GPS coordinates. Click **Remove metadata** and download the cleaned copies one by one or all together as a zip.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "It reads JPG, PNG and WebP. HEIC photos are not supported by the remover, so convert those first with the [HEIC to JPG converter](/tools/heic-to-jpg), which leaves metadata out unless you tick the box to keep it.", "Everything happens inside your browser tab, so the photos never leave your device."],
+      },
+      {
+        h: "Check that it worked",
+        p: ["Drop a cleaned photo back on the [remover](/tools/strip-exif). It should report \"No removable metadata found\" and \"GPS location: no\". The [EXIF viewer](/tools/exif-viewer) gives the full field-by-field view. Keep your originals: you can always share a stripped copy, but you cannot put the date and camera details back once the only copy is clean. For what those fields are, see [what EXIF data is](/guides/what-is-exif-data)."],
+      },
+    ],
+    faq: [
+      { q: "Does right-click Properties remove all EXIF data?", a: "It removes the properties Windows can edit for that file type, which varies. It is not guaranteed to remove everything, so check the result with a viewer before you share a sensitive photo." },
+      { q: "Can I remove EXIF data from many photos at once on Windows?", a: "Yes. Select several files in File Explorer before opening Properties, or add a whole folder of photos to the [EXIF remover](/tools/strip-exif), which cleans them in one go and offers a zip." },
+      { q: "Why are there no check boxes in the Remove Properties dialog?", a: "A property without a check box is one Windows cannot edit, so it cannot remove it. Use the [EXIF remover](/tools/strip-exif), which cuts the metadata blocks out of the file itself." },
+      { q: "Is it safe to use a website to remove EXIF data?", a: "Only if the photo stays on your computer. The [Stayput remover](/tools/strip-exif) runs in your browser tab and the photo is not uploaded; you can confirm in the browser's network tab, or by switching to airplane mode after the page has loaded." },
+    ],
+  },
+  {
+    slug: "remove-exif-data-from-photos-on-mac",
+    title: "How to Remove Metadata and EXIF Data From Photos on a Mac",
+    description: "What Photos, Preview and the Terminal can do about photo metadata on a Mac, and a lossless way to strip EXIF and GPS from JPG, PNG and WebP in your browser.",
+    heading: "How to remove metadata from photos on a Mac",
+    dek: "Photos can hide a location, Preview can show or remove one, and neither touches the rest of the metadata. Here is what each does and how to strip a photo for sure.",
+    keywords: ["remove metadata from photo mac", "remove exif data mac", "strip exif macos", "mac remove gps from photo", "remove exif data mac terminal"],
+    updated: "2026-10-03",
+    tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
+    sections: [
+      {
+        h: "The Photos app: Hide Location",
+        p: ["In Photos, select the pictures, choose **Image**, **Location**, then **Hide Location**. Apple's Photos guide lists **Hide Location** and **Revert to Original Location** in that menu, and Revert brings it back, so the location is hidden from view rather than erased from your library.", "This only concerns location, not the date or the camera. Apple's guide also does not say what the file contains after you export or share it, so treat an exported photo as unchecked until you have looked at it (see below)."],
+      },
+      {
+        h: "Preview: see the location, or remove it",
+        p: ["Open a photo in Preview and choose **Tools**, **Show Location Info**, then click the **More Info** inspector button and the **GPS** tab. Apple's Preview guide documents this as a way to see where a photo was taken on a map. The command is dimmed when the photo has no location, which makes it a quick test for whether a photo carries GPS data. In that same Inspector section Preview also has a **Remove Location Info** button (next to **Change Location Info**). Apple's Preview guide describes only viewing, so treat the button as a location-only fix: it does not touch the date, the camera model or the other EXIF fields, and it is worth checking the saved file afterwards with the [EXIF viewer](/tools/exif-viewer)."],
+      },
+      {
+        h: "In the Terminal with ExifTool",
+        p: ["ExifTool is a free, open-source command-line program (not part of macOS). Once installed, `exiftool -all= photo.jpg` deletes all the metadata it can from that file and keeps the original as `photo.jpg_original`. Its FAQ recommends keeping the colour information when you do this, because removing it can change how an image displays. This is powerful and fine for scripts. For a handful of photos it is more setup than most people want."],
+      },
+      {
+        h: "The point-and-click way that checks itself",
+        p: ["Open the [EXIF remover](/tools/strip-exif) in Safari or any browser and drag the photos in from Finder. The page lists what each photo carries, whether it has GPS coordinates, the camera and the date, before it changes anything. Click **Remove metadata** and download the cleaned copies, or all of them in one zip.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "Photos from an iPhone or a recent camera may be HEIC. In Photos you can export them as JPEG (**File**, **Export**, Export Photos, then choose JPEG under **Photo Kind**) and drop the JPEGs on the remover, or use the [HEIC to JPG converter](/tools/heic-to-jpg). Everything happens inside your browser tab, so the photos never leave your device."],
+      },
+      {
+        h: "Check the result",
+        p: ["Drop a cleaned photo back on the [remover](/tools/strip-exif): it should report \"No removable metadata found\" and \"GPS location: no\". Keep the originals in Photos, and share the stripped copies. The [guide to viewing photo metadata](/guides/how-to-view-photo-metadata) explains how to inspect a photo in each Apple app, and [what EXIF data is](/guides/what-is-exif-data) lists the fields."],
+      },
+    ],
+    faq: [
+      { q: "Does Hide Location in Photos remove the GPS data from the file?", a: "Apple describes it as hiding the location in Photos, and Revert to Original Location restores it, so the original file still has it. Apple does not say what an exported or shared copy contains. Run the copy through the [EXIF remover](/tools/strip-exif) to be sure." },
+      { q: "Can Preview remove location data?", a: "Yes, location only: Preview's Inspector has a Remove Location Info button. Apple's Preview guide documents viewing the location (Tools, Show Location Info), not the button, and the date and camera details stay. Use the [EXIF remover](/tools/strip-exif) to remove everything, and check the result with the [EXIF viewer](/tools/exif-viewer)." },
+      { q: "Will removing EXIF data change how the photo looks?", a: "Not for a JPG, PNG or WebP cleaned with the [EXIF remover](/tools/strip-exif): the picture data is copied unchanged. The only exception is a sideways photo with the orientation option ticked, which is re-encoded." },
+      { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline. ExifTool is a separate install." },
+    ],
+  },
+  {
+    slug: "remove-exif-data-from-iphone-photos",
+    title: "How to Remove Metadata and EXIF Data From iPhone Photos",
+    description: "Remove location, metadata and other EXIF data from iPhone photos: the Share sheet and Photos options, what they cover, and how to strip everything before you post.",
+    heading: "How to remove metadata from iPhone photos",
+    dek: "Apple's built-in options handle location. For the date, device and everything else, here is how to strip a photo before you post it.",
+    keywords: ["remove metadata from photo iphone", "remove location from photo iphone", "remove exif data iphone", "strip metadata iphone", "remove location from iphone photo before sharing", "delete exif data iphone photo"],
+    updated: "2026-10-03",
+    tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
+    sections: [
+      {
+        h: "When you share: turn Location off",
+        p: ["In the Camera or Photos app, select one or more photos and tap the share button, then tap **Options** and switch **Location** off (it then reads \"Location Not Included\"). Tap **Done** and share as usual. This is the method in Apple's guide to managing location metadata in Photos.", "It is a location control. Apple's guide does not say the date or the camera model are also dropped, so do not assume they are."],
+      },
+      {
+        h: "For a photo already in your library",
+        p: ["Open the photo in **Photos**, tap the more button, choose **Adjust Info**, then **Adjust Location**, then **No Location**. That follows Apple's guide, which does not state a minimum iOS version, and menu wording has shifted between versions, so if you do not see it, swipe up on the photo or tap the info button and look for an Adjust option next to the location. The change is made to the photo in your library, not to copies you already sent."],
+      },
+      {
+        h: "Stop new photos recording location",
+        p: ["To keep future photos from carrying a location at all, go to Settings, Privacy & Security, Location Services, Camera and choose **Never**. The [guide to turning off location tags](/guides/turn-off-location-tags-on-photos) covers Pixel and Samsung phones as well."],
+      },
+      {
+        h: "To remove everything, not just the location",
+        p: ["Apple's steps above deal with location. To remove the date, device and the rest of the EXIF block, open the [EXIF remover](/tools/strip-exif) in Safari and choose your photos. The page shows what each one contains, including whether it has GPS coordinates, before you click **Remove metadata**.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "iPhones save photos as HEIC by default, and the remover will tell you it cannot clean HEIC files losslessly. For those, use the [HEIC to JPG converter](/tools/heic-to-jpg): the JPG it makes has no metadata unless you tick \"Keep EXIF metadata\". Converting to JPG is a lossy step (the default quality is 92), while stripping a photo that is already a JPG is not. The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "Everything happens inside your browser tab, so the photos never leave your device."],
+      },
+      {
+        h: "Check before you post",
+        p: ["Drop the result back on the [remover](/tools/strip-exif) or on the [EXIF viewer](/tools/exif-viewer): it should say \"GPS location: no\". Apps differ in what they strip when you upload, so cleaning the photo yourself is the dependable option. For the fields involved, see [what EXIF data is](/guides/what-is-exif-data), and for the other platforms, the [location removal guide](/guides/remove-location-data-from-photos)."],
+      },
+    ],
+    faq: [
+      { q: "Does the iPhone Share sheet remove all metadata?", a: "Apple's steps describe a Location switch under Options, which leaves the location out of what you share. They do not claim the other EXIF fields are removed." },
+      { q: "How do I remove EXIF data from an iPhone photo for free without an app?", a: "Use the [EXIF remover](/tools/strip-exif) in Safari for JPG, PNG and WebP, or the [HEIC to JPG converter](/tools/heic-to-jpg) for HEIC photos. Both run in the browser and the photos are not uploaded." },
+      { q: "Does converting HEIC to JPG remove EXIF data?", a: "Using the [HEIC to JPG converter](/tools/heic-to-jpg) with \"Keep EXIF metadata\" left unticked, yes: the JPG has no metadata. Tick the box and the original EXIF block is copied across." },
+      { q: "Will turning off Location Services for Camera hide where my old photos were taken?", a: "No. It affects photos taken afterwards. Photos you have already taken keep the location they recorded until you remove it." },
+    ],
+  },
+  {
+    slug: "remove-exif-data-from-android-photos",
+    title: "How to Remove Metadata and EXIF Data From Android Photos",
+    description: "Remove location, metadata and EXIF data from Android photos: Samsung's share option, why Google Photos cannot remove a camera-recorded location, and how to strip it all.",
+    heading: "How to remove metadata from Android photos",
+    dek: "Samsung can drop the location when you share. Google Photos cannot remove one your camera recorded. Here is what works, and how to strip everything.",
+    keywords: ["remove exif data android", "remove metadata from photo android", "remove location from photo samsung", "strip metadata android", "remove gps from photo android pixel"],
+    updated: "2026-10-03",
+    tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
+    sections: [
+      {
+        h: "Samsung Gallery: remove location data when sharing",
+        p: ["In the Gallery app, long-press a photo to select it, tap any others you want, tap the **Share** icon and tick **Remove Location data**, then choose the app to send with. Samsung's guide says the receiving phone then cannot see the location when it swipes up on the photo. Samsung's page covers One UI 3.0 and later, and other regions' pages may differ.", "It is a location control for that share. It is not described as removing the date or the phone model, and the photo in your Gallery keeps its location."],
+      },
+      {
+        h: "Google Photos cannot remove a location your camera recorded",
+        p: ["Google Photos has an **Edit location** option, but Google's help is explicit: you can only change or remove estimated locations and locations you added yourself. If your camera added the location, you cannot update or remove it in Google Photos. That is the usual case for a photo you took, so do not rely on it for that.", "Google also notes that your Google Photos edits do not travel with a copy you download and send, which carries whatever the file recorded."],
+      },
+      {
+        h: "Stop new photos recording location",
+        p: ["On a Pixel, open Camera, tap Settings, **More settings** and turn off **Save location**. On a Samsung, open the camera settings and turn off **Location tags**. The [guide to turning off location tags](/guides/turn-off-location-tags-on-photos) has the details and other manufacturers' names for the setting."],
+      },
+      {
+        h: "Remove everything from a photo",
+        p: ["Open the [EXIF remover](/tools/strip-exif) in Chrome or Samsung Internet and choose your photos. The page lists what each contains, including whether it has GPS coordinates, then **Remove metadata** gives you cleaned copies to download.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "Android cameras mostly save JPG, which the remover handles. If yours saves HEIC, convert first with the [HEIC to JPG converter](/tools/heic-to-jpg). Everything happens inside your browser tab, so the photos never leave your device."],
+      },
+      {
+        h: "Check before you post",
+        p: ["Drop the result on the [remover](/tools/strip-exif) or the [EXIF viewer](/tools/exif-viewer) to confirm \"GPS location: no\", especially if the photo is going somewhere that keeps metadata, such as email or a cloud link. The [guide to viewing photo metadata](/guides/how-to-view-photo-metadata) covers the Android and other built-in panels."],
+      },
+    ],
+    faq: [
+      { q: "Why can't I remove the location in Google Photos?", a: "Google Photos only edits estimated locations and ones you added. A location your camera recorded cannot be changed or removed there. Remove it from the file with the [EXIF remover](/tools/strip-exif)." },
+      { q: "Does Samsung's Remove Location data change the original photo?", a: "It applies to the copy you share. Samsung's guide describes it as a step in sharing, and the photo in Gallery is not described as being changed." },
+      { q: "How do I remove EXIF data from Android photos for free?", a: "Open the [EXIF remover](/tools/strip-exif) in your browser, choose the photos and download the cleaned copies. It is free and the photos are not uploaded." },
+      { q: "Does the EXIF remover work on every Android photo?", a: "On JPG, PNG and WebP. HEIC files need converting first with the [HEIC to JPG converter](/tools/heic-to-jpg)." },
+    ],
+  },
+  {
+    slug: "turn-off-location-tags-on-photos",
+    title: "How to Turn Off Location Tags on Photos (iPhone, Pixel and Samsung)",
+    description: "Stop your phone saving GPS coordinates in photos: the setting on iPhone, Pixel and Samsung, what you lose by turning it off, and how to clean old photos.",
+    heading: "How to stop your phone putting your location in photos",
+    dek: "One setting in the camera decides whether every photo carries GPS coordinates. Here is where it is on iPhone, Pixel and Samsung.",
+    keywords: ["turn off geotagging iphone", "how to turn off location tags on photos", "disable geotagging android", "stop photos saving location", "turn off location on camera"],
+    updated: "2026-10-03",
+    tools: ["exif-viewer", "strip-exif", "remove-location-from-photos"],
+    sections: [
+      {
+        h: "Why turn it off at the camera",
+        p: ["Removing location from each photo before you share it works, but it relies on you remembering every time. The camera setting keeps location out of new photos in the first place. You can still remove it from photos you already took, which is covered further down."],
+      },
+      {
+        h: "iPhone and iPad",
+        p: ["Go to **Settings**, **Privacy & Security**, **Location Services**, **Camera** and choose **Never**. Apple's guide says location metadata can be collected only if the Camera app has access to Location Services, so with Never it cannot be."],
+      },
+      {
+        h: "Google Pixel",
+        p: ["Open the **Camera** app, tap **Settings** at the bottom left, then **More settings**, and turn off **Save location**. Google's Pixel Camera help says photos and videos then no longer carry location data."],
+      },
+      {
+        h: "Samsung Galaxy and other Android phones",
+        p: ["Open the camera's settings and turn off **Location tags** on a Samsung. Google's help lists the other names: **Store location data** (OnePlus), **Geographic locations** (Vivo) and **Save location info** (Xiaomi). Phone makers move these settings around between versions, so if you cannot find it, search the camera settings for \"location\"."],
+      },
+      {
+        h: "What you lose",
+        p: ["Google notes that photos without a location may not appear in Google Photos' map view, location searches or trip-based Memories. Turning the setting back on later restores it for new photos only. Apple lists no such trade-off for iPhone in the guide above, but apps that sort photos by place will not have a place to sort by."],
+      },
+      {
+        h: "Photos you already took still have it",
+        p: ["The setting is not retroactive: earlier photos keep the location they recorded. To clean them, follow the [iPhone](/guides/remove-exif-data-from-iphone-photos) or [Android](/guides/remove-exif-data-from-android-photos) guide, or drop them on the [EXIF remover](/tools/strip-exif), which shows what each photo contains and removes the metadata from JPG, PNG and WebP without re-compressing the picture. Everything happens inside your browser tab, so the photos never leave your device."],
+      },
+      {
+        h: "Check a new photo",
+        p: ["Take a photo and drop it on the [EXIF viewer](/tools/exif-viewer): with the setting off, it should show no GPS location. If it still does, the photo came from another app or an older file. For the full list of fields, read [what EXIF data is](/guides/what-is-exif-data)."],
+      },
+    ],
+    faq: [
+      { q: "Does turning off location tags hide where my old photos were taken?", a: "No. It only affects new photos. Remove the location from older ones with the [EXIF remover](/tools/strip-exif)." },
+      { q: "Is turning off geotagging the same as turning off Location Services?", a: "No. On an iPhone you can set only the Camera to Never and leave Location Services on for maps. On Pixel and Samsung the setting lives in the camera app." },
+      { q: "Do other camera apps follow this setting?", a: "The settings above are for the phone's own camera. Other camera apps have their own options, so check a photo from them with the [EXIF viewer](/tools/exif-viewer)." },
+      { q: "Will the date and phone model still be in the photo?", a: "Yes. These settings control location. The date, device and camera settings stay until you remove them with the [EXIF remover](/tools/strip-exif)." },
+    ],
+  },
+  {
+    slug: "does-discord-reddit-or-instagram-remove-exif-data",
+    title: "Does Discord, Reddit or Instagram Remove EXIF Data? What's Documented",
+    description: "Do social apps remove the metadata and GPS location from photos you post? What the platforms document as of October 2026, why the answer varies, and how to be sure.",
+    heading: "Do Discord, Reddit and Instagram remove EXIF data from photos?",
+    dek: "Nobody documents it well, and the answer can differ by file type and how you send the photo. Here is what we could verify, how to test it, and the safe way.",
+    keywords: ["does discord remove exif data", "does reddit remove exif data", "does instagram remove exif data", "does whatsapp remove metadata from photos", "do social media sites remove metadata"],
+    updated: "2026-10-03",
+    tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
+    sections: [
+      {
+        h: "The short answer",
+        p: ["It depends, and the platforms mostly do not say. This page is dated October 2026, and it deliberately does not give a yes or no for each app, because we could not back one with an official source. What is always true: a photo you clean yourself before posting carries no location, whatever the app does afterwards."],
+      },
+      {
+        h: "What we could and could not verify (as of October 2026)",
+        p: ["We looked for each platform's own help or support pages on whether photo uploads have their metadata removed, and did not find a page that states it for Discord, Reddit, Instagram or WhatsApp. Some of those support sites could not be read by our tools, so an official statement may exist that we missed.", "Plenty of published comparison tables say which apps strip metadata. The ones we checked in detail came from makers of metadata tools and did not describe how they tested: no dates, no sample files, no way to check that the result still holds. We do not repeat their per-app verdicts here. If you rely on a verdict, ask for the method behind it."],
+      },
+      {
+        h: "Why there is no simple answer",
+        p: ["A few things make any blanket claim unreliable, and they are properties of how services work rather than claims about a particular app:"],
+        list: ["**The service may re-encode the photo on upload.** Re-saving an image usually drops its metadata as a side effect. If the service instead passes the original file through, the metadata travels with it.", "**Photo and file modes can differ.** Apps that let you send a picture either as a photo or as a file or document may treat the two differently.", "**File type can matter.** A service that processes JPGs one way may handle PNG, WebP or HEIC files another way.", "**What other people download may differ from what the service keeps.** Removing metadata from the copy shown to others says nothing about the original the service stored.", "**It can change without notice.** A result that held last year may not hold after an app update."],
+      },
+      {
+        h: "Test it yourself in a few minutes",
+        p: ["You can check a specific app, file type and send mode on your own device. Take a photo of something unremarkable with location turned on (not your home), and confirm on the [EXIF viewer](/tools/exif-viewer) that it shows GPS coordinates. Send it to yourself or a friend in a private chat or message, in the mode you actually use, then save the copy the other side receives and drop it on the viewer.", "That tells you what that copy contained at that time, for that file type and mode. It does not tell you what the service stores, and it does not cover the public version of a post. It is a good check, but not a guarantee."],
+      },
+      {
+        h: "The dependable way: strip it before you post",
+        p: ["Open the [EXIF remover](/tools/strip-exif), add the photos and check the list of what each one contains, including whether it has GPS coordinates. Click **Remove metadata** and download the cleaned copies, or all of them in one zip. A cleaned copy has nothing for any platform to leak or keep.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "It reads JPG, PNG and WebP. HEIC photos are not supported by the remover, so convert those first with the [HEIC to JPG converter](/tools/heic-to-jpg), which leaves metadata out unless you tick the box to keep it. Everything happens inside your browser tab, so the photos never leave your device."],
+      },
+      {
+        h: "Related guides",
+        p: ["To see what a photo contains first, read [how to view photo metadata](/guides/how-to-view-photo-metadata) and [what EXIF data is](/guides/what-is-exif-data). For removing location on each device, see the [location removal guide](/guides/remove-location-data-from-photos), or [turn off location tags](/guides/turn-off-location-tags-on-photos) so new photos do not record it."],
+      },
+    ],
+    faq: [
+      { q: "Does Discord remove EXIF data?", a: "We found no Discord help page that says, as of October 2026, and behaviour may differ by file type. Clean the photo with the [EXIF remover](/tools/strip-exif) before you send it, or test the copy you receive with the [EXIF viewer](/tools/exif-viewer)." },
+      { q: "Does Reddit remove EXIF data from photos?", a: "We found no Reddit help page that states it, as of October 2026. Linking to an image hosted elsewhere is a separate case, because the file is hosted by someone else. Strip the photo first to be sure." },
+      { q: "Does Instagram remove metadata from photos?", a: "We found no Instagram help page that states what it removes, as of October 2026. The safe route is to remove the metadata yourself before uploading." },
+      { q: "Is sending a photo as a file different from sending it as a photo?", a: "It can be. Apps with both modes may handle them differently, and we found no official statement either way. Remove the metadata yourself, then the mode does not matter for location." },
     ],
   },
 ];
