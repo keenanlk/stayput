@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ['sb/**']
+    branches: [main, 'sb/**']
   pull_request:
 
 permissions:
@@ -10,10 +10,11 @@ permissions:
 
 # A push to a branch that also has an open pull request fires both events.
 # Both share one group per branch (head_ref for PRs, ref_name for pushes), so
-# the newer run cancels the older one and only one run completes.
+# the newer run cancels the older one and only one run completes. Runs on main
+# are never cancelled, so every merge keeps its own post-merge check.
 concurrency:
   group: ci-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build-and-test:
