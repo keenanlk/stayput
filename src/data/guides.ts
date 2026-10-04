@@ -4621,7 +4621,7 @@ export const guides: Guide[] = [
         p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP."],
         list: [
           "**Folders:** the paths inside the archive are kept, so files from a folder show as folder/name.",
-          "**Passwords:** type the password first if the archive is locked. In our test, a password-protected ZIP opened with the right password and showed an error with a wrong one. A password-protected 7z file did not open even with the correct password, so use 7-Zip for those. We could not test a locked RAR file.",
+          "**Passwords, as of October 2026:** a password-protected ZIP opens if you type the password first, and shows an error with a wrong one. A password-protected 7z did not open in our test, even with the correct password, so use 7-Zip for those. We have not confirmed whether a password-protected RAR opens, so do not count on it; WinRAR or The Unarchiver are the safer choice.",
           "**Split archives:** archives in parts, such as .part1.rar or .7z.001, are not supported.",
           "**Size:** the tool sets no size limit, but the archive is unpacked in your device's memory, so a very large one may not fit on a phone.",
         ],
