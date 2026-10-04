@@ -4817,6 +4817,235 @@ export const guides: Guide[] = [
       { q: "Can I rotate many photos at once?", a: "Yes. Drop them all on the [tool](/tools/rotate-image) and the same turn applies to each; several download as a zip." },
     ],
   },
+  {
+    slug: "how-to-convert-an-image-to-svg",
+    title: "How to Convert an Image to SVG (PNG or JPG, Step by Step)",
+    description: "Converting an image to SVG means tracing it into vector shapes. Here is what that does, when it works (logos, line art) and when it does not (photos), and how to do it in your browser without uploading.",
+    heading: "How to convert an image to SVG",
+    dek: "A PNG or JPG is a grid of pixels; an SVG is a set of shapes. Turning one into the other is called tracing. Here is what to expect, and the steps.",
+    keywords: ["convert image to svg", "how to convert png to svg", "how to convert jpg to svg", "vectorize an image", "trace an image to svg"],
+    updated: "2026-10-04",
+    tools: ["image-to-svg", "upscale-image"],
+    sections: [
+      {
+        h: "What converting to SVG really does",
+        p: ["A PNG or JPG stores a grid of coloured dots, so it turns soft and blocky when enlarged. An SVG stores shapes, such as outlines and fills, so it stays sharp at any size and a designer can edit one shape or change one colour. There is no exact conversion between the two. The software has to find the edge of every area of colour and draw a path around it, which is called tracing or vectorising.", "That means the SVG is an approximation. The Inkscape tutorial on tracing says the tracer's purpose is not to reproduce an exact duplicate of the original image, nor to produce a final product, but to give you a set of curves to work from. Expect to check the result and sometimes tidy it up."],
+      },
+      {
+        h: "When it works well, and when it does not",
+        p: ["Tracing suits flat artwork with clear edges: logos, icons, line drawings, signatures, text and clip art. A few solid colours become a few shapes, and the file is often smaller than the picture it came from."],
+        list: [
+          "**A logo:** a generated 600 by 600 PNG with three flat colours (4.0 KB) traced into 6 shapes in 3 colours, a 2.17 KB SVG.",
+          "**A photo or a smooth scene:** a generated 1200 by 800 picture with soft gradients and noise (a 66 KB JPG) traced in the most detailed style into 1,765 shapes in 32 colours, a 318 KB SVG, nearly five times bigger than the JPG. The result is poster-like, because every shade has to become a flat shape.",
+        ],
+        after: ["So a photo is better left as a JPG. If your picture is small or blurry, start from the biggest, cleanest copy you have: soft or compressed edges trace as wobbly outlines. If you only have a small copy, [the image upscaler](/tools/upscale-image) can enlarge it first."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [image to SVG tool](/tools/image-to-svg) takes JPG, PNG, WebP, HEIC, AVIF and JPEG XL images, one or several at once. If you only have a PNG, the [PNG to SVG page](/png-to-svg) opens the same tracer with the logo style chosen and its transparent background kept, and [JPG to SVG](/jpg-to-svg) is set up for drawings and signatures. The steps are:"],
+        list: [
+          "**1. Drop the image.** The first one is traced straight away and shown next to the original, so you can see the result before you download anything.",
+          "**2. Pick a style:** Black and white (two colours, for cutting, stencils and line art), Logo, few colours (up to 8 colours), or Detailed, many colours (up to 32).",
+          "**3. Leave out white** if you want a transparent background. Every white area is dropped, including the inside of letters such as o and a, which is usually right for a sticker or shirt print.",
+          "**4. Press Convert to SVG** and download. Several files download as a zip. Each keeps its name with .svg.",
+        ],
+        after: ["Each area of colour becomes a real path of lines and curves, not a picture wrapped inside an SVG file, so the result opens in Inkscape, Illustrator or Figma with editable shapes. The note under each download gives the size, the number of shapes and the number of colours, so you can tell at a glance whether the trace stayed simple. A very large image is traced at a reduced size (up to 1,000 pixels on the long side, 800 for Detailed) and the shapes are scaled back to the original width and height. A small image is enlarged first so the curves come out smooth.", "Everything happens inside your browser tab, in a background worker, so the image never leaves your device. That matters for logos that have not been released and for client artwork."],
+      },
+      {
+        h: "In Inkscape or Illustrator",
+        p: ["In Inkscape, which is free and open source, the tutorial on its website says to load or import the image, select it, and choose **Path, Trace Bitmap** (Shift+Alt+B). It offers several ways to decide what counts as black and white, and suggests **Path, Simplify** afterwards to cut the number of nodes so the result is easier to edit.", "Adobe's Illustrator help lists an Image Trace panel (Window, Image Trace) with presets such as Black and White, Low Color and High Color. Adobe's menus and presets change between versions, so check its current Image Trace page for the steps in the version you have. If you do not own Illustrator, the browser tool does the same kind of job for free."],
+      },
+      {
+        h: "Check the result",
+        p: ["Zoom in on the preview. Look for the holes in letters, thin lines that vanished, and stray specks around the edges. If the shapes are rough, try a different style or a bigger source image. If the result has far too many shapes, go down a style: Black and white and Logo give the cleanest edges. To go the other way, from SVG to an ordinary image, use the [SVG to PNG converter](/svg-to-png)."],
+      },
+    ],
+    faq: [
+      { q: "How do I convert a PNG to SVG?", a: "Drop the PNG on the [image to SVG tool](/tools/image-to-svg) or the [PNG to SVG page](/png-to-svg), choose Logo, few colours (or Black and white for a one-colour mark), check the preview, and press Convert to SVG. The shapes are traced on your device." },
+      { q: "Can I convert a photo to SVG?", a: "You can, with the Detailed style, but the result is a poster-like picture of thousands of shapes. In our test of a generated picture with soft gradients, the SVG was nearly five times the size of the JPG. Photos are better kept as JPG." },
+      { q: "Is the SVG really a vector?", a: "Yes. Each area of colour is traced into a path of lines and curves, so it stays sharp at any size. Some converters only wrap the original pixels in an SVG file, which stays blurry when enlarged." },
+      { q: "Is my image uploaded?", a: "No. The image is decoded and traced by code running in your browser tab, so it stays on your device." },
+    ],
+  },
+  {
+    slug: "how-to-brighten-a-photo",
+    title: "How to Brighten a Photo (iPhone, Android, Mac and Browser)",
+    description: "Lighten a dark photo: the built-in steps in Photos on iPhone and Mac and in Google Photos as of October 2026, and a browser tool with a live preview that brightens a whole batch without uploading.",
+    heading: "How to brighten a photo",
+    dek: "A dark photo can usually be saved in a few taps. Here are the steps on each device, and a way to fix a batch of them at once.",
+    keywords: ["how to brighten a photo", "how to brighten a dark photo", "make a picture brighter", "brighten an image online", "fix an underexposed photo"],
+    updated: "2026-10-04",
+    tools: ["adjust-image", "compress-image"],
+    sections: [
+      {
+        h: "On an iPhone",
+        p: ["Apple's iPhone guide gives these steps in the Photos app: open the photo and tap **Edit**, then tap **Adjust**. Swipe left under the photo to see the settings, such as Exposure, Brilliance or Highlights, tap one, and drag the slider. Tap **Done** to save, or tap the Enhance button to have the light and colour improved automatically. Tapping a setting's button compares the edited photo with the original."],
+      },
+      {
+        h: "On Android with Google Photos",
+        p: ["Google's Photos help says to tap **Edit**. Under **Adjust** it lists Brightness, Contrast, Saturation, Warmth and more, and you can also search for a tool by name. Tap and hold the preview to compare with the original. To save, tap **Save**, which changes the original, or **Save as copy**, which makes a new photo and leaves the original alone."],
+      },
+      {
+        h: "On a Mac",
+        p: ["In the Photos app, Apple's guide says to double-click the photo, click **Edit**, then **Adjust**. Drag the slider next to **Light**, or click **Auto**. Click **Options** under Light for finer sliders, including Brilliance, Exposure, Highlights, Shadows, Brightness, Contrast and Black Point.", "In Preview, Apple's guide to marking up images lists an Adjust color tool in the Markup toolbar, which changes an image's exposure, contrast, saturation and more, with an Auto Levels button and Reset All to go back."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [photo adjuster](/tools/adjust-image) works on a computer without those apps and on a whole set of photos at once. It takes JPG, PNG, WebP, HEIC, AVIF and JPEG XL images. The page [Brighten a dark photo](/brighten-photo) opens the same tool with Brightness already set to +35."],
+        list: [
+          "**Sliders:** Brightness, Contrast, Saturation and Warmth, each from -100 to +100, and Sharpen from 0 to 100, plus an Invert colours option. The picture updates as you move them, and holding the Hold to compare button shows the original.",
+          "**Brightness is a curve,** not a flat addition. Shadows and middle tones rise while black stays black and white stays white, so a bright sky is not turned into a flat white patch as it is when the same amount is added to every pixel.",
+          "**Batch:** the preview shows the first photo, and the same settings are applied to every photo you drop.",
+          "**Format:** keep the original format, or choose JPG, PNG or WebP. JPG and WebP are saved at the quality you set, 92 by default.",
+        ],
+        after: ["In our test, a generated dark picture with an average brightness of 45 out of 255 came out at 72 with Brightness at +50, saved as dark-adjusted.jpg. The photo is decoded, adjusted and saved once, so a JPG is compressed one time. The new file is written fresh, so the camera and location data in the original are not carried over; see [what EXIF data is](/guides/what-is-exif-data).", "Everything happens inside your browser tab, so the photos never leave your device."],
+      },
+      {
+        h: "Getting a good result",
+        p: ["Brighten a little and look at the dark and bright parts together. Lifting shadows also lifts the grain the camera recorded in them, so a heavily brightened night photo gets noisy. If it looks flat afterwards, add a little contrast; if a room lit by bulbs looks orange, move Warmth towards cooler. Parts of a photo that are pure white in the file hold no detail to bring back, and no brightness setting can recover them. To make the file smaller afterwards, see [how to reduce image size for email and uploads](/guides/reduce-image-size-for-email-and-uploads)."],
+      },
+    ],
+    faq: [
+      { q: "How do I brighten a photo on my iPhone?", a: "Open it in Photos, tap Edit, tap Adjust, swipe to a setting such as Exposure and drag the slider, then tap Done, per Apple's iPhone guide. For a batch, use the [photo adjuster](/tools/adjust-image) in the browser." },
+      { q: "Why does brightening make my photo look washed out or noisy?", a: "Lifting dark areas also lifts the noise in them and can make the colours look flat. Brighten less, add a little contrast or saturation, and avoid sharpening a heavily brightened night photo." },
+      { q: "Can I brighten many photos at once?", a: "Yes. Drop them all on the [photo adjuster](/tools/adjust-image); the same settings apply to every one when you press Apply. This suits a set taken in the same light." },
+      { q: "Are my photos uploaded?", a: "No. Each photo is adjusted by code running in your browser tab and never leaves your device." },
+    ],
+  },
+  {
+    slug: "how-to-make-a-pdf-black-and-white",
+    title: "How to Make a PDF Black and White (Grayscale, Text Kept)",
+    description: "Printing in black and white and having a black and white file are different jobs. Here is each, including a browser tool that turns a PDF grayscale on your device, keeps the text selectable and never uploads it.",
+    heading: "How to make a PDF black and white",
+    dek: "Choosing black and white when you print only changes the paper. If a portal or a printer wants the file itself in black and white, you need a converted copy.",
+    keywords: ["how to make a pdf black and white", "convert pdf to grayscale", "pdf to black and white", "print pdf in grayscale", "remove color from a pdf"],
+    updated: "2026-10-04",
+    tools: ["grayscale-pdf", "compress-pdf"],
+    sections: [
+      {
+        h: "Two different jobs",
+        p: ["**Printing in black and white** is a setting on the print job. The PDF itself stays in colour, and only the paper comes out grey. **A black and white file** is a copy of the PDF where the colour has been taken out, which is what some court, university and grant portals, and some print shops, ask you to send. The first needs no conversion; the second does."],
+      },
+      {
+        h: "Printing in black and white",
+        p: ["Apple's Mac guide to print settings lists a **Print in Color** option in the Print dialog, which appears only if your printer supports colour printing; turn it off for a black and white print. Other printers offer a black and white setting under their own options instead.", "Adobe's Acrobat help describes a **Print in Grayscale (Black and White)** option in the print dialog. Adobe's help also says the option is not in every version, and that many colour printers offer it in their own Properties dialog instead. Menus change, so look in your own print dialog and its Properties or Preferences button, as of October 2026."],
+      },
+      {
+        h: "Making a grayscale copy in the browser",
+        p: ["The [grayscale PDF tool](/tools/grayscale-pdf) opens one or several PDFs and writes a copy of each with every colour turned into its own shade of grey. There is nothing to set: press **Convert to grayscale** and download. The copy is named like the original with -grayscale added. The page [Convert a PDF to black and white](/black-and-white-pdf) opens the same tool."],
+        list: [
+          "**The text stays text.** The pages are not turned into pictures. A grey layer that removes colour is drawn over each page, so text can still be selected, searched and copied, and it stays sharp when you zoom in. Links and bookmarks are kept.",
+          "**Every colour becomes a grey of the same brightness,** in text, drawings and photos alike. Colours of similar brightness, such as a mid red and a mid green, can end up almost the same grey, so check charts and colour-coded tables.",
+          "**The file barely changes size.** Nothing is drawn again, so there are no page images to add.",
+          "**Comments and form fields** are drawn by your PDF reader on top of the page, so they can keep their colour. Flatten them into the page first if they must be grey too.",
+        ],
+        after: ["In our test, a generated two-page PDF with red and green boxes and blue text went from 1,219 bytes to 1,698 bytes. Rendering the first page showed 19,084 coloured pixels before and none after, and extracting the text from the result still returned the heading on each page. The result note reads \"text still selectable\" for every file, including a scan: a scanned PDF is a picture of each page, so it has no text to select in the first place.", "Everything happens inside your browser tab, so the document never leaves your device."],
+      },
+      {
+        h: "What this does not do",
+        p: ["When we rendered the result, it came out grey. It is made by drawing a grey layer over the original page content, not by rewriting the colours inside the file, so the colour is still stored underneath. A portal that only looks at how the pages appear will see grey. A checker that reads the colour information stored in the file may still report colour, and for that a converter that turns each page into a grey picture is the only route, at the cost of unselectable text and a bigger file. If a portal has a rule like that, check its instructions first. To make the copy smaller afterwards, use the [PDF compressor](/tools/compress-pdf)."],
+      },
+    ],
+    faq: [
+      { q: "How do I print a PDF in black and white?", a: "Turn off Print in Color in the Mac print dialog, or choose the grayscale or black and white option in your printer's settings or in Adobe Acrobat's print dialog. The PDF file itself stays in colour." },
+      { q: "Will the text in the grayscale PDF still be selectable?", a: "Yes. The [grayscale PDF tool](/tools/grayscale-pdf) does not turn pages into pictures, so text stays searchable, copyable and sharp at any zoom." },
+      { q: "Is the result black and white or grayscale?", a: "Grayscale: photos and coloured areas become shades of grey so they stay readable, and black text stays black. That is what most portals and print shops mean by black and white." },
+      { q: "Is my PDF uploaded?", a: "No. The PDF is converted by code in your browser tab and never leaves your device." },
+    ],
+  },
+  {
+    slug: "how-to-reduce-mp3-size",
+    title: "How to Reduce MP3 Size (Compress an MP3 File)",
+    description: "An MP3's size comes from its bitrate and its length. Here are the ways to make one smaller, measured results from a browser tool that compresses MP3s on your device, and how to fit a size limit.",
+    heading: "How to reduce MP3 size",
+    dek: "An MP3 gets smaller when you lower its bitrate, make it mono, shorten it, or switch format. Here is what each saves, with measured results.",
+    keywords: ["reduce mp3 size", "how to compress mp3", "make an mp3 smaller", "compress mp3 for email", "reduce audio file size"],
+    updated: "2026-10-04",
+    tools: ["compress-audio", "trim-audio", "audio-converter"],
+    sections: [
+      {
+        h: "What decides the size",
+        p: ["An MP3's size is its bitrate times its length. A 320 kbps file is about two and a half times the size of one at 128 kbps, however long it is. A smaller file means a lower bitrate, one channel instead of two, less audio, or a more efficient format. Making an MP3 smaller always means encoding it again, so some quality is lost; Audacity's manual warns that editing an MP3 and exporting it as MP3 loses quality twice, so keep a copy of the original."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [audio compressor](/tools/compress-audio) takes MP3, WAV, M4A, FLAC, OGG and other audio files, one or several at once. The [Compress MP3](/compress-mp3) page opens the same tool at 96 kbps. The options are:"],
+        list: [
+          "**Compression:** Light (160 kbps), Balanced (128 kbps), Small (96 kbps) or Smallest (64 kbps).",
+          "**Mono,** which gives the whole bitrate to one channel. It suits speech.",
+          "**Fit under:** 8 MB, 16 MB or 25 MB. The tool works out the bitrate from the length so that the file fits, using a lower one than your setting when it has to.",
+          "**Save as:** MP3, or OGG with Opus, which sounds better than MP3 at low bitrates but is not played by a few older players.",
+        ],
+        after: ["Several files download as a zip, and each keeps its name with -compressed added. Everything happens inside your browser tab, so the audio never leaves your device."],
+      },
+      {
+        h: "What it saves",
+        p: ["We tested a generated 60 second stereo clip of a tone with noise, encoded as a 320 kbps MP3 of 2.29 MB. The results, as shown by the tool:"],
+        list: [
+          "Light, 160 kbps: 1.14 MB, 50% smaller.",
+          "Balanced, 128 kbps: 938 KB, 60% smaller.",
+          "Small, 96 kbps: 704 KB, 70% smaller; as OGG Opus, 712 KB.",
+          "Smallest, 64 kbps with Mono: 469 KB, 80% smaller.",
+        ],
+        after: ["A 128 kbps MP3 of the same clip (938 KB) came out at 704 KB at Small, 25% smaller, and at Light the tool gave back the original file unchanged, with a note that it was already smaller than that setting would make it, rather than a bigger copy. A test tone is not music, so these figures show the sizes to expect and not how the result sounds: for speech, 64 to 96 kbps is usually fine, and for music stay at 128 kbps or more."],
+      },
+      {
+        h: "Fitting under a size limit",
+        p: ["Pick a Fit under size and leave the rest. The bitrate is the highest of 160, 128, 112, 96, 80, 64, 48 or 32 kbps, at or below your setting, that keeps the file under the limit, with 3% kept back for headers. An hour of audio needs about 54 kbps to fit in 25 MB, so it is written at 48 kbps, which is fine for speech, and works best with Mono ticked. If a very long file still comes out over the limit, the result says so and the answer is to split it, for example with [the MP3 trimmer](/guides/how-to-trim-an-mp3-file)."],
+      },
+      {
+        h: "In Audacity",
+        p: ["Audacity's manual says to open **File, Export Audio** and choose MP3. It offers variable, average and constant bit rate modes, and a default of about 170 to 210 kbps variable, which it says is not generally recommended for podcasts. Pick a lower setting or a lower fixed bit rate for a smaller file. To convert a WAV recording, see [how to convert WAV to MP3](/guides/how-to-convert-wav-to-mp3)."],
+      },
+    ],
+    faq: [
+      { q: "How do I reduce the size of an MP3?", a: "Drop it on the [audio compressor](/tools/compress-audio), choose a lower bitrate such as Small (96 kbps), or a size limit under Fit under, and press Compress. In our test, a 320 kbps MP3 came out 70% smaller at 96 kbps." },
+      { q: "How do I get an MP3 under 25 MB for email?", a: "Choose 25 MB (Gmail and Outlook) under Fit under, and tick Mono for speech. The tool picks the bitrate from the length of the audio so the file comes in under the limit." },
+      { q: "Does compressing an MP3 reduce the quality?", a: "Yes, a little: the file is decoded and encoded again at a lower bitrate. It is least noticeable for speech. Keep your original." },
+      { q: "Why did I get my original file back?", a: "If the new file would not be smaller, because the MP3 is already at or below the setting, the tool returns your original unchanged and says so." },
+      { q: "Is my audio uploaded?", a: "No. The sound is decoded and encoded again by code in your browser tab, so it stays on your device." },
+    ],
+  },
+  {
+    slug: "how-to-turn-audio-into-a-video",
+    title: "How to Turn Audio into a Video (MP3 to MP4 for YouTube)",
+    description: "YouTube does not take an MP3 on its own, as of October 2026. Here is how to turn a song, podcast or voice note into an MP4 with a cover picture, in your browser, without uploading it.",
+    heading: "How to turn audio into a video",
+    dek: "To put a song, a podcast episode or a voice note on YouTube, you need a video. Here is how to make one from the sound and a single picture.",
+    keywords: ["how to turn audio into video", "how to make mp3 to mp4", "audio to video with a picture", "put music on youtube", "podcast to video"],
+    updated: "2026-10-04",
+    tools: ["audio-to-video", "compress-video"],
+    sections: [
+      {
+        h: "Why you need a video",
+        p: ["YouTube's help page on supported file formats says that audio files, such as MP3, WAV or PCM, cannot be uploaded to create a YouTube video, and suggests converting the audio to a video with video editing software, as of October 2026. Other sites and apps may have the same rule, so check theirs. The usual answer is a video that holds one still picture, such as the album cover, for as long as the sound plays."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [audio to video tool](/tools/audio-to-video) makes that video. The [MP3 to MP4 page](/mp3-to-mp4) is the converter for the same job, set up for one MP3 and a cover. The steps are:"],
+        list: [
+          "**1. Drop the sound and a picture.** The sound can be MP3, WAV, M4A, AAC, OGG, Opus or FLAC, and the picture JPG, PNG, WebP or HEIC. Without a picture, the video shows the file's name as a title on a plain background.",
+          "**2. Choose the shape:** wide 16:9 (1920 by 1080) for YouTube, square (1080 by 1080) for feeds, or tall 9:16 (1080 by 1920) for vertical video. The picture is shown whole, over a blurred copy of itself, or over plain black or white.",
+          "**3. Press Make video.** The MP4 downloads when it is ready, named like the sound file.",
+        ],
+        after: ["To make a video of every track on an album, drop all the tracks and one cover: each track becomes its own video with the same picture. Dropping two or more pictures gives an error, since one picture is shown for the whole video."],
+      },
+      {
+        h: "What you get",
+        p: ["The result is a standard MP4. In our test in Chromium the picture was H.264 and the sound AAC. In our test, a generated 60 second MP3 (938 KB) with a picture came out as a 1.73 MB wide MP4 at 1920 by 1080, and 1.39 MB as a tall 1080 by 1920 video with no picture. The sound is encoded again as AAC, which loses a little quality. The picture does not change, so the video is a single frame once a second, which costs almost nothing, and nearly all of the file is the sound. There is no watermark and no length limit set by the tool.", "Everything happens inside your browser tab, so a song you have not released, or a private recording, never leaves your device."],
+      },
+      {
+        h: "When you want more than a still picture",
+        p: ["This tool makes a still-picture video only: no waveform, no moving background, no lyrics. For those, use a video editor. In Clipchamp on Windows, Microsoft's help says to drag audio files into **My media**, add them to the timeline, and export at 480p, 720p, 1080p or 4K. If the finished video is too big to upload, see [how to compress a video without losing quality](/guides/how-to-compress-a-video-without-losing-quality). To go the other way and take the sound out of a video, see [how to convert a video to MP3](/guides/how-to-convert-a-video-to-mp3)."],
+      },
+    ],
+    faq: [
+      { q: "How do I turn an MP3 into a video?", a: "Drop the MP3 and a cover picture on the [audio to video tool](/tools/audio-to-video), choose the shape, and press Make video. You get an MP4 that shows the picture for the length of the sound." },
+      { q: "Can I upload an MP3 to YouTube?", a: "Not as a video. YouTube's help says audio files such as MP3 cannot be uploaded to create a video, as of October 2026, so make an MP4 first." },
+      { q: "Can I make a video with a moving background or a waveform?", a: "Not with this tool, which makes a still-picture video. Use a video editor for moving pictures or a waveform." },
+      { q: "Are my files uploaded?", a: "No. The sound is decoded and the video is written by code in your browser tab, so neither file leaves your device." },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
