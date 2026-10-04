@@ -22,6 +22,7 @@ import {
   WEBM,
   WebMOutputFormat,
 } from 'mediabunny';
+import { executeWatched } from './encoder-watchdog';
 import { unplayable } from './video-compress';
 
 export interface TrimOptions {
@@ -63,8 +64,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
       throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot cut this video.');
     }
-    conversion.onProgress = (p) => opts.onProgress?.(p);
-    await conversion.execute();
+    await executeWatched(conversion, opts.onProgress);
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     return { blob: new Blob([buffer], { type: outFormat.mimeType }), ext: outFormat.fileExtension.replace(/^\./, ''), duration: opts.end - opts.start };

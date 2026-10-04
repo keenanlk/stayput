@@ -22,6 +22,7 @@ import {
   getFirstEncodableAudioCodec,
   type Quality,
 } from 'mediabunny';
+import { executeWatched } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 
 export type CompressMode = 'balanced' | 'small' | 'high' | 'size';
@@ -140,8 +141,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
         throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
       }
-      conversion.onProgress = (p) => onProgress?.(p);
-      await conversion.execute();
+      await executeWatched(conversion, onProgress);
       const buffer = output.target.buffer;
       if (!buffer) throw new Error('The video could not be written.');
       return buffer;

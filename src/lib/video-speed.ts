@@ -23,6 +23,7 @@ import {
   getFirstEncodableAudioCodec,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
+import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { timeStretch } from './stretch';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
@@ -82,32 +83,41 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
     const soundLen = feed.length;
     const pushSoundUntil = (seconds: number) => feed.until(seconds);
 
-    const sink = new VideoSampleSink(video);
-    const start = await video.getFirstTimestamp();
-    let lastKept = -Infinity;
     let end = 0;
-    for await (const sample of sink.samples()) {
-      const t = (sample.timestamp - start) / speed;
-      const d = sample.duration / speed;
-      // Faster than 60 frames a second only makes the file bigger; drop the extra frames.
-      if (t < lastKept + 1 / MAX_FPS - 1e-4) {
-        sample.close();
-        continue;
-      }
-      lastKept = t;
-      sample.setTimestamp(t);
-      sample.setDuration(d);
-      sample.setRotation(0);
-      await pushSoundUntil(t);
-      await videoSource.add(sample);
-      end = Math.max(end, t + d);
-      sample.close();
-      opts.onProgress?.(Math.min(0.99, t / Math.max(0.001, duration / speed)));
-    }
-    await pushSoundUntil(Infinity);
-    videoSource.close();
-    audioSource?.close();
-    await output.finalize();
+    await watchEncode(
+      async (progress) => {
+        const report = (f: number) => {
+          progress(f);
+          opts.onProgress?.(f);
+        };
+        const sink = new VideoSampleSink(video);
+        const start = await video.getFirstTimestamp();
+        let lastKept = -Infinity;
+        for await (const sample of sink.samples()) {
+          const t = (sample.timestamp - start) / speed;
+          const d = sample.duration / speed;
+          // Faster than 60 frames a second only makes the file bigger; drop the extra frames.
+          if (t < lastKept + 1 / MAX_FPS - 1e-4) {
+            sample.close();
+            continue;
+          }
+          lastKept = t;
+          sample.setTimestamp(t);
+          sample.setDuration(d);
+          sample.setRotation(0);
+          await pushSoundUntil(t);
+          await videoSource.add(sample);
+          end = Math.max(end, t + d);
+          sample.close();
+          report(Math.min(0.99, t / Math.max(0.001, duration / speed)));
+        }
+        await pushSoundUntil(Infinity);
+        videoSource.close();
+        audioSource?.close();
+        await output.finalize();
+      },
+      () => output.cancel(),
+    );
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     opts.onProgress?.(1);

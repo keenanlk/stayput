@@ -24,6 +24,7 @@ import {
   type Rotation,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
+import { executeWatched } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 
 export interface EditOptions {
@@ -195,8 +196,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
       throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot edit this video.');
     }
-    conversion.onProgress = (p) => opts.onProgress?.(p);
-    await conversion.execute();
+    await executeWatched(conversion, opts.onProgress);
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     const kept = !opts.mute && !!sound && !conversion.discardedTracks.some((d) => d.track.isAudioTrack());

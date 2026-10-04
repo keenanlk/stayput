@@ -25,6 +25,7 @@ import {
   getFirstEncodableAudioCodec,
   type VideoSamplePixelFormat,
 } from 'mediabunny';
+import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
@@ -117,44 +118,53 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
     await output.start();
     const feed = pcmFeeder(audioSource, audioSource ? sound : null);
 
-    // Size the window so its frames fit in memory (4:2:0 frames take 1.5 bytes a pixel).
-    const fps = Math.max(1, packets / total);
-    const window = Math.min(2, Math.max(0.1, WINDOW_BYTES / (width * height * 1.5 * fps)));
-    const sink = new VideoSampleSink(video);
-    let lastT = Infinity;
-    for (const [start, stop] of reverseWindows(keys, first, end, window)) {
-      const held: Held[] = [];
-      for await (const sample of sink.samples(start, stop)) {
-        // A frame that straddles a window edge comes back twice; keep the first copy.
-        if (sample.timestamp >= lastT || sample.timestamp >= stop || !sample.format) {
-          sample.close();
-          continue;
+    await watchEncode(
+      async (progress) => {
+        const report = (f: number) => {
+          progress(f);
+          opts.onProgress?.(f);
+        };
+        // Size the window so its frames fit in memory (4:2:0 frames take 1.5 bytes a pixel).
+        const fps = Math.max(1, packets / total);
+        const window = Math.min(2, Math.max(0.1, WINDOW_BYTES / (width * height * 1.5 * fps)));
+        const sink = new VideoSampleSink(video);
+        let lastT = Infinity;
+        for (const [start, stop] of reverseWindows(keys, first, end, window)) {
+          const held: Held[] = [];
+          for await (const sample of sink.samples(start, stop)) {
+            // A frame that straddles a window edge comes back twice; keep the first copy.
+            if (sample.timestamp >= lastT || sample.timestamp >= stop || !sample.format) {
+              sample.close();
+              continue;
+            }
+            // Only the visible part: coded frames can carry a few rows of padding.
+            const r = sample.visibleRect;
+            const rect = { x: r.left, y: r.top, width: r.width, height: r.height };
+            const data = new ArrayBuffer(sample.allocationSize({ rect }));
+            await sample.copyTo(data, { rect });
+            held.push({ data, format: sample.format, codedWidth: r.width, codedHeight: r.height, timestamp: sample.timestamp, duration: sample.duration });
+            sample.close();
+          }
+          held.sort((a, b) => b.timestamp - a.timestamp);
+          for (const h of held) {
+            const d = h.duration || 1 / fps;
+            const t = Math.max(0, total - (h.timestamp - first) - d);
+            const frame = new VideoSample(h.data, { format: h.format, codedWidth: h.codedWidth, codedHeight: h.codedHeight, timestamp: t, duration: d });
+            await feed.until(t);
+            await videoSource.add(frame);
+            frame.close();
+            lastT = Math.min(lastT, h.timestamp);
+            report(Math.min(0.99, t / total));
+          }
+          held.length = 0;
         }
-        // Only the visible part: coded frames can carry a few rows of padding.
-        const r = sample.visibleRect;
-        const rect = { x: r.left, y: r.top, width: r.width, height: r.height };
-        const data = new ArrayBuffer(sample.allocationSize({ rect }));
-        await sample.copyTo(data, { rect });
-        held.push({ data, format: sample.format, codedWidth: r.width, codedHeight: r.height, timestamp: sample.timestamp, duration: sample.duration });
-        sample.close();
-      }
-      held.sort((a, b) => b.timestamp - a.timestamp);
-      for (const h of held) {
-        const d = h.duration || 1 / fps;
-        const t = Math.max(0, total - (h.timestamp - first) - d);
-        const frame = new VideoSample(h.data, { format: h.format, codedWidth: h.codedWidth, codedHeight: h.codedHeight, timestamp: t, duration: d });
-        await feed.until(t);
-        await videoSource.add(frame);
-        frame.close();
-        lastT = Math.min(lastT, h.timestamp);
-        opts.onProgress?.(Math.min(0.99, t / total));
-      }
-      held.length = 0;
-    }
-    await feed.until(Infinity);
-    videoSource.close();
-    audioSource?.close();
-    await output.finalize();
+        await feed.until(Infinity);
+        videoSource.close();
+        audioSource?.close();
+        await output.finalize();
+      },
+      () => output.cancel(),
+    );
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     opts.onProgress?.(1);
