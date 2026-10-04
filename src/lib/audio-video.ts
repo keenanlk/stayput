@@ -6,6 +6,7 @@
  * WebCodecs encoders write the file. Nothing leaves the tab.
  */
 import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource, getFirstEncodableAudioCodec } from 'mediabunny';
+import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
@@ -93,19 +94,28 @@ export async function audioToVideo(
 
   const canvas = new OffscreenCanvas(frame.width, frame.height);
   drawStill(canvas.getContext('2d')!, frame, picture, opts.backdrop, opts.title);
-  // One frame a second: players show the same picture, and the file stays small.
-  for (let t = 0; t < duration; t += 1) {
-    const d = Math.min(1, duration - t);
-    const sample = new VideoSample(canvas, { timestamp: t, duration: d });
-    await feed.until(t);
-    await videoSource.add(sample);
-    sample.close();
-    opts.onProgress?.(Math.min(0.99, t / duration));
-  }
-  await feed.until(Infinity);
-  videoSource.close();
-  audioSource.close();
-  await output.finalize();
+  await watchEncode(
+    async (progress) => {
+      const report = (f: number) => {
+        progress(f);
+        opts.onProgress?.(f);
+      };
+      // One frame a second: players show the same picture, and the file stays small.
+      for (let t = 0; t < duration; t += 1) {
+        const d = Math.min(1, duration - t);
+        const sample = new VideoSample(canvas, { timestamp: t, duration: d });
+        await feed.until(t);
+        await videoSource.add(sample);
+        sample.close();
+        report(Math.min(0.99, t / duration));
+      }
+      await feed.until(Infinity);
+      videoSource.close();
+      audioSource.close();
+      await output.finalize();
+    },
+    () => output.cancel(),
+  );
   const buffer = output.target.buffer;
   if (!buffer) throw new Error('The video could not be written.');
   opts.onProgress?.(1);

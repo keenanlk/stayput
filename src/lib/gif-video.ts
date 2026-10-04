@@ -7,6 +7,7 @@
  * mp4-muxer (MIT). Nothing leaves the tab.
  */
 import { parseGIF, decompressFrame, type ParsedGif } from 'gifuct-js';
+import { EncoderStall, watchEncode } from './encoder-watchdog';
 import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 
 type GifFrame = Parameters<typeof decompressFrame>[0];
@@ -123,6 +124,8 @@ export async function gifToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promi
     try {
       return await encode(job, config, candidate);
     } catch (e) {
+      // A silent encoder is not a reason to wait through the next codec as well.
+      if (e instanceof EncoderStall) throw e;
       console.warn(`${candidate.codec} failed, trying the next codec:`, e);
       lastError = e;
     }
@@ -177,43 +180,49 @@ async function encode(job: Job, config: VideoEncoderConfig, candidate: Candidate
   let t = 0; // microseconds
   let n = 0;
   try {
-    for (let play = 0; play < plays; play++) {
-      cctx.clearRect(0, 0, gw, gh);
-      for (const [i, frame] of frames.entries()) {
-        if (failure) throw failure;
-        const f = decompressFrame(frame, gif.gct, true);
-        const { left, top, width: fw, height: fh } = f.dims;
-        // Disposal 3 puts back whatever was there before this frame once it has been shown.
-        const restore = f.disposalType === 3 ? cctx.getImageData(0, 0, gw, gh) : undefined;
-        if (fw > 0 && fh > 0) {
-          if (patch.width !== fw || patch.height !== fh) {
-            patch.width = fw;
-            patch.height = fh;
+    await watchEncode(
+      async (progress) => {
+        for (let play = 0; play < plays; play++) {
+          cctx.clearRect(0, 0, gw, gh);
+          for (const [i, frame] of frames.entries()) {
+            if (failure) throw failure;
+            const f = decompressFrame(frame, gif.gct, true);
+            const { left, top, width: fw, height: fh } = f.dims;
+            // Disposal 3 puts back whatever was there before this frame once it has been shown.
+            const restore = f.disposalType === 3 ? cctx.getImageData(0, 0, gw, gh) : undefined;
+            if (fw > 0 && fh > 0) {
+              if (patch.width !== fw || patch.height !== fh) {
+                patch.width = fw;
+                patch.height = fh;
+              }
+              pctx.putImageData(new ImageData(new Uint8ClampedArray(f.patch), fw, fh), 0, 0);
+              cctx.drawImage(patch, left, top);
+            }
+            octx.fillStyle = job.background;
+            octx.fillRect(0, 0, width, height);
+            octx.drawImage(comp, 0, 0, width, height);
+            poster ??= await createImageBitmap(out);
+
+            const duration = delays[i]! * 1000;
+            const vf = new VideoFrame(out, { timestamp: t, duration });
+            encoder.encode(vf, { keyFrame: n % keyEvery === 0 });
+            vf.close();
+            t += duration;
+            n++;
+            if (f.disposalType === 2) cctx.clearRect(left, top, fw, fh);
+            else if (restore) cctx.putImageData(restore, 0, 0);
+
+            // Let the encoder catch up rather than queueing hundreds of frames in memory.
+            while (encoder.encodeQueueSize > 8 && !failure) await new Promise((r) => setTimeout(r, 4));
+            progress(n / total);
+            job.onProgress?.(n / total);
           }
-          pctx.putImageData(new ImageData(new Uint8ClampedArray(f.patch), fw, fh), 0, 0);
-          cctx.drawImage(patch, left, top);
         }
-        octx.fillStyle = job.background;
-        octx.fillRect(0, 0, width, height);
-        octx.drawImage(comp, 0, 0, width, height);
-        poster ??= await createImageBitmap(out);
-
-        const duration = delays[i]! * 1000;
-        const vf = new VideoFrame(out, { timestamp: t, duration });
-        encoder.encode(vf, { keyFrame: n % keyEvery === 0 });
-        vf.close();
-        t += duration;
-        n++;
-        if (f.disposalType === 2) cctx.clearRect(left, top, fw, fh);
-        else if (restore) cctx.putImageData(restore, 0, 0);
-
-        // Let the encoder catch up rather than queueing hundreds of frames in memory.
-        while (encoder.encodeQueueSize > 8 && !failure) await new Promise((r) => setTimeout(r, 4));
-        job.onProgress?.(n / total);
-      }
-    }
-    await encoder.flush();
-    if (failure) throw failure;
+        await encoder.flush();
+        if (failure) throw failure;
+      },
+      () => encoder.close(),
+    );
   } catch (e) {
     poster?.close();
     throw e;

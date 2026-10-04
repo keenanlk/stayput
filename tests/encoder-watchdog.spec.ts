@@ -179,13 +179,19 @@ async function silentEncoderPage(page: Page) {
   );
 }
 
-for (const tool of ['compress-video', 'resize-video']) {
+const STUCK: [string, string][] = [
+  ['compress-video', './fixtures/static/clip.webm'],
+  ['resize-video', './fixtures/static/clip.webm'],
+  ['reverse-video', './fixtures/static/clip.webm'],
+  ['gif-to-mp4', './fixtures/generated/anim.gif'],
+];
+for (const [tool, fixture] of STUCK) {
   test(`${tool} turns a stuck encoder into a plain message, resets the bar and sends only the error kind`, async ({ page }) => {
     await silentEncoderPage(page);
     await page.goto(`/tools/${tool}`);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     // Two files: the second is not left to wait out the same silence.
-    const clip = fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url));
+    const clip = fileURLToPath(new URL(fixture, import.meta.url));
     await page.locator('#file-input').setInputFiles([clip, clip]);
     await page.locator('#run').click();
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 30_000 });
