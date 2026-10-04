@@ -37,6 +37,9 @@ const REFS = new Set([
   'openalternative', 'opensourcealternative', 'uneed', 'peerlist', 'privacyguides',
 ]);
 
+/** An error kind is a class name only: letters and digits, at most 40, never a sentence. */
+const ERROR_CLASS = /^[A-Za-z][A-Za-z0-9]{0,39}$/;
+
 type Sent = { type: string; payload: Record<string, unknown> };
 /** Request headers the tracker may add: the site id, the hostname and the in-memory session token. */
 const UMAMI_HEADERS = new Set(['x-umami-website-id', 'x-umami-hostname', 'x-umami-cache']);
@@ -58,6 +61,7 @@ function violations({ type, payload }: Sent): string[] {
     if (!event) bad.push(`event ${String(payload.name)}`);
     else for (const k of Object.keys(data)) if (!event.keys.includes(k)) bad.push(`${String(payload.name)}.${k}`);
   }
+  if ('error_class' in data && !ERROR_CLASS.test(String(data.error_class))) bad.push(`data.error_class ${String(data.error_class)}`);
   if ('ref' in data && !REFS.has(String(data.ref))) bad.push(`data.ref ${String(data.ref)}`);
   return bad;
 }
@@ -114,6 +118,30 @@ test('page view, files added and tool run send only the documented fields', asyn
   expect(headerLog.at(-1)!['x-umami-cache']).toBe('test-token');
   const raw = JSON.stringify(sent);
   for (const secret of ['example.com', 'secret-term', 'token=abc', 'section', 'photo']) expect(raw).not.toContain(secret);
+});
+
+test('a failed run sends the original error class as the kind, with no message and no new keys', async ({ page, baseURL }) => {
+  const sent = await captureAnalytics(page, baseURL!);
+  // Make the tool itself throw a TypeError whose message carries a recognisable secret.
+  await page.addInitScript(() => {
+    (window as unknown as { OffscreenCanvas: unknown }).OffscreenCanvas = class {
+      constructor() {
+        throw new TypeError('secret-message-from-the-tool');
+      }
+    };
+  });
+  await page.goto(`${SITE}/tools/compress-gif`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fx('anim.gif'));
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('secret-message-from-the-tool');
+  await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
+  const run = sent.find((s) => s.payload.name === 'tool_run')!;
+  expect(violations(run), JSON.stringify(run)).toEqual([]);
+  const data = run.payload.data as Record<string, string>;
+  expect(data).toMatchObject({ tool: 'compress-gif', outcome: 'error', error_class: 'TypeError' });
+  const raw = JSON.stringify(sent);
+  for (const secret of ['secret-message', 'anim']) expect(raw).not.toContain(secret);
 });
 
 test('search and next-step events send only what /privacy lists, and never the typed words', async ({ page, baseURL }) => {
@@ -197,6 +225,9 @@ test('the checker rejects each kind of leak', () => {
     ['unlisted event', { name: 'surprise', data: { tool: 'x' } }],
     ['key from another event', { name: 'search_open', data: { page: '/', to: '/x' } }],
     ['page view with data', { name: undefined, data: { tool: 'x' } }],
+    ['error message as the kind', { data: { tool: 'x', error_class: 'Cannot read properties of undefined' } }],
+    ['file name as the kind', { data: { tool: 'x', error_class: 'holiday.gif' } }],
+    ['overlong kind', { data: { tool: 'x', error_class: 'A'.repeat(41) } }],
     ['unlisted data key', { data: { tool: 'x', file_name: 'a.jpg' } }],
   ];
   for (const [what, extra] of leaks) expect(violations({ ...ok, payload: { ...ok.payload, ...extra } }), what).not.toEqual([]);
