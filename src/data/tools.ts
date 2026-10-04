@@ -1985,7 +1985,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is the video file so small?',
-        a: 'The picture does not change, so the video part is a single still frame repeated once a second, which costs almost nothing. Nearly all of the file is the sound, at 192 kbps.',
+        a: 'The picture does not change, so the video part is a single still frame repeated once a second, which costs almost nothing. Nearly all of the file is the sound, encoded with a target of up to 192 kbps.',
       },
       {
         q: 'Can I make videos for a whole album at once?',
@@ -3700,7 +3700,7 @@ export const tools: Tool[] = [
     name: 'Grayscale PDF',
     title: 'Convert PDF to Grayscale, Text Kept, No Upload | Stayput',
     description:
-      'Turn a colour PDF into grayscale for printing or submission. Text stays selectable and sharp, and the file barely grows. Runs in your browser; nothing is uploaded.',
+      'Turn a colour PDF into grayscale for printing or submission. Text stays text and sharp (scanned pages are images and stay images), and the file barely grows. Runs in your browser; nothing is uploaded.',
     heading: 'Convert a PDF to grayscale',
     tagline: 'Every colour becomes its own shade of grey, and the text stays text.',
     category: 'pdf',
@@ -3721,11 +3721,11 @@ export const tools: Tool[] = [
       },
       {
         q: 'Will the text still be selectable?',
-        a: 'Yes. The pages are not turned into pictures. A grey layer that removes colour is placed over each page, so text can still be selected, searched and copied, and it stays sharp at any zoom.',
+        a: 'If the PDF has text, yes. The pages are not turned into pictures. A grey layer that removes colour is placed over each page, so text can still be selected, searched and copied, and it stays sharp at any zoom. A scanned PDF is made of page images with no text layer, so it stays that way unless it was run through OCR.',
       },
       {
         q: 'Why would I need a grayscale PDF?',
-        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo.',
+        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo. One caveat for strict checks: the pages look and print grey, but the original colour data stays inside the file, so a system that inspects colour spaces may still flag it. If a portal or print shop rejects the copy, print the PDF to a new PDF in greyscale from your PDF reader, or use a preflight tool.',
       },
       {
         q: 'Do different colours stay distinguishable?',
