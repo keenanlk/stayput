@@ -4915,7 +4915,7 @@ export const guides: Guide[] = [
   {
     slug: "how-to-make-a-pdf-black-and-white",
     title: "How to Make a PDF Black and White (Grayscale, Text Kept)",
-    description: "Printing in black and white and having a black and white file are different jobs. Here is each, including a browser tool that turns a PDF grayscale on your device, keeps the text selectable and never uploads it.",
+    description: "Printing in black and white and having a black and white file are different jobs. Here is each, including a browser tool that turns a PDF grayscale on your device, keeps real text selectable (scanned pages are images and stay images) and never uploads it.",
     heading: "How to make a PDF black and white",
     dek: "Choosing black and white when you print only changes the paper. If a portal or a printer wants the file itself in black and white, you need a converted copy.",
     keywords: ["how to make a pdf black and white", "convert pdf to grayscale", "pdf to black and white", "print pdf in grayscale", "remove color from a pdf"],
@@ -4948,7 +4948,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: "How do I print a PDF in black and white?", a: "Turn off Print in Color in the Mac print dialog, or choose the grayscale or black and white option in your printer's settings or in Adobe Acrobat's print dialog. The PDF file itself stays in colour." },
-      { q: "Will the text in the grayscale PDF still be selectable?", a: "Yes. The [grayscale PDF tool](/tools/grayscale-pdf) does not turn pages into pictures, so text stays searchable, copyable and sharp at any zoom." },
+      { q: "Will the text in the grayscale PDF still be selectable?", a: "If the PDF has text, yes. The [grayscale PDF tool](/tools/grayscale-pdf) does not turn pages into pictures, so text stays searchable, copyable and sharp at any zoom. Scanned pages are images and stay images, so there is no text to select in them unless the scan was OCR'd." },
       { q: "Is the result black and white or grayscale?", a: "Grayscale: photos and coloured areas become shades of grey so they stay readable, and black text stays black. That is what most portals and print shops mean by black and white." },
       { q: "Is my PDF uploaded?", a: "No. The PDF is converted by code in your browser tab and never leaves your device." },
     ],
