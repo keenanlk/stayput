@@ -4621,7 +4621,7 @@ export const guides: Guide[] = [
         p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP."],
         list: [
           "**Folders:** the paths inside the archive are kept, so files from a folder show as folder/name.",
-          "**Passwords, as of October 2026:** a password-protected ZIP opens if you type the password first, and shows an error with a wrong one. A password-protected 7z did not open in our test, even with the correct password, so use 7-Zip for those. We have not confirmed whether a password-protected RAR opens, so do not count on it; WinRAR or The Unarchiver are the safer choice.",
+          "**Passwords, as of October 2026:** a password-protected ZIP opens after you enter the password, so type it before pressing Extract; a wrong one shows an error. Encrypted 7z and RAR archives are not supported yet: in our tests they did not open even with the correct password. Use 7-Zip for an encrypted 7z, and WinRAR or The Unarchiver for an encrypted RAR.",
           "**Split archives:** archives in parts, such as .part1.rar or .7z.001, are not supported.",
           "**Size:** the tool sets no size limit, but the archive is unpacked in your device's memory, so a very large one may not fit on a phone.",
         ],
@@ -4634,7 +4634,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: "How do I open a RAR file on a Mac?", a: "Apple's help only describes ZIP files, so install a free app such as The Unarchiver, or drop the file on the [archive extractor](/tools/archive-extractor) in a browser." },
-      { q: "How do I open a 7z file?", a: "Windows 11, version 24H2 opens 7z files in File Explorer per Microsoft's support page. Elsewhere, use 7-Zip on Windows or the [archive extractor](/tools/archive-extractor) in any browser. The tool did not open a password-protected 7z in our test." },
+      { q: "How do I open a 7z file?", a: "Windows 11, version 24H2 opens 7z files in File Explorer per Microsoft's support page. Elsewhere, use 7-Zip on Windows or the [archive extractor](/tools/archive-extractor) in any browser. Encrypted 7z and RAR archives are not supported yet (in our tests they did not open even with the correct password), but password-protected ZIP files open after you enter the password." },
       { q: "Can I open a RAR file on my phone?", a: "Not with the built-in Files by Google app, which supports ZIP only. A browser works: the [archive extractor](/tools/archive-extractor) runs on the phone itself." },
       { q: "Is my archive uploaded?", a: "No. The archive is opened by code running in your browser tab, so it and the files inside stay on your device." },
     ],
