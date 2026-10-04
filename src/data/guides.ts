@@ -4322,6 +4322,274 @@ export const guides: Guide[] = [
       { q: "Is sending a photo as a file different from sending it as a photo?", a: "It can be. Apps with both modes may handle them differently, and we found no official statement either way. Remove the metadata yourself, then the mode does not matter for location." },
     ],
   },
+  {
+    slug: "how-to-add-text-to-a-photo",
+    title: "How to Add Text to a Photo or Image (Phone, Windows, Mac or Browser)",
+    description: "Put words on a photo or screenshot: the built-in way on iPhone, Android, Windows and Mac as of October 2026, and a browser tool that handles fonts, outlines and batches without uploading.",
+    heading: "How to add text to a photo",
+    dek: "Every phone and computer can do it, but the controls differ and the text is often hard to read on a busy picture. Here is each built-in way, and a private browser option.",
+    keywords: ["how to add text to a photo", "add text to an image", "write on a picture", "put text on a photo online", "add caption to photo"],
+    updated: "2026-10-03",
+    tools: ["add-text-to-image", "watermark-image", "resize-image"],
+    sections: [
+      {
+        h: "On an iPhone",
+        p: ["Open the photo in Photos, tap **Edit**, tap the **Markup** button, then tap the **Add** button and choose text. Tap **Done** when you are finished, then **Done** again to save. Apple documents this on its Markup help page, as of October 2026."],
+      },
+      {
+        h: "On Android with Google Photos",
+        p: ["Open the photo in the Google Photos app and tap **Edit**, then **Markup**. Tap **Text**, type, and touch and hold the text box to drag it where you want it. Tap the checkmark, then **Save as copy** to keep the original. Google documents this on its Edit your photos page; on some phones you may need to tap **Edit**, **Tools**, then **Markup**."],
+      },
+      {
+        h: "On Windows with Paint",
+        p: ["Open the picture in Paint, choose the **Text** tool (the T icon), click where the words should start and type. The toolbar changes the font, size and colour. Paint is a basic editor: there is no outline or shadow option, so white or black text can disappear on a busy background."],
+      },
+      {
+        h: "On a Mac with Preview",
+        p: ["Open the image in Preview, show the Markup toolbar if it is hidden, click the **Text** button, type, and drag the text box into place. Apple warns that once you save an annotated image you cannot edit, move or delete the annotations, so keep a copy of the original or work on a duplicate."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [add text to image tool](/tools/add-text-to-image) opens a live preview of your picture. Type a line of text, and an optional second line for a caption at the other end, then drag either one into place or use the Top, Middle, Bottom and Corner buttons."],
+        list: [
+          "**Look:** five fonts (bold sans, a meme-style Impact face, serif, handwriting and typewriter), a colour picker with quick swatches, a size slider, an opacity slider and an ALL CAPS switch.",
+          "**Readability:** outline, shadow or a solid box behind the words, or none. White text with an outline reads on almost any photo.",
+          "**Output:** the same format as the original, or JPG, PNG or WebP, with a quality slider for the lossy ones. The text is drawn at the picture's full size, and the text size is a share of the picture, so it looks like the preview.",
+          "**Batches:** drop several pictures and the same text goes in the same place on each. The preview shows the first.",
+        ],
+        after: ["Everything happens inside your browser tab, so the photos never leave your device. The text becomes part of the picture, so keep the original if you may want to change the words later.", "One thing we checked on a test photo: a JPG that carried a camera model and a GPS position came out of the tool without them, because the picture is redrawn. Treat that as a side effect, not a promise. To clean a photo on purpose, use the [EXIF remover](/tools/strip-exif)."],
+      },
+      {
+        h: "Making text readable",
+        p: ["Pick a colour that contrasts with the area behind the words, and add an outline or a box if the background is busy. Keep the text away from the edges, because social apps crop photos differently. If you want the same words repeated across a photo as a mark of ownership, use the [watermark tool](/tools/watermark-image) instead, or read [how to add a watermark to a photo](/guides/how-to-add-a-watermark-to-a-photo)."],
+      },
+    ],
+    faq: [
+      { q: "Can I add text to a photo without an app?", a: "Yes. The [add text to image tool](/tools/add-text-to-image) runs in your browser on a phone or computer, so there is nothing to install, and the photo is not uploaded." },
+      { q: "Can I edit the text after I save the picture?", a: "Not in the saved picture: the words become part of the image. Keep your original, which is never changed, and run it again with new text." },
+      { q: "Can I put the same caption on many photos?", a: "Yes. Drop them all on the [add text to image tool](/tools/add-text-to-image) and the text is placed the same way on each one." },
+      { q: "Does adding text make the picture smaller or blurrier?", a: "The saved file is the same pixel size as the original. If the format is JPG or WebP it is saved again at the quality you choose (92 by default), and PNG output is lossless." },
+    ],
+  },
+  {
+    slug: "how-to-crop-a-video",
+    title: "How to Crop a Video (Make It Square or Vertical, or Cut Away the Edges)",
+    description: "Crop a video to square, 9:16 or any box: the built-in way on iPhone, Android and Windows as of October 2026, and a browser tool that crops on your device without uploading.",
+    heading: "How to crop a video",
+    dek: "Cropping cuts away the edges of the picture, which is different from trimming the length. Here is where each device does it, and a private browser option.",
+    keywords: ["how to crop a video", "crop video online", "crop a video to square", "crop video to 9:16", "video cropper"],
+    updated: "2026-10-03",
+    tools: ["crop-video", "trim-video", "resize-video"],
+    sections: [
+      {
+        h: "Crop is not trim",
+        p: ["Cropping removes parts of the picture, such as a strip at the side or the black bars around a screen recording. Trimming removes time from the start or end. Many searches for \"crop a video\" mean the second one, so if you only want to shorten the clip, read [how to trim a video without an app](/guides/how-to-trim-a-video-without-an-app)."],
+      },
+      {
+        h: "On an iPhone",
+        p: ["Apple's Photos app can crop videos as well as photos, as of October 2026. Open the video, tap **Edit**, tap the crop button, then drag the corners of the rectangle to enclose the area you want. Presets such as Square, 9:16 and others are available from the aspect ratio button, and the lock at the top right lets you unlock the ratio for a free-form box."],
+      },
+      {
+        h: "On Android with Google Photos",
+        p: ["Google's Photos help says the video editor's crop tool needs an Android device with at least 1 GB of RAM running Android 6.0 or later, and that some Android 9 devices that are not Pixels have no video editing. Open the video in Google Photos, tap **Edit**, then **Crop**. Tap **Aspect ratio** for a preset such as a square, and **Save** to keep a copy with your edits."],
+      },
+      {
+        h: "On Windows with Clipchamp",
+        p: ["Microsoft's Clipchamp video editor has a freehand crop: click the clip on the timeline, click **Crop** on the floating toolbar, drag the handles at the sides, top and bottom, then click **Done**. It also has a **Fit** option that removes black borders. You then export the project as a video file."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [crop video tool](/tools/crop-video) shows a frame from your video with a crop box on it."],
+        list: [
+          "**Draw or snap:** drag the box and its edges, or pick Vertical 9:16 for TikTok, Reels and Shorts, Square 1:1, Portrait 4:5, Widescreen 16:9, Classic 4:3, or Same as the video.",
+          "**Exact numbers:** type the left, top, width and height in pixels if you need a precise region.",
+          "**Sound:** kept by default; tick \"Remove the sound\" to drop it.",
+          "**Output:** an MP4. It takes MP4, MOV, WebM or MKV, one video at a time.",
+        ],
+        after: ["Cropping changes the pixels, so the video is encoded again, at high quality, into an MP4. On a 640 by 360 test clip, the 1:1 option produced a 360 by 360 MP4 with H.264 video. The crop applies to the whole length of the video; to keep only part of the time, use [Trim video](/tools/trim-video) first or afterwards.", "It uses your browser's own video decoder, so a format your browser cannot play will not open. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux may not decode; in that case try Safari. Everything happens inside your browser tab, so the video never leaves your device."],
+      },
+    ],
+    faq: [
+      { q: "How do I crop a landscape video to vertical for TikTok or Reels?", a: "Choose Vertical (9:16) in the [crop video tool](/tools/crop-video). The box covers the tallest 9:16 area of the picture, and you can drag it sideways to keep the part that matters." },
+      { q: "Does cropping lower the quality?", a: "Pixels inside the box keep their size, but the video is encoded again, which is done at high quality. If the file size matters, run the result through [compress video](/tools/compress-video) afterwards." },
+      { q: "Is cropping the same as resizing?", a: "No. Cropping cuts away part of the picture; resizing shrinks or enlarges the whole picture. For resizing, see [how to resize a video](/guides/how-to-resize-a-video)." },
+      { q: "Can I crop a video on a phone browser?", a: "Yes, if the phone's browser can play the file. Long videos take longer on a phone because the work is done on the device." },
+    ],
+  },
+  {
+    slug: "how-to-reverse-a-video",
+    title: "How to Reverse a Video (Play a Clip Backwards)",
+    description: "Make a video play backwards: iMovie on Mac has a Reverse option as of October 2026, phones mostly do not, and a browser tool can reverse a clip on your device without uploading.",
+    heading: "How to reverse a video",
+    dek: "Rewind effects are popular, but most phones have no reverse button. Here is where it exists, and a way to do it without installing an app.",
+    keywords: ["how to reverse a video", "play a video backwards", "reverse video online", "rewind video effect", "backwards video maker"],
+    updated: "2026-10-03",
+    tools: ["reverse-video", "video-speed", "trim-video"],
+    sections: [
+      {
+        h: "Why it is not built into most phones",
+        p: ["Apple's guide to editing in the Photos app lists cropping, trimming, speed and audio edits, but reversing is not among them. Google's help page for editing videos in Google Photos on Android does not mention reversing either, as of October 2026. Social video apps offer reverse effects, but you have to install them and trust them with your clip."],
+      },
+      {
+        h: "On a Mac with iMovie",
+        p: ["Apple documents it in iMovie on Mac: select the clip in the timeline, click the **Speed** button to show the speed controls, then select the **Reverse** checkbox. A reverse-play icon appears on the clip and it plays backwards at the speed you set. Then share or export the movie as a file."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [reverse video tool](/tools/reverse-video) takes MP4, MOV, WebM or MKV videos, one or several at once, and saves each as an MP4 that plays backwards."],
+        list: [
+          "**Sound:** it plays backwards too unless you tick \"Remove the sound\".",
+          "**Output:** an MP4, with the video encoded again (H.264 where the browser has it) and the sound as AAC or Opus. Our 4 second test clip came out at the same 640 by 360 size.",
+          "**Why it is slower than other video tools:** video files can only be decoded forwards from a keyframe, so the page decodes the clip in short pieces from the end and puts the frames in the opposite order. Only about a second or two of frames are held in memory at a time, so a long clip takes longer rather than running out of memory.",
+        ],
+        after: ["Everything happens inside your browser tab, so the video never leaves your device. For a quick boomerang, trim the clip first with [Trim video](/tools/trim-video) so there is less to reverse."],
+      },
+      {
+        h: "Ideas that work well",
+        p: ["Short clips reverse best: a splash going back into a glass, a jump played backwards, or a rewind transition. To play a clip forwards and then backwards, reverse a copy and join the two with [merge videos](/tools/merge-videos), or read [how to merge multiple videos into one](/guides/how-to-merge-multiple-videos-into-one). To change how fast it plays, see [how to slow down or speed up a video](/guides/how-to-slow-down-or-speed-up-a-video)."],
+      },
+    ],
+    faq: [
+      { q: "Can I reverse a video on my iPhone?", a: "Apple's Photos editing tools do not include reverse. You can reverse it in iMovie on a Mac, or use the [reverse video tool](/tools/reverse-video) in Safari or another browser on the phone." },
+      { q: "Does the sound play backwards too?", a: "By default yes. Tick \"Remove the sound\" in the [reverse video tool](/tools/reverse-video) if you want a silent result." },
+      { q: "Is there a length limit?", a: "The tool sets no size or length limit, and it holds only a short stretch of frames in memory at a time. A long video simply takes longer, and speed depends on your device." },
+      { q: "Does reversing change the quality?", a: "The frames are decoded and encoded again into an MP4, at high quality, so the result looks very close to the original but it is not a byte-for-byte copy." },
+    ],
+  },
+  {
+    slug: "how-to-merge-audio-files",
+    title: "How to Merge Audio Files into One (MP3, WAV, M4A and More)",
+    description: "Join MP3, WAV and other audio files into one track, one after another: the free Audacity way as of October 2026, and a browser tool with silence or crossfades that does not upload.",
+    heading: "How to merge audio files",
+    dek: "Joining voice notes, podcast segments or songs end to end is simple once you know the right tool. Here is the desktop way and a private browser way.",
+    keywords: ["how to merge audio files", "combine audio files into one", "join mp3 files", "merge mp3 online", "audio joiner"],
+    updated: "2026-10-03",
+    tools: ["merge-audio", "trim-audio", "audio-converter"],
+    sections: [
+      {
+        h: "Two meanings of \"merge\"",
+        p: ["People use the word for two different jobs. **Joining** plays one file after another, which is what you want for podcast segments, voice notes or a playlist as one file. **Mixing** plays files at the same time, for example a voice over a music bed. This page is about joining; the browser tool below joins files end to end and does not overlay them."],
+      },
+      {
+        h: "With Audacity (free, Windows, Mac and Linux)",
+        p: ["Audacity is a free, open-source audio editor. Choose **File, Import, Audio** and select your files, which open as separate tracks. Select all the tracks and use **Tracks, Align Tracks, Align End to End**, which Audacity's manual describes as moving each track so it starts where the previous one ends. Then **File, Export** and pick MP3 or WAV. To mix instead, use **Tracks, Mix**.", "It is powerful, but it is a full editor to install for a simple join, and there is no phone version."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [merge audio tool](/tools/merge-audio) takes MP3, WAV, M4A, AAC, OGG, Opus and FLAC files, or the sound of a video, and needs at least two."],
+        list: [
+          "**Order:** files are joined top to bottom; use the arrows to reorder.",
+          "**Between files:** nothing (straight on), 1 or 2 seconds of silence, a 2 second crossfade, or a 5 second crossfade for a DJ-style blend. A crossfade is shortened if a clip is too short to hold it.",
+          "**Save as:** MP3 at 128, 192 or 320 kbps, or a 16-bit WAV with no quality loss but a larger file.",
+          "**Mixed formats:** an MP3, a WAV and an M4A can be joined together; everything is converted to 44.1 kHz. If any file is stereo, mono files play in both ears.",
+        ],
+        after: ["In our test, a 3 second MP3 and a 2 second WAV joined with a 2 second crossfade made one 4 second, 192 kbps MP3 (the crossfade was shortened to 1 second because the second clip was short). The result is saved as merged.mp3 or merged.wav.", "Everything happens inside your browser tab, so the audio never leaves your device. To cut the start or end of a file before joining, use [trim audio](/tools/trim-audio) first, or read [how to trim an MP3 file](/guides/how-to-trim-an-mp3-file)."],
+      },
+      {
+        h: "Keeping quality",
+        p: ["Every join re-encodes the sound once. Saving as WAV keeps every sample; MP3 is encoded once at the bitrate you choose, and at 192 kbps or more the difference from the originals is very hard to hear. If one source is much quieter than another, fix the volume first with the [volume booster](/tools/volume-booster), because joining does not even them out."],
+      },
+    ],
+    faq: [
+      { q: "Can I merge MP3 and WAV files together?", a: "Yes. The [merge audio tool](/tools/merge-audio) accepts different formats in one go and converts everything to 44.1 kHz." },
+      { q: "Can I play two audio files at the same time, such as a voice over music?", a: "Not with this tool, which joins files one after another. Audacity's **Tracks, Mix** command overlays tracks." },
+      { q: "Will merging lower the quality?", a: "WAV output keeps every sample. MP3 output is encoded once at 128, 192 or 320 kbps, as you choose." },
+      { q: "Can I merge audio on my phone?", a: "Yes, in a phone browser. The files are processed on the phone itself, so very long or many files take longer than on a computer." },
+    ],
+  },
+  {
+    slug: "how-to-remove-metadata-from-a-pdf",
+    title: "How to Remove Metadata from a PDF (Author, Software and Dates)",
+    description: "PDFs carry a hidden author name, software and dates. Here is what is stored, how Adobe Acrobat and Word handle it as of October 2026, and how to remove it in your browser without uploading.",
+    heading: "How to remove metadata from a PDF",
+    dek: "A PDF often says who made it, with what, and when, without showing any of it on the page. Here is how to see it and remove it before you share the file.",
+    keywords: ["how to remove metadata from a pdf", "remove author from pdf", "pdf metadata remover", "strip pdf metadata", "clean pdf properties"],
+    updated: "2026-10-03",
+    tools: ["remove-pdf-metadata", "redact-pdf", "strip-exif"],
+    sections: [
+      {
+        h: "What a PDF remembers",
+        p: ["Most PDFs store an **author** (often your full name or your computer's user name), a title, the program that created the document, the program that turned it into a PDF with version numbers, and the dates it was created and last changed. Many also carry an **XMP** packet repeating all that, sometimes with edit history, plus private application data (PieceInfo) and a unique file ID. None of it appears on the page, but anyone can open the document properties and read it."],
+      },
+      {
+        h: "Why it matters",
+        p: ["A CV, a legal filing, a quote or a leaked document can reveal a name, a company's software or an edit date you did not intend to share. The metadata is a separate problem from what is written in the document itself."],
+      },
+      {
+        h: "In Word, before you export",
+        p: ["If the PDF comes from a Word document, Microsoft's Document Inspector removes document properties and personal information from the Word file: go to **File, Info, Check for Issues, Inspect Document**. Microsoft recommends running it on a copy, because the removal cannot always be undone. It cleans the Word file; it does not clean a PDF that already exists."],
+      },
+      {
+        h: "In Adobe Acrobat Pro",
+        p: ["Adobe's help describes a Sanitize document feature in Acrobat Pro: choose **All tools, Redact a PDF, Sanitize document**, then **Remove all** (or **Selectively remove** to pick items), and save the sanitized copy. It removes much more than metadata, including comments, attachments, scripts and hidden layers, which is useful when you want that but heavier than you may need. Acrobat Pro is a paid product."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [PDF metadata remover](/tools/remove-pdf-metadata) lists what each PDF carries as soon as you drop it, before anything is changed: the author, title, subject, keywords, creating program, PDF producer and dates, plus how many XMP packets, whether there is private PieceInfo data, and whether it has a file ID. Press **Remove metadata** and download the cleaned PDF."],
+        list: [
+          "**Removed:** the information dictionary, XMP metadata on the document and on pages, images and fonts, PieceInfo private data, the file ID, and objects nothing refers to any more.",
+          "**Kept as they are:** pages, text, fonts, images, links, bookmarks and form fields.",
+          "**Name:** the cleaned file keeps its original name, because a name like report-clean.pdf would itself say the file was scrubbed. The file on your device is never changed; the cleaned copy is a new download.",
+        ],
+        after: ["On a test PDF with a title, author, subject, keywords, creator, producer and two dates, the tool reported removing 8 info fields, and reading the result back showed none of them while the page count stayed the same.", "Everything happens inside your browser tab, so the document never leaves your device."],
+      },
+      {
+        h: "What it cannot see",
+        p: ["It removes document metadata only. Names written in the text, in comments, in headers and footers, or in the EXIF data of photos placed on the pages are not touched. To hide visible content, see [how to redact a PDF](/guides/how-to-redact-a-pdf), and clean photos with the [EXIF remover](/tools/strip-exif) before you put them in a document. For the photo side of this problem, read [what EXIF data is](/guides/what-is-exif-data)."],
+      },
+    ],
+    faq: [
+      { q: "Can I just see the metadata without removing it?", a: "Yes. Drop the PDF on the [PDF metadata remover](/tools/remove-pdf-metadata) and read the list; nothing changes until you press Remove metadata." },
+      { q: "Does removing metadata change how the PDF looks?", a: "No. Pages, text, fonts, images, links, bookmarks and form fields are kept; only the metadata and unreferenced objects are removed." },
+      { q: "Does it remove the author name written inside the document?", a: "No. It only removes metadata. Names in the visible text, comments or embedded photos need separate attention." },
+      { q: "Is my PDF uploaded to remove the metadata?", a: "No. The file is read and rewritten by code running in your browser tab, so a CV, contract or legal filing never leaves your device." },
+    ],
+  },
+  {
+    slug: "how-to-compress-a-png",
+    title: "How to Compress a PNG (Smaller File, Transparency Kept)",
+    description: "PNG files are large because they are lossless. Here is why, what built-in tools can and cannot do as of October 2026, and a browser tool that shrinks PNGs and keeps transparency without uploading.",
+    heading: "How to compress a PNG",
+    dek: "PNG does not have a quality slider, which is why shrinking one confuses people. Here is what actually works, and what it costs.",
+    keywords: ["how to compress a png", "reduce png file size", "png compressor", "shrink png without losing transparency", "make png smaller"],
+    updated: "2026-10-03",
+    tools: ["compress-png", "compress-image", "convert-image"],
+    sections: [
+      {
+        h: "Why PNGs are big, and why there is no slider",
+        p: ["PNG stores every pixel exactly. It is great for screenshots, logos and graphics with sharp edges and transparency, but a photo saved as PNG can be several times the size of the same photo as a JPG. Because the format is lossless, programs that offer a quality slider usually offer it for other formats: Apple's Preview, for example, shows a quality control when you export as JPEG or JPEG-2000, as of October 2026, not for PNG."],
+      },
+      {
+        h: "Three honest ways to make a PNG smaller",
+        p: ["There are only three levers, and each trades something."],
+        list: [
+          "**Use fewer colours.** Most screenshots, logos and illustrations use far fewer than the 16 million colours a PNG can hold. Rewriting the image with a palette of 256 or fewer colours takes a fraction of the space, which is how tools like TinyPNG and pngquant work. Transparency can be kept.",
+          "**Make the picture smaller.** Fewer pixels means fewer bytes. Preview on Mac can resize an image, and any editor can; see [how to resize an image to exact pixels](/guides/how-to-resize-an-image-to-exact-pixels).",
+          "**Change the format.** For a photo with no transparency, a JPG or WebP is far smaller than a PNG. The cost is that transparency is lost and JPG is lossy. [Which image format to use](/guides/which-image-format-to-use) explains when that is fine.",
+        ],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [compress PNG tool](/tools/compress-png) keeps the file a PNG and works on one or many files at once. Choose a level:"],
+        list: [
+          "**Best quality (256 colours):** the default, good for most images.",
+          "**Smaller (128 colours)** and **Smallest (64 colours):** a smaller file, with more visible banding in smooth gradients.",
+          "**Lossless (pixels unchanged):** every pixel kept; only a tighter way of storing them is tried.",
+        ],
+        after: ["Transparency is always kept, including soft edges, and animated PNGs keep every frame and its timing. If the result would not be smaller, you get the original back unchanged and the page says so.", "Results depend a lot on the picture. On a synthetic 800 by 500 test image of a noisy colour gradient (775 KB), 256 colours gave 154 KB (80% smaller) and 64 colours gave 81.5 KB (89% smaller), while Lossless kept the original because it could not do better. A flat-colour 400 by 400 logo with soft transparent edges went from 16.7 KB to 7.8 KB (53% smaller). Your own images will differ, so check the result by eye.", "Everything happens inside your browser tab, so the images never leave your device."],
+      },
+      {
+        h: "When to use something else",
+        p: ["For a photo, the [compress image tool](/tools/compress-image) or the [image converter](/tools/convert-image) will usually do better than any PNG setting. For email and upload limits, read [how to reduce image size for email and uploads](/guides/reduce-image-size-for-email-and-uploads)."],
+      },
+    ],
+    faq: [
+      { q: "Does compressing a PNG keep transparency?", a: "Yes. The [compress PNG tool](/tools/compress-png) keeps transparency, including soft edges, and the file stays a PNG." },
+      { q: "Is compressing a PNG lossy?", a: "With 256, 128 or 64 colours the pixels change slightly, because the image is rewritten with a smaller palette. Choose Lossless to keep every pixel." },
+      { q: "Why did I get my original file back?", a: "If the compressed version would not be smaller, the tool returns your original unchanged. It is already well compressed, or it is a photo where only a format change will help." },
+      { q: "Can I compress many PNGs at once?", a: "Yes. Drop them all on the [compress PNG tool](/tools/compress-png); one file downloads straight away, several download as a zip." },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
