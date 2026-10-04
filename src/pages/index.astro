@@ -10,6 +10,20 @@ import { profiles } from '../data/site';
 // Short column headings so the three tool columns line up on one line.
 const shortLabel = { images: 'Images', pdf: 'PDFs and files', media: 'Video and audio' };
 
+// Verb-led starting points for the hero. Each slug must be a real tool; the lookup keeps links honest.
+const startTiles = [
+  { label: 'iPhone photo to JPG', slug: 'heic-to-jpg' },
+  { label: 'Shrink an image', slug: 'compress-image' },
+  { label: 'Merge PDFs', slug: 'merge-pdf' },
+  { label: 'Compress a PDF', slug: 'compress-pdf' },
+  { label: 'Remove a background', slug: 'remove-background' },
+  { label: 'Video to MP3', slug: 'video-to-mp3' },
+].map((t) => {
+  const tool = tools.find((x) => x.slug === t.slug);
+  if (!tool) throw new Error(`Home page tile points at a missing tool: ${t.slug}`);
+  return { label: t.label, href: `/tools/${tool.slug}` };
+});
+
 const title = 'Stayput: Free File Tools That Never Upload Your Files';
 const description =
   'Convert HEIC to JPG, merge and compress PDFs, shrink images and edit video in your browser. No uploads, no watermarks, no size caps beyond your device. Open source.';
@@ -48,12 +62,13 @@ const jsonLd = [
       <div>
         <h1>Your files stay put.</h1>
         <p class="lede">
-          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off.
+          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off after your first visit.
         </p>
-        <div class="hero-actions">
-          <a class="btn btn-invert btn-lg" href="/tools/heic-to-jpg">Convert a HEIC photo</a>
-          <a class="hero-link" href="#tools">See all {tools.length} tools</a>
-        </div>
+        <p class="start-label" id="start-h">What do you want to do? Pick one, then drop your file.</p>
+        <ul class="start-tiles" aria-labelledby="start-h">
+          {startTiles.map((t) => <li><a href={t.href}>{t.label}</a></li>)}
+        </ul>
+        <p class="start-note">Your file stays in this tab. <a class="hero-link" href="#tools">See all {tools.length} tools</a></p>
       </div>
       <figure>
         <div class="devtools" role="img" aria-label="A browser network panel after converting photos: requests for the site's code and the decoder, then a few small anonymous usage-count requests. None of them carry the photos.">
@@ -148,6 +163,28 @@ const jsonLd = [
     <ul class="guide-list guide-grid">{guides.slice(0, 6).map((g) => <li><a href={`/guides/${g.slug}`}>{g.heading}</a><span class="muted">{g.dek}</span></li>)}</ul>
   </section>
 </Base>
+
+<style>
+  .start-label { margin: 0 0 12px; font-weight: 650; font-size: 17px; color: var(--on-field); max-width: 44ch; }
+  .start-tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 560px; }
+  .start-tiles a {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    min-height: 56px; padding: 10px 12px; border-radius: var(--radius-sm);
+    background: var(--on-field); color: #0d2c26; font-weight: 650; font-size: 16px; line-height: 1.2; text-decoration: none;
+    border: 1px solid var(--on-field);
+  }
+  .start-tiles a:hover { background: #ffffff; border-color: #ffffff; }
+  .start-note { margin: 14px 0 0; font-size: 15px; color: var(--on-field-2); }
+  @media (max-width: 900px) {
+    .start-tiles { max-width: none; }
+  }
+  @media (max-width: 600px) {
+    .hero-grid { padding: 28px 0 44px; gap: 36px; }
+    .hero h1 { font-size: clamp(44px, 14vw, 56px); margin-bottom: 14px; }
+    .hero .lede { font-size: 16px; margin-bottom: 18px; }
+    .start-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
 
 <script>
   // The poster is a 100 kB image below the fold; fetch it only when the visitor scrolls near it,
