@@ -21,6 +21,7 @@ import {
   getFirstEncodableAudioCodec,
   type AudioCodec,
 } from 'mediabunny';
+import { executeWatched } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { CODEC_NAMES, unplayable } from './video-compress';
 
@@ -93,8 +94,7 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
       throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
     }
-    conversion.onProgress = (p) => opts.onProgress?.(p);
-    await conversion.execute();
+    await executeWatched(conversion, opts.onProgress);
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     return {

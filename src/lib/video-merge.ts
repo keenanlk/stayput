@@ -26,6 +26,7 @@ import {
   type InputVideoTrack,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
+import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 
@@ -100,35 +101,44 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
     await output.start();
     const feed = pcmFeeder(audioSource, audioSource ? sound : null);
 
-    const canvas = new OffscreenCanvas(width, height);
-    const ctx = canvas.getContext('2d')!;
-    let offset = 0;
-    let lastKept = -Infinity;
-    for (const clip of clips) {
-      for await (const sample of new VideoSampleSink(clip.track).samples()) {
-        const t = offset + sample.timestamp - clip.first;
-        if (t < lastKept + 1 / MAX_FPS - 1e-4 || t >= offset + clip.length) {
-          sample.close();
-          continue;
+    await watchEncode(
+      async (progress) => {
+        const report = (f: number) => {
+          progress(f);
+          opts.onProgress?.(f);
+        };
+        const canvas = new OffscreenCanvas(width, height);
+        const ctx = canvas.getContext('2d')!;
+        let offset = 0;
+        let lastKept = -Infinity;
+        for (const clip of clips) {
+          for await (const sample of new VideoSampleSink(clip.track).samples()) {
+            const t = offset + sample.timestamp - clip.first;
+            if (t < lastKept + 1 / MAX_FPS - 1e-4 || t >= offset + clip.length) {
+              sample.close();
+              continue;
+            }
+            lastKept = t;
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+            sample.drawWithFit(ctx, { fit: 'contain' });
+            const d = Math.min(sample.duration, offset + clip.length - t);
+            sample.close();
+            const frame = new VideoSample(canvas, { timestamp: t, duration: d });
+            await feed.until(t);
+            await videoSource.add(frame);
+            frame.close();
+            report(Math.min(0.99, t / Math.max(0.001, total)));
+          }
+          offset += clip.length;
         }
-        lastKept = t;
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, width, height);
-        sample.drawWithFit(ctx, { fit: 'contain' });
-        const d = Math.min(sample.duration, offset + clip.length - t);
-        sample.close();
-        const frame = new VideoSample(canvas, { timestamp: t, duration: d });
-        await feed.until(t);
-        await videoSource.add(frame);
-        frame.close();
-        opts.onProgress?.(Math.min(0.99, t / Math.max(0.001, total)));
-      }
-      offset += clip.length;
-    }
-    await feed.until(Infinity);
-    videoSource.close();
-    audioSource?.close();
-    await output.finalize();
+        await feed.until(Infinity);
+        videoSource.close();
+        audioSource?.close();
+        await output.finalize();
+      },
+      () => output.cancel(),
+    );
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     opts.onProgress?.(1);

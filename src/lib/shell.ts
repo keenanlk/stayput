@@ -5,6 +5,7 @@
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
 import { classifyError, trackFilesAdded, trackToolRun } from './analytics';
+import { EncoderStall } from './encoder-watchdog';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
@@ -112,9 +113,14 @@ export async function processEach(
       console.warn(`${entry.file.name}:`, e);
       firstError ??= e;
       skipped.push({ name: entry.file.name, reason: e instanceof Error ? e.message : String(e) });
+      if (e instanceof EncoderStall) {
+        // The encoder is the problem, not this file; the rest would only wait out the same silence.
+        for (const rest of files.slice(i + 1)) skipped.push({ name: rest.file.name, reason: e.message });
+        break;
+      }
     }
   }
-  if (outputs.length === 0 && skipped.length > 0) throw new Error(describeError(files[0]!.file, firstError));
+  if (outputs.length === 0 && skipped.length > 0) throw firstError instanceof EncoderStall ? firstError : new Error(describeError(files[0]!.file, firstError));
   progress.set('Done', 1);
   return { outputs, skipped };
 }
