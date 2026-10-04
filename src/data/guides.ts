@@ -4086,7 +4086,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "remove-exif-data-from-photos-on-windows",
-    title: "How to Remove Metadata (EXIF) From a Photo on Windows 10 and 11",
+    title: "How to Remove Metadata (EXIF) From a Photo on Windows",
     description: "Remove metadata, EXIF and GPS data from photos on Windows: the File Explorer option, what it leaves alone, and a lossless way to clean a whole folder in your browser.",
     heading: "How to remove metadata from a photo on Windows",
     dek: "File Explorer can strip some metadata from a photo. Here is how, what it does not promise, and how to clean a whole folder without re-saving the pictures.",
@@ -4096,7 +4096,7 @@ export const guides: Guide[] = [
     sections: [
       {
         h: "The built-in way: Remove Properties and Personal Information",
-        p: ["Windows has a metadata scrubber in File Explorer, and it works on several photos at once. Select one or more photos, right-click and choose **Properties**, open the **Details** tab and click **Remove Properties and Personal Information** at the bottom. This is the dialog Microsoft documents for Windows 7, and Windows 10 and 11 still have it.", "The dialog gives you two choices:"],
+        p: ["File Explorer has a metadata scrubber, and it works on several photos at once. Select one or more photos, right-click and choose **Properties**, open the **Details** tab and click **Remove Properties and Personal Information** at the bottom. Microsoft's only published description of this dialog that we found is an archived tip written for Windows 7, so what you see may differ a little on your version of Windows.", "The dialog gives you two choices:"],
         list: ["**Create a copy with all possible properties removed.** The default. Windows makes a copy with the word Copy added to the file name and strips every property it is able to change for that file type. Your original keeps its metadata.", "**Remove the following properties from this file.** You tick the properties to delete and click OK, and they are removed from the original permanently. A property with no check box next to it is one Windows cannot edit."],
       },
       {
@@ -4124,18 +4124,18 @@ export const guides: Guide[] = [
     title: "How to Remove Metadata and EXIF Data From Photos on a Mac",
     description: "What Photos, Preview and the Terminal can do about photo metadata on a Mac, and a lossless way to strip EXIF and GPS from JPG, PNG and WebP in your browser.",
     heading: "How to remove metadata from photos on a Mac",
-    dek: "Photos can hide a location, Preview can show one, and neither is documented to clean a file. Here is what each does and how to strip a photo for sure.",
+    dek: "Photos can hide a location, Preview can show or remove one, and neither touches the rest of the metadata. Here is what each does and how to strip a photo for sure.",
     keywords: ["remove metadata from photo mac", "remove exif data mac", "strip exif macos", "mac remove gps from photo", "remove exif data mac terminal"],
     updated: "2026-10-03",
     tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
     sections: [
       {
         h: "The Photos app: Hide Location",
-        p: ["In Photos, select the pictures, choose **Image**, **Location**, then **Hide Location**. Apple's Photos guide describes the same menu as the way to \"remove or restore a photo's original location\": **Revert to Original Location** brings it back, so the location is hidden from view rather than erased from your library.", "This only concerns location, not the date or the camera. Apple's guide also does not say what the file contains after you export or share it, so treat an exported photo as unchecked until you have looked at it (see below)."],
+        p: ["In Photos, select the pictures, choose **Image**, **Location**, then **Hide Location**. Apple's Photos guide lists **Hide Location** and **Revert to Original Location** in that menu, and Revert brings it back, so the location is hidden from view rather than erased from your library.", "This only concerns location, not the date or the camera. Apple's guide also does not say what the file contains after you export or share it, so treat an exported photo as unchecked until you have looked at it (see below)."],
       },
       {
-        h: "Preview shows the location, it is not documented to remove it",
-        p: ["Open a photo in Preview and choose **Tools**, **Show Location Info**, then click the **More Info** inspector button and the **GPS** tab. Apple's Preview guide documents this as a way to see where a photo was taken on a map. The command is dimmed when the photo has no location, which makes it a quick test for whether a photo carries GPS data. Apple's guide describes viewing, not removing, so use Preview to look and a remover to clean."],
+        h: "Preview: see the location, or remove it",
+        p: ["Open a photo in Preview and choose **Tools**, **Show Location Info**, then click the **More Info** inspector button and the **GPS** tab. Apple's Preview guide documents this as a way to see where a photo was taken on a map. The command is dimmed when the photo has no location, which makes it a quick test for whether a photo carries GPS data. In that same Inspector section Preview also has a **Remove Location Info** button (next to **Change Location Info**). Apple's Preview guide describes only viewing, so treat the button as a location-only fix: it does not touch the date, the camera model or the other EXIF fields, and it is worth checking the saved file afterwards with the [EXIF viewer](/tools/exif-viewer)."],
       },
       {
         h: "In the Terminal with ExifTool",
@@ -4152,7 +4152,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: "Does Hide Location in Photos remove the GPS data from the file?", a: "Apple describes it as hiding the location in Photos, and Revert to Original Location restores it, so the original file still has it. Apple does not say what an exported or shared copy contains. Run the copy through the [EXIF remover](/tools/strip-exif) to be sure." },
-      { q: "Can Preview remove location data?", a: "Apple's Preview guide documents viewing a photo's location (Tools, Show Location Info, GPS tab), not removing it. Use the [EXIF remover](/tools/strip-exif) to remove it." },
+      { q: "Can Preview remove location data?", a: "Yes, location only: Preview's Inspector has a Remove Location Info button. Apple's Preview guide documents viewing the location (Tools, Show Location Info), not the button, and the date and camera details stay. Use the [EXIF remover](/tools/strip-exif) to remove everything, and check the result with the [EXIF viewer](/tools/exif-viewer)." },
       { q: "Will removing EXIF data change how the photo looks?", a: "Not for a JPG, PNG or WebP cleaned with the [EXIF remover](/tools/strip-exif): the picture data is copied unchanged. The only exception is a sideways photo with the orientation option ticked, which is re-encoded." },
       { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline. ExifTool is a separate install." },
     ],
