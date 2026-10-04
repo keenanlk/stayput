@@ -9,7 +9,7 @@ createShell({
       const out: OutputFile = {
         name: suffixName(entry.file.name, '-grayscale', 'pdf'),
         blob: new Blob([bytes as BlobPart], { type: 'application/pdf' }),
-        note: `${pages} page${pages === 1 ? '' : 's'} in grayscale; text still selectable`,
+        note: `${pages} page${pages === 1 ? '' : 's'} in grayscale; text stays text (scanned pages stay images)`,
       };
       return out;
     });

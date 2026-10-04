@@ -3596,7 +3596,7 @@ export const presets: Preset[] = [
     base: 'grayscale-pdf',
     name: 'Black and white PDF',
     title: 'Convert PDF to Black and White, Free, No Upload | Stayput',
-    description: 'Make a colour PDF black and white for printing, a court filing or a portal that asks for it. Text stays selectable. Runs in your browser; no upload.',
+    description: 'Make a colour PDF black and white for printing, a court filing or a portal that asks for it. Text stays text. Runs in your browser; no upload.',
     heading: 'Convert a PDF to black and white',
     tagline: 'Print-ready black and white in one click, with the text still searchable.',
     keywords: ['convert pdf to black and white', 'black and white pdf', 'make pdf black and white', 'pdf color to black and white', 'print pdf black and white'],
@@ -3615,7 +3615,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Is it pure black and white or grayscale?', a: 'Grayscale: photos and coloured shapes become shades of grey so they stay readable. Black text stays black. That is what printers and filing systems mean by black and white; pure two-tone output would turn photos into blotches.' },
-      { q: 'Will a court or portal accept it?', a: 'The pages contain no colour after conversion, which is what those rules check. Hyperlinks and bookmarks keep working and the text is searchable, which many e-filing systems also require.' },
+      { q: 'Will a court or portal accept it?', a: 'The pages look and print grey, which is what most of those rules are after. But the original colour data stays inside the file, so a system that inspects colour spaces may still flag it as colour. If a portal or print shop rejects it, print the PDF to a new PDF in greyscale from your PDF reader, or run it through a preflight tool. Hyperlinks and bookmarks keep working and the text is searchable, which many e-filing systems also require.' },
       { q: 'Can I check the result before printing?', a: 'Yes. Open the downloaded copy in any PDF reader. It shows exactly what a mono printer will print, which is a quick way to see whether a chart still reads without colour.' },
       noUpload,
     ],
@@ -3904,7 +3904,7 @@ export const presets: Preset[] = [
       'Convert, and upload the MP4 wherever you need it.',
     ],
     faq: [
-      { q: 'Does converting lower the sound quality?', a: 'Slightly: the sound is re-encoded as AAC (or Opus) at 192 kbps, which is as good as a typical MP3 to the ear. Video sites re-encode uploads anyway.' },
+      { q: 'Does converting lower the sound quality?', a: 'Slightly: the sound is re-encoded as AAC (or Opus) with a target of up to 192 kbps, which is as good as a typical MP3 to the ear. Simple audio can come out lower, because the encoder spends fewer bits where it does not need them. Video sites re-encode uploads anyway.' },
       { q: 'Can I use a moving background or a waveform?', a: 'Not on this page: it makes a still-picture video, which is what most music uploads on YouTube are. For moving pictures, merge real video clips with Add audio to video.' },
       { q: 'I want the MP3 from an MP4, not the other way round.', a: 'Use Video to MP3, which pulls the sound out of a video as an MP3.' },
       noUpload,

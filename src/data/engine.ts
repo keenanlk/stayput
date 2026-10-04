@@ -348,7 +348,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Photo filter sites upload your pictures to apply a filter a phone could do offline, and many add a watermark or keep the images. Here the photos stay on your device, there is no limit on how many you convert at once, and the result is not recompressed more than once.',
   },
   'grayscale-pdf': {
-    how: 'pdf-lib (MIT) opens the PDF in your tab and draws one neutral grey rectangle over each page with the PDF Saturation blend mode. Blending keeps the brightness of whatever is underneath and takes the grey’s zero saturation, so every colour, in text, drawings and photos alike, turns into its own shade of grey. Nothing on the page is rewritten or re-rendered, so text stays text.',
+    how: 'pdf-lib (MIT) opens the PDF in your tab and draws one neutral grey rectangle over each page with the PDF Saturation blend mode. Blending keeps the brightness of whatever is underneath and takes the grey’s zero saturation, so every colour, in text, drawings and photos alike, turns into its own shade of grey. Nothing on the page is rewritten or re-rendered, so text stays text. For the same reason the original colour data is still in the file: the page looks and prints grey, but a check that inspects colour spaces may still detect colour.',
     versus: 'Most online converters rasterise every page to make it grayscale, which uploads your document, makes text unselectable and often makes the file much larger. Here nothing leaves your device, text stays sharp and searchable, and the file grows by a few hundred bytes.',
   },
   'crop-pdf': {
