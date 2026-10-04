@@ -16,6 +16,11 @@
       "permanent": true
     },
     {
+      "source": "/tools",
+      "destination": "/#tools",
+      "permanent": true
+    },
+    {
       "source": "/upscale-image",
       "destination": "/tools/upscale-image",
       "permanent": true

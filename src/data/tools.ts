@@ -2920,7 +2920,7 @@ export const tools: Tool[] = [
     name: 'Open ZIP, RAR and 7z',
     title: 'Open RAR, ZIP and 7z Files Online: Extract Without Uploading | Stayput',
     description:
-      'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ones, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
+      'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ZIP files, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
     heading: 'Open ZIP, RAR and 7z files',
     tagline: 'The files inside an archive, unpacked on your own device, without installing WinRAR or 7-Zip.',
     category: 'pdf',
@@ -2931,7 +2931,7 @@ export const tools: Tool[] = [
     keywords: ['rar extractor', 'open rar file', 'zip file opener', 'unzip files online', '7z extractor', 'extract rar online', 'open 7z file'],
     steps: [
       'Drop a ZIP, RAR, 7z or TAR archive, or several.',
-      'If the archive is locked, type its password.',
+      'If the ZIP is password-protected, type its password.',
       'Press Extract, then download the files you need, or all of them as one ZIP.',
     ],
     faq: [
@@ -2945,7 +2945,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can it open password-protected archives?',
-        a: 'Yes, if you know the password: type it before pressing Extract. It cannot guess or remove a password you do not have.',
+        a: 'Password-protected ZIP files open after you enter the password: type it before pressing Extract. Encrypted 7z and RAR archives are not supported yet (in our tests they did not open even with the correct password). It cannot guess or remove a password you do not have.',
       },
       {
         q: 'Is the archive uploaded?',
