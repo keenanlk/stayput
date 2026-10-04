@@ -32,7 +32,7 @@ export default defineConfig({
         launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {},
       },
     },
-      // Firefox runs a small smoke spec only. It is on in CI, or locally with PW_FIREFOX=1
+    // Firefox runs a small smoke spec only. It is on in CI, or locally with PW_FIREFOX=1
     // once `npx playwright install firefox` has been run.
     ...(process.env.CI || process.env.PW_FIREFOX
       ? [{ name: 'firefox', testMatch: /firefox-smoke/, use: { browserName: 'firefox' as const } }]
