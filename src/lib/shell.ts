@@ -88,6 +88,13 @@ export function describeError(file: File, e: unknown): string {
   return msg.startsWith(file.name) ? msg : `${file.name}: ${msg}`;
 }
 
+/** The same message tools have always shown (prefixed with the file name), carrying the original error's class name so analytics can tell failures apart. */
+function rewrap(file: File, e: unknown): Error {
+  const out = new Error(describeError(file, e));
+  if (e instanceof Error && e.name) out.name = e.name;
+  return out;
+}
+
 /**
  * Run `fn` for every file in a batch. One bad file (a corrupt download, a
  * PDF dropped on an image tool) no longer fails the whole batch: it is
@@ -120,7 +127,7 @@ export async function processEach(
       }
     }
   }
-  if (outputs.length === 0 && skipped.length > 0) throw firstError instanceof EncoderStall ? firstError : new Error(describeError(files[0]!.file, firstError));
+  if (outputs.length === 0 && skipped.length > 0) throw firstError instanceof EncoderStall ? firstError : rewrap(files[0]!.file, firstError);
   progress.set('Done', 1);
   return { outputs, skipped };
 }

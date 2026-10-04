@@ -121,9 +121,10 @@ function context(): Record<string, string> {
 
 /** Coarse error category for tool_run failures: the error's own name, never its message or stack. */
 export function classifyError(e: unknown): string {
-  if (e instanceof DOMException) return e.name || 'DOMException';
-  if (e instanceof Error) return e.name || 'Error';
-  return 'Unknown';
+  const name = e instanceof Error ? e.name : '';
+  // A class name only: letters and digits, short. Anything else (a name someone set to a sentence) is just "Error".
+  if (/^[A-Za-z][A-Za-z0-9]{0,39}$/.test(name)) return name;
+  return e instanceof Error ? 'Error' : 'Unknown';
 }
 
 export function trackFilesAdded(data: { tool: string; files: number; inputBytes: number }): void {

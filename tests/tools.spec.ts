@@ -3269,6 +3269,26 @@ test('Compress GIF halves the size and drops frames without changing the timing,
   await expect(page.locator('#error')).toContainText('This file is not a GIF.');
 });
 
+test('Compress GIF says what to try for a GIF too big for the device, a WebP named .gif, and a damaged file', async ({ page }) => {
+  await page.goto('/tools/compress-gif');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const u16 = (n: number) => [n & 255, n >> 8];
+  // A 30000 by 30000 canvas with one 1 by 1 frame: a few dozen bytes that would need about 3.6 GB to hold.
+  const huge = Buffer.from([...Buffer.from('GIF89a'), ...u16(30000), ...u16(30000), 0, 0, 0, 0x2c, 0, 0, 0, 0, 1, 0, 1, 0, 0x80, 0, 0, 0, 255, 255, 255, 2, 2, 0x44, 0x01, 0, 0x3b]);
+  const tries: [string, Buffer, string][] = [
+    ['huge.gif', huge, "too large for this device's memory. Try a desktop browser"],
+    ['sticker.gif', Buffer.concat([Buffer.from('RIFF\0\0\0\0WEBPVP8 '), Buffer.alloc(40)]), 'This file is not a GIF. It looks like a WebP image'],
+    ['clip.gif', Buffer.concat([Buffer.from([0, 0, 0, 24]), Buffer.from('ftypmp42'), Buffer.alloc(40)]), 'It looks like a video.'],
+    ['cut.gif', Buffer.from('GIF89a\x10\x00'), 'may be damaged or cut short'],
+  ];
+  for (const [name, buffer, message] of tries) {
+    await page.locator('#file-input').setInputFiles({ name, mimeType: 'image/gif', buffer });
+    await page.locator('#run').click();
+    await expect(page.locator('#error')).toContainText(message);
+    await page.locator('#clear').click();
+  }
+});
+
 test('Compress GIF hands back a GIF that is already tight unchanged', async ({ page }) => {
   await open(page, 'compress-gif');
   const { downloads } = await run(page, ['anim.gif'], async () => {
