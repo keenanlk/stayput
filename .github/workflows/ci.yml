@@ -26,7 +26,7 @@ jobs:
       - name: MCP server (mcp/)
         working-directory: mcp
         run: npm ci && npm run typecheck && npm test
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium firefox
       - run: npm test
       - uses: actions/upload-artifact@v7
         if: failure()

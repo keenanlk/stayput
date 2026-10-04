@@ -25,11 +25,17 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: /firefox-smoke/,
       use: {
         browserName: 'chromium',
         // Use a preinstalled Chromium when PLAYWRIGHT_CHROMIUM_PATH is set (CI sandboxes).
         launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {},
       },
     },
+    // Firefox runs a small smoke spec only. It is on in CI, or locally with PW_FIREFOX=1
+    // once `npx playwright install firefox` has been run.
+    ...(process.env.CI || process.env.PW_FIREFOX
+      ? [{ name: 'firefox', testMatch: /firefox-smoke/, use: { browserName: 'firefox' as const } }]
+      : []),
   ],
 });
