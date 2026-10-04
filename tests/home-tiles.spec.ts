@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const tiles = [
+const tiles: [string, string][] = [
   ['iPhone photo to JPG', '/tools/heic-to-jpg'],
   ['Shrink an image', '/tools/compress-image'],
   ['Merge PDFs', '/tools/merge-pdf'],
