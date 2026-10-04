@@ -4590,6 +4590,233 @@ export const guides: Guide[] = [
       { q: "Can I compress many PNGs at once?", a: "Yes. Drop them all on the [compress PNG tool](/tools/compress-png); one file downloads straight away, several download as a zip." },
     ],
   },
+  {
+    slug: "how-to-open-a-rar-file",
+    title: "How to Open a RAR or 7z File (Windows, Mac and Phone)",
+    description: "Open RAR and 7z archives: Windows 11 can do it without an app as of October 2026, a Mac and most phones cannot, and a browser tool opens both on your device without uploading.",
+    heading: "How to open a RAR or 7z file",
+    dek: "RAR and 7z are archive formats like ZIP, but not every device opens them. Here is what works on Windows, Mac and phones, and a way that needs no install.",
+    keywords: ["how to open a rar file", "how to open rar file on mac", "how to open 7z file", "open rar files online", "extract rar without winrar"],
+    updated: "2026-10-04",
+    tools: ["archive-extractor", "create-zip"],
+    sections: [
+      {
+        h: "What these files are",
+        p: ["A RAR or 7z file is a container that holds one or more files squeezed into a single package, like a ZIP file. You cannot read the contents until you extract them. If you got one in an email or a download, the steps below get the files out. Only open archives from people and sites you trust, since the files inside are ordinary files that can contain anything."],
+      },
+      {
+        h: "On Windows 11",
+        p: ["Microsoft's support page on zipping and unzipping says Windows 11, version 24H2 supports ZIP, RAR, 7z and TAR archive formats. Open the archive and drag files out, or right-click it and choose **Extract All**, then follow the prompts.", "The same page says this built-in support does not handle encrypted archives, and suggests apps such as 7-Zip or WinRAR for those. Older versions of Windows 11 and Windows 10 need an app too. 7-Zip is free and open source, and lists RAR among the formats it can unpack."],
+      },
+      {
+        h: "On a Mac",
+        p: ["Apple's page on zipping and unzipping on a Mac only describes .zip files, and says nothing about RAR or 7z, as of October 2026. In practice, you need a free app. The Unarchiver is free in the Mac App Store, runs on macOS 10.13 or later, and its website lists RAR (including encrypted and multi-part archives) and 7z. After you install it, double-click the archive."],
+      },
+      {
+        h: "On an iPhone or Android phone",
+        p: ["Android's Files by Google app says on its help page that only .zip files are supported, so RAR and 7z are out. Apple's help for the iPhone Files app is titled Create or open ZIP files, and we found nothing there about RAR or 7z either. On a phone, the usual choices are to install a third-party archive app or use a browser tool."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP."],
+        list: [
+          "**Folders:** the paths inside the archive are kept, so files from a folder show as folder/name.",
+          "**Passwords:** type the password first if the archive is locked. In our test, a password-protected ZIP opened with the right password and showed an error with a wrong one. A password-protected 7z file did not open even with the correct password, so use 7-Zip for those. We could not test a locked RAR file.",
+          "**Split archives:** archives in parts, such as .part1.rar or .7z.001, are not supported.",
+          "**Size:** the tool sets no size limit, but the archive is unpacked in your device's memory, so a very large one may not fit on a phone.",
+        ],
+        after: ["In our test, a small RAR5 archive and a 7z archive with a folder in it both opened and listed their files, with the right names and sizes. The extraction code is the open-source libarchive library, running in your browser tab as WebAssembly, so the archive never leaves your device. That is the main difference from online extractors that upload the file to a server."],
+      },
+      {
+        h: "Which one to choose",
+        p: ["On Windows 11 with a plain archive, File Explorer is enough. For a locked 7z, or a lot of archives, install 7-Zip. On a Mac, The Unarchiver is the simple option. On a Chromebook, a work computer where you cannot install anything, or a phone, the browser tool is the quickest. To pack files up again, the [ZIP creator](/tools/create-zip) makes a ZIP that every device opens."],
+      },
+    ],
+    faq: [
+      { q: "How do I open a RAR file on a Mac?", a: "Apple's help only describes ZIP files, so install a free app such as The Unarchiver, or drop the file on the [archive extractor](/tools/archive-extractor) in a browser." },
+      { q: "How do I open a 7z file?", a: "Windows 11, version 24H2 opens 7z files in File Explorer per Microsoft's support page. Elsewhere, use 7-Zip on Windows or the [archive extractor](/tools/archive-extractor) in any browser. The tool did not open a password-protected 7z in our test." },
+      { q: "Can I open a RAR file on my phone?", a: "Not with the built-in Files by Google app, which supports ZIP only. A browser works: the [archive extractor](/tools/archive-extractor) runs on the phone itself." },
+      { q: "Is my archive uploaded?", a: "No. The archive is opened by code running in your browser tab, so it and the files inside stay on your device." },
+    ],
+  },
+  {
+    slug: "how-to-blur-a-face-in-a-video",
+    title: "How to Blur a Face in a Video (Every Frame, Without Uploading)",
+    description: "Hide faces in a video before you share it: what phones and Clipchamp do as of October 2026, and a browser tool that finds and covers faces in every frame on your device.",
+    heading: "How to blur a face in a video",
+    dek: "Blurring a face in one photo is easy. In a video the face moves, so the cover has to follow it. Here are the options, and a way that never uploads the clip.",
+    keywords: ["how to blur a face in a video", "blur faces in a video", "hide a face in a video", "pixelate face in video", "anonymize a video"],
+    updated: "2026-10-04",
+    tools: ["blur-face-video", "blur-image", "mute-video"],
+    sections: [
+      {
+        h: "Why video is harder than a photo",
+        p: ["A blur placed over a face in a photo stays where you put it. In a video, people move, turn and leave the frame, so a fixed blur misses the face within a second. The cover has to be found again in each frame. If you only have one still image, read [how to blur a face in a photo](/guides/how-to-blur-a-face-in-a-photo) instead."],
+      },
+      {
+        h: "On an iPhone",
+        p: ["Apple's guide to cropping, rotating, flipping and straightening in the Photos app lists those tools and does not mention blurring a face, as of October 2026. Cropping is the only way to cut someone out there, and only if they are at the edge of the frame."],
+      },
+      {
+        h: "In Clipchamp on Windows",
+        p: ["Microsoft's Clipchamp has a blur effect. Its own blog describes blurring one face with a workaround: crop a copy of the clip to the face, apply the blur effect to it, then lay the original underneath as picture-in-picture. The same article says this suits clips without much movement, and it describes no automatic face tracking. For a person who walks around, you would be adjusting by hand."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [blur faces in video tool](/tools/blur-face-video) finds faces itself and covers every one it finds in the whole video. There is no way to pick a single face, so everyone it sees is covered. It takes MP4, MOV, WebM and MKV videos, one or several at once."],
+        list: [
+          "**How it finds faces:** about ten times a second it checks the frame with a face detector that runs on your device, follows each face between checks, and keeps it covered for half a second after it was last seen. The detector downloads once, about 4 MB, then is cached.",
+          "**Cover:** blur, pixelate, a black box, or an emoji. Blur and pixelate have a strength from 1 to 10.",
+          "**Sound:** kept unless you tick \"Remove the sound too\", worth doing when voices could identify someone.",
+          "**Result:** an MP4. The video is decoded and encoded again, so the file size can change, and a note says in how many frames faces were covered.",
+        ],
+        after: ["In our test, a 2 second clip with a cartoon face drawn on it moving across the frame had the face covered in 100% of frames, and a clip with no face in it said \"no faces found: check the video before sharing it\". These were synthetic clips with no real people in them, so they show the tool runs and reports honestly, not how well it finds real faces in your footage.", "Everything happens inside your browser tab, so the video never leaves your device. That matters most for exactly the clips you want to anonymize."],
+      },
+      {
+        h: "Check the result before you share it",
+        p: ["A face detector can miss faces in profile, turned away, very small, or half hidden by a mask or glasses, even for a moment. Watch the whole result. A black box or an emoji hides a face completely, while a light blur may still let someone who knows the person recognize them. To also drop the soundtrack, use [mute video](/tools/mute-video)."],
+      },
+    ],
+    faq: [
+      { q: "Can I blur just one person's face in a video?", a: "Not with the [blur faces in video tool](/tools/blur-face-video), which covers every face it detects. To leave one person visible you would need an editor where you place the blur by hand." },
+      { q: "Does it follow a face that moves?", a: "Yes. It looks for faces about ten times a second, follows them between checks and keeps each covered for half a second after it was last seen." },
+      { q: "Will it catch every face?", a: "No detector does. Faces in profile, turned away, very small or partly covered can be missed for a moment, so watch the result before you share it." },
+      { q: "Is the video uploaded?", a: "No. The video is read, scanned and written again by code in your browser tab, and the face detector runs on your device." },
+    ],
+  },
+  {
+    slug: "how-to-reduce-gif-size",
+    title: "How to Reduce GIF Size (Make an Animated GIF Smaller)",
+    description: "GIFs get big fast. Here is why, the three things that shrink one, and a browser tool that compresses animated GIFs on your device without uploading, with measured results as of October 2026.",
+    heading: "How to reduce GIF size",
+    dek: "An animated GIF is a stack of pictures, and the file grows with every frame. Here is what makes it smaller and what that costs you.",
+    keywords: ["reduce gif size", "how to make a gif file smaller", "compress gif", "gif compressor", "make a gif smaller"],
+    updated: "2026-10-04",
+    tools: ["compress-gif", "gif-to-mp4", "video-to-gif"],
+    sections: [
+      {
+        h: "Why a GIF is so big",
+        p: ["A GIF stores a sequence of frames, each limited to 256 colours, with only simple compression. A few seconds at a decent size can run to many megabytes, because nothing in the format understands that most of the picture stays the same from frame to frame. Smaller means saving the same picture with fewer pixels, fewer frames, fewer colours, or storing only what changes."],
+      },
+      {
+        h: "Three things that shrink it",
+        p: ["Each trades something for size."],
+        list: [
+          "**Smaller picture.** Half the width and height leaves a quarter of the pixels. This usually makes the biggest difference.",
+          "**Fewer frames.** Dropping every second frame roughly halves the rest, and the animation looks a little less smooth. The playing time can stay the same.",
+          "**Smarter frames.** Each frame can hold only the area that changed from the one before, and tiny changes that no one would notice can be ignored. Fewer colours also help, and may add grain.",
+        ],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [GIF compressor](/tools/compress-gif) opens one or several GIFs and has three settings:"],
+        list: [
+          "**Compression:** Light (looks the same), Medium (much smaller) or Strong (smallest, some grain).",
+          "**Size:** keep the size, or 75%, 50% or 33%.",
+          "**Frames:** keep every frame, drop every second, or keep one in three. Dropped frames give their time to the frame before, so the GIF plays at the same speed.",
+        ],
+        after: ["On a generated 400 by 300 test GIF with 40 frames (65.8 KB), Light and Medium both gave 46.9 KB (27% smaller) and Strong gave 42.8 KB (33% smaller). Medium with the size at 50% and every second frame dropped gave 13.3 KB (79% smaller), at 200 by 150 pixels and 20 of the 40 frames. Real GIFs will differ: a screen recording with a still background shrinks a lot, while a busy filmed clip shrinks less. If the result would not be smaller, you get your original back and the page says so.", "Everything happens inside your browser tab, so the GIF never leaves your device, and there is no file size limit set by the tool."],
+      },
+      {
+        h: "When a video is better",
+        p: ["If the place you are posting to accepts video, an MP4 of the same clip is usually far smaller than any GIF; see [how to convert a GIF to MP4](/guides/how-to-convert-a-gif-to-mp4). To make a GIF from a video in the first place, read [how to make a GIF from a video](/guides/how-to-make-a-gif-from-a-video)."],
+      },
+    ],
+    faq: [
+      { q: "How do I get a GIF under a size limit?", a: "Start with Medium in the [GIF compressor](/tools/compress-gif), then lower the size to 75% or 50%, and drop every second frame, until the result shown is under your limit." },
+      { q: "Will it still be animated and the same speed?", a: "Yes. The result is still an animated GIF with the same timing, because the time of any dropped frame is added to the frame before." },
+      { q: "Why did I get my original file back?", a: "If the compressed version would not be smaller, the tool returns your original unchanged and says so. The GIF is already well compressed." },
+      { q: "Is my GIF uploaded?", a: "No. The GIF is decoded and written again by code in your browser tab." },
+    ],
+  },
+  {
+    slug: "how-to-resize-a-pdf",
+    title: "How to Resize a PDF (Page Size to A4 or Letter, or File Size)",
+    description: "\"Resize a PDF\" can mean the paper size or the file size. Here is how to change the page size to A4, Letter or others on your device without uploading, and where to go to make the file smaller.",
+    heading: "How to resize a PDF",
+    dek: "Two different jobs share this name: changing the paper size, and making the file smaller. Here is which is which, and how to do each.",
+    keywords: ["how to resize a pdf", "change pdf page size", "resize pdf to a4", "resize pdf to letter", "make a pdf smaller"],
+    updated: "2026-10-04",
+    tools: ["resize-pdf", "compress-pdf", "crop-pdf"],
+    sections: [
+      {
+        h: "Which kind of resize do you mean?",
+        p: ["**Page size** is the paper the document is laid out on, such as US Letter (8.5 by 11 inches) or A4 (210 by 297 mm). You change it when a document made for one country has to print in another. **File size** is how many megabytes the file takes, which matters for email and upload limits. They are separate: changing the page size does not make the file smaller."],
+      },
+      {
+        h: "Changing the page size",
+        p: ["The [resize PDF tool](/tools/resize-pdf) moves every page onto new paper. Pick the new size, then press **Resize PDF**."],
+        list: [
+          "**Sizes:** US Letter, A4, US Legal, A3, A5 or Tabloid.",
+          "**Orientation:** same as each page, portrait or landscape.",
+          "**Margin:** none (fill the page), 5, 10 or 20 mm.",
+          "**What happens to the content:** it is scaled up or down, keeps its proportions, and is centred. When the new paper has a different shape, you get white space at the sides or at the top and bottom. It is never stretched.",
+          "**Text stays text:** pages are not turned into pictures, so text stays sharp and selectable, and links and form fields move with the content.",
+        ],
+        after: ["In our test, a three-page A4 PDF became US Letter with the content at 94% of its size, and A5 with the content at 70%. The note under the result tells you the scale used. The file keeps its name with the size added, such as report-letter.pdf.", "Everything happens inside your browser tab, so the PDF never leaves your device."],
+      },
+      {
+        h: "If you meant file size",
+        p: ["The resize tool does not shrink the file. In the same test, the Letter version was 17% larger than the A4 original (4.55 KB against 4.0 KB), a small PDF made of plain text. To make a PDF smaller, use the [PDF compressor](/tools/compress-pdf), and read [how to compress a PDF without losing quality](/guides/compress-pdf-without-losing-quality) for what to expect."],
+      },
+      {
+        h: "If you meant cutting away the margins",
+        p: ["Changing the paper size scales the whole page. To remove white margins or part of the page instead, see [how to crop a PDF](/guides/how-to-crop-a-pdf)."],
+      },
+    ],
+    faq: [
+      { q: "Does resizing a PDF make the file smaller?", a: "No. The [resize PDF tool](/tools/resize-pdf) changes the paper size and can leave the file slightly larger. For a smaller file, use the [PDF compressor](/tools/compress-pdf)." },
+      { q: "How do I change a PDF from A4 to Letter?", a: "Drop it on the [resize PDF tool](/tools/resize-pdf), choose US Letter, and press Resize PDF. The content is scaled to fit and centred." },
+      { q: "Will the text get blurry?", a: "No. The text and drawings are placed on the new page with a scale, not turned into pictures, so they stay sharp." },
+      { q: "Can I resize many PDFs at once?", a: "Yes. Drop them all on the tool; the same size and margin apply to each." },
+    ],
+  },
+  {
+    slug: "how-to-rotate-a-picture",
+    title: "How to Rotate a Picture (iPhone, Android, Mac and Browser)",
+    description: "Turn a sideways photo upright: the Photos steps on iPhone, Google Photos on Android and Preview on Mac as of October 2026, and a browser tool that rotates and flips a whole batch without uploading.",
+    heading: "How to rotate a picture",
+    dek: "A photo that shows sideways is quick to fix. Here are the built-in steps on each device, and a browser option for a whole batch.",
+    keywords: ["how to rotate a picture", "how to rotate a photo on iphone", "rotate image online", "flip a picture", "turn a photo upright"],
+    updated: "2026-10-04",
+    tools: ["rotate-image", "rotate-pdf", "rotate-video"],
+    sections: [
+      {
+        h: "On an iPhone",
+        p: ["Apple's iPhone guide gives these steps in the Photos app: open the photo and tap **Edit**, tap the crop button, then tap the rotate button, which turns the image 90 degrees each time. The flip button mirrors it horizontally. Tap **Done** to save. The same page describes a straighten tool for a slightly tilted horizon."],
+      },
+      {
+        h: "On Android with Google Photos",
+        p: ["Google's Photos help says to open the photo, tap **Edit**, and tap **Rotate**, which adds 90 degrees with each tap. The crop editor also has a **Flip** button and a slider for small tilts. Tap **Done**, then **Save**."],
+      },
+      {
+        h: "On a Mac with Preview",
+        p: ["Apple's Preview guide says to open the image and click the rotate button in the toolbar, which turns it to the left; hold the Option key and click to turn it to the right. Use **Tools, Flip Horizontal** or **Flip Vertical** to mirror it. To change several images at once, show them in one Preview window, choose **View, Thumbnails**, select them in the sidebar, then use the **Tools** menu."],
+      },
+      {
+        h: "In the browser, without uploading",
+        p: ["The [rotate and flip image tool](/tools/rotate-image) is useful on a computer without those apps, or for many photos at once. It takes JPG, PNG, WebP, HEIC, AVIF and JPEG XL images."],
+        list: [
+          "**Turns:** 90 degrees right, 90 degrees left, or 180 degrees. Only quarter turns are offered, not an arbitrary angle.",
+          "**Flip:** horizontally (mirror left to right) or vertically, alone or with a turn.",
+          "**Preview:** the first image is shown as it will come out.",
+          "**Batch:** the same change is applied to every image you drop; several download as a zip.",
+          "**Format:** keep the original, or choose JPG, PNG or WebP. JPG and WebP output are saved at the quality you set, 92 by default.",
+        ],
+        after: ["In our test, a 600 by 400 JPG rotated 90 degrees right came out 400 by 600 with the corner marker in the expected place. A JPG is saved again at the chosen quality, and PNG stays lossless.", "Everything happens inside your browser tab, so the pictures never leave your device. If a photo shows sideways in one app and upright in another, read [what EXIF data is](/guides/what-is-exif-data), since phones record the orientation as a note; the tool turns the pixels themselves."],
+      },
+      {
+        h: "Other things you may be rotating",
+        p: ["For a sideways video, see [how to rotate a sideways video](/guides/how-to-rotate-a-sideways-video). For PDF pages, see [how to rotate a PDF](/guides/how-to-rotate-a-pdf). To change the pixel size of a picture, see [how to resize an image to exact pixels](/guides/how-to-resize-an-image-to-exact-pixels)."],
+      },
+    ],
+    faq: [
+      { q: "How do I rotate a picture on my iPhone?", a: "Open it in Photos, tap Edit, tap the crop button, then tap the rotate button, and tap Done, per Apple's iPhone guide. For a batch, use the [rotate and flip image tool](/tools/rotate-image) in the browser." },
+      { q: "Can I rotate by a small angle, like 5 degrees?", a: "Not with the [rotate and flip image tool](/tools/rotate-image), which does quarter turns and flips. The iPhone Photos app and Google Photos have a straighten slider for small tilts." },
+      { q: "Does rotating lower the quality?", a: "PNG stays lossless. A JPG is saved again once at the quality you set, 92 by default; choose 100 for the closest copy." },
+      { q: "Can I rotate many photos at once?", a: "Yes. Drop them all on the [tool](/tools/rotate-image) and the same turn applies to each; several download as a zip." },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string): Guide | undefined => guides.find((g) => g.slug === slug);
