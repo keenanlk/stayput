@@ -1,5 +1,6 @@
 import { channelsOf, decodeAudio, formatDuration } from './audio';
 import { clean, cutPoints, type Segment } from './captions';
+import { audioDecodeError, fromWorker, looksLikeMemory, noSpeechFound, outOfMemoryError, workerCrashError } from './speech-errors';
 import type { Reply, Request } from './transcribe.worker';
 
 /**
@@ -14,8 +15,13 @@ const RATE = 16000;
 let worker: Worker | undefined;
 let nextId = 0;
 function recognise(audio: Float32Array, language: string | null, task: Request['task'], onLoading: (f: number) => void): Promise<{ chunks: Segment[]; language: string }> {
-  worker ??= new Worker(new URL('./transcribe.worker.ts', import.meta.url), { type: 'module' });
-  const w = worker;
+  let w: Worker;
+  try {
+    worker ??= new Worker(new URL('./transcribe.worker.ts', import.meta.url), { type: 'module' });
+    w = worker;
+  } catch {
+    return Promise.reject(workerCrashError());
+  }
   const id = nextId++;
   return new Promise((resolve, reject) => {
     const onMessage = (e: MessageEvent<Reply>) => {
@@ -24,13 +30,14 @@ function recognise(audio: Float32Array, language: string | null, task: Request['
       if (msg.type === 'loading') return onLoading(msg.fraction);
       done();
       if (msg.type === 'result') resolve({ chunks: msg.chunks, language: msg.language });
-      else reject(new Error(msg.message));
+      else reject(fromWorker(msg.name, msg.message));
     };
-    const onError = (e: ErrorEvent) => {
+    // The worker script failed to load or the browser killed it (memory, mostly): the page's own text, never the event's.
+    const onError = () => {
       done();
       worker = undefined;
       w.terminate();
-      reject(new Error(e.message || 'The speech model stopped unexpectedly.'));
+      reject(workerCrashError());
     };
     const done = () => {
       w.removeEventListener('message', onMessage);
@@ -62,10 +69,15 @@ export async function transcribeFile(
 ): Promise<Speech> {
   const { onProgress } = opts;
   onProgress(`Reading the sound from ${file.name}…`, 0.02);
-  const [samples] = channelsOf(await decodeAudio(file, RATE), true);
-  const total = samples!.length / RATE;
-  if (total < 0.5) throw new Error('The recording is too short to hold any speech.');
-  const cuts = [0, ...cutPoints(samples!, RATE), samples!.length];
+  let samples: Float32Array;
+  try {
+    [samples] = channelsOf(await decodeAudio(file, RATE), true) as [Float32Array];
+  } catch (e) {
+    throw looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError(e instanceof Error ? e.message : undefined);
+  }
+  const total = samples.length / RATE;
+  if (total < 0.5) throw noSpeechFound('The recording is too short to hold any speech.');
+  const cuts = [0, ...cutPoints(samples, RATE), samples.length];
   const segments: Segment[] = [];
   // Detected once, from the first piece, then kept for the rest of the recording.
   let spoken: string | null = opts.language === 'auto' ? null : opts.language;
@@ -74,7 +86,7 @@ export async function transcribeFile(
     const at = from / RATE;
     onProgress(`Transcribing ${file.name}: ${formatDuration(at)} of ${formatDuration(total)}`, 0.05 + 0.95 * (at / total));
     // A copy, because the samples are handed over to the worker.
-    const piece = samples!.slice(from, cuts[i]);
+    const piece = samples.slice(from, cuts[i]);
     const found = await recognise(piece, spoken, opts.task, (f) => {
       if (!modelReady) onProgress(`Downloading the speech model, once (76 MB): ${Math.round(f * 100)}%`, 0.05 * f);
     });

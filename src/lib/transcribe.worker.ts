@@ -7,6 +7,7 @@
  */
 import { env, pipeline, Tensor, type AutomaticSpeechRecognitionPipeline } from '@huggingface/transformers';
 import { vendorDir } from './vendor';
+import { looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, type SpeechError } from './speech-errors';
 
 export const MODEL = 'whisper-base';
 export const RATE = 16000;
@@ -15,7 +16,7 @@ export type Request = { id: number; audio: Float32Array; language: string | null
 export type Reply =
   | { id: number; type: 'loading'; fraction: number }
   | { id: number; type: 'result'; chunks: { start: number; end: number; text: string }[]; language: string }
-  | { id: number; type: 'error'; message: string };
+  | { id: number; type: 'error'; name: string; message: string };
 
 env.allowRemoteModels = false;
 env.allowLocalModels = true;
@@ -28,7 +29,7 @@ wasm.numThreads = 1;
 let asr: Promise<AutomaticSpeechRecognitionPipeline> | undefined;
 const post = (msg: Reply) => (self as unknown as Worker).postMessage(msg);
 
-function load(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
+function start(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
   // The two model files make up nearly all of the download; report them together.
   const sizes = new Map<string, [number, number]>();
   asr ??= pipeline('automatic-speech-recognition', MODEL, {
@@ -49,6 +50,26 @@ function load(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
   // A failed load (offline on first use, say) may be retried by the next request.
   asr.catch(() => (asr = undefined));
   return asr;
+}
+
+/** Load the model; when the browser's storage is full, once more without caching it, and a dropped connection once more too. */
+async function load(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await start(id);
+    } catch (err) {
+      if (attempt >= 1) throw err;
+      if ((err as { name?: string })?.name === 'QuotaExceededError') env.useBrowserCache = false;
+      else if (!looksLikeNetwork(err)) throw err;
+    }
+  }
+}
+
+/** The named error for a failure while loading the model or while recognising. */
+function named(err: unknown, loading: boolean): SpeechError {
+  if (looksLikeMemory(err)) return outOfMemoryError();
+  if (!loading) return speechModelError();
+  return looksLikeNetwork(err) ? modelDownloadError() : modelLoadError();
 }
 
 /**
@@ -75,8 +96,10 @@ async function detectLanguage(run: AutomaticSpeechRecognitionPipeline, audio: Fl
 
 self.onmessage = async (e: MessageEvent<Request>) => {
   const { id, audio, language, task } = e.data;
+  let loading = true;
   try {
     const run = await load(id);
+    loading = false;
     const spoken = language ?? (await detectLanguage(run, audio));
     const out = (await run(audio, { return_timestamps: true, language: spoken, task })) as { text: string; chunks?: { timestamp: [number, number | null]; text: string }[] };
     const seconds = audio.length / RATE;
@@ -87,6 +110,9 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     }));
     post({ id, type: 'result', chunks, language: spoken });
   } catch (err) {
-    post({ id, type: 'error', message: err instanceof Error ? err.message : String(err) });
+    // Only the class name and our own message go back; the original error is logged here for the console.
+    console.error(err);
+    const out = named(err, loading);
+    post({ id, type: 'error', name: out.name, message: out.message });
   }
 };
