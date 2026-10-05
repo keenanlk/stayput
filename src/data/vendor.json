@@ -1,7 +1,7 @@
 {
   "heic": {
     "package": "heic-to",
-    "version": "1.5.2",
+    "version": "1.6.5",
     "entry": "heic-to.min.js",
     "files": { "heic-to.min.js": "dist/csp/heic-to.min.js", "LICENSE": "LICENSE" }
   },
