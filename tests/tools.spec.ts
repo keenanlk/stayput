@@ -5748,6 +5748,23 @@ test('Transcribe turns a speech recording into SRT captions with the words spoke
   expect(errors).toEqual([]);
 });
 
+test('Transcribe recovers when the speech model download drops once, by trying again', async ({ page }) => {
+  test.setTimeout(120_000);
+  const errors = await open(page, 'transcribe');
+  const dropped = new Set<string>();
+  await page.route('**/models/**/*.onnx', (route) => {
+    const url = route.request().url();
+    if (dropped.has(url)) return route.continue();
+    dropped.add(url);
+    return route.abort('connectionreset');
+  });
+  const { downloads } = await run(page, [staticFx('jfk.wav')]);
+  expect(dropped.size).toBeGreaterThan(0);
+  expect(new TextDecoder().decode(await bytesOf(downloads[0]!)).toLowerCase()).toContain('ask not what your country can do for you');
+  // The dropped download is logged by the model library; nothing else may be.
+  expect(errors.filter((e) => !/Failed to load resource|Unable to load from local path|ERR_CONNECTION_RESET/.test(e))).toEqual([]);
+});
+
 /** A 16-bit mono WAV of white noise (a fixed seed, so every run is the same). */
 function noiseWav(seconds: number, rate = 44100, amplitude = 6000): string {
   const n = Math.round(seconds * rate);

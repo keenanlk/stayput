@@ -144,6 +144,69 @@ test('a failed run sends the original error class as the kind, with no message a
   for (const secret of ['secret-message', 'anim']) expect(raw).not.toContain(secret);
 });
 
+const SPEECH_TOOLS = ['transcribe', 'add-subtitles-to-video'] as const;
+const SPOKEN = fileURLToPath(new URL('./fixtures/static/jfk.wav', import.meta.url));
+
+/** A failed caption run: what the page shows and the one tool_run event, which must carry only the class name. */
+async function failedCaptionRun(page: Page, baseURL: string, slug: string, sent: Sent[], file = SPOKEN) {
+  await page.goto(`${SITE}/tools/${slug}`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(file);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
+  const run = sent.find((s) => s.payload.name === 'tool_run')!;
+  expect(violations(run), JSON.stringify(run)).toEqual([]);
+  const raw = JSON.stringify(sent);
+  for (const secret of ['jfk', 'onnx', 'Failed to fetch']) expect(raw).not.toContain(secret);
+  return { shown: (await page.locator('#error').innerText()).replace(/\s+/g, ' '), data: run.payload.data as Record<string, string> };
+}
+
+for (const slug of SPEECH_TOOLS) {
+  test(`${slug}: a speech model that cannot be downloaded or started fails with its own class, and the class survives the worker`, async ({ page, baseURL }) => {
+    test.setTimeout(120_000);
+    const sent = await captureAnalytics(page, baseURL!);
+    await page.route(`${SITE}/models/**/*.onnx`, (route) => route.abort('connectionreset'));
+    const dl = await failedCaptionRun(page, baseURL!, slug, sent);
+    expect(dl.data).toMatchObject({ outcome: 'error', error_class: 'ModelDownloadError' });
+    expect(dl.shown).toContain('could not be downloaded');
+  });
+
+  test(`${slug}: a damaged model file reports ModelLoadError with what to try`, async ({ page, baseURL }) => {
+    test.setTimeout(120_000);
+    const sent = await captureAnalytics(page, baseURL!);
+    await page.route(`${SITE}/models/**/*.onnx`, (route) => route.fulfill({ contentType: 'application/octet-stream', body: Buffer.alloc(2048, 7) }));
+    const bad = await failedCaptionRun(page, baseURL!, slug, sent);
+    expect(bad.data).toMatchObject({ outcome: 'error', error_class: 'ModelLoadError' });
+    expect(bad.shown).toContain('could not be started');
+  });
+
+  test(`${slug}: a worker the browser kills reports WorkerCrashError`, async ({ page, baseURL }) => {
+    const sent = await captureAnalytics(page, baseURL!);
+    await page.addInitScript(() => {
+      const Real = window.Worker;
+      // A worker whose script throws at once, like one the browser could not start or killed.
+      (window as unknown as { Worker: unknown }).Worker = class extends Real {
+        constructor() {
+          super(URL.createObjectURL(new Blob(['throw new Error("secret-worker-message")'], { type: 'text/javascript' })));
+        }
+      };
+    });
+    const crashed = await failedCaptionRun(page, baseURL!, slug, sent);
+    expect(crashed.data).toMatchObject({ outcome: 'error', error_class: 'WorkerCrashError' });
+    expect(JSON.stringify(sent)).not.toContain('secret-worker-message');
+  });
+}
+
+test('a file with no readable sound fails with AudioDecodeError before any model is fetched', async ({ page, baseURL }) => {
+  const sent = await captureAnalytics(page, baseURL!);
+  const models: string[] = [];
+  page.on('request', (r) => r.url().includes('/models/') && models.push(r.url()));
+  const out = await failedCaptionRun(page, baseURL!, 'transcribe', sent, fx('anim.gif'));
+  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'AudioDecodeError' });
+  expect(models).toEqual([]);
+});
+
 test('search and next-step events send only what /privacy lists, and never the typed words', async ({ page, baseURL }) => {
   const sent = await captureAnalytics(page, baseURL!);
   await page.addInitScript(() => (Math.random = () => 0.1)); // experiment arm "on": next steps are shown

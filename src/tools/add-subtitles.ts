@@ -2,6 +2,7 @@ import { bool, createShell, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../lib/captions';
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
+import { noSpeechFound } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
 
 /**
@@ -43,7 +44,7 @@ createShell({
         // Writing the captions is roughly the first 40% of the work, encoding the rest.
         const speech = await transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) });
         segments = speech.segments;
-        if (segments.length === 0) throw new Error(`No speech was found in ${file.name}, so there are no subtitles to add.`);
+        if (segments.length === 0) throw noSpeechFound(`No speech was found in ${file.name}, so there are no subtitles to add.`);
         const spoken = new Intl.DisplayNames(['en'], { type: 'language' }).of(speech.language) ?? speech.language;
         from = bool('translate') ? `translated to English from ${spoken} speech` : `written from ${spoken} speech`;
       }
