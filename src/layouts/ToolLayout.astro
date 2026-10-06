@@ -11,7 +11,7 @@ import { engineFor } from '../data/engine';
 import { nextSteps } from '../data/next-steps';
 import { inline, inlineLinks, plainLinks } from '../lib/inline';
 import { lastmodFor } from '../lib/lastmod';
-import { leadFor, offlineBadge, defaultSizeBadge } from '../data/leads';
+import { leadFor, offlineBadge, needsFirstUse, defaultSizeBadge } from '../data/leads';
 
 interface Props {
   tool: Tool;
@@ -173,7 +173,7 @@ const jsonLd = [
       <div class="install" id="install" hidden role="region" aria-label="Install Stayput">
         <div>
           <strong>Keep Stayput a tap away.</strong>
-          <span>Install it as an app for a home-screen icon and offline use after your first visit.</span>
+          <span>Install it as an app for a home-screen icon and offline use after your first {needsFirstUse(base ?? tool.slug) ? 'run' : 'visit'}.</span>
         </div>
         <div class="field-row">
           <button class="btn btn-sm btn-primary" id="install-yes" type="button">Install</button>
@@ -216,7 +216,7 @@ const jsonLd = [
     <div class="engine">
       <p>{engine.how}</p>
       <p class="versus"><strong>Compared with upload-based tools:</strong> {engine.versus}</p>
-      <p class="verify"><strong>Verify it yourself.</strong> Load this page, turn off Wi-Fi or switch to airplane mode, and run the tool. Or open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, and watch it while you convert. The panel above does the same count for you.</p>
+      <p class="verify"><strong>Verify it yourself.</strong> After {needsFirstUse(base ?? tool.slug) ? 'your first run' : 'one visit'}, turn off Wi-Fi or switch to airplane mode and run the tool again. Or open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, and watch it while you convert. The panel above does the same count for you.</p>
     </div>
   </section>
 
