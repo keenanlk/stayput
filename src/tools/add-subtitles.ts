@@ -2,6 +2,8 @@ import { bool, createShell, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../lib/captions';
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
+import { CaptionsUnavailable, ensureH264Encoder } from '../lib/encoder-probe';
+import { EncoderStall } from '../lib/encoder-watchdog';
 import { noSpeechFound } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
 
@@ -32,6 +34,9 @@ createShell({
     const language = str('language', 'auto');
     const saveSrt = bool('save-srt');
     const { editVideo } = await import('../lib/video-edit');
+    // Find out now, in a second or two, that this browser cannot encode, not after minutes of transcribing.
+    progress.set('Checking this browser can write the video…', 0);
+    if (!(await ensureH264Encoder())) throw new CaptionsUnavailable();
     const outputs: OutputFile[] = [];
     for (const [index, entry] of videos.entries()) {
       const file = entry.file;
@@ -69,6 +74,9 @@ createShell({
           last = cap;
         },
         onProgress: (f) => progress.set(`Adding subtitles to ${file.name}: ${Math.round(f * 100)}%`, share(start + f * (1 - start))),
+      }).catch((e) => {
+        // A stall part way through: the same plain message and link as the early check.
+        throw e instanceof EncoderStall ? new CaptionsUnavailable() : e;
       });
       if (shown === 0) throw new Error(`None of the subtitles fall within ${file.name}. Check that the subtitle file belongs to this video.`);
       outputs.push({
