@@ -2868,7 +2868,7 @@ export const guides: Guide[] = [
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, so the output comes back at the photo\'s original resolution with no paid tier gating it, and the photo is never uploaded to produce the result. [Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it.',
+          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, so the output comes back at the photo\'s original resolution with no watermark, and the photo is never uploaded to produce the result. [Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it.',
         ],
       },
       {
@@ -2879,7 +2879,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is there a free way to remove a background at full resolution?', a: 'Yes. A background remover that runs the cutout model in your own browser has no reason to gate resolution behind a paid tier, since there is no server cost per image to recover.' },
+      { q: 'Is there a free way to remove a background at full resolution?', a: 'Yes. A background remover that runs the cutout model in your own browser returns the full-resolution result with no watermark, because the model runs on your device and nothing is uploaded.' },
       { q: 'Why does remove.bg give me a small image for free?', a: 'Its free tier on the website is limited to a low resolution for personal use; the full-size result requires a paid credit or subscription, according to its pricing page.' },
       { q: 'Does a browser-based background remover work as well as remove.bg?', a: 'For most everyday photos, yes; remove.bg\'s model can have an edge on especially difficult cases like very fine hair or low-contrast subjects, refined over a larger dataset.' },
       { q: 'Is my photo uploaded to remove a background locally?', a: 'No. A tool that runs the cutout model in the browser processes the image on your device; you can confirm this with the browser\'s network panel or by trying it in airplane mode after the page loads.' },
@@ -3186,7 +3186,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'What is the difference between subtitles and captions burned in?', a: 'Subtitles are a separate file a player can switch on or off. Burned-in captions are part of the video image itself, so they show up everywhere, which is what most social platforms need.' },
-      { q: 'Can I add subtitles to a video for free with no watermark?', a: 'Yes, with a tool that processes the video in your browser rather than a server, since there is no hosting cost to recover with a watermark or a paid tier.' },
+      { q: 'Can I add subtitles to a video for free with no watermark?', a: 'Yes, with a tool that processes the video in your browser rather than a server, since nothing is uploaded and no watermark is added.' },
       { q: 'Do auto-captions need an internet connection?', a: 'A browser-based tool downloads its speech model once and then works offline; a cloud-based captioning site needs a connection for every video.' },
       { q: 'Can I burn in subtitles I already wrote as an SRT file?', a: 'Yes. Stayput\'s add subtitles tool accepts an existing SRT or VTT file and burns those exact captions into the video instead of generating new ones from the speech.' },
     ],
@@ -3545,7 +3545,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Does CamScanner put a watermark on free scans?', a: 'Yes, as of when this page was checked, CamScanner\'s free tier watermarked exported PDFs and images, with a subscription needed to remove it.' },
-      { q: 'Is there a document scanner with no watermark and no subscription?', a: 'Yes. A browser-based scanner like Stayput\'s document scanner has no paid tier to gate a watermark behind, since it has no server cost to recover.' },
+      { q: 'Is there a document scanner with no watermark and no subscription?', a: 'Yes. A browser-based scanner like Stayput\'s document scanner adds no watermark, and nothing is uploaded.' },
       { q: 'Is it safe to scan an ID or personal document without an app?', a: 'A tool that processes the photo entirely in your browser, without uploading it anywhere, avoids sending the document to any third-party server at all.' },
       { q: 'Can a browser scanner combine multiple pages into one PDF?', a: 'Yes, Stayput\'s document scanner combines several scanned photos, in the order you drop them, into a single PDF.' },
     ],
@@ -3910,7 +3910,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is there a photo collage maker with no watermark?', a: 'Yes, Stayput\'s collage maker adds no watermark or logo to the result, since it has no paid tier to gate that behind.' },
+      { q: 'Is there a photo collage maker with no watermark?', a: 'Yes, Stayput\'s collage maker adds no watermark or logo to the result.' },
       { q: 'How many photos can I put in one collage?', a: 'There is no fixed cap; the practical limit is how many photos your device can hold in memory at once while it lays out the grid.' },
       { q: 'Can I stack photos vertically instead of a grid?', a: 'Yes, Stayput\'s collage maker offers a grid, a row, or a vertical stack layout, with adjustable spacing between photos.' },
       { q: 'Can I combine several screenshots into one long image?', a: 'Yes, the stitch screenshots page joins them end to end in order, which suits a long scrolling capture split across multiple images better than a grid layout does.' },
