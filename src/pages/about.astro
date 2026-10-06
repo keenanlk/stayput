@@ -13,8 +13,9 @@ import Base from '../layouts/Base.astro';
     <h2>Open source</h2>
     <p>The code is published under the MIT license at <a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>. Bug reports, feature requests and pull requests are welcome. If you want to verify the privacy claim, the repository is the place to look.</p>
     <h2>Credits</h2>
+    <p>Stayput is built on the work below. The complete list, with versions, licenses, links to the exact source and the source offer for the LGPL parts, is on the <a href="/licenses">open-source licenses page</a>.</p>
     <ul>
-      <li><a href="https://github.com/strukturag/libheif" rel="noopener">libheif</a> via <a href="https://github.com/hoppergee/heic-to" rel="noopener">heic-to</a> (LGPL-3.0) for HEIC decoding</li>
+      <li><a href="https://github.com/strukturag/libheif" rel="noopener">libheif</a> and <a href="https://github.com/strukturag/libde265" rel="noopener">libde265</a> via <a href="https://github.com/hoppergee/heic-to" rel="noopener">heic-to</a> (LGPL-3.0) for HEIC decoding</li>
       <li><a href="https://pdf-lib.js.org" rel="noopener">pdf-lib</a> (MIT) for editing PDFs</li>
       <li><a href="https://mozilla.github.io/pdf.js/" rel="noopener">pdf.js</a> (Apache-2.0) for rendering PDFs</li>
       <li><a href="https://github.com/101arrowz/fflate" rel="noopener">fflate</a> (MIT) for zip downloads</li>
@@ -22,17 +23,21 @@ import Base from '../layouts/Base.astro';
       <li><a href="https://mediabunny.dev" rel="noopener">Mediabunny</a> (MPL-2.0) for reading and writing video files when compressing</li>
       <li><a href="https://github.com/Vanilagy/mp4-muxer" rel="noopener">mp4-muxer</a> (MIT) and <a href="https://github.com/matt-way/gifuct-js" rel="noopener">gifuct-js</a> (MIT) for GIF to MP4</li>
       <li><a href="https://github.com/mattdesl/gifenc" rel="noopener">gifenc</a> (MIT) for making GIFs</li>
-      <li><a href="https://github.com/naptha/tesseract.js" rel="noopener">tesseract.js</a> (Apache-2.0) for reading text in images and scanned PDFs</li>
+      <li><a href="https://github.com/naptha/tesseract.js" rel="noopener">tesseract.js</a> (Apache-2.0), with Tesseract (Apache-2.0) and Leptonica, for reading text in images and scanned PDFs</li>
       <li><a href="https://ai.google.dev/edge/mediapipe" rel="noopener">MediaPipe</a> (Apache-2.0) for finding faces to blur and people in videos</li>
       <li><a href="https://github.com/jankovicsandras/imagetracerjs" rel="noopener">imagetracerjs</a> (public domain, Unlicense) for tracing images into SVG</li>
+      <li><a href="https://github.com/jamsinclair/jSquash" rel="noopener">jSquash</a> (Apache-2.0) with <a href="https://github.com/AOMediaCodec/libavif" rel="noopener">libavif</a> and libaom (BSD-2-Clause) and <a href="https://github.com/libjxl/libjxl" rel="noopener">libjxl</a> (BSD-3-Clause) for opening AVIF and JPEG XL images</li>
+      <li><a href="https://github.com/qpdf/qpdf" rel="noopener">qpdf</a> (Apache-2.0) via <a href="https://github.com/neslinesli93/qpdf-wasm" rel="noopener">qpdf-wasm</a> (ISC) for compressing, locking and unlocking PDFs</li>
+      <li><a href="https://onnxruntime.ai" rel="noopener">ONNX Runtime</a> (MIT) for running the AI models in your browser</li>
+      <li>ISNet from the <a href="https://github.com/xuebinqin/DIS" rel="noopener">DIS project</a> (code Apache-2.0; weights’ license not stated upstream, see <a href="/licenses#models">licenses</a>) for removing photo backgrounds</li>
       <li><a href="https://github.com/openai/whisper" rel="noopener">Whisper</a> (MIT) run by <a href="https://github.com/huggingface/transformers.js" rel="noopener">Transformers.js</a> (Apache-2.0) for turning speech into text</li>
       <li><a href="https://github.com/Anjok07/ultimatevocalremovergui" rel="noopener">Ultimate Vocal Remover</a>’s MDX-Net Inst HQ 3 model (MIT) for separating vocals from music</li>
-      <li><a href="https://lame.sourceforge.io" rel="noopener">LAME</a> (LGPL) via <a href="https://github.com/arseneyr/wasm-media-encoders" rel="noopener">wasm-media-encoders</a> (MIT) for MP3 encoding</li>
+      <li><a href="https://lame.sourceforge.io" rel="noopener">LAME</a> (LGPL-2.0 or later) via <a href="https://github.com/arseneyr/wasm-media-encoders" rel="noopener">wasm-media-encoders</a> (MIT) for MP3 encoding</li>
       <li><a href="https://github.com/xiph/rnnoise" rel="noopener">RNNoise</a> (BSD-3-Clause) via <a href="https://github.com/shiguredo/rnnoise-wasm" rel="noopener">rnnoise-wasm</a> (Apache-2.0) for removing background noise</li>
       <li><a href="https://github.com/xinntao/Real-ESRGAN" rel="noopener">Real-ESRGAN</a> (BSD-3-Clause) for the AI image upscaler</li>
       <li><a href="https://github.com/Picsart-AI-Research/MI-GAN" rel="noopener">MI-GAN</a> (MIT) for removing objects from photos</li>
       <li><a href="https://pdfmake.github.io" rel="noopener">pdfmake</a> (MIT) with the <a href="https://github.com/googlefonts/roboto" rel="noopener">Roboto</a> font (Apache-2.0) for turning EPUB books into PDFs</li>
-      <li><a href="https://www.libarchive.org" rel="noopener">libarchive</a> (BSD-2-Clause) via <a href="https://github.com/nika-begiashvili/libarchivejs" rel="noopener">libarchive.js</a> (MIT) for opening ZIP, RAR and 7z archives</li>
+      <li><a href="https://www.libarchive.org" rel="noopener">libarchive</a> (BSD-2-Clause) via <a href="https://github.com/nika-begiashvili/libarchivejs" rel="noopener">libarchive.js</a> (MIT), which also contains OpenSSL, for opening ZIP, RAR and 7z archives</li>
       <li><a href="https://github.com/paulmillr/noble-ciphers" rel="noopener">@noble/ciphers</a> (MIT) for AES-256 password-locked ZIPs</li>
       <li><a href="https://astro.build" rel="noopener">Astro</a> (MIT) for building the site</li>
     </ul>

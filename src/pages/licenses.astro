@@ -1,0 +1,159 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/licenses.json';
+
+interface Licence { name: string; url: string }
+interface Component {
+  id: string;
+  name: string;
+  version: string;
+  npm: string | null;
+  licences: Licence[];
+  project: string;
+  source: string;
+  shipped: string;
+  kind: 'library' | 'wasm' | 'model' | 'font';
+  via?: string;
+  copyleft?: 'lgpl' | 'mpl';
+  copyright?: string;
+  replace?: string;
+  attribution?: string;
+  note?: string;
+}
+const all = data.components as Component[];
+
+const copyleft = all.filter((c) => c.copyleft);
+const lgpl = copyleft.filter((c) => c.copyleft === 'lgpl');
+const mpl = copyleft.filter((c) => c.copyleft === 'mpl');
+const attributions = all.filter((c) => c.attribution);
+const childrenOf = (id: string) => all.filter((c) => c.via === id);
+const libraries = all.filter((c) => (c.kind === 'library' || c.kind === 'wasm') && !c.via);
+const models = all.filter((c) => c.kind === 'model');
+const fonts = all.filter((c) => c.kind === 'font' && !c.via);
+---
+<Base title="Open-source licenses" description="Every library, WebAssembly module, AI model and font Stayput ships, with its version, license and a link to the exact source. Includes the source offer for the LGPL and MPL parts.">
+  <article class="wrap-narrow prose page licenses">
+    <h1>Open-source licenses</h1>
+    <p>Stayput is MIT licensed and stands on a lot of other people's open-source work. This page lists every library, WebAssembly module, AI model and font the site ships to your browser, with its version, its license and a link to the exact source. It is generated from one data file in <a href="https://github.com/keenanlk/stayput/blob/main/src/data/licenses.json" rel="noopener">the repository</a>, and a test fails when a dependency is missing from it.</p>
+
+    <h2 id="source-offer">Source code, and your right to replace or relink the LGPL parts</h2>
+    <p>A few components are under the GNU Lesser General Public License (LGPL) or the Mozilla Public License 2.0 (MPL). Both let anyone use them in a project like this one. They also give you rights over those components, so here is how to use them.</p>
+    <ul>
+      <li><strong>Source.</strong> Each LGPL and MPL component below links to the exact version that Stayput ships: a release tag or a commit in its upstream repository. The source for Stayput's own code, including the build script that copies the decoders into place, is in the <a href="https://github.com/keenanlk/stayput" rel="noopener">repository</a>. If a link ever stops working, tell us at <a href="mailto:hello@stayput.dev">hello@stayput.dev</a> and we will fix it or send you the source.</li>
+      <li><strong>They are separate files.</strong> The LGPL parts are not merged into Stayput's own JavaScript. HEIC support is one file (<code>/vendor/heic-to@1.6.5/heic-to.min.js</code>, which holds libheif and libde265), and MP3 encoding is another (<code>/vendor/wasm-media-encoders@0.7.0/mp3.wasm</code>, which is LAME). The page loads each by URL when a tool needs it and does not check what is inside, so a modified or newer build of the same library works as a drop-in.</li>
+      <li><strong>Replace or relink them on your own copy.</strong> Clone the repository, point the entry for the library in <code>src/data/vendor.json</code> at your build (or install your build in place of the npm package), run <code>npm run build</code> and serve the <code>dist</code> folder. The build copies the file into <code>/vendor/</code> and nothing else needs to change.</li>
+      <li><strong>Replace them in your browser, without building anything.</strong> Use your browser's local overrides, or an extension that rewrites requests, to answer the URL above with your own file. Turn on "Bypass for network" in the developer tools for the visit, because the site's service worker caches these files. You may also reverse engineer the LGPL parts as far as needed to debug your changes.</li>
+      <li><strong>MPL parts.</strong> Mediabunny and Eigen are under MPL-2.0, which applies to their own files only. Their source is linked below. Stayput's own files stay MIT, and any change you make to a file under the MPL has to be published under the MPL.</li>
+    </ul>
+    <p>Full license texts: <a href="/licenses/LGPL-3.0.txt">GNU LGPL 3.0</a> (it builds on the <a href="https://www.gnu.org/licenses/gpl-3.0.txt" rel="noopener">GNU GPL 3.0</a>), <a href="/licenses/LGPL-2.0.txt">GNU Library GPL 2.0</a> and <a href="/licenses/MPL-2.0.txt">Mozilla Public License 2.0</a>.</p>
+
+    <h2 id="lgpl">Components under the LGPL</h2>
+    <ul class="lic-list lic-cards">
+      {lgpl.map((c) => (
+        <li class="lic-card" id={c.id}>
+          <b>{c.name} <span class="lic-ver">{c.version}</span></b>
+          <span>License: {c.licences.map((l, i) => <><a href={l.url} rel="noopener">{l.name}</a>{i < c.licences.length - 1 ? ', ' : ''}</>)}</span>
+          {c.copyright && <span>Copyright: {c.copyright}</span>}
+          <span>Source for this exact version: <a href={c.source} rel="noopener">{c.source.replace('https://', '')}</a></span>
+          <span>Shipped as: {c.shipped}</span>
+          {c.replace && <span>To replace it, serve your own file at <code>{c.replace}</code>.</span>}
+          {c.note && <span class="muted">{c.note}</span>}
+        </li>
+      ))}
+    </ul>
+
+    <h2 id="mpl">Components under the MPL-2.0</h2>
+    <ul class="lic-list lic-cards">
+      {mpl.map((c) => (
+        <li class="lic-card" id={c.id}>
+          <b>{c.name} <span class="lic-ver">{c.version}</span></b>
+          <span>License: {c.licences.map((l, i) => <><a href={l.url} rel="noopener">{l.name}</a>{i < c.licences.length - 1 ? ', ' : ''}</>)}</span>
+          {c.copyright && <span>Copyright: {c.copyright}</span>}
+          <span>Source for this exact version: <a href={c.source} rel="noopener">{c.source.replace('https://', '')}</a></span>
+          <span>Shipped as: {c.shipped}</span>
+          {c.replace && <span>To replace it, serve your own file at <code>{c.replace}</code>.</span>}
+          {c.note && <span class="muted">{c.note}</span>}
+        </li>
+      ))}
+    </ul>
+
+    {attributions.length > 0 && (
+      <>
+        <h2 id="notices">Notices</h2>
+        <ul class="lic-list lic-cards">
+          {attributions.map((c) => (
+            <li class="lic-card">
+              <b>{c.name} <span class="lic-ver">{c.version}</span></b>
+              <span>{c.attribution}</span>
+              <span>Copyright: {c.copyright}</span>
+              <span>License text: {c.licences.map((l, i) => <><a href={l.url} rel="noopener">{l.name}</a>{i < c.licences.length - 1 ? ', ' : ''}</>)}</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <h2 id="libraries">Libraries and WebAssembly modules</h2>
+    <p>Each item names the library, then what is compiled or bundled inside it. Versions are the ones in the current build.</p>
+    <ul class="lic-list">
+      {libraries.map((c) => (
+        <li id={`i-${c.id}`}>
+          <b>{c.name} <span class="lic-ver">{c.version}</span></b>
+          <span class="lic-meta">
+            {c.licences.map((l, i) => <><a href={l.url} rel="noopener">{l.name}</a>{i < c.licences.length - 1 ? ', ' : ''}</>)}
+            {' · '}<a href={c.project} rel="noopener">Project</a>
+            {' · '}<a href={c.source} rel="noopener">Source</a>
+          </span>
+          <span class="muted">{c.shipped}.{c.note ? ` ${c.note}` : ''}</span>
+          {childrenOf(c.id).length > 0 && (
+            <ul class="lic-sub">
+              {childrenOf(c.id).map((k) => (
+                <li>
+                  <b>{k.name} <span class="lic-ver">{k.version}</span></b>
+                  <span class="lic-meta">
+                    {k.licences.map((l, i) => <><a href={l.url} rel="noopener">{l.name}</a>{i < k.licences.length - 1 ? ', ' : ''}</>)}
+                    {' · '}<a href={k.project} rel="noopener">Project</a>
+                    {' · '}<a href={k.source} rel="noopener">Source</a>
+                  </span>
+                  {k.note && <span class="muted">{k.note}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+
+    <h2 id="models">AI models</h2>
+    <p>The models are files on this site, loaded by the tool that needs them and run on your device. Each license below allows redistribution; a note flags anything unusual about a model's training data.</p>
+    <ul class="lic-list">
+      {models.map((c) => (
+        <li id={`i-${c.id}`}>
+          <b>{c.name} <span class="lic-ver">{c.version}</span></b>
+          <span class="lic-meta">
+            {c.licences.map((l, i) => <><a href={l.url} rel="noopener">{l.name}</a>{i < c.licences.length - 1 ? ', ' : ''}</>)}
+            {' · '}<a href={c.project} rel="noopener">Project</a>
+            {' · '}<a href={c.source} rel="noopener">Source</a>
+          </span>
+          <span class="muted">{c.shipped}{c.note ? `. ${c.note}` : ''}</span>
+        </li>
+      ))}
+    </ul>
+
+    <h2 id="fonts">Fonts and other files</h2>
+    <ul class="lic-list">
+      {fonts.map((c) => (
+        <li id={`i-${c.id}`}>
+          <b>{c.name} <span class="lic-ver">{c.version}</span></b>
+          <span class="lic-meta">
+            {c.licences.map((l, i) => <><a href={l.url} rel="noopener">{l.name}</a>{i < c.licences.length - 1 ? ', ' : ''}</>)}
+            {' · '}<a href={c.project} rel="noopener">Project</a>
+            {' · '}<a href={c.source} rel="noopener">Source</a>
+          </span>
+          <span class="muted">{c.shipped}</span>
+        </li>
+      ))}
+    </ul>
+    <p>Back to <a href="/about">About Stayput</a>.</p>
+  </article>
+</Base>

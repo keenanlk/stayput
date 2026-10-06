@@ -1,5 +1,5 @@
 /**
- * Background removal in the browser. ISNet general-use (DIS, Apache-2.0),
+ * Background removal in the browser. ISNet general-use (DIS; see /licenses for its licensing),
  * with its weights stored as 8-bit integers (computed in full precision), finds the foreground at 1024×1024; the mask is
  * scaled back to the photo's own size and used as its alpha channel, so the
  * cut-out keeps full resolution. The model runs in a web worker

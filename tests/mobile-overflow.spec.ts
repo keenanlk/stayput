@@ -14,6 +14,7 @@ const pages = [
   '/tools/add-border-to-image',
   '/tools/crop-video',
   '/press',
+  '/licenses',
 ];
 
 for (const path of pages) {
