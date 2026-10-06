@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { unzipSync, zipSync } from 'fflate';
-import { PDFDocument, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees, StandardFonts } from 'pdf-lib';
+import { PDFDocument, PDFHexString, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees, StandardFonts } from 'pdf-lib';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { inspect, sniffFormat } from '../src/lib/exif';
@@ -467,6 +467,65 @@ test('Compress PDF recompresses images, cleans losslessly and flattens', async (
   await expect.poll(() => downloads.length).toBe(2);
   const flat = await PDFDocument.load(await bytesOf(downloads[1]!));
   expect(flat.getPageCount()).toBe(2);
+});
+
+/** A one-page PDF with a big photo, text, a link annotation and a filled-in text field. */
+async function linkAndFormPdf(): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage([612, 792]);
+  page.drawImage(await doc.embedJpg(readFileSync(fx('big.jpg'))), { x: 40, y: 360, width: 532, height: 380 });
+  page.drawText('Contact the team', { x: 60, y: 320, size: 20, font });
+  const link = doc.context.obj({
+    Type: 'Annot',
+    Subtype: 'Link',
+    Rect: [60, 315, 220, 340],
+    Border: [0, 0, 0],
+    A: { Type: 'Action', S: 'URI', URI: PDFHexString.fromText('https://example.com/contact') },
+  });
+  page.node.set(PDFName.of('Annots'), doc.context.obj([doc.context.register(link)]));
+  const field = doc.getForm().createTextField('full-name');
+  field.setText('Ada Lovelace');
+  field.addToPage(page, { x: 60, y: 250, width: 240, height: 28 });
+  return doc.save();
+}
+
+async function linksAndFields(bytes: Uint8Array) {
+  const doc = await PDFDocument.load(bytes);
+  const annots = doc.getPages().flatMap((p) => (p.node.Annots()?.asArray() ?? []).map((a) => doc.context.lookup(a)));
+  const links = annots.filter((a) => String(a?.toString()).includes('/Link')).length;
+  const fields = doc.getForm().getFields().map((f) => f.getName());
+  const text = fields.includes('full-name') ? doc.getForm().getTextField('full-name').getText() : undefined;
+  return { links, fields, text };
+}
+
+test('Compress PDF keeps links and form fields at the lossless and image levels, and drops them when pages are flattened', async ({ page }) => {
+  test.setTimeout(120_000);
+  const src = join(mkdtempSync(join(tmpdir(), 'linkform-')), 'link-and-form.pdf');
+  writeFileSync(src, await linkAndFormPdf());
+  expect(await linksAndFields(new Uint8Array(readFileSync(src)))).toEqual({ links: 1, fields: ['full-name'], text: 'Ada Lovelace' });
+
+  await open(page, 'compress-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([src]);
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
+  const outputs: Record<string, Awaited<ReturnType<typeof linksAndFields>>> = {};
+  for (const mode of ['lossless', 'images', 'flatten']) {
+    await page.locator('#results').evaluate((el) => el.classList.remove('is-active')).catch(() => {});
+    await choose(page.locator(`input[name="mode"][value="${mode}"]`));
+    const before = downloads.length;
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+    await expect.poll(() => downloads.length).toBe(before + 1);
+    outputs[mode] = await linksAndFields(await bytesOf(downloads[before]!));
+    // The image level must really have recompressed the photo, or keeping the link would prove nothing.
+    if (mode === 'images') await expect(page.locator('.result-item .meta')).toContainText('1 of 1 images recompressed');
+  }
+  const kept = { links: 1, fields: ['full-name'], text: 'Ada Lovelace' };
+  expect(outputs.lossless).toEqual(kept);
+  expect(outputs.images).toEqual(kept);
+  expect(outputs.flatten).toEqual({ links: 0, fields: [], text: undefined });
 });
 
 test('Rotate PDF writes page rotation', async ({ page }) => {

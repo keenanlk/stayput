@@ -104,6 +104,43 @@ test('MP4 to MP3 and Video to MP3 target different queries, with no size-limit c
   expect(await (await request.get('/tools/merge-pdf')).text()).toContain('<a href="/mp4-to-mp3">MP4 to MP3</a>');
 });
 
+test('Webcam test, mic test and compress PDF carry the reworked copy, sections, links and footer entries', async ({ request }) => {
+  const get = async (path: string) => (await request.get(path)).text();
+  const [webcam, mic, pdf] = await Promise.all([get('/tools/webcam-test'), get('/tools/mic-test'), get('/tools/compress-pdf')]);
+  expect(webcam).toContain('<title>Webcam Test: Check Camera Resolution and FPS | Stayput</title>');
+  expect(mic).toContain('<title>Mic Test: Check Your Microphone Online, No Upload | Stayput</title>');
+  expect(pdf).toContain('<title>Compress PDF Online: Free, No Upload, Set a Size | Stayput</title>');
+  for (const h of ['What this test shows', 'Webcam not working?']) expect(webcam).toContain(`<h2>${h}</h2>`);
+  for (const h of ['Test a headset or external microphone', 'Tips for a clean recording', 'Microphone not working? Check these first']) expect(mic).toContain(`<h2>${h}</h2>`);
+  expect(pdf).toContain('<h2>Compress to a set size: 100 KB, 200 KB, 500 KB, 1 MB, 2 MB</h2>');
+  // FAQ JSON-LD carries the new questions as plain text, with no link markup.
+  for (const [html, qs] of [
+    [webcam, ['How do I test my webcam on Windows or Mac?', 'Can I test my webcam before a Zoom or Teams call?']],
+    [mic, ['How do I test my microphone on Windows or Mac?', 'How do I test an external or USB microphone?', 'Does the mic test work on a phone?']],
+    [pdf, ['How do I compress a scanned PDF?', 'Can I compress a PDF on my phone?', 'Will compressing change my text, links or forms?']],
+  ] as [string, string[]][]) {
+    for (const q of qs) expect(html).toContain(`"name":"${q}"`);
+  }
+  // Every listed link is in the page and goes to a page that exists without a redirect.
+  const links: [string, string[]][] = [
+    ['/tools/mic-test', ['/tools/voice-recorder', '/tools/remove-noise']],
+    ['/tools/compress-pdf', ['/compress-pdf-to-100kb', '/compress-pdf-to-200kb', '/compress-pdf-to-500kb', '/compress-pdf-to-1mb', '/compress-pdf-to-2mb', '/tools/split-pdf', '/guides/compress-pdf-without-losing-quality']],
+    ...['/tools/tuner', '/tools/metronome', '/tools/screen-recorder', '/screen-recorder-with-audio', '/tools/vocal-remover', '/tools/audio-converter'].map((p): [string, string[]] => [p, ['/tools/mic-test']]),
+    ...['/tools/passport-photo', '/tools/profile-picture-maker'].map((p): [string, string[]] => [p, ['/tools/webcam-test']]),
+    ['/tools/heic-to-jpg', ['/tools/mic-test', '/tools/webcam-test']],
+  ];
+  for (const [from, targets] of links) {
+    const html = await get(from);
+    for (const t of targets) {
+      expect(html, `${from} -> ${t}`).toContain(`href="${t}"`);
+      expect((await request.get(t, { maxRedirects: 0 })).status(), t).toBe(200);
+    }
+  }
+  // Mic and camera copy follows the privacy page; none of the claims the site avoids.
+  for (const slug of ['webcam-test', 'mic-test', 'compress-pdf']) expect(JSON.stringify(tools.find((t) => t.slug === slug)), slug).not.toMatch(/no limit|unlimited|any device|any phone|every device|no data|zero requests/i);
+  expect(mic).toContain('handled inside the page in your tab and is never sent to a server');
+});
+
 test('HEIC to JPG explains how to open HEIC, links related pages and says the decoder comes from this site', async ({ request }) => {
   const html = await (await request.get('/tools/heic-to-jpg')).text();
   expect(html).toContain('How to open or convert HEIC on Windows, Mac and iPhone');
