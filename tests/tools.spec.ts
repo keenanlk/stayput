@@ -2594,7 +2594,7 @@ test('Extract text page joins lines into paragraphs, and an image without text g
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(fx('plain.jpg'));
   await page.locator('#run').click();
-  await expect(page.locator('#error')).toContainText('No text was found', { timeout: 60_000 });
+  await expect(page.locator('#error')).toContainText('No clear text found', { timeout: 60_000 });
 });
 
 test('Color picker reads the pixel under a click, finds the main colours, saves a palette, and no bytes leave the tab', async ({ page }) => {
@@ -6467,4 +6467,27 @@ test('Pixel art, photo to sketch and rounded corners make the expected images', 
   expect(r).toMatchObject({ width: 4000, height: 3000 });
   expect(r.px[0]![3]).toBe(0);
   expect(r.px[1]![3]).toBe(255);
+});
+
+test('Image to text reads the words on a photo with a busy background and no junk lines', async ({ page }) => {
+  const errors = await open(page, 'image-to-text');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(staticFx('ocr-scene.jpg'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 90_000 });
+  const text = await page.locator('#results-list .result-text').inputValue();
+  // The words, and nothing from the background.
+  expect(text).toBe('OPEN DAILY\nCOFFEE & TEA');
+  expect(errors).toEqual([]);
+});
+
+test('Image to text says so when a photo has no text, instead of showing noise', async ({ page }) => {
+  await open(page, 'image-to-text');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(staticFx('ocr-texture.jpg'));
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 90_000 });
+  await expect(page.locator('#error')).toContainText('No clear text found');
+  await expect(page.locator('#error')).toContainText('try cropping to the text');
+  await expect(page.locator('#results-list .result-text')).toHaveCount(0);
 });

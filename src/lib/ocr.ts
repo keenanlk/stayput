@@ -5,7 +5,7 @@
  * src/data/vendor.json): about 6 MB, fetched the first time Run is pressed and
  * never from a third party. Nothing leaves the tab.
  */
-import type { Worker } from 'tesseract.js';
+import type { Page, Worker } from 'tesseract.js';
 import { vendorDir } from './vendor';
 
 let worker: Promise<Worker> | undefined;
@@ -67,8 +67,44 @@ export async function readText(
   onProgress?.('loading', 0);
   const w = await load((f) => onProgress?.('loading', f));
   onProgress?.('reading', 0);
-  const { data } = await w.recognize(prepare(bitmap));
-  return { text: data.text.replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim(), confidence: data.confidence };
+  const { data } = await w.recognize(prepare(bitmap), {}, { text: true, blocks: true });
+  return confidentText(data);
+}
+
+/** Words below this confidence (0 to 100) are dropped from a photo's text. Real words on a clean background score 80+; texture reads as 0 to 40. */
+const MIN_WORD_CONFIDENCE = 60;
+
+/** A line must hold at least one word of two or more letters or digits at this confidence, or it is noise that happened to match a short word. */
+const ANCHOR_CONFIDENCE = 80;
+
+/**
+ * Tesseract treats a photo as a page, so a brick wall or foliage comes back as
+ * lines of random characters. Keep only the words it is sure of, and drop a
+ * line that is left mostly symbols. Clean pages lose nothing: their words all
+ * score high, and an untouched line keeps Tesseract's own spacing.
+ */
+function confidentText(data: Page): OcrResult {
+  const blocks: string[] = [];
+  const scores: number[] = [];
+  for (const block of data.blocks ?? []) {
+    const paras: string[] = [];
+    for (const para of block.paragraphs) {
+      const lines: string[] = [];
+      for (const line of para.lines) {
+        const kept = line.words.filter((w) => w.text.trim() && w.confidence >= MIN_WORD_CONFIDENCE);
+        const text = (kept.length === line.words.length ? line.text : kept.map((w) => w.text.trim()).join(' ')).trim();
+        // A real line has letters or digits making up most of it, and a word it is sure of.
+        const solid = text.replace(/[^\p{L}\p{N}]/gu, '').length;
+        if (solid / (text.replace(/\s/g, '').length || 1) < 0.6 || !kept.some((w) => w.confidence >= ANCHOR_CONFIDENCE && /[\p{L}\p{N}]{2}/u.test(w.text))) continue;
+        lines.push(text);
+        scores.push(...kept.map((w) => w.confidence));
+      }
+      if (lines.length) paras.push(lines.join('\n'));
+    }
+    if (paras.length) blocks.push(paras.join('\n\n'));
+  }
+  const text = blocks.join('\n\n').replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim();
+  return { text, confidence: scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0 };
 }
 
 /**
