@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tools } from '../src/data/tools';
 import { guides } from '../src/data/guides';
-// @ts-expect-error plain .mjs script, no types
 import { changedUrls } from '../scripts/indexnow-changes.mjs';
 
 const dist = new URL('../dist/', import.meta.url);
