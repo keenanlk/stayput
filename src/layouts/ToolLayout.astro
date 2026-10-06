@@ -9,7 +9,7 @@ import { presets } from '../data/presets';
 import { guidesFor } from '../data/guides';
 import { engineFor } from '../data/engine';
 import { nextSteps } from '../data/next-steps';
-import { inline } from '../lib/inline';
+import { inline, inlineLinks, plainLinks } from '../lib/inline';
 
 interface Props {
   tool: Tool;
@@ -99,7 +99,7 @@ const jsonLd = [
     mainEntity: tool.faq.map((f) => ({
       '@type': 'Question',
       name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
+      acceptedAnswer: { '@type': 'Answer', text: plainLinks(f.a) },
     })),
   },
   {
@@ -221,7 +221,7 @@ const jsonLd = [
       {tool.faq.map((f, i) => (
         <details open={i === 0}>
           <summary>{f.q}</summary>
-          <p>{f.a}</p>
+          <p set:html={inlineLinks(f.a)} />
         </details>
       ))}
     </div>
