@@ -2594,7 +2594,7 @@ test('Extract text page joins lines into paragraphs, and an image without text g
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(fx('plain.jpg'));
   await page.locator('#run').click();
-  await expect(page.locator('#error')).toContainText('No text was found', { timeout: 60_000 });
+  await expect(page.locator('#error')).toContainText('No clear text found', { timeout: 60_000 });
 });
 
 test('Color picker reads the pixel under a click, finds the main colours, saves a palette, and no bytes leave the tab', async ({ page }) => {
