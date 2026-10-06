@@ -26,4 +26,10 @@ jobs:
         with:
           node-version: 22
       - if: steps.changed.outputs.site == 'true'
-        run: node scripts/indexnow.mjs
+        # A manual run resubmits every page; a deploy submits only the pages whose lastmod changed.
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            node scripts/indexnow.mjs --all
+          else
+            node scripts/indexnow.mjs --from=HEAD~1 --to=HEAD
+          fi

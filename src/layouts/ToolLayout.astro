@@ -10,6 +10,7 @@ import { guidesFor } from '../data/guides';
 import { engineFor } from '../data/engine';
 import { nextSteps } from '../data/next-steps';
 import { inline, inlineLinks, plainLinks } from '../lib/inline';
+import { lastmodFor } from '../lib/lastmod';
 
 interface Props {
   tool: Tool;
@@ -92,6 +93,7 @@ const jsonLd = [
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     isAccessibleForFree: true,
     license: 'https://opensource.org/licenses/MIT',
+    dateModified: lastmodFor(new URL(url).pathname),
   },
   {
     '@context': 'https://schema.org',
