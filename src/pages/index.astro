@@ -62,7 +62,7 @@ const jsonLd = [
       <div>
         <h1>Your files stay put.</h1>
         <p class="lede">
-          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is capped, nothing is watermarked. It even works with the Wi-Fi off after your first visit.
+          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is watermarked, and the only size limit is your device’s memory. It even works with the Wi-Fi off after your first visit.
         </p>
         <p class="start-label" id="start-h">What do you want to do? Pick one, then drop your file.</p>
         <ul class="start-tiles" aria-labelledby="start-h">
@@ -91,12 +91,12 @@ const jsonLd = [
   <section class="wrap demo" aria-labelledby="demo-h">
     <h2 id="demo-h">Watch it with the network tab open</h2>
     <figure>
-      <video controls muted playsinline preload="none" width="1280" height="720" data-poster="/media/stayput-network-tab-poster.webp" aria-label="Demo: three photos convert on Stayput while a network panel lists every request, then the same conversion runs again offline">
+      <video controls muted playsinline preload="none" width="1280" height="720" data-poster="/media/stayput-network-tab-poster.webp" aria-label="Demo: three photos convert on Stayput while a network panel lists every request, then, after the page has loaded, the same conversion runs again offline">
         <source src="/media/stayput-network-tab.webm" type="video/webm" />
         <source src="/media/stayput-network-tab.mp4" type="video/mp4" />
         Your browser can't play this video. The text below describes it.
       </video>
-      <figcaption>Three HEIC photos convert to JPG while a network panel lists every request the page makes. None of the requests carries a photo. Then the network is switched off and the same photos convert again. The video has captions and no sound; it runs 23 seconds.</figcaption>
+      <figcaption>Three HEIC photos convert to JPG while a network panel lists every request the page makes. None of the requests carries a photo. Once the page has loaded, the network is switched off and the same photos convert again. The video has captions and no sound; it runs 23 seconds.</figcaption>
     </figure>
   </section>
 
@@ -137,7 +137,7 @@ const jsonLd = [
       <div><dt>Uploads</dt><dd><b>None.</b> The site is static files; every conversion runs in your tab.</dd></div>
       <div><dt>Limits</dt><dd><b>No daily limit.</b> No "two tasks per hour" and no server-side size tier. Batch a hundred photos if your device can hold them.</dd></div>
       <div><dt>Account</dt><dd><b>None.</b> No sign-up wall, no watermark.</dd></div>
-      <div><dt>Offline</dt><dd><b>Yes.</b> Open a tool once and it is cached. Install it as an app from your browser menu to keep it a tap away.</dd></div>
+      <div><dt>Offline</dt><dd><b>Yes, after your first visit.</b> Open a tool once and it is cached. Install it as an app from your browser menu to keep it a tap away.</dd></div>
       <div><dt>Tracking</dt><dd>An anonymous, cookie-free page count. Never file names or contents.</dd></div>
       <div><dt>Source</dt><dd>MIT licensed and <a href="https://github.com/keenanlk/stayput" rel="noopener">on GitHub</a>. Read the code, report a bug, or host your own copy.</dd></div>
     </dl>

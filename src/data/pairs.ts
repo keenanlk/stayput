@@ -82,7 +82,7 @@ export const pairs: Pair[] = [
     faq: [
       { q: 'Why is the PNG so much bigger than the HEIC?', a: 'HEIC uses lossy video-style compression; PNG is lossless. A 2 MB HEIC from a 12-megapixel camera typically becomes a 15 to 25 MB PNG. If size matters more than a lossless copy, use the HEIC to JPG tool instead.' },
       { q: 'Does the PNG keep the photo’s date and location?', a: 'No. PNG has no standard place for camera EXIF data, and browsers do not write it. If you need the metadata, convert to JPG and tick "Keep EXIF metadata".' },
-      { q: 'Are my photos uploaded?', a: 'No. There is no server in this process at all. You can load the page, switch your device to airplane mode, and convert.' },
+      { q: 'Are my photos uploaded?', a: 'No. There is no server in this process at all. After one visit you can switch your device to airplane mode and convert.' },
     ],
   },
   {
@@ -229,7 +229,7 @@ export const pairs: Pair[] = [
     faq: [
       { q: 'What if my browser cannot decode AVIF?', a: 'AVIF decoding arrived in Chrome 85, Firefox 93 and Safari 16. In an older browser the page fetches a WebAssembly AVIF decoder (about 1 MB of program code, cached after the first use) and decodes the image in the tab instead. Either way the image itself is never sent anywhere.' },
       { q: 'Is quality lost?', a: 'AVIF and JPG are both lossy, so a small amount of detail is discarded in the re-encode. At quality 90 it is not visible. There is no way to convert AVIF to JPG without this step.' },
-      { q: 'Is the image uploaded anywhere?', a: 'No. The conversion runs entirely inside your browser tab. The page works with the network disconnected.' },
+      { q: 'Is the image uploaded anywhere?', a: 'No. The conversion runs entirely inside your browser tab. After one visit the page works with the network disconnected.' },
     ],
   },
   {
@@ -335,7 +335,7 @@ export const pairs: Pair[] = [
       { q: 'Is JFIF the same as JPG?', a: 'Yes, in practice. JFIF is the standard container for JPEG data, and .jfif, .jpg, .jpeg and .jpe files are all the same kind of image. Only the name at the end differs, and some software checks the name.' },
       { q: 'Why do my downloaded images save as .jfif?', a: 'Windows maps the image/jpeg type to the .jfif extension in its registry on some machines, so browsers on those machines offer .jfif when you save a picture. Converting the files, or renaming them, fixes it for the files you already have.' },
       { q: 'Does converting lose quality?', a: 'The image is re-encoded as JPG at the quality you choose, 90 by default, which is visually identical for photos. If you want the original bytes untouched, rename the file instead of converting it. Tick "Keep EXIF metadata" to carry the camera data over.' },
-      { q: 'Are the images uploaded?', a: 'No. Your browser decodes and encodes each image inside this tab. There is no server in the process; you can go offline after the page loads.' },
+      { q: 'Are the images uploaded?', a: 'No. Your browser decodes and encodes each image inside this tab. There is no server in the process; you can go offline after one visit.' },
     ],
   },
   {
@@ -498,7 +498,7 @@ export const pairs: Pair[] = [
       { q: 'What about BMPs with transparency?', a: 'A 32-bit BMP with an alpha channel keeps its transparency in the PNG. Most BMPs are 24-bit and have no transparency to keep.' },
       { q: 'Can Windows open PNG files everywhere a BMP worked?', a: 'Almost always. Photos, Paint, Word, PowerPoint and every browser open PNG. The exceptions are the same old or embedded programs that still ask for BMP in the first place; keep the original bitmap for those.' },
       { q: 'Does the PNG keep the DPI of the scan?', a: 'The pixel count is identical, which is what decides print quality. The dots-per-inch tag from the bitmap header is not copied, so print dialogs may assume 72 or 96 dpi; set the print size you want there.' },
-      { q: 'Is anything uploaded?', a: 'No. The bitmap is decoded and the PNG is written by your browser, in this tab. The page keeps working with Wi-Fi turned off.' },
+      { q: 'Is anything uploaded?', a: 'No. The bitmap is decoded and the PNG is written by your browser, in this tab. After one visit the page keeps working with Wi-Fi turned off.' },
     ],
   },
   {

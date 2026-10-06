@@ -158,7 +158,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is anything uploaded?',
-        a: 'No. Decoding and encoding happen in this browser tab. This page works with your network switched off.',
+        a: 'No. Decoding and encoding happen in this browser tab. After one visit this page works with your network switched off.',
       },
     ],
   },
@@ -544,7 +544,7 @@ export const tools: Tool[] = [
   {
     slug: 'unlock-pdf',
     lead:
-      'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The only size limit is your device’s memory, and after your first run the page works offline.',
     name: 'Unlock PDF',
     title: 'Unlock PDF: Remove a PDF Password, Free and Private | Stayput',
     description:
@@ -573,7 +573,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my PDF or password sent anywhere?',
-        a: 'No. The PDF is decrypted inside your browser tab by qpdf compiled to WebAssembly. The password is used in the tab and never leaves it, and the page works with the network off after one visit.',
+        a: 'No. The PDF is decrypted inside your browser tab by qpdf compiled to WebAssembly. The password is used in the tab and never leaves it, and the page works with the network off after your first run.',
       },
     ],
   },
@@ -751,7 +751,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I sign on a phone?',
-        a: 'Yes. Draw with your finger in the signature box. It works in Safari on iPhone and in Chrome on Android, offline included.',
+        a: 'Yes. Draw with your finger in the signature box. It works in Safari on iPhone and in Chrome on Android, and works offline after one visit.',
       },
       {
         q: 'What if the PDF is a form or is password protected?',
@@ -839,7 +839,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is the PDF uploaded?',
-        a: 'No. pdf.js reads the text inside your browser and the Word file is assembled in memory in your tab. You can convert with the network switched off.',
+        a: 'No. pdf.js reads the text inside your browser and the Word file is assembled in memory in your tab. After one visit you can convert with the network switched off.',
       },
     ],
   },
@@ -881,7 +881,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is the photo uploaded?',
-        a: 'No. The image is decoded and cropped on a canvas inside your browser tab. You can load the page, switch off Wi-Fi and crop as many photos as you like.',
+        a: 'No. The image is decoded and cropped on a canvas inside your browser tab. After one visit you can switch off Wi-Fi and crop as many photos as you like.',
       },
     ],
   },
@@ -907,7 +907,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my photo uploaded?',
-        a: 'No. The photo is decoded and edited on a canvas inside your browser tab, and the new file is written there too. That matters most for exactly the photos people blur: children, other people’s faces, ID cards, bank screenshots. You can load the page, turn off Wi-Fi and it still works.',
+        a: 'No. The photo is decoded and edited on a canvas inside your browser tab, and the new file is written there too. That matters most for exactly the photos people blur: children, other people’s faces, ID cards, bank screenshots. After your first run you can turn off Wi-Fi and it still works.',
       },
       {
         q: 'Should I blur, pixelate or use a black box?',
@@ -969,7 +969,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is anything uploaded?',
-        a: 'No. Each image is decoded and redrawn on a canvas inside your browser tab, then saved from there. You can load the page, turn off Wi-Fi and it still works.',
+        a: 'No. Each image is decoded and redrawn on a canvas inside your browser tab, then saved from there. After one visit you can turn off Wi-Fi and it still works.',
       },
     ],
   },
@@ -1037,7 +1037,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my image uploaded?',
-        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page. The engine and its English model (about 6 MB) are downloaded from this site the first time you use it, then the tool works offline. Switch off Wi-Fi after the first run and it still reads images.',
+        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page. The engine and its English model (about 6 MB) are downloaded from this site the first time you use it, and after that first use the tool works offline. Switch off Wi-Fi after the first run and it still reads images.',
       },
       {
         q: 'How accurate is it?',
@@ -1053,7 +1053,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is the first run slower?',
-        a: 'The first time, your browser downloads the OCR engine and model from this site. They are cached, so later runs start straight away, even offline. Reading a full page takes a few seconds on a laptop and a little longer on a phone.',
+        a: 'The first time, your browser downloads the OCR engine and model from this site. They are cached, so after the first run it starts straight away, even offline. Reading a full page takes a few seconds on a laptop and a little longer on a phone.',
       },
     ],
   },
@@ -1081,7 +1081,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser reads the sound track with its own decoders, and an MP3 encoder (LAME, compiled to WebAssembly) runs inside the page to write the file. There is no server in the process, so there is no upload to wait for. You can load the page, switch off Wi-Fi and it still works.',
+        a: 'No. Your browser reads the sound track with its own decoders, and an MP3 encoder (LAME, compiled to WebAssembly) runs inside the page to write the file. There is no server in the process, so there is no upload to wait for. After your first run you can switch off Wi-Fi and it still works.',
       },
       {
         q: 'Which files can I convert?',
@@ -1123,7 +1123,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser plays the video from the file on your device, Stayput copies the frames you asked for onto a canvas, and a small GIF encoder in the page writes the file. There is no server in the process; you can load the page, turn off Wi-Fi and it still works.',
+        a: 'No. Your browser plays the video from the file on your device, Stayput copies the frames you asked for onto a canvas, and a small GIF encoder in the page writes the file. There is no server in the process; after one visit you can turn off Wi-Fi and it still works.',
       },
       {
         q: 'How long can the GIF be?',
@@ -1167,7 +1167,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is decoded by code in this page and each frame is encoded by your browser’s own video encoder. There is no server in the process, so there is nothing to wait for, and the page works with Wi-Fi off.',
+        a: 'No. The GIF is decoded by code in this page and each frame is encoded by your browser’s own video encoder. There is no server in the process, so there is nothing to wait for, and after one visit the page works with Wi-Fi off.',
       },
       {
         q: 'Why is the MP4 so much smaller than the GIF?',
@@ -1209,7 +1209,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for and no copy left on someone else’s computer. You can load the page, switch off Wi-Fi and it still works.',
+        a: 'No. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for and no copy left on someone else’s computer. After one visit you can switch off Wi-Fi and it still works.',
       },
       {
         q: 'How much smaller will it get?',
@@ -1251,7 +1251,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process, so there is no upload and no copy left anywhere. The page works with Wi-Fi off.',
+        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process, so there is no upload and no copy left anywhere. After one visit the page works with Wi-Fi off.',
       },
       {
         q: 'Why was my file converted so fast?',
@@ -1329,7 +1329,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The file is read and rewritten by code in this page. There is no server in the process, so there is no upload and no copy left anywhere. The page works with Wi-Fi off.',
+        a: 'No. The file is read and rewritten by code in this page. There is no server in the process, so there is no upload and no copy left anywhere. After one visit the page works with Wi-Fi off.',
       },
       {
         q: 'Does removing the sound lower the quality?',
@@ -1743,7 +1743,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my Wi-Fi password sent anywhere?',
-        a: 'No. The code is built by code in this page from what you type, and nothing is sent to a server, not even a usage count of what you typed. You can load the page, turn off your internet connection, and it still works.',
+        a: 'No. The code is built by code in this page from what you type, and nothing is sent to a server, not even a usage count of what you typed. After one visit you can turn off your internet connection and it still works.',
       },
       {
         q: 'Do you track who scans my code?',
@@ -1823,7 +1823,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my recording uploaded?',
-        a: 'No. The microphone is recorded by your browser in this tab, and the MP3 is written by code in this page. There is no account and no server, so nobody else can hear it, and the page works offline once loaded.',
+        a: 'No. The microphone is recorded by your browser in this tab, and the MP3 is written by code in this page. There is no account and no server, so nobody else can hear it, and the page works offline after your first run.',
       },
       {
         q: 'Does it work on my phone?',
@@ -1861,7 +1861,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound, the volume change runs in the page, and the file is written again in your tab. Videos have their picture copied across without re-encoding. Nothing is sent anywhere, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the sound, the volume change runs in the page, and the file is written again in your tab. Videos have their picture copied across without re-encoding. Nothing is sent anywhere, and it works offline after your first run.',
       },
       {
         q: 'Will boosting make it distort?',
@@ -1903,7 +1903,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my recordings uploaded?',
-        a: 'No. The noise remover is a small neural network that runs as WebAssembly inside this page. Your browser decodes the sound, the network cleans it, and the file is written again in your tab. Nothing is sent anywhere, and it works offline once the page has loaded.',
+        a: 'No. The noise remover is a small neural network that runs as WebAssembly inside this page. Your browser decodes the sound, the network cleans it, and the file is written again in your tab. Nothing is sent anywhere, and it works offline after your first run.',
       },
       {
         q: 'What kind of noise does it remove?',
@@ -1945,7 +1945,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Nothing is sent to a server, the page works offline once loaded.',
+        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Nothing is sent to a server, the page works offline after your first run.',
       },
       {
         q: 'Can I mix different formats?',
@@ -2362,7 +2362,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my audio uploaded?',
-        a: 'No. Your browser decodes the sound, the pitch and speed change run in the page, and the file is written again in your tab. Nothing is sent anywhere, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the sound, the pitch and speed change run in the page, and the file is written again in your tab. Nothing is sent anywhere, and it works offline after your first run.',
       },
       {
         q: 'How do I change the key of a song?',
@@ -3174,7 +3174,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my logo uploaded?',
-        a: 'No. The image is decoded and resized on a canvas in your browser tab, and the ICO file is written by a small encoder in the page. Logos for a rebrand or an unannounced product never leave your device. You can load the page, go offline and generate icons as often as you like.',
+        a: 'No. The image is decoded and resized on a canvas in your browser tab, and the ICO file is written by a small encoder in the page. Logos for a rebrand or an unannounced product never leave your device. After one visit you can go offline and generate icons as often as you like.',
       },
     ],
   },
@@ -3200,7 +3200,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my photo uploaded?',
-        a: 'No. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only download is the model itself, fetched from this site the first time. You can load the page, use it once, turn off Wi-Fi and it keeps working.',
+        a: 'No. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only download is the model itself, fetched from this site the first time. After your first run you can turn off Wi-Fi and it keeps working.',
       },
       {
         q: 'Why is the first photo slow?',

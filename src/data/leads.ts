@@ -141,7 +141,7 @@ const downloads: Record<string, Download> = {
 /**
  * Tools whose engine is fetched on first use rather than on page load, so they work offline only
  * after one run: a model (the `downloads` above), the MP3 encoder, the archive, checksum, noise
- * and encrypted-PDF engines, and the face finder behind blur-image. tests/offline-badge.spec.ts
+ * and encrypted-PDF engines, and the face finder behind blur-image. tests/claims.spec.ts
  * checks that a tool importing one of these engines is listed. Everything else is fully cached
  * on the first visit (pages, scripts and the image decoders).
  */
@@ -153,8 +153,15 @@ const firstUseEngines = [
 
 /** The offline badge: after the first visit, or, for tools that fetch an engine on first run, after the first use. */
 export function offlineBadge(base: string): string {
-  return base in downloads || firstUseEngines.includes(base) ? 'Works offline after first use' : 'Works offline after first visit';
+  return needsFirstUse(base) ? 'Works offline after first use' : 'Works offline after first visit';
 }
+
+/** True for a tool that is offline-ready only after one run, because it fetches a model or engine when used. */
+export const needsFirstUse = (base: string): boolean => base in downloads || firstUseEngines.includes(base);
+
+/** Rewrites "after one visit" to "after your first run" for a tool that needs a first run. */
+export const offlineWhen = (base: string, text: string): string =>
+  needsFirstUse(base) ? text.replace(/\bafter one visit\b/g, 'after your first run').replace(/\bAfter one visit\b/g, 'After your first run') : text;
 
 /** The size badge: a tool's own `sizeFact`, else a watermark claim with the real limit. */
 export const defaultSizeBadge = 'No watermark · limit is your device’s memory';

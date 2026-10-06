@@ -62,13 +62,13 @@ export const guides: Guide[] = [
         h: 'How to tell whether a tool uploads your file',
         p: [
           'You do not have to take anyone\'s word for it. Open the tool in your browser, press **F12** (or Cmd-Option-I on a Mac), pick the **Network** tab, then add your PDFs and run the merge. Every request the page makes appears in that list. An upload shows up as a **POST** or **PUT** request whose size matches your files. If the list stays empty after you add files, apart from small analytics pings, nothing left your computer. The [full walkthrough](/guides/does-this-website-upload-my-files) has screenshots of what each case looks like.',
-          'A second test is cruder and just as convincing: load the page, switch to airplane mode, and try to merge. A tool that needs a server fails immediately.',
+          'A second test is cruder and just as convincing: after the page has loaded, switch to airplane mode and try to merge. A tool that needs a server fails immediately.',
         ],
       },
       {
         h: 'Merging without uploading',
         p: [
-          'PDF merging does not need a server. A PDF is a container of pages, and copying pages from several containers into a new one is something a browser can do in JavaScript with a library such as pdf-lib. Stayput\'s [merge tool](/tools/merge-pdf) does exactly that: your files are read from disk into your tab\'s memory, the combined document is written there, and the download comes from your own browser. The page works with the network switched off, and its own request counter shows you the list.',
+          'PDF merging does not need a server. A PDF is a container of pages, and copying pages from several containers into a new one is something a browser can do in JavaScript with a library such as pdf-lib. Stayput\'s [merge tool](/tools/merge-pdf) does exactly that: your files are read from disk into your tab\'s memory, the combined document is written there, and the download comes from your own browser. After one visit the page works with the network switched off, and its own request counter shows you the list.',
           'The same goes for [splitting](/tools/split-pdf), [compressing](/tools/compress-pdf), [rotating](/tools/rotate-pdf) and [signing](/tools/sign-pdf). None of these need anything a browser cannot do.',
         ],
       },
@@ -83,7 +83,7 @@ export const guides: Guide[] = [
       { q: 'Are big-name PDF sites safe?', a: 'They are professionally run and encrypt the transfer, which protects you from eavesdropping, not from the file being on their server. Read the retention section of the privacy policy and decide per document.' },
       { q: 'Does HTTPS mean my PDF is private?', a: 'HTTPS protects the file in transit between you and the server. Once it arrives it is stored and processed in the clear. It says nothing about what happens next.' },
       { q: 'Is a browser-only tool really safer?', a: 'The file never leaves your device, so there is nothing to retain, breach or subpoena. You can verify that in the network tab rather than trusting a policy.' },
-      { q: 'Can I merge PDFs offline on my phone?', a: 'Yes. Open the merge tool once, and it is cached; afterwards it works in airplane mode and can be installed as an app from the browser menu.' },
+      { q: 'Can I merge PDFs offline on my phone?', a: 'Yes. Open the merge tool once, and it is cached; after that first visit it works in airplane mode and can be installed as an app from the browser menu.' },
     ],
   },
   {
@@ -419,7 +419,7 @@ export const guides: Guide[] = [
       {
         h: 'Step 4: the airplane-mode test',
         p: [
-          'For a second opinion that needs no panel at all: load the tool, switch on airplane mode or unplug the network, and run it. A tool that processes locally keeps working. A tool that uploads fails at once. This also catches the case where a site processes locally but "phones home" with the result.',
+          'For a second opinion that needs no panel at all: after one visit, switch on airplane mode or unplug the network and run it. (Tools that fetch a model or engine on first use, such as the background remover, need one run first.) A tool that processes locally keeps working. A tool that uploads fails at once. This also catches the case where a site processes locally but "phones home" with the result.',
         ],
       },
       {
@@ -491,7 +491,7 @@ export const guides: Guide[] = [
       { q: 'Is a drawn or typed signature legally valid?', a: 'In the United States (ESIGN Act), the United Kingdom, the European Union (eIDAS "simple electronic signature") and most other jurisdictions, a signature you intend as your signature is valid for ordinary contracts. Certain documents, such as wills and some property deeds, have stricter rules.' },
       { q: 'Can the recipient remove the signature?', a: 'It is drawn into the page content like any other graphic. Editing it out is as hard, or as easy, as editing any part of a PDF, which is the same as for a scanned signature.' },
       { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline after your first visit.' },
-      { q: 'Is my document uploaded when I sign it here?', a: 'No. The signature is placed by code running in your browser; you can verify it in the network tab or by signing with the network switched off.' },
+      { q: 'Is my document uploaded when I sign it here?', a: 'No. The signature is placed by code running in your browser; you can verify it in the network tab or, after one visit, by signing with the network switched off.' },
     ],
   },
   {
@@ -599,15 +599,15 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'Working offline and installing it',
+        h: 'Working offline after your first visit, and installing it',
         p: [
-          'Because every tool is a static page and a script, the site caches itself after the first visit and works with the network off. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
+          'Because every tool is a static page and a script, the site caches itself after the first visit and works with the network off from then on. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
         ],
       },
     ],
     faq: [
       { q: 'Is a browser tool slower than a desktop app?', a: 'For these jobs, not noticeably. WebAssembly runs the same code at close to native speed, and the work happens on your own processor.' },
-      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu for offline use.' },
+      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu; after your first visit it then works offline.' },
       { q: 'What about very large files?', a: 'The limit is your device\'s memory. A few hundred megabytes of PDF or a few hundred photos are fine on a laptop; a phone manages less at once.' },
       { q: 'How do I know the code does what it says?', a: 'It is open source under the MIT licence. The repository is linked in the footer of every page, and the network tab shows what the page does while you use it.' },
     ],
@@ -766,7 +766,7 @@ export const guides: Guide[] = [
       {
         h: 'How to check any converter yourself',
         p: [
-          'Whatever a site says, you can see whether it uploads. Open your browser’s network panel, add a file and watch for an outgoing request the size of your file; or load the page, switch on airplane mode and try it. Our guide [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks in five minutes.',
+          'Whatever a site says, you can see whether it uploads. Open your browser’s network panel, add a file and watch for an outgoing request the size of your file; or, after the page has loaded, switch on airplane mode and try it. Our guide [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks in five minutes.',
         ],
       },
     ],
@@ -815,7 +815,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting without uploading',
         p: [
-          'For the formats people convert most, a browser can do the work locally. Stayput’s tools run inside the page: [convert images](/tools/convert-image) between JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF, [compress images](/tools/compress-image), turn clips into GIFs with [Video to GIF](/tools/video-to-gif), and pull audio out of video with [Video to MP3](/tools/video-to-mp3). Nothing is sent to a server, there are no file size caps from a pricing plan, and the pages keep working with the network switched off.',
+          'For the formats people convert most, a browser can do the work locally. Stayput’s tools run inside the page: [convert images](/tools/convert-image) between JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF, [compress images](/tools/compress-image), turn clips into GIFs with [Video to GIF](/tools/video-to-gif), and pull audio out of video with [Video to MP3](/tools/video-to-mp3). Nothing is sent to a server, there are no file size caps from a pricing plan, only your device’s memory, and after one visit the pages keep working with the network switched off.',
           'FreeConvert covers many more formats, such as documents, e-books and archives, and adds features like cloud imports. Choose by the file: sensitive and common, stay local; obscure and harmless, an upload service is the practical option.',
         ],
       },
@@ -830,7 +830,7 @@ export const guides: Guide[] = [
       { q: 'Is FreeConvert legit?', a: 'Yes. It is operated by TRMedia Inc., a Canadian company, and publishes a privacy policy with a fixed deletion period.' },
       { q: 'How long does FreeConvert keep my files?', a: 'Its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
       { q: 'Where are FreeConvert files stored?', a: 'On Amazon Web Services in Ireland, according to its privacy policy.' },
-      { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; switch on airplane mode after the page loads and they still work.' },
+      { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; after one visit, switch on airplane mode and they still work.' },
     ],
   },
   {
@@ -886,7 +886,7 @@ export const guides: Guide[] = [
       { q: 'Is iLovePDF legit?', a: 'Yes. It is an established service run from Barcelona, Spain, with ISO/IEC 27001 certification and GDPR compliance.' },
       { q: 'How long does iLovePDF keep my files?', a: 'Its security policy says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
       { q: 'Does iLovePDF have an offline version?', a: 'Yes. iLovePDF Desktop for Windows and Mac works offline. Browser tools like Stayput’s are another option that needs no installation.' },
-      { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after it loads, it keeps working with the network switched off.' },
+      { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after one visit, it keeps working with the network switched off.' },
     ],
   },
   {
@@ -933,7 +933,7 @@ export const guides: Guide[] = [
       {
         h: 'How to see where a file goes',
         p: [
-          'You do not have to take any site’s word, including ours. [This guide](/guides/does-this-website-upload-my-files) shows how to watch the browser’s network panel for an upload, and how the airplane-mode test tells you in seconds whether a tool works locally.',
+          'You do not have to take any site’s word, including ours. [This guide](/guides/does-this-website-upload-my-files) shows how to watch the browser’s network panel for an upload, and how the airplane-mode test, run after the page has loaded, tells you in seconds whether a tool works locally.',
         ],
       },
     ],
@@ -982,14 +982,14 @@ export const guides: Guide[] = [
       {
         h: 'Making GIFs without uploading',
         p: [
-          'Modern browsers can decode video and encode GIFs on your own device. Stayput’s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs inside the page, with trimming, size and frame-rate settings. [GIF to MP4](/tools/gif-to-mp4) goes the other way for a much smaller file, [Crop image](/tools/crop-image) trims a still, and [Compress image](/tools/compress-image) shrinks one. Nothing is sent anywhere, there are no ads next to the download, and once loaded the pages work in airplane mode.',
+          'Modern browsers can decode video and encode GIFs on your own device. Stayput’s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs inside the page, with trimming, size and frame-rate settings. [GIF to MP4](/tools/gif-to-mp4) goes the other way for a much smaller file, [Crop image](/tools/crop-image) trims a still, and [Compress image](/tools/compress-image) shrinks one. Nothing is sent anywhere, there are no ads next to the download, and after one visit the pages work in airplane mode.',
           'Ezgif still does more GIF-specific editing than these tools, such as frame-by-frame editing, effects and text overlays on animations. For a harmless clip it is a fine choice; for a private recording, convert it locally.',
         ],
       },
       {
         h: 'Check any GIF site yourself',
         p: [
-          'Open the browser’s network panel, add your video, and watch for a request about the size of the file. Or load the page, turn off Wi-Fi and try it. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both tests.',
+          'Open the browser’s network panel, add your video, and watch for a request about the size of the file. Or, after the page has loaded, turn off Wi-Fi and try it. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both tests.',
         ],
       },
     ],
@@ -1038,14 +1038,14 @@ export const guides: Guide[] = [
       {
         h: 'PDF jobs in the browser, without uploading',
         p: [
-          'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work in any modern browser on Windows, Mac, Android or iPhone and keep working with the network switched off.',
+          'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work in any modern browser on Windows, Mac, Android or iPhone and, after one visit, keep working with the network switched off.',
           'PDF24 has a far larger toolbox, including Office conversions, OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on a Mac, a Chromebook or a phone, a browser tool avoids both the upload and the install.',
         ],
       },
       {
         h: 'See for yourself where the file goes',
         p: [
-          'You can confirm PDF24’s own description, or ours, in a minute: watch the network panel while adding a PDF, or try the page in airplane mode. [This guide](/guides/does-this-website-upload-my-files) shows how, and [Is it safe to merge PDFs online?](/guides/is-it-safe-to-merge-pdfs-online) covers the wider risks.',
+          'You can confirm PDF24’s own description, or ours, in a minute: watch the network panel while adding a PDF, or, after one visit, try the page in airplane mode. [This guide](/guides/does-this-website-upload-my-files) shows how, and [Is it safe to merge PDFs online?](/guides/is-it-safe-to-merge-pdfs-online) covers the wider risks.',
         ],
       },
     ],
@@ -1095,7 +1095,7 @@ export const guides: Guide[] = [
       {
         h: 'Common conversions that never leave your device',
         p: [
-          'For the formats most people convert, the browser can do the job locally. Stayput’s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF; [HEIC to JPG](/tools/heic-to-jpg) fixes iPhone photos; [Image to PDF](/tools/image-to-pdf) turns photos or scans into a PDF; and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack. The file is processed in the page, there are no ads, and airplane mode proves it.',
+          'For the formats most people convert, the browser can do the job locally. Stayput’s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF; [HEIC to JPG](/tools/heic-to-jpg) fixes iPhone photos; [Image to PDF](/tools/image-to-pdf) turns photos or scans into a PDF; and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack. The file is processed in the page, there are no ads, and after one visit airplane mode proves it.',
           'Convertio supports hundreds of formats that browsers cannot read, so for those a server is the only practical route. Keep it for files that would not matter if a stranger saw them.',
         ],
       },
@@ -1159,7 +1159,7 @@ export const guides: Guide[] = [
       {
         h: 'How to tell whether a site uploads',
         p: [
-          'Load the converter, switch on airplane mode and try a file: server-based tools fail, local ones keep working. [Our guide](/guides/does-this-website-upload-my-files) also shows the network-panel check.',
+          'After one visit, switch on airplane mode and try a file: server-based tools fail, local ones keep working. [Our guide](/guides/does-this-website-upload-my-files) also shows the network-panel check.',
         ],
       },
     ],
@@ -1215,7 +1215,7 @@ export const guides: Guide[] = [
       {
         h: 'How to check where a photo goes',
         p: [
-          'Open your browser’s network panel, drop a photo into any background remover and look for an upload about the size of the file; or load the page, turn on airplane mode and try again. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks.',
+          'Open your browser’s network panel, drop a photo into any background remover and look for an upload about the size of the file; or, after the page has loaded and one photo has run, turn on airplane mode and try again. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks.',
         ],
       },
     ],
@@ -3187,7 +3187,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'What is the difference between subtitles and captions burned in?', a: 'Subtitles are a separate file a player can switch on or off. Burned-in captions are part of the video image itself, so they show up everywhere, which is what most social platforms need.' },
       { q: 'Can I add subtitles to a video for free with no watermark?', a: 'Yes, with a tool that processes the video in your browser rather than a server, since nothing is uploaded and no watermark is added.' },
-      { q: 'Do auto-captions need an internet connection?', a: 'A browser-based tool downloads its speech model once and then works offline; a cloud-based captioning site needs a connection for every video.' },
+      { q: 'Do auto-captions need an internet connection?', a: 'A browser-based tool works offline after it has downloaded its speech model once; a cloud-based captioning site needs a connection for every video.' },
       { q: 'Can I burn in subtitles I already wrote as an SRT file?', a: 'Yes. Stayput\'s add subtitles tool accepts an existing SRT or VTT file and burns those exact captions into the video instead of generating new ones from the speech.' },
     ],
   },
@@ -4154,7 +4154,7 @@ export const guides: Guide[] = [
       { q: "Does Hide Location in Photos remove the GPS data from the file?", a: "Apple describes it as hiding the location in Photos, and Revert to Original Location restores it, so the original file still has it. Apple does not say what an exported or shared copy contains. Run the copy through the [EXIF remover](/tools/strip-exif) to be sure." },
       { q: "Can Preview remove location data?", a: "Yes, location only: Preview's Inspector has a Remove Location Info button. Apple's Preview guide documents viewing the location (Tools, Show Location Info), not the button, and the date and camera details stay. Use the [EXIF remover](/tools/strip-exif) to remove everything, and check the result with the [EXIF viewer](/tools/exif-viewer)." },
       { q: "Will removing EXIF data change how the photo looks?", a: "Not for a JPG, PNG or WebP cleaned with the [EXIF remover](/tools/strip-exif): the picture data is copied unchanged. The only exception is a sideways photo with the orientation option ticked, which is re-encoded." },
-      { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline. ExifTool is a separate install." },
+      { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline after your first visit. ExifTool is a separate install." },
     ],
   },
   {

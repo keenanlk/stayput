@@ -1,6 +1,6 @@
 import type { Tool } from './tools';
 import { toolBySlug } from './tools.ts';
-
+import { offlineWhen } from './leads.ts';
 /**
  * Landing pages that are a preset of an existing tool ("JPG to PDF" is the
  * images-to-PDF tool with its copy written for that search). Like format
@@ -33,7 +33,7 @@ export interface Preset {
   lead?: string;
 }
 
-const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. You can load the page, turn off Wi-Fi, and it still works.' };
+const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. After one visit you can turn off Wi-Fi and it still works.' };
 
 export const presets: Preset[] = [
   {
@@ -1334,7 +1334,7 @@ export const presets: Preset[] = [
       'Pixelating replaces each square block of an image with the average colour of that block. It is the mosaic effect TV news uses on bystanders, and the look behind pixel-art avatars and retro posters. This page opens set to pixelate the whole picture, so you see the effect the moment the image loads; drag the Strength slider to make the blocks bigger or smaller.',
       'To pixelate only part of a picture, switch Hide to "Areas I mark" and drag a box over each face, logo or name. Every box gets the same block size, and the preview redraws as you go, so you can check nothing is still recognisable before saving. Strength is measured against the size of the image, which means a strength of 5 gives the same chunky look on a 600 pixel screenshot as on a 12 megapixel phone photo.',
       'A word of caution for text. Light pixelation of a few words can sometimes be reversed: tools exist that render candidate text, pixelate it the same way, and compare. For account numbers, passwords and addresses use a large block size or, better, the Black box effect, which leaves nothing behind.',
-      'The mosaic is computed on a canvas inside your browser tab. The picture is never uploaded, the saved file is written fresh from the canvas without its camera or location metadata, and the page keeps working with Wi-Fi switched off.',
+      'The mosaic is computed on a canvas inside your browser tab. The picture is never uploaded, the saved file is written fresh from the canvas without its camera or location metadata, and after your first run the page keeps working with Wi-Fi switched off.',
     ],
     steps: [
       'Drop a photo or screenshot, or tap to pick one. The whole picture is pixelated straight away.',
@@ -1705,7 +1705,7 @@ export const presets: Preset[] = [
     intro: [
       'PNG is the format for screenshots, exported slides, diagrams and scans saved without compression, so its text is usually crisp and an easy read for OCR. Drop a PNG here and its words come back as plain text you can copy or save.',
       'PNGs with transparent backgrounds, like logos or text cut out of a design, are placed on white first so dark lettering does not vanish into a black background. Small images are enlarged before reading.',
-      'Everything runs in your browser. Diagrams from work, screenshots of documents and exported slides stay on your machine; the page does not upload them, and it keeps working after you go offline.',
+      'Everything runs in your browser. Diagrams from work, screenshots of documents and exported slides stay on your machine; the page does not upload them, and after your first run it keeps working offline.',
       'PNG is the usual format for exported slides, UI mockups and screenshots of code, and each has its own quirk. Slides read well, but text boxes laid out side by side can be read in an unexpected order. Mockups often use pale grey labels that are easy to miss. For code, keep line breaks as they are; the words and symbols come through, but indentation and runs of spaces are usually lost, so reformat it in your editor.',
       'A PNG saved from a design tool at 1x can be small, a button label only a dozen pixels tall. Images under 1200 px on the long side are doubled before reading, which rescues most of these. If a small PNG still reads badly, export it again at 2x or 3x rather than enlarging it yourself. A fresh export draws the letters with real detail, while an enlarged copy only makes the existing blur bigger.',
     ],
@@ -1915,7 +1915,7 @@ export const presets: Preset[] = [
     defaults: { bitrate: '96', channels: 'mono' },
     intro: [
       'Opus is the codec behind almost every voice note sent today. WhatsApp exports voice messages as .opus files, Telegram and Signal use it too, and Discord and many web meeting tools record with it. It is excellent at squeezing speech into tiny files, but Windows Media Player, many car systems, older iPhones, most transcription upload forms and some court and HR systems will not open a .opus file.',
-      'Voice notes are personal by nature. Uploading one to a free converter hands a stranger’s server a recording of you or someone you know. Here the Opus audio is decoded by your browser and encoded as MP3 in the same tab; you can load the page, switch to airplane mode, and convert.',
+      'Voice notes are personal by nature. Uploading one to a free converter hands a stranger’s server a recording of you or someone you know. Here the Opus audio is decoded by your browser and encoded as MP3 in the same tab; after your first run you can switch to airplane mode and convert.',
       'This page opens at 96 kbps mono, which is more than a voice note needs: a five-minute message comes out under 4 MB. Raise the bitrate and switch to stereo only for music.',
     ],
     steps: [
@@ -3569,7 +3569,7 @@ export const presets: Preset[] = [
     defaults: { kind: 'wifi' },
     intro: [
       'A Wi-Fi QR code holds your network name, password and security type in the format phone cameras understand. Scanning it on an iPhone or Android phone shows a “Join network” prompt, so guests, customers and Airbnb visitors connect in one tap.',
-      'Typing your Wi-Fi password into a website is exactly what you should be wary of, and most QR sites do send it to their server. This page builds the code in your browser: the password never leaves your device, and the page works with your internet switched off.',
+      'Typing your Wi-Fi password into a website is exactly what you should be wary of, and most QR sites do send it to their server. This page builds the code in your browser: the password never leaves your device, and after one visit the page works with your internet switched off.',
       'Print it for a guest room, a café table or a rental welcome book. If you change the password, make a new code; the old one stops joining.',
     ],
     steps: [
@@ -4938,7 +4938,7 @@ export function presetAsTool(p: Preset): Tool {
     action: p.action ?? base.action,
     keywords: p.keywords,
     steps: p.steps,
-    faq: p.faq,
+    faq: p.faq.map((f) => ({ ...f, a: offlineWhen(p.base, f.a) })),
     taglineMd: undefined,
     sizeFact: p.sizeFact,
     sections: p.sections,
