@@ -11,6 +11,7 @@ import { engineFor } from '../data/engine';
 import { nextSteps } from '../data/next-steps';
 import { inline, inlineLinks, plainLinks } from '../lib/inline';
 import { lastmodFor } from '../lib/lastmod';
+import { leadFor } from '../data/leads';
 
 interface Props {
   tool: Tool;
@@ -24,6 +25,7 @@ interface Props {
 const { tool, intro = [], engineSlug, base } = Astro.props;
 const path = toolPath(tool);
 const url = new URL(path, Astro.site).toString();
+const lead = leadFor(tool, base ?? tool.slug, base ? 'landing' : 'tool');
 const engine = engineFor(engineSlug ?? tool.slug);
 // The tool this page runs first (on landing pages), then its neighbours in the category, wrapping around,
 // so every tool is linked from several pages rather than only the first four in the list.
@@ -124,6 +126,7 @@ const jsonLd = [
       <li><Icon name="open" /> Open source</li>
       <li><Icon name="check" /> {tool.sizeFact ?? 'No size caps, no watermark'}</li>
     </ul>
+    <p class="hero-lead">{lead}</p>
   </section>
 
   <section class="wrap">

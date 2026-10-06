@@ -37,6 +37,8 @@ export interface Tool {
   taglineMd?: string;
   /** Extra headed blocks shown above "How it works". Bullets and paragraphs accept inline markup. */
   sections?: { heading: string; paragraphs?: string[]; bullets?: string[] }[];
+  /** Hand-written lead paragraph (plain text) replacing the one built in src/data/leads.ts. */
+  lead?: string;
 }
 
 export const toolPath = (t: Pick<Tool, 'slug' | 'path'>): string => t.path ?? `/tools/${t.slug}`;
@@ -541,6 +543,8 @@ export const tools: Tool[] = [
   },
   {
     slug: 'unlock-pdf',
+    lead:
+      'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
     name: 'Unlock PDF',
     title: 'Unlock PDF: Remove a PDF Password, Free and Private | Stayput',
     description:
@@ -1141,6 +1145,8 @@ export const tools: Tool[] = [
   },
   {
     slug: 'gif-to-mp4',
+    lead:
+      'Converts animated GIFs to MP4 video (H.264 in Chrome, Edge and Safari, with no sound track since GIFs have none), often five to twenty times smaller, with each frame keeping its timing. It is free, and your GIFs are not uploaded: each frame is encoded by your browser’s own video encoder. The only size limit is your device’s memory, and after one visit the page works offline.',
     name: 'GIF to MP4',
     title: 'GIF to MP4 Converter, Free, No Upload | Stayput',
     description:
@@ -1301,6 +1307,8 @@ export const tools: Tool[] = [
   },
   {
     slug: 'mute-video',
+    lead:
+      'Removes the sound track from a video (MP4, MOV, WebM or MKV) and saves it in the same format, copying the picture untouched so it takes seconds with no quality loss. It is free, and your video is not uploaded: it is rewritten in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
     name: 'Mute video',
     title: 'Remove Audio from Video: Mute MP4, MOV, No Upload | Stayput',
     description:
@@ -3740,7 +3748,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this AI?',
-        a: 'No. It is the classic colour dodge technique artists use in Photoshop: a grey copy of the photo is divided by a blurred negative of itself, so flat areas go white and edges stay as strokes. That is why it runs quickly, even on older devices, and gives the same result every time.',
+        a: 'No. It is the classic colour dodge technique artists use in Photoshop: a grey copy of the photo is divided by a blurred negative of itself, so flat areas go white and edges stay as strokes. It is plain arithmetic on the pixels, with no AI model to download, so it gives the same result every time.',
       },
       {
         q: 'Can I print the sketch?',
