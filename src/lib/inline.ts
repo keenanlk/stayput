@@ -19,3 +19,18 @@ export function inline(text: string): string {
 export function plain(text: string): string {
   return text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1');
 }
+
+/**
+ * For FAQ answers: escapes HTML and turns only [text](/path) into a link, and only for
+ * site-relative paths ("/x", not "//host"). Anything else, including other link targets,
+ * stays as escaped text.
+ */
+export function inlineLinks(text: string): string {
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return escaped.replace(/\[([^\]]+)\]\((\/(?!\/)[^)\s]*)\)/g, '<a href="$2">$1</a>');
+}
+
+/** Plain-text FAQ answer for structured data: link markup reduced to its text. */
+export function plainLinks(text: string): string {
+  return text.replace(/\[([^\]]+)\]\((\/(?!\/)[^)\s]*)\)/g, '$1');
+}
