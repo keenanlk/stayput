@@ -3079,7 +3079,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Which model does this use?',
-        a: 'ISNet general-use from the DIS research project, released under the Apache 2.0 licence, converted to 8-bit weights so it downloads faster. It runs with onnxruntime-web, Microsoft’s open-source runtime for machine learning models in the browser.',
+        a: 'ISNet general-use from the DIS research project (see the licenses page for its licensing), converted to 8-bit weights so it downloads faster. It runs with onnxruntime-web, Microsoft’s open-source runtime for machine learning models in the browser.',
       },
     ],
   },

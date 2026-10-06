@@ -1644,16 +1644,15 @@
    "npm": null,
    "licences": [
     {
-     "name": "Apache-2.0",
-     "url": "https://spdx.org/licenses/Apache-2.0.html"
+     "name": "Weights: licence not stated upstream (code: Apache-2.0)",
+     "url": "https://github.com/xuebinqin/DIS/blob/main/LICENSE.md"
     }
    ],
    "project": "https://github.com/xuebinqin/DIS",
    "source": "https://github.com/danielgatis/rembg/releases/tag/v0.0.0",
    "shipped": "/models/isnet-general-use-int8w.onnx",
    "kind": "model",
-   "copyright": "Copyright Xuebin Qin and the DIS authors",
-   "note": "The DIS repository licenses its code and released weights under Apache-2.0. The model was trained on data that includes the DIS5K dataset, whose own terms of use are non-commercial; the weights are not the dataset, and rembg distributes the same weights under MIT."
+   "note": "The DIS README licenses only its \"code and evaluation metric\" under Apache-2.0 and names no licence for the ISNet weights. The model was trained on the DIS5K dataset, whose terms of use restrict it to non-commercial research and educational use. The 8-bit file here is the re-export distributed by rembg."
   },
   {
    "id": "m-migan",

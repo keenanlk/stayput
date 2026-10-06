@@ -8,7 +8,10 @@ The blur tool loads it only when someone presses "Find faces"; it runs in the
 browser through @mediapipe/tasks-vision, served from /vendor/.
 
 `isnet-general-use-int8w.onnx` is ISNet general-use from the DIS project
-(https://github.com/xuebinqin/DIS), released under the Apache License 2.0. The
+(https://github.com/xuebinqin/DIS). The DIS README licenses its code and
+evaluation metric under the Apache License 2.0 and names no licence for the
+weights. The model was trained on the DIS5K dataset, whose terms of use
+restrict it to non-commercial research and educational use. The
 ONNX export is the one distributed by rembg
 (https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx,
 179 MB). Only its main output is kept. The convolution weights are stored as

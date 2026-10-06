@@ -312,11 +312,11 @@ export const engines: Record<string, Engine> = {
     versus: 'The pictures people want text from are often private: a letter, a receipt, a bank statement, a prescription, a screenshot of a conversation. Online OCR sites upload the image to their server to read it and keep it for hours, and several limit free use or ask for an account. Here the image never leaves your device, and the page keeps working with Wi-Fi off.',
   },
   'remove-background': {
-    how: 'ISNet, an open image segmentation model (Apache 2.0), runs in a web worker through onnxruntime-web compiled to WebAssembly. Your photo is shrunk to 1024 × 1024 in memory, the model marks every pixel as subject or background, and that mask is scaled back up and applied to the original pixels on a canvas, so the cut-out keeps full resolution. The model and runtime are served from this site, downloaded once and cached.',
+    how: 'ISNet, an open image segmentation model, runs in a web worker through onnxruntime-web compiled to WebAssembly. Your photo is shrunk to 1024 × 1024 in memory, the model marks every pixel as subject or background, and that mask is scaled back up and applied to the original pixels on a canvas, so the cut-out keeps full resolution. The model and runtime are served from this site, downloaded once and cached.',
     versus: 'Online background removers upload your photo, give back a small preview for free and charge for the full-size file. Here the full-size cut-out is made on your device, with no credits, no watermark and no copy of your photo on anyone’s server.',
   },
   'passport-photo': {
-    how: 'Two open models run in your tab. MediaPipe’s BlazeFace face detector (Apache 2.0) finds your eyes and mouth, from which the chin is estimated, and ISNet (Apache 2.0) running on onnxruntime-web finds the outline of your head, whose highest point is the top of your hair. The photo is scaled so the head fills the middle of the allowed range, drawn at 600 pixels per inch, and tiled onto a 4 × 6 inch sheet at 300 pixels per inch with cut lines.',
+    how: 'Two open models run in your tab. MediaPipe’s BlazeFace face detector (Apache 2.0) finds your eyes and mouth, from which the chin is estimated, and ISNet running on onnxruntime-web finds the outline of your head, whose highest point is the top of your hair. The photo is scaled so the head fills the middle of the allowed range, drawn at 600 pixels per inch, and tiled onto a 4 × 6 inch sheet at 300 pixels per inch with cut lines.',
     versus: 'Passport photo sites and apps upload a picture of your face to crop it, and many charge to download the result or to remove a watermark. A face photo for an identity document is exactly the file you want to keep to yourself. Here it never leaves your device, and the print sheet costs whatever your local photo counter charges for a 4 × 6.',
   },
   'watermark-image': {
@@ -376,11 +376,11 @@ export const engines: Record<string, Engine> = {
     versus: 'Emote resizer sites upload commissioned artwork and unreleased sub badges to a server, and many add a watermark to the preview or cap how many you can do. Here the drawings never leave your device and every size is made in one go.',
   },
   'sticker-maker': {
-    how: 'The same open segmentation model as the background remover (ISNet, Apache 2.0, running on onnxruntime-web in a web worker) marks the subject. The cut-out is trimmed to the subject’s bounds, and the border is drawn by stamping a tinted silhouette of it in rings around the edge on a canvas, so it follows every curve. The canvas is saved as PNG or WebP by your browser.',
+    how: 'The same open segmentation model as the background remover (ISNet, running on onnxruntime-web in a web worker) marks the subject. The cut-out is trimmed to the subject’s bounds, and the border is drawn by stamping a tinted silhouette of it in rings around the edge on a canvas, so it follows every curve. The canvas is saved as PNG or WebP by your browser.',
     versus: 'Sticker apps and sites upload your photos of people and pets to a server to cut them out, and many add a watermark or ask for a subscription. Here the photo never leaves your device and the sticker is yours at full size.',
   },
   'profile-picture-maker': {
-    how: 'Two open models run in your tab: MediaPipe’s BlazeFace (Apache 2.0) finds your face and eyes, and ISNet (Apache 2.0) on onnxruntime-web cuts you out of the photo. The cut-out is scaled and placed so the face sits in the standard headshot position, over a solid colour, clipped to a circle if you choose, and saved at 1024 × 1024 by your browser.',
+    how: 'Two open models run in your tab: MediaPipe’s BlazeFace (Apache 2.0) finds your face and eyes, and ISNet on onnxruntime-web cuts you out of the photo. The cut-out is scaled and placed so the face sits in the standard headshot position, over a solid colour, clipped to a circle if you choose, and saved at 1024 × 1024 by your browser.',
     versus: 'Profile picture and AI headshot apps upload your face, often keep it to train models, and charge for the full-size file. Here your photo is processed on your device, and the result is yours at full size with no watermark.',
   },
   'color-picker': {

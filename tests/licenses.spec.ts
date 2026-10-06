@@ -46,6 +46,11 @@ test('every package in vendor.json has an entry in licenses.json', () => {
   expect(missing, 'add these to src/data/licenses.json').toEqual([]);
 });
 
+test('the ISNet weights are not called Apache-2.0 without an upstream statement', () => {
+  const isnet = components.find((c) => c.id === 'm-isnet')!;
+  expect(isnet.licences.map((l) => l.name).join(' ')).toContain('not stated');
+});
+
 test('every model file in public/models is credited', () => {
   const credited = components.filter((c) => c.shipped.startsWith('/models/')).map((c) => c.shipped);
   for (const file of ['blaze_face_short_range.tflite', 'isnet-general-use-int8w.onnx', 'migan-pipeline-v2.onnx', 'realesr-general-x4v3.onnx', 'selfie_multiclass_256x256.tflite', 'uvr-mdx-net-inst-hq-3.onnx', 'whisper-base/']) {
