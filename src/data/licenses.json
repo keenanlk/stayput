@@ -1,0 +1,1831 @@
+{
+ "components": [
+  {
+   "id": "transformers",
+   "name": "Transformers.js",
+   "version": "4.3.0",
+   "npm": "@huggingface/transformers",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/huggingface/transformers.js",
+   "source": "https://github.com/huggingface/transformers.js/tree/4.3.0",
+   "shipped": "Bundled into the site JavaScript (speech to text)",
+   "kind": "library"
+  },
+  {
+   "id": "hf-jinja",
+   "name": "@huggingface/jinja",
+   "version": "0.5.10",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/huggingface/huggingface.js/tree/main/packages/jinja",
+   "source": "https://www.npmjs.com/package/@huggingface/jinja/v/0.5.10",
+   "shipped": "Inside Transformers.js",
+   "kind": "library",
+   "via": "transformers"
+  },
+  {
+   "id": "hf-tokenizers",
+   "name": "@huggingface/tokenizers",
+   "version": "0.2.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/huggingface/tokenizers.js",
+   "source": "https://github.com/huggingface/tokenizers.js/tree/v0.2.0",
+   "shipped": "Inside Transformers.js",
+   "kind": "library",
+   "via": "transformers"
+  },
+  {
+   "id": "ort-web",
+   "name": "ONNX Runtime Web",
+   "version": "1.30.0",
+   "npm": "onnxruntime-web",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/microsoft/onnxruntime",
+   "source": "https://github.com/microsoft/onnxruntime/tree/v1.30.0",
+   "shipped": "JavaScript bundled into the site; WebAssembly files served from /vendor/onnxruntime-web@1.30.0/ (background remover, upscaler, object remover, speech to text, vocal remover)",
+   "kind": "library"
+  },
+  {
+   "id": "ort-common",
+   "name": "onnxruntime-common",
+   "version": "1.30.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/microsoft/onnxruntime/tree/main/js/common",
+   "source": "https://github.com/microsoft/onnxruntime/tree/v1.30.0/js/common",
+   "shipped": "Inside ONNX Runtime Web",
+   "kind": "library",
+   "via": "ort-web"
+  },
+  {
+   "id": "jsquash-avif",
+   "name": "jSquash AVIF",
+   "version": "2.1.1",
+   "npm": "@jsquash/avif",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/jamsinclair/jSquash/tree/main/packages/avif",
+   "source": "https://github.com/jamsinclair/jSquash/tree/b7fa9ac9ec02f224847ad23d19d115f9e296a368/packages/avif",
+   "shipped": "Decoder served from /vendor/jsquash-avif@2.1.1/ (JavaScript and WebAssembly)",
+   "kind": "library"
+  },
+  {
+   "id": "jsquash-jxl",
+   "name": "jSquash JPEG XL",
+   "version": "1.3.0",
+   "npm": "@jsquash/jxl",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/jamsinclair/jSquash/tree/main/packages/jxl",
+   "source": "https://github.com/jamsinclair/jSquash/tree/1b1964194611ece3ec984ab91c04726d1088f05e/packages/jxl",
+   "shipped": "Decoder served from /vendor/jsquash-jxl@1.3.0/ (JavaScript and WebAssembly)",
+   "kind": "library"
+  },
+  {
+   "id": "wasm-feature-detect",
+   "name": "wasm-feature-detect",
+   "version": "1.9.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/GoogleChromeLabs/wasm-feature-detect",
+   "source": "https://github.com/GoogleChromeLabs/wasm-feature-detect/tree/v1.9.0",
+   "shipped": "Inside jSquash AVIF and the Tesseract.js worker",
+   "kind": "library",
+   "via": "jsquash-avif"
+  },
+  {
+   "id": "mediapipe",
+   "name": "MediaPipe Tasks Vision",
+   "version": "1.0.1",
+   "npm": "@mediapipe/tasks-vision",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://ai.google.dev/edge/mediapipe",
+   "source": "https://www.npmjs.com/package/@mediapipe/tasks-vision/v/1.0.1",
+   "shipped": "JavaScript bundled into the site; WebAssembly served from /vendor/mediapipe-tasks-vision@1.0.1/ (face blur, video background removal)",
+   "kind": "library",
+   "note": "The npm package is the exact source we link; upstream does not publish a Git tag for 1.0.1 (the nearest is v1.0.0 at https://github.com/google-ai-edge/mediapipe/tree/v1.0.0)."
+  },
+  {
+   "id": "qpdf-wasm",
+   "name": "qpdf-wasm",
+   "version": "0.3.0",
+   "npm": "@neslinesli93/qpdf-wasm",
+   "licences": [
+    {
+     "name": "ISC",
+     "url": "https://spdx.org/licenses/ISC.html"
+    }
+   ],
+   "project": "https://github.com/neslinesli93/qpdf-wasm",
+   "source": "https://github.com/neslinesli93/qpdf-wasm/tree/0.3.0",
+   "shipped": "Served from /vendor/neslinesli93-qpdf-wasm@0.3.0/ (JavaScript and WebAssembly: compress, unlock and protect PDFs)",
+   "kind": "library",
+   "note": "This ISC licence covers only the wrapper. The qpdf program inside it is Apache-2.0, listed below."
+  },
+  {
+   "id": "noble-ciphers",
+   "name": "@noble/ciphers",
+   "version": "2.4.0",
+   "npm": "@noble/ciphers",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/paulmillr/noble-ciphers",
+   "source": "https://github.com/paulmillr/noble-ciphers/tree/2.4.0",
+   "shipped": "Bundled into the site JavaScript (AES for password ZIPs)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2022 Paul Miller"
+  },
+  {
+   "id": "rnnoise-wasm",
+   "name": "rnnoise-wasm",
+   "version": "2025.1.5",
+   "npm": "@shiguredo/rnnoise-wasm",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/shiguredo/rnnoise-wasm",
+   "source": "https://github.com/shiguredo/rnnoise-wasm/tree/2025.1.5",
+   "shipped": "Served from /vendor/shiguredo-rnnoise-wasm@2025.1.5/ (JavaScript with embedded WebAssembly: remove background noise)",
+   "kind": "library"
+  },
+  {
+   "id": "tesseract-js",
+   "name": "Tesseract.js",
+   "version": "7.0.0",
+   "npm": "tesseract.js",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/naptha/tesseract.js",
+   "source": "https://github.com/naptha/tesseract.js/tree/v7.0.0",
+   "shipped": "Worker served from /vendor/tesseract.js@7.0.0/; client bundled into the site JavaScript (image to text)",
+   "kind": "library"
+  },
+  {
+   "id": "tesseract-core",
+   "name": "Tesseract.js Core",
+   "version": "7.0.0",
+   "npm": "tesseract.js-core",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/naptha/tesseract.js-core",
+   "source": "https://github.com/naptha/tesseract.js-core/tree/v7.0.0",
+   "shipped": "Served from /vendor/tesseract.js-core@7.0.0/ (WebAssembly build of Tesseract)",
+   "kind": "library"
+  },
+  {
+   "id": "tesseract-eng",
+   "name": "Tesseract English training data (tessdata_best, integer model)",
+   "version": "1.0.0",
+   "npm": "@tesseract.js-data/eng",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/tesseract-ocr/tessdata_best",
+   "source": "https://github.com/naptha/tessdata/tree/b86746569320a6103cea84cc2b8d9ee74f0f45d3",
+   "shipped": "Served from /vendor/tesseract.js-data-eng@1.0.0/eng.traineddata.gz (loaded by image to text)",
+   "kind": "model",
+   "note": "The npm package says MIT; the data itself comes from tessdata_best, whose repository states Apache-2.0 for all data."
+  },
+  {
+   "id": "fflate",
+   "name": "fflate",
+   "version": "0.8.3",
+   "npm": "fflate",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/101arrowz/fflate",
+   "source": "https://github.com/101arrowz/fflate/tree/v0.8.3",
+   "shipped": "Bundled into the site JavaScript (ZIP files)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2026 Arjun Barrett"
+  },
+  {
+   "id": "gifenc",
+   "name": "gifenc",
+   "version": "1.0.3",
+   "npm": "gifenc",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/mattdesl/gifenc",
+   "source": "https://github.com/mattdesl/gifenc/tree/v1.0.3",
+   "shipped": "Bundled into the site JavaScript (making GIFs)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2017 Matt DesLauriers"
+  },
+  {
+   "id": "gifuct-js",
+   "name": "gifuct-js",
+   "version": "2.1.2",
+   "npm": "gifuct-js",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/matt-way/gifuct-js",
+   "source": "https://github.com/matt-way/gifuct-js/tree/c497192922d79acc537ec9f4796dfa2d89aaa13a",
+   "shipped": "Bundled into the site JavaScript (reading GIFs)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2015 Matt Way"
+  },
+  {
+   "id": "js-binary-schema-parser",
+   "name": "js-binary-schema-parser",
+   "version": "2.0.3",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/matt-way/jsBinarySchemaParser",
+   "source": "https://github.com/matt-way/jsBinarySchemaParser/tree/333f7eb5b4ef958a5fee71ec704f1eae5a65b78b",
+   "shipped": "Inside gifuct-js",
+   "kind": "library",
+   "via": "gifuct-js"
+  },
+  {
+   "id": "heic-to",
+   "name": "heic-to",
+   "version": "1.6.5",
+   "npm": "heic-to",
+   "licences": [
+    {
+     "name": "LGPL-3.0",
+     "url": "/licenses/LGPL-3.0.txt"
+    }
+   ],
+   "project": "https://github.com/hoppergee/heic-to",
+   "source": "https://github.com/hoppergee/heic-to/tree/v1.6.5",
+   "shipped": "Served as a separate file, /vendor/heic-to@1.6.5/heic-to.min.js, loaded only by tools that open HEIC photos. It contains libheif and libde265 compiled to WebAssembly.",
+   "kind": "library",
+   "copyleft": "lgpl",
+   "copyright": "Hopper Gee (author of heic-to; its LICENSE has no separate copyright line)",
+   "replace": "/vendor/heic-to@1.6.5/heic-to.min.js"
+  },
+  {
+   "id": "imagetracerjs",
+   "name": "imagetracerjs",
+   "version": "1.2.6",
+   "npm": "imagetracerjs",
+   "licences": [
+    {
+     "name": "Unlicense",
+     "url": "https://spdx.org/licenses/Unlicense.html"
+    }
+   ],
+   "project": "https://github.com/jankovicsandras/imagetracerjs",
+   "source": "https://github.com/jankovicsandras/imagetracerjs/tree/f66099fe02592378013d434922bf9b162ed0eb75",
+   "shipped": "Bundled into the site JavaScript (tracing images to SVG)",
+   "kind": "library"
+  },
+  {
+   "id": "libarchive-js",
+   "name": "libarchive.js",
+   "version": "2.0.2",
+   "npm": "libarchive.js",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/nika-begiashvili/libarchivejs",
+   "source": "https://github.com/nika-begiashvili/libarchivejs/tree/v2.0.2",
+   "shipped": "Served from /vendor/libarchive.js@2.0.2/ (worker bundle and WebAssembly: opens ZIP, RAR and 7z)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2018 Nika Begiashvili"
+  },
+  {
+   "id": "comlink",
+   "name": "Comlink",
+   "version": "4.4.2",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/GoogleChromeLabs/comlink",
+   "source": "https://github.com/GoogleChromeLabs/comlink/tree/v4.4.2",
+   "shipped": "Inside the libarchive.js worker bundle",
+   "kind": "library",
+   "via": "libarchive-js"
+  },
+  {
+   "id": "mediabunny",
+   "name": "Mediabunny",
+   "version": "1.61.0",
+   "npm": "mediabunny",
+   "licences": [
+    {
+     "name": "MPL-2.0",
+     "url": "/licenses/MPL-2.0.txt"
+    }
+   ],
+   "project": "https://mediabunny.dev",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "shipped": "Bundled into the site JavaScript (video and audio tools)",
+   "kind": "library",
+   "copyleft": "mpl",
+   "copyright": "Copyright (c) 2026-present, Vanilagy and contributors"
+  },
+  {
+   "id": "mp4-muxer",
+   "name": "mp4-muxer",
+   "version": "5.2.2",
+   "npm": "mp4-muxer",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Vanilagy/mp4-muxer",
+   "source": "https://github.com/Vanilagy/mp4-muxer/tree/v5.2.2",
+   "shipped": "Bundled into the site JavaScript (GIF to MP4)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2023 Vanilagy"
+  },
+  {
+   "id": "pdf-lib",
+   "name": "pdf-lib",
+   "version": "1.17.1",
+   "npm": "pdf-lib",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Hopding/pdf-lib",
+   "source": "https://github.com/Hopding/pdf-lib/tree/v1.17.1",
+   "shipped": "Bundled into the site JavaScript (editing PDFs)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2019 Andrew Dillon"
+  },
+  {
+   "id": "pdf-lib-standard-fonts",
+   "name": "@pdf-lib/standard-fonts",
+   "version": "1.0.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Hopding/standard-fonts",
+   "source": "https://www.npmjs.com/package/@pdf-lib/standard-fonts/v/1.0.0",
+   "shipped": "Inside pdf-lib",
+   "kind": "library",
+   "via": "pdf-lib"
+  },
+  {
+   "id": "pdf-lib-upng",
+   "name": "@pdf-lib/upng",
+   "version": "1.0.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Hopding/upng",
+   "source": "https://www.npmjs.com/package/@pdf-lib/upng/v/1.0.1",
+   "shipped": "Inside pdf-lib",
+   "kind": "library",
+   "via": "pdf-lib"
+  },
+  {
+   "id": "pako-1",
+   "name": "pako",
+   "version": "1.0.11",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    },
+    {
+     "name": "Zlib",
+     "url": "https://spdx.org/licenses/Zlib.html"
+    }
+   ],
+   "project": "https://github.com/nodeca/pako",
+   "source": "https://github.com/nodeca/pako/tree/1.0.11",
+   "shipped": "Inside pdf-lib and UTIF.js",
+   "kind": "library"
+  },
+  {
+   "id": "pako-0",
+   "name": "pako",
+   "version": "0.2.9",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/nodeca/pako",
+   "source": "https://github.com/nodeca/pako/tree/0.2.9",
+   "shipped": "Inside the PDF-making library pdfmake (through unicode-trie)",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "tslib-1",
+   "name": "tslib",
+   "version": "1.14.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "0BSD",
+     "url": "https://spdx.org/licenses/0BSD.html"
+    }
+   ],
+   "project": "https://github.com/microsoft/tslib",
+   "source": "https://github.com/microsoft/tslib/tree/v1.14.1",
+   "shipped": "Inside pdf-lib",
+   "kind": "library",
+   "via": "pdf-lib"
+  },
+  {
+   "id": "tslib-2",
+   "name": "tslib",
+   "version": "2.8.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "0BSD",
+     "url": "https://spdx.org/licenses/0BSD.html"
+    }
+   ],
+   "project": "https://github.com/microsoft/tslib",
+   "source": "https://github.com/microsoft/tslib/tree/v2.8.1",
+   "shipped": "Inside pdfmake (through @swc/helpers)",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "swc-helpers",
+   "name": "@swc/helpers",
+   "version": "0.5.23",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/swc-project/swc/tree/main/packages/helpers",
+   "source": "https://www.npmjs.com/package/@swc/helpers/v/0.5.23",
+   "shipped": "Inside pdfmake (through fontkit)",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "pdfjs",
+   "name": "PDF.js",
+   "version": "6.3.289",
+   "npm": "pdfjs-dist",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://mozilla.github.io/pdf.js/",
+   "source": "https://github.com/mozilla/pdf.js/tree/v6.3.289",
+   "shipped": "Bundled into the site JavaScript, plus its worker (showing PDF pages)",
+   "kind": "library",
+   "copyright": "Copyright Mozilla Foundation"
+  },
+  {
+   "id": "pdfmake",
+   "name": "pdfmake",
+   "version": "0.3.11",
+   "npm": "pdfmake",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://pdfmake.github.io/docs/",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.11",
+   "shipped": "Bundled into the site JavaScript (EPUB to PDF)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2014-2015 bpampuch, 2016-2026 liborm85"
+  },
+  {
+   "id": "pdfkit",
+   "name": "pdfkit",
+   "version": "0.19.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/foliojs/pdfkit",
+   "source": "https://github.com/foliojs/pdfkit/tree/v0.19.1",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "fontkit",
+   "name": "fontkit",
+   "version": "2.0.4",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/foliojs/fontkit",
+   "source": "https://github.com/foliojs/fontkit/tree/v2.0.4",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "restructure",
+   "name": "restructure",
+   "version": "3.0.2",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/foliojs/restructure",
+   "source": "https://github.com/foliojs/restructure/tree/v3.0.2",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "linebreak",
+   "name": "linebreak",
+   "version": "1.1.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/foliojs/linebreak",
+   "source": "https://github.com/devongovett/linebreaker/tree/v1.1.0",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "unicode-trie",
+   "name": "unicode-trie",
+   "version": "2.0.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/devongovett/unicode-trie",
+   "source": "https://github.com/devongovett/unicode-trie/tree/v2.0.0",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "unicode-properties",
+   "name": "unicode-properties",
+   "version": "1.4.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/foliojs/unicode-properties",
+   "source": "https://github.com/foliojs/unicode-properties/tree/v1.4.1",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "tiny-inflate",
+   "name": "tiny-inflate",
+   "version": "1.0.3",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/devongovett/tiny-inflate",
+   "source": "https://github.com/devongovett/tiny-inflate/tree/v1.0.3",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "png-js",
+   "name": "png-js",
+   "version": "1.1.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/devongovett/png.js",
+   "source": "https://github.com/devongovett/png.js/tree/fe53c2d25545e941a6f706cba30ed13c0991d1a1",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "brotli-js",
+   "name": "brotli.js",
+   "version": "1.3.3",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/devongovett/brotli.js",
+   "source": "https://github.com/devongovett/brotli.js/tree/v1.3.3",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "dfa",
+   "name": "dfa",
+   "version": "1.2.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/devongovett/dfa",
+   "source": "https://github.com/devongovett/dfa/tree/v1.2.0",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "clone",
+   "name": "clone",
+   "version": "2.1.2",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/pvorb/node-clone",
+   "source": "https://github.com/pvorb/node-clone/tree/v2.1.2",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "js-md5",
+   "name": "js-md5",
+   "version": "0.8.3",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/emn178/js-md5",
+   "source": "https://github.com/emn178/js-md5/tree/v0.8.3",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "xmldoc",
+   "name": "xmldoc",
+   "version": "2.0.3",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/nfarina/xmldoc",
+   "source": "https://github.com/nfarina/xmldoc/tree/e16f238f93395a5ea5fb78b1670c27fd135c4eed",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "sax",
+   "name": "sax",
+   "version": "1.6.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BlueOak-1.0.0",
+     "url": "https://spdx.org/licenses/BlueOak-1.0.0.html"
+    }
+   ],
+   "project": "https://github.com/isaacs/sax-js",
+   "source": "https://github.com/isaacs/sax-js/tree/v1.6.1",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "noble-hashes",
+   "name": "@noble/hashes",
+   "version": "1.8.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/paulmillr/noble-hashes",
+   "source": "https://github.com/paulmillr/noble-hashes/tree/1.8.0",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "noble-ciphers-1",
+   "name": "@noble/ciphers",
+   "version": "1.3.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/paulmillr/noble-ciphers",
+   "source": "https://www.npmjs.com/package/@noble/ciphers/v/1.3.0",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "fast-deep-equal",
+   "name": "fast-deep-equal",
+   "version": "3.1.3",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/epoberezkin/fast-deep-equal",
+   "source": "https://github.com/epoberezkin/fast-deep-equal/tree/v3.1.3",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "browserify-zlib",
+   "name": "browserify-zlib",
+   "version": "0.2.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/devongovett/browserify-zlib",
+   "source": "https://github.com/devongovett/browserify-zlib/tree/v0.2.0",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "base64-js",
+   "name": "base64-js",
+   "version": "1.5.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/beatgammit/base64-js",
+   "source": "https://github.com/beatgammit/base64-js/tree/v1.5.1",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake"
+  },
+  {
+   "id": "pdfmake-shims",
+   "name": "Node.js compatibility shims in pdfmake's prebuilt bundle (buffer, readable-stream, safe-buffer, events, assert, util, process, stream-browserify, string_decoder, ieee754, inherits, core-js, file-saver and similar small packages)",
+   "version": "as pinned by pdfmake 0.3.11",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    },
+    {
+     "name": "ISC",
+     "url": "https://spdx.org/licenses/ISC.html"
+    },
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    }
+   ],
+   "project": "https://github.com/bpampuch/pdfmake",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.11",
+   "shipped": "Inside pdfmake",
+   "kind": "library",
+   "via": "pdfmake",
+   "note": "Licences taken from each package's npm metadata (nearly all MIT; ieee754 is BSD-3-Clause and inherits is ISC)."
+  },
+  {
+   "id": "upng-js",
+   "name": "UPNG.js",
+   "version": "2.1.0",
+   "npm": "upng-js",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/photopea/UPNG.js",
+   "source": "https://github.com/photopea/UPNG.js/tree/5e5af183a3dda1e320b90a1830b3f64bc92010d4",
+   "shipped": "Bundled into the site JavaScript (PNG)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2017 Photopea"
+  },
+  {
+   "id": "utif2",
+   "name": "UTIF.js (utif2)",
+   "version": "4.1.0",
+   "npm": "utif2",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/photopea/UTIF.js",
+   "source": "https://www.npmjs.com/package/utif2/v/4.1.0",
+   "shipped": "Bundled into the site JavaScript (TIFF)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2017 Photopea"
+  },
+  {
+   "id": "wasm-media-encoders",
+   "name": "wasm-media-encoders",
+   "version": "0.7.0",
+   "npm": "wasm-media-encoders",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/arseneyr/wasm-media-encoders",
+   "source": "https://github.com/arseneyr/wasm-media-encoders/tree/v0.7.0",
+   "shipped": "JavaScript bundled into the site; mp3.wasm served from /vendor/wasm-media-encoders@0.7.0/ (MP3 encoding)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2020-2024 arseneyr",
+   "note": "The MIT licence covers the wrapper. The MP3 encoder inside mp3.wasm is LAME, which is LGPL, listed below."
+  },
+  {
+   "id": "regenerator-runtime",
+   "name": "regenerator-runtime",
+   "version": "0.13.11",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/facebook/regenerator/tree/main/packages/runtime",
+   "source": "https://www.npmjs.com/package/regenerator-runtime/v/0.13.11",
+   "shipped": "Inside Tesseract.js",
+   "kind": "library",
+   "via": "tesseract-js"
+  },
+  {
+   "id": "bmp-js",
+   "name": "bmp-js",
+   "version": "0.1.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/shaozilee/bmp-js",
+   "source": "https://github.com/shaozilee/bmp-js/tree/60fa5ad6ac2f0ce0d2d157de187831a82cdb2cd6",
+   "shipped": "Inside the Tesseract.js worker",
+   "kind": "library",
+   "via": "tesseract-js"
+  },
+  {
+   "id": "idb-keyval",
+   "name": "idb-keyval",
+   "version": "6.3.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/jakearchibald/idb-keyval",
+   "source": "https://github.com/jakearchibald/idb-keyval/tree/v6.3.0",
+   "shipped": "Inside the Tesseract.js worker",
+   "kind": "library",
+   "via": "tesseract-js"
+  },
+  {
+   "id": "is-url",
+   "name": "is-url",
+   "version": "1.2.4",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/segmentio/is-url",
+   "source": "https://github.com/segmentio/is-url/tree/v1.2.4",
+   "shipped": "Inside the Tesseract.js worker",
+   "kind": "library",
+   "via": "tesseract-js"
+  },
+  {
+   "id": "zlibjs",
+   "name": "zlibjs",
+   "version": "0.3.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/imaya/zlib.js",
+   "source": "https://github.com/imaya/zlib.js/tree/2701521273ed7a9741c9a7827fa8de51d8843f7f",
+   "shipped": "Inside the Tesseract.js worker",
+   "kind": "library",
+   "via": "tesseract-js"
+  },
+  {
+   "id": "libheif",
+   "name": "libheif",
+   "version": "1.23.5",
+   "npm": null,
+   "licences": [
+    {
+     "name": "LGPL-3.0",
+     "url": "/licenses/LGPL-3.0.txt"
+    }
+   ],
+   "project": "https://github.com/strukturag/libheif",
+   "source": "https://github.com/strukturag/libheif/tree/v1.23.5",
+   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.5/heic-to.min.js",
+   "kind": "wasm",
+   "via": "heic-to",
+   "copyleft": "lgpl",
+   "copyright": "Copyright (c) 2017-2025 Dirk Farin and the libheif contributors",
+   "replace": "/vendor/heic-to@1.6.5/heic-to.min.js"
+  },
+  {
+   "id": "libde265",
+   "name": "libde265",
+   "version": "1.0.16",
+   "npm": null,
+   "licences": [
+    {
+     "name": "LGPL-3.0",
+     "url": "/licenses/LGPL-3.0.txt"
+    }
+   ],
+   "project": "https://github.com/strukturag/libde265",
+   "source": "https://github.com/strukturag/libde265/tree/v1.0.16",
+   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.5/heic-to.min.js",
+   "kind": "wasm",
+   "via": "heic-to",
+   "copyleft": "lgpl",
+   "copyright": "Copyright (c) 2013-2014 struktur AG, Dirk Farin",
+   "replace": "/vendor/heic-to@1.6.5/heic-to.min.js"
+  },
+  {
+   "id": "lame",
+   "name": "LAME MP3 encoder",
+   "version": "3.100 (arseneyr/lame fork, commit 98db548)",
+   "npm": null,
+   "licences": [
+    {
+     "name": "LGPL-2.0-or-later",
+     "url": "/licenses/LGPL-2.0.txt"
+    }
+   ],
+   "project": "https://lame.sourceforge.io",
+   "source": "https://github.com/arseneyr/lame/tree/98db548e8e851defbba3184125ce10725355c332",
+   "shipped": "Compiled to WebAssembly as /vendor/wasm-media-encoders@0.7.0/mp3.wasm",
+   "kind": "wasm",
+   "via": "wasm-media-encoders",
+   "copyleft": "lgpl",
+   "copyright": "Copyright (c) 1999-2017 Mark Taylor, Takehiro Tominaga, Robert Hegemann, Gabriel Bouvigne, Alexander Leidinger and others",
+   "replace": "/vendor/wasm-media-encoders@0.7.0/mp3.wasm",
+   "note": "Licensed under the GNU Library General Public License version 2 or, at your option, any later version. The upstream release 3.100 is also at https://sourceforge.net/projects/lame/files/lame/3.100/ ; the linked commit is the exact (slightly modified) tree that was compiled."
+  },
+  {
+   "id": "libavif",
+   "name": "libavif",
+   "version": "1.0.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-2-Clause",
+     "url": "https://spdx.org/licenses/BSD-2-Clause.html"
+    }
+   ],
+   "project": "https://github.com/AOMediaCodec/libavif",
+   "source": "https://github.com/AOMediaCodec/libavif/tree/v1.0.1",
+   "shipped": "Compiled to WebAssembly inside avif_dec.wasm",
+   "kind": "wasm",
+   "via": "jsquash-avif",
+   "copyright": "Copyright 2019 Joe Drago"
+  },
+  {
+   "id": "libaom",
+   "name": "libaom (AV1 decoder)",
+   "version": "3.7.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-2-Clause",
+     "url": "https://spdx.org/licenses/BSD-2-Clause.html"
+    }
+   ],
+   "project": "https://aomedia.googlesource.com/aom/",
+   "source": "https://aomedia.googlesource.com/aom/+/refs/tags/v3.7.0",
+   "shipped": "Compiled to WebAssembly inside avif_dec.wasm",
+   "kind": "wasm",
+   "via": "jsquash-avif",
+   "note": "Also covered by the AOMedia Patent License 1.0 in the same repository."
+  },
+  {
+   "id": "libsharpyuv",
+   "name": "libsharpyuv (from libwebp)",
+   "version": "commit e2c8587",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    }
+   ],
+   "project": "https://chromium.googlesource.com/webm/libwebp/",
+   "source": "https://chromium.googlesource.com/webm/libwebp/+/e2c85878f6a33f29948b43d3492d9cdaf801aa54",
+   "shipped": "Compiled to WebAssembly inside avif_dec.wasm",
+   "kind": "wasm",
+   "via": "jsquash-avif"
+  },
+  {
+   "id": "libjxl",
+   "name": "libjxl",
+   "version": "commit 9f54464",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    }
+   ],
+   "project": "https://github.com/libjxl/libjxl",
+   "source": "https://github.com/libjxl/libjxl/tree/9f544641ec83f6abd9da598bdd08178ee8a003e0",
+   "shipped": "Compiled to WebAssembly inside jxl_dec.wasm",
+   "kind": "wasm",
+   "via": "jsquash-jxl",
+   "copyright": "Copyright (c) the JPEG XL Project Authors"
+  },
+  {
+   "id": "libjxl-third-party",
+   "name": "Highway, skcms and Brotli (libjxl third_party)",
+   "version": "as pinned by libjxl commit 9f54464",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    },
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    },
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/libjxl/libjxl/tree/main/third_party",
+   "source": "https://github.com/libjxl/libjxl/tree/9f544641ec83f6abd9da598bdd08178ee8a003e0/third_party",
+   "shipped": "Compiled to WebAssembly inside jxl_dec.wasm",
+   "kind": "wasm",
+   "via": "jsquash-jxl",
+   "note": "Highway is Apache-2.0 (also BSD-3-Clause), skcms is BSD-3-Clause, Brotli is MIT, each per its upstream licence."
+  },
+  {
+   "id": "qpdf",
+   "name": "qpdf",
+   "version": "12.2.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/qpdf/qpdf",
+   "source": "https://github.com/qpdf/qpdf/tree/v12.2.0",
+   "shipped": "Compiled to WebAssembly as qpdf.wasm",
+   "kind": "wasm",
+   "via": "qpdf-wasm",
+   "copyright": "Copyright (c) 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger"
+  },
+  {
+   "id": "qpdf-zlib",
+   "name": "zlib",
+   "version": "1.2.12 (commit 21767c6)",
+   "npm": null,
+   "licences": [
+    {
+     "name": "zlib license",
+     "url": "https://spdx.org/licenses/Zlib.html"
+    }
+   ],
+   "project": "https://zlib.net",
+   "source": "https://github.com/madler/zlib/tree/21767c654d31d2dccdde4330529775c6c5fd5389",
+   "shipped": "Compiled into qpdf.wasm",
+   "kind": "wasm",
+   "via": "qpdf-wasm"
+  },
+  {
+   "id": "qpdf-jpeg",
+   "name": "libjpeg-turbo (ImageMagick fork)",
+   "version": "commit 7aa2a89 (copyright 1991-2021)",
+   "npm": null,
+   "licences": [
+    {
+     "name": "IJG, BSD-3-Clause and zlib licenses (libjpeg-turbo)",
+     "url": "https://github.com/ImageMagick/jpeg-turbo/blob/7aa2a898c564041a24b09d0a6e780aaa632d08d3/LICENSE.md"
+    }
+   ],
+   "project": "https://github.com/ImageMagick/jpeg-turbo",
+   "source": "https://github.com/ImageMagick/jpeg-turbo/tree/7aa2a898c564041a24b09d0a6e780aaa632d08d3",
+   "shipped": "Compiled into qpdf.wasm",
+   "kind": "wasm",
+   "via": "qpdf-wasm"
+  },
+  {
+   "id": "tesseract",
+   "name": "Tesseract OCR engine (Balearica fork)",
+   "version": "commit 2a9c1c4",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/tesseract-ocr/tesseract",
+   "source": "https://github.com/Balearica/tesseract/tree/2a9c1c49c360462733c386d2a44fcd22c4e21411",
+   "shipped": "Compiled to WebAssembly in tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "leptonica",
+   "name": "Leptonica",
+   "version": "commit 4af068b",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Leptonica license (BSD-2-Clause style)",
+     "url": "https://github.com/DanBloomberg/leptonica/blob/4af068b56a9674da915debea4ed7e1b9885b17e8/leptonica-license.txt"
+    }
+   ],
+   "project": "https://github.com/DanBloomberg/leptonica",
+   "source": "https://github.com/DanBloomberg/leptonica/tree/4af068b56a9674da915debea4ed7e1b9885b17e8",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core",
+   "copyright": "Copyright (C) 2001-2020 Leptonica"
+  },
+  {
+   "id": "tess-libjpeg",
+   "name": "libjpeg (IJG 9a, LuaDist mirror)",
+   "version": "commit 6c0fcb8",
+   "npm": null,
+   "licences": [
+    {
+     "name": "IJG license",
+     "url": "https://github.com/LuaDist/libjpeg/blob/6c0fcb8ddee365e7abc4d332662b06900612e923/README"
+    }
+   ],
+   "project": "https://www.ijg.org",
+   "source": "https://github.com/LuaDist/libjpeg/tree/6c0fcb8ddee365e7abc4d332662b06900612e923",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "tess-libpng",
+   "name": "libpng",
+   "version": "commit a37d483",
+   "npm": null,
+   "licences": [
+    {
+     "name": "PNG Reference Library License v2",
+     "url": "https://github.com/glennrp/libpng/blob/a37d4836519517bdce6cb9d956092321eca3e73b/LICENSE"
+    }
+   ],
+   "project": "https://www.libpng.org/pub/png/libpng.html",
+   "source": "https://github.com/glennrp/libpng/tree/a37d4836519517bdce6cb9d956092321eca3e73b",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "tess-libtiff",
+   "name": "libtiff",
+   "version": "commit b51bb15",
+   "npm": null,
+   "licences": [
+    {
+     "name": "libtiff license",
+     "url": "https://spdx.org/licenses/libtiff.html"
+    }
+   ],
+   "project": "https://libtiff.gitlab.io/libtiff/",
+   "source": "https://gitlab.com/libtiff/libtiff/-/tree/b51bb157123264e26d34c09cc673d213aea61fc7",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "tess-libwebp",
+   "name": "libwebp",
+   "version": "commit 20ef03e",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    }
+   ],
+   "project": "https://github.com/webmproject/libwebp",
+   "source": "https://github.com/webmproject/libwebp/tree/20ef03ee351d4ff03fc5ff3ec4804a879d1b9d5c",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "tess-giflib",
+   "name": "giflib (mirror)",
+   "version": "commit fa37672",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://sourceforge.net/projects/giflib/",
+   "source": "https://github.com/mirrorer/giflib/tree/fa37672085ce4b3d62c51627ab3c8cf2dda8009a",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "tess-zlib",
+   "name": "zlib",
+   "version": "1.2.12 (commit 21767c6)",
+   "npm": null,
+   "licences": [
+    {
+     "name": "zlib license",
+     "url": "https://spdx.org/licenses/Zlib.html"
+    }
+   ],
+   "project": "https://zlib.net",
+   "source": "https://github.com/madler/zlib/tree/21767c654d31d2dccdde4330529775c6c5fd5389",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "tess-openlibm",
+   "name": "OpenLibm",
+   "version": "commit ae2d916",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT, BSD and ISC (the tests, which are not shipped, are LGPL)",
+     "url": "https://github.com/JuliaMath/openlibm/blob/ae2d91698508701c83cab83714d42a1146dccf85/LICENSE.md"
+    }
+   ],
+   "project": "https://github.com/JuliaMath/openlibm",
+   "source": "https://github.com/JuliaMath/openlibm/tree/ae2d91698508701c83cab83714d42a1146dccf85",
+   "shipped": "Compiled into tesseract-core-*.wasm.js",
+   "kind": "wasm",
+   "via": "tesseract-core"
+  },
+  {
+   "id": "libarchive",
+   "name": "libarchive",
+   "version": "3.7.2",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-2-Clause",
+     "url": "https://spdx.org/licenses/BSD-2-Clause.html"
+    }
+   ],
+   "project": "https://www.libarchive.org",
+   "source": "https://github.com/libarchive/libarchive/tree/v3.7.2",
+   "shipped": "Compiled to WebAssembly as libarchive.wasm",
+   "kind": "wasm",
+   "via": "libarchive-js",
+   "copyright": "Copyright (c) the libarchive contributors (Tim Kientzle and others)"
+  },
+  {
+   "id": "libarchive-zlib",
+   "name": "zlib",
+   "version": "1.3",
+   "npm": null,
+   "licences": [
+    {
+     "name": "zlib license",
+     "url": "https://spdx.org/licenses/Zlib.html"
+    }
+   ],
+   "project": "https://zlib.net",
+   "source": "https://github.com/madler/zlib/tree/v1.3",
+   "shipped": "Compiled into libarchive.wasm",
+   "kind": "wasm",
+   "via": "libarchive-js"
+  },
+  {
+   "id": "libarchive-bzip2",
+   "name": "bzip2",
+   "version": "1.0.8",
+   "npm": null,
+   "licences": [
+    {
+     "name": "bzip2 license (BSD style)",
+     "url": "https://sourceware.org/git/?p=bzip2.git;a=blob;f=LICENSE;hb=refs/tags/bzip2-1.0.8"
+    }
+   ],
+   "project": "https://sourceware.org/bzip2/",
+   "source": "https://sourceware.org/git/?p=bzip2.git;a=tree;hb=refs/tags/bzip2-1.0.8",
+   "shipped": "Compiled into libarchive.wasm",
+   "kind": "wasm",
+   "via": "libarchive-js"
+  },
+  {
+   "id": "libarchive-xz",
+   "name": "XZ Utils (liblzma)",
+   "version": "5.2.11",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Public domain / 0BSD (liblzma)",
+     "url": "https://github.com/tukaani-project/xz/blob/v5.2.11/COPYING"
+    }
+   ],
+   "project": "https://tukaani.org/xz/",
+   "source": "https://github.com/tukaani-project/xz/tree/v5.2.11",
+   "shipped": "Compiled into libarchive.wasm",
+   "kind": "wasm",
+   "via": "libarchive-js"
+  },
+  {
+   "id": "libarchive-openssl",
+   "name": "OpenSSL",
+   "version": "1.0.2s",
+   "npm": null,
+   "licences": [
+    {
+     "name": "OpenSSL License and SSLeay License",
+     "url": "/licenses/OpenSSL-1.0.2.txt"
+    }
+   ],
+   "project": "https://www.openssl.org",
+   "source": "https://github.com/openssl/openssl/tree/OpenSSL_1_0_2s",
+   "shipped": "Compiled into libarchive.wasm (used for encrypted archives)",
+   "kind": "wasm",
+   "via": "libarchive-js",
+   "copyright": "Copyright (c) 1998-2018 The OpenSSL Project; Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)",
+   "attribution": "This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (https://www.openssl.org/), and cryptographic software written by Eric Young (eay@cryptsoft.com)."
+  },
+  {
+   "id": "rnnoise",
+   "name": "RNNoise (code and trained model)",
+   "version": "commit 70f1d25",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    }
+   ],
+   "project": "https://github.com/xiph/rnnoise",
+   "source": "https://github.com/xiph/rnnoise/tree/70f1d256acd4b34a572f999a05c87bf00b67730d",
+   "shipped": "Compiled to WebAssembly inside rnnoise.js",
+   "kind": "wasm",
+   "via": "rnnoise-wasm",
+   "copyright": "Copyright (c) 2007-2017, 2024 Jean-Marc Valin; (c) 2023 Amazon; (c) 2017 Mozilla; (c) 2005-2017 Xiph.Org Foundation; (c) 2003-2004 Mark Borgerding"
+  },
+  {
+   "id": "mediapipe-wasm",
+   "name": "MediaPipe runtime (TensorFlow Lite, XNNPACK, ruy, OpenCV, libpng, libjpeg)",
+   "version": "as pinned by MediaPipe tasks-vision 1.0.1",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    },
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    }
+   ],
+   "project": "https://github.com/google-ai-edge/mediapipe",
+   "source": "https://github.com/google-ai-edge/mediapipe/blob/v1.0.0/WORKSPACE",
+   "shipped": "Compiled into vision_wasm_internal.wasm",
+   "kind": "wasm",
+   "via": "mediapipe",
+   "note": "The libraries named in the binary, each under its own permissive licence. The WORKSPACE file at the linked tag pins their versions."
+  },
+  {
+   "id": "eigen-mediapipe",
+   "name": "Eigen (inside MediaPipe's WebAssembly)",
+   "version": "commit 4c38131",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MPL-2.0",
+     "url": "/licenses/MPL-2.0.txt"
+    }
+   ],
+   "project": "https://eigen.tuxfamily.org",
+   "source": "https://gitlab.com/libeigen/eigen/-/tree/4c38131a16803130b66266a912029504f2cf23cd",
+   "shipped": "Compiled into vision_wasm_internal.wasm",
+   "kind": "wasm",
+   "via": "mediapipe",
+   "copyleft": "mpl",
+   "copyright": "Copyright (C) 2008 Gael Guennebaud; (C) 2007-2011 Benoit Jacob; and other Eigen contributors",
+   "replace": "/vendor/mediapipe-tasks-vision@1.0.1/vision_wasm_internal.wasm"
+  },
+  {
+   "id": "eigen-ort",
+   "name": "Eigen (inside ONNX Runtime's WebAssembly)",
+   "version": "commit 1d8b82b",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MPL-2.0",
+     "url": "/licenses/MPL-2.0.txt"
+    }
+   ],
+   "project": "https://eigen.tuxfamily.org",
+   "source": "https://github.com/eigen-mirror/eigen/tree/1d8b82b0740839c0de7f1242a3585e3390ff5f33",
+   "shipped": "Compiled into the ort-wasm-simd-threaded*.wasm files",
+   "kind": "wasm",
+   "via": "ort-web",
+   "copyleft": "mpl",
+   "copyright": "Copyright (C) 2008 Gael Guennebaud; (C) 2007-2011 Benoit Jacob; and other Eigen contributors",
+   "replace": "/vendor/onnxruntime-web@1.30.0/ort-wasm-simd-threaded.wasm"
+  },
+  {
+   "id": "ort-wasm-other",
+   "name": "Other libraries inside ONNX Runtime's WebAssembly (protobuf, ONNX, FlatBuffers, Abseil, XNNPACK and others)",
+   "version": "as pinned by ONNX Runtime 1.30.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    },
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    },
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/microsoft/onnxruntime",
+   "source": "https://github.com/microsoft/onnxruntime/blob/v1.30.0/ThirdPartyNotices.txt",
+   "shipped": "Compiled into the ort-wasm-simd-threaded*.wasm files",
+   "kind": "wasm",
+   "via": "ort-web",
+   "note": "ONNX Runtime publishes the full list with licence texts in ThirdPartyNotices.txt at the linked tag."
+  },
+  {
+   "id": "m-isnet",
+   "name": "ISNet general use (background remover)",
+   "version": "isnet-general-use, 8-bit weights re-export",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/xuebinqin/DIS",
+   "source": "https://github.com/danielgatis/rembg/releases/tag/v0.0.0",
+   "shipped": "/models/isnet-general-use-int8w.onnx",
+   "kind": "model",
+   "copyright": "Copyright Xuebin Qin and the DIS authors",
+   "note": "The DIS repository licenses its code and released weights under Apache-2.0. The model was trained on data that includes the DIS5K dataset, whose own terms of use are non-commercial; the weights are not the dataset, and rembg distributes the same weights under MIT."
+  },
+  {
+   "id": "m-migan",
+   "name": "MI-GAN (object remover)",
+   "version": "pipeline v2",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Picsart-AI-Research/MI-GAN",
+   "source": "https://huggingface.co/andraniksargsyan/migan/tree/406830d0fa60666da0071c342ad2fbc8f30c5c64",
+   "shipped": "/models/migan-pipeline-v2.onnx",
+   "kind": "model",
+   "copyright": "Copyright (c) 2024 Picsart AI Research (PAIR)",
+   "note": "Code and weights are both MIT (LICENSE and LICENSE-WEIGHTS in the repository)."
+  },
+  {
+   "id": "m-esrgan",
+   "name": "Real-ESRGAN general x4v3 (image upscaler)",
+   "version": "v0.2.5.0 weights",
+   "npm": null,
+   "licences": [
+    {
+     "name": "BSD-3-Clause",
+     "url": "https://spdx.org/licenses/BSD-3-Clause.html"
+    }
+   ],
+   "project": "https://github.com/xinntao/Real-ESRGAN",
+   "source": "https://github.com/xinntao/Real-ESRGAN/releases/tag/v0.2.5.0",
+   "shipped": "/models/realesr-general-x4v3.onnx",
+   "kind": "model",
+   "copyright": "Copyright (c) 2021, Xintao Wang"
+  },
+  {
+   "id": "m-whisper",
+   "name": "Whisper base, 8-bit ONNX export (speech to text)",
+   "version": "base, onnx-community export",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/openai/whisper",
+   "source": "https://huggingface.co/onnx-community/whisper-base/tree/1846881b6b3a3024392c1eea3ad983695bc23925",
+   "shipped": "/models/whisper-base/",
+   "kind": "model",
+   "copyright": "Copyright (c) 2022 OpenAI",
+   "note": "OpenAI's repository releases the code and model weights under MIT. The Hugging Face card for openai/whisper-base lists Apache-2.0; both are permissive."
+  },
+  {
+   "id": "m-uvr",
+   "name": "UVR-MDX-NET Inst HQ 3 (vocal remover)",
+   "version": "unmodified ONNX file",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Anjok07/ultimatevocalremovergui",
+   "source": "https://huggingface.co/spaces/next-playground/Ultimate-Vocal-Remover-WebUI",
+   "shipped": "/models/uvr-mdx-net-inst-hq-3.onnx",
+   "kind": "model",
+   "note": "The Ultimate Vocal Remover README says its code is MIT and asks developers who use its models to honour the MIT licence and credit UVR and its developers. Credit is given on this page."
+  },
+  {
+   "id": "m-blaze",
+   "name": "BlazeFace short range (face finder)",
+   "version": "float16, \"latest\" as downloaded",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://ai.google.dev/edge/mediapipe/solutions/vision/face_detector",
+   "source": "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite",
+   "shipped": "/models/blaze_face_short_range.tflite",
+   "kind": "model",
+   "note": "Licence from the MediaPipe BlazeFace model card."
+  },
+  {
+   "id": "m-selfie",
+   "name": "Selfie multiclass segmenter (video background remover)",
+   "version": "256x256 float32, \"latest\" as downloaded",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter",
+   "source": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite",
+   "shipped": "/models/selfie_multiclass_256x256.tflite",
+   "kind": "model",
+   "note": "Licence from the MediaPipe multiclass segmentation model card."
+  },
+  {
+   "id": "f-archivo",
+   "name": "Archivo font",
+   "version": "variable, 2020",
+   "npm": null,
+   "licences": [
+    {
+     "name": "OFL-1.1",
+     "url": "https://spdx.org/licenses/OFL-1.1.html"
+    }
+   ],
+   "project": "https://github.com/Omnibus-Type/Archivo",
+   "source": "https://github.com/Omnibus-Type/Archivo",
+   "shipped": "/fonts/archivo-var.woff2 (licence at /fonts/OFL-Archivo.txt)",
+   "kind": "font",
+   "copyright": "Copyright 2020 The Archivo Project Authors"
+  },
+  {
+   "id": "f-caveat",
+   "name": "Caveat font",
+   "version": "500, 2014",
+   "npm": null,
+   "licences": [
+    {
+     "name": "OFL-1.1",
+     "url": "https://spdx.org/licenses/OFL-1.1.html"
+    }
+   ],
+   "project": "https://github.com/googlefonts/caveat",
+   "source": "https://github.com/googlefonts/caveat",
+   "shipped": "/fonts/caveat-500.woff2 (licence at /fonts/OFL-Caveat.txt)",
+   "kind": "font",
+   "copyright": "Copyright 2014 The Caveat Project Authors"
+  },
+  {
+   "id": "f-roboto",
+   "name": "Roboto font (in pdfmake)",
+   "version": "as bundled in pdfmake 0.3.11",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/googlefonts/roboto",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.11",
+   "shipped": "Bundled into the site JavaScript (EPUB to PDF)",
+   "kind": "font",
+   "via": "pdfmake"
+  },
+  {
+   "id": "umami",
+   "name": "Umami tracker script",
+   "version": "3.4.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/umami-software/umami",
+   "source": "https://github.com/umami-software/umami/tree/v3.4.0",
+   "shipped": "Loaded from our own analytics server, not from this site (see the privacy page)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2022 Umami Software, Inc."
+  }
+ ]
+}
