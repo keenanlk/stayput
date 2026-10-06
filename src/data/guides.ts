@@ -236,7 +236,7 @@ export const guides: Guide[] = [
       {
         h: 'Fix 1: convert them to JPG in your browser',
         p: [
-          'If what you actually want is to use the photos, attach them or send them, converting is the direct answer. Open the [HEIC to JPG converter](/tools/heic-to-jpg) in Edge, Chrome or Firefox, drop the whole folder of photos, and download them as JPGs or as one zip. The decoder (libheif, the same open-source library Linux desktops use) runs inside the browser tab, so the photos are not uploaded and there is no cap on how many you convert. Choose PNG on the [HEIC to PNG page](/heic-to-png) for a lossless copy, or [HEIC to PDF](/heic-to-pdf) for photographed documents.',
+          'If what you actually want is to use the photos, attach them or send them, converting is the direct answer. Open the [HEIC to JPG converter](/tools/heic-to-jpg) in Edge, Chrome or Firefox, drop the whole folder of photos, and download them as JPGs or as one zip. The decoder (libheif, the same open-source library Linux desktops use) runs inside the browser tab, so the photos are not uploaded and there is no cap on how many you convert beyond your device’s memory. Choose PNG on the [HEIC to PNG page](/heic-to-png) for a lossless copy, or [HEIC to PDF](/heic-to-pdf) for photographed documents.',
           'The conversion drops the location and camera metadata unless you tick "Keep EXIF metadata", which is worth knowing before you upload the results anywhere.',
         ],
       },
@@ -490,7 +490,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Is a drawn or typed signature legally valid?', a: 'In the United States (ESIGN Act), the United Kingdom, the European Union (eIDAS "simple electronic signature") and most other jurisdictions, a signature you intend as your signature is valid for ordinary contracts. Certain documents, such as wills and some property deeds, have stricter rules.' },
       { q: 'Can the recipient remove the signature?', a: 'It is drawn into the page content like any other graphic. Editing it out is as hard, or as easy, as editing any part of a PDF, which is the same as for a scanned signature.' },
-      { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline.' },
+      { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline after your first visit.' },
       { q: 'Is my document uploaded when I sign it here?', a: 'No. The signature is placed by code running in your browser; you can verify it in the network tab or by signing with the network switched off.' },
     ],
   },
@@ -774,7 +774,7 @@ export const guides: Guide[] = [
       { q: 'Is CloudConvert legit?', a: 'Yes. It is run by Lunaweb GmbH in Munich, Germany, has been operating for years, publishes its security practices and holds ISO 27001 certification.' },
       { q: 'How long does CloudConvert keep my files?', a: 'According to its privacy policy, until you delete them with the × button, and automatically after 24 hours at the latest.' },
       { q: 'Can CloudConvert staff see my files?', a: 'Its security page says conversions run in isolated containers and that staff cannot technically access your files; for support cases it asks you to send files manually.' },
-      { q: 'Is there a way to convert without uploading anything?', a: 'Yes, for common formats. Tools that run in the browser, such as Stayput’s image, audio and video converters, process the file on your device. You can confirm it with airplane mode: they keep working offline.' },
+      { q: 'Is there a way to convert without uploading anything?', a: 'Yes, for common formats. Tools that run in the browser, such as Stayput’s image, audio and video converters, process the file on your device. You can confirm it with airplane mode: they keep working offline after one visit.' },
     ],
   },
   {
@@ -1053,7 +1053,7 @@ export const guides: Guide[] = [
       { q: 'Is PDF24 legit?', a: 'Yes. PDF24 is operated by Geek Software GmbH, a German company, and has been developed since 2006.' },
       { q: 'How long does PDF24 keep uploaded files?', a: 'Its site says files uploaded to the online tools are deleted automatically after one hour, and can be removed manually before then.' },
       { q: 'Is PDF24 Creator safer than the online tools?', a: 'PDF24 itself says so: Creator processes files on your own PC, so nothing is uploaded. It is Windows software, though.' },
-      { q: 'How can I edit a PDF privately on a Mac or phone?', a: 'Use a tool that works in the browser without uploading, such as Stayput’s PDF tools. After the page loads, they keep working offline.' },
+      { q: 'How can I edit a PDF privately on a Mac or phone?', a: 'Use a tool that works in the browser without uploading, such as Stayput’s PDF tools. After one visit, they keep working offline.' },
     ],
   },
   {
@@ -1283,7 +1283,7 @@ export const guides: Guide[] = [
   {
     slug: 'how-to-make-a-gif-from-a-video',
     title: 'How to Make a GIF From a Video (iPhone, Android, Windows, Mac)',
-    description: 'A short clip is often more useful as a GIF than a video: it loops, plays without a tap, and works where video does not. Here is how to make one on each platform, and a browser tool with no upload or size cap.',
+    description: 'A short clip is often more useful as a GIF than a video: it loops, plays without a tap, and works where video does not. Here is how to make one on each platform, and a browser tool with no upload, limited only by your device’s memory.',
     heading: 'How to make a GIF from a video',
     dek: 'A GIF loops and plays anywhere without a tap. Here is how to make one on each platform, and a browser tool for when there is no built-in way.',
     keywords: ['how to make a gif from a video', 'convert video to gif', 'mp4 to gif', 'turn video into gif iphone', 'make a gif from a video clip'],
@@ -1323,7 +1323,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting without installing anything',
         p: [
-          'Stayput\'s [video to GIF](/tools/video-to-gif) converter reads the video and writes the GIF entirely in your browser tab, so there is no upload and no file-size cap. It handles [MP4](/mp4-to-gif), [MOV](/mov-to-gif) straight from an iPhone, and WebM. For a smaller file, lower the frame rate and the output width before converting; a GIF at 10-12 fps and 480px wide is usually plenty for chat and forum posts, and cuts the size dramatically compared to the source resolution and frame rate.',
+          'Stayput\'s [video to GIF](/tools/video-to-gif) converter reads the video and writes the GIF entirely in your browser tab, so there is no upload and the only size limit is your device’s memory. It handles [MP4](/mp4-to-gif), [MOV](/mov-to-gif) straight from an iPhone, and WebM. For a smaller file, lower the frame rate and the output width before converting; a GIF at 10-12 fps and 480px wide is usually plenty for chat and forum posts, and cuts the size dramatically compared to the source resolution and frame rate.',
         ],
       },
     ],
@@ -1695,7 +1695,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting without re-encoding when possible',
         p: [
-          'Since most MOV files already contain H.264 video, Stayput\'s [video to MP4](/tools/video-to-mp4) converter (and the dedicated [MOV to MP4](/mov-to-mp4) page) checks first: if the video is already H.264, it repackages the container in seconds with no quality loss and no re-encoding at all; only HEVC or other codecs get re-encoded. Everything happens in your browser tab, so a private video is never uploaded, and there is no file-size limit.',
+          'Since most MOV files already contain H.264 video, Stayput\'s [video to MP4](/tools/video-to-mp4) converter (and the dedicated [MOV to MP4](/mov-to-mp4) page) checks first: if the video is already H.264, it repackages the container in seconds with no quality loss and no re-encoding at all; only HEVC or other codecs get re-encoded. Everything happens in your browser tab, so a private video is never uploaded, and the only size limit is your device’s memory.',
         ],
       },
     ],
@@ -2716,7 +2716,7 @@ export const guides: Guide[] = [
   {
     slug: 'smallpdf-alternative',
     title: 'A Free Smallpdf Alternative With No Daily Limit',
-    description: 'Smallpdf\'s free plan caps you at two tasks a day; unlimited use needs a paid plan. Here is what that free limit actually looks like, and a browser-based alternative with no cap and no upload.',
+    description: 'Smallpdf\'s free plan caps you at two tasks a day; unlimited use needs a paid plan. Here is what that free limit actually looks like, and a browser-based alternative with no daily task cap and no upload.',
     heading: 'A free Smallpdf alternative with no daily limit',
     dek: 'Smallpdf\'s free plan is genuinely limited, not just ad-supported. Here is what that limit looks like, and a way around it that never uploads your files at all.',
     keywords: ['smallpdf alternative', 'free smallpdf alternative', 'smallpdf alternative no limit', 'smallpdf free plan limit', 'smallpdf without sign up'],
@@ -2788,7 +2788,7 @@ export const guides: Guide[] = [
       {
         h: 'Where iLovePDF still has the edge',
         p: [
-          'iLovePDF\'s OCR, Office document conversion and legally binding e-signature workflow are more capable than what runs client-side today, and its desktop app is a reasonable private option if you need those specifically. For everyday merging, splitting, compressing, signing and organizing PDFs, a browser tool with no file size caps covers most of what people actually search for iLovePDF to do.',
+          'iLovePDF\'s OCR, Office document conversion and legally binding e-signature workflow are more capable than what runs client-side today, and its desktop app is a reasonable private option if you need those specifically. For everyday merging, splitting, compressing, signing and organizing PDFs, a browser tool with no daily task cap covers most of what people actually search for iLovePDF to do.',
         ],
       },
     ],
@@ -2922,7 +2922,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is there a free Convertio alternative with no file size limit?', a: 'Yes, for formats a browser can already handle. A tool that converts locally has no server-side size tier to enforce, so the practical limit is only what your device can process.' },
+      { q: 'Is there a free Convertio alternative without the 100MB file limit?', a: 'Yes, for formats a browser can already handle. A tool that converts locally has no server-side size tier to enforce, so the practical limit is only what your device can process.' },
       { q: 'How many free conversions does Convertio allow per day?', a: 'Its free plan, as of when this page was checked, allowed around 10 conversions a day, with paid tiers raising that count and the 100MB file size cap.' },
       { q: 'Does a browser converter support as many formats as Convertio?', a: 'No, Convertio covers many more file types, particularly documents, e-books and archives; for common image, audio and video formats, a browser tool matches it with no daily cap.' },
       { q: 'Can I convert a large file without hitting a size cap?', a: 'For formats the browser can decode locally, size is limited only by your device\'s memory, not a fixed plan tier the way an upload-based converter enforces.' },
@@ -2960,7 +2960,7 @@ export const guides: Guide[] = [
       {
         h: 'Where Zamzar still has the edge',
         p: [
-          'Zamzar\'s broader format support and its API for automated conversions go beyond what a browser tool offers. For everyday image, PDF and audio conversions, especially more than two a day, a browser-based tool with no cap is the more practical option.',
+          'Zamzar\'s broader format support and its API for automated conversions go beyond what a browser tool offers. For everyday image, PDF and audio conversions, especially more than two a day, a browser-based tool with no daily cap is the more practical option.',
         ],
       },
     ],
@@ -3060,7 +3060,7 @@ export const guides: Guide[] = [
   {
     slug: 'ezgif-alternative',
     title: 'A Free Ezgif Alternative With No File Size Cap',
-    description: 'Ezgif caps uploads at 200MB and shows ads around the download. Here is a browser-based GIF alternative with no size cap and nothing to click around.',
+    description: 'Ezgif caps uploads at 200MB and shows ads around the download. Here is a browser-based GIF alternative that is limited only by your device’s memory, with nothing to click around.',
     heading: 'A free ezgif alternative with no file size cap',
     dek: 'Ezgif caps how big a file you can upload and runs ads around the result. Here is an alternative with neither.',
     keywords: ['ezgif alternative', 'free ezgif alternative', 'ezgif alternative no ads', 'ezgif file size limit', 'gif maker without upload'],
@@ -3089,7 +3089,7 @@ export const guides: Guide[] = [
       {
         h: 'Where ezgif still has the edge',
         p: [
-          'Ezgif\'s frame-by-frame GIF editing, text overlays and effects are more specialized than what a browser conversion tool offers. For turning a clip into a GIF or back, or basic image edits, a browser tool with no size cap and no ads covers the common case.',
+          'Ezgif\'s frame-by-frame GIF editing, text overlays and effects are more specialized than what a browser conversion tool offers. For turning a clip into a GIF or back, or basic image edits, a browser tool with no ads, limited only by your device’s memory, covers the common case.',
         ],
       },
     ],
@@ -3382,7 +3382,7 @@ export const guides: Guide[] = [
     title: 'How to Convert EPUB to PDF (Free, No Email Required)',
     description: 'Some tools email you the file, cap the size, or need Calibre installed. Here is how to convert EPUB to PDF a few different ways, and a browser tool with none of those catches.',
     heading: 'How to convert EPUB to PDF',
-    dek: 'A few tools do this conversion, each with a catch: an email delivery, a size cap, or an app to install. Here is a browser one with none of those.',
+    dek: 'A few tools do this conversion, each with a catch: an email delivery, a size cap, or an app to install. Here is a browser one with none of those: nothing is emailed, and the only limit is your device’s memory.',
     keywords: ['how to convert epub to pdf', 'epub to pdf converter free', 'convert epub to pdf online free', 'epub to pdf no email', 'ebook to pdf converter'],
     updated: '2026-09-30',
     tools: ['epub-to-pdf', 'pdf-to-epub', 'pdf-to-kindle'],
@@ -3805,7 +3805,7 @@ export const guides: Guide[] = [
   {
     slug: 'how-to-record-your-screen',
     title: 'How to Record Your Screen (Free, No Software to Install)',
-    description: 'Recording your screen used to mean installing an app with a watermark or a time limit on its free tier. Here is how to do it from the browser instead, with no install and no cap.',
+    description: 'Recording your screen used to mean installing an app with a watermark or a time limit on its free tier. Here is how to do it from the browser instead, with no install and no daily cap.',
     heading: 'How to record your screen',
     dek: 'A quick screen recording for a bug report, a tutorial or a demo does not need a downloaded app. Here is how to record it straight from your browser, free.',
     keywords: ['how to record your screen', 'screen recorder online free', 'record screen without downloading software', 'free screen recorder no watermark', 'record browser tab with audio'],
@@ -4715,7 +4715,7 @@ export const guides: Guide[] = [
           "**Size:** keep the size, or 75%, 50% or 33%.",
           "**Frames:** keep every frame, drop every second, or keep one in three. Dropped frames give their time to the frame before, so the GIF plays at the same speed.",
         ],
-        after: ["On a generated 400 by 300 test GIF with 40 frames (65.8 KB), Light and Medium both gave 46.9 KB (27% smaller) and Strong gave 42.8 KB (33% smaller). Medium with the size at 50% and every second frame dropped gave 13.3 KB (79% smaller), at 200 by 150 pixels and 20 of the 40 frames. Real GIFs will differ: a screen recording with a still background shrinks a lot, while a busy filmed clip shrinks less. If the result would not be smaller, you get your original back and the page says so.", "Everything happens inside your browser tab, so the GIF never leaves your device, and there is no file size limit set by the tool."],
+        after: ["On a generated 400 by 300 test GIF with 40 frames (65.8 KB), Light and Medium both gave 46.9 KB (27% smaller) and Strong gave 42.8 KB (33% smaller). Medium with the size at 50% and every second frame dropped gave 13.3 KB (79% smaller), at 200 by 150 pixels and 20 of the 40 frames. Real GIFs will differ: a screen recording with a still background shrinks a lot, while a busy filmed clip shrinks less. If the result would not be smaller, you get your original back and the page says so.", "Everything happens inside your browser tab, so the GIF never leaves your device, and the only size limit is your device’s memory."],
       },
       {
         h: "When a video is better",
