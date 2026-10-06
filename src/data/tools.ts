@@ -214,7 +214,7 @@ export const tools: Tool[] = [
     name: 'Compress PNG',
     title: 'Compress PNG Images, Up to 80% Smaller, No Upload | Stayput',
     description:
-      'Compress PNG files in your browser and keep transparency: up to 80% smaller with a smart colour palette, or lossless. Batch, no limit, nothing uploaded.',
+      'Compress PNG files in your browser and keep transparency: up to 80% smaller with a smart colour palette, or lossless. Batch, nothing uploaded.',
     heading: 'Compress PNG',
     tagline: 'Shrink PNG screenshots, logos and graphics while keeping them PNGs, transparency and all. Nothing is uploaded.',
     category: 'images',
@@ -336,7 +336,7 @@ export const tools: Tool[] = [
     name: 'Merge PDF',
     title: 'Merge PDF Files Online, Free, No Upload | Stayput',
     description:
-      'Combine multiple PDF files into one in your browser. Reorder pages, no size limit, no watermark, no account. Your documents never leave your device.',
+      'Combine multiple PDF files into one in your browser. Reorder pages, no watermark, no account. Your documents never leave your device.',
     heading: 'Merge PDF files',
     tagline: 'Combine PDFs into a single document. Drag to reorder. No file size caps beyond what your device can hold, no watermark, nothing uploaded.',
     category: 'pdf',
@@ -344,7 +344,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop PDF files here',
     action: 'Merge PDFs',
-    keywords: ['merge pdf', 'combine pdf', 'join pdf', 'pdf merger', 'merge pdf no limit'],
+    keywords: ['merge pdf', 'combine pdf', 'join pdf', 'pdf merger', 'merge pdf no upload'],
     steps: [
       'Drop two or more PDFs onto the page.',
       'Reorder them with the arrows until they are in the right sequence.',
@@ -437,7 +437,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is the PDF uploaded to a server?',
-        a: 'No. Everything runs in your browser using pdf-lib and pdf.js. That is why there is no size limit and no queue.',
+        a: 'No. Everything runs in your browser using pdf-lib and pdf.js. That is why there is no upload and no queue.',
       },
     ],
   },
@@ -990,7 +990,7 @@ export const tools: Tool[] = [
     name: 'Video to MP3',
     title: 'Video to MP3 Converter, MP4 to MP3, No Upload | Stayput',
     description:
-      'Convert MP4, MOV, M4A, WAV and other video or audio files to MP3 (or WAV) in your browser. Batch, no size limit, no upload, no sign-up.',
+      'Convert MP4, MOV, M4A, WAV and other video or audio files to MP3 (or WAV) in your browser. Batch, no upload, no sign-up.',
     heading: 'Convert video or audio to MP3',
     tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
     category: 'media',
@@ -1091,7 +1091,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is decoded by code in this page and each frame is encoded by your browser’s own video encoder. There is no server in the process, so there is nothing to wait for and no size limit, and the page works with Wi-Fi off.',
+        a: 'No. The GIF is decoded by code in this page and each frame is encoded by your browser’s own video encoder. There is no server in the process, so there is nothing to wait for, and the page works with Wi-Fi off.',
       },
       {
         q: 'Why is the MP4 so much smaller than the GIF?',
@@ -1116,7 +1116,7 @@ export const tools: Tool[] = [
     name: 'Compress video',
     title: 'Video Compressor, Compress MP4 Without Uploading | Stayput',
     description:
-      'Compress MP4, MOV and WebM videos in your browser: make a video small enough for Discord, email or WhatsApp. No upload, no size limit, no watermark.',
+      'Compress MP4, MOV and WebM videos in your browser: make a video small enough for Discord, email or WhatsApp. No upload, no watermark, no sign-up.',
     heading: 'Compress a video',
     tagline: 'Make a video a fraction of the size, or fit it under a limit like 10 MB for Discord or 25 MB for email. It is compressed on this device and never uploaded.',
     category: 'media',
@@ -1133,7 +1133,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for, no size limit and no copy left on someone else’s computer. You can load the page, switch off Wi-Fi and it still works.',
+        a: 'No. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for and no copy left on someone else’s computer. You can load the page, switch off Wi-Fi and it still works.',
       },
       {
         q: 'How much smaller will it get?',
@@ -1158,7 +1158,7 @@ export const tools: Tool[] = [
     name: 'Video to MP4',
     title: 'Convert Video to MP4: MOV, MKV, WebM to MP4, No Upload | Stayput',
     description:
-      'Convert MOV, MKV and WebM videos to MP4 in your browser. H.264 files convert in seconds with no quality loss. Batch, no size limit, nothing uploaded.',
+      'Convert MOV, MKV and WebM videos to MP4 in your browser. H.264 files convert in seconds with no quality loss. Batch, nothing uploaded.',
     heading: 'Convert video to MP4',
     tagline: 'Turn MOV, MKV and WebM files into MP4s that play everywhere. Converted on this device, never uploaded.',
     category: 'media',
@@ -1175,7 +1175,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process, so there is no upload, no size limit and no copy left anywhere. The page works with Wi-Fi off.',
+        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process, so there is no upload and no copy left anywhere. The page works with Wi-Fi off.',
       },
       {
         q: 'Why was my file converted so fast?',
@@ -1213,7 +1213,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser plays the video from the file on your device, and the clip is cut by code in this page. There is no server, no size limit and no watermark, and the page works offline.',
+        a: 'No. Your browser plays the video from the file on your device, and the clip is cut by code in this page. There is no server and no watermark, and the page works offline.',
       },
       {
         q: 'Why does my clip start a moment early?',
@@ -1251,7 +1251,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The file is read and rewritten by code in this page. There is no server in the process, so there is no upload, no size limit and no copy left anywhere. The page works with Wi-Fi off.',
+        a: 'No. The file is read and rewritten by code in this page. There is no server in the process, so there is no upload and no copy left anywhere. The page works with Wi-Fi off.',
       },
       {
         q: 'Does removing the sound lower the quality?',
@@ -1289,7 +1289,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser decodes and re-encodes the video with its own video encoder, in this tab. There is no server in the process, so there is no upload, no size limit and no watermark.',
+        a: 'No. Your browser decodes and re-encodes the video with its own video encoder, in this tab. There is no server in the process, so there is no upload and no watermark.',
       },
       {
         q: 'What does 720p mean for a vertical phone video?',
@@ -1327,7 +1327,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser decodes the video, turns each frame and encodes it again with its own video encoder, all in this tab. There is no upload, no size limit and no watermark.',
+        a: 'No. Your browser decodes the video, turns each frame and encodes it again with its own video encoder, all in this tab. There is no upload and no watermark.',
       },
       {
         q: 'Will the rotation show everywhere?',
@@ -1365,7 +1365,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser shows a frame from the file on your device, and the crop is done by its own video decoder and encoder in this tab. There is no upload, no size limit and no watermark.',
+        a: 'No. Your browser shows a frame from the file on your device, and the crop is done by its own video decoder and encoder in this tab. There is no upload and no watermark.',
       },
       {
         q: 'How do I make a landscape video vertical for TikTok or Reels?',
@@ -1403,7 +1403,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser decodes the video, re-times every frame and encodes it again in this tab. There is no upload, no size limit and no watermark.',
+        a: 'No. Your browser decodes the video, re-times every frame and encodes it again in this tab. There is no upload and no watermark.',
       },
       {
         q: 'Does the sound speed up too?',
@@ -1441,7 +1441,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my videos uploaded?',
-        a: 'No. Your browser decodes each clip, draws its frames one after another and encodes them into one MP4 in this tab. There is no upload, no size limit and no watermark.',
+        a: 'No. Your browser decodes each clip, draws its frames one after another and encodes them into one MP4 in this tab. There is no upload and no watermark.',
       },
       {
         q: 'Can I join videos of different sizes or shapes?',
@@ -1479,7 +1479,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound, fits it to the video and writes a new file in this tab. There is no upload, no size limit and no watermark.',
+        a: 'No. Your browser decodes the sound, fits it to the video and writes a new file in this tab. There is no upload and no watermark.',
       },
       {
         q: 'Does the video lose quality?',
@@ -1517,7 +1517,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser decodes the video, puts its frames in the opposite order and encodes it again in this tab. There is no upload, no size limit and no watermark.',
+        a: 'No. Your browser decodes the video, puts its frames in the opposite order and encodes it again in this tab. There is no upload and no watermark.',
       },
       {
         q: 'Why does reversing take longer than other video tools?',
@@ -1551,7 +1551,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser decodes only the frames you asked for and saves them as images in this tab. There is no upload, no size limit and no watermark.',
+        a: 'No. Your browser decodes only the frames you asked for and saves them as images in this tab. There is no upload and no watermark.',
       },
       {
         q: 'Which option gives me the best still from a clip?',
@@ -1585,7 +1585,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my recording uploaded?',
-        a: 'No. Your browser decodes the sound, cuts it and writes the new file in this tab. Voice memos and interviews stay on your device. There is no size limit and no sign-up.',
+        a: 'No. Your browser decodes the sound, cuts it and writes the new file in this tab. Voice memos and interviews stay on your device. There is no sign-up.',
       },
       {
         q: 'Which format should I save as?',
@@ -1602,7 +1602,7 @@ export const tools: Tool[] = [
     name: 'Audio converter',
     title: 'Audio Converter: MP3, WAV, M4A, OGG, FLAC, No Upload | Stayput',
     description:
-      'Convert audio between MP3, WAV, FLAC, M4A and OGG in your browser, or pull the sound out of a video. Batch, no size limit, no upload, no sign-up.',
+      'Convert audio between MP3, WAV, FLAC, M4A and OGG in your browser, or pull the sound out of a video. Batch, no upload, no sign-up.',
     heading: 'Audio converter',
     tagline: 'Turn any sound file into MP3, WAV, FLAC, M4A or OGG. Your files are converted on this device and never uploaded.',
     category: 'media',
@@ -1867,7 +1867,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Nothing is sent to a server, there is no size limit, and the page works offline once loaded.',
+        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Nothing is sent to a server, the page works offline once loaded.',
       },
       {
         q: 'Can I mix different formats?',
@@ -2675,7 +2675,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is there a watermark or a length limit?',
-        a: 'No watermark and no limit. The only limit is your device’s memory, since the new video is built in the tab.',
+        a: 'No watermark. The only limit is your device’s memory, since the new video is built in the tab.',
       },
     ],
   },

@@ -290,7 +290,7 @@ export const pairs: Pair[] = [
       'Because most browsers cannot decode JXL, this page loads the reference decoder (libjxl) compiled to WebAssembly by the Squoosh project. The decoder is about 850 KB, fetched once as a program file and cached. Your image is decoded to pixels in memory and the browser writes the PNG. If you are in Safari, its native decoder is used and nothing extra is downloaded.',
     ],
     faq: [
-      { q: 'Why is the decoder downloaded but my image is not uploaded?', a: 'The download is the decoding program, the same for everyone, fetched from a public CDN. Your image never leaves your device: it is read from disk into memory, decoded by that program inside your tab, and saved back to disk. The network panel on this page counts the requests so you can check.' },
+      { q: 'Why is the decoder downloaded but my image is not uploaded?', a: 'The download is the decoding program, the same for everyone, served from this site. Your image never leaves your device: it is read from disk into memory, decoded by that program inside your tab, and saved back to disk. The network panel on this page counts the requests so you can check.' },
       { q: 'Will the PNG be larger than the JXL?', a: 'Almost always, often many times larger. JXL is a highly efficient format and PNG stores every pixel. If you need a small file, convert to JPG or WebP instead.' },
       { q: 'Does it keep HDR or animation?', a: 'No. The output is a standard 8-bit PNG of the first frame. HDR content is tone-mapped by the decoder to standard range.' },
     ],
@@ -312,7 +312,7 @@ export const pairs: Pair[] = [
     ],
     faq: [
       { q: 'Is the conversion lossless?', a: 'No. JPG is lossy, so a little detail is discarded when the pixels are re-encoded. At quality 90 the difference is invisible for photos. Use the JXL to PNG page for a lossless copy.' },
-      { q: 'Are my files uploaded?', a: 'No. The decoder is a program file fetched once from a CDN and cached; your images are decoded and re-encoded inside your browser tab and never travel anywhere.' },
+      { q: 'Are my files uploaded?', a: 'No. The decoder is a program file served from this site, downloaded once and cached; your images are decoded and re-encoded inside your browser tab and never travel anywhere.' },
       { q: 'Can I convert many files at once?', a: 'Yes. Drop a folder’s worth of .jxl files and download them one by one or as a single zip.' },
     ],
   },
