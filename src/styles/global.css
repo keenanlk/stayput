@@ -231,6 +231,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .tool-hero { padding: 48px 0 26px; }
 .tool-hero h1 { margin-bottom: 12px; font-size: clamp(36px, 5.6vw, 64px); }
 .tool-hero .tagline { font-size: clamp(17px, 1.6vw, 19px); color: var(--ink-2); max-width: 60ch; margin-bottom: 18px; }
+.tool-hero .hero-lead { font-size: 15px; line-height: 1.55; color: var(--ink-2); max-width: 68ch; margin: 14px 0 0; }
 .tool-panel { background: var(--surface); border: 1px solid var(--line); border-radius: calc(var(--radius) + 4px); box-shadow: var(--shadow); padding: 14px; display: grid; gap: 20px; }
 .tool-panel > :not(.dropzone):not(input) { margin-inline: 8px; }
 .tool-panel > .privacy-note { margin-bottom: 6px; }
@@ -539,7 +540,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
   .search-bar { padding-left: 16px; }
   .search-bar input { font-size: 17px; padding: 15px 0; }
   .nav a { white-space: nowrap; font-size: 14px; padding: 7px 9px; }
-  .tool-hero { padding-top: 30px; }
+  .tool-hero { padding-top: 30px; padding-bottom: 18px; }
+  .tool-hero .hero-lead { font-size: 14px; line-height: 1.5; margin-top: 12px; }
   .tool-panel { padding: 10px; }
   #tool[data-count]:not([data-count="0"]) .run-dock { margin-inline: -10px; padding-inline: 18px; }
   /* Pinned on a phone, Run and Clear share one row so the bar covers less of the tool. */

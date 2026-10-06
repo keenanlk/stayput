@@ -29,15 +29,16 @@ export async function computeEntries(root = root0) {
   const dir = fileURLToPath(root);
   const imp = (rel) => import(pathToFileURL(dir + rel).href);
   const { tools } = await imp('src/data/tools.ts');
-  const { pairs } = await imp('src/data/pairs.ts');
+  const { pairs, pairAsTool } = await imp('src/data/pairs.ts');
+  const { leadFor } = await imp('src/data/leads.ts');
   const { presets, presetAsTool } = await imp('src/data/presets.ts');
   const { guides } = await imp('src/data/guides.ts');
   const { engines } = await imp('src/data/engine.ts');
   const json = JSON.stringify;
   const out = {};
-  for (const t of tools) out[`/tools/${t.slug}`] = { hash: sha(json(t), json(engines[t.slug] ?? null), read(root, `src/pages/tools/${t.slug}.astro`)) };
-  for (const p of pairs) out[`/${p.slug}`] = { hash: sha(json(p), json(engines['convert-image'] ?? null)) };
-  for (const p of presets) out[`/${p.slug}`] = { hash: sha(json(presetAsTool(p)), json(p.intro ?? null), json(p.defaults ?? null), json(engines[p.base] ?? null)) };
+  for (const t of tools) out[`/tools/${t.slug}`] = { hash: sha(json(t), json(engines[t.slug] ?? null), leadFor(t), read(root, `src/pages/tools/${t.slug}.astro`)) };
+  for (const p of pairs) out[`/${p.slug}`] = { hash: sha(json(p), json(engines['convert-image'] ?? null), leadFor(pairAsTool(p), 'convert-image', 'landing')) };
+  for (const p of presets) out[`/${p.slug}`] = { hash: sha(json(presetAsTool(p)), json(p.intro ?? null), json(p.defaults ?? null), json(engines[p.base] ?? null), leadFor(presetAsTool(p), p.base, 'landing')) };
   for (const g of guides) {
     const { updated, ...rest } = g;
     out[`/guides/${g.slug}`] = { hash: sha(json(rest)), date: updated };

@@ -29,6 +29,8 @@ export interface Preset {
   sizeFact?: string;
   /** Extra headed blocks shown above "How it works". */
   sections?: { heading: string; paragraphs?: string[]; bullets?: string[] }[];
+  /** Hand-written lead paragraph replacing the one built from the description (see src/data/leads.ts). */
+  lead?: string;
 }
 
 const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. You can load the page, turn off Wi-Fi, and it still works.' };
@@ -4434,6 +4436,8 @@ export const presets: Preset[] = [
   },
   {
     slug: 'video-to-subtitles',
+    lead:
+      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (76 MB), and after that it works offline.',
     base: 'transcribe',
     name: 'Video to subtitles',
     title: 'Generate Subtitles from Video: Free SRT Maker, No Upload | Stayput',
@@ -4493,6 +4497,8 @@ export const presets: Preset[] = [
   },
   {
     slug: 'auto-caption-video',
+    lead:
+      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB), and after that it works offline; the longest video you can caption depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     name: 'Auto caption video',
     title: 'Auto Caption Video Free: Captions Burned In, No Upload | Stayput',
@@ -4523,6 +4529,8 @@ export const presets: Preset[] = [
   },
   {
     slug: 'burn-subtitles-into-video',
+    lead:
+      'Burns an SRT or VTT subtitle file permanently into an MP4, MOV or WebM video, in the look, size and place you pick, and saves a new MP4. It is free, and your files are not uploaded: the video is re-encoded in your browser, and your own subtitle file needs no model. If you drop only the video, a speech model (76 MB) downloads once to write the subtitles, and the longest video you can burn depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     name: 'Burn subtitles into video',
     title: 'Burn SRT Subtitles into Video (Hardcode), Free, No Upload | Stayput',
@@ -4934,5 +4942,6 @@ export function presetAsTool(p: Preset): Tool {
     taglineMd: undefined,
     sizeFact: p.sizeFact,
     sections: p.sections,
+    lead: p.lead,
   };
 }
