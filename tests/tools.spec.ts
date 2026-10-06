@@ -6308,6 +6308,71 @@ test('Video background remover puts a dropped picture behind the person', async 
   await expect(page.locator('#results-list')).toContainText('background from swatches.png');
 });
 
+/** Click Run on what is already loaded and wait for the outcome: the results panel, or the error text. */
+async function runAgain(page: Page): Promise<{ ok: boolean; text: string }> {
+  await page.locator('#results').evaluate((el) => el.classList.remove('is-active')).catch(() => {});
+  await page.locator('#run').click();
+  const done = page.locator('#results.is-active, #error.is-active');
+  await expect(done.first()).toBeVisible({ timeout: 90_000 });
+  const failed = await page.locator('#error').evaluate((el) => el.classList.contains('is-active'));
+  return { ok: !failed, text: failed ? ((await page.locator('#error').textContent()) ?? '') : '' };
+}
+
+for (const slug of ['blur-video-background', 'green-screen-video', 'video-background-remover']) {
+  test(`${slug}: a second run on the same page and a two-video batch both succeed`, async ({ page }) => {
+    test.setTimeout(300_000);
+    const errors: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') errors.push(m.text());
+    });
+    await stubAnalytics(page);
+    await page.goto(slug === 'video-background-remover' ? `/tools/${slug}` : `/${slug}`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    const clip = await portraitClip(page);
+    await page.locator('#file-input').setInputFiles([clip]);
+    await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+    const first = await runAgain(page);
+    expect(first, 'first run').toEqual({ ok: true, text: '' });
+    const second = await runAgain(page);
+    expect(second, 'second run on the same page').toEqual({ ok: true, text: '' });
+    await page.locator('#file-input').setInputFiles([clip]);
+    await expect(page.locator('#tool')).toHaveAttribute('data-count', '2');
+    const batch = await runAgain(page);
+    expect(batch, 'two-video batch').toEqual({ ok: true, text: '' });
+    await expect(page.locator('#results-list .result-item')).toHaveCount(2);
+    expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+  });
+}
+
+test('Video background tools say a video is too large when WebAssembly runs out of memory, and the next run works', async ({ page }) => {
+  test.setTimeout(240_000);
+  await stubAnalytics(page);
+  // Stand in for the engine aborting: the person finder hands each frame to WebGL, so fail there while the flag is set.
+  await page.addInitScript(() => {
+    const real = WebGL2RenderingContext.prototype.texImage2D;
+    (WebGL2RenderingContext.prototype as any).texImage2D = function (this: WebGL2RenderingContext, ...args: any[]) {
+      if ((window as any).__oom) throw new WebAssembly.RuntimeError('Aborted(). Build with -sASSERTIONS for more info.');
+      return (real as any).apply(this, args);
+    };
+  });
+  await page.goto('/tools/video-background-remover');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const clip = await portraitClip(page);
+  await page.locator('#file-input').setInputFiles([clip]);
+  await page.evaluate(() => ((window as any).__oom = true));
+  const failed = await runAgain(page);
+  expect(failed.ok).toBe(false);
+  expect(failed.text).toContain("too large for this device's memory");
+  expect(failed.text).not.toContain('Aborted');
+  await page.evaluate(() => ((window as any).__oom = false));
+  const next = await runAgain(page);
+  expect(next, 'run after the failure').toEqual({ ok: true, text: '' });
+  const runs = (await page.evaluate(() => (window as any).__events as { n: string; d: Record<string, string> }[])).filter((e) => e.n === 'tool_run');
+  expect(runs.map((r) => r.d.outcome)).toEqual(['error', 'ok']);
+  expect(runs[0]!.d.error_class).toBe('OutOfMemoryError');
+  for (const r of runs) expect(Object.values(r.d).join(' ')).not.toMatch(/call\.webm|Aborted|memory/);
+});
+
 test('Compress image fits a file size, and exact-size pages crop or pad to the pixel', async ({ page }) => {
   const errors = await open(page, 'compress-image');
   const net = watchNetwork(page);

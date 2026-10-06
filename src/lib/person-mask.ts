@@ -16,6 +16,29 @@ const WORK = 512;
 const KEEP = 0.45;
 
 let segmenter: Promise<ImageSegmenter> | undefined;
+/**
+ * The segmenter is shared by every video and requires timestamps that keep
+ * growing across calls, so the clock lives here and is never reset.
+ */
+let clock = 0;
+
+/** The engine ran out of memory: its WebAssembly module aborted and cannot be used again. */
+export class MemoryError extends Error {
+  constructor() {
+    super("This video is too large for this device's memory. Try a shorter or smaller video.");
+    this.name = 'OutOfMemoryError';
+  }
+}
+
+/** Throw away the shared segmenter, so the next run builds a fresh one. */
+function drop() {
+  const old = segmenter;
+  segmenter = undefined;
+  old?.then((s) => s.close()).catch(() => {});
+}
+
+/** An emscripten abort ("Aborted()", "Aborted(OOM)") or a plain out-of-memory failure. */
+const isAbort = (e: unknown) => /^Aborted\(|out of memory|Cannot enlarge memory|memory access out of bounds/i.test(e instanceof Error ? e.message : String(e));
 
 function load(): Promise<ImageSegmenter> {
   segmenter ??= (async () => {
@@ -28,8 +51,14 @@ function load(): Promise<ImageSegmenter> {
       outputCategoryMask: false,
     });
   })();
-  segmenter.catch(() => (segmenter = undefined));
-  return segmenter;
+  const mine = segmenter;
+  mine.catch((e) => {
+    if (segmenter === mine) segmenter = undefined;
+    return e;
+  });
+  return mine.catch((e) => {
+    throw isAbort(e) ? new MemoryError() : e;
+  });
 }
 
 /** Load the model ahead of the first frame, so its download shows as its own step. */
@@ -44,7 +73,6 @@ export class Matte {
   private mask = document.createElement('canvas');
   private person = document.createElement('canvas');
   private prev: Float32Array | undefined;
-  private stamp = 0;
   /** Frames in which some of the picture was a person. */
   framesWithPerson = 0;
   frames = 0;
@@ -61,9 +89,16 @@ export class Matte {
       this.prev = undefined;
     }
     this.small.getContext('2d')!.drawImage(ctx.canvas, 0, 0, sw, sh);
-    // Timestamps must only grow; the frame's own time can repeat after a seek, so count instead.
-    this.stamp += 33;
-    const result = seg.segmentForVideo(this.small, this.stamp);
+    // Timestamps must only grow, across videos too; the frame's own time can repeat after a seek, so count instead.
+    clock += 33;
+    let result;
+    try {
+      result = seg.segmentForVideo(this.small, clock);
+    } catch (e) {
+      if (!isAbort(e)) throw e;
+      drop();
+      throw new MemoryError();
+    }
     const bg = result.confidenceMasks?.[0];
     if (!bg) throw new Error('The person finder returned no mask.');
     const conf = bg.getAsFloat32Array();
