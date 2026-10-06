@@ -1271,7 +1271,7 @@
      "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
     }
    ],
-   "project": "http://www.saphir2.com/sphlib/",
+   "project": "https://github.com/qpdf/qpdf/blob/v12.2.0/NOTICE.md",
    "source": "https://github.com/qpdf/qpdf/tree/v12.2.0/libqpdf",
    "shipped": "Compiled into qpdf.wasm (Copyright (c) 2007-2011 Projet RNRT SAPHIR)",
    "kind": "wasm",
@@ -1288,7 +1288,7 @@
      "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
     }
    ],
-   "project": "http://www.efgh.com/software/rijndael.htm",
+   "project": "https://github.com/qpdf/qpdf/blob/v12.2.0/NOTICE.md",
    "source": "https://github.com/qpdf/qpdf/tree/v12.2.0/libqpdf",
    "shipped": "Compiled into qpdf.wasm",
    "kind": "wasm",
