@@ -153,3 +153,18 @@ test('HEIC to JPG explains how to open HEIC, links related pages and says the de
     expect(html).toContain(`"name":"${q}"`);
   }
 });
+
+test('the guitar tuning guide and the guitar tuner link to each other, and no guide claims "any device"', async ({ request }) => {
+  const guide = await request.get('/guides/how-to-tune-a-guitar');
+  expect(guide.status()).toBe(200);
+  const html = await guide.text();
+  expect(html).toContain('href="/guitar-tuner"');
+  expect(html).toContain('"@type":"FAQPage"');
+  expect(html).toContain('"@type":"Article"');
+  expect(html).not.toContain('href="/tools/tuner"');
+  const tuner = await request.get('/guitar-tuner', { maxRedirects: 0 });
+  expect(tuner.status()).toBe(200);
+  expect(await tuner.text()).toContain('href="/guides/how-to-tune-a-guitar"');
+  expect(await (await request.get('/tools/compress-pdf')).text()).not.toMatch(/any device|any phone|every device/i);
+  expect(await (await request.get('/guides/pdf24-alternative')).text()).not.toMatch(/any device/i);
+});

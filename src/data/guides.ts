@@ -103,7 +103,7 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'The quick way: any device, no app',
+        h: 'The quick way: in your browser, no app',
         p: [
           'Open the [location remover](/remove-location-from-photos) in your browser, drop the photos in, and it shows you what each one contains, GPS coordinates included. One click removes the location, camera and date metadata and gives you a clean copy. The image itself is not re-compressed, so the quality is identical, and the photo never leaves your device: the removal runs inside the browser tab. It works on iPhone, Android, Windows, Mac and Linux, and offline after the first visit.',
           'For HEIC photos straight from an iPhone, use the [HEIC to JPG converter](/tools/heic-to-jpg); the JPG it produces has no metadata unless you tick the box to keep it.',
@@ -616,14 +616,14 @@ export const guides: Guide[] = [
     slug: "how-to-view-photo-metadata",
     title: "How to View Photo Metadata (EXIF) on iPhone, Android, Windows and Mac",
     description: "See a photo's hidden location, date and camera data. The built-in way on every phone and computer, what each hides, and how to check any photo without uploading it.",
-    heading: "How to view photo metadata on any device",
+    heading: "How to view photo metadata on iPhone, Android, Windows and Mac",
     dek: "Every phone and computer can show some of a photo's EXIF data. Here is where to look, what each one leaves out, and how to see all of it.",
     keywords: ["how to view photo metadata", "view photo metadata", "view photo metadata iphone", "how to view photo metadata on android", "exif viewer", "check photo location"],
     updated: "2026-09-29",
     tools: ["exif-viewer", "strip-exif", "remove-location-from-photos"],
     sections: [
       {
-        h: "The quickest way, on any device",
+        h: "The quickest way, on your phone or computer",
         p: ["Open the [EXIF viewer](/tools/exif-viewer) in any browser and drop the photo on it. It reads the file on your device and shows where the photo was taken, when, on which phone or camera, any serial number or owner name, and every other EXIF field in plain words. It reads JPG, PNG, WebP, HEIC from iPhones and TIFF or DNG files, and nothing is uploaded, which matters when the reason you are checking is that the photo might be private.", "The built-in panels below are fine for a quick look. They each show a subset, and none of them tells you about the embedded thumbnail, the camera serial number or the XMP and IPTC blocks that editors add."],
       },
       {
@@ -1038,8 +1038,8 @@ export const guides: Guide[] = [
       {
         h: 'PDF jobs in the browser, without uploading',
         p: [
-          'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work on any device with a modern browser and keep working with the network switched off.',
-          'PDF24 has a far larger toolbox, including Office conversions, OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on any other device, a browser tool avoids both the upload and the install.',
+          'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work in any modern browser on Windows, Mac, Android or iPhone and keep working with the network switched off.',
+          'PDF24 has a far larger toolbox, including Office conversions, OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on a Mac, a Chromebook or a phone, a browser tool avoids both the upload and the install.',
         ],
       },
       {
@@ -1543,9 +1543,9 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'Removing it in one step, on any device',
+        h: 'Removing it in one step, on your phone or computer',
         p: [
-          'Stayput\'s [mute video](/tools/mute-video) tool drops the audio track entirely in your browser tab, on any phone or computer, without an app to install. The [Remove audio from video](/remove-audio-from-video) preset is the same tool set up for this exact job. The file is processed locally, so nothing is uploaded.',
+          'Stayput\'s [mute video](/tools/mute-video) tool drops the audio track entirely in your browser tab, on your phone or computer, without an app to install. The [Remove audio from video](/remove-audio-from-video) preset is the same tool set up for this exact job. The file is processed locally, so nothing is uploaded.',
         ],
       },
     ],
@@ -1751,7 +1751,7 @@ export const guides: Guide[] = [
   {
     slug: 'how-to-resize-a-photo-for-social-media',
     title: 'How to Resize a Photo for Instagram, Discord and Profile Pictures',
-    description: 'Every platform crops or squeezes a photo to its own shape if you upload it as-is. Here are the sizes that matter and how to hit them exactly, on any device.',
+    description: 'Every platform crops or squeezes a photo to its own shape if you upload it as-is. Here are the sizes that matter and how to hit them exactly, on your phone or computer.',
     heading: 'How to resize a photo for social media',
     dek: 'Upload the wrong shape and the platform crops it for you, sometimes badly. Here are the sizes that matter and how to hit them.',
     keywords: ['how to resize a photo for instagram', 'resize image for discord', 'profile picture size', 'instagram photo dimensions', 'image size for social media'],
@@ -2018,7 +2018,7 @@ export const guides: Guide[] = [
       {
         h: 'A browser tool that actually encrypts the file',
         p: [
-          'Stayput\'s [protect PDF](/tools/protect-pdf) tool sets a real password with AES-256 encryption directly in the browser: the file is encrypted on your device before it is ever saved, so the unprotected version never leaves your computer or gets uploaded anywhere to be locked. It works on any device, including Windows and Android where there is no built-in option, and handles several PDFs in one batch.',
+          'Stayput\'s [protect PDF](/tools/protect-pdf) tool sets a real password with AES-256 encryption directly in the browser: the file is encrypted on your device before it is ever saved, so the unprotected version never leaves your computer or gets uploaded anywhere to be locked. It works in any modern browser, including on Windows and Android where there is no built-in option, and handles several PDFs in one batch.',
         ],
       },
     ],
@@ -2071,7 +2071,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Can I split a PDF without installing software?', a: 'Yes, a browser-based splitter needs no install and works the same on any device, unlike Preview\'s drag-out method which is Mac-only.' },
+      { q: 'Can I split a PDF without installing software?', a: 'Yes, a browser-based splitter needs no install and works in any modern browser on Windows, Mac, Android or iPhone, unlike Preview\'s drag-out method which is Mac-only.' },
       { q: 'What is the difference between splitting and deleting pages?', a: 'Deleting removes pages from the existing document and leaves the rest; splitting produces the removed (or selected) pages as their own separate file, keeping both parts usable.' },
       { q: 'Can I extract just one page from a PDF?', a: 'Yes, that\'s the simplest case of a page range, whether by dragging a single page out in Preview, printing that one page to a new PDF, or using a dedicated split tool.' },
       { q: 'Does splitting a PDF reduce its quality?', a: 'No, splitting copies the existing pages into new files without re-rendering them, so text and images stay exactly as they were.' },
@@ -2114,7 +2114,7 @@ export const guides: Guide[] = [
       {
         h: 'A direct converter to MP3',
         p: [
-          'Stayput\'s [video to MP3](/tools/video-to-mp3) tool does this directly, on any device: drop in a video (or several, in a batch) and it extracts the audio and saves it as an MP3 or WAV, in the browser, without uploading the file. It skips the extra M4A-to-MP3 conversion step that QuickTime\'s export leaves you with.',
+          'Stayput\'s [video to MP3](/tools/video-to-mp3) tool does this directly, on your phone or computer: drop in a video (or several, in a batch) and it extracts the audio and saves it as an MP3 or WAV, in the browser, without uploading the file. It skips the extra M4A-to-MP3 conversion step that QuickTime\'s export leaves you with.',
         ],
       },
     ],
@@ -2390,7 +2390,7 @@ export const guides: Guide[] = [
       {
         h: 'A tool that rotates and saves it for good',
         p: [
-          'Stayput\'s [rotate PDF](/tools/rotate-pdf) tool rotates all pages or just the ones you select by 90, 180 or 270 degrees and saves the change permanently into a new file, directly in the browser without uploading the document. It works the same way on any device, including Windows, iPhone and Android where there is no built-in equivalent.',
+          'Stayput\'s [rotate PDF](/tools/rotate-pdf) tool rotates all pages or just the ones you select by 90, 180 or 270 degrees and saves the change permanently into a new file, directly in the browser without uploading the document. It works the same way in any modern browser, including on Windows, iPhone and Android where there is no built-in equivalent.',
         ],
       },
     ],
@@ -2538,7 +2538,7 @@ export const guides: Guide[] = [
     title: 'How to Reorder Pages in a PDF',
     description: 'Fixing the order of pages in a PDF, or deleting the ones you do not need, is easy on a Mac but missing from most other built-in PDF viewers. Here is what works everywhere.',
     heading: 'How to reorder pages in a PDF',
-    dek: 'Rearranging pages is built into Preview on a Mac, but missing on Windows, iPhone and Android. Here is what works on every device.',
+    dek: 'Rearranging pages is built into Preview on a Mac, but missing on Windows, iPhone and Android. Here is what works on Windows, Mac, iPhone and Android.',
     keywords: ['how to reorder pdf pages', 'rearrange pages in a pdf', 'delete pages from a pdf', 'change pdf page order free', 'move pages in a pdf document'],
     updated: '2026-09-29',
     tools: ['reorder-pdf'],
@@ -2562,7 +2562,7 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'A page thumbnail view that works on any device',
+        h: 'A page thumbnail view that works in your browser',
         p: [
           'Stayput\'s [reorder & delete pages](/tools/reorder-pdf) tool shows every page as a thumbnail, lets you drag them into a new order and remove the ones you don\'t need, then saves the result, directly in the browser without uploading the document. It works the same way on a phone or a computer, unlike Preview\'s drag-and-drop which is Mac-only.',
         ],
@@ -3016,10 +3016,10 @@ export const guides: Guide[] = [
   },
   {
     slug: 'pdf24-alternative',
-    title: 'A PDF24 Alternative That Works on Any Device Without Uploading',
+    title: 'A PDF24 Alternative That Works in Your Browser Without Uploading',
     description: 'PDF24\'s free online tools have no size limits, but they still upload your PDF to a server; its private offline option, PDF24 Creator, is Windows only. Here is an alternative that works anywhere without uploading.',
-    heading: 'A PDF24 alternative that works on any device without uploading',
-    dek: 'PDF24 itself recommends its offline app for privacy, but that app is Windows only. Here is an alternative that skips the upload on any device.',
+    heading: 'A PDF24 alternative that works in your browser without uploading',
+    dek: 'PDF24 itself recommends its offline app for privacy, but that app is Windows only. Here is an alternative that skips the upload, in any modern browser.',
     keywords: ['pdf24 alternative', 'pdf24 alternative mac', 'pdf24 without upload', 'pdf24 alternative no install', 'pdf24 creator alternative'],
     updated: '2026-09-29',
     tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf', 'rotate-pdf', 'reorder-pdf'],
@@ -3046,7 +3046,7 @@ export const guides: Guide[] = [
       {
         h: 'Where PDF24 still has the edge',
         p: [
-          'PDF24\'s toolbox is larger, including OCR, Office conversions and a virtual PDF printer available in Creator on Windows. If you are on Windows and need those specifically, Creator remains a solid private choice; for the everyday jobs above, on any device, a browser tool matches PDF24\'s no-limit approach without the upload or the install.',
+          'PDF24\'s toolbox is larger, including OCR, Office conversions and a virtual PDF printer available in Creator on Windows. If you are on Windows and need those specifically, Creator remains a solid private choice; for the everyday jobs above, a browser tool matches PDF24\'s lack of size limits without the upload or the install.',
         ],
       },
     ],
@@ -5044,6 +5044,76 @@ export const guides: Guide[] = [
       { q: "Can I upload an MP3 to YouTube?", a: "Not as a video. YouTube's help says audio files such as MP3 cannot be uploaded to create a video, as of October 2026, so make an MP4 first." },
       { q: "Can I make a video with a moving background or a waveform?", a: "Not with this tool, which makes a still-picture video. Use a video editor for moving pictures or a waveform." },
       { q: "Are my files uploaded?", a: "No. The sound is decoded and the video is written by code in your browser tab, so neither file leaves your device." },
+    ],
+  },
+  {
+    slug: 'how-to-tune-a-guitar',
+    title: 'How to Tune a Guitar: Standard Tuning, by Ear or with a Tuner',
+    description: 'Standard guitar tuning is E A D G B E. Here are the notes and frequencies, how to tune with a tuner in your browser, how to tune by ear, and what to do when a string will not stay in tune.',
+    heading: 'How to tune a guitar',
+    dek: 'Standard tuning is E A D G B E, from the thickest string to the thinnest. Here is how to get each string there with a tuner, by ear, and what to do when it drifts.',
+    keywords: ['how to tune a guitar', 'how to tune a guitar by ear', 'guitar standard tuning', 'guitar string notes', 'tune a guitar with a tuner', 'how to tune a guitar for beginners'],
+    updated: '2026-10-06',
+    tools: ['guitar-tuner'],
+    sections: [
+      {
+        h: 'Standard tuning: the six strings',
+        p: ['Standard tuning, from the thickest string to the thinnest, is E A D G B E. The thickest string, at the top when you hold the guitar, is string 6; the thinnest is string 1. Each note has an octave number, so the low E is E2 and the high E is E4. The frequencies below use the usual reference of A4 at 440 Hz:'],
+        list: [
+          '**String 6:** E2, 82.41 Hz',
+          '**String 5:** A2, 110.00 Hz',
+          '**String 4:** D3, 146.83 Hz',
+          '**String 3:** G3, 196.00 Hz',
+          '**String 2:** B3, 246.94 Hz',
+          '**String 1:** E4, 329.63 Hz',
+        ],
+        after: ['The high E is two octaves above the low E, so it has four times the frequency. Rounded, the E4 figure is often written as 329.6 Hz.'],
+      },
+      {
+        h: 'Tune with a tuner in your browser',
+        p: ['The [guitar tuner](/guitar-tuner) listens through the microphone of the phone or computer you are using, so you need nothing but a browser. Stayput\'s privacy page says the sound from its microphone tools is handled inside the page in your tab and never sent to a server. The steps are:'],
+        list: [
+          '**1. Open the tuner and press Start the tuner.** Allow the microphone when your browser asks. Leave the instrument on Guitar, standard.',
+          '**2. Pluck one open string and let it ring.** The tuner shows the nearest note, with its octave, and a needle that moves left when the string is flat and right when it is sharp. It also shows the pitch in Hz, and the target pitch of the string it thinks you are tuning.',
+          '**3. Turn the peg.** Tightening the string raises the note and loosening it lowers it. The tuner says how many cents sharp or flat you are, such as "18 cents flat: tune up", and says "In tune" when you are within 5 cents. Pluck again after each small turn.',
+          '**4. Move to the next string,** working from low E to high E. Then go round all six strings once more, because tightening one string can shift the others a little.',
+        ],
+        after: ['The string buttons on the page play each open-string note through your speaker, so you can also tune by listening. If your band or a piano tunes to a pitch other than A4 at 440 Hz, the tuner lets you set the reference pitch from 415 to 466 Hz.'],
+      },
+      {
+        h: 'Tune by ear with the 5th-fret method',
+        p: ['With no tuner, tune the strings to each other. Start with the low E sounding right (from a tuner, a piano, or a recording of an E), then:'],
+        list: [
+          '**A string:** press string 6 at the 5th fret. It plays an A. Tune the open string 5 until it matches.',
+          '**D string:** press string 5 at the 5th fret to get a D, and tune the open string 4 to it.',
+          '**G string:** press string 4 at the 5th fret to get a G, and tune the open string 3 to it.',
+          '**B string:** the exception. Press string 3 at the **4th** fret to get a B, and tune the open string 2 to it.',
+          '**High E string:** press string 2 at the 5th fret to get an E, and tune the open string 1 to it.',
+        ],
+        after: ['Listen for the "wobble" between the two notes. It slows as they come closer together and stops when they match. By-ear tuning gets the strings in tune with each other, but not necessarily at the right pitch, so check against a tuner if you will play with other people.'],
+      },
+      {
+        h: 'When a string will not stay in tune',
+        p: ['New strings stretch for the first day or two, so expect to retune them several times. Always tune up to a note: if a string is sharp, loosen it below the note and then bring it back up, so the gear is pulling against the string and holds better.'],
+        list: [
+          '**The tuner reads the wrong octave.** Pluck one string only, let it ring rather than muting it, and keep the others from sounding. A light pluck gives a cleaner sound than a hard one, which can add overtones. The tuner shows the octave next to the note name, so you can see when it is off.',
+          '**The needle will not settle in a noisy room.** The tuner listens to everything the microphone hears. Move somewhere quieter, turn off music and fans, and hold the phone or laptop close to the guitar. An unplugged electric guitar is quiet, so hold the device right next to the strings.',
+          '**Every string is in tune but chords still sound wrong.** The open strings can be perfect while notes up the neck are off. That is intonation, set at the bridge, and a tuner cannot fix it. A guitar shop can set it up.',
+        ],
+      },
+      {
+        h: 'Drop D and half a step down',
+        p: ['**Drop D** keeps five strings as they are and lowers string 6 a whole step, from E2 to D2 (73.42 Hz), so the strings read D A D G B E. In the guitar tuner, choose Guitar, drop D from the Instrument list, then tune only the sixth string down until the needle centres.'],
+        after: ['**Half a step down** (E flat) lowers all six strings by one semitone: E♭ A♭ D♭ G♭ B♭ E♭. The guitar tuner has no preset for it, so choose Chromatic and tune each string down until it reads the note one semitone lower. The big letter on the tuner uses sharp names, so the same notes show as D♯, G♯, C♯, F♯, A♯ and D♯.'],
+      },
+    ],
+    faq: [
+      { q: 'What is standard guitar tuning?', a: 'E A D G B E, from the thickest string (string 6) to the thinnest (string 1). The pitches are E2 (82.41 Hz), A2 (110.00 Hz), D3 (146.83 Hz), G3 (196.00 Hz), B3 (246.94 Hz) and E4 (329.63 Hz), with A4 at 440 Hz.' },
+      { q: 'How often should I tune my guitar?', a: 'Check it each time you pick the guitar up. Strings drift as they settle and as the temperature and humidity change, and new strings drift most in their first days, so tune more often then.' },
+      { q: 'Can I tune with my phone?', a: 'You can try the [guitar tuner](/guitar-tuner) in your phone\'s browser: it needs a browser that lets the page use the microphone. Allow the microphone when asked, and hold the phone close to the guitar.' },
+      { q: 'Which way do I turn the tuning peg?', a: 'Tightening raises the note and loosening lowers it. Which way that is depends on the guitar, so pluck the string while you turn the peg and watch which way the needle moves.' },
+      { q: 'Does the tuner record my guitar?', a: 'No. Stayput\'s privacy page says the sound from its microphone tools is handled inside the page in your tab and is never sent to a server. See the [guitar tuner](/guitar-tuner) for details.' },
+      { q: 'Why does the high E string sound out of tune after I tune the low E?', a: 'Tightening or loosening one string changes the tension on the neck a little, which can move the others. Go round all six strings a second time, and a third time on new strings.' },
     ],
   },
 ];
