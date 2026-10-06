@@ -87,3 +87,32 @@ test('archive tool pages only claim password support for ZIP, in the visible FAQ
     if (path === '/tools/archive-extractor') expect(answers.join(' ')).toMatch(/ZIP files open after you enter the password.*7z and RAR archives are not supported yet/);
   }
 });
+
+test('MP4 to MP3 and Video to MP3 target different queries, with no size-limit claims and a footer link', async ({ request }) => {
+  const mp4 = await (await request.get('/mp4-to-mp3')).text();
+  const video = await (await request.get('/tools/video-to-mp3')).text();
+  expect(mp4).toContain('<title>MP4 to MP3 Converter: Free, Private, No Upload | Stayput</title>');
+  expect(mp4).toContain('<link rel="canonical" href="https://stayput.dev/mp4-to-mp3"');
+  expect(video).toContain('<link rel="canonical" href="https://stayput.dev/tools/video-to-mp3"');
+  expect(video).toContain('Have an MP4? Use <a href="/mp4-to-mp3">');
+  expect(tools.find((t) => t.slug === 'video-to-mp3')!.keywords).not.toContain('mp4 to mp3');
+  for (const html of [mp4, video]) expect(html).not.toMatch(/no limit|no size limit|no file size limit|unlimited|no size caps/i);
+  for (const q of ['What is the difference between MP4 and MP3?', 'Is there a maximum file size?', 'Can I convert only part of the video?']) {
+    expect(mp4).toContain(q);
+    expect(mp4).toContain(`"name":"${q}"`);
+  }
+  expect(await (await request.get('/tools/merge-pdf')).text()).toContain('<a href="/mp4-to-mp3">MP4 to MP3</a>');
+});
+
+test('HEIC to JPG explains how to open HEIC, links related pages and says the decoder comes from this site', async ({ request }) => {
+  const html = await (await request.get('/tools/heic-to-jpg')).text();
+  expect(html).toContain('How to open or convert HEIC on Windows, Mac and iPhone');
+  expect(html).toContain('What is a HEIC file?');
+  for (const href of ['/guides/open-heic-files-on-windows', '/heic-to-png', '/tools/strip-exif']) expect(html).toContain(`href="${href}"`);
+  expect(html).toContain('downloaded once from this site and cached');
+  expect(html).not.toMatch(/CDN|no size caps/i);
+  for (const q of ['What is the difference between HEIC and HEIF?', 'Can I convert HEIC to JPG without losing the location?', 'How do I open a HEIC file on Windows?']) {
+    expect(html).toContain(q);
+    expect(html).toContain(`"name":"${q}"`);
+  }
+});

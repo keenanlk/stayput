@@ -25,6 +25,10 @@ export interface Preset {
   accept?: string;
   /** Option element id (or radio group name) to preselected value. */
   defaults?: Record<string, string>;
+  /** Replaces the hero's "No size caps, no watermark" line. */
+  sizeFact?: string;
+  /** Extra headed blocks shown above "How it works". */
+  sections?: { heading: string; paragraphs?: string[]; bullets?: string[] }[];
 }
 
 const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. You can load the page, turn off Wi-Fi, and it still works.' };
@@ -1404,10 +1408,21 @@ export const presets: Preset[] = [
     slug: 'mp4-to-mp3',
     base: 'video-to-mp3',
     name: 'MP4 to MP3',
-    title: 'MP4 to MP3 Converter, Free, No Upload, No Sign-up | Stayput',
-    description: 'Convert MP4 videos to MP3 audio in your browser. Batch convert, pick the quality, no file size limit. Nothing is uploaded and there is no sign-up.',
+    title: 'MP4 to MP3 Converter: Free, Private, No Upload | Stayput',
+    description: 'Convert MP4 to MP3 in your browser. Choose the quality, convert several files at once, and download. Your video is never uploaded; no sign-up.',
     heading: 'Convert MP4 to MP3',
-    tagline: 'Keep the sound, drop the picture. Your MP4 is converted on this device, as fast as it can read the file.',
+    tagline: 'Drop an MP4, pick a quality and download the MP3. Your video is converted on this device and never uploaded. Use 96 to 128 kbps mono for speech, 192 kbps for music.',
+    sizeFact: 'No sign-up, no watermark',
+    sections: [
+      {
+        heading: 'MP4 to MP3 on a phone or computer',
+        bullets: [
+          'On an iPhone or Android phone, tap the drop area and pick the video from Files or your camera roll.',
+          'On a computer, drag the MP4 onto the drop area, or click it to choose the file.',
+          'Either way the video is converted in this tab and nothing is uploaded.',
+        ],
+      },
+    ],
     keywords: ['mp4 to mp3', 'convert mp4 to mp3', 'mp4 to mp3 converter', 'turn mp4 into mp3', 'free mp4 to mp3 converter', 'mp4 to mp3 no upload'],
     dropLabel: 'Drop MP4 videos to convert to MP3',
     accept: 'video/mp4,.mp4,.m4v,video/*,audio/*',
@@ -1425,6 +1440,9 @@ export const presets: Preset[] = [
       { q: 'Does converting MP4 to MP3 lose quality?', a: 'The sound in an MP4 is already compressed (usually AAC at 128 to 256 kbps), and MP3 compresses it again. At 192 kbps or higher the difference is not audible in normal listening; at 320 kbps it is as close as MP3 gets. The only lossless way to keep the track is to choose WAV, which is much larger.' },
       { q: 'Should I save as MP3 or WAV?', a: 'Keep the original format for sharing or listening. If you will edit the recording further, for example cut it in an editor or add music, choose WAV or FLAC under Save as, so the next export does not compress the sound a second time.' },
       { q: 'How long does it take?', a: 'Usually a few seconds per minute of audio on a laptop and somewhat longer on a phone. There is no upload or queue, so the time depends only on your device.' },
+      { q: 'What is the difference between MP4 and MP3?', a: 'MP4 is a container that usually holds a video track and an audio track. MP3 is audio only, so an MP3 made from an MP4 keeps the sound and drops the picture, and it is much smaller than the video.' },
+      { q: 'Is there a maximum file size?', a: 'There is no file size cap from us; very large files depend on your device’s memory.' },
+      { q: 'Can I convert only part of the video?', a: 'Convert the whole file first, then cut the MP3 down to the part you want with the Trim audio tool. Both steps happen on your device.' },
       { q: 'My MP4 has no sound in the MP3. Why?', a: 'Some MP4s, such as screen recordings made without a microphone or clips exported from a GIF, have no audio track at all. The tool tells you when it cannot find one.' },
       noUpload,
     ],
@@ -4912,5 +4930,8 @@ export function presetAsTool(p: Preset): Tool {
     keywords: p.keywords,
     steps: p.steps,
     faq: p.faq,
+    taglineMd: undefined,
+    sizeFact: p.sizeFact,
+    sections: p.sections,
   };
 }

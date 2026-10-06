@@ -12,7 +12,7 @@ export interface Engine {
 
 export const engines: Record<string, Engine> = {
   'heic-to-jpg': {
-    how: 'The page loads libheif, the same open-source HEIC decoder used by Linux desktops, compiled to WebAssembly. It decodes each photo to raw pixels inside your tab, and the browser’s own image encoder writes the JPG or PNG. The decoder is a program file served from this site, downloaded once and cached; your photos are never part of any request.',
+    how: 'The page loads libheif, the same open-source HEIC decoder used by Linux desktops, compiled to WebAssembly. It decodes each photo to raw pixels inside your tab, and the browser’s own image encoder writes the JPG or PNG. The decoder is a program file downloaded once from this site and cached; your photos are never part of any request.',
     versus: 'Upload-based HEIC converters send every photo, location data included, to a server you have never heard of, then cap you at a handful per day. Here a hundred photos convert in the time the first one would take to upload.',
   },
   'convert-image': {

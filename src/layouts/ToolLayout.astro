@@ -115,7 +115,7 @@ const jsonLd = [
 <Base title={tool.title} description={tool.description} jsonLd={jsonLd} ogImage={`/og/${tool.slug}.png`}>
   <section class="tool-hero wrap">
     <h1>{tool.heading}</h1>
-    <p class="tagline">{tool.tagline}</p>
+    {tool.taglineMd ? <p class="tagline" set:html={inline(tool.taglineMd)} /> : <p class="tagline">{tool.tagline}</p>}
     <ul class="facts">
       <li><Icon name="shield" /> Nothing is uploaded</li>
       <li><Icon name="offline" /> Works offline</li>
@@ -189,6 +189,14 @@ const jsonLd = [
       {intro.map((p) => (/\[|\*\*/.test(p) ? <p set:html={inline(p)} /> : <p>{p}</p>))}
     </section>
   )}
+
+  {(tool.sections ?? []).map((s) => (
+    <section class="wrap section prose-wide">
+      <h2>{s.heading}</h2>
+      {(s.paragraphs ?? []).map((p) => <p set:html={inline(p)} />)}
+      {s.bullets && <ul>{s.bullets.map((b) => <li set:html={inline(b)} />)}</ul>}
+    </section>
+  ))}
 
   <section class="wrap section split">
     <h2>How it works</h2>
