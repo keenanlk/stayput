@@ -1245,7 +1245,11 @@
    "licences": [
     {
      "name": "Apache-2.0",
-     "url": "https://spdx.org/licenses/Apache-2.0.html"
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/LICENSE-qpdf.txt"
+    },
+    {
+     "name": "NOTICE",
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
     }
    ],
    "project": "https://github.com/qpdf/qpdf",
@@ -1253,7 +1257,42 @@
    "shipped": "Compiled to WebAssembly as qpdf.wasm",
    "kind": "wasm",
    "via": "qpdf-wasm",
-   "copyright": "Copyright (c) 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger"
+   "copyright": "Copyright (c) 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger",
+   "note": "The Apache-2.0 text and qpdf's NOTICE are copied verbatim from the v12.2.0 release and served next to the wasm. Also inside qpdf: Philip J. Erdelsky's public-domain Rijndael (AES) code, and sha2 code from sphlib 3.0 (Copyright (c) 2007-2011 Projet RNRT SAPHIR, MIT-style licence reproduced in the NOTICE)."
+  },
+  {
+   "id": "qpdf-sphlib",
+   "name": "sphlib (sha2 code)",
+   "version": "3.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT-style licence, reproduced in qpdf's NOTICE",
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
+    }
+   ],
+   "project": "https://github.com/qpdf/qpdf/blob/v12.2.0/NOTICE.md",
+   "source": "https://github.com/qpdf/qpdf/tree/v12.2.0/libqpdf",
+   "shipped": "Compiled into qpdf.wasm (Copyright (c) 2007-2011 Projet RNRT SAPHIR)",
+   "kind": "wasm",
+   "via": "qpdf-wasm"
+  },
+  {
+   "id": "qpdf-rijndael",
+   "name": "Rijndael (AES) implementation by Philip J. Erdelsky",
+   "version": "as vendored in qpdf 12.2.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Public domain (see qpdf's NOTICE)",
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
+    }
+   ],
+   "project": "https://github.com/qpdf/qpdf/blob/v12.2.0/NOTICE.md",
+   "source": "https://github.com/qpdf/qpdf/tree/v12.2.0/libqpdf",
+   "shipped": "Compiled into qpdf.wasm",
+   "kind": "wasm",
+   "via": "qpdf-wasm"
   },
   {
    "id": "qpdf-zlib",
@@ -1280,7 +1319,7 @@
    "licences": [
     {
      "name": "IJG, BSD-3-Clause and zlib licenses (libjpeg-turbo)",
-     "url": "https://github.com/ImageMagick/jpeg-turbo/blob/7aa2a898c564041a24b09d0a6e780aaa632d08d3/LICENSE.md"
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/LICENSE-libjpeg-turbo.md"
     }
    ],
    "project": "https://github.com/ImageMagick/jpeg-turbo",

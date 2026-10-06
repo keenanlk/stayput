@@ -25,6 +25,17 @@ const BUILD_ONLY = new Set(['astro', '@astrojs/sitemap']);
 
 const hosted = (url: string) => url.startsWith('/licenses/');
 
+/** Licence files served under /vendor/ come from vendor.json's "licences"; returns the repo path that feeds a URL. */
+function servedFromVendor(url: string): string | null {
+  if (!url.startsWith('/vendor/')) return null;
+  for (const lib of Object.values(vendor) as { package: string; version: string; licences?: Record<string, string> }[]) {
+    const dir = `/vendor/${lib.package.replace(/^@/, '').replace('/', '-')}@${lib.version}/`;
+    const src = url.startsWith(dir) ? lib.licences?.[url.slice(dir.length)] : undefined;
+    if (src) return src;
+  }
+  throw new Error(`${url} is not produced by src/data/vendor.json`);
+}
+
 test('every browser-shipped dependency in package.json has an entry in licenses.json', () => {
   const missing: string[] = [];
   for (const [name, version] of Object.entries(pkg.dependencies)) {
@@ -68,8 +79,9 @@ test('every entry is complete and points somewhere real', () => {
     expect(c.licences.length, `${c.id} has a licence`).toBeGreaterThan(0);
     for (const l of c.licences) {
       expect(l.name, c.id).toBeTruthy();
-      expect(l.url.startsWith('https://') || hosted(l.url), `${c.id} licence link ${l.url}`).toBe(true);
+      expect(l.url.startsWith('https://') || hosted(l.url) || l.url.startsWith('/vendor/'), `${c.id} licence link ${l.url}`).toBe(true);
       if (hosted(l.url)) expect(existsSync(new URL(`../public${l.url}`, import.meta.url)), l.url).toBe(true);
+      if (servedFromVendor(l.url)) expect(existsSync(new URL(`../${servedFromVendor(l.url)}`, import.meta.url)), `${l.url} has a source file in the repo`).toBe(true);
     }
     expect(c.project, `${c.id} project link`).toMatch(/^https:\/\//);
     expect(c.source, `${c.id} source link`).toMatch(/^https:\/\//);
@@ -105,4 +117,22 @@ test('the licenses page lists every component and is linked from About and the f
     const res = await request.get(`/licenses/${file}.txt`);
     expect(res.ok(), file).toBe(true);
   }
+});
+
+test('qpdf is credited as Apache-2.0 with its licence and NOTICE served next to the wasm', async ({ request }) => {
+  const qpdf = components.find((c) => c.id === 'qpdf')!;
+  const wrapper = components.find((c) => c.id === 'qpdf-wasm')!;
+  expect(wrapper.licences.map((l) => l.name)).toEqual(['ISC']);
+  expect(qpdf.version).toBe('12.2.0');
+  expect(qpdf.source).toContain('/tree/v12.2.0');
+  const dir = `/vendor/neslinesli93-qpdf-wasm@${vendor.qpdf.version}/`;
+  expect(qpdf.licences[0]).toEqual({ name: 'Apache-2.0', url: `${dir}LICENSE-qpdf.txt` });
+  expect(qpdf.licences.map((l) => l.url)).toContain(`${dir}NOTICE-qpdf.md`);
+  expect(readFileSync(new URL('../vendor-licenses/qpdf-wasm/LICENSE-qpdf.txt', import.meta.url), 'utf8')).toContain('Apache License\n                           Version 2.0, January 2004');
+  for (const file of ['LICENSE-qpdf.txt', 'NOTICE-qpdf.md', 'LICENSE-libjpeg-turbo.md', 'qpdf.wasm']) {
+    const res = await request.get(`${dir}${file}`);
+    expect(res.status(), file).toBe(200);
+  }
+  const html = await (await request.get('/licenses')).text();
+  expect(html).toContain(`${dir}LICENSE-qpdf.txt`);
 });
