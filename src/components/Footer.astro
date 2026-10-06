@@ -35,7 +35,7 @@ const CAP = 8;
       <div>
         <h3><a href="/#media-tools">Video and audio</a></h3>
         <ul>
-          {media.slice(0, CAP).map((t) => <li><a href={`/tools/${t.slug}`}>{t.name}</a></li>)}
+          {media.slice(0, CAP).map((t) => <><li><a href={`/tools/${t.slug}`}>{t.name}</a></li>{t.slug === 'video-to-mp3' && <li><a href="/mp4-to-mp3">MP4 to MP3</a></li>}</>)}
           <li><a href="/#media-tools">All video tools →</a></li>
         </ul>
       </div>

@@ -33,6 +33,10 @@ export interface Tool {
   path?: string;
   /** Replaces the "No size caps, no watermark" line under the heading, for tools whose size is bounded by the device. */
   sizeFact?: string;
+  /** Hero paragraph with inline markup (links); the plain `tagline` stays for cards, search and social images. */
+  taglineMd?: string;
+  /** Extra headed blocks shown above "How it works". Bullets and paragraphs accept inline markup. */
+  sections?: { heading: string; paragraphs?: string[]; bullets?: string[] }[];
 }
 
 export const toolPath = (t: Pick<Tool, 'slug' | 'path'>): string => t.path ?? `/tools/${t.slug}`;
@@ -41,9 +45,9 @@ export const tools: Tool[] = [
   {
     slug: 'heic-to-jpg',
     name: 'HEIC to JPG',
-    title: 'HEIC to JPG Converter, Free and Private | Stayput',
+    title: 'HEIC to JPG Converter: Free, Batch, No Upload | Stayput',
     description:
-      'Convert iPhone HEIC photos to JPG or PNG in your browser. No upload, no size caps, no watermark. Batch convert hundreds of photos offline.',
+      'Convert iPhone HEIC photos to JPG or PNG in your browser. Drop many photos at once, keep or drop the location data. Nothing is uploaded; no watermark.',
     heading: 'Convert HEIC to JPG',
     tagline:
       'Turn iPhone and iPad photos into JPG or PNG files that open anywhere. Your photos never leave this device.',
@@ -52,6 +56,23 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop HEIC photos here',
     action: 'Convert',
+    sizeFact: 'No sign-up, no watermark',
+    sections: [
+      {
+        heading: 'How to open or convert HEIC on Windows, Mac and iPhone',
+        bullets: [
+          'On this page: drop the HEIC file, choose JPG or PNG and download the result. Nothing is uploaded.',
+          'On Windows, HEIC needs the HEIF image extension from Microsoft; or convert the file here instead. See [how to open HEIC files on Windows](/guides/open-heic-files-on-windows).',
+          'On an iPhone, Settings > Camera > Formats > Most Compatible makes new photos JPG. Photos you already took stay HEIC, so convert those here.',
+        ],
+      },
+      {
+        heading: 'What is a HEIC file?',
+        paragraphs: [
+          'HEIC is the photo format iPhones and iPads have used since iOS 11. It stores the same picture in about half the space of a JPG, but Windows, many websites and older programs cannot open it, which is why people convert HEIC to JPG. Need a lossless copy? Use [HEIC to PNG](/heic-to-png). Photos carry their date and GPS location; to take it off a JPG you already have, use [Remove EXIF data](/tools/strip-exif).',
+        ],
+      },
+    ],
     keywords: ['heic to jpg', 'heic to png', 'convert heic', 'heic converter', 'iphone photo to jpg'],
     steps: [
       'Drop one or many HEIC or HEIF photos onto the page, or tap to pick them.',
@@ -69,7 +90,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is there a file size or quantity limit?',
-        a: 'There is no server, so there is no quota. The only limit is your device memory. Batches of a few hundred photos work fine on a modern laptop or phone.',
+        a: 'There is no file size cap from us, and no quota because there is no server. Very large batches depend on your device’s memory.',
       },
       {
         q: 'Does converting lose quality?',
@@ -77,7 +98,19 @@ export const tools: Tool[] = [
       },
       {
         q: 'Does it keep the photo date, location and camera info?',
-        a: 'Not by default. Browsers strip EXIF metadata when they re-encode an image, which also removes GPS location. If you want to keep metadata, tick "Keep EXIF metadata" and the original EXIF block is copied into the JPG.',
+        a: 'Not by default. Browsers strip EXIF metadata when they re-encode an image, which also removes GPS location. If you want to keep metadata, tick "Keep EXIF metadata" and the original EXIF block is copied into the JPG. To remove location data from a photo that is already a JPG, use the Remove EXIF data tool.',
+      },
+      {
+        q: 'What is the difference between HEIC and HEIF?',
+        a: 'HEIF is the container standard and HEIC is the version iPhones use, with images compressed by the HEVC codec. In practice the two extensions mean the same kind of photo, and this page opens both .heic and .heif files.',
+      },
+      {
+        q: 'Can I convert HEIC to JPG without losing the location?',
+        a: 'Yes. Tick "Keep EXIF metadata" and the date, camera info and GPS location are copied into the JPG. Leave it unticked to drop them, or use the Remove EXIF data tool on a photo you already have.',
+      },
+      {
+        q: 'How do I open a HEIC file on Windows?',
+        a: 'Install Microsoft’s HEIF image extension from the Microsoft Store, or convert the photo to JPG on this page and open that. Nothing is uploaded either way. The Windows guide linked above has the steps.',
       },
     ],
   },
@@ -990,17 +1023,19 @@ export const tools: Tool[] = [
   {
     slug: 'video-to-mp3',
     name: 'Video to MP3',
-    title: 'Video to MP3 Converter, MP4 to MP3, No Upload | Stayput',
+    title: 'Video to MP3: Extract the Audio from a Video | Stayput',
     description:
-      'Convert MP4, MOV, M4A, WAV and other video or audio files to MP3 (or WAV) in your browser. Batch, no upload, no sign-up.',
+      'Pull the audio out of MOV, MKV, WebM or other video, or turn M4A, WAV and FLAC into MP3. Converted in your browser, nothing uploaded, no sign-up.',
     heading: 'Convert video or audio to MP3',
     tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
+    taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3).',
+    sizeFact: 'No sign-up, no watermark',
     category: 'media',
     accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
     multiple: true,
     dropLabel: 'Drop videos or audio files to convert',
     action: 'Convert',
-    keywords: ['video to mp3', 'mp4 to mp3', 'extract audio from video', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
+    keywords: ['video to mp3', 'extract audio from video', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
     steps: [
       'Drop one or more videos or audio files (MP4, MOV, WebM, M4A, WAV, FLAC and more), or tap to pick them.',
       'Choose MP3 or WAV. For MP3 pick a quality: 192 kbps suits music, 96 kbps is plenty for speech. Choose mono to halve the size of a voice recording.',
@@ -1009,7 +1044,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser reads the sound track with its own decoders, and an MP3 encoder (LAME, compiled to WebAssembly) runs inside the page to write the file. There is no server in the process, so there is no upload to wait for and no size cap. You can load the page, switch off Wi-Fi and it still works.',
+        a: 'No. Your browser reads the sound track with its own decoders, and an MP3 encoder (LAME, compiled to WebAssembly) runs inside the page to write the file. There is no server in the process, so there is no upload to wait for. You can load the page, switch off Wi-Fi and it still works.',
       },
       {
         q: 'Which files can I convert?',
@@ -1021,7 +1056,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is there a length or size limit?',
-        a: 'No fixed limit. The whole file is read into your device’s memory, so a feature-length film works on a laptop but may be too much for an older phone. The MP3 of an hour of audio at 192 kbps is about 85 MB.',
+        a: 'There is no file size cap from us; very large files depend on your device’s memory. The whole file is read into your device’s memory, so a feature-length film works on a laptop but may be too much for an older phone. The MP3 of an hour of audio at 192 kbps is about 85 MB.',
       },
       {
         q: 'Can I get a WAV instead?',
