@@ -6,6 +6,7 @@ import { pairBySlug, pairAsTool } from '../data/pairs';
 import { presetBySlug, presetAsTool } from '../data/presets';
 import { relatedGuides, isSafetyGuide, type Guide } from '../data/guides';
 import { inline, plain } from '../lib/inline';
+import { lastmodFor } from '../lib/lastmod';
 
 interface Props { guide: Guide }
 const { guide } = Astro.props;
@@ -33,7 +34,7 @@ const jsonLd = [
     description: guide.description,
     url,
     datePublished: guide.updated,
-    dateModified: guide.updated,
+    dateModified: lastmodFor(`/guides/${guide.slug}`),
     wordCount,
     author: { '@type': 'Organization', name: 'Stayput', url: Astro.site?.toString() },
     publisher: { '@type': 'Organization', name: 'Stayput', url: Astro.site?.toString() },

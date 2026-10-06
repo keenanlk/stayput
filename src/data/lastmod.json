@@ -1,0 +1,1654 @@
+{
+ "/": {
+  "date": "2026-10-06",
+  "hash": "0f6e7ecfb36d4f3a"
+ },
+ "/2x2-photo": {
+  "date": "2026-10-05",
+  "hash": "df5c353d36bb2fc9"
+ },
+ "/35x45-photo": {
+  "date": "2026-10-05",
+  "hash": "eb55de29ad6101d6"
+ },
+ "/a4-to-letter": {
+  "date": "2026-10-06",
+  "hash": "a615550df37411ca"
+ },
+ "/aac-to-mp3": {
+  "date": "2026-09-29",
+  "hash": "7cebb53ba304c002"
+ },
+ "/about": {
+  "date": "2026-10-05",
+  "hash": "916ef8f0b4235b1e"
+ },
+ "/acapella-extractor": {
+  "date": "2026-10-06",
+  "hash": "c40dea360909b8bd"
+ },
+ "/add-music-to-video": {
+  "date": "2026-09-29",
+  "hash": "49d109812fc304ac"
+ },
+ "/add-signature-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "c02b187dba8c454f"
+ },
+ "/animated-emote-resizer": {
+  "date": "2026-09-29",
+  "hash": "d4317cf3cce20a98"
+ },
+ "/animated-gif-to-mp4": {
+  "date": "2026-09-29",
+  "hash": "042264f407a5b064"
+ },
+ "/auto-caption-video": {
+  "date": "2026-09-29",
+  "hash": "4c46479e7efbfbc8"
+ },
+ "/avif-to-jpg": {
+  "date": "2026-09-29",
+  "hash": "22305c0b1a46d6ae"
+ },
+ "/avif-to-png": {
+  "date": "2026-09-29",
+  "hash": "2a6c205e3bcfc17f"
+ },
+ "/black-and-white-pdf": {
+  "date": "2026-10-04",
+  "hash": "884e30d9614a41e3"
+ },
+ "/blur-background": {
+  "date": "2026-10-05",
+  "hash": "66fccb3aefd20c0b"
+ },
+ "/blur-face": {
+  "date": "2026-09-29",
+  "hash": "e267712c4d45d4bc"
+ },
+ "/blur-text-in-image": {
+  "date": "2026-09-29",
+  "hash": "b524c0f85f781888"
+ },
+ "/blur-video-background": {
+  "date": "2026-09-29",
+  "hash": "3f4bcbae782ba796"
+ },
+ "/bmp-to-jpg": {
+  "date": "2026-09-29",
+  "hash": "676903aef92a3f21"
+ },
+ "/bmp-to-png": {
+  "date": "2026-09-29",
+  "hash": "9d701f77373299f9"
+ },
+ "/brighten-photo": {
+  "date": "2026-09-29",
+  "hash": "081c6d9e15ba90b0"
+ },
+ "/burn-subtitles-into-video": {
+  "date": "2026-09-29",
+  "hash": "f906dc14fec67b99"
+ },
+ "/change-video-resolution": {
+  "date": "2026-10-06",
+  "hash": "babb8e035d185742"
+ },
+ "/color-palette-from-image": {
+  "date": "2026-09-29",
+  "hash": "09cabd58d36c1498"
+ },
+ "/color-picker-from-image": {
+  "date": "2026-09-29",
+  "hash": "00898f6e98e60302"
+ },
+ "/combine-images": {
+  "date": "2026-09-29",
+  "hash": "15ab3683220de5c1"
+ },
+ "/combine-images-into-pdf": {
+  "date": "2026-09-29",
+  "hash": "5b68c4c7b6695473"
+ },
+ "/combine-pdf": {
+  "date": "2026-10-06",
+  "hash": "7938c6965af6baed"
+ },
+ "/combine-videos": {
+  "date": "2026-10-06",
+  "hash": "c61277d4f6c563c2"
+ },
+ "/compress-image-to-100kb": {
+  "date": "2026-09-29",
+  "hash": "18812d19a24fe7f8"
+ },
+ "/compress-image-to-1mb": {
+  "date": "2026-09-29",
+  "hash": "c2b912b1945c6357"
+ },
+ "/compress-image-to-20kb": {
+  "date": "2026-09-29",
+  "hash": "c3b87634d11640a3"
+ },
+ "/compress-image-to-2mb": {
+  "date": "2026-09-29",
+  "hash": "65bb828886c9e0d9"
+ },
+ "/compress-image-to-50kb": {
+  "date": "2026-09-29",
+  "hash": "cdaea3804a0da4ca"
+ },
+ "/compress-jpg": {
+  "date": "2026-10-03",
+  "hash": "1744e7f3c9c87cf5"
+ },
+ "/compress-mp3": {
+  "date": "2026-09-29",
+  "hash": "0b1fc4df527ab493"
+ },
+ "/compress-pdf-to-100kb": {
+  "date": "2026-09-29",
+  "hash": "cca5aeb758c41bbb"
+ },
+ "/compress-pdf-to-1mb": {
+  "date": "2026-09-29",
+  "hash": "208aa4fcdf0b161b"
+ },
+ "/compress-pdf-to-200kb": {
+  "date": "2026-09-29",
+  "hash": "7500c3c94e05f3ad"
+ },
+ "/compress-pdf-to-2mb": {
+  "date": "2026-09-29",
+  "hash": "448027012266609f"
+ },
+ "/compress-pdf-to-500kb": {
+  "date": "2026-09-29",
+  "hash": "fcd2d50d7a526eaa"
+ },
+ "/compress-video-for-discord": {
+  "date": "2026-09-29",
+  "hash": "826bc57d75603c51"
+ },
+ "/compress-video-for-email": {
+  "date": "2026-09-29",
+  "hash": "871c4ea57bfaeed9"
+ },
+ "/compress-wav": {
+  "date": "2026-09-29",
+  "hash": "ca75a40695bf0ac5"
+ },
+ "/confidential-watermark": {
+  "date": "2026-09-29",
+  "hash": "8662d342f6695cc8"
+ },
+ "/conversions": {
+  "date": "2026-09-29",
+  "hash": "90c5bca4af24d31b"
+ },
+ "/crop-image-to-circle": {
+  "date": "2026-09-25",
+  "hash": "b8b987f35ab16880"
+ },
+ "/crop-image-to-square": {
+  "date": "2026-09-25",
+  "hash": "9bcc270db8c9e39f"
+ },
+ "/crop-video-for-tiktok": {
+  "date": "2026-10-06",
+  "hash": "e3530c579bbda619"
+ },
+ "/cut-video": {
+  "date": "2026-10-06",
+  "hash": "9c36884f2e87e30d"
+ },
+ "/delete-pdf-pages": {
+  "date": "2026-10-03",
+  "hash": "e95f528c2a75eec8"
+ },
+ "/discord-banner-resizer": {
+  "date": "2026-09-29",
+  "hash": "9bca1d2478a0a18c"
+ },
+ "/discord-emoji-resizer": {
+  "date": "2026-09-29",
+  "hash": "867b150c1be995d0"
+ },
+ "/discord-sticker-resizer": {
+  "date": "2026-09-29",
+  "hash": "23e21e9a0f41763d"
+ },
+ "/enlarge-image": {
+  "date": "2026-09-29",
+  "hash": "b4074ecea416c59a"
+ },
+ "/extract-frames-from-video": {
+  "date": "2026-09-29",
+  "hash": "16bb6651f4c1eb3d"
+ },
+ "/extract-pages-from-pdf": {
+  "date": "2026-09-25",
+  "hash": "74d359da5cd96781"
+ },
+ "/extract-text-from-image": {
+  "date": "2026-09-29",
+  "hash": "d234e2ed6e1f1857"
+ },
+ "/facebook-cover-photo-resizer": {
+  "date": "2026-09-29",
+  "hash": "b83f05b26a94c7e6"
+ },
+ "/flac-to-mp3": {
+  "date": "2026-09-29",
+  "hash": "9d44ed2e0cd9c65e"
+ },
+ "/flac-to-wav": {
+  "date": "2026-10-06",
+  "hash": "38c7573246e937d4"
+ },
+ "/flip-image": {
+  "date": "2026-09-29",
+  "hash": "38073f462390cd5e"
+ },
+ "/flip-video": {
+  "date": "2026-09-29",
+  "hash": "bdc597f2cfb85798"
+ },
+ "/gif-compressor": {
+  "date": "2026-10-06",
+  "hash": "892abd33740716b5"
+ },
+ "/gif-to-jpg": {
+  "date": "2026-10-03",
+  "hash": "909fc27effd69ddc"
+ },
+ "/gif-to-pdf": {
+  "date": "2026-10-03",
+  "hash": "4542e5b1220894f3"
+ },
+ "/gif-to-png": {
+  "date": "2026-09-29",
+  "hash": "808a52831939480e"
+ },
+ "/gif-to-video": {
+  "date": "2026-09-29",
+  "hash": "1ace2c304bf300e5"
+ },
+ "/grayscale-image": {
+  "date": "2026-10-06",
+  "hash": "7de7c34fe1055718"
+ },
+ "/green-screen-video": {
+  "date": "2026-09-29",
+  "hash": "87fcdd87b0d80c2c"
+ },
+ "/guides": {
+  "date": "2026-10-06",
+  "hash": "e74b591ee6faeff5"
+ },
+ "/guides/camscanner-alternative": {
+  "date": "2026-09-30",
+  "hash": "fc7b4018f71ccdc2"
+ },
+ "/guides/cloudconvert-alternative": {
+  "date": "2026-09-29",
+  "hash": "8736f3af06baf4a3"
+ },
+ "/guides/compress-pdf-without-losing-quality": {
+  "date": "2026-09-25",
+  "hash": "e0f43aa6b56c06ac"
+ },
+ "/guides/convert-files-without-uploading": {
+  "date": "2026-09-25",
+  "hash": "c751a63d387f155c"
+ },
+ "/guides/convertio-alternative": {
+  "date": "2026-09-29",
+  "hash": "db92a8c6f2676e07"
+ },
+ "/guides/does-discord-reddit-or-instagram-remove-exif-data": {
+  "date": "2026-10-03",
+  "hash": "0e742977bd22b5d3"
+ },
+ "/guides/does-this-website-upload-my-files": {
+  "date": "2026-09-25",
+  "hash": "4c4b10623d292acd"
+ },
+ "/guides/ezgif-alternative": {
+  "date": "2026-09-29",
+  "hash": "225185fd6b1e9aca"
+ },
+ "/guides/freeconvert-alternative": {
+  "date": "2026-09-29",
+  "hash": "3e6736b9a43c8968"
+ },
+ "/guides/how-to-add-a-watermark-to-a-pdf": {
+  "date": "2026-09-29",
+  "hash": "3f92319d9a53536d"
+ },
+ "/guides/how-to-add-a-watermark-to-a-photo": {
+  "date": "2026-09-29",
+  "hash": "d2cda485d2c2f555"
+ },
+ "/guides/how-to-add-music-to-a-video": {
+  "date": "2026-09-29",
+  "hash": "fbcc0de774bbab34"
+ },
+ "/guides/how-to-add-page-numbers-to-a-pdf": {
+  "date": "2026-09-29",
+  "hash": "f4f6ea9e562aef5f"
+ },
+ "/guides/how-to-add-subtitles-to-a-video": {
+  "date": "2026-09-30",
+  "hash": "9e932d1973f2e952"
+ },
+ "/guides/how-to-add-text-to-a-photo": {
+  "date": "2026-10-03",
+  "hash": "fae42ba9ee587f2a"
+ },
+ "/guides/how-to-blur-a-face-in-a-photo": {
+  "date": "2026-09-29",
+  "hash": "fad0887687d1fced"
+ },
+ "/guides/how-to-blur-a-face-in-a-video": {
+  "date": "2026-10-04",
+  "hash": "addaa726f4122c95"
+ },
+ "/guides/how-to-blur-a-video-background": {
+  "date": "2026-09-30",
+  "hash": "b8373b08cdc80509"
+ },
+ "/guides/how-to-brighten-a-photo": {
+  "date": "2026-10-04",
+  "hash": "4bf50c16d2a2ff11"
+ },
+ "/guides/how-to-compress-a-png": {
+  "date": "2026-10-03",
+  "hash": "a7dae850ebf1bf78"
+ },
+ "/guides/how-to-compress-a-video-without-losing-quality": {
+  "date": "2026-09-29",
+  "hash": "594c863e310a78f9"
+ },
+ "/guides/how-to-convert-a-gif-to-mp4": {
+  "date": "2026-09-29",
+  "hash": "d3cb0366d5c885ec"
+ },
+ "/guides/how-to-convert-a-photo-to-black-and-white": {
+  "date": "2026-09-30",
+  "hash": "f726667b929d92bc"
+ },
+ "/guides/how-to-convert-a-photo-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "ff91bb9c6af9fd6f"
+ },
+ "/guides/how-to-convert-a-video-to-mp3": {
+  "date": "2026-09-29",
+  "hash": "a5a46587b3ad551f"
+ },
+ "/guides/how-to-convert-an-image-to-svg": {
+  "date": "2026-10-04",
+  "hash": "05457855e9e1af37"
+ },
+ "/guides/how-to-convert-epub-to-pdf": {
+  "date": "2026-09-30",
+  "hash": "1ce2e36c9d1f347f"
+ },
+ "/guides/how-to-convert-mov-to-mp4": {
+  "date": "2026-09-29",
+  "hash": "2c76e6771a62507c"
+ },
+ "/guides/how-to-convert-pdf-to-word": {
+  "date": "2026-09-29",
+  "hash": "3be2e2e8d5b2bf81"
+ },
+ "/guides/how-to-convert-wav-to-mp3": {
+  "date": "2026-09-29",
+  "hash": "029e759bf60a6c47"
+ },
+ "/guides/how-to-copy-text-from-an-image": {
+  "date": "2026-09-29",
+  "hash": "d0248c7aa71731f5"
+ },
+ "/guides/how-to-crop-a-pdf": {
+  "date": "2026-09-30",
+  "hash": "ff5a2f2893f9703e"
+ },
+ "/guides/how-to-crop-a-video": {
+  "date": "2026-10-03",
+  "hash": "04222cb042f6cb76"
+ },
+ "/guides/how-to-extract-images-from-a-pdf": {
+  "date": "2026-09-30",
+  "hash": "e0a05b3e4e67c538"
+ },
+ "/guides/how-to-fill-out-a-pdf-form": {
+  "date": "2026-09-30",
+  "hash": "0212fef49b5d7ea7"
+ },
+ "/guides/how-to-flatten-a-pdf": {
+  "date": "2026-09-30",
+  "hash": "d30f5bd153cc72e6"
+ },
+ "/guides/how-to-get-a-color-code-from-an-image": {
+  "date": "2026-09-29",
+  "hash": "96dae4929f0efa69"
+ },
+ "/guides/how-to-increase-audio-volume": {
+  "date": "2026-09-30",
+  "hash": "9aced3ab54e91e3f"
+ },
+ "/guides/how-to-make-a-favicon": {
+  "date": "2026-09-29",
+  "hash": "ba34e0ce398b73b6"
+ },
+ "/guides/how-to-make-a-gif-from-a-video": {
+  "date": "2026-09-29",
+  "hash": "10367e3a6877ec5d"
+ },
+ "/guides/how-to-make-a-pdf-black-and-white": {
+  "date": "2026-10-04",
+  "hash": "6e4b949290174531"
+ },
+ "/guides/how-to-make-a-pdf-searchable": {
+  "date": "2026-09-30",
+  "hash": "31acca592ff3a6f5"
+ },
+ "/guides/how-to-make-a-photo-collage": {
+  "date": "2026-09-30",
+  "hash": "ff89448aa9912fea"
+ },
+ "/guides/how-to-make-a-qr-code": {
+  "date": "2026-09-30",
+  "hash": "65a1481d35e39363"
+ },
+ "/guides/how-to-merge-audio-files": {
+  "date": "2026-10-03",
+  "hash": "5634221f0ff8b530"
+ },
+ "/guides/how-to-merge-multiple-videos-into-one": {
+  "date": "2026-09-29",
+  "hash": "095556193c5b1524"
+ },
+ "/guides/how-to-merge-pdfs-on-iphone": {
+  "date": "2026-09-29",
+  "hash": "a844270f5f3404af"
+ },
+ "/guides/how-to-open-a-rar-file": {
+  "date": "2026-10-04",
+  "hash": "2469d572ba2bef0f"
+ },
+ "/guides/how-to-password-protect-a-pdf": {
+  "date": "2026-09-29",
+  "hash": "af963a593b2a028e"
+ },
+ "/guides/how-to-record-your-screen": {
+  "date": "2026-09-30",
+  "hash": "042c4a2de319edb7"
+ },
+ "/guides/how-to-redact-a-pdf": {
+  "date": "2026-09-30",
+  "hash": "1ebd4d308fd5dae0"
+ },
+ "/guides/how-to-reduce-gif-size": {
+  "date": "2026-10-04",
+  "hash": "9b52af15dc804359"
+ },
+ "/guides/how-to-reduce-mp3-size": {
+  "date": "2026-10-04",
+  "hash": "d9f063aeadbb4213"
+ },
+ "/guides/how-to-remove-a-password-from-a-pdf": {
+  "date": "2026-09-29",
+  "hash": "dc8fd038a951737c"
+ },
+ "/guides/how-to-remove-an-object-from-a-photo": {
+  "date": "2026-09-30",
+  "hash": "24fcfa7f54e8c3a3"
+ },
+ "/guides/how-to-remove-audio-from-a-video": {
+  "date": "2026-09-29",
+  "hash": "34258fa7ee5a900d"
+ },
+ "/guides/how-to-remove-metadata-from-a-pdf": {
+  "date": "2026-10-03",
+  "hash": "e0bc69834027e18a"
+ },
+ "/guides/how-to-remove-vocals-from-a-song": {
+  "date": "2026-09-30",
+  "hash": "f4c8c24c17acdcc5"
+ },
+ "/guides/how-to-reorder-pages-in-a-pdf": {
+  "date": "2026-09-29",
+  "hash": "aa329730042697ac"
+ },
+ "/guides/how-to-resize-a-pdf": {
+  "date": "2026-10-04",
+  "hash": "d677fbadcf836699"
+ },
+ "/guides/how-to-resize-a-photo-for-social-media": {
+  "date": "2026-09-29",
+  "hash": "aafcfe09a6bd3b2e"
+ },
+ "/guides/how-to-resize-a-video": {
+  "date": "2026-09-30",
+  "hash": "1d3d58cffab7498b"
+ },
+ "/guides/how-to-resize-an-image-to-exact-pixels": {
+  "date": "2026-09-30",
+  "hash": "0c2f8df619cc9011"
+ },
+ "/guides/how-to-reverse-a-video": {
+  "date": "2026-10-03",
+  "hash": "2107bfdc27b72575"
+ },
+ "/guides/how-to-rotate-a-pdf": {
+  "date": "2026-09-29",
+  "hash": "d64dcc55f790003c"
+ },
+ "/guides/how-to-rotate-a-picture": {
+  "date": "2026-10-04",
+  "hash": "6a7396f8c78bc520"
+ },
+ "/guides/how-to-rotate-a-sideways-video": {
+  "date": "2026-09-29",
+  "hash": "b5d1c62c12ff6d16"
+ },
+ "/guides/how-to-scan-a-document-with-your-phone": {
+  "date": "2026-09-30",
+  "hash": "7e7d224c743aaeee"
+ },
+ "/guides/how-to-slow-down-or-speed-up-a-video": {
+  "date": "2026-09-29",
+  "hash": "d625b4f2e783cbd7"
+ },
+ "/guides/how-to-split-a-pdf": {
+  "date": "2026-09-29",
+  "hash": "2fbf3ee0b2f078b1"
+ },
+ "/guides/how-to-take-a-passport-photo-at-home": {
+  "date": "2026-09-29",
+  "hash": "6364d81619c42654"
+ },
+ "/guides/how-to-transcribe-audio-to-text": {
+  "date": "2026-09-30",
+  "hash": "62a8a556a2dd9446"
+ },
+ "/guides/how-to-trim-a-video-without-an-app": {
+  "date": "2026-09-29",
+  "hash": "b31a054b5422c175"
+ },
+ "/guides/how-to-trim-an-mp3-file": {
+  "date": "2026-09-29",
+  "hash": "57a73b4303651983"
+ },
+ "/guides/how-to-tune-a-guitar": {
+  "date": "2026-10-06",
+  "hash": "6462e935ffa858ad"
+ },
+ "/guides/how-to-turn-audio-into-a-video": {
+  "date": "2026-10-04",
+  "hash": "8969fb574301b034"
+ },
+ "/guides/how-to-upscale-an-image": {
+  "date": "2026-09-30",
+  "hash": "56d32b82cfe3b8ca"
+ },
+ "/guides/how-to-view-photo-metadata": {
+  "date": "2026-09-29",
+  "hash": "1760bf4ebf8d0296"
+ },
+ "/guides/ilovepdf-alternative": {
+  "date": "2026-09-29",
+  "hash": "bfd168805d0ae0ed"
+ },
+ "/guides/is-cloudconvert-safe": {
+  "date": "2026-09-29",
+  "hash": "a1a54185adaa8e07"
+ },
+ "/guides/is-convertio-safe": {
+  "date": "2026-09-29",
+  "hash": "eb3d0ab3899c4a1c"
+ },
+ "/guides/is-ezgif-safe": {
+  "date": "2026-09-29",
+  "hash": "62db913a11db97fc"
+ },
+ "/guides/is-freeconvert-safe": {
+  "date": "2026-09-29",
+  "hash": "71e90431af77ccab"
+ },
+ "/guides/is-ilovepdf-safe": {
+  "date": "2026-09-29",
+  "hash": "50a2aa2791182cab"
+ },
+ "/guides/is-it-safe-to-merge-pdfs-online": {
+  "date": "2026-09-25",
+  "hash": "eb1174597b17d47d"
+ },
+ "/guides/is-pdf24-safe": {
+  "date": "2026-09-29",
+  "hash": "147e2d3d4737ac82"
+ },
+ "/guides/is-remove-bg-safe": {
+  "date": "2026-09-29",
+  "hash": "e1b365f7687d9dfe"
+ },
+ "/guides/is-smallpdf-safe": {
+  "date": "2026-09-29",
+  "hash": "531f4de5273ccbb8"
+ },
+ "/guides/is-zamzar-safe": {
+  "date": "2026-09-29",
+  "hash": "ce782a8790c69e60"
+ },
+ "/guides/open-heic-files-on-windows": {
+  "date": "2026-09-25",
+  "hash": "8da2eab417eb2cdc"
+ },
+ "/guides/otter-ai-alternative": {
+  "date": "2026-09-30",
+  "hash": "3cf743c78f305ba6"
+ },
+ "/guides/pdf24-alternative": {
+  "date": "2026-09-29",
+  "hash": "4915bf605a6f698d"
+ },
+ "/guides/reduce-image-size-for-email-and-uploads": {
+  "date": "2026-09-25",
+  "hash": "3ec1b26c6377d6bf"
+ },
+ "/guides/remove-background-from-a-photo": {
+  "date": "2026-09-29",
+  "hash": "06c1ab8301e73d2e"
+ },
+ "/guides/remove-bg-alternative": {
+  "date": "2026-09-29",
+  "hash": "e9514388e7020c27"
+ },
+ "/guides/remove-exif-data-from-android-photos": {
+  "date": "2026-10-03",
+  "hash": "09538b84b055d9a4"
+ },
+ "/guides/remove-exif-data-from-iphone-photos": {
+  "date": "2026-10-03",
+  "hash": "9e3e9819ad397615"
+ },
+ "/guides/remove-exif-data-from-photos-on-mac": {
+  "date": "2026-10-03",
+  "hash": "d5204c31620d693c"
+ },
+ "/guides/remove-exif-data-from-photos-on-windows": {
+  "date": "2026-10-03",
+  "hash": "9fb366fd1c5656b0"
+ },
+ "/guides/remove-location-data-from-photos": {
+  "date": "2026-09-25",
+  "hash": "a1fa9005208a73f9"
+ },
+ "/guides/sign-a-pdf-without-adobe": {
+  "date": "2026-09-25",
+  "hash": "b260414cdd5315fe"
+ },
+ "/guides/smallpdf-alternative": {
+  "date": "2026-09-29",
+  "hash": "57b6e351952949be"
+ },
+ "/guides/strip-exif-without-re-encoding": {
+  "date": "2026-09-29",
+  "hash": "7e9f3c994efbfbca"
+ },
+ "/guides/turn-off-location-tags-on-photos": {
+  "date": "2026-10-03",
+  "hash": "b86fafd8f81df24b"
+ },
+ "/guides/what-is-exif-data": {
+  "date": "2026-09-29",
+  "hash": "b0049cf27e00d214"
+ },
+ "/guides/which-image-format-to-use": {
+  "date": "2026-09-26",
+  "hash": "4d626e0dc9b00e4d"
+ },
+ "/guides/zamzar-alternative": {
+  "date": "2026-09-29",
+  "hash": "0b2bfe661fa85a70"
+ },
+ "/guitar-tuner": {
+  "date": "2026-09-29",
+  "hash": "b074107ec2537efe"
+ },
+ "/heic-to-pdf": {
+  "date": "2026-10-03",
+  "hash": "a8c0c4f802079eab"
+ },
+ "/heic-to-png": {
+  "date": "2026-10-03",
+  "hash": "b7810168bf1bb38d"
+ },
+ "/hex-color-from-image": {
+  "date": "2026-09-29",
+  "hash": "42e942b3072efe25"
+ },
+ "/ico-to-png": {
+  "date": "2026-09-29",
+  "hash": "8d3bf35785fbddef"
+ },
+ "/image-to-pixel-art": {
+  "date": "2026-09-29",
+  "hash": "95b6dc7097646b83"
+ },
+ "/images-to-gif": {
+  "date": "2026-09-29",
+  "hash": "c59e6d6bbb379bff"
+ },
+ "/increase-image-resolution": {
+  "date": "2026-09-29",
+  "hash": "ca946d48535350bb"
+ },
+ "/increase-video-volume": {
+  "date": "2026-09-29",
+  "hash": "7a562cbafaddaa08"
+ },
+ "/instagram-carousel-splitter": {
+  "date": "2026-09-29",
+  "hash": "3a1f626e90a794d6"
+ },
+ "/instagram-grid-maker": {
+  "date": "2026-09-29",
+  "hash": "64410d8a31a6baf2"
+ },
+ "/invert-image-colors": {
+  "date": "2026-09-29",
+  "hash": "86e8a23b1dc70da7"
+ },
+ "/jfif-to-jpg": {
+  "date": "2026-09-29",
+  "hash": "b7f64f16f04e169d"
+ },
+ "/jfif-to-png": {
+  "date": "2026-10-03",
+  "hash": "dc3ba11cfe982478"
+ },
+ "/jpg-to-gif": {
+  "date": "2026-09-29",
+  "hash": "210333979516427b"
+ },
+ "/jpg-to-ico": {
+  "date": "2026-09-29",
+  "hash": "d7ceeebd7e63e256"
+ },
+ "/jpg-to-pdf": {
+  "date": "2026-10-03",
+  "hash": "0bae9569db37a350"
+ },
+ "/jpg-to-png": {
+  "date": "2026-10-03",
+  "hash": "438dff8f08d87ff0"
+ },
+ "/jpg-to-svg": {
+  "date": "2026-09-29",
+  "hash": "e8eb4fd0f85f220c"
+ },
+ "/jpg-to-text": {
+  "date": "2026-09-29",
+  "hash": "e8f36f6d790bf092"
+ },
+ "/jpg-to-tiff": {
+  "date": "2026-09-29",
+  "hash": "adbcb7d0e92850ee"
+ },
+ "/jpg-to-webp": {
+  "date": "2026-09-29",
+  "hash": "9352c22f57f400d2"
+ },
+ "/jxl-to-jpg": {
+  "date": "2026-10-06",
+  "hash": "b515884b015f2687"
+ },
+ "/jxl-to-png": {
+  "date": "2026-10-06",
+  "hash": "4d88620707db742a"
+ },
+ "/karaoke-maker": {
+  "date": "2026-10-06",
+  "hash": "c6816fe811047728"
+ },
+ "/letter-to-a4": {
+  "date": "2026-10-06",
+  "hash": "2e902a93e51718bd"
+ },
+ "/licenses": {
+  "date": "2026-10-06",
+  "hash": "a1abbff7538f1310"
+ },
+ "/linkedin-profile-picture": {
+  "date": "2026-10-05",
+  "hash": "8189e6e53e3b1db2"
+ },
+ "/m4a-to-mp3": {
+  "date": "2026-09-29",
+  "hash": "f0c12104039aefaf"
+ },
+ "/m4a-to-wav": {
+  "date": "2026-10-06",
+  "hash": "2ce661a25ac89f4b"
+ },
+ "/magic-eraser": {
+  "date": "2026-10-06",
+  "hash": "c99ea72a679a935c"
+ },
+ "/make-background-transparent": {
+  "date": "2026-10-05",
+  "hash": "eddfb6aad1e40360"
+ },
+ "/make-pdf-searchable": {
+  "date": "2026-09-29",
+  "hash": "7bd0fa8c3a9393b9"
+ },
+ "/mcp": {
+  "date": "2026-10-03",
+  "hash": "a6562a5355b951f2"
+ },
+ "/meme-generator": {
+  "date": "2026-09-29",
+  "hash": "3822422ebfe48c61"
+ },
+ "/merge-mp3": {
+  "date": "2026-10-06",
+  "hash": "e1a60509c490df27"
+ },
+ "/mkv-to-mp3": {
+  "date": "2026-10-06",
+  "hash": "913fc83f0cff718d"
+ },
+ "/mkv-to-mp4": {
+  "date": "2026-10-06",
+  "hash": "7edef715767fc6ef"
+ },
+ "/mov-to-gif": {
+  "date": "2026-09-29",
+  "hash": "dc9127a130a99cae"
+ },
+ "/mov-to-mp3": {
+  "date": "2026-09-29",
+  "hash": "24e2ff7ffd066a53"
+ },
+ "/mov-to-mp4": {
+  "date": "2026-09-29",
+  "hash": "e8121aa1da75fc2e"
+ },
+ "/mov-to-wav": {
+  "date": "2026-09-29",
+  "hash": "88bae8880e5da3e4"
+ },
+ "/mp3-cutter": {
+  "date": "2026-09-29",
+  "hash": "06673f1007c4d3fd"
+ },
+ "/mp3-to-m4a": {
+  "date": "2026-10-06",
+  "hash": "5f8fab028d17cccc"
+ },
+ "/mp3-to-mp4": {
+  "date": "2026-10-04",
+  "hash": "1e0242fa1b142140"
+ },
+ "/mp3-to-ogg": {
+  "date": "2026-10-06",
+  "hash": "9ad8e18e47eb5fe4"
+ },
+ "/mp3-to-text": {
+  "date": "2026-09-29",
+  "hash": "18ca0855cdc8f48e"
+ },
+ "/mp3-to-wav": {
+  "date": "2026-09-29",
+  "hash": "5a4c1ff9648699c2"
+ },
+ "/mp4-to-gif": {
+  "date": "2026-10-06",
+  "hash": "0cd5c7f665c166bf"
+ },
+ "/mp4-to-mp3": {
+  "date": "2026-10-06",
+  "hash": "8d1a8f51f3f862d5"
+ },
+ "/mp4-to-wav": {
+  "date": "2026-10-06",
+  "hash": "63cc56e5c897904b"
+ },
+ "/normalize-audio": {
+  "date": "2026-09-29",
+  "hash": "c8031b4f30297eed"
+ },
+ "/ogg-to-mp3": {
+  "date": "2026-10-06",
+  "hash": "7ccb860a7ad71c80"
+ },
+ "/ogg-to-wav": {
+  "date": "2026-09-29",
+  "hash": "c3e4581816dd8a36"
+ },
+ "/open-7z-file": {
+  "date": "2026-10-04",
+  "hash": "c7f17029dc3059a4"
+ },
+ "/opus-to-mp3": {
+  "date": "2026-09-29",
+  "hash": "d950e890bcf72631"
+ },
+ "/password-protect-zip-file": {
+  "date": "2026-09-29",
+  "hash": "20cbcd429b6434e0"
+ },
+ "/pdf-metadata-viewer": {
+  "date": "2026-09-29",
+  "hash": "21d898d2f97d8439"
+ },
+ "/pdf-to-jpg": {
+  "date": "2026-09-25",
+  "hash": "40f797c9a9e69a83"
+ },
+ "/pdf-to-kindle": {
+  "date": "2026-10-06",
+  "hash": "e7209f078588423a"
+ },
+ "/pdf-to-png": {
+  "date": "2026-10-03",
+  "hash": "e58079aae08ebc1f"
+ },
+ "/pdf-to-text": {
+  "date": "2026-09-25",
+  "hash": "c2f882c8d6592928"
+ },
+ "/pdf-to-tiff": {
+  "date": "2026-09-29",
+  "hash": "574a2af9bdb9b3f4"
+ },
+ "/photo-to-pencil-sketch": {
+  "date": "2026-09-29",
+  "hash": "2ca4d5078b466c2b"
+ },
+ "/picture-to-text": {
+  "date": "2026-09-29",
+  "hash": "249a9bf25fef58b6"
+ },
+ "/pixelate-image": {
+  "date": "2026-09-29",
+  "hash": "cdf9220d43011bdb"
+ },
+ "/play-video-backwards": {
+  "date": "2026-09-29",
+  "hash": "9ae44ce007f59274"
+ },
+ "/png-compressor": {
+  "date": "2026-10-06",
+  "hash": "09d3ba62d6388a9d"
+ },
+ "/png-to-bmp": {
+  "date": "2026-09-29",
+  "hash": "3e12995a31f2606e"
+ },
+ "/png-to-gif": {
+  "date": "2026-09-29",
+  "hash": "eb45b0f3d2b7d069"
+ },
+ "/png-to-ico": {
+  "date": "2026-09-29",
+  "hash": "c34e4ae1e98682e4"
+ },
+ "/png-to-jpg": {
+  "date": "2026-10-03",
+  "hash": "ffe495e3bf242fd4"
+ },
+ "/png-to-pdf": {
+  "date": "2026-10-03",
+  "hash": "76b272fc17bc9556"
+ },
+ "/png-to-svg": {
+  "date": "2026-09-29",
+  "hash": "384aecfcf9b2d3b5"
+ },
+ "/png-to-text": {
+  "date": "2026-09-29",
+  "hash": "3a9a36336416a6d6"
+ },
+ "/png-to-tiff": {
+  "date": "2026-09-29",
+  "hash": "b4dc4acf8b189b83"
+ },
+ "/png-to-webp": {
+  "date": "2026-09-29",
+  "hash": "d9073f475cacbfae"
+ },
+ "/press": {
+  "date": "2026-10-06",
+  "hash": "628aa89ba428496d"
+ },
+ "/privacy": {
+  "date": "2026-10-06",
+  "hash": "affc7fb25cfde399"
+ },
+ "/rar-extractor": {
+  "date": "2026-10-04",
+  "hash": "47130bc3f96eed94"
+ },
+ "/receipt-scanner": {
+  "date": "2026-09-29",
+  "hash": "726fe15debec7918"
+ },
+ "/reduce-gif-size": {
+  "date": "2026-09-29",
+  "hash": "46c2b2a45324cc70"
+ },
+ "/reduce-png-size": {
+  "date": "2026-09-29",
+  "hash": "4885c669d73007e4"
+ },
+ "/remove-audio-from-video": {
+  "date": "2026-10-06",
+  "hash": "4ac3d84b21296a2b"
+ },
+ "/remove-background-noise-from-audio": {
+  "date": "2026-09-29",
+  "hash": "0d2d73cd24a413a9"
+ },
+ "/remove-background-noise-from-video": {
+  "date": "2026-09-29",
+  "hash": "9d436fd5fb45d495"
+ },
+ "/remove-location-from-photos": {
+  "date": "2026-09-25",
+  "hash": "7cbde994801986a1"
+ },
+ "/remove-person-from-photo": {
+  "date": "2026-09-29",
+  "hash": "fe554693aaa6ec60"
+ },
+ "/remove-text-from-image": {
+  "date": "2026-09-29",
+  "hash": "5409a56473c27b97"
+ },
+ "/resize-image": {
+  "date": "2026-09-29",
+  "hash": "4df132f021309321"
+ },
+ "/resize-image-for-instagram": {
+  "date": "2026-09-29",
+  "hash": "e01a78f089f63513"
+ },
+ "/resize-image-to-1024x1024": {
+  "date": "2026-09-29",
+  "hash": "4bf380c9b9c9fb9a"
+ },
+ "/resize-image-to-1920x1080": {
+  "date": "2026-09-29",
+  "hash": "5bc9ad3839cf872e"
+ },
+ "/resize-image-to-3000x3000": {
+  "date": "2026-09-29",
+  "hash": "8a88e5834db64bcf"
+ },
+ "/resize-image-to-512x512": {
+  "date": "2026-09-29",
+  "hash": "72a497c548cd370c"
+ },
+ "/rounded-corners-image": {
+  "date": "2026-09-29",
+  "hash": "33d206d656e32c0d"
+ },
+ "/scan-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "2ac4d4fffee107bb"
+ },
+ "/scanned-pdf-to-text": {
+  "date": "2026-09-29",
+  "hash": "97564773ab54b7e8"
+ },
+ "/screen-recorder-with-audio": {
+  "date": "2026-10-06",
+  "hash": "5eff0a61f0d1ab7e"
+ },
+ "/screenshot-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "c59af412b777223f"
+ },
+ "/screenshot-to-text": {
+  "date": "2026-09-29",
+  "hash": "3ba79c963d44382e"
+ },
+ "/sepia-filter": {
+  "date": "2026-10-06",
+  "hash": "ebd480b70e6d1d6e"
+ },
+ "/sharpen-image": {
+  "date": "2026-09-29",
+  "hash": "55b3d9c726b6ff3d"
+ },
+ "/slow-down-audio": {
+  "date": "2026-09-29",
+  "hash": "18910e37dd254ad2"
+ },
+ "/slow-down-video": {
+  "date": "2026-09-29",
+  "hash": "ccc41983f6b50661"
+ },
+ "/speed-up-audio": {
+  "date": "2026-09-29",
+  "hash": "6a7bdc9b24858b98"
+ },
+ "/speed-up-video": {
+  "date": "2026-09-29",
+  "hash": "9db02b30eb62d220"
+ },
+ "/stitch-screenshots": {
+  "date": "2026-09-29",
+  "hash": "a80aec3911359da6"
+ },
+ "/svg-to-jpg": {
+  "date": "2026-09-29",
+  "hash": "5fe00928b20f58ff"
+ },
+ "/svg-to-png": {
+  "date": "2026-09-29",
+  "hash": "8c2115b980009654"
+ },
+ "/tap-tempo": {
+  "date": "2026-09-29",
+  "hash": "9229b77f15edcd36"
+ },
+ "/terms": {
+  "date": "2026-09-27",
+  "hash": "1ee772f856638645"
+ },
+ "/tiff-to-jpg": {
+  "date": "2026-09-29",
+  "hash": "28c3e41a14d3f789"
+ },
+ "/tiff-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "e84ca12043d3e149"
+ },
+ "/tiff-to-png": {
+  "date": "2026-09-29",
+  "hash": "37bea4a275ad0616"
+ },
+ "/tools/add-audio-to-video": {
+  "date": "2026-10-06",
+  "hash": "ad05b11a27692188"
+ },
+ "/tools/add-border-to-image": {
+  "date": "2026-09-29",
+  "hash": "8cbbb2cc4d7d2b26"
+ },
+ "/tools/add-subtitles-to-video": {
+  "date": "2026-10-06",
+  "hash": "d36ca90ee5d0dfe9"
+ },
+ "/tools/add-text-to-image": {
+  "date": "2026-09-29",
+  "hash": "b5cf8dd272093cd8"
+ },
+ "/tools/adjust-image": {
+  "date": "2026-09-29",
+  "hash": "e734f2c6d3fd3d5d"
+ },
+ "/tools/archive-extractor": {
+  "date": "2026-10-04",
+  "hash": "67eb9cb154ad3a3f"
+ },
+ "/tools/audio-converter": {
+  "date": "2026-10-06",
+  "hash": "b2766d9175ac08d0"
+ },
+ "/tools/audio-to-video": {
+  "date": "2026-10-04",
+  "hash": "837935210033bcd8"
+ },
+ "/tools/black-and-white-image": {
+  "date": "2026-10-06",
+  "hash": "dfff9f859d61e52a"
+ },
+ "/tools/blur-face-video": {
+  "date": "2026-09-29",
+  "hash": "ad13a49a9569850a"
+ },
+ "/tools/blur-image": {
+  "date": "2026-09-29",
+  "hash": "c965dc3015f36927"
+ },
+ "/tools/collage-maker": {
+  "date": "2026-09-29",
+  "hash": "b73ec5e2f7fd8889"
+ },
+ "/tools/color-picker": {
+  "date": "2026-09-29",
+  "hash": "916e3f02f68ddfad"
+ },
+ "/tools/compress-audio": {
+  "date": "2026-09-29",
+  "hash": "e3e669149d0c7c7c"
+ },
+ "/tools/compress-gif": {
+  "date": "2026-09-29",
+  "hash": "bac70b018154784d"
+ },
+ "/tools/compress-image": {
+  "date": "2026-09-29",
+  "hash": "19d5939451f7d56d"
+ },
+ "/tools/compress-pdf": {
+  "date": "2026-10-06",
+  "hash": "3bee946fe3214a83"
+ },
+ "/tools/compress-png": {
+  "date": "2026-10-06",
+  "hash": "c2c21ac2ee358353"
+ },
+ "/tools/compress-video": {
+  "date": "2026-10-06",
+  "hash": "d7102d3a5dafe72f"
+ },
+ "/tools/convert-image": {
+  "date": "2026-09-29",
+  "hash": "4e67daf71f698dd0"
+ },
+ "/tools/create-zip": {
+  "date": "2026-09-29",
+  "hash": "aa1cb16bc6f660af"
+ },
+ "/tools/crop-image": {
+  "date": "2026-09-25",
+  "hash": "3bc0e11b80284b5b"
+ },
+ "/tools/crop-pdf": {
+  "date": "2026-09-29",
+  "hash": "4fde229b89c51a13"
+ },
+ "/tools/crop-video": {
+  "date": "2026-10-06",
+  "hash": "d88caa88a93a1a4e"
+ },
+ "/tools/document-scanner": {
+  "date": "2026-09-29",
+  "hash": "bee7629811dfa215"
+ },
+ "/tools/emote-resizer": {
+  "date": "2026-09-29",
+  "hash": "062f8e6f23b2ce4d"
+ },
+ "/tools/epub-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "ff38c3ff31135690"
+ },
+ "/tools/exif-viewer": {
+  "date": "2026-09-29",
+  "hash": "160bebf16f34412a"
+ },
+ "/tools/extract-pdf-images": {
+  "date": "2026-10-03",
+  "hash": "709da034c70d6803"
+ },
+ "/tools/favicon-generator": {
+  "date": "2026-09-28",
+  "hash": "a8ce3d3a403ef4c7"
+ },
+ "/tools/file-checksum": {
+  "date": "2026-10-06",
+  "hash": "805e25ccd2c9b8d7"
+ },
+ "/tools/fill-pdf-form": {
+  "date": "2026-09-29",
+  "hash": "64763bd380779d3c"
+ },
+ "/tools/flatten-pdf": {
+  "date": "2026-09-29",
+  "hash": "7c241985395b896c"
+ },
+ "/tools/gif-maker": {
+  "date": "2026-09-29",
+  "hash": "037070c210a0f13c"
+ },
+ "/tools/gif-to-mp4": {
+  "date": "2026-10-06",
+  "hash": "ad26eddb948e33a9"
+ },
+ "/tools/grayscale-pdf": {
+  "date": "2026-10-04",
+  "hash": "c28ef268f1178e8a"
+ },
+ "/tools/heic-to-jpg": {
+  "date": "2026-10-06",
+  "hash": "822bafaef5527167"
+ },
+ "/tools/image-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "63588a7614439a7d"
+ },
+ "/tools/image-to-svg": {
+  "date": "2026-09-29",
+  "hash": "c8502f71d67127c6"
+ },
+ "/tools/image-to-text": {
+  "date": "2026-09-29",
+  "hash": "bc7bb070e7ac9584"
+ },
+ "/tools/merge-audio": {
+  "date": "2026-10-06",
+  "hash": "2eeb15d5f9a8fefe"
+ },
+ "/tools/merge-pdf": {
+  "date": "2026-10-06",
+  "hash": "19507d064bc70b4a"
+ },
+ "/tools/merge-videos": {
+  "date": "2026-10-06",
+  "hash": "c4086a64b02c1bb8"
+ },
+ "/tools/metronome": {
+  "date": "2026-10-06",
+  "hash": "483648bc44c52d4d"
+ },
+ "/tools/mic-test": {
+  "date": "2026-10-06",
+  "hash": "54f866827ea98837"
+ },
+ "/tools/mute-video": {
+  "date": "2026-10-06",
+  "hash": "5416a82cf5ed1af4"
+ },
+ "/tools/ocr-pdf": {
+  "date": "2026-09-29",
+  "hash": "741addec894659c5"
+ },
+ "/tools/passport-photo": {
+  "date": "2026-10-06",
+  "hash": "d52c029a73770084"
+ },
+ "/tools/pdf-page-numbers": {
+  "date": "2026-09-25",
+  "hash": "b52312078fd18bfc"
+ },
+ "/tools/pdf-to-epub": {
+  "date": "2026-10-06",
+  "hash": "e24ce770f1aaa819"
+ },
+ "/tools/pdf-to-image": {
+  "date": "2026-10-03",
+  "hash": "d28f7d56edc75222"
+ },
+ "/tools/pdf-to-word": {
+  "date": "2026-09-29",
+  "hash": "ebaaadc7ef136d55"
+ },
+ "/tools/photo-to-sketch": {
+  "date": "2026-10-06",
+  "hash": "0e089ff839f0b868"
+ },
+ "/tools/pitch-changer": {
+  "date": "2026-09-29",
+  "hash": "dbe30a53396ce564"
+ },
+ "/tools/pixel-art-converter": {
+  "date": "2026-09-29",
+  "hash": "abc4e5f3af5e2516"
+ },
+ "/tools/profile-picture-maker": {
+  "date": "2026-10-06",
+  "hash": "6c0f67163e8fc0da"
+ },
+ "/tools/protect-pdf": {
+  "date": "2026-09-29",
+  "hash": "4eaf82a0126f7122"
+ },
+ "/tools/qr-code-generator": {
+  "date": "2026-09-29",
+  "hash": "dd738278cd45d98c"
+ },
+ "/tools/redact-pdf": {
+  "date": "2026-09-29",
+  "hash": "197b7167e256e78d"
+ },
+ "/tools/remove-background": {
+  "date": "2026-10-05",
+  "hash": "4066f17b1250bd7d"
+ },
+ "/tools/remove-noise": {
+  "date": "2026-09-29",
+  "hash": "1a4dccb89c072848"
+ },
+ "/tools/remove-object": {
+  "date": "2026-09-29",
+  "hash": "1fe974b42b95b95e"
+ },
+ "/tools/remove-pdf-metadata": {
+  "date": "2026-09-29",
+  "hash": "32ea96f5fa27cd57"
+ },
+ "/tools/remove-silence": {
+  "date": "2026-09-29",
+  "hash": "3b2110e8bc2a3b0f"
+ },
+ "/tools/reorder-pdf": {
+  "date": "2026-10-03",
+  "hash": "f12813bd4a6899dd"
+ },
+ "/tools/resize-pdf": {
+  "date": "2026-10-06",
+  "hash": "160fc9d8e25d582b"
+ },
+ "/tools/resize-video": {
+  "date": "2026-10-06",
+  "hash": "11edf8ac804626c0"
+ },
+ "/tools/reverse-video": {
+  "date": "2026-10-06",
+  "hash": "0953eecd83b9c338"
+ },
+ "/tools/rotate-image": {
+  "date": "2026-09-29",
+  "hash": "361ce8bb680b209b"
+ },
+ "/tools/rotate-pdf": {
+  "date": "2026-09-25",
+  "hash": "2c552416fd43eafb"
+ },
+ "/tools/rotate-video": {
+  "date": "2026-10-06",
+  "hash": "7728907f355299e2"
+ },
+ "/tools/screen-recorder": {
+  "date": "2026-10-06",
+  "hash": "9f0a4a1455094327"
+ },
+ "/tools/sign-pdf": {
+  "date": "2026-09-29",
+  "hash": "d4d2b24655af920f"
+ },
+ "/tools/split-image": {
+  "date": "2026-09-29",
+  "hash": "2f0393051d68573d"
+ },
+ "/tools/split-pdf": {
+  "date": "2026-10-03",
+  "hash": "b984634ffc237ae3"
+ },
+ "/tools/sticker-maker": {
+  "date": "2026-10-05",
+  "hash": "26575ba694e84304"
+ },
+ "/tools/strip-exif": {
+  "date": "2026-09-25",
+  "hash": "ea7b13bc8fd7b769"
+ },
+ "/tools/transcribe": {
+  "date": "2026-09-29",
+  "hash": "f7fbc1323f68ba0a"
+ },
+ "/tools/trim-audio": {
+  "date": "2026-10-06",
+  "hash": "f2874a775d63b0e8"
+ },
+ "/tools/trim-video": {
+  "date": "2026-10-06",
+  "hash": "bec17501799c8c70"
+ },
+ "/tools/tuner": {
+  "date": "2026-10-06",
+  "hash": "dcb839cba0cbe335"
+ },
+ "/tools/unlock-pdf": {
+  "date": "2026-09-29",
+  "hash": "ef9e0cdb07385112"
+ },
+ "/tools/upscale-image": {
+  "date": "2026-09-29",
+  "hash": "6ea0d63a265a6db8"
+ },
+ "/tools/video-background-remover": {
+  "date": "2026-09-29",
+  "hash": "6be3a4b2b1188cc1"
+ },
+ "/tools/video-speed": {
+  "date": "2026-10-06",
+  "hash": "62a67d8fc33cee70"
+ },
+ "/tools/video-to-gif": {
+  "date": "2026-09-29",
+  "hash": "ab6b5b2edceccb7e"
+ },
+ "/tools/video-to-jpg": {
+  "date": "2026-10-06",
+  "hash": "b0ad826975fb8784"
+ },
+ "/tools/video-to-mp3": {
+  "date": "2026-10-06",
+  "hash": "934289bad19349c5"
+ },
+ "/tools/video-to-mp4": {
+  "date": "2026-10-06",
+  "hash": "e196ef1f6a90bcc3"
+ },
+ "/tools/vocal-remover": {
+  "date": "2026-10-06",
+  "hash": "1320694f1c04afc6"
+ },
+ "/tools/voice-recorder": {
+  "date": "2026-09-29",
+  "hash": "0fa37c9d96731d97"
+ },
+ "/tools/volume-booster": {
+  "date": "2026-09-29",
+  "hash": "e173078837af1439"
+ },
+ "/tools/watermark-image": {
+  "date": "2026-10-06",
+  "hash": "e309abb27da8043c"
+ },
+ "/tools/watermark-pdf": {
+  "date": "2026-09-29",
+  "hash": "57bd532161ce2225"
+ },
+ "/tools/webcam-test": {
+  "date": "2026-10-06",
+  "hash": "2027c20905741a19"
+ },
+ "/trim-mp4": {
+  "date": "2026-09-29",
+  "hash": "7b9fd6c8d73fdf9e"
+ },
+ "/twitch-badge-resizer": {
+  "date": "2026-09-29",
+  "hash": "2c28a9a45f0f35c5"
+ },
+ "/twitch-emote-resizer": {
+  "date": "2026-09-29",
+  "hash": "7e6a13649364d9a0"
+ },
+ "/ukulele-tuner": {
+  "date": "2026-09-29",
+  "hash": "8f3abc236f5078ee"
+ },
+ "/vcard-qr-code-generator": {
+  "date": "2026-09-29",
+  "hash": "30e7fbbfeb2e47e6"
+ },
+ "/video-compressor": {
+  "date": "2026-10-06",
+  "hash": "86879b6f911557b9"
+ },
+ "/video-to-png": {
+  "date": "2026-09-29",
+  "hash": "8b8b1402954d5890"
+ },
+ "/video-to-subtitles": {
+  "date": "2026-09-29",
+  "hash": "52ded21047d42f69"
+ },
+ "/watermark-id-copy": {
+  "date": "2026-10-06",
+  "hash": "3bca0388093d90f4"
+ },
+ "/wav-to-flac": {
+  "date": "2026-10-06",
+  "hash": "5111cf63e90c599a"
+ },
+ "/wav-to-m4a": {
+  "date": "2026-09-29",
+  "hash": "50d61abb3bd15967"
+ },
+ "/wav-to-mp3": {
+  "date": "2026-10-06",
+  "hash": "66b997ff4770f2f6"
+ },
+ "/webm-to-gif": {
+  "date": "2026-09-29",
+  "hash": "4e984fb504837088"
+ },
+ "/webm-to-mp3": {
+  "date": "2026-10-06",
+  "hash": "60b86d1431879a86"
+ },
+ "/webm-to-mp4": {
+  "date": "2026-09-29",
+  "hash": "cdb1d3d52ddcb916"
+ },
+ "/webp-to-gif": {
+  "date": "2026-09-29",
+  "hash": "7ddeffe755c21818"
+ },
+ "/webp-to-jpg": {
+  "date": "2026-09-29",
+  "hash": "c2943999315e19fd"
+ },
+ "/webp-to-pdf": {
+  "date": "2026-09-29",
+  "hash": "055de9e9ad674ef2"
+ },
+ "/webp-to-png": {
+  "date": "2026-10-03",
+  "hash": "d49fd86f650c3129"
+ },
+ "/whatsapp-sticker-maker": {
+  "date": "2026-10-05",
+  "hash": "d481434c81758183"
+ },
+ "/white-background": {
+  "date": "2026-10-05",
+  "hash": "aa9ad24c3ff80f5a"
+ },
+ "/wifi-qr-code-generator": {
+  "date": "2026-09-29",
+  "hash": "cbe8f529e1bced1c"
+ },
+ "/youtube-banner-resizer": {
+  "date": "2026-09-29",
+  "hash": "eb264ca72b57bc1c"
+ },
+ "/youtube-thumbnail-resizer": {
+  "date": "2026-09-29",
+  "hash": "c268240abb03bef9"
+ }
+}

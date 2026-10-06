@@ -166,6 +166,12 @@ Set `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome` to use a preinstalled browser.
 
 `public/og.png` and `public/og/<slug>.png` are rendered from the page copy by `node scripts/make-og.mjs` (headless Chromium). Re-run it after changing a tool's heading or tagline and commit the result.
 
+### Sitemap dates
+
+Every sitemap URL has a real `<lastmod>`, and tool and guide structured data carries the same `dateModified`. The dates live in `src/data/lastmod.json` (page path to date and a content hash), so builds never depend on git history, which Vercel and CI clones don't have. After you change a tool, pair, preset, guide or static page, run `node scripts/lastmod.mjs`: pages whose content hash changed get today's date and new pages are added. Commit the result. `tests/lastmod.spec.ts` runs `node scripts/lastmod.mjs --check`, so CI fails if you forget. Guides use their own `updated` field as the date, and the check also fails when a guide changes without it moving forward.
+
+After each production deploy, `scripts/indexnow.mjs` pings IndexNow with only the pages whose lastmod entry differs from the previous commit. `node scripts/indexnow.mjs --all` resubmits every page (the workflow's manual run does this); `--dry-run` lists what would be sent.
+
 ## Adding a tool
 
 1. Add an entry to `src/data/tools.ts` (slug, SEO copy, steps, FAQ) and a paragraph to `src/data/engine.ts` saying what actually runs in the tab. These feed the home page, footer, sitemap, service worker, structured data and social image.
