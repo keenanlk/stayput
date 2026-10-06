@@ -5423,7 +5423,7 @@ test('Blur faces in video finds the face in every frame and covers it, leaves th
   const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'interview.webm');
   writeFileSync(file, Buffer.from(clip));
   const { downloads } = await run(page, [file], async () => {
-    await page.locator('input[name="effect"][value="box"]').check({ force: true });
+    await page.locator('label:has(input[name="effect"][value="box"])').click();
     await expect(page.locator('#strength-field')).toBeHidden();
   });
   expect(downloads[0]!.suggestedFilename()).toBe('interview-faces-hidden.mp4');
@@ -5876,7 +5876,7 @@ test('Remove background noise at Light keeps some of the original sound', async 
   const file = noiseWav(1.5);
   const before = await levels(page, readFileSync(file));
   const { downloads } = await run(page, [file], async () => {
-    await page.locator('input[name="strength"][value="light"]').check({ force: true });
+    await page.locator('label:has(input[name="strength"][value="light"])').click();
     await page.locator('#format').selectOption('flac');
   });
   expect(downloads[0]!.suggestedFilename()).toBe('fan-clean.flac');
