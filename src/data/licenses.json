@@ -200,6 +200,23 @@
    "kind": "library"
   },
   {
+   "id": "hash-wasm",
+   "name": "hash-wasm",
+   "version": "4.12.0",
+   "npm": "hash-wasm",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Daninet/hash-wasm",
+   "source": "https://github.com/Daninet/hash-wasm/tree/v4.12.0",
+   "shipped": "Served from /vendor/hash-wasm@4.12.0/ (JavaScript with embedded WebAssembly: MD5, SHA-1 and SHA-256 for the file checksum tool)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2020 Dani Biró"
+  },
+  {
    "id": "tesseract-js",
    "name": "Tesseract.js",
    "version": "7.0.0",

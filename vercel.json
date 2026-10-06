@@ -21,6 +21,11 @@
       "permanent": true
     },
     {
+      "source": "/sitemap.xml",
+      "destination": "/sitemap-index.xml",
+      "permanent": true
+    },
+    {
       "source": "/upscale-image",
       "destination": "/tools/upscale-image",
       "permanent": true

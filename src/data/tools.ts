@@ -31,6 +31,8 @@ export interface Tool {
   faq: Faq[];
   /** Served path. Defaults to /tools/<slug>. Format-pair landing pages override it. */
   path?: string;
+  /** Replaces the "No size caps, no watermark" line under the heading, for tools whose size is bounded by the device. */
+  sizeFact?: string;
 }
 
 export const toolPath = (t: Pick<Tool, 'slug' | 'path'>): string => t.path ?? `/tools/${t.slug}`;
@@ -3830,6 +3832,53 @@ export const tools: Tool[] = [
       {
         q: 'Does it work on scanned or password-protected PDFs?',
         a: 'Scans work: draw the boxes by hand, since a scan has no text to search. A PDF that only needs a password to edit is handled automatically. If it asks for a password to open, you are prompted for it, and the result is saved without the password.',
+      },
+    ],
+  },
+  {
+    slug: 'file-checksum',
+    name: 'File Checksum',
+    title: 'MD5 & SHA-256 File Checksum, No Upload | Stayput',
+    description:
+      'Get the MD5, SHA-1 or SHA-256 checksum of a file and compare it with the one the publisher lists. Runs in your browser; the file is not uploaded.',
+    heading: "Check a file's MD5 or SHA-256 checksum",
+    tagline: "Get a file's checksum on your device and compare it with the one the publisher lists.",
+    category: 'pdf',
+    accept: '',
+    multiple: true,
+    dropLabel: 'Drop files to checksum',
+    action: 'Calculate checksums',
+    sizeFact: 'No account, no watermark',
+    keywords: ['md5 checksum', 'file hash', 'sha256 checksum', 'md5 checksum of file', 'file hash checker', 'verify file checksum', 'checksum checker online'],
+    steps: [
+      'Drop a file, or several, or tap to pick them. Nothing is uploaded.',
+      'Press Calculate checksums. A large file takes a while; a progress bar shows how far it has got.',
+      'Paste the checksum the publisher gave you into the compare box to see whether it matches. Copy any value with its Copy button.',
+    ],
+    faq: [
+      {
+        q: "How do I check a file's checksum?",
+        a: 'Drop the file and press Calculate checksums. You get its MD5, SHA-1 and SHA-256 values; use whichever one the download page lists. Paste the published value into the compare box and it says whether it matches, and which algorithm matched. Capital letters and spaces in the pasted value do not matter.',
+      },
+      {
+        q: 'Is the file uploaded?',
+        a: 'No. The file is read by this tab and hashed on your device; only the page itself is downloaded. Neither the file, its name nor the checksums are sent anywhere.',
+      },
+      {
+        q: 'Is MD5 secure? Which should I use?',
+        a: 'No. MD5 is not secure against deliberate tampering, because attackers can craft two different files with the same MD5. It still catches accidental corruption, such as a broken download. If the publisher lists SHA-256, use that. A matching hash also does not prove a file is safe, only that it is the same file the publisher hashed, and that is only as trustworthy as where you got the checksum.',
+      },
+      {
+        q: 'What is the difference between MD5, SHA-1 and SHA-256?',
+        a: 'They are different algorithms that give different-length fingerprints: 128, 160 and 256 bits. The same file gives a different value in each, so compare like with like. MD5 and SHA-1 are broken for security use; SHA-256 is the usual choice.',
+      },
+      {
+        q: 'How do I get a checksum on Windows without installing anything?',
+        a: '`certutil -hashfile <file> SHA256` in Command Prompt, or `Get-FileHash <file> -Algorithm SHA256` in PowerShell, give the same answer as this tool. Use MD5 or SHA1 in place of SHA256 for the other algorithms.',
+      },
+      {
+        q: 'Can it hash a very large file, like an ISO?',
+        a: 'It is built for large files: it reads the file in small pieces rather than loading it whole, so a multi-gigabyte ISO does not need that much memory. It is still bounded by your device. A phone or a low-memory computer may run out of memory or take a very long time, and then the page says so instead of giving a result. If that happens, use certutil, Get-FileHash or shasum on the file instead.',
       },
     ],
   },

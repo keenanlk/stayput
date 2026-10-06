@@ -102,5 +102,11 @@
     "version": "2025.1.5",
     "entry": "rnnoise.js",
     "files": { "rnnoise.js": "dist/rnnoise.js", "LICENSE": "LICENSE" }
+  },
+  "hash": {
+    "package": "hash-wasm",
+    "version": "4.12.0",
+    "entry": "index.esm.min.js",
+    "files": { "index.esm.min.js": "dist/index.esm.min.js", "LICENSE": "LICENSE" }
   }
 }

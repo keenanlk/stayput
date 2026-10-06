@@ -34,6 +34,7 @@
     "fflate": "0.8.3",
     "gifenc": "1.0.3",
     "gifuct-js": "2.1.2",
+    "hash-wasm": "4.12.0",
     "heic-to": "1.6.5",
     "imagetracerjs": "1.2.6",
     "libarchive.js": "2.0.2",

@@ -136,3 +136,12 @@ test('qpdf is credited as Apache-2.0 with its licence and NOTICE served next to 
   const html = await (await request.get('/licenses')).text();
   expect(html).toContain(`${dir}LICENSE-qpdf.txt`);
 });
+
+test('hash-wasm is credited as MIT and its licence is served next to it', async ({ request }) => {
+  const entry = components.find((c) => c.npm === 'hash-wasm')!;
+  expect(entry.licences.map((l) => l.name)).toEqual(['MIT']);
+  expect(entry.version).toBe(vendor.hash.version);
+  const dir = `/vendor/hash-wasm@${vendor.hash.version}/`;
+  for (const file of ['index.esm.min.js', 'LICENSE']) expect((await request.get(`${dir}${file}`)).status(), file).toBe(200);
+  expect(await (await request.get(`${dir}LICENSE`)).text()).toContain('MIT License');
+});

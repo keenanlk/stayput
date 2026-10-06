@@ -387,7 +387,7 @@ export const guides: Guide[] = [
     dek: 'A five-minute check with tools already in your browser. No trust required.',
     keywords: ['does this website upload my files', 'check if website uploads files', 'browser network tab file upload', 'client side processing verify', 'is this online tool private'],
     updated: '2026-09-25',
-    tools: ['strip-exif', 'merge-pdf', 'heic-to-jpg'],
+    tools: ['strip-exif', 'merge-pdf', 'heic-to-jpg', 'file-checksum'],
     sections: [
       {
         h: 'The claim and the check',
@@ -567,7 +567,7 @@ export const guides: Guide[] = [
     dek: 'Browsers can do most file jobs themselves. What runs locally, why it is enough, and which tools to use.',
     keywords: ['convert files without uploading', 'offline file converter', 'browser based file tools', 'local file conversion', 'privacy file converter', 'no upload pdf tools'],
     updated: '2026-09-25',
-    tools: ['heic-to-jpg', 'merge-pdf', 'compress-image', 'strip-exif'],
+    tools: ['heic-to-jpg', 'merge-pdf', 'compress-image', 'strip-exif', 'file-checksum'],
     sections: [
       {
         h: 'The default is upload, and it does not need to be',

@@ -1,0 +1,46 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('file-checksum')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" class="cs-panel" id="cs-panel" hidden>
+    <div id="cs-report" class="cs-report" aria-live="polite"></div>
+    <div class="cs-compare">
+      <label for="cs-paste">Paste the checksum you were given</label>
+      <input id="cs-paste" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. the SHA-256 from the download page" />
+      <p id="cs-verdict" class="cs-verdict" role="status" aria-live="polite" hidden></p>
+    </div>
+    <p class="cs-next">
+      Verified? <a href="/tools/archive-extractor" data-to="archive-extractor">Now open the archive</a> or
+      <a href="/tools/create-zip" data-to="create-zip">zip files together</a>. Want to see for yourself that nothing is sent?
+      Read <a href="/guides/does-this-website-upload-my-files">how to check whether a website uploads your files</a>.
+      Checking a photo instead? The <a href="/tools/exif-viewer" data-to="exif-viewer">EXIF viewer</a> shows what it carries.
+    </p>
+  </div>
+</ToolLayout>
+<style is:global>
+  .cs-report { display: grid; gap: 12px; }
+  .cs-card { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+  .cs-card > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .cs-card > header strong { color: var(--ink); overflow-wrap: anywhere; }
+  .cs-card > header span { font-size: 13px; color: var(--muted); }
+  .cs-digests { list-style: none; margin: 0; padding: 4px 14px; display: grid; }
+  .cs-digests li { display: grid; grid-template-columns: 5.5rem 1fr auto; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .cs-digests li:last-child { border-bottom: 0; }
+  .cs-digests .k { color: var(--muted); }
+  .cs-digests code { font-family: var(--mono); font-size: 13px; color: var(--ink); overflow-wrap: anywhere; }
+  .cs-digests li.is-match { box-shadow: inset 3px 0 0 var(--ok); margin-left: -14px; padding-left: 14px; }
+  .cs-compare { margin-top: 16px; display: grid; gap: 8px; }
+  .cs-compare label { font-weight: 560; color: var(--ink); }
+  .cs-compare input { width: 100%; padding: 10px 12px; font: 13px var(--mono); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); }
+  .cs-verdict { margin: 0; font-size: 14px; font-weight: 560; }
+  .cs-verdict.ok { color: var(--ok); }
+  .cs-verdict.bad { color: var(--warn); }
+  .cs-next { margin: 12px 0 0; font-size: 14px; color: var(--ink-2); }
+  @media (max-width: 480px) {
+    .cs-digests li { grid-template-columns: 1fr auto; }
+    .cs-digests .k { grid-column: 1 / -1; }
+  }
+</style>
+<script src="../../tools/file-checksum.ts"></script>
