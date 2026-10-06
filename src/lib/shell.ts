@@ -291,8 +291,14 @@ export function createShell(opts: ShellOptions) {
     return b;
   }
 
-  function showError(message: string) {
+  function showError(message: string, link?: { href: string; text: string }) {
     error.textContent = message;
+    if (link) {
+      const a = document.createElement('a');
+      a.href = link.href;
+      a.textContent = link.text;
+      error.append(' ', a);
+    }
     error.classList.add('is-active');
   }
   function hideError() {
@@ -444,7 +450,7 @@ export function createShell(opts: ShellOptions) {
       root.dispatchEvent(new CustomEvent('stayput:done'));
     } catch (e) {
       console.error(e);
-      showError(e instanceof Error ? e.message : String(e));
+      showError(e instanceof Error ? e.message : String(e), (e as { link?: { href: string; text: string } } | null)?.link);
       trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e) });
     } finally {
       setBusy(false);
