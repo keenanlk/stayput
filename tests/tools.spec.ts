@@ -4718,7 +4718,12 @@ test('Audio to video makes an MP4 of the sound with the picture, and no bytes le
   expect(tracks.audio).toBe(1);
   expect(await videoSeconds(mp4)).toBeCloseTo(1.5, 1);
   const sound = await soundOf(page, mp4);
-  expect(sound.seconds).toBeCloseTo(1.5, 1);
+  // AAC encoders add priming and padding that the browser decodes as real samples, and how much
+  // depends on the platform's encoder: macOS adds 2112 samples up front and rounds up to a whole
+  // 1024-sample frame (1.579 s for this 1.5 s clip); the Linux encoder adds less. Allow up to 100 ms
+  // extra, never less than the sound itself.
+  expect(sound.seconds).toBeGreaterThanOrEqual(1.5 - 0.01);
+  expect(sound.seconds).toBeLessThan(1.5 + 0.1);
   net.assertNothingLeft(['tone.wav', 'swatches.png']);
   expect(errors).toEqual([]);
 });
