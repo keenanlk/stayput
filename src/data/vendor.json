@@ -33,7 +33,12 @@
     "package": "@neslinesli93/qpdf-wasm",
     "version": "0.3.0",
     "entry": "qpdf.js",
-    "files": { "qpdf.js": "dist/qpdf.js", "qpdf.wasm": "dist/qpdf.wasm" }
+    "files": { "qpdf.js": "dist/qpdf.js", "qpdf.wasm": "dist/qpdf.wasm" },
+    "licences": {
+      "LICENSE-qpdf.txt": "vendor-licenses/qpdf-wasm/LICENSE-qpdf.txt",
+      "NOTICE-qpdf.md": "vendor-licenses/qpdf-wasm/NOTICE-qpdf.md",
+      "LICENSE-libjpeg-turbo.md": "vendor-licenses/qpdf-wasm/LICENSE-libjpeg-turbo.md"
+    }
   },
   "mediapipe": {
     "package": "@mediapipe/tasks-vision",

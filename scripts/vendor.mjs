@@ -21,6 +21,12 @@ for (const lib of Object.values(vendor)) {
     await mkdir(dirname(target.pathname), { recursive: true });
     await copyFile(new URL(src, pkgDir), target);
   }
+  // Licence and notice texts that must travel with the binaries, kept in the repo.
+  for (const [dest, src] of Object.entries(lib.licences ?? {})) {
+    const target = new URL(`${vendorDir(lib)}${dest}`, out);
+    await mkdir(dirname(target.pathname), { recursive: true });
+    await copyFile(new URL(src, root), target);
+  }
 }
 console.log(`vendor: copied ${Object.keys(vendor).length} decoders to public/vendor/`);
 
