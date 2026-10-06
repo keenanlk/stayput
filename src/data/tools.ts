@@ -441,16 +441,37 @@ export const tools: Tool[] = [
   {
     slug: 'compress-pdf',
     name: 'Compress PDF',
-    title: 'Compress PDF Online Without Uploading, Free | Stayput',
+    title: 'Compress PDF Online: Free, No Upload, Set a Size | Stayput',
     description:
-      'Reduce PDF file size in your browser, or fit it under a limit like 1 MB or 200 KB. Recompress images, remove unused data, or flatten pages. No upload, no watermark.',
+      'Compress a PDF in your browser, or fit it under a limit like 1 MB or 200 KB. Three levels, from lossless cleanup to aggressive. No upload, no watermark.',
     heading: 'Compress a PDF',
-    tagline: 'Shrink PDFs for email or upload limits. Three levels, from lossless cleanup to aggressive. Processed on your device.',
+    tagline: 'Shrink a PDF for email or an upload limit. Pick a level, or type the size you need, like 1 MB, and the page tries the gentlest setting that fits. Processed on your device.',
     category: 'pdf',
     accept: 'application/pdf,.pdf',
     multiple: true,
     dropLabel: 'Drop PDF files here',
     action: 'Compress PDF',
+    sections: [
+      {
+        heading: 'Compress to a set size: 100 KB, 200 KB, 500 KB, 1 MB, 2 MB',
+        paragraphs: [
+          'Upload forms often name a maximum size. These pages open this tool already set to that size:',
+        ],
+        bullets: [
+          '[Compress a PDF to 100 KB](/compress-pdf-to-100kb)',
+          '[Compress a PDF to 200 KB](/compress-pdf-to-200kb)',
+          '[Compress a PDF to 500 KB](/compress-pdf-to-500kb)',
+          '[Compress a PDF to 1 MB](/compress-pdf-to-1mb)',
+          '[Compress a PDF to 2 MB](/compress-pdf-to-2mb)',
+        ],
+      },
+      {
+        heading: 'Still too big, or worried about quality?',
+        paragraphs: [
+          'If one file stays over the limit, [split the PDF](/tools/split-pdf) and send it in parts. To see what each level does to the pages, read [how to compress a PDF without losing quality](/guides/compress-pdf-without-losing-quality).',
+        ],
+      },
+    ],
     keywords: ['compress pdf', 'reduce pdf size', 'shrink pdf', 'pdf compressor', 'make pdf smaller'],
     steps: [
       'Drop one or more PDFs.',
@@ -469,6 +490,18 @@ export const tools: Tool[] = [
       {
         q: 'Why did my PDF barely shrink?',
         a: 'PDFs made from text (Word exports, invoices) are already small and consist mostly of fonts and vector data that cannot be compressed further without losing content. Compression helps most on files with large photos or scans.',
+      },
+      {
+        q: 'How do I compress a scanned PDF?',
+        a: 'Use "Recompress images" first: a scan is one large picture per page, so lowering the picture quality is where the savings are, and the file stays a normal PDF. The result says how many images were recompressed; if it says none, use "Flatten pages". If it is still too big, choose "Flatten pages" and lower the resolution, or choose "Fit a file size" and let the page step down for you. Flattening gives the smallest scans, but text is no longer selectable.',
+      },
+      {
+        q: 'Can I compress a PDF on my phone?',
+        a: 'Try it. Open this page in your phone\'s browser and drop the PDF in. The work happens in the page, so a long or image-heavy file can be slow on a phone; if it stalls, try a smaller file or split it first.',
+      },
+      {
+        q: 'Will compressing change my text, links or forms?',
+        a: '"Lossless cleanup" and "Recompress images" keep the text selectable, and in our test a link and a filled-in form field survived both; only the embedded photos change at the image level. "Flatten pages" turns each page into a picture, so text is no longer selectable and links and form fields are gone. "Fit a file size" flattens only when nothing gentler fits, and the result says which step it took.',
       },
       {
         q: 'Is the PDF uploaded to a server?',
@@ -1672,7 +1705,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Does converting improve the quality?',
-        a: 'No. Converting can keep the quality (to WAV or FLAC) or lower it (to MP3, M4A or OGG), never raise it. An MP3 turned into a FLAC is a bigger file with the same MP3 sound.',
+        a: 'No. Converting can keep the quality (to WAV or FLAC) or lower it (to MP3, M4A or OGG), never raise it. An MP3 turned into a FLAC is a bigger file with the same MP3 sound. If a recording sounds thin or quiet at the source, check the microphone with the [mic test](/tools/mic-test) before you record it again.',
       },
     ],
   },
@@ -1744,7 +1777,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is there no sound in my recording?',
-        a: 'The sound is only captured when you share it. In Chrome and Edge, tick "Share audio" (or "Also share tab audio") in the browser\'s picker; a single window cannot share its sound, so share the tab or the entire screen instead. Firefox and Safari do not share screen sound at all, so tick "My microphone" to narrate instead.',
+        a: 'The sound is only captured when you share it. In Chrome and Edge, tick "Share audio" (or "Also share tab audio") in the browser\'s picker; a single window cannot share its sound, so share the tab or the entire screen instead. Firefox and Safari do not share screen sound at all, so tick "My microphone" to narrate instead. Not sure the microphone works? Check it first with the [mic test](/tools/mic-test).',
       },
       {
         q: 'Is the video MP4 or WebM?',
@@ -1923,16 +1956,42 @@ export const tools: Tool[] = [
   {
     slug: 'mic-test',
     name: 'Mic test',
-    title: 'Mic Test: Check Your Microphone Online, Private | Stayput',
+    title: 'Mic Test: Check Your Microphone Online, No Upload | Stayput',
     description:
-      'Test your microphone in the browser: a live level meter, a plain verdict, and a five-second record and play back. Nothing is recorded to a server.',
+      'Test your microphone online: live level meter, a plain verdict, and a 5-second record and play back. Runs in your browser; nothing is uploaded.',
     heading: 'Test your microphone',
-    tagline: 'See whether your microphone works and how loud it is, and hear yourself back, before a call or a recording.',
+    tagline: 'Check that your microphone works before a Zoom, Teams or Discord call: speak and watch the level, then play back five seconds to hear how you sound. Nothing is uploaded.',
     category: 'media',
     accept: '.txt',
     multiple: false,
     dropLabel: 'Test your microphone',
     action: 'Test',
+    sections: [
+      {
+        heading: 'Test a headset or external microphone',
+        paragraphs: [
+          'Plug in or pair the headset or USB microphone first, then press Test my microphone and choose it from the Microphone list. The bar and the play-back then show that microphone, not the laptop\'s own. If it is not in the list, check that it is connected and not muted, then press Stop using the microphone and start again.',
+        ],
+      },
+      {
+        heading: 'Tips for a clean recording',
+        bullets: [
+          'Keep your mouth about a hand\'s width from the microphone.',
+          'Keep the peak marker clear of the right end of the bar: a peak at the end means clipping, so turn the input volume down.',
+          'Close other apps that use the microphone, and turn off fans and music that the microphone can hear.',
+          'Happy with the level? Record it with the [voice recorder](/tools/voice-recorder). Still hissy or noisy? Clean the recording with [Remove background noise](/tools/remove-noise).',
+        ],
+      },
+      {
+        heading: 'Microphone not working? Check these first',
+        bullets: [
+          'Check the microphone is not muted: many headsets and laptops have a mute key or switch.',
+          'Check that the right microphone is chosen in the list.',
+          'Check that no other app, such as Zoom or Teams, is holding the microphone.',
+          'Check the browser is allowed to use it: on a Mac under System Settings, Privacy and Security, Microphone; on Windows under Settings, Privacy, Microphone.',
+        ],
+      },
+    ],
     keywords: ['mic test', 'microphone test', 'test my mic', 'online mic test', 'is my mic working', 'check microphone', 'mic checker'],
     steps: [
       'Press Test my microphone and allow it when your browser asks. Choose another microphone from the list if you have several.',
@@ -1956,21 +2015,54 @@ export const tools: Tool[] = [
         q: 'Why does it sound different in calls?',
         a: 'This test turns off the browser’s noise suppression, echo cancellation and automatic gain, so you hear what the microphone really picks up. Call apps apply their own clean-up, which usually makes voices quieter in the background and more even.',
       },
+      {
+        q: 'How do I test my microphone on Windows or Mac?',
+        a: 'Open this page, press Test my microphone and allow it when your browser asks, then speak: the bar moves and the verdict tells you if the level is right. If the browser has no access, allow it on a Mac under System Settings, Privacy and Security, Microphone, or on Windows under Settings, Privacy, Microphone. The sound is handled inside the page in your tab and is never sent to a server.',
+      },
+      {
+        q: 'How do I test an external or USB microphone?',
+        a: 'Connect it first, press Test my microphone, then pick it from the Microphone list and speak into it. If you plug it in after the test has started, press Stop using the microphone and start again. For a headset, also check the headset is the one chosen, not the laptop microphone.',
+      },
+      {
+        q: 'Does the mic test work on a phone?',
+        a: 'Try it. Open this page in your phone’s browser, press Test my microphone and allow the microphone when asked. If the bar moves, it works there; if it does not, check the browser’s microphone permission in your phone’s settings.',
+      },
     ],
   },
   {
     slug: 'webcam-test',
     name: 'Webcam test',
-    title: 'Webcam Test: Check Your Camera Online, Private | Stayput',
+    title: 'Webcam Test: Check Camera Resolution and FPS | Stayput',
     description:
-      'Test your webcam in the browser: live preview, real resolution and frame rate, mirror view and a snapshot as JPG. The picture never leaves your device.',
+      'Test your webcam online: live preview, real resolution and frame rate, mirror view and a snapshot. The picture stays in this tab; nothing is uploaded.',
     heading: 'Test your webcam',
-    tagline: 'See your camera, its real resolution and frame rate, before a call or an interview. Nothing is recorded or sent anywhere.',
+    tagline: 'Check that your webcam works before a Zoom, Teams or interview call: see the live picture, the real resolution and the measured frame rate. Nothing is uploaded.',
     category: 'media',
     accept: '.txt',
     multiple: false,
     dropLabel: 'Test your webcam',
     action: 'Test',
+    sections: [
+      {
+        heading: 'What this test shows',
+        bullets: [
+          'The live picture from your camera, so you can check framing and light.',
+          'The resolution the camera really delivers, which can be lower than the box says.',
+          'The frame rate, measured in this page.',
+          'The aspect ratio of the picture.',
+          'A mirror view, to see yourself as in a mirror.',
+          'A snapshot you can save as a JPG.',
+        ],
+      },
+      {
+        heading: 'Webcam not working?',
+        bullets: [
+          'Check the lens cover or privacy switch. Some laptops also have a camera key on the keyboard.',
+          'Check that no other app, such as Zoom or Teams, is using the camera.',
+          'Check the browser is allowed to use the camera: on a Mac under System Settings, Privacy and Security, Camera; on Windows under Settings, Privacy, Camera.',
+        ],
+      },
+    ],
     keywords: ['webcam test', 'camera test', 'test my webcam', 'online webcam test', 'is my webcam working', 'check camera', 'webcam resolution test'],
     steps: [
       'Press Test my webcam and allow the camera when your browser asks. Choose another camera from the list if you have several.',
@@ -1993,6 +2085,14 @@ export const tools: Tool[] = [
       {
         q: 'Why is the measured frame rate low?',
         a: 'Webcams slow down in dim light to let in more light per frame, often from 30 to 15 frames per second. Turn on a lamp facing you and test again.',
+      },
+      {
+        q: 'How do I test my webcam on Windows or Mac?',
+        a: 'Open this page, press Test my webcam and allow the camera when your browser asks. If the picture stays black, allow the browser on a Mac under System Settings, Privacy and Security, Camera, or on Windows under Settings, Privacy, Camera. The picture, its resolution and the frame rate then show on the page, and the picture stays in this tab.',
+      },
+      {
+        q: 'Can I test my webcam before a Zoom or Teams call?',
+        a: 'Yes. Close the call app first, because another app may be using the camera, then press Test my webcam here to check the picture, the light and the frame rate. Turn the camera off on this page before you rejoin the call.',
       },
     ],
   },
@@ -2308,7 +2408,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why does it jump around on my low strings?',
-        a: 'A low string has few vibrations in each moment of sound, and a laptop microphone picks up little bass. Hold the phone or laptop close to the instrument, pluck firmly once and wait a moment for the reading to settle. For an electric guitar or bass without an amp, a clip-on or pedal tuner will do better.',
+        a: 'A low string has few vibrations in each moment of sound, and a laptop microphone picks up little bass. Hold the phone or laptop close to the instrument, pluck firmly once and wait a moment for the reading to settle. If the needle never moves, check the microphone with the [mic test](/tools/mic-test). For an electric guitar or bass without an amp, a clip-on or pedal tuner will do better.',
       },
       {
         q: 'Can I tune without a microphone?',
@@ -2354,7 +2454,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is anything recorded?',
-        a: 'No. The metronome only plays sound; it never uses the microphone. Nothing about your practice is stored or sent.',
+        a: 'No. The metronome only plays sound; it never uses the microphone. Nothing about your practice is stored or sent. To check a microphone before you record yourself playing along, use the [mic test](/tools/mic-test).',
       },
     ],
   },
@@ -2754,7 +2854,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I use the result?',
-        a: 'For practice, karaoke at home, remixes of your own songs and study, yes. Separating a track does not change who owns it: publishing an instrumental or acapella of someone else’s song still needs their permission.',
+        a: 'For practice, karaoke at home, remixes of your own songs and study, yes. Separating a track does not change who owns it: publishing an instrumental or acapella of someone else’s song still needs their permission. To sing over the karaoke track, check your microphone first with the [mic test](/tools/mic-test).',
       },
     ],
   },
@@ -3162,7 +3262,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'What photo works best?',
-        a: 'One taken by someone else from about 1.5 metres (4 to 5 feet) away, at eye level, in even daylight with no shadows on your face or behind you. Take off glasses and hats, keep your hair off your face, and leave plenty of space above your head and around your shoulders so there is room to crop.',
+        a: 'One taken by someone else from about 1.5 metres (4 to 5 feet) away, at eye level, in even daylight with no shadows on your face or behind you. Take off glasses and hats, keep your hair off your face, and leave plenty of space above your head and around your shoulders so there is room to crop. If you use a laptop camera, check its picture first with the [webcam test](/tools/webcam-test), which saves a snapshot as JPG.',
       },
     ],
   },
@@ -3377,6 +3477,10 @@ export const tools: Tool[] = [
       {
         q: 'How is the picture framed?',
         a: 'Around your face: the face fills about 40% of the width with the eyes a little above the middle, the usual headshot framing that still looks right when a site crops it to a circle. If no face is found, for a pet or an object, the whole subject is fitted in instead.',
+      },
+      {
+        q: 'Can I use a photo from my webcam?',
+        a: 'Yes, as a photo file. Check your framing and light first with the [webcam test](/tools/webcam-test), save a snapshot as JPG, then drop it here.',
       },
       {
         q: 'Which background colour works best?',

@@ -3606,6 +3606,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Why can’t I hear the screen’s sound in the video?', a: 'It was not shared. Start again, choose a tab or the entire screen (not a window), and tick “Share audio” before pressing Share. On a Mac, Chrome can only share the sound of a tab, not the whole system.' },
       { q: 'My voice echoes. How do I stop it?', a: 'Wear headphones. With speakers, the microphone picks up the screen’s sound a second time. The recorder turns on the browser’s echo cancellation, which helps, but headphones fix it.' },
+      { q: 'How do I check my microphone before I record?', a: 'Run the [mic test](/tools/mic-test) first: speak, watch the level and play back five seconds to hear how you sound.' },
       { q: 'Can I record only my voice over a silent screen?', a: 'Yes. Untick “Sound from the screen or tab” and keep “My microphone” ticked.' },
     ],
   },
