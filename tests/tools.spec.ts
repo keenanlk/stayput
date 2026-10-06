@@ -6340,7 +6340,8 @@ for (const slug of ['blur-video-background', 'green-screen-video', 'video-backgr
     const batch = await runAgain(page);
     expect(batch, 'two-video batch').toEqual({ ok: true, text: '' });
     await expect(page.locator('#results-list .result-item')).toHaveCount(2);
-    expect(errors.filter((e) => !e.includes('XNNPACK'))).toEqual([]);
+    // MediaPipe tries to post usage logs to Google after a few runs; the page's CSP blocks it, which is the point.
+    expect(errors.filter((e) => !e.includes('XNNPACK') && !e.includes('odml.pa.googleapis.com'))).toEqual([]);
   });
 }
 
