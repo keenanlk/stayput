@@ -197,7 +197,7 @@ export const engines: Record<string, Engine> = {
   },
   'compress-audio': {
     how: 'Your browser decodes the sound with its own audio decoders. When you set a size limit, the bitrate is worked out from the length of the sound so the file lands under it. The smaller file is then written in your tab, as MP3 by LAME compiled to WebAssembly or as OGG by the browser’s own Opus encoder (WebCodecs) with Mediabunny (MPL-2.0) writing the container.',
-    versus: 'Online audio compressors upload the recording before they shrink it, which for a large WAV is the slowest part, and cap free files at 50 to 100 MB. Here nothing is uploaded, so there is no cap and private recordings stay on your device.',
+    versus: 'Online audio compressors upload the recording before they shrink it, which for a large WAV is the slowest part, and cap free files at 50 to 100 MB. Here nothing is uploaded, so the only limit is your device’s memory and private recordings stay on your device.',
   },
   'add-text-to-image': {
     how: 'Your browser decodes each image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab at full size. Your text is wrapped to fit, then drawn with the canvas text functions at a size that is a share of the image, with an outline, shadow or backing box if chosen, and the result is encoded once in the format you picked. Fonts come from your device, apart from the site’s own Archivo and Caveat.',
@@ -225,7 +225,7 @@ export const engines: Record<string, Engine> = {
   },
   'metronome': {
     how: 'A Web Audio oscillator makes each click, shaped by a gain envelope a few milliseconds long. Every 25 ms the page schedules the clicks due in the next 120 ms at exact times on the audio clock, which is driven by your sound card rather than the page’s timers, and the beat lights are drawn from the same clock. Tap tempo takes the median gap between your last eight taps.',
-    versus: 'Metronome apps want an install and often a subscription for odd time signatures or subdivisions, and metronome websites run ads and trackers that can make the page stutter. This one has every setting free, no ads, and keeps working offline.',
+    versus: 'Metronome apps want an install and often a subscription for odd time signatures or subdivisions, and metronome websites run ads and trackers that can make the page stutter. This one has every setting free, no ads, and keeps working offline after one visit.',
   },
   'fill-pdf-form': {
     how: 'pdf-lib reads the form’s fields (AcroForm) and where each one sits on the page, and pdf.js draws every page in your tab with the fields left off. The fields are laid over the pages as ordinary inputs. When you save, pdf-lib writes your answers into the same fields, draws their appearance with the standard Helvetica font, and, if you ask, flattens them into the page.',
@@ -237,7 +237,7 @@ export const engines: Record<string, Engine> = {
   },
   'remove-silence': {
     how: 'Your browser’s own audio decoders turn the file into plain samples in your tab. The level is measured in 10 ms windows, using the loudest channel, and every quiet stretch longer than your chosen length is cut down to the pause you chose, with a 5 ms fade at each join. The sound is then written again: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders.',
-    versus: 'Online silence removers upload the recording, cap free files by length or size, and some keep the uploads. Here nothing is uploaded and there is no cap, which matters for long lectures and for private interviews.',
+    versus: 'Online silence removers upload the recording, cap free files by length or size, and some keep the uploads. Here nothing is uploaded and the only limit is your device’s memory, which matters for long lectures and for private interviews.',
   },
   'image-to-svg': {
     how: 'Your browser decodes the image in the tab. It is scaled so its longest side is between 400 and 1,000 pixels (800 for the Detailed style) and handed to imagetracerjs (public domain), running in a background worker. The colours are reduced to a palette (2, up to 8 or up to 32), the outline of every area of each colour is traced, and each outline is fitted with straight lines and quadratic curves. The shapes are scaled back to the image’s own width and height and written as SVG paths. Black and white first sets each pixel to black or white with a threshold chosen from the image’s own brightness (Otsu’s method).',
@@ -281,7 +281,7 @@ export const engines: Record<string, Engine> = {
   },
   'epub-to-pdf': {
     how: 'An EPUB is a zip file. fflate (MIT) unzips it in your tab and the browser’s own parser reads the package file for the reading order, title and author, then each chapter’s XHTML. Headings, paragraphs with their bold and italic runs, lists, quotations and pictures are turned into a document description, and pdfmake (MIT, built on PDFKit) sets it in the Roboto font (Apache-2.0), breaking lines and pages in a background worker. Each chapter starts on a new page, and the first heading of each goes into the contents page.',
-    versus: 'Online EPUB converters upload the whole book, many queue it on a server and some email you a download link. Here the book stays on your device, there is no size or file limit, and it works offline once the page has loaded.',
+    versus: 'Online EPUB converters upload the whole book, many queue it on a server and some email you a download link. Here the book stays on your device, the only size limit is your device’s memory, and it works offline once the page has loaded.',
   },
   'pdf-to-epub': {
     how: 'pdf.js (Apache-2.0) reads the positioned text of every page in your tab. The same rebuilding as PDF to Word groups it into lines and paragraphs and spots headings by their size. Text that sits at the top or bottom of many pages and differs only in its numbers is treated as a running header or footer and dropped, bare page numbers too, and a paragraph that stops mid-sentence at a page break is joined to its continuation. The main headings start chapters. Each chapter is written as XHTML with a small stylesheet, with an EPUB 3 navigation file and an NCX contents list for older readers, and fflate (MIT) zips them with the uncompressed mimetype first, as the EPUB specification requires.',
@@ -309,7 +309,7 @@ export const engines: Record<string, Engine> = {
   },
   'gif-to-mp4': {
     how: 'Stayput reads the GIF byte by byte in your tab with gifuct-js (MIT), decompresses each frame and composites it the way browsers play GIFs, honouring each frame’s delay and disposal rule. Every finished frame goes to your browser’s own video encoder through WebCodecs: H.264 where the browser has one (Chrome, Edge, Safari), VP9 or AV1 where it does not. The encoded frames are written into an MP4 container by mp4-muxer (MIT), all in memory.',
-    versus: 'GIF to MP4 sites upload the file to convert it on a server, cap the size, and some add a watermark or keep the file for hours. Here the conversion runs on your device, so a reaction GIF, a screen recording of your product or a clip of your kids never leaves it, and the page keeps working offline.',
+    versus: 'GIF to MP4 sites upload the file to convert it on a server, cap the size, and some add a watermark or keep the file for hours. Here the conversion runs on your device, so a reaction GIF, a screen recording of your product or a clip of your kids never leaves it, and the page keeps working offline after one visit.',
   },
   'image-to-text': {
     how: 'Your browser decodes the image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL), enlarges small screenshots so letters are big enough to read, and hands the pixels to Tesseract, the open-source OCR engine first built at HP and later developed by Google, compiled to WebAssembly by tesseract.js (Apache-2.0). Its neural network model for English is served by this site and loaded the first time you run it. The text is recognised line by line inside a worker in your tab.',

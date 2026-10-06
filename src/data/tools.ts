@@ -121,7 +121,7 @@ export const tools: Tool[] = [
     name: 'Image Converter',
     title: 'Image Converter: JPG, PNG, WebP, PDF, ICO, No Upload | Stayput',
     description:
-      'Drop any image and Stayput detects its real format. Convert to JPG, PNG, WebP, PDF, ICO, GIF, BMP or TIFF without uploading. Free, batches, works offline.',
+      'Drop any image and Stayput detects its real format. Convert to JPG, PNG, WebP, PDF, ICO, GIF, BMP or TIFF without uploading. Free, batches, works offline after one visit.',
     heading: 'Convert images between formats',
     tagline: 'Drop any image, see what it really is, pick what you need. Converted on your device.',
     category: 'images',
@@ -226,7 +226,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is decoded and written again by code running in this page. There is no server in the process, no daily limit and no file size cap, and the page keeps working offline.',
+        a: 'No. The GIF is decoded and written again by code running in this page. There is no server in the process, no daily limit, and the only size limit is your device’s memory. The page keeps working offline after one visit.',
       },
       {
         q: 'How does it make GIFs smaller?',
@@ -268,7 +268,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my PNG uploaded?',
-        a: 'No. The PNG is decoded and written again by code running in this page. There is no server in the process, no daily limit and no file size cap, and the page keeps working offline.',
+        a: 'No. The PNG is decoded and written again by code running in this page. There is no server in the process, no daily limit, and the only size limit is your device’s memory. The page keeps working offline after one visit.',
       },
       {
         q: 'How does it make PNGs so much smaller?',
@@ -411,7 +411,7 @@ export const tools: Tool[] = [
     name: 'Split PDF',
     title: 'Split PDF or Extract Pages Online, Private | Stayput',
     description:
-      'Split a PDF into separate pages, extract a page range, or break it into chunks. Runs in your browser, no upload, no size caps.',
+      'Split a PDF into separate pages, extract a page range, or break it into chunks. Runs in your browser, no upload.',
     heading: 'Split a PDF or extract pages',
     tagline: 'Pull out the pages you need, or break a document into single pages. Done on your device.',
     category: 'pdf',
@@ -654,7 +654,7 @@ export const tools: Tool[] = [
     name: 'PDF to Image',
     title: 'Convert PDF to JPG or PNG Online, Private | Stayput',
     description:
-      'Turn PDF pages into high-resolution JPG or PNG images in your browser. Pick the pages and DPI. No upload, no size caps, free.',
+      'Turn PDF pages into high-resolution JPG or PNG images in your browser. Pick the pages and DPI. No upload, free.',
     heading: 'Convert PDF pages to images',
     tagline: 'Export every page, or just some, as JPG or PNG at the resolution you need. Rendered on your device.',
     category: 'pdf',
@@ -684,7 +684,7 @@ export const tools: Tool[] = [
     name: 'Reorder & Delete Pages',
     title: 'Reorder, Rearrange and Delete PDF Pages Online, Private | Stayput',
     description:
-      'Drag PDF pages into a new order, delete the ones you do not need, and save. Runs in your browser: no upload, no size caps, free.',
+      'Drag PDF pages into a new order, delete the ones you do not need, and save. Runs in your browser: no upload, free.',
     heading: 'Reorder and delete PDF pages',
     tagline: 'See every page as a thumbnail, drag them into the order you want, remove the extras. Saved on your device.',
     category: 'pdf',
@@ -764,7 +764,7 @@ export const tools: Tool[] = [
     name: 'Add Page Numbers',
     title: 'Add Page Numbers to a PDF Online, Free and Private | Stayput',
     description:
-      'Stamp page numbers on every page of a PDF. Choose the position, format such as "Page 1 of 10", font and starting number. No upload, works offline.',
+      'Stamp page numbers on every page of a PDF. Choose the position, format such as "Page 1 of 10", font and starting number. No upload, works offline after one visit.',
     heading: 'Add page numbers to a PDF',
     tagline: 'Number every page in the corner or the centre, in the format you want, without sending the document anywhere.',
     category: 'pdf',
@@ -1289,7 +1289,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser plays the video from the file on your device, and the clip is cut by code in this page. There is no server and no watermark, and the page works offline.',
+        a: 'No. Your browser plays the video from the file on your device, and the clip is cut by code in this page. There is no server and no watermark, and the page works offline after one visit.',
       },
       {
         q: 'Why does my clip start a moment early?',
@@ -1697,7 +1697,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound with its own decoders, and the new file is written inside the page: MP3 by LAME compiled to WebAssembly, WAV and FLAC by small encoders in this site’s code, M4A and OGG by the browser’s built-in AAC and Opus encoders. Nothing is sent anywhere, so there is no size cap and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the sound with its own decoders, and the new file is written inside the page: MP3 by LAME compiled to WebAssembly, WAV and FLAC by small encoders in this site’s code, M4A and OGG by the browser’s built-in AAC and Opus encoders. Nothing is sent anywhere, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
       },
       {
         q: 'Which format should I choose?',
@@ -1928,7 +1928,7 @@ export const tools: Tool[] = [
     name: 'Merge audio',
     title: 'Merge Audio Files Online: Join MP3 and WAV, No Upload | Stayput',
     description:
-      'Join two or more audio files into one MP3 or WAV in your browser, in the order you choose, with silence or a crossfade between them. No upload, no size caps.',
+      'Join two or more audio files into one MP3 or WAV in your browser, in the order you choose, with silence or a crossfade between them. No upload.',
     heading: 'Merge audio files',
     tagline: 'Combine songs, voice notes or podcast segments into one file. Done on this device, never uploaded.',
     category: 'media',
@@ -2164,7 +2164,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Nothing is sent anywhere, so there is no size cap and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Nothing is sent anywhere, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
       },
       {
         q: 'How much smaller will it get?',
@@ -2303,7 +2303,7 @@ export const tools: Tool[] = [
     name: 'Extract Images from PDF',
     title: 'Extract Images from PDF at Full Resolution, No Upload | Stayput',
     description:
-      'Save every photo and picture inside a PDF as PNG or JPG, at the resolution it was stored. Runs in your browser: the PDF is not uploaded. Free, no size caps.',
+      'Save every photo and picture inside a PDF as PNG or JPG, at the resolution it was stored. Runs in your browser: the PDF is not uploaded. Free.',
     heading: 'Extract images from a PDF',
     tagline: 'Every picture in the file, at its real size, without screenshots and without uploading the PDF.',
     category: 'pdf',
@@ -2429,7 +2429,7 @@ export const tools: Tool[] = [
     name: 'Metronome',
     title: 'Online Metronome with Tap Tempo, Free, No Ads | Stayput',
     description:
-      'A steady online metronome: 20 to 300 BPM, any time signature, accented downbeat, eighths, triplets and sixteenths, and tap tempo. Works offline.',
+      'A steady online metronome: 20 to 300 BPM, any time signature, accented downbeat, eighths, triplets and sixteenths, and tap tempo. Works offline after one visit.',
     heading: 'Online metronome',
     tagline: 'A steady click at any tempo, with the bar, the subdivisions and tap tempo, running on your device.',
     category: 'media',

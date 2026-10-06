@@ -138,6 +138,27 @@ const downloads: Record<string, Download> = {
   },
 };
 
+/**
+ * Tools whose engine is fetched on first use rather than on page load, so they work offline only
+ * after one run: a model (the `downloads` above), the MP3 encoder, the archive, checksum, noise
+ * and encrypted-PDF engines, and the face finder behind blur-image. tests/offline-badge.spec.ts
+ * checks that a tool importing one of these engines is listed. Everything else is fully cached
+ * on the first visit (pages, scripts and the image decoders).
+ */
+const firstUseEngines = [
+  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-converter', 'compress-audio', 'volume-booster',
+  'pitch-changer', 'remove-silence', 'voice-recorder', 'remove-noise', 'file-checksum',
+  'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image',
+];
+
+/** The offline badge: after the first visit, or, for tools that fetch an engine on first run, after the first use. */
+export function offlineBadge(base: string): string {
+  return base in downloads || firstUseEngines.includes(base) ? 'Works offline after first use' : 'Works offline after first visit';
+}
+
+/** The size badge: a tool's own `sizeFact`, else a watermark claim with the real limit. */
+export const defaultSizeBadge = 'No watermark · limit is your device’s memory';
+
 /** Tools with no file to size-limit; their fact says what is true of them instead. */
 const facts: Record<string, string> = {
   'qr-code-generator': 'The codes are static, so they never expire, and after one visit the page works offline.',
@@ -178,5 +199,7 @@ export function leadFor(tool: Tool, base: string = tool.slug, kind: 'tool' | 'la
   if (!first) throw new Error(`No lead sentence for ${tool.slug}`);
   const dl = downloads[base];
   const third = dl ? (dl.text ?? `The first run downloads the ${dl.what} (about ${dl.size}) to your browser, and after that the tool works offline.`) : (facts[base] ?? (tool.sizeFact && /memory/i.test(tool.sizeFact) ? tool.sizeFact : memory));
-  return [first, free[base] ?? freeFiles, third].join(' ');
+  // Tools that fetch an engine on first run are not offline after the visit alone.
+  const offline = firstUseEngines.includes(base) ? third.replace(/\bafter one visit\b/i, (m) => (m[0] === 'A' ? 'After' : 'after') + ' your first run') : third;
+  return [first, free[base] ?? freeFiles, offline].join(' ');
 }
