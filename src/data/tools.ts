@@ -3740,7 +3740,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this AI?',
-        a: 'No. It is the classic colour dodge technique artists use in Photoshop: a grey copy of the photo is divided by a blurred negative of itself, so flat areas go white and edges stay as strokes. That is why it runs instantly on any device and gives the same result every time.',
+        a: 'No. It is the classic colour dodge technique artists use in Photoshop: a grey copy of the photo is divided by a blurred negative of itself, so flat areas go white and edges stay as strokes. That is why it runs quickly, even on older devices, and gives the same result every time.',
       },
       {
         q: 'Can I print the sketch?',
