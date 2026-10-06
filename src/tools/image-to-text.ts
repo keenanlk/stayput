@@ -18,7 +18,7 @@ createShell({
             ? progress.set(`Loading the text reader (one time, about 6 MB): ${Math.round(f * 100)}%`, share(0.05))
             : progress.set(`Reading the text in ${entry.file.name}…`, share(0.3)),
         );
-        if (!result.text) throw new Error('No text was found in this image. Try a sharper photo, taken straight on, with the text filling more of the frame.');
+        if (!result.text) throw new Error('No clear text found. This works best on screenshots, scans and photos where the text fills most of the frame; try cropping to the text.');
         const text = join ? unwrap(result.text) : result.text;
         const words = text.split(/\s+/).filter(Boolean).length;
         const out: OutputFile = {
