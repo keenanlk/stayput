@@ -285,7 +285,7 @@ export const engines: Record<string, Engine> = {
   },
   'pdf-to-epub': {
     how: 'pdf.js (Apache-2.0) reads the positioned text of every page in your tab. The same rebuilding as PDF to Word groups it into lines and paragraphs and spots headings by their size. Text that sits at the top or bottom of many pages and differs only in its numbers is treated as a running header or footer and dropped, bare page numbers too, and a paragraph that stops mid-sentence at a page break is joined to its continuation. The main headings start chapters. Each chapter is written as XHTML with a small stylesheet, with an EPUB 3 navigation file and an NCX contents list for older readers, and fflate (MIT) zips them with the uncompressed mimetype first, as the EPUB specification requires.',
-    versus: 'Online converters upload the PDF and often queue it on a server; some email you the result. Here the PDF stays on your device and the book is ready in seconds,.',
+    versus: 'Online converters upload the PDF and often queue it on a server; some email you the result. Here the PDF stays on your device and the book is ready in seconds.',
   },
   'archive-extractor': {
     how: 'libarchive (BSD-2-Clause), the archive library behind bsdtar, compiled to WebAssembly by libarchive.js (MIT), runs in a background worker in your tab. It detects the format from the file itself, opens password-protected ZIP files when you give the password, and hands back each file. The worker and its WebAssembly, about 1 MB, are served from this site the first time you extract something, then cached. Downloading everything packs the files into one plain ZIP with fflate (MIT), keeping the folders.',
