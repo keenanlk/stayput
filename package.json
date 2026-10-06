@@ -14,6 +14,7 @@
     "dev": "astro dev",
     "build": "astro build && node scripts/postbuild.mjs",
     "check-links": "node scripts/check-links.mjs",
+    "live-caption-matrix": "node scripts/live-caption-matrix.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "playwright test",
