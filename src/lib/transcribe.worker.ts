@@ -21,6 +21,41 @@ export type Reply =
 env.allowRemoteModels = false;
 env.allowLocalModels = true;
 env.localModelPath = '/models/';
+// The model is fetched through here, so each file travels once and is kept once:
+//  - transformers.js keeps it in its Cache API store and nothing else does (the service worker
+//    leaves /models/whisper-base/ alone), so the browser's HTTP cache is skipped. Its write is
+//    a third copy of the same 76 MB made while the download streams in, and where it fails
+//    (net::ERR_CACHE_WRITE_FAILURE) the fetch fails with it.
+//  - Download progress is counted here, on the response body. Giving transformers.js a progress
+//    callback makes it first read each file's size from a plain GET of the same URL, dropping
+//    that body unread: a second 76 MB download in flight beside the real one.
+//  - The store is the same Cache API cache as before, behind a wrapper that swallows every
+//    failure (cannot open, cannot read, cannot write, storage full). A model that cannot be
+//    kept is still used for this run, straight from the network response.
+const fetchOnce = env.fetch;
+let download: { sizes: Map<string, [number, number]>; report: () => void } | undefined;
+env.fetch = async (input, init) => {
+  const res = (await fetchOnce(input, { ...init, cache: 'no-store' })) as Response;
+  const url = String(input);
+  const total = Number(res.headers.get('content-length'));
+  if (!download || !res.ok || !res.body || !/\.onnx$/.test(url) || !total) return res;
+  const { sizes, report } = download;
+  sizes.set(url, [0, total]);
+  const count = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, out) {
+      sizes.set(url, [sizes.get(url)![0] + chunk.byteLength, total]);
+      report();
+      out.enqueue(chunk);
+    },
+  });
+  return new Response(res.body.pipeThrough(count), { status: res.status, statusText: res.statusText, headers: res.headers });
+};
+const store = (): Promise<Cache | undefined> => (typeof caches === 'undefined' ? Promise.resolve(undefined) : caches.open(env.cacheKey).catch(() => undefined));
+env.useCustomCache = true;
+env.customCache = {
+  match: async (key) => (await store().then((c) => c?.match(key)).catch(() => undefined)) ?? undefined,
+  put: async (key, response) => void (await store().then((c) => c?.put(key, response)).catch(() => undefined)),
+};
 const wasm = env.backends.onnx.wasm!;
 wasm.wasmPaths = vendorDir('ort');
 // Threads need a cross-origin-isolated page, which this site is not.
@@ -32,12 +67,9 @@ const post = (msg: Reply) => (self as unknown as Worker).postMessage(msg);
 function start(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
   // The two model files make up nearly all of the download; report them together.
   const sizes = new Map<string, [number, number]>();
-  asr ??= pipeline('automatic-speech-recognition', MODEL, {
-    dtype: 'q8',
-    device: 'wasm',
-    progress_callback: (p: { status: string; file?: string; loaded?: number; total?: number }) => {
-      if (p.status !== 'progress' || !p.file || !p.total) return;
-      sizes.set(p.file, [p.loaded ?? 0, p.total]);
+  download = {
+    sizes,
+    report() {
       let got = 0;
       let all = 0;
       for (const [l, t] of sizes.values()) {
@@ -46,21 +78,21 @@ function start(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
       }
       post({ id, type: 'loading', fraction: all ? got / all : 0 });
     },
-  }) as Promise<AutomaticSpeechRecognitionPipeline>;
+  };
+  asr ??= pipeline('automatic-speech-recognition', MODEL, { dtype: 'q8', device: 'wasm' }) as Promise<AutomaticSpeechRecognitionPipeline>;
   // A failed load (offline on first use, say) may be retried by the next request.
   asr.catch(() => (asr = undefined));
   return asr;
 }
 
-/** Load the model; when the browser's storage is full, once more without caching it, and a dropped connection once more too. */
+/** Load the model; a dropped connection gets one more try. */
 async function load(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
   for (let attempt = 0; ; attempt++) {
     try {
       return await start(id);
     } catch (err) {
       if (attempt >= 1) throw err;
-      if ((err as { name?: string })?.name === 'QuotaExceededError') env.useBrowserCache = false;
-      else if (!looksLikeNetwork(err)) throw err;
+      if (!looksLikeNetwork(err)) throw err;
     }
   }
 }

@@ -105,6 +105,8 @@ self.addEventListener('message', (event) => {
   );
 });
 
+// The speech model files belong to transformers.js, which stores them itself.
+const isOwnedElsewhere = (url) => url.pathname.startsWith('/models/whisper-base/');
 const isImmutable = (url) =>
   url.origin === self.location.origin && (url.pathname.startsWith('/_astro/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/vendor/') || url.pathname.startsWith('/models/'));
 
@@ -112,13 +114,16 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  // Not answered here at all, so the browser makes the one request itself.
+  if (url.origin === self.location.origin && isOwnedElsewhere(url)) return;
   if (isImmutable(url)) {
     event.respondWith(
       caches.open(ASSET_CACHE).then(async (cache) => {
         const hit = await cache.match(req);
         if (hit) return hit;
         const res = await fetch(req);
-        if (res.ok) cache.put(req, res.clone());
+        // A failed write only means no offline copy; the response still goes to the page.
+        if (res.ok) event.waitUntil(cache.put(req, res.clone()).catch(() => {}));
         return res;
       }),
     );
