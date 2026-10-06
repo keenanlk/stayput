@@ -7,6 +7,7 @@ import Base from '../layouts/Base.astro';
     <p>The short version: your files never leave your device, and we do not know who you are.</p>
     <h2>Your files</h2>
     <p>Every tool on this site processes files inside your browser. Files are read from your disk into memory, converted there, and offered back to you as a download. No file, file name or file content is ever transmitted to Stayput or to anyone else. You can verify this with your browser's network inspector, or by loading a tool, disconnecting from the internet and using it. Every tool page also counts the requests it makes after you add files and shows you the list.</p>
+    <p>The microphone and camera tools (mic test, voice recorder, tuner, webcam test, and the screen recorder when you turn its microphone on) ask your browser for access, and the sound or picture is handled inside the page in your tab: it is never sent to a server, and a recording is kept in memory until you save it.</p>
     <h2>What the site loads</h2>
     <ul>
       <li>The pages, scripts and styles of this site, served from our host (Vercel).</li>
@@ -14,6 +15,7 @@ import Base from '../layouts/Base.astro';
       <li>A small usage-counting script from our own self-hosted <a href="https://umami.is" rel="noopener">Umami</a> instance, described below.</li>
     </ul>
     <p>That is the complete list. There are no advertising scripts, no fonts from third parties and no cookies.</p>
+    <p>The tools that cut a person out of a video (blur video background, green screen video and video background remover) use Google's open-source MediaPipe library, served from this site. After a few runs it tries to send a usage ping to Google, and the site's security policy blocks that request, so nothing reaches Google.</p>
     <h2>Usage counting</h2>
     <p>To know whether Stayput is useful, we count page views and a few anonymous events with Umami, an open-source analytics tool we host ourselves. It sets no cookies and stores nothing in your browser, and it does not follow you across sites. (The one small note the site itself keeps in your browser is described below; it never leaves your device as-is.) Our server does group the events of one browser into a session, described under "What the stats server can see" below. If your browser sends a Do Not Track or Global Privacy Control signal, nothing is recorded at all.</p>
     <p>Every event, page views included, carries the site's address (stayput.dev) and the path of the page it happened on, such as "/tools/strip-exif". It never carries the query string or fragment of the address, the page title, your screen size, your browser language or the address of the page you came from. The details below are added for the events that have them:</p>
@@ -36,6 +38,6 @@ import Base from '../layouts/Base.astro';
     <p>To work offline, the site asks your browser to cache its own pages and scripts using a service worker. This cache contains only the site's code, never your files. You can clear it at any time from your browser's site settings.</p>
     <h2>Open source</h2>
     <p>The full source code is at <a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>, so anyone can confirm the above.</p>
-    <p class="muted small">Last updated October 3, 2026.</p>
+    <p class="muted small">Last updated October 6, 2026.</p>
   </article>
 </Base>

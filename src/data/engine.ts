@@ -12,7 +12,7 @@ export interface Engine {
 
 export const engines: Record<string, Engine> = {
   'heic-to-jpg': {
-    how: 'The page loads libheif, the same open-source HEIC decoder used by Linux desktops, compiled to WebAssembly. It decodes each photo to raw pixels inside your tab, and the browser’s own image encoder writes the JPG or PNG. The decoder is fetched once as a program file from a CDN and cached; your photos are never part of any request.',
+    how: 'The page loads libheif, the same open-source HEIC decoder used by Linux desktops, compiled to WebAssembly. It decodes each photo to raw pixels inside your tab, and the browser’s own image encoder writes the JPG or PNG. The decoder is a program file served from this site, downloaded once and cached; your photos are never part of any request.',
     versus: 'Upload-based HEIC converters send every photo, location data included, to a server you have never heard of, then cap you at a handful per day. Here a hundred photos convert in the time the first one would take to upload.',
   },
   'convert-image': {
@@ -181,7 +181,7 @@ export const engines: Record<string, Engine> = {
   },
   'merge-audio': {
     how: 'Your browser’s own audio decoders read each file (MP3, AAC in M4A or MP4, Opus or Vorbis, FLAC, WAV) into plain samples at 44.1 kHz in your tab. The sounds are laid end to end, with equal-power crossfades if you chose them, and written once as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
-    versus: 'Online audio joiners upload every file, cap free use at a few files or a few minutes, and keep the uploads on their servers. Here the files never leave your device, and there is no limit on how many you join.',
+    versus: 'Online audio joiners upload every file, cap free use at a few files or a few minutes, and keep the uploads on their servers. Here the files never leave your device, and your device’s memory is the only limit on how many you join.',
   },
   'mic-test': {
     how: 'Your browser opens the microphone (getUserMedia) with its own clean-up turned off, and the Web Audio API measures the level of each moment of sound in your tab. The play-back check is recorded by the browser’s built-in recorder into memory and played straight back.',
@@ -253,7 +253,7 @@ export const engines: Record<string, Engine> = {
   },
   'resize-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab. Each page gets the new paper size, turned to match the page as it is shown, and its existing content is wrapped in a single transform that scales it to fit inside the margin and centres it, with a clip at the old page edge. Nothing is redrawn or rasterised, so text, vector drawings and images are unchanged. Links, form fields and comments are moved and scaled by the same amount.',
-    versus: 'Online resizers upload the PDF, and many rasterise the pages or cap free use. Here the document stays on your device, the text stays real text, and there is no limit on pages or files.',
+    versus: 'Online resizers upload the PDF, and many rasterise the pages or cap free use. Here the document stays on your device, the text stays real text, and the only limit is your device’s memory.',
   },
   'transcribe': {
     how: 'Your browser’s own decoders read the sound, from an audio file or a video’s soundtrack, and it is resampled to 16 kHz mono in the tab. The recording is cut at pauses into pieces of up to 28 seconds, and each piece goes to OpenAI’s Whisper base model (MIT), 8-bit ONNX weights run by transformers.js (Apache-2.0) and onnxruntime-web (MIT) in a background worker. The model, 76 MB, is downloaded from this site on first use and cached. Its timed segments become paragraphs, SRT or WebVTT.',
@@ -265,7 +265,7 @@ export const engines: Record<string, Engine> = {
   },
   'vocal-remover': {
     how: 'Your browser’s own decoders read the song, from an audio file or a video’s soundtrack, at 44.1 kHz stereo. It is cut into pieces of about six seconds, and each piece becomes a spectrogram (a short-time Fourier transform with a 6144-point window, as the model was trained with). UVR-MDX-NET Inst HQ 3, an MDX-Net model from the Ultimate Vocal Remover project (MIT), predicts the spectrogram of the music without the voice; it runs through onnxruntime-web (MIT) on the graphics chip with WebGPU where the browser has it, or on the CPU with WebAssembly. The answer is turned back into sound, and the vocals are the song minus the music.',
-    versus: 'Online vocal removers upload the whole song, queue it, cap free minutes or songs per day, and ask for an account to download WAV. Here the song never leaves your device, there is no limit, and the model works offline after the first run.',
+    versus: 'Online vocal removers upload the whole song, queue it, cap free minutes or songs per day, and ask for an account to download WAV. Here the song never leaves your device, the only limit is your device’s memory, and the model works offline after the first run.',
   },
   'video-background-remover': {
     how: 'Mediabunny (MPL-2.0) decodes the video in your tab. Each frame is scaled down and given to Google’s MediaPipe selfie multiclass segmenter (Apache-2.0), a 16 MB model that rates every pixel as background, hair, skin or clothing, running in WebAssembly. The person’s outline is softened at the edge and averaged with the previous frame so it does not flicker, the background is blurred or replaced with your colour or picture, and your browser’s own encoder (WebCodecs) writes the new MP4, with the sound copied across.',
@@ -285,7 +285,7 @@ export const engines: Record<string, Engine> = {
   },
   'pdf-to-epub': {
     how: 'pdf.js (Apache-2.0) reads the positioned text of every page in your tab. The same rebuilding as PDF to Word groups it into lines and paragraphs and spots headings by their size. Text that sits at the top or bottom of many pages and differs only in its numbers is treated as a running header or footer and dropped, bare page numbers too, and a paragraph that stops mid-sentence at a page break is joined to its continuation. The main headings start chapters. Each chapter is written as XHTML with a small stylesheet, with an EPUB 3 navigation file and an NCX contents list for older readers, and fflate (MIT) zips them with the uncompressed mimetype first, as the EPUB specification requires.',
-    versus: 'Online converters upload the PDF and often queue it on a server; some email you the result. Here the PDF stays on your device and the book is ready in seconds, with no size limit.',
+    versus: 'Online converters upload the PDF and often queue it on a server; some email you the result. Here the PDF stays on your device and the book is ready in seconds,.',
   },
   'archive-extractor': {
     how: 'libarchive (BSD-2-Clause), the archive library behind bsdtar, compiled to WebAssembly by libarchive.js (MIT), runs in a background worker in your tab. It detects the format from the file itself, opens password-protected ZIP files when you give the password, and hands back each file. The worker and its WebAssembly, about 1 MB, are served from this site the first time you extract something, then cached. Downloading everything packs the files into one plain ZIP with fflate (MIT), keeping the folders.',
@@ -321,7 +321,7 @@ export const engines: Record<string, Engine> = {
   },
   'watermark-image': {
     how: 'Your browser decodes each photo (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab at full size. The text is drawn on top with your device’s own fonts at the chosen opacity, sized to the photo’s shorter side so the same setting looks alike on every photo, and the canvas is saved as JPG, PNG or WebP by the browser’s own encoder.',
-    versus: 'Watermark sites and apps upload the photos you most want to protect, the unpublished ones, and several add their own branding on the free tier. Here the photos never leave your device, and there is no limit on how many you do at once.',
+    versus: 'Watermark sites and apps upload the photos you most want to protect, the unpublished ones, and several add their own branding on the free tier. Here the photos never leave your device, and the only limit on how many you do at once is your device’s memory.',
   },
   'watermark-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab. For each page size, the watermark is drawn once on a transparent canvas at about 216 dpi and embedded as a PNG, then placed over every page of that size, following each page’s crop box and rotation. The original page content is not rewritten, so text, links and forms are untouched.',
@@ -345,7 +345,7 @@ export const engines: Record<string, Engine> = {
   },
   'black-and-white-image': {
     how: 'Your browser decodes each image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab. Each pixel’s brightness is computed with the Rec. 709 weights, the way the eye weighs red, green and blue. High contrast stretches the tones to the full range; pure black and white picks the split point with Otsu’s method, which finds the threshold that best separates ink from paper. The browser then saves the canvas as JPG, PNG or WebP.',
-    versus: 'Photo filter sites upload your pictures to apply a filter a phone could do offline, and many add a watermark or keep the images. Here the photos stay on your device, there is no limit on how many you convert at once, and the result is not recompressed more than once.',
+    versus: 'Photo filter sites upload your pictures to apply a filter a phone could do offline, and many add a watermark or keep the images. Here the photos stay on your device, the only limit on how many you convert at once is your device’s memory, and the result is not recompressed more than once.',
   },
   'grayscale-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab and draws one neutral grey rectangle over each page with the PDF Saturation blend mode. Blending keeps the brightness of whatever is underneath and takes the grey’s zero saturation, so every colour, in text, drawings and photos alike, turns into its own shade of grey. Nothing on the page is rewritten or re-rendered, so text stays text. For the same reason the original colour data is still in the file: the page looks and prints grey, but a check that inspects colour spaces may still detect colour.',

@@ -1737,7 +1737,7 @@ export const guides: Guide[] = [
       {
         h: 'When you need more control',
         p: [
-          'Stayput\'s [merge PDF](/tools/merge-pdf) tool lets you drag files into the exact order you want, see thumbnails of every page, and remove any you do not need, before merging, all in your phone\'s browser. There is no size limit, and the files are combined locally rather than uploaded anywhere, which matters for something like a signed lease or a set of ID documents.',
+          'Stayput\'s [merge PDF](/tools/merge-pdf) tool lets you drag files into the exact order you want, see thumbnails of every page, and remove any you do not need, before merging, all in your phone\'s browser. The tool sets no size limit, but your phone’s memory does, and the files are combined locally rather than uploaded anywhere, which matters for something like a signed lease or a set of ID documents.',
         ],
       },
     ],
@@ -2745,7 +2745,7 @@ export const guides: Guide[] = [
       {
         h: 'Where Smallpdf still has the edge',
         p: [
-          'Smallpdf\'s OCR-heavy conversions, its e-signature workflow with audit trails for legally binding signatures, team workspaces and some Office document conversions go beyond what a browser can currently do unassisted. If you need those specifically, Smallpdf (or its desktop app, which also avoids uploading) remains the more complete tool. For the everyday jobs above, a local tool with no limit is usually the simpler choice.',
+          'Smallpdf\'s OCR-heavy conversions, its e-signature workflow with audit trails for legally binding signatures, team workspaces and some Office document conversions go beyond what a browser can currently do unassisted. If you need those specifically, Smallpdf (or its desktop app, which also avoids uploading) remains the more complete tool. For the everyday jobs above, a local tool with no daily cap is usually the simpler choice.',
         ],
       },
     ],
@@ -2838,7 +2838,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Why does CloudConvert\'s free plan run out at different times for different files?', a: 'Because its free tier is measured in conversion minutes rather than a file count, so a longer or more complex conversion uses up more of the daily allowance than a quick one.' },
       { q: 'Is there a free alternative to CloudConvert with no minute limit?', a: 'Yes, for common formats. A browser-based converter processes the file on your device, so there is no server time being metered against a daily budget.' },
-      { q: 'Does a browser converter support as many formats as CloudConvert?', a: 'No, CloudConvert supports far more formats, including many document, e-book and professional media formats a browser cannot decode; for common image, audio and video formats, a browser tool covers the same ground with no limit.' },
+      { q: 'Does a browser converter support as many formats as CloudConvert?', a: 'No, CloudConvert supports far more formats, including many document, e-book and professional media formats a browser cannot decode; for common image, audio and video formats, a browser tool covers the same ground with no daily cap.' },
       { q: 'Can I convert files without uploading them at all?', a: 'Yes, for formats the browser itself can read and write. Stayput\'s converters process the file on your device, and you can confirm it by switching on airplane mode after the page loads.' },
     ],
   },
@@ -2924,7 +2924,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Is there a free Convertio alternative with no file size limit?', a: 'Yes, for formats a browser can already handle. A tool that converts locally has no server-side size tier to enforce, so the practical limit is only what your device can process.' },
       { q: 'How many free conversions does Convertio allow per day?', a: 'Its free plan, as of when this page was checked, allowed around 10 conversions a day, with paid tiers raising that count and the 100MB file size cap.' },
-      { q: 'Does a browser converter support as many formats as Convertio?', a: 'No, Convertio covers many more file types, particularly documents, e-books and archives; for common image, audio and video formats, a browser tool matches it with no limit.' },
+      { q: 'Does a browser converter support as many formats as Convertio?', a: 'No, Convertio covers many more file types, particularly documents, e-books and archives; for common image, audio and video formats, a browser tool matches it with no daily cap.' },
       { q: 'Can I convert a large file without hitting a size cap?', a: 'For formats the browser can decode locally, size is limited only by your device\'s memory, not a fixed plan tier the way an upload-based converter enforces.' },
     ],
   },
