@@ -20,6 +20,7 @@ import {
   QUALITY_LOW,
   QUALITY_MEDIUM,
   getFirstEncodableAudioCodec,
+  type InputAudioTrack,
   type Quality,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
@@ -73,6 +74,13 @@ function fit(w: number, h: number, short: number): { width: number; height: numb
   return { width: even(w * scale), height: even(h * scale) };
 }
 
+/** Bits per second a copied sound track really takes, measured from its first packets. */
+async function copiedSoundBitrate(track: InputAudioTrack): Promise<number> {
+  const stats = await track.computePacketStats(500).catch(() => null);
+  if (stats && stats.averageBitrate > 0) return Math.ceil(stats.averageBitrate);
+  return (await track.getAverageBitrate().catch(() => null)) ?? 128_000;
+}
+
 export async function compressVideo(file: File, opts: CompressOptions): Promise<CompressResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
@@ -82,6 +90,11 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     const soundOk = sound ? await sound.canDecode() : false;
     const duration = await input.computeDuration();
+    // Where the browser cannot re-encode (or cannot decode) the sound, as iPhone Safari cannot
+    // for a .mov, the sound's own packets are copied across untouched instead of being left out.
+    const canEncodeSound =
+      !!sound && (await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: 128_000 })) !== null;
+    const copySound = !!sound && !(soundOk && canEncodeSound) && !!sound.codec && new Mp4OutputFormat().getSupportedAudioCodecs().includes(sound.codec);
     if (!(duration > 0)) throw new Error('This video has no length to compress.');
     const srcW = video.displayWidth;
     const srcH = video.displayHeight;
@@ -93,7 +106,9 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       const target = (opts.targetMB ?? 10) * 1e6;
       // Leave room for the container and for encoders that overshoot a little.
       const total = (target * 8 * 0.9) / duration;
-      const audioBits = sound && soundOk ? (total > 1_500_000 ? 128_000 : total > 600_000 ? 96_000 : 64_000) : 0;
+      const audioBits = copySound
+        ? await copiedSoundBitrate(sound!)
+        : sound && soundOk ? (total > 1_500_000 ? 128_000 : total > 600_000 ? 96_000 : 64_000) : 0;
       const bits = Math.floor(total - audioBits);
       audioBitrate = audioBits;
       videoBitrate = bits;
@@ -113,7 +128,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
     const videoCodec = await pickVideoCodec({ width, height, bitrate: videoBitrate });
     if (!videoCodec) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const audioCodec =
-      sound && soundOk
+      sound && soundOk && !copySound
         ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: audioBitrate })
         : null;
 
@@ -135,7 +150,9 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
           // Bake a phone's rotation into the pixels so every player shows it upright.
           allowTransformationMetadata: false,
         },
-        audio: audioCodec
+        audio: copySound
+          ? {}
+          : audioCodec
           ? { codec: audioCodec, bitrate: audioBitrate, numberOfChannels: Math.min(2, sound!.numberOfChannels), sampleRate: audioRate, forceTranscode: opts.mode === 'size' }
           : { discard: true },
       });
@@ -183,8 +200,8 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       height,
       duration,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
-      audio: !!audioCodec,
-      audioDropped: !!sound && !audioCodec,
+      audio: !!audioCodec || copySound,
+      audioDropped: !!sound && !audioCodec && !copySound,
     };
   } finally {
     input.dispose?.();
