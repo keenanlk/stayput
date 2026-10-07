@@ -33,6 +33,19 @@ test('burned-in captions finish here and give a playable mp4', async ({ page }, 
   info.annotations.push({ type: 'browser', description: info.project.name });
 });
 
+// iPhone camera files are QuickTime .mov, which iPhone Safari's decodeAudioData refuses whole; the sound is read through the demuxer instead.
+test('captions are written from the speech in a QuickTime .mov, where Safari cannot decode the file whole', async ({ page }, info) => {
+  // CI's Chromium cannot decode AAC at all, so this one is for WebKit (and a desktop Chrome with AAC).
+  test.skip(info.project.name !== 'webkit', 'AAC sound is decoded in WebKit only here');
+  test.setTimeout(180_000);
+  await open(page);
+  await page.locator('#file-input').setInputFiles(fileURLToPath(new URL('./fixtures/static/speech.mov', import.meta.url)));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 150_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  await expect(page.locator('#results-list')).toContainText(/written from English speech/);
+});
+
 test('an encoder that never answers is caught at once, with a plain message and a link, before any transcribing', async ({ page }) => {
   await page.addInitScript(() => {
     const Real = window.VideoEncoder;

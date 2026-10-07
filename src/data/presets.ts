@@ -4500,6 +4500,7 @@ export const presets: Preset[] = [
     lead:
       'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB), and after that it works offline; the longest video you can caption depends on your device’s memory.',
     base: 'add-subtitles-to-video',
+    sizeFact: 'No watermark. On a phone, up to about 200 MB (2 minutes of iPhone video)',
     name: 'Auto caption video',
     title: 'Auto Caption Video Free: Captions Burned In, No Upload | Stayput',
     description: 'Automatic captions for Reels, TikTok and Shorts, written from the speech by Whisper on your device and burned into the video. Large text, no watermark, no upload.',

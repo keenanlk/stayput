@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Download, type Locator } from '@playwright/test';
-import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync, mkdirSync, truncateSync } from 'node:fs';
 import { execSync, execFileSync } from 'node:child_process';
 import { deflateSync } from 'node:zlib';
 import { join } from 'node:path';
@@ -6058,6 +6058,34 @@ test('Add subtitles to video writes captions from the speech and can save them a
   expect(frame.bottom).toBe(0);
   net.assertNothingLeft(['speech.webm']);
   expect(errors).toEqual([]);
+});
+
+test('Auto caption video warns before a too-big video runs on a phone, and says nothing on a computer', async ({ browser }) => {
+  const big = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'long.mp4');
+  writeFileSync(big, '');
+  truncateSync(big, 201_000_000);
+  const small = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'short.mp4');
+  writeFileSync(small, Buffer.alloc(1_000_000));
+  const phone = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1' });
+  const p = await phone.newPage();
+  await p.goto('/auto-caption-video');
+  await expect(p.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(p.getByText('On a phone, up to about 200 MB').first()).toBeVisible();
+  await p.locator('#file-input').setInputFiles(big);
+  await expect(p.locator('#run-hint')).toBeVisible();
+  await expect(p.locator('#run-hint')).toContainText('about 200 MB');
+  await p.locator('#clear').click();
+  await p.locator('#file-input').setInputFiles(small);
+  await expect(p.locator('#run-hint')).toBeHidden();
+  await phone.close();
+  const desktop = await browser.newContext();
+  const d = await desktop.newPage();
+  await d.goto('/auto-caption-video');
+  await expect(d.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await d.locator('#file-input').setInputFiles(big);
+  await expect(d.locator('#run')).toBeVisible();
+  await expect(d.locator('#run-hint')).toBeHidden();
+  await desktop.close();
 });
 
 /** A 400×300 PNG: a smooth blue-to-green gradient with a red 60×60 square in the middle. */

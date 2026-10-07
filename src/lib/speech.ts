@@ -52,6 +52,12 @@ function recognise(audio: Float32Array, language: string | null, task: Request['
 
 let modelReady = false;
 
+/** Stop the speech worker and give back the memory its model holds (about 0.7 GB), for work that follows on a phone. The next run starts it again from the stored model. */
+export function releaseSpeechModel() {
+  worker?.terminate();
+  worker = undefined;
+}
+
 export interface Speech {
   segments: Segment[];
   /** Language code Whisper heard (or was told), like "en". */
