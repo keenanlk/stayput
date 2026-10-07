@@ -143,6 +143,31 @@ test('Compress video keeps an iPhone-style .mov\'s sound where the browser has n
   }
 });
 
+test('Merge videos keeps the sound of two iPhone-style .mov clips where the browser has no audio encoder or decoder (iOS 18.4)', async ({ page, browserName }) => {
+  test.skip(browserName !== 'webkit', 'only WebKit decodes AAC in the page in every CI image');
+  test.setTimeout(240_000);
+  await page.addInitScript(() => {
+    delete (window as { AudioEncoder?: unknown }).AudioEncoder;
+    delete (window as { AudioDecoder?: unknown }).AudioDecoder;
+  });
+  await open(page, '/tools/merge-videos');
+  await page.locator('#file-input').setInputFiles([phoneMov, phoneMov]);
+  const bytes = await runOnce(page);
+  await expectPlayableMp4(page, bytes);
+  const r = await page.evaluate(async (data) => {
+    const buf = await new AudioContext().decodeAudioData(new Uint8Array(data).buffer);
+    const pcm = buf.getChannelData(0);
+    // Peak in each half: both clips must carry their tone.
+    const half = pcm.length >> 1;
+    const peak = (a: number, b: number) => pcm.subarray(a, b).reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+    return { seconds: buf.duration, channels: buf.numberOfChannels, first: peak(0, half), second: peak(half, pcm.length) };
+  }, [...bytes]);
+  expect(r.channels).toBe(2);
+  expect(r.seconds).toBeGreaterThan(7.5);
+  expect(r.first).toBeGreaterThan(0.05);
+  expect(r.second).toBeGreaterThan(0.05);
+});
+
 test('Compress video gives a playable mp4, twice on the same page', async ({ page }) => {
   test.setTimeout(240_000);
   await open(page, '/tools/compress-video');

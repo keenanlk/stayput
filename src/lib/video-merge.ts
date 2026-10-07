@@ -10,6 +10,7 @@ import {
   AudioSampleSource,
   BlobSource,
   BufferTarget,
+  EncodedAudioPacketSource,
   EncodedPacketSink,
   Input,
   MATROSKA,
@@ -23,6 +24,7 @@ import {
   VideoSampleSource,
   WEBM,
   getFirstEncodableAudioCodec,
+  type InputAudioTrack,
   type InputVideoTrack,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
@@ -55,6 +57,32 @@ async function pictureLength(track: InputVideoTrack): Promise<{ first: number; l
   return { first, length: Math.max(0, end - first) };
 }
 
+/**
+ * The sound track of every clip, when they can be joined by copying packets: this browser
+ * has no audio encoder, and every clip has AAC with the same sample rate and channel count.
+ */
+async function copyableSound(inputs: Input[]): Promise<InputAudioTrack[] | null> {
+  const tracks = await Promise.all(inputs.map((i) => i.getPrimaryAudioTrack().catch(() => null)));
+  if (!tracks.some(Boolean)) return null;
+  if (await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH })) return null;
+  const all = tracks.filter((t): t is InputAudioTrack => !!t);
+  if (all.length !== tracks.length || !all.every((t) => t.codec === 'aac')) return null;
+  const [rate, channels] = await Promise.all([all[0]!.getSampleRate(), all[0]!.getNumberOfChannels()]);
+  for (const t of all) if ((await t.getSampleRate()) !== rate || (await t.getNumberOfChannels()) !== channels) return null;
+  return all;
+}
+
+/** Copy one clip's sound packets into the merged track, shifted to where the clip starts and cut where its picture ends. */
+async function copyClipSound(target: EncodedAudioPacketSource, track: InputAudioTrack, clip: { first: number; length: number }, offset: number) {
+  const meta = { decoderConfig: (await track.getDecoderConfig()) ?? undefined };
+  for await (const p of new EncodedPacketSink(track).packets()) {
+    const t = p.timestamp - clip.first;
+    if (t < 0) continue;
+    if (t >= clip.length) break;
+    await target.add(p.clone({ timestamp: offset + t }), meta);
+  }
+}
+
 export async function mergeVideos(files: File[], opts: MergeOptions): Promise<MergeResult> {
   if (files.length < 2) throw new Error('Add at least two videos to join.');
   const inputs = files.map((f) => new Input({ source: new BlobSource(f), formats: [MP4, QTFF, WEBM, MATROSKA] }));
@@ -72,9 +100,13 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
     const videoCodec = await pickVideoCodec({ width, height, bitrate: QUALITY_HIGH });
     if (!videoCodec) throw new Error('This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
+    // Where the browser cannot encode sound (iPhone Safari) but every clip carries the same
+    // AAC, the clips' own packets are laid end to end instead, with no decoding or encoding.
+    const copy = opts.mute ? null : await copyableSound(inputs);
+
     // The sound of every clip, end to end, each padded or cut to its picture's length.
     let sound: Float32Array[] | null = null;
-    if (!opts.mute) {
+    if (!opts.mute && !copy) {
       const parts = await Promise.all(files.map(async (f, i) => ((await inputs[i]!.getPrimaryAudioTrack()) ? decodePcm(f) : null)));
       if (parts.some(Boolean)) {
         const len = Math.round(total * SAMPLE_RATE);
@@ -98,6 +130,8 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
     output.addVideoTrack(videoSource, { frameRate: MAX_FPS });
     const audioSource = audioCodec ? new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH }) : null;
     if (audioSource) output.addAudioTrack(audioSource);
+    const packetSource = copy ? new EncodedAudioPacketSource('aac') : null;
+    if (packetSource) output.addAudioTrack(packetSource);
     await output.start();
     const feed = pcmFeeder(audioSource, audioSource ? sound : null);
 
@@ -130,11 +164,13 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
             frame.close();
             report(Math.min(0.99, t / Math.max(0.001, total)));
           }
+          if (packetSource) await copyClipSound(packetSource, copy![clips.indexOf(clip)]!, clip, offset);
           offset += clip.length;
         }
         await feed.until(Infinity);
         videoSource.close();
         audioSource?.close();
+        packetSource?.close();
         await output.finalize();
       },
       () => output.cancel(),
@@ -148,7 +184,7 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
       height,
       duration: total,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
-      audio: !!audioSource,
+      audio: !!audioSource || !!packetSource,
     };
   } finally {
     for (const input of inputs) input.dispose?.();
