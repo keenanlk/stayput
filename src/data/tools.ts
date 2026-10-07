@@ -436,7 +436,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my document uploaded?',
-        a: 'No. Splitting happens in your browser with pdf-lib. Nothing is sent anywhere.',
+        a: 'No. Splitting happens in your browser with pdf-lib. Your files are not uploaded.',
       },
     ],
   },
@@ -743,7 +743,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my document or signature stored anywhere?',
-        a: 'No. The PDF, your signature drawing and the signed result exist only in this browser tab. Nothing is sent to a server, and nothing is kept once you close or reload the page.',
+        a: 'No. The PDF, your signature drawing and the signed result exist only in this browser tab. Your files are not uploaded, and nothing is kept once you close or reload the page.',
       },
       {
         q: 'Can I sign several pages?',
@@ -1697,7 +1697,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound with its own decoders, and the new file is written inside the page: MP3 by LAME compiled to WebAssembly, WAV and FLAC by small encoders in this site’s code, M4A and OGG by the browser’s built-in AAC and Opus encoders. Nothing is sent anywhere, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
+        a: 'No. Your browser decodes the sound with its own decoders, and the new file is written inside the page: MP3 by LAME compiled to WebAssembly, WAV and FLAC by small encoders in this site’s code, M4A and OGG by the browser’s built-in AAC and Opus encoders. Your files are not uploaded, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
       },
       {
         q: 'Which format should I choose?',
@@ -1743,7 +1743,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my Wi-Fi password sent anywhere?',
-        a: 'No. The code is built by code in this page from what you type, and nothing is sent to a server, not even a usage count of what you typed. After one visit you can turn off your internet connection and it still works.',
+        a: 'No. The code is built by code in this page from what you type, and what you type is never uploaded. After one visit you can turn off your internet connection and it still works.',
       },
       {
         q: 'Do you track who scans my code?',
@@ -1861,7 +1861,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound, the volume change runs in the page, and the file is written again in your tab. Videos have their picture copied across without re-encoding. Nothing is sent anywhere, and it works offline after your first run.',
+        a: 'No. Your browser decodes the sound, the volume change runs in the page, and the file is written again in your tab. Videos have their picture copied across without re-encoding. Your files are not uploaded, and it works offline after your first run.',
       },
       {
         q: 'Will boosting make it distort?',
@@ -1903,7 +1903,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my recordings uploaded?',
-        a: 'No. The noise remover is a small neural network that runs as WebAssembly inside this page. Your browser decodes the sound, the network cleans it, and the file is written again in your tab. Nothing is sent anywhere, and it works offline after your first run.',
+        a: 'No. The noise remover is a small neural network that runs as WebAssembly inside this page. Your browser decodes the sound, the network cleans it, and the file is written again in your tab. Your files are not uploaded, and it works offline after your first run.',
       },
       {
         q: 'What kind of noise does it remove?',
@@ -1945,7 +1945,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Nothing is sent to a server, the page works offline after your first run.',
+        a: 'No. Your browser decodes each file and the joined file is written by code in this page. Your files are not uploaded, the page works offline after your first run.',
       },
       {
         q: 'Can I mix different formats?',
@@ -2126,7 +2126,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound and writes the video with its own encoders, in this tab. There is no size or length limit and no watermark, and nothing is sent anywhere.',
+        a: 'No. Your browser decodes the sound and writes the video with its own encoders, in this tab. There is no size or length limit and no watermark, and your files are not uploaded.',
       },
       {
         q: 'Why is the video file so small?',
@@ -2164,7 +2164,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Nothing is sent anywhere, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
+        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Your files are not uploaded, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
       },
       {
         q: 'How much smaller will it get?',
@@ -2202,7 +2202,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my photo uploaded?',
-        a: 'No. Your browser decodes the image, draws your text onto it on a canvas in the page, and saves the result. Nothing is sent anywhere, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the image, draws your text onto it on a canvas in the page, and saves the result. Your files are not uploaded, and it works offline once the page has loaded.',
       },
       {
         q: 'Does the text stay sharp on a big photo?',
@@ -2244,7 +2244,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my picture uploaded?',
-        a: 'No. Your browser decodes the image and cuts the tiles on a canvas in the page. Nothing is sent anywhere, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the image and cuts the tiles on a canvas in the page. Your files are not uploaded, and it works offline once the page has loaded.',
       },
       {
         q: 'Which grid for an Instagram profile?',
@@ -2282,7 +2282,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Your browser decodes the pictures and draws the collage on a canvas in the page. Nothing is sent anywhere, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the pictures and draws the collage on a canvas in the page. Your files are not uploaded, and it works offline once the page has loaded.',
       },
       {
         q: 'Are the pictures cropped?',
@@ -2336,7 +2336,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my PDF uploaded?',
-        a: 'No. The file is read by pdf.js running in this tab and the pictures are saved from memory. Nothing is sent to a server, and the page keeps working with the network off once it has loaded.',
+        a: 'No. The file is read by pdf.js running in this tab and the pictures are saved from memory. Your files are not uploaded, and the page keeps working with the network off once it has loaded.',
       },
     ],
   },
@@ -2362,7 +2362,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my audio uploaded?',
-        a: 'No. Your browser decodes the sound, the pitch and speed change run in the page, and the file is written again in your tab. Nothing is sent anywhere, and it works offline after your first run.',
+        a: 'No. Your browser decodes the sound, the pitch and speed change run in the page, and the file is written again in your tab. Your files are not uploaded, and it works offline after your first run.',
       },
       {
         q: 'How do I change the key of a song?',
@@ -2404,7 +2404,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is the sound recorded or uploaded?',
-        a: 'No. The pitch is measured by code in this page from the live microphone input, a few times a second, and each reading is thrown away straight after. Nothing is saved, and nothing is sent anywhere.',
+        a: 'No. The pitch is measured by code in this page from the live microphone input, a few times a second, and each reading is thrown away straight after. Nothing is saved, and the audio never leaves this tab.',
       },
       {
         q: 'How accurate is it?',
@@ -3296,7 +3296,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Each photo is decoded, drawn with the watermark and saved inside your browser tab. Nothing is sent to a server, so unpublished work, client photos and pictures of your home stay on your device. The page works with Wi-Fi off once it has loaded.',
+        a: 'No. Each photo is decoded, drawn with the watermark and saved inside your browser tab. Your files are not uploaded, so unpublished work, client photos and pictures of your home stay on your device. The page works with Wi-Fi off once it has loaded.',
       },
       {
         q: 'Which placement should I use?',
@@ -3614,7 +3614,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Each photo is decoded and adjusted pixel by pixel on a canvas in your tab, and saved by your browser. Nothing is sent anywhere, so it works offline once the page has loaded.',
+        a: 'No. Each photo is decoded and adjusted pixel by pixel on a canvas in your tab, and saved by your browser. Your files are not uploaded, so it works offline once the page has loaded.',
       },
       {
         q: 'Why does brightness not wash out the whites?',
@@ -3714,7 +3714,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my picture uploaded?',
-        a: 'No. The picture is shrunk, recoloured and enlarged on a canvas in your browser tab, and the PNG is saved from there. Nothing is sent anywhere, and it works offline once the page has loaded.',
+        a: 'No. The picture is shrunk, recoloured and enlarged on a canvas in your browser tab, and the PNG is saved from there. Your files are not uploaded, and it works offline once the page has loaded.',
       },
     ],
   },
@@ -3798,7 +3798,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Are my pictures uploaded?',
-        a: 'No. The frame is drawn on a canvas in your browser tab and saved from there. Nothing is sent anywhere.',
+        a: 'No. The frame is drawn on a canvas in your browser tab and saved from there. Your files are not uploaded.',
       },
     ],
   },
@@ -3824,7 +3824,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Each photo is decoded, converted and saved by code running in your browser tab. Nothing is sent to a server, and the page works offline once it has loaded.',
+        a: 'No. Each photo is decoded, converted and saved by code running in your browser tab. Your files are not uploaded, and the page works offline once it has loaded.',
       },
       {
         q: 'What is the difference between the looks?',

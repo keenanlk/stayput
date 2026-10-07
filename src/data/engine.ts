@@ -329,11 +329,11 @@ export const engines: Record<string, Engine> = {
   },
   'watermark-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab. For each page size, the watermark is drawn once on a transparent canvas at about 216 dpi and embedded as a PNG, then placed over every page of that size, following each page’s crop box and rotation. The original page content is not rewritten, so text, links and forms are untouched.',
-    versus: 'Online PDF watermark tools upload the whole document to add a line of text to it, and the documents people watermark are the confidential ones. Here nothing is sent anywhere, there is no page or file limit, and nothing but your watermark is added.',
+    versus: 'Online PDF watermark tools upload the whole document to add a line of text to it, and the documents people watermark are the confidential ones. Here your files are not uploaded, there is no page or file limit, and nothing but your watermark is added.',
   },
   'remove-pdf-metadata': {
     how: 'pdf-lib (MIT) parses the PDF in your tab (an encrypted file is first decrypted by qpdf, compiled to WebAssembly and served from this site). The trailer’s information dictionary and file ID are dropped, every /Metadata XMP stream and /PieceInfo entry is unlinked from the catalog, pages, images and fonts, and every object nothing refers to any more is deleted before the file is written back out, so the removed data is really gone rather than just hidden.',
-    versus: 'The PDFs people clean before sharing are the ones where the author matters: CVs, legal filings, reports sent anonymously, documents for a client who should not see who drafted them. Uploading them to a metadata-removal site hands the full document, name included, to a stranger. Here nothing is sent anywhere.',
+    versus: 'The PDFs people clean before sharing are the ones where the author matters: CVs, legal filings, reports sent anonymously, documents for a client who should not see who drafted them. Uploading them to a metadata-removal site hands the full document, name included, to a stranger. Here your files are not uploaded.',
   },
   'upscale-image': {
     how: 'Your browser decodes the picture. Real-ESRGAN general x4v3 (BSD-3-Clause, Xintao Wang and others), a compact neural network, runs in a web worker through onnxruntime-web (MIT) compiled to WebAssembly. It enlarges the picture 4× in overlapping 128-pixel tiles whose seams are cut away; for 2× and 3× the picture is first shrunk so that 4× lands on the size you asked for. Transparency is enlarged separately and put back. The result is saved by your browser’s own image encoder.',

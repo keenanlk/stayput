@@ -10,7 +10,7 @@ Related: the Content-Security-Policy in `vercel.json` and `public/_headers` deli
 
 ## Ground rules
 
-- Free forever: no accounts, no file size caps, no watermarks, no paid tier, no ads.
+- Free, no account: no watermarks and no ads. The only size limit is what your device can hold.
 - Every tool is a page with its own URL, real explanatory copy and a FAQ. Copy is plain and calm: say what happens, do not sell.
 - Batch by default. Tools accept many files and zip the outputs when there is more than one.
 - Work in a way that keeps the page responsive on a phone: process files one at a time and release buffers between them.

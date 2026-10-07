@@ -487,7 +487,7 @@ export const pairs: Pair[] = [
     intro: [
       'BMP is the bitmap format Windows Paint saved by default for decades, and it is still what some scanners, CNC and embroidery programs, microscope cameras and old industrial software write out. It stores every pixel raw, row by row, so a 1920 by 1080 screenshot takes about 6 MB whether it shows a photo or a blank page. Many upload forms, chat apps and content systems reject it outright.',
       'PNG is the natural replacement because it is also lossless. The colours of every pixel in the PNG match the bitmap exactly, but PNG compresses runs of repeated colour, so a diagram, screenshot or pixel-art sprite typically shrinks to a tenth of the BMP or less. Photos saved as BMP shrink less, often by half.',
-      'Your browser reads the bitmap, including the 1, 4 and 8-bit palette variants and 32-bit files with an alpha channel, and writes the PNG inside this tab. Nothing is sent to a server, which matters when the bitmaps come from lab equipment, medical imaging or a client’s scanner.',
+      'Your browser reads the bitmap, including the 1, 4 and 8-bit palette variants and 32-bit files with an alpha channel, and writes the PNG inside this tab. Your files are not uploaded, which matters when the bitmaps come from lab equipment, medical imaging or a client’s scanner.',
       'A few practical notes on specific sources. Screenshots saved from very old versions of Windows Paint, and exports from tools like MS Paint on Windows XP, are 24-bit and convert cleanly. Bitmaps from embroidery and sign-cutting software are often 1-bit or 4-bit with a tiny palette; the PNG keeps those exact colours, and is usually a few kilobytes. Game textures and sprite sheets from older engines sometimes use a magenta or bright green key colour instead of real transparency: that colour is kept as a normal colour, so remove it in an image editor if you need a transparent PNG.',
       'If you are converting a folder of bitmaps for a website or an archive, drop them all at once and download the zip. File names stay the same apart from the extension, so links and references are easy to update. For photographs where size matters more than perfection, JPG gets much smaller still.',
       'Why not just rename the file? Changing .bmp to .png leaves the bytes untouched, so the file still starts with the BM signature and stays the same size. Some viewers sniff the contents and open it anyway, but upload forms, content management systems and image hosts check the signature and refuse it, or worse, accept it and show a broken image later. A real conversion rewrites the data in PNG form.',
@@ -554,7 +554,7 @@ export const pairs: Pair[] = [
       { q: 'What happens to transparency?', a: 'It is flattened onto the background colour in the options, white by default. If your software needs a particular colour behind a logo, set it before converting.' },
       { q: 'Can I convert JPG or WebP to BMP here too?', a: 'Yes, with the [image converter](/tools/convert-image): drop any image and pick BMP as the output format. It writes the same 24-bit bitmap.' },
       { q: 'My device needs a 1-bit or 16-bit bitmap. Will this work?', a: 'Not directly. This page writes 24-bit colour. Most tools that need monochrome or 16-bit input can convert from a 24-bit BMP, and reading a 24-bit file is what they are most likely to support.' },
-      { q: 'Are the images uploaded?', a: 'No. The bitmap is assembled byte by byte in this tab. Nothing is sent over the network.' },
+      { q: 'Are the images uploaded?', a: 'No. The bitmap is assembled byte by byte in this tab. Your files are not uploaded.' },
     ],
   },
   {
@@ -636,7 +636,7 @@ export const pairs: Pair[] = [
       { q: 'The colours look slightly grainy. Can I fix that?', a: 'That is the 256-colour limit of GIF at work, and it shows mostly on gradients and filmed footage. Cartoon stickers and flat graphics come through cleanly. If the destination accepts WebP or MP4, keep the original instead.' },
       { q: 'What about a still WebP?', a: 'It becomes a single-frame GIF. For still images, PNG or JPG are usually better choices: [WebP to PNG](/webp-to-png) keeps full colour and transparency.' },
       { q: 'How do I save a WhatsApp or Telegram sticker as a WebP first?', a: 'On desktop, stickers are saved as .webp when you right-click and save them, or when you export the chat media. Drop that file here. Stickers in Telegram’s .tgs or .webm formats are a different kind of animation and are not supported.' },
-      { q: 'Is anything uploaded?', a: 'No. The file is read, decoded and re-encoded in this browser tab. Nothing is sent to a server.' },
+      { q: 'Is anything uploaded?', a: 'No. The file is read, decoded and re-encoded in this browser tab. Your files are not uploaded.' },
     ],
   },
   {
@@ -661,7 +661,7 @@ export const pairs: Pair[] = [
       { q: 'Why does my photo look blotchy as a GIF?', a: 'GIF allows 256 colours per image, and a photo has tens of thousands. Smooth gradients break into visible bands. For photos, PNG or JPG is the better format; GIF suits logos, icons and simple graphics.' },
       { q: 'Is the GIF smaller than the PNG?', a: 'Often, for simple graphics with few colours, since both use lossless compression and the palette is small. For detailed images the GIF can be larger, because GIF’s LZW compression is older and weaker than PNG’s.' },
       { q: 'Can I combine several PNGs into an animated GIF?', a: 'Not on this page: each PNG becomes its own single-frame GIF. For animation, make the frames into a short video and use Video to GIF.' },
-      { q: 'Is anything uploaded?', a: 'No. The PNG is decoded, reduced to a palette and written as a GIF in this browser tab. Nothing is sent to a server.' },
+      { q: 'Is anything uploaded?', a: 'No. The PNG is decoded, reduced to a palette and written as a GIF in this browser tab. Your files are not uploaded.' },
     ],
   },
   {
@@ -711,7 +711,7 @@ export const pairs: Pair[] = [
       { q: 'Why is the TIFF file so large?', a: 'It is uncompressed: every pixel is stored as four bytes. A 4000 × 3000 photo is 48 MB. That is normal for print-ready TIFFs; zip them, or use a file-transfer service, if email refuses them.' },
       { q: 'Can I get a CMYK TIFF for printing?', a: 'No. The TIFF is RGB. Most print shops convert RGB to CMYK themselves with their own press profiles; ask them if they require CMYK, and use a desktop editor if they do.' },
       { q: 'Does the TIFF keep the JPG’s EXIF data?', a: 'No. Date, camera and location data are not carried over, which is also a quick way to hand over an image without its GPS location.' },
-      { q: 'Is anything uploaded?', a: 'No. The JPG is decoded and the TIFF is written in this browser tab. Nothing is sent to a server.' },
+      { q: 'Is anything uploaded?', a: 'No. The JPG is decoded and the TIFF is written in this browser tab. Your files are not uploaded.' },
     ],
   },
   {
@@ -738,7 +738,7 @@ export const pairs: Pair[] = [
       { q: 'Why is the TIFF bigger than the PNG?', a: 'The TIFF is stored uncompressed for maximum compatibility, while PNG compresses without loss. Expect three to ten times the size, depending on the image.' },
       { q: 'Can I make a TIFF from a screenshot for OCR or fax software?', a: 'Yes. Screenshots and scanned pages saved as PNG convert without any loss, so text edges stay sharp for OCR. Fax and document systems that need black-and-white Group 4 TIFFs are the exception; this page writes colour TIFFs only.' },
       { q: 'My publisher wants 300 dpi. Is this TIFF usable?', a: 'The dpi tag here says 72, but that is only a label. If your image has enough pixels for the printed size (for example 2100 pixels wide for 7 inches at 300 dpi), the publisher can relabel it without resampling.' },
-      { q: 'Is anything uploaded?', a: 'No. The PNG is decoded and the TIFF is written in this browser tab. Nothing is sent to a server.' },
+      { q: 'Is anything uploaded?', a: 'No. The PNG is decoded and the TIFF is written in this browser tab. Your files are not uploaded.' },
     ],
   },
   {
@@ -767,7 +767,7 @@ export const pairs: Pair[] = [
       { q: 'Why is my PNG only 16 or 32 pixels?', a: 'The ICO did not contain anything bigger. Favicons made before high-resolution screens often stop at 32 × 32. The converter never upscales, so you get the true largest size rather than a blurry enlargement.' },
       { q: 'Can I extract a program’s icon from its .exe?', a: 'Not directly. Windows stores those icons as resources inside the program file. Use a free resource extractor to save the icon as an .ico first, then convert that file here.' },
       { q: 'Can I go the other way and make an ICO?', a: 'Yes. PNG to ICO builds a multi-size icon from a PNG, and the Favicon generator makes the full set of icons a website needs.' },
-      { q: 'Is anything uploaded?', a: 'No. The icon is decoded and the PNG is written in this browser tab. Nothing is sent to a server.' },
+      { q: 'Is anything uploaded?', a: 'No. The icon is decoded and the PNG is written in this browser tab. Your files are not uploaded.' },
     ],
   },
 ];

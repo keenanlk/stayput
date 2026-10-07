@@ -815,7 +815,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting without uploading',
         p: [
-          'For the formats people convert most, a browser can do the work locally. Stayput’s tools run inside the page: [convert images](/tools/convert-image) between JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF, [compress images](/tools/compress-image), turn clips into GIFs with [Video to GIF](/tools/video-to-gif), and pull audio out of video with [Video to MP3](/tools/video-to-mp3). Nothing is sent to a server, there are no file size caps from a pricing plan, only your device’s memory, and after one visit the pages keep working with the network switched off.',
+          'For the formats people convert most, a browser can do the work locally. Stayput’s tools run inside the page: [convert images](/tools/convert-image) between JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF, [compress images](/tools/compress-image), turn clips into GIFs with [Video to GIF](/tools/video-to-gif), and pull audio out of video with [Video to MP3](/tools/video-to-mp3). Your files are not uploaded, there are no file size caps from a pricing plan, only your device’s memory, and after one visit the pages keep working with the network switched off.',
           'FreeConvert covers many more formats, such as documents, e-books and archives, and adds features like cloud imports. Choose by the file: sensitive and common, stay local; obscure and harmless, an upload service is the practical option.',
         ],
       },
@@ -982,7 +982,7 @@ export const guides: Guide[] = [
       {
         h: 'Making GIFs without uploading',
         p: [
-          'Modern browsers can decode video and encode GIFs on your own device. Stayput’s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs inside the page, with trimming, size and frame-rate settings. [GIF to MP4](/tools/gif-to-mp4) goes the other way for a much smaller file, [Crop image](/tools/crop-image) trims a still, and [Compress image](/tools/compress-image) shrinks one. Nothing is sent anywhere, there are no ads next to the download, and after one visit the pages work in airplane mode.',
+          'Modern browsers can decode video and encode GIFs on your own device. Stayput’s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs inside the page, with trimming, size and frame-rate settings. [GIF to MP4](/tools/gif-to-mp4) goes the other way for a much smaller file, [Crop image](/tools/crop-image) trims a still, and [Compress image](/tools/compress-image) shrinks one. Your files are not uploaded, there are no ads next to the download, and after one visit the pages work in airplane mode.',
           'Ezgif still does more GIF-specific editing than these tools, such as frame-by-frame editing, effects and text overlays on animations. For a harmless clip it is a fine choice; for a private recording, convert it locally.',
         ],
       },
@@ -3707,7 +3707,7 @@ export const guides: Guide[] = [
       {
         h: 'Making a code that never expires',
         p: [
-          'Stayput\'s [QR code generator](/tools/qr-code-generator) builds a static code directly in the browser: for a link, [Wi-Fi network](/wifi-qr-code-generator), [contact card](/vcard-qr-code-generator), email or phone number. Nothing is sent to a server to generate it, so there is no account to lapse and no redirect to go dark; the code is only as permanent as the content stays valid, such as a Wi-Fi password that later changes.',
+          'Stayput\'s [QR code generator](/tools/qr-code-generator) builds a static code directly in the browser: for a link, [Wi-Fi network](/wifi-qr-code-generator), [contact card](/vcard-qr-code-generator), email or phone number. Your content is not uploaded to generate it, so there is no account to lapse and no redirect to go dark; the code is only as permanent as the content stays valid, such as a Wi-Fi password that later changes.',
         ],
       },
     ],
