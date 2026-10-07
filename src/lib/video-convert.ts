@@ -22,7 +22,7 @@ import {
   type AudioCodec,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
-import { pickVideoCodec } from './video-codec';
+import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
 import { H264Unavailable } from './encoder-probe';
 import { CODEC_NAMES, unplayable } from './video-compress';
 
@@ -96,7 +96,7 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
       video: copyVideo
         ? {}
         : { codec: videoCodec, bitrate: QUALITY_HIGH, width: evenW, height: evenH, fit: 'contain', allowTransformationMetadata: false },
-      audio: audioCodec ? { codec: audioCodec, bitrate: QUALITY_HIGH } : { discard: true },
+      audio: audioCodec ? { codec: audioCodec, bitrate: QUALITY_HIGH, sampleRate: await aacSafeSampleRate(sound) } : { discard: true },
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;

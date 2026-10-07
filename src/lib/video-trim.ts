@@ -24,6 +24,7 @@ import {
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
 import { requireH264Encoder } from './encoder-probe';
+import { aacSafeSampleRate } from './video-codec';
 import { unplayable } from './video-compress';
 
 export interface TrimOptions {
@@ -53,6 +54,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
     const outFormat =
       format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
     const output = new Output({ format: outFormat, target: new BufferTarget() });
+    const audioRate = opts.exact && !opts.mute ? await aacSafeSampleRate(await input.getPrimaryAudioTrack()) : undefined;
     const conversion = await Conversion.init({
       input,
       output,
@@ -60,7 +62,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
       trim: { start: opts.start, end: opts.end },
       copy: opts.exact ? false : { boundaryTolerance: 0.5 },
       video: opts.exact ? { bitrate: QUALITY_HIGH, allowTransformationMetadata: false } : {},
-      audio: opts.mute ? { discard: true } : opts.exact ? { bitrate: QUALITY_HIGH } : {},
+      audio: opts.mute ? { discard: true } : opts.exact ? { bitrate: QUALITY_HIGH, sampleRate: audioRate } : {},
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;

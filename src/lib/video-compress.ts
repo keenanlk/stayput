@@ -23,7 +23,7 @@ import {
   type Quality,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
-import { pickVideoCodec } from './video-codec';
+import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
 
 export type CompressMode = 'balanced' | 'small' | 'high' | 'size';
 
@@ -117,6 +117,8 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
         ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: audioBitrate })
         : null;
 
+    const audioRate = await aacSafeSampleRate(sound);
+
     const encodeAt = async (bitrate: number | Quality, onProgress?: (f: number) => void): Promise<ArrayBuffer> => {
       const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
       const conversion = await Conversion.init({
@@ -134,7 +136,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
           allowTransformationMetadata: false,
         },
         audio: audioCodec
-          ? { codec: audioCodec, bitrate: audioBitrate, numberOfChannels: Math.min(2, sound!.numberOfChannels), forceTranscode: opts.mode === 'size' }
+          ? { codec: audioCodec, bitrate: audioBitrate, numberOfChannels: Math.min(2, sound!.numberOfChannels), sampleRate: audioRate, forceTranscode: opts.mode === 'size' }
           : { discard: true },
       });
       if (!conversion.isValid) {

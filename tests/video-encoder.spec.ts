@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 // encoder can go silent with the settings Mediabunny picks first; each tool must still give a playable
 // mp4, and say so at once when no encoder answers. Runs in the chromium project and in the webkit project (CI).
 const clip = fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url));
+// 4 s of H.264 with a 440 Hz tone, AAC mono at 16 kHz (the shape phone recordings have).
+const toneClip = fileURLToPath(new URL('./fixtures/static/tone-16k-mono.mp4', import.meta.url));
 
 async function open(page: Page, path: string) {
   await page.goto(path);
@@ -41,6 +43,55 @@ async function expectPlayableMp4(page: Page, bytes: Buffer) {
   expect(probe.width).toBeGreaterThan(0);
   expect(probe.duration).toBeGreaterThan(1);
 }
+
+/** The mp4's sound must decode end to end, with the channel count the source had and a real tone in it. */
+async function expectAudioDecodes(page: Page, bytes: Buffer, channels: number) {
+  const r = await page.evaluate(async (data) => {
+    try {
+      const ctx = new AudioContext();
+      const buf = await ctx.decodeAudioData(new Uint8Array(data).buffer);
+      const pcm = buf.getChannelData(0);
+      let peak = 0;
+      for (let i = 0; i < pcm.length; i++) peak = Math.max(peak, Math.abs(pcm[i]!));
+      return { ok: true, channels: buf.numberOfChannels, seconds: buf.duration, peak };
+    } catch (e) {
+      return { ok: false, error: String(e) };
+    }
+  }, [...bytes]);
+  expect(r, JSON.stringify(r)).toMatchObject({ ok: true, channels });
+  expect(r.seconds).toBeGreaterThan(3);
+  expect(r.peak).toBeGreaterThan(0.05);
+}
+
+test('Compress video keeps the sound: a mono 16 kHz AAC track decodes cleanly', async ({ page }) => {
+  test.setTimeout(240_000);
+  await open(page, '/tools/compress-video');
+  await page.locator('#file-input').setInputFiles([toneClip]);
+  const bytes = await runOnce(page);
+  await expectPlayableMp4(page, bytes);
+  await expectAudioDecodes(page, bytes, 1);
+});
+
+test('Trim video (exact cut) keeps the sound: a mono 16 kHz AAC track decodes cleanly', async ({ page }) => {
+  test.setTimeout(240_000);
+  await open(page, '/tools/trim-video');
+  await page.locator('#file-input').setInputFiles([toneClip]);
+  await page.locator('#exact').check();
+  const bytes = await runOnce(page);
+  await expectPlayableMp4(page, bytes);
+  await expectAudioDecodes(page, bytes, 1);
+});
+
+test('Video to MP4 keeps the sound: a mono 16 kHz AAC track decodes cleanly', async ({ page, browserName }) => {
+  // Video to MP4 keeps AAC for the sound, which Playwright's Chromium on Linux cannot decode in the page.
+  test.skip(browserName !== 'webkit', 'only WebKit decodes AAC in every CI image');
+  test.setTimeout(240_000);
+  await open(page, '/tools/video-to-mp4');
+  await page.locator('#file-input').setInputFiles([toneClip]);
+  const bytes = await runOnce(page);
+  await expectPlayableMp4(page, bytes);
+  await expectAudioDecodes(page, bytes, 1);
+});
 
 test('Compress video gives a playable mp4, twice on the same page', async ({ page }) => {
   test.setTimeout(240_000);
