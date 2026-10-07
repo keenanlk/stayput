@@ -15,17 +15,18 @@ const src = execSync(
     import { pairs, pairAsTool } from './src/data/pairs.ts';
     import { presets, presetAsTool } from './src/data/presets.ts';
     import { guides } from './src/data/guides.ts';
-    console.log(JSON.stringify([
-      { slug: 'site', heading: 'Your files stay put.', tagline: 'Free file tools that run entirely in your browser. Nothing is uploaded, nothing is capped, it works offline.', category: 'site' },
+    import { ogSite, ogPills } from './src/data/og.ts';
+    console.log(JSON.stringify({ ogPills, pages: [
+      { slug: 'site', ...ogSite, category: 'site' },
       ...tools.map(t => ({ slug: t.slug, heading: t.heading, tagline: t.tagline, category: t.category })),
       ...pairs.map(p => { const t = pairAsTool(p); return { slug: t.slug, heading: t.heading, tagline: t.tagline, category: 'images' }; }),
       ...presets.map(p => { const t = presetAsTool(p); return { slug: t.slug, heading: t.heading, tagline: t.tagline, category: t.category }; }),
       ...guides.map(g => ({ slug: 'guide-' + g.slug, heading: g.heading, tagline: g.dek, category: 'guide' })),
-    ]));
+    ] }));
   "`,
   { encoding: 'utf8' },
 );
-const pages = JSON.parse(src);
+const { ogPills, pages } = JSON.parse(src);
 
 const html = ({ heading, tagline, category }) => `<!doctype html>
 <html><head><meta charset="utf-8"><style>
@@ -46,7 +47,7 @@ const html = ({ heading, tagline, category }) => `<!doctype html>
   <div class="kicker">${category === 'pdf' ? 'PDF tool' : category === 'media' ? 'Video and audio tool' : category === 'images' ? 'Image tool' : category === 'guide' ? 'Guide' : 'Free file tools, in your browser'}</div>
   <h1>${esc(heading)}</h1>
   <p>${esc(tagline)}</p>
-  <div class="bar"><span>Nothing is uploaded</span><span>Works offline</span><span>Open source</span><span class="url">stayput.dev</span></div>
+  <div class="bar">${ogPills.map((t) => `<span>${esc(t)}</span>`).join('')}<span class="url">stayput.dev</span></div>
 </body></html>`;
 
 function esc(s) {
