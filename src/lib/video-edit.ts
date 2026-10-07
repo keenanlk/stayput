@@ -42,6 +42,11 @@ export interface EditOptions {
    * Gets the frame on a canvas and its time in seconds.
    */
   paint?: (ctx: CanvasRenderingContext2D, seconds: number) => void | Promise<void>;
+  /**
+   * Whether `paint` reads pixels back from the canvas (getImageData). Painters that only draw should say false:
+   * a canvas kept for reading holds a copy of every frame in Safari until it is freed, which ran phones out of memory.
+   */
+  readsBack?: boolean;
   /** Output size. With only one side set, the other follows the aspect ratio. */
   width?: number;
   height?: number;
@@ -161,7 +166,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
-      frame = canvas.getContext('2d', { willReadFrequently: true }) ?? undefined;
+      frame = canvas.getContext('2d', { willReadFrequently: opts.readsBack !== false }) ?? undefined;
       if (!frame) throw new Error('Canvas is not available in this browser.');
     }
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
@@ -185,7 +190,12 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
           paint && frame
             ? async (sample) => {
                 sample.draw(frame!, 0, 0, width, height);
-                await paint(frame!, sample.timestamp);
+                const at = sample.timestamp;
+                // Let go of the decoded frame now, and give the browser a turn between frames: without
+                // it the frames pile up faster than they are freed (about 10 MB per second of 1080p video in Safari).
+                sample.close();
+                await paint(frame!, at);
+                await new Promise((r) => setTimeout(r, 0));
                 return frame!.canvas;
               }
             : undefined,

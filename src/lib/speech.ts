@@ -1,6 +1,7 @@
-import { channelsOf, decodeAudio, formatDuration } from './audio';
+import { formatDuration } from './audio';
+import { SPEECH_RATE, speechSamples } from './speech-audio';
 import { clean, cutPoints, type Segment } from './captions';
-import { audioDecodeError, fromWorker, looksLikeMemory, noSpeechFound, outOfMemoryError, workerCrashError } from './speech-errors';
+import { fromWorker, noSpeechFound, workerCrashError } from './speech-errors';
 import type { Reply, Request } from './transcribe.worker';
 
 /**
@@ -10,7 +11,7 @@ import type { Reply, Request } from './transcribe.worker';
  * (transcribe.worker.ts). Nothing is uploaded.
  */
 
-const RATE = 16000;
+const RATE = SPEECH_RATE;
 
 let worker: Worker | undefined;
 let nextId = 0;
@@ -51,6 +52,12 @@ function recognise(audio: Float32Array, language: string | null, task: Request['
 
 let modelReady = false;
 
+/** Stop the speech worker and give back the memory its model holds (about 0.7 GB), for work that follows on a phone. The next run starts it again from the stored model. */
+export function releaseSpeechModel() {
+  worker?.terminate();
+  worker = undefined;
+}
+
 export interface Speech {
   segments: Segment[];
   /** Language code Whisper heard (or was told), like "en". */
@@ -69,12 +76,7 @@ export async function transcribeFile(
 ): Promise<Speech> {
   const { onProgress } = opts;
   onProgress(`Reading the sound from ${file.name}…`, 0.02);
-  let samples: Float32Array;
-  try {
-    [samples] = channelsOf(await decodeAudio(file, RATE), true) as [Float32Array];
-  } catch (e) {
-    throw looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError(e instanceof Error ? e.message : undefined);
-  }
+  const samples = await speechSamples(file, (f) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f));
   const total = samples.length / RATE;
   if (total < 0.5) throw noSpeechFound('The recording is too short to hold any speech.');
   const cuts = [0, ...cutPoints(samples, RATE), samples.length];

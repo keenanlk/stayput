@@ -6,6 +6,7 @@ import { CaptionsUnavailable, ensureH264Encoder } from '../lib/encoder-probe';
 import { EncoderStall } from '../lib/encoder-watchdog';
 import { noSpeechFound } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
+import { phoneLimitNote } from '../lib/phone-limit';
 
 /**
  * Add subtitles to a video, burned into the picture. The captions come from
@@ -17,7 +18,13 @@ import { describeEdit } from './video-edit-shell';
 
 const isSubs = (f: File) => /\.(srt|vtt)$/i.test(f.name);
 
-createShell({
+const shell = createShell({
+  // A video too big for a phone to caption is said so now, not after the browser gives up.
+  onFilesChanged(files) {
+    const videos = files.filter((f) => !isSubs(f.file));
+    const speech = !files.some((f) => isSubs(f.file));
+    shell.setHint(speech ? phoneLimitNote(Math.max(0, ...videos.map((f) => f.file.size))) : '');
+  },
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const subsFiles = files.filter((f) => isSubs(f.file));
@@ -45,9 +52,11 @@ createShell({
       let from = 'from your subtitle file';
       if (given) segments = given;
       else {
-        const { transcribeFile } = await import('../lib/speech');
+        const { transcribeFile, releaseSpeechModel } = await import('../lib/speech');
         // Writing the captions is roughly the first 40% of the work, encoding the rest.
         const speech = await transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) });
+        // The model is no longer needed; free its memory before the video is redrawn.
+        releaseSpeechModel();
         segments = speech.segments;
         if (segments.length === 0) throw noSpeechFound(`No speech was found in ${file.name}, so there are no subtitles to add.`);
         const spoken = new Intl.DisplayNames(['en'], { type: 'language' }).of(speech.language) ?? speech.language;
@@ -58,6 +67,7 @@ createShell({
       let shown = 0;
       let last: Segment | undefined;
       const r = await editVideo(file, {
+        readsBack: false,
         paint(ctx, t) {
           const { width, height } = ctx.canvas;
           const { font, px, maxWidth } = captionFont(width, height, size);
