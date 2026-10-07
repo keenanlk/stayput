@@ -28,6 +28,8 @@ const note = $('mic-note');
 createShell({ process: async () => [] });
 
 const FLOOR = -60; // dBFS at the left of the meter
+const SILENT = -70; // a peak never above this since the start means no sound arrived at all
+const SETTLE_FRAMES = 90; // about 1.5 s of quiet before saying quiet or silent
 const RECORD_SECONDS = 5;
 
 let stream: MediaStream | undefined;
@@ -35,7 +37,7 @@ let ctx: AudioContext | undefined;
 let analyser: AnalyserNode | undefined;
 let frame = 0;
 let held = FLOOR; // peak hold, falls slowly
-let loudest = FLOOR;
+let loudest = -Infinity; // loudest peak since the test began; true silence stays at -∞
 let recentQuiet = 0; // frames in a row below the "hearing you" level
 let playUrl: string | undefined;
 let tracked = false;
@@ -46,6 +48,8 @@ function say(text: string, warn = false) {
 }
 
 const toDb = (v: number) => (v > 0 ? 20 * Math.log10(v) : -Infinity);
+// Anything under the meter's floor reads as "under -60 dB", never -∞ beside a peak that is on the bar.
+const fmtDb = (db: number) => (db > FLOOR ? `${Math.round(db)} dB` : `under ${FLOOR} dB`);
 const pos = (db: number) => `${Math.max(0, Math.min(100, ((db - FLOOR) / -FLOOR) * 100))}%`;
 
 function measure() {
@@ -65,14 +69,14 @@ function measure() {
   loudest = Math.max(loudest, pk);
   fill.style.width = pos(rms);
   peakMark.style.left = pos(held);
-  dbText.textContent = `${Number.isFinite(rms) ? Math.round(rms) : '-∞'} dB average, ${Number.isFinite(held) ? Math.round(held) : '-∞'} dB peak`;
+  dbText.textContent = `${fmtDb(rms)} average, ${fmtDb(held)} peak`;
   recentQuiet = rms > -50 ? 0 : recentQuiet + 1;
   let v: 'ok' | 'quiet' | 'loud' | 'silent';
   if (held >= -1) v = 'loud';
   else if (rms > -50) v = 'ok';
-  else if (loudest < -70) v = 'silent';
+  else if (loudest < SILENT) v = 'silent';
   else v = 'quiet';
-  if (panel.dataset.verdict !== v && (v !== 'quiet' || recentQuiet > 90)) {
+  if (panel.dataset.verdict !== v && (v === 'ok' || v === 'loud' || recentQuiet > SETTLE_FRAMES)) {
     panel.dataset.verdict = v;
     verdict.textContent = {
       ok: 'Your microphone works. We can hear you.',
@@ -158,7 +162,7 @@ async function start() {
   analyser.fftSize = 2048;
   ctx.createMediaStreamSource(stream).connect(analyser);
   held = FLOOR;
-  loudest = FLOOR;
+  loudest = -Infinity;
   recentQuiet = 0;
   delete panel.dataset.verdict;
   verdict.textContent = 'Listening… say something.';
