@@ -1,5 +1,6 @@
 import { bindRange, createShell, num, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { requireH264Encoder } from '../lib/encoder-probe';
 import { describeEdit } from './video-edit-shell';
 
 /**
@@ -45,6 +46,9 @@ createShell({
     const color = str('bg-color', '#00b140');
     const picture = pictures[0] ? await createImageBitmap(pictures[0].file) : undefined;
 
+    // Find out now, in a second or two, that this browser cannot encode, not after the person finder has downloaded.
+    progress.set('Checking this browser can write the video…', 0);
+    await requireH264Encoder();
     progress.set('Loading the person finder, once (16 MB)…', 0.01);
     const { Matte, loadPersonMask } = await import('../lib/person-mask');
     await loadPersonMask();

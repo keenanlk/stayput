@@ -21,8 +21,8 @@ export const STALL_MESSAGE = "This browser's video encoder stopped responding. T
 
 /** Thrown when the watchdog fires. The name is the short error kind a failed run records. */
 export class EncoderStall extends Error {
-  constructor() {
-    super(STALL_MESSAGE);
+  constructor(message = STALL_MESSAGE) {
+    super(message);
     this.name = 'EncoderStall';
   }
 }
