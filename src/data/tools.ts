@@ -2003,7 +2003,7 @@ export const tools: Tool[] = [
     keywords: ['mic test', 'microphone test', 'test my mic', 'online mic test', 'is my mic working', 'check microphone', 'mic checker'],
     steps: [
       'Press Test my microphone and allow it when your browser asks. Choose another microphone from the list if you have several.',
-      'Speak. The bar moves with your voice, and the verdict says whether the level is right, too quiet or clipping.',
+      'Speak. The bar moves with your voice, and the verdict says whether the level is right, too quiet, clipping or silent.',
       'Press Record 5 seconds and play back to hear exactly how you sound, then press Stop using the microphone.',
     ],
     faq: [
