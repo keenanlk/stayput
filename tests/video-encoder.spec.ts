@@ -143,6 +143,28 @@ for (const mode of ['balanced', 'size']) {
   });
 }
 
+test('DIAG compress size without the stub', async ({ page, browserName }) => {
+  test.skip(browserName !== 'webkit', 'diag');
+  test.setTimeout(240_000);
+  await open(page, '/tools/compress-video');
+  await page.locator('#mode').selectOption('size');
+  await page.locator('#size').selectOption('8');
+  await page.locator('#file-input').setInputFiles([phoneMov]);
+  const bytes = await runOnce(page);
+  const info = await page.evaluate(async (data) => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
+    return await new Promise((r) => {
+      v.onloadeddata = () => r('loaded ' + v.videoWidth + 'x' + v.videoHeight);
+      v.onerror = () => r('error ' + v.error?.code + ' ' + v.error?.message);
+      setTimeout(() => r('timeout'), 15000);
+    });
+  }, [...bytes]);
+  console.log('DIAG', bytes.length, info);
+  expect(info, 'DIAG ' + bytes.length).toMatch(/^loaded/);
+});
+
 test('Merge videos keeps the sound of two iPhone-style .mov clips where the browser has no audio encoder or decoder (iOS 18.4)', async ({ page, browserName }) => {
   test.skip(browserName !== 'webkit', 'only WebKit decodes AAC in the page in every CI image');
   test.setTimeout(240_000);
