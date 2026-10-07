@@ -2869,6 +2869,7 @@ export const presets: Preset[] = [
   {
     slug: 'play-video-backwards',
     base: 'reverse-video',
+    sizeFact: 'No watermark. On a phone, up to about 2 minutes of 1080p video (30 seconds of 4K)',
     name: 'Play video backwards',
     title: 'Play a Video Backwards: Rewind Effect Maker, No Upload | Stayput',
     description: 'Make any clip play backwards for a rewind or boomerang effect, in your browser. Reversed sound or silent. MP4 out, nothing uploaded, no watermark.',

@@ -44,8 +44,11 @@ export interface ReverseResult {
   audio: boolean;
 }
 
-/** Frames held in memory at once, in bytes: enough for a second of 1080p at 30 fps. */
-const WINDOW_BYTES = 120e6;
+/**
+ * Frames held in memory at once, in bytes: about a third of a second of 1080p at 30 fps. Safari holds on to several windows' worth
+ * of freed frames before it lets them go, so a larger window ran a 2-minute 1080p clip up to 3 to 4 GB; this keeps it under 1 GB.
+ */
+const WINDOW_BYTES = 30e6;
 
 interface Held {
   data: ArrayBuffer;

@@ -59,6 +59,8 @@ createShell({
       const share = (f: number) => (index + f) / videos.length;
       const matte = new Matte();
       const r = await editVideo(file, {
+        // The frame is only drawn on and copied from; the person finder reads its own small canvas.
+        readsBack: false,
         async paint(ctx) {
           await matte.apply(ctx, (c, frame) => {
             if (bgKind === 'color') {
