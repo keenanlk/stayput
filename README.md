@@ -7,7 +7,7 @@
 **Your files stay put.**
 
 Free, open-source tools for images, PDFs, video and audio that run entirely in your browser.<br>
-Nothing is uploaded, there are no accounts or file size caps beyond what your device can hold, and it works offline.
+Your files are not uploaded, there are no accounts or file size caps beyond what your device can hold, and it works offline after one visit (the AI-model tools need one online run to download their model).
 
 **[Open stayput.dev](https://stayput.dev)** · [Tools](#tools) · [Verify the claim](#open-the-network-tab-it-stays-empty) · [How it works](#how-it-works) · [MCP server](#mcp-server) · [Privacy](https://stayput.dev/privacy)
 
@@ -185,7 +185,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the ground rules, the main one being 
 
 ## Support
 
-Stayput is free and will stay free. There are no ads, no accounts and no paid tier. If it saved you a subscription and you want to say thanks, the repository has a GitHub Sponsors link; sponsorship covers the domain and nothing else.
+Stayput is free and needs no account, no ads. If it saved you a subscription and you want to say thanks, the repository has a GitHub Sponsors link; sponsorship helps cover running costs (domain, hosting and the stats server).
 
 ## License
 

@@ -3259,7 +3259,7 @@ export const presets: Preset[] = [
     intro: [
       'A CONFIDENTIAL watermark tells every reader, on every page, that the document is not for passing around: a draft contract, board papers, a salary review, a due-diligence pack, a patient letter. It does not stop anyone from sharing it, but it removes any doubt about whether they were allowed to, and a leaked page is recognisable at a glance.',
       'This page puts the word diagonally across the middle of each page, faint enough that the text underneath stays readable, and sized to each page, so a landscape spreadsheet printout gets the same mark as the A4 letter before it. You can change the wording to STRICTLY CONFIDENTIAL, INTERNAL ONLY, or a person’s name and date to trace a copy back to who received it.',
-      'The irony of most online watermark tools is that they ask you to upload the confidential document to mark it confidential. Here the PDF is opened and stamped inside your browser tab, and nothing is sent anywhere.',
+      'The irony of most online watermark tools is that they ask you to upload the confidential document to mark it confidential. Here the PDF is opened and stamped inside your browser tab, and the file is not uploaded.',
     ],
     steps: [
       'Drop one or more PDFs, or tap to pick them.',

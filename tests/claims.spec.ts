@@ -110,6 +110,20 @@ test('every other built page (home, about, press, privacy, hubs, conversions) an
   expect(bad).toEqual([]);
 });
 
+// Promises about the future and "nothing is sent" are never true of the site: it sends anonymous usage counts.
+const bannedPhrases = /nothing is sent|free forever|no paid tier|will stay free|covers the domain and nothing else/i;
+
+test('no built page or llms.txt uses a banned price or "nothing is sent" phrase', () => {
+  const files = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') || f === 'llms.txt');
+  expect(files.length).toBeGreaterThan(400);
+  const bad = files.flatMap((f) => {
+    const m = bannedPhrases.exec(scannable(readFileSync(new URL(f, dist), 'utf8')));
+    return m ? [`${f}: ${m[0]}`] : [];
+  });
+  expect(bad).toEqual([]);
+  for (const s of ['Nothing is sent anywhere.', 'Free forever.', 'There is no paid tier.', 'It will stay free.']) expect(bannedPhrases.test(s), s).toBe(true);
+});
+
 test('the guard catches the claims it is meant to catch', () => {
   for (const s of [
     '<p>No size caps, no watermark.</p>',
