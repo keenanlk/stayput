@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { tools, toolPath } from '../src/data/tools';
-import { pairs } from '../src/data/pairs';
-import { presets } from '../src/data/presets';
+import { pairs, pairAsTool } from '../src/data/pairs';
+import { presets, presetAsTool } from '../src/data/presets';
 import { guides } from '../src/data/guides';
+import { ogSite, ogPills } from '../src/data/og';
 import { offlineBadge, needsFirstUse, defaultSizeBadge } from '../src/data/leads';
 
 // Reads the built HTML of every tool, pair, preset and guide page: visible text, meta
@@ -177,4 +178,21 @@ test('a tool that loads an engine on first run has the "first use" badge', () =>
       expect(offlineBadge(slug), slug).toBe('Works offline after first use');
     }
   }
+});
+
+test('the link-preview card text makes no banned claim', () => {
+  // The fixed text lives in src/data/og.ts; the per-page lines come from the same data as the pages.
+  const cards = [
+    ogSite.heading, ogSite.tagline, ...ogPills,
+    ...tools.flatMap((t) => [t.heading, t.tagline]),
+    ...pairs.flatMap((p) => { const t = pairAsTool(p); return [t.heading, t.tagline]; }),
+    ...presets.flatMap((p) => { const t = presetAsTool(p); return [t.heading, t.tagline]; }),
+    ...guides.flatMap((g) => [g.heading, g.dek]),
+  ];
+  const bad = cards.flatMap((c) => [...claimsIn(`<p>${c}</p>`), ...(bannedPhrases.test(c) ? [`banned phrase: ${c}`] : [])]);
+  expect(bad).toEqual([]);
+  // scripts/make-og.mjs must not carry card copy of its own.
+  const script = readFileSync(new URL('../scripts/make-og.mjs', import.meta.url), 'utf8');
+  expect([...claimsIn(`<p>${script.replace(/\n/g, '</p><p>')}</p>`), ...(bannedPhrases.exec(script) ? ['banned phrase in make-og.mjs'] : [])]).toEqual([]);
+  expect(claimsIn('<p>Nothing is uploaded, nothing is capped, it works offline.</p>')).not.toEqual([]);
 });
