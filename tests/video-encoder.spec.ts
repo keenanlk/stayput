@@ -122,26 +122,26 @@ test('Resize video takes an iPhone-style HEVC .mov where the browser can decode 
   expect([probe.width, probe.height]).toEqual([480, 854]);
 });
 
-test('Compress video keeps an iPhone-style .mov\'s sound where the browser has no audio encoder or decoder (iOS 18.4)', async ({ page, browserName }) => {
-  // Safari on iOS 18.4 has neither WebCodecs AudioEncoder nor AudioDecoder, so the AAC packets must be copied across.
-  test.skip(browserName !== 'webkit', 'only WebKit decodes AAC in the page in every CI image');
-  test.setTimeout(240_000);
-  await page.addInitScript(() => {
-    delete (window as { AudioEncoder?: unknown }).AudioEncoder;
-    delete (window as { AudioDecoder?: unknown }).AudioDecoder;
-  });
-  for (const mode of ['balanced', 'size']) {
+for (const mode of ['balanced', 'size']) {
+  test(`Compress video (${mode}) keeps an iPhone-style .mov's sound where the browser has no audio encoder or decoder (iOS 18.4)`, async ({ page, browserName }) => {
+    // Safari on iOS 18.4 has neither WebCodecs AudioEncoder nor AudioDecoder, so the AAC packets must be copied across.
+    test.skip(browserName !== 'webkit', 'only WebKit decodes AAC in the page in every CI image');
+    test.setTimeout(240_000);
+    await page.addInitScript(() => {
+      delete (window as { AudioEncoder?: unknown }).AudioEncoder;
+      delete (window as { AudioDecoder?: unknown }).AudioDecoder;
+    });
     await open(page, '/tools/compress-video');
     expect(await page.evaluate(() => typeof AudioEncoder + typeof AudioDecoder)).toBe('undefinedundefined');
     await page.locator('#mode').selectOption(mode);
     if (mode === 'size') await page.locator('#size').selectOption('8');
     await page.locator('#file-input').setInputFiles([phoneMov]);
     const bytes = await runOnce(page);
-    await expectPlayableMp4(page, bytes);
     await expectAudioDecodes(page, bytes, 2);
+    await expectPlayableMp4(page, bytes);
     await expect(page.locator('#results-list')).not.toContainText('sound left out');
-  }
-});
+  });
+}
 
 test('Merge videos keeps the sound of two iPhone-style .mov clips where the browser has no audio encoder or decoder (iOS 18.4)', async ({ page, browserName }) => {
   test.skip(browserName !== 'webkit', 'only WebKit decodes AAC in the page in every CI image');
