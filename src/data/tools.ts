@@ -1575,6 +1575,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'reverse-video',
+    sizeFact: 'No watermark. On a phone, up to about 2 minutes of 1080p video (30 seconds of 4K)',
     name: 'Reverse video',
     title: 'Reverse Video Online: Play a Clip Backwards, No Upload | Stayput',
     description:

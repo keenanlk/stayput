@@ -7,6 +7,10 @@ import { fileURLToPath } from 'node:url';
 const clip = fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url));
 // 4 s of H.264 with a 440 Hz tone, AAC mono at 16 kHz (the shape phone recordings have).
 const toneClip = fileURLToPath(new URL('./fixtures/static/tone-16k-mono.mp4', import.meta.url));
+// 4 s of a 1280x720 picture turned 90 degrees by the file (so it shows as 720x1280, the way an iPhone holds the camera), in a
+// QuickTime .mov with 44.1 kHz stereo AAC: once as H.264 and once as HEVC.
+const phoneMov = fileURLToPath(new URL('./fixtures/static/iphone-portrait.mov', import.meta.url));
+const phoneHevc = fileURLToPath(new URL('./fixtures/static/iphone-hevc.mov', import.meta.url));
 
 async function open(page: Page, path: string) {
   await page.goto(path);
@@ -25,7 +29,7 @@ async function runOnce(page: Page): Promise<Buffer> {
 }
 
 /** An mp4 starts with an ftyp box; the page's own player must also be able to load it. */
-async function expectPlayableMp4(page: Page, bytes: Buffer) {
+async function expectPlayableMp4(page: Page, bytes: Buffer): Promise<{ width: number; height: number; duration: number }> {
   expect(bytes.subarray(4, 8).toString('latin1')).toBe('ftyp');
   const probe = await page.evaluate(async (data) => {
     const url = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
@@ -37,11 +41,12 @@ async function expectPlayableMp4(page: Page, bytes: Buffer) {
       v.onerror = () => resolve(false);
       setTimeout(() => resolve(false), 15_000);
     });
-    return { ok, width: v.videoWidth, duration: v.duration };
+    return { ok, width: v.videoWidth, height: v.videoHeight, duration: v.duration };
   }, [...bytes]);
   expect(probe.ok).toBe(true);
   expect(probe.width).toBeGreaterThan(0);
   expect(probe.duration).toBeGreaterThan(1);
+  return probe;
 }
 
 /** The mp4's sound must decode end to end, with the channel count the source had and a real tone in it. */
@@ -91,6 +96,30 @@ test('Video to MP4 keeps the sound: a mono 16 kHz AAC track decodes cleanly', as
   const bytes = await runOnce(page);
   await expectPlayableMp4(page, bytes);
   await expectAudioDecodes(page, bytes, 1);
+});
+
+test('Resize video turns an iPhone-style portrait .mov into a playable mp4 at the new size, with its sound', async ({ page, browserName }) => {
+  test.setTimeout(240_000);
+  await open(page, '/tools/resize-video');
+  await page.locator('#size').selectOption('480');
+  await page.locator('#file-input').setInputFiles([phoneMov]);
+  const bytes = await runOnce(page);
+  // 720x1280 as shown, so the short side 480 gives 480x854.
+  const probe = await expectPlayableMp4(page, bytes);
+  expect([probe.width, probe.height]).toEqual([480, 854]);
+  // Playwright's Chromium on Linux cannot decode AAC in the page; WebKit can everywhere.
+  if (browserName === 'webkit') await expectAudioDecodes(page, bytes, 2);
+});
+
+test('Resize video takes an iPhone-style HEVC .mov where the browser can decode HEVC', async ({ page }) => {
+  test.setTimeout(240_000);
+  await open(page, '/tools/resize-video');
+  const hevc = await page.evaluate(async () => typeof VideoDecoder !== 'undefined' && (await VideoDecoder.isConfigSupported({ codec: 'hvc1.1.6.L120.90' })).supported);
+  test.skip(!hevc, 'this browser has no HEVC decoder (iPhones and Macs do)');
+  await page.locator('#size').selectOption('480');
+  await page.locator('#file-input').setInputFiles([phoneHevc]);
+  const probe = await expectPlayableMp4(page, await runOnce(page));
+  expect([probe.width, probe.height]).toEqual([480, 854]);
 });
 
 test('Compress video gives a playable mp4, twice on the same page', async ({ page }) => {
