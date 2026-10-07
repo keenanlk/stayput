@@ -82,7 +82,9 @@ test('Trim video (exact cut) keeps the sound: a mono 16 kHz AAC track decodes cl
   await expectAudioDecodes(page, bytes, 1);
 });
 
-test('Video to MP4 keeps the sound: a mono 16 kHz AAC track decodes cleanly', async ({ page }) => {
+test('Video to MP4 keeps the sound: a mono 16 kHz AAC track decodes cleanly', async ({ page, browserName }) => {
+  // Video to MP4 keeps AAC for the sound, which Playwright's Chromium on Linux cannot decode in the page.
+  test.skip(browserName !== 'webkit', 'only WebKit decodes AAC in every CI image');
   test.setTimeout(240_000);
   await open(page, '/tools/video-to-mp4');
   await page.locator('#file-input').setInputFiles([toneClip]);
