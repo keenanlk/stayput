@@ -23,6 +23,7 @@ import {
   WebMOutputFormat,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
+import { requireH264Encoder } from './encoder-probe';
 import { unplayable } from './video-compress';
 
 export interface TrimOptions {
@@ -48,6 +49,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new Error('This file has no video track.');
     if (opts.exact && !(await video.canDecode())) throw new Error(unplayable());
+    if (opts.exact) await requireH264Encoder();
     const outFormat =
       format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
     const output = new Output({ format: outFormat, target: new BufferTarget() });

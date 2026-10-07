@@ -9,6 +9,7 @@
  * can send the person to Video to subtitles instead of letting them wait.
  * The test frames are drawn here; no file is read.
  */
+import { EncoderStall } from './encoder-watchdog';
 import { CustomVideoEncoder, EncodedPacket, registerEncoder, type VideoCodec, type VideoSample } from 'mediabunny';
 
 type Variant = { latencyMode: 'quality' | 'realtime'; baseline: boolean };
@@ -120,6 +121,19 @@ export function ensureH264Encoder(): Promise<boolean> {
     return !offered;
   })();
   return checked;
+}
+
+/** Shown by the tools that re-encode video (other than burned-in captions) when this browser's H.264 encoder never answers. */
+export class H264Unavailable extends EncoderStall {
+  // The same plain message a stalled encode shows: suggests Chrome or Firefox, and Mute video.
+  constructor() {
+    super();
+  }
+}
+
+/** Throws H264Unavailable (at once, before any slow work) when the browser's H.264 encoder is silent with every setting. */
+export async function requireH264Encoder(): Promise<void> {
+  if (!(await ensureH264Encoder())) throw new H264Unavailable();
 }
 
 /** Shown when burned-in captions cannot be made here: says so plainly and links to the tool that still works. */

@@ -23,6 +23,7 @@ import {
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
+import { H264Unavailable } from './encoder-probe';
 import { CODEC_NAMES, unplayable } from './video-compress';
 
 export interface ConvertOptions {
@@ -58,7 +59,13 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
     const evenW = width + (width % 2);
     const evenH = height + (height % 2);
     // The best codec this browser can write; re-encoding into the codec the file already has gains nothing.
-    const best = await pickVideoCodec({ width: evenW, height: evenH, bitrate: QUALITY_HIGH });
+    // A silent H.264 encoder only matters if the picture really is re-encoded; copying needs no encoder.
+    let silent: H264Unavailable | undefined;
+    const best = await pickVideoCodec({ width: evenW, height: evenH, bitrate: QUALITY_HIGH }).catch((e) => {
+      if (e instanceof H264Unavailable) silent = e;
+      else throw e;
+      return null;
+    });
     let copyVideo = !!sourceVideo && (PLAYS_EVERYWHERE_VIDEO.includes(sourceVideo) || sourceVideo === best);
     if (!copyVideo && !(await video.canDecode())) {
       // iPhone HEVC in a browser that cannot decode it: MP4 can hold HEVC as it is,
@@ -66,6 +73,7 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
       if (sourceVideo === 'hevc') copyVideo = true;
       else throw new Error(unplayable());
     }
+    if (!copyVideo && silent) throw silent;
     if (!copyVideo && !best) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const videoCodec = copyVideo ? sourceVideo! : best!;
     const duration = await input.computeDuration();
