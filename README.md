@@ -7,7 +7,7 @@
 **Your files stay put.**
 
 Free, open-source tools for images, PDFs, video and audio that run entirely in your browser.<br>
-Nothing is uploaded, there are no accounts or file size caps beyond what your device can hold, and it works offline.
+Your files are not uploaded, there are no accounts or file size caps beyond what your device can hold, and it works offline after one visit (the AI-model tools need one online run to download their model).
 
 **[Open stayput.dev](https://stayput.dev)** · [Tools](#tools) · [Verify the claim](#open-the-network-tab-it-stays-empty) · [How it works](#how-it-works) · [MCP server](#mcp-server) · [Privacy](https://stayput.dev/privacy)
 
