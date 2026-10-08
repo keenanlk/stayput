@@ -18,9 +18,23 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
   try {
     buffer = await ctx.decodeAudioData(bytes);
   } catch {
-    throw new Error('No audio could be read from this file. It may have no sound track, or use an audio format this browser cannot decode.');
+    buffer = await decodeThroughDemuxer(file, rate);
   }
   return buffer.numberOfChannels > 2 ? downmixToStereo(buffer) : buffer;
+}
+
+/**
+ * Safari cannot decode a QuickTime .mov (what an iPhone records) as a whole, so the sound
+ * track's packets are lifted out with the demuxer and decoded from a small MP4 wrapper.
+ */
+async function decodeThroughDemuxer(file: File, rate: number): Promise<AudioBuffer> {
+  const none = new Error('No audio could be read from this file. It may have no sound track, or use an audio format this browser cannot decode.');
+  const { demuxedFileSound } = await import('./demux-audio');
+  const chans = await demuxedFileSound(file, rate, false).catch(() => null);
+  if (!chans?.length) throw none;
+  const buffer = new AudioBuffer({ length: chans[0]!.length, numberOfChannels: chans.length, sampleRate: rate });
+  chans.forEach((ch, c) => buffer.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
+  return buffer;
 }
 
 /**

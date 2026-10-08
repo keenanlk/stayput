@@ -44,6 +44,8 @@ export interface MergeResult {
   duration: number;
   videoCodec: string;
   audio: boolean;
+  /** Set when a clip had sound this browser could not read or encode, so the merged video has none. */
+  audioDropped: boolean;
 }
 
 const MAX_FPS = 60;
@@ -106,6 +108,7 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
 
     // The sound of every clip, end to end, each padded or cut to its picture's length.
     let sound: Float32Array[] | null = null;
+    const hadSound = (await Promise.all(inputs.map((i) => i.getPrimaryAudioTrack().catch(() => null)))).some(Boolean);
     if (!opts.mute && !copy) {
       const parts = await Promise.all(files.map(async (f, i) => ((await inputs[i]!.getPrimaryAudioTrack()) ? decodePcm(f) : null)));
       if (parts.some(Boolean)) {
@@ -185,6 +188,7 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
       duration: total,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       audio: !!audioSource || !!packetSource,
+      audioDropped: !opts.mute && hadSound && !audioSource && !packetSource,
     };
   } finally {
     for (const input of inputs) input.dispose?.();
