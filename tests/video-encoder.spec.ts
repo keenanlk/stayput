@@ -234,3 +234,78 @@ test('an encoder that never answers is caught at once, with a plain message and 
   await expect(error).not.toContainText('captions');
   await expect(error.locator('a')).toHaveCount(0);
 });
+
+// Safari's decoder can hand over the frames of a video with B-frames out of presentation order (seen on an iPhone H.264 .mov in iOS 18.4).
+// Sending that to the encoder as it came wrote timestamps that run backwards, which the muxer refuses. This makes the decoder do the same
+// (frames in groups of five come out as 0 2 4 1 3, each keeping its own timestamp) and expects the encoder to be given the frames in order.
+test('Compress video finishes when the decoder returns frames out of presentation order', async ({ page, browserName }) => {
+  test.skip(browserName !== 'webkit', 'the encoder puts frames back in order on WebKit only');
+  test.setTimeout(240_000);
+  await page.addInitScript(() => {
+    // Frame times per encoder: the page's own startup check also encodes a few test frames, with an encoder of its own.
+    const seen = new Map<VideoEncoder, number[]>();
+    (window as { __encoded?: () => number[][] }).__encoded = () => [...seen.values()];
+    const encode = VideoEncoder.prototype.encode;
+    VideoEncoder.prototype.encode = function (frame, options) {
+      seen.set(this, [...(seen.get(this) ?? []), frame.timestamp]);
+      return encode.call(this, frame, options);
+    };
+    const Real = window.VideoDecoder;
+    const order = [0, 2, 4, 1, 3];
+    class Shuffled {
+      private real: VideoDecoder;
+      private group: VideoFrame[] = [];
+      constructor(init: VideoDecoderInit) {
+        const emit = (frames: VideoFrame[]) => {
+          const sorted = [...frames].sort((a, b) => a.timestamp - b.timestamp);
+          for (const i of order) if (sorted[i]) init.output(sorted[i]!);
+        };
+        this.real = new Real({
+          output: (frame) => {
+            this.group.push(frame);
+            if (this.group.length === order.length) emit(this.group.splice(0));
+          },
+          error: init.error,
+        });
+        const flush = this.real.flush.bind(this.real);
+        this.real.flush = async () => {
+          await flush();
+          emit(this.group.splice(0));
+        };
+      }
+      static isConfigSupported(config: VideoDecoderConfig) {
+        return Real.isConfigSupported(config);
+      }
+      get state() {
+        return this.real.state;
+      }
+      get decodeQueueSize() {
+        return this.real.decodeQueueSize;
+      }
+      configure(config: VideoDecoderConfig) {
+        this.real.configure(config);
+      }
+      decode(chunk: EncodedVideoChunk) {
+        this.real.decode(chunk);
+      }
+      flush() {
+        return this.real.flush();
+      }
+      reset() {
+        this.real.reset();
+      }
+      close() {
+        this.real.close();
+      }
+    }
+    (window as { VideoDecoder: unknown }).VideoDecoder = Shuffled;
+  });
+  await open(page, '/tools/compress-video');
+  await page.locator('#file-input').setInputFiles([phoneMov]);
+  const bytes = await runOnce(page);
+  await expectPlayableMp4(page, bytes);
+  const all = await page.evaluate(() => (window as { __encoded?: () => number[][] }).__encoded?.() ?? []);
+  const encoded = all.sort((a, b) => b.length - a.length)[0] ?? [];
+  expect(encoded.length).toBeGreaterThan(30);
+  expect(encoded.filter((t, i) => i > 0 && t <= encoded[i - 1]!)).toEqual([]);
+});
