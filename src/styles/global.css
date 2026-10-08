@@ -438,6 +438,10 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .prose { max-width: 70ch; }
 .prose p, .prose li { color: var(--ink-2); }
 .prose h2 { margin-top: 36px; margin-bottom: 10px; }
+/* Headings in prose get their own space above, whatever sits before them (paragraph, code block, list). */
+.prose h3 { margin-top: 28px; margin-bottom: 8px; }
+.prose h3 + .snippet { margin-top: 0; }
+.prose h2:first-child, .prose h3:first-child { margin-top: 0; }
 .prose pre.code { margin: 18px 0; padding: 14px 16px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); font-family: var(--mono); font-size: 13.5px; line-height: 1.55; color: var(--ink); tab-size: 2; }
 .prose pre.code code { font: inherit; background: none; padding: 0; border-radius: 0; }
 
