@@ -1003,7 +1003,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-pdf24-safe',
     title: 'Is PDF24 Safe? Online Tools vs PDF24 Creator, and a No-Install Option',
-    description: 'PDF24 is run by Geek Software GmbH in Germany and usually deletes online uploads one hour after upload. How its versions differ, and how to edit PDFs without uploading.',
+    description: 'As of October 2026, PDF24’s privacy policy says its online uploads are usually deleted one hour after upload. How its versions differ, and how to edit PDFs without uploading.',
     heading: 'Is PDF24 safe?',
     dek: 'PDF24 is a long-standing German project, and it tells you itself that its offline app is the more private option. Here is how to choose between the two, and a third way.',
     keywords: ['is pdf24 safe', 'pdf24 safe', 'is pdf24 legit', 'is pdf24 tools safe', 'pdf24 privacy', 'pdf24 creator safe'],
@@ -1172,7 +1172,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-remove-bg-safe',
     title: 'Is remove.bg Safe? Uploads and a No-Upload Option',
-    description: 'remove.bg says it deletes uploads shortly after processing, and says its standalone site is moving to Canva. What that means, and how to cut out photos locally.',
+    description: 'As of October 2026, remove.bg says it deletes uploads shortly after processing, and that its standalone site is moving to Canva. What that means, and how to cut out photos locally.',
     heading: 'Is remove.bg safe?',
     dek: 'remove.bg is a legitimate Canva-owned service. Its policy gives no exact deletion time, and its website is closing, so it is worth knowing the options.',
     keywords: ['is remove.bg safe', 'remove.bg safe', 'is remove bg safe', 'is remove.bg legit', 'remove.bg privacy', 'remove.bg alternative no upload'],
