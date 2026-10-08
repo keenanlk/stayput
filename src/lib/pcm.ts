@@ -15,7 +15,9 @@ export async function decodePcm(file: Blob): Promise<Float32Array[] | null> {
     const buffer = await ctx.decodeAudioData(await file.arrayBuffer());
     return Array.from({ length: Math.min(2, buffer.numberOfChannels) }, (_, i) => buffer.getChannelData(i));
   } catch {
-    return null;
+    // Safari refuses a QuickTime .mov whole; its sound track is read through the demuxer instead.
+    const { demuxedFileSound } = await import('./demux-audio');
+    return demuxedFileSound(file, SAMPLE_RATE, false).catch(() => null);
   }
 }
 

@@ -24,7 +24,7 @@ createShell({
       { mute, onProgress: (f) => progress.set(`Merging ${files.length} videos: ${Math.round(f * 100)}%`, 0.02 + f * 0.98) },
     );
     const notes = [`${files.length} videos joined`, clock(r.duration), `${r.width}×${r.height}`, r.videoCodec];
-    if (!r.audio) notes.push('no sound');
+    if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
     const out: OutputFile = {
       name: 'merged.mp4',
       blob: r.blob,
