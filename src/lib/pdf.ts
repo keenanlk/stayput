@@ -4,6 +4,7 @@
  */
 import type * as PdfLib from 'pdf-lib';
 import type * as PdfJs from 'pdfjs-dist';
+import type { TextContent } from 'pdfjs-dist/types/src/display/api';
 import { canvasToBlob } from './image';
 import { unlockPdf } from './unlock';
 
@@ -80,6 +81,25 @@ export async function renderPage(doc: PdfJs.PDFDocumentProxy, pageNumber: number
   await page.render({ canvas, canvasContext: ctx, viewport }).promise;
   page.cleanup();
   return { canvas, widthPt: base.width, heightPt: base.height };
+}
+
+/**
+ * `page.getTextContent()` without async iteration. pdf.js 6 collects the text
+ * stream with `for await (... of readableStream)`, which Safari before 26
+ * lacks (it throws "undefined is not a function"). Reading the stream with a
+ * reader works everywhere and returns the same shape.
+ */
+export async function getTextContent(page: PdfJs.PDFPageProxy): Promise<TextContent> {
+  const reader = page.streamTextContent().getReader();
+  const out: TextContent = { items: [], styles: Object.create(null), lang: null };
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    out.lang ??= value.lang;
+    Object.assign(out.styles, value.styles);
+    for (const item of value.items) out.items.push(item);
+  }
+  return out;
 }
 
 /** Render a page to a small thumbnail data URL. */

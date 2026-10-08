@@ -1309,6 +1309,21 @@ test('tool pages link to related guides and preset landing pages', async ({ page
 
 const xmlText = (xml: string) => [...xml.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)].map((m) => m[1]!);
 
+// Safari before 26 has no async iteration over a ReadableStream, which pdf.js's own getTextContent() relies on.
+const withoutStreamIteration = (page: Page) => page.addInitScript(() => {
+  delete (ReadableStream.prototype as unknown as Record<symbol, unknown>)[Symbol.asyncIterator];
+});
+
+test('PDF to Word reads text where ReadableStream cannot be async-iterated (Safari 18)', async ({ page }) => {
+  await withoutStreamIteration(page);
+  const errors = await open(page, 'pdf-to-word');
+  expect(await page.evaluate(() => Symbol.asyncIterator in ReadableStream.prototype)).toBe(false);
+  const { downloads } = await run(page, ['article.pdf']);
+  const zip = unzipSync(await bytesOf(downloads[0]!));
+  expect(new TextDecoder().decode(zip['word/document.xml']!)).toContain('Fixture Article Title');
+  expect(errors).toEqual([]);
+});
+
 test('PDF to Word rebuilds paragraphs and headings into a .docx and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'pdf-to-word');
   const net = watchNetwork(page);
@@ -4357,6 +4372,18 @@ test('Voice recorder records the microphone to an MP3 that keeps the pitch, and 
   expect(sound.seconds).toBeLessThan(2.2);
   expect(Math.abs(sound.hz - 440)).toBeLessThan(22);
   net.assertNothingLeft(['voice-recording']);
+  expect(errors).toEqual([]);
+});
+
+test('Redact PDF text search works where ReadableStream cannot be async-iterated (Safari 18)', async ({ page }) => {
+  await withoutStreamIteration(page);
+  const errors = await open(page, 'redact-pdf');
+  expect(await page.evaluate(() => Symbol.asyncIterator in ReadableStream.prototype)).toBe(false);
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#redact-panel')).toBeVisible();
+  await page.locator('#find-text').fill('page 2');
+  await page.locator('#find-form button[type="submit"]').click();
+  await expect(page.locator('#find-result')).toContainText('Marked 1 match');
   expect(errors).toEqual([]);
 });
 
