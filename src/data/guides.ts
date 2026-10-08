@@ -727,7 +727,7 @@ export const guides: Guide[] = [
     heading: 'Is CloudConvert safe?',
     dek: 'For most files, yes: it is an established, certified service. The real question is whether a given file should leave your computer at all.',
     keywords: ['is cloudconvert safe', 'cloudconvert safe', 'cloudconvert privacy', 'is cloudconvert legit', 'cloudconvert security', 'cloudconvert alternative no upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'video-to-mp3', 'heic-to-jpg', 'video-to-gif'],
     sections: [
       {
@@ -739,7 +739,7 @@ export const guides: Guide[] = [
       },
       {
         h: 'What CloudConvert says it does with your files',
-        p: ['From CloudConvert’s own security page and privacy policy, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per CloudConvert’s [security page](https://cloudconvert.com/security) and [privacy policy](https://cloudconvert.com/privacy):'],
         list: [
           '**Deletion.** Files are deleted when you press the delete (×) button, and automatically after 24 hours at the latest. It offers no permanent storage.',
           '**Isolation.** Each conversion runs in its own isolated container, and the company says its staff cannot technically access your files.',
@@ -784,32 +784,32 @@ export const guides: Guide[] = [
     heading: 'Is FreeConvert safe?',
     dek: 'FreeConvert is a legitimate service with a clear deletion policy. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
     keywords: ['is freeconvert safe', 'freeconvert safe', 'is freeconvert.com safe', 'freeconvert privacy', 'is freeconvert legit', 'freeconvert virus'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'FreeConvert.com is a real, widely used converter, owned by TRMedia Inc., a Canadian software company. Files you convert there are not malware by virtue of passing through it, and its privacy policy sets out a clear retention period. For everyday files it is a reasonable choice.',
+          'FreeConvert.com is a real, widely used converter, operated by TransMedia Inc. of Toronto, Canada, according to its terms of service. Files you convert there are not malware by virtue of passing through it, and its privacy policy sets out a clear retention period. For everyday files it is a reasonable choice.',
           'Like every upload-based converter, it works by sending your file to its servers. So the practical question is not whether FreeConvert is trustworthy in general, but whether the file in front of you is one you are comfortable storing on a third party’s cloud for a few hours.',
         ],
       },
       {
         h: 'What FreeConvert’s policy says',
-        p: ['From FreeConvert’s privacy policy and about page, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per FreeConvert’s [privacy policy](https://www.freeconvert.com/privacy):'],
         list: [
           '**Deletion.** Uploaded files are automatically and permanently deleted after 8 hours, and you can delete them yourself sooner.',
           '**Storage.** Files are stored with Amazon Web Services in Ireland.',
           '**Access.** The company says it does not access or view your files without your written consent, unless legally required, and does not sell or share them. You keep ownership of your files.',
           '**Encryption.** Communication between your device and its systems is encrypted with SSL/TLS.',
-          '**Analytics.** The site uses Google Analytics, Sentry and similar services to measure use and errors; the policy says these do not collect your file contents.',
+          '**Cookies.** The policy says FreeConvert and some services it works with use cookies to provide the service.',
         ],
       },
       {
         h: 'Where the risk actually sits',
         p: [
-          'An eight-hour window on a major cloud provider is a normal design for a free converter. The exposure is not a secret flaw; it is the upload itself. During that window your document exists outside your control, under Canadian and EU-hosted terms, and deletion is something you trust rather than verify.',
-          'FreeConvert is also an ad-supported site. Ads are not a file risk, but they are where people sometimes click the wrong download button. Use the button inside the conversion result, not a large button in an ad slot.',
+          'An eight-hour window on a major cloud provider is a normal design for a free converter. The exposure is not a secret flaw; it is the upload itself. During that window your document exists outside your control, with files stored in Ireland, and deletion is something you trust rather than verify.',
+          'FreeConvert’s pricing page lists “No Ads” as a feature of its paid plans, as of October 2026, so the free site is ad-supported. Ads are not a file risk, but they are where people sometimes click the wrong download button. Use the button inside the conversion result, not a large button in an ad slot.',
         ],
       },
       {
@@ -827,7 +827,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is FreeConvert legit?', a: 'Yes. It is operated by TRMedia Inc., a Canadian company, and publishes a privacy policy with a fixed deletion period.' },
+      { q: 'Is FreeConvert legit?', a: 'Yes. Its terms name TransMedia Inc. of Toronto, Canada as the operator, and its privacy policy gives a fixed deletion period.' },
       { q: 'How long does FreeConvert keep my files?', a: 'Its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
       { q: 'Where are FreeConvert files stored?', a: 'On Amazon Web Services in Ireland, according to its privacy policy.' },
       { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; after one visit, switch on airplane mode and they still work.' },
@@ -836,29 +836,29 @@ export const guides: Guide[] = [
   {
     slug: 'is-ilovepdf-safe',
     title: 'Is iLovePDF Safe? How It Handles Your PDFs, and How to Keep Them Local',
-    description: 'iLovePDF is a Barcelona-based, ISO 27001 certified PDF service that deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
+    description: 'iLovePDF is a Europe-based, ISO 27001 certified PDF service that deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
     heading: 'Is iLovePDF safe?',
     dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
     keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'iLovePDF is one of the most popular PDF websites, run by a company based in Barcelona, Spain. It is legitimate, holds ISO/IEC 27001 certification and operates under the EU’s GDPR. For ordinary PDFs it is a sensible choice.',
-          'Its tools work by uploading your PDF to its servers, processing it there and handing the result back. That means the document spends up to two hours outside your control. For payslips, bank statements, identity documents, medical or legal files, you may prefer tools that never send the file anywhere.',
+          'iLovePDF is one of the most popular PDF websites, a Europe-based company. It is legitimate, holds ISO/IEC 27001 certification and operates under the EU’s GDPR. For ordinary PDFs it is a sensible choice.',
+          'Its online tools work by uploading your PDF to its servers, processing it there and handing the result back. That means the document spends up to two hours outside your control. For payslips, bank statements, identity documents, medical or legal files, you may prefer tools that never send the file anywhere.',
         ],
       },
       {
         h: 'What iLovePDF says it does with your PDFs',
-        p: ['From iLovePDF’s security policy and FAQ, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per iLovePDF’s [security page](https://www.ilovepdf.com/help/security) and [desktop page](https://www.ilovepdf.com/desktop):'],
         list: [
           '**Deletion.** Processed files are automatically and permanently deleted within two hours; you can also delete them from the download screen straight away.',
           '**Signatures.** Documents signed through its e-signature service are kept for up to five years, for legal compliance.',
           '**Encryption.** Data is protected with HTTPS in transit, and the company says it is also encrypted at rest.',
           '**Certification and law.** ISO/IEC 27001 certified, GDPR compliant, and a Europe-based company.',
-          '**Offline option.** iLovePDF Desktop for Windows and Mac can process files offline, on your own computer.',
+          '**Desktop option.** iLovePDF Desktop is available for Windows and Mac and processes files on your own computer.',
         ],
       },
       {
@@ -872,7 +872,7 @@ export const guides: Guide[] = [
         h: 'Merge, split and compress PDFs without uploading',
         p: [
           'Stayput’s PDF tools run entirely in your browser tab. [Merge PDF](/tools/merge-pdf) joins files in the order you choose, [Split PDF](/tools/split-pdf) extracts pages or splits every page, [Compress PDF](/tools/compress-pdf) shrinks scanned documents, and [Sign PDF](/tools/sign-pdf) places a drawn or typed signature. The PDF is read from your disk and the result is written back; there is no upload, no account and no daily limit.',
-          'iLovePDF offers a wider set of tools, such as Office conversion, OCR, and legally binding e-signature workflows. If you need those, its desktop app keeps files on your machine; for the common jobs, a browser tool does the same without installing anything.',
+          'iLovePDF offers a wider set of tools and e-signature options. If you need those, its desktop app processes files on your machine; for the common jobs, a browser tool does the same without installing anything.',
         ],
       },
       {
@@ -883,51 +883,51 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is iLovePDF legit?', a: 'Yes. It is an established service run from Barcelona, Spain, with ISO/IEC 27001 certification and GDPR compliance.' },
+      { q: 'Is iLovePDF legit?', a: 'Yes. It is an established Europe-based service with ISO/IEC 27001 certification and GDPR compliance, according to its security page.' },
       { q: 'How long does iLovePDF keep my files?', a: 'Its security policy says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
-      { q: 'Does iLovePDF have an offline version?', a: 'Yes. iLovePDF Desktop for Windows and Mac works offline. Browser tools like Stayput’s are another option that needs no installation.' },
+      { q: 'Does iLovePDF have an offline version?', a: 'Yes. Per its desktop page, iLovePDF Desktop for Windows and Mac processes files offline. Browser tools like Stayput’s are another option that needs no installation.' },
       { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after one visit, it keeps working with the network switched off.' },
     ],
   },
   {
     slug: 'is-smallpdf-safe',
     title: 'Is Smallpdf Safe? File Retention, Storage and a No-Upload Option',
-    description: 'Smallpdf deletes uploads after one hour and keeps shared files for 14 days. What that means for private files, and how to edit PDFs without uploading.',
+    description: 'Smallpdf says it deletes files within an hour for signed-in users, unless they are saved to file storage. What that means for private files, and how to edit PDFs without uploading.',
     heading: 'Is Smallpdf safe?',
     dek: 'Smallpdf is a reputable Swiss company with ISO 27001 certification. What changes the answer for you is which of its storage rules applies to your file.',
     keywords: ['is smallpdf safe', 'smallpdf safe', 'is smallpdf legit', 'smallpdf privacy', 'smallpdf security', 'smallpdf alternative'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['compress-pdf', 'merge-pdf', 'pdf-to-word', 'sign-pdf'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'Smallpdf is a large, established PDF service run by Smallpdf AG in Zurich, Switzerland. It holds ISO 27001 certification and publishes clear retention rules. For everyday PDFs, it is a legitimate and reasonable choice.',
+          'Smallpdf is a large, established PDF service run by Smallpdf AG in Zurich, Switzerland. Its pricing page says it is ISO/IEC 27001 certified, and its privacy notice sets out retention rules. For everyday PDFs, it is a legitimate and reasonable choice.',
           'Like other web PDF services it processes files on its servers, and how long your file stays there depends on what you do with it. Knowing those rules, and knowing that you can avoid the upload entirely for common tasks, is what makes the answer useful.',
         ],
       },
       {
-        h: 'Smallpdf’s three retention rules',
-        p: ['From Smallpdf’s own help and trust pages, as checked on 29 September 2026:'],
+        h: 'Smallpdf’s retention rules',
+        p: ['As of October 2026, per Smallpdf’s [privacy notice](https://smallpdf.com/privacy):'],
         list: [
-          '**One hour** for ordinary processing: an uploaded file is deleted automatically an hour after processing.',
-          '**14 days** if you share the result by email or link, or send it for signature with its e-sign feature.',
-          '**Until you delete it** if you have an account and use document storage, which can be turned off in your settings.',
+          '**With an account:** files are deleted within one hour unless you save them to your file storage.',
+          '**Saved files:** when you delete them from storage, Smallpdf says it generally deletes them within 14 days.',
+          '**Without an account:** it aims to delete files within a reasonable period after they were last opened, and that period restarts each time you reopen the file.',
         ],
-        after: ['Transfers use TLS encryption, and the company is ISO 27001 certified.'],
+        after: ['Its pricing page says documents are processed under TLS encryption and that Smallpdf is ISO/IEC 27001 certified.'],
       },
       {
         h: 'Reading those rules for your file',
         p: [
-          'The one-hour window is short, and that is a well-designed default. The account storage option is the one to watch: it is convenient, but it means your documents live in a cloud account, protected by your password, until you remove them. If you signed up to try a feature, check whether storage is on.',
+          'For signed-in users the one-hour window is short, which is a well-designed default. The account storage option is the one to watch: it is convenient, but it means your documents live in a cloud account, protected by your password, until you remove them. Without an account the retention period is less precise, so it is worth knowing which case applies to you.',
           'The general caveat is the same for every upload service: deletion and access controls are commitments about a server you cannot see. For files your job, a client agreement or health privacy law says must stay under your control, choose a tool that does not upload.',
         ],
       },
       {
         h: 'Common PDF jobs without uploading',
         p: [
-          'Stayput’s PDF tools run in your browser, so the PDF stays on your device: [Compress PDF](/tools/compress-pdf) for oversized scans, [Merge PDF](/tools/merge-pdf) to combine documents, [PDF to Word](/tools/pdf-to-word) to get editable text into a .docx, and [Sign PDF](/tools/sign-pdf) to add a signature and date. There is no account and no storage to switch off, because nothing is ever stored.',
-          'Smallpdf does things a browser tool cannot, including OCR-heavy conversions, team workspaces and e-signature requests with audit trails. If you rely on those, its retention settings are worth a two-minute review; for one-off edits of private documents, local tools avoid the question.',
+          'Stayput’s PDF tools run in your browser, so the PDF stays on your device: [Compress PDF](/tools/compress-pdf) for oversized scans, [Merge PDF](/tools/merge-pdf) to combine documents, [PDF to Word](/tools/pdf-to-word) to get editable text into a .docx, and [Sign PDF](/tools/sign-pdf) to add a signature and date. There is no account and no cloud storage to switch off, because your files are not uploaded.',
+          'Smallpdf does things a browser tool cannot, including OCR, team plans and e-signature requests (all listed on its pricing page as of October 2026). If you rely on those, its retention settings are worth a two-minute review; for one-off edits of private documents, local tools avoid the question.',
         ],
       },
       {
@@ -939,38 +939,38 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is Smallpdf legit?', a: 'Yes. It is operated by Smallpdf AG in Zurich, Switzerland, is ISO 27001 certified, and is one of the most widely used PDF services.' },
-      { q: 'How long does Smallpdf keep my files?', a: 'One hour after processing by default; 14 days if you share the file or send it for e-signature; and indefinitely if you store it in an account, until you delete it or turn storage off.' },
-      { q: 'How do I stop Smallpdf storing my documents?', a: 'Signed-in users can turn off document storage in their Smallpdf settings, and delete files already stored there.' },
-      { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so the PDF never leaves your device. It keeps working with the network off once the page has loaded.' },
+      { q: 'How long does Smallpdf keep my files?', a: 'As of October 2026, per its privacy notice: within one hour for signed-in users unless the file is saved to file storage, and generally within 14 days after you delete a saved file. Without an account it aims to delete within a reasonable period after the file was last opened.' },
+      { q: 'How do I stop Smallpdf storing my documents?', a: 'Per its privacy notice, files are deleted within an hour for signed-in users unless you save them to file storage; you can delete saved files yourself.' },
+      { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so your PDF is not uploaded. It keeps working with the network off once the page has loaded.' },
     ],
   },
   {
     slug: 'is-ezgif-safe',
     title: 'Is Ezgif Safe? What Happens to Your Uploads, and a No-Upload GIF Maker',
-    description: 'Ezgif is a long-running GIF editor from Latvia that deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
+    description: 'Ezgif is a long-running GIF editor that deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
     heading: 'Is ezgif safe?',
     dek: 'Ezgif is a legitimate, popular GIF tool with a short deletion window. The file you are about to drop in decides whether uploading it is fine.',
     keywords: ['is ezgif safe', 'ezgif safe', 'is ezgif legit', 'is ezgif.com safe', 'ezgif privacy', 'ezgif virus', 'ezgif alternative'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'Yes, in the ordinary sense. Ezgif.com has been one of the go-to GIF editors for years, and its about page says it is developed and hosted by Open Idea, a small company in Latvia. Using it does not put malware on your computer, and it states a short retention period for the files you give it.',
+          'Yes, in the ordinary sense. Ezgif.com has been one of the go-to GIF editors for years, and its about page says it is developed and hosted by Open Idea. Using it does not put malware on your computer, and it states a short retention period for the files you give it.',
           'Every ezgif tool works on its servers: the video or image you choose is uploaded, edited there, and the result is shown back to you. So for a meme or a game clip there is little to think about. For a screen recording that shows your inbox, a video of your children, or anything from work, the useful question is whether that file should be uploaded at all.',
         ],
       },
       {
         h: 'What ezgif’s privacy page says',
-        p: ['From ezgif’s privacy and about pages, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per ezgif’s [privacy page](https://ezgif.com/privacy) and [about page](https://ezgif.com/about):'],
         list: [
           '**Deletion.** Uploaded files stay on its servers for up to one hour after they were last used with its tools, then are deleted automatically.',
           '**Visibility.** File names are not listed publicly.',
           '**Cookies and ads.** The site uses cookies to analyse traffic with anonymised, aggregated data, to remember preferences and to serve advertisements.',
-          '**Operator.** Developed and hosted by Open Idea, Latvia. The site is served over HTTPS.',
+          '**Operator.** Developed and hosted by Open Idea.',
         ],
-        after: ['The privacy page does not describe certifications, encryption at rest or who else can reach the servers, which is typical for a small free tool rather than a warning sign.'],
+        after: ['The privacy page does not describe certifications, encryption or who else can reach the servers.'],
       },
       {
         h: 'The two real risks',
@@ -994,7 +994,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is ezgif legit?', a: 'Yes. It is a long-established free GIF editor, developed and hosted by Open Idea in Latvia according to its about page.' },
+      { q: 'Is ezgif legit?', a: 'Yes. It is a long-established free GIF editor, developed and hosted by Open Idea according to its about page.' },
       { q: 'How long does ezgif keep my files?', a: 'Its privacy page says uploads are kept up to one hour after they were last used with its tools and then deleted automatically.' },
       { q: 'Can ezgif give my computer a virus?', a: 'Converting a file there does not. The usual risk on ad-supported sites is clicking an advert that looks like a download button, so save the result from the output itself.' },
       { q: 'How do I make a GIF without uploading the video?', a: 'Use a converter that runs in the browser. Stayput’s Video to GIF encodes the GIF on your device; switch off the network after the page loads and it still works.' },
@@ -1003,29 +1003,28 @@ export const guides: Guide[] = [
   {
     slug: 'is-pdf24-safe',
     title: 'Is PDF24 Safe? Online Tools vs PDF24 Creator, and a No-Install Option',
-    description: 'PDF24 is run by Geek Software GmbH in Germany and deletes online uploads after one hour. How its versions differ, and how to edit PDFs without uploading.',
+    description: 'PDF24 is run by Geek Software GmbH in Germany and usually deletes online uploads one hour after upload. How its versions differ, and how to edit PDFs without uploading.',
     heading: 'Is PDF24 safe?',
     dek: 'PDF24 is a long-standing German project, and it tells you itself that its offline app is the more private option. Here is how to choose between the two, and a third way.',
     keywords: ['is pdf24 safe', 'pdf24 safe', 'is pdf24 legit', 'is pdf24 tools safe', 'pdf24 privacy', 'pdf24 creator safe'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'PDF24 is legitimate. It is operated by Geek Software GmbH, a German company, which says it has been developing the PDF24 tools since 2006. Both its online tools and its PDF24 Creator desktop app are free.',
+          'PDF24 is legitimate. It is operated by Geek Software GmbH, a German company, which offers free online tools and a desktop app. Both its online tools and its PDF24 Creator desktop app are free.',
           'What makes PDF24 unusual is that it answers the privacy question on its own homepage: the online tools process files on its servers, and if you want to be more secure, it recommends PDF24 Creator, where files stay on your PC. So which PDF24 you use matters more than whether PDF24 is safe.',
         ],
       },
       {
         h: 'What PDF24 says about the online tools',
-        p: ['From tools.pdf24.org and the Geek Software privacy policy, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per [tools.pdf24.org](https://tools.pdf24.org/en/) and the [PDF24 privacy policy](https://www.pdf24.org/en/privacy-policy.html):'],
         list: [
           '**Processing.** The online tools run on PDF24’s own servers, not in your browser.',
-          '**Deletion.** Uploaded files are deleted from the server automatically after one hour, and you can remove them sooner yourself.',
-          '**Encryption.** File transfers to its servers are encrypted.',
-          '**Law.** As a German company it processes data under the GDPR.',
-          '**Offline option.** PDF24 Creator for Windows provides the same tools offline, with files kept on your computer.',
+          '**Deletion.** Files and results are usually deleted one hour after upload or creation; the policy says longer storage may be needed if processing takes longer than an hour.',
+          '**Encryption.** The homepage says file transfers to its servers are encrypted.',
+                    '**Desktop option.** PDF24 Creator, Windows software, provides the tools with files kept on your computer.',
         ],
       },
       {
@@ -1039,7 +1038,7 @@ export const guides: Guide[] = [
         h: 'PDF jobs in the browser, without uploading',
         p: [
           'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work in any modern browser on Windows, Mac, Android or iPhone and, after one visit, keep working with the network switched off.',
-          'PDF24 has a far larger toolbox, including Office conversions, OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on a Mac, a Chromebook or a phone, a browser tool avoids both the upload and the install.',
+          'PDF24 has a far larger toolbox, including OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on a Mac, a Chromebook or a phone, a browser tool avoids both the upload and the install.',
         ],
       },
       {
@@ -1050,8 +1049,8 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is PDF24 legit?', a: 'Yes. PDF24 is operated by Geek Software GmbH, a German company, and has been developed since 2006.' },
-      { q: 'How long does PDF24 keep uploaded files?', a: 'Its site says files uploaded to the online tools are deleted automatically after one hour, and can be removed manually before then.' },
+      { q: 'Is PDF24 legit?', a: 'Yes. PDF24 is operated by Geek Software GmbH, a German company, and offers its tools free of charge.' },
+      { q: 'How long does PDF24 keep uploaded files?', a: 'As of October 2026, its privacy policy says uploaded files and results are usually deleted one hour after upload or creation.' },
       { q: 'Is PDF24 Creator safer than the online tools?', a: 'PDF24 itself says so: Creator processes files on your own PC, so nothing is uploaded. It is Windows software, though.' },
       { q: 'How can I edit a PDF privately on a Mac or phone?', a: 'Use a tool that works in the browser without uploading, such as Stayput’s PDF tools. After one visit, they keep working offline.' },
     ],
@@ -1063,7 +1062,7 @@ export const guides: Guide[] = [
     heading: 'Is Convertio safe?',
     dek: 'Convertio is a well-known converter with a published deletion policy. For private files, the safer choice is a converter that never receives them.',
     keywords: ['is convertio safe', 'convertio safe', 'is convertio legit', 'is convertio.co safe', 'convertio privacy', 'convertio virus'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf'],
     sections: [
       {
@@ -1075,7 +1074,7 @@ export const guides: Guide[] = [
       },
       {
         h: 'Convertio’s stated practices',
-        p: ['From Convertio’s privacy page and terms, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per Convertio’s [privacy page](https://convertio.co/privacy/) and [terms](https://convertio.co/terms/):'],
         list: [
           '**Input files** are removed right after conversion.',
           '**Converted files** are deleted when you click the × next to them, or automatically after 24 hours.',
@@ -1118,27 +1117,27 @@ export const guides: Guide[] = [
     title: 'Is Zamzar Safe? Seven-Day Storage, Email Links and a Local Alternative',
     description: 'Zamzar is a UK converter that keeps free conversions for up to seven days. What that means for private files, and how to convert without uploading.',
     heading: 'Is Zamzar safe?',
-    dek: 'Zamzar is one of the oldest online converters and runs without third-party ads. Its storage window is longer than most, which is the detail worth knowing.',
+    dek: 'Zamzar is one of the oldest online converters. Its storage window is longer than most, which is the detail worth knowing.',
     keywords: ['is zamzar safe', 'zamzar safe', 'is zamzar legit', 'is zamzar.com safe', 'zamzar privacy', 'zamzar virus'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'Zamzar is legitimate. It is run by Zamzar Limited, a company registered in England, and has been converting files online since 2006. Its privacy policy was last updated in August 2026, and the site says it hosts no third-party advertising, which removes the fake-download-button problem common on free converters.',
+          'Zamzar is legitimate. It is run by Zamzar Limited, a company registered in England, and has been converting files online since 2006. Its privacy policy was last modified on 14 August 2026.',
           'The point to understand before uploading something personal is retention. Free conversions can stay on Zamzar’s systems for up to seven days, noticeably longer than services that delete within hours.',
         ],
       },
       {
         h: 'What Zamzar’s policy says',
-        p: ['From Zamzar’s privacy policy, last modified 14 August 2026, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per Zamzar’s [privacy policy](https://www.zamzar.com/privacy/), last modified 14 August 2026:'],
         list: [
           '**Free conversions.** Files you submit and their converted outputs are stored for no longer than 7 days.',
           '**Accounts.** For account holders, data is kept while the account is active; files are permanently removed 35 days after an account is deactivated.',
           '**Email.** If you give an email address, Zamzar sends links to download your converted files there.',
           '**Encryption.** Traffic to and from its servers uses TLS.',
-          '**Ads and analytics.** No third-party advertising on zamzar.com; it uses Google Analytics.',
+          '**Analytics.** It uses Google Analytics.',
           '**Service providers.** Data is shared with vendors for server hosting and content delivery.',
         ],
       },
@@ -1152,7 +1151,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting on your own device instead',
         p: [
-          'Stayput’s tools do the most common conversions inside your browser, so there is no copy on a server and no link to expire. Use the [image converter](/tools/convert-image) for JPG, PNG, WebP, HEIC and more, [Compress image](/tools/compress-image) to shrink photos for upload forms, [PDF to image](/tools/pdf-to-image) to turn pages into JPG or PNG, and [Video to MP3](/tools/video-to-mp3) for audio. The result downloads straight from the page.',
+          'Stayput’s tools do the most common conversions inside your browser, so your files are not uploaded, there is no copy on a server and no link to expire. Use the [image converter](/tools/convert-image) for JPG, PNG, WebP, HEIC and more, [Compress image](/tools/compress-image) to shrink photos for upload forms, [PDF to image](/tools/pdf-to-image) to turn pages into JPG or PNG, and [Video to MP3](/tools/video-to-mp3) for audio. The result downloads straight from the page.',
           'Zamzar covers many more formats and offers an API and account features. For obscure formats with nothing private inside, it remains a solid choice.',
         ],
       },
@@ -1166,50 +1165,49 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Is Zamzar legit?', a: 'Yes. It is operated by Zamzar Limited, a company registered in England, and has run online conversions since 2006.' },
       { q: 'How long does Zamzar keep my files?', a: 'Its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
-      { q: 'Does Zamzar have ads?', a: 'Its privacy policy says it does not host third-party advertising on zamzar.com. It does use Google Analytics.' },
+      { q: 'Does Zamzar use analytics?', a: 'As of October 2026, its privacy policy says it uses Google Analytics, with cookies that store a client and session id.' },
       { q: 'Can I convert files without uploading them?', a: 'Yes, for common image, PDF and audio formats. Browser-based tools like Stayput’s process files on your device and work offline once loaded.' },
     ],
   },
   {
     slug: 'is-remove-bg-safe',
-    title: 'Is remove.bg Safe? Uploads, AI Training and a No-Upload Option',
-    description: 'remove.bg deletes uploads shortly after processing, but its policy lets account uploads train AI. What that means, and how to cut out photos locally.',
+    title: 'Is remove.bg Safe? Uploads and a No-Upload Option',
+    description: 'remove.bg says it deletes uploads shortly after processing, and says its standalone site is moving to Canva. What that means, and how to cut out photos locally.',
     heading: 'Is remove.bg safe?',
-    dek: 'remove.bg is a legitimate Canva-owned service. Two details in its privacy policy matter more than the usual deletion promise: training and preview-only free downloads.',
+    dek: 'remove.bg is a legitimate Canva-owned service. Its policy gives no exact deletion time, and its website is closing, so it is worth knowing the options.',
     keywords: ['is remove.bg safe', 'remove.bg safe', 'is remove bg safe', 'is remove.bg legit', 'remove.bg privacy', 'remove.bg alternative no upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-image'],
     sections: [
       {
         h: 'The short answer',
         p: [
           'Yes, remove.bg is legitimate and widely used. It belongs to Canva: its privacy policy names the operator as Canva Austria GmbH in Vienna, the company behind Kaleido, remove.bg, Unscreen and Designify. Using it will not harm your computer, and the policy says uploads are deleted shortly after processing.',
-          'On the website every cut-out is made on its servers, so each photo is uploaded. For a product shot that is rarely a concern. For a picture of your children, a selfie or anyone who did not agree to it, two parts of the policy are worth reading before you drop the file in.',
+          'On the website every cut-out is made on its servers, so each photo is uploaded. For a product shot that is rarely a concern. For a picture of your children, a selfie or anyone who did not agree to it, the policy is worth reading before you drop the file in.',
         ],
       },
       {
         h: 'What remove.bg’s policy says',
-        p: ['From the remove.bg privacy policy (last updated 16 July 2025) and pricing page, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per the remove.bg [privacy policy](https://www.remove.bg/privacy) (last updated 16 July 2025) and [pricing page](https://www.remove.bg/pricing):'],
         list: [
           '**Deletion.** Files are uploaded, processed, offered for download and then deleted “shortly after”. The policy gives no exact time.',
-          '**AI training.** The company may analyse media uploads and related data in your account to train its algorithms, models and AI products. Separately, the site asks some users to opt in with “Contribute this image & help us make remove.bg better”.',
-          '**Location.** Data is stored and processed in Europe and in any other country where the company, its affiliates or service providers have facilities. Server logs are kept for up to three months.',
-          '**Analytics.** Google Analytics collects usage data through cookies.',
-          '**Free vs paid.** Preview images are free on the website; each full-resolution result costs a credit.',
+          '**Location.** Data is stored and processed in Europe and in any other country where the company, its affiliates or service providers have facilities.',
+          '**Analytics.** Cookies served by Google Analytics collect limited usage data.',
+          '**The site is closing.** The pricing page says the standalone website will no longer be available from 1 December 2026, with background removal moving to Canva.',
         ],
       },
       {
         h: 'What that means for your photos',
         p: [
-          'Short-lived storage is the norm for upload tools. The training clause is the part to weigh: it covers uploads tied to an account, which is exactly where people who buy credits end up. If you would rather your family photos or client work did not feed a model, that is a reason to avoid signing in or to use a different tool.',
-          'The preview limit changes the calculation too. To get a full-size cut-out for free, many people end up uploading the same photo to several sites in turn, multiplying the copies on other people’s servers.',
+          'Short-lived storage is the norm for upload tools, but “shortly after” is not a number, so for private photos the safest copy is the one that is never uploaded.',
+          'The move to Canva is the other thing to weigh: if you rely on remove.bg’s site, check the pricing page for what replaces it after 1 December 2026.',
         ],
       },
       {
         h: 'Cutting out a photo without uploading it',
         p: [
-          'Stayput’s [background remover](/tools/remove-background) runs an open segmentation model inside your browser tab. The photo is never sent anywhere, the result is at your photo’s full resolution, and there are no credits or watermark. Use [Make background transparent](/make-background-transparent) for a PNG with a see-through background, or [White background](/white-background) for marketplace-ready product shots. To hide a face instead of cutting it out, use [Blur image](/tools/blur-image).',
-          'remove.bg’s own model is very good at difficult hair and busy scenes, and it offers an API, desktop apps and a Photoshop plug-in for bulk work. For a quick cut-out of a private photo, a local tool avoids the upload, the training question and the preview limit in one go.',
+          'Stayput’s [background remover](/tools/remove-background) runs an open segmentation model inside your browser tab. Your photo is not uploaded, the result is at your photo’s full resolution, and there are no credits or watermark. Use [Make background transparent](/make-background-transparent) for a PNG with a see-through background, or [White background](/white-background) for marketplace-ready product shots. To hide a face instead of cutting it out, use [Blur image](/tools/blur-image).',
+          'remove.bg’s own model is very good at difficult hair and busy scenes, and it offers an API, desktop apps and a Photoshop plug-in for bulk work. For a quick cut-out of a private photo, a local tool avoids the upload.',
         ],
       },
       {
@@ -1221,8 +1219,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is remove.bg legit?', a: 'Yes. It is a Canva brand, operated by Canva Austria GmbH in Vienna, Austria, and is one of the best-known background removers.' },
-      { q: 'Does remove.bg keep my photos?', a: 'Its privacy policy says uploaded files are deleted shortly after processing, without giving an exact time. Server logs are kept for up to three months.' },
-      { q: 'Does remove.bg use my photos to train AI?', a: 'Its privacy policy says it may analyse media uploads and related data in your account to train its algorithms and AI products. It also asks some users to contribute images voluntarily.' },
+      { q: 'Does remove.bg keep my photos?', a: 'As of October 2026, its privacy policy says uploaded files are deleted shortly after processing, without giving an exact time.' },
       { q: 'How can I remove a background without uploading the photo?', a: 'Use a tool that runs the model in your browser, such as Stayput’s background remover. After the model has downloaded once, it works with the network switched off.' },
     ],
   },
