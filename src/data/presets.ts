@@ -2478,12 +2478,12 @@ export const presets: Preset[] = [
     title: 'PNG Compressor, Free TinyPNG Alternative, No Upload | Stayput',
     description: 'Free PNG compressor that runs in your browser. Cut PNG file size by up to 80% and keep transparency. No upload, no 5 MB cap, no daily limit.',
     heading: 'Free PNG compressor',
-    tagline: 'TinyPNG-style compression without sending your images anywhere, and without a limit on how many you do.',
+    tagline: 'TinyPNG-style compression without uploading your images, and without a limit on how many you do.',
     keywords: ['png compressor', 'tinypng alternative', 'png optimizer', 'compress png online', 'png compressor free', 'optimize png'],
     dropLabel: 'Drop PNG files to compress',
     intro: [
       'Web pages, apps and design systems are full of PNGs that are three or four times bigger than they need to be. A PNG saved from a design tool or a screenshot stores every pixel in full 24-bit colour plus transparency, even when the image only uses a few hundred colours. A PNG compressor rewrites it with a palette of the colours that matter, and the file usually drops by 60 to 80 percent with no difference you can see.',
-      'Popular compressors upload each image to their server, cap free use at a handful of files and 5 MB each, and ask you to pay for more. This page does the same job in your browser tab: the colour reduction and the PNG encoding run in JavaScript on your device. Drop a whole folder of exports and they are compressed one after another and downloaded as a zip.',
+      'As of October 2026, per [tinypng.com](https://tinypng.com/), TinyPNG\'s web page lists "Up to 20 images, max 5 MB each" and points to a paid plan for more. This page does the same job in your browser tab, and your images are not uploaded: the colour reduction and the PNG encoding run in JavaScript on your device. Drop a whole folder of exports and they are compressed one after another and downloaded as a zip.',
       'Pick Best quality for most images. Flat graphics, icons and diagrams can go down to 64 colours; photographic PNGs are better converted to JPG or WebP. If a file would not get smaller, you get the original back untouched.',
     ],
     steps: [
@@ -2492,9 +2492,9 @@ export const presets: Preset[] = [
       'Compress and compare the savings in the results.',
     ],
     faq: [
-      { q: 'Is this as good as TinyPNG?', a: 'It uses the same technique, reducing the image to a smart palette of up to 256 colours with full transparency, and typically lands within a few percent of it. The difference is that nothing is uploaded and there is no cap on the number of files beyond your device’s memory.' },
+      { q: 'Is this as good as TinyPNG?', a: 'TinyPNG describes its method as selectively decreasing the number of colours in the image (tinypng.com, as of October 2026). This page does something similar: it reduces the image to a smart palette of up to 256 colours with full transparency. The difference is that your images are not uploaded and there is no cap on the number of files beyond your device’s memory.' },
       { q: 'Will my images look different?', a: 'On screenshots, logos, icons and illustrations, almost never at 256 colours. Smooth gradients and photos can show slight banding; use Lossless or keep more colours for those.' },
-      noUpload,
+      { q: 'Are my images uploaded anywhere?', a: 'No. Your images are not uploaded: the compression runs in your browser tab, and you can confirm in your browser’s network panel that no image leaves your device.' },
     ],
   },
   {
