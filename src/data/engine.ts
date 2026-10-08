@@ -113,7 +113,7 @@ export const engines: Record<string, Engine> = {
   },
   'compress-png': {
     how: 'UPNG.js (MIT), the PNG codec from the Photopea editor, reads the PNG byte by byte in your tab, so the exact pixels are used, not a canvas copy. For lossy compression it reduces the image to a palette of up to 256 colours chosen for that image and writes an 8-bit PNG with full transparency; lossless mode keeps every pixel and picks the tightest colour type and filters. The result is compressed with pako’s deflate (MIT) and saved from memory.',
-    versus: 'TinyPNG and similar sites upload every PNG to their server, limit free use to a handful of files at 5 MB each, and keep the files for a while. Screenshots, design exports and logos are often confidential. Here they never leave your device, and there is no daily limit or file cap.',
+    versus: 'Compressors that process your PNGs on their server usually limit free use. Screenshots, design exports and logos are often confidential. Here your files are not uploaded, and there is no daily limit or file cap.',
   },
   'mute-video': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, MOV, WebM or MKV container in your tab and copies every video packet into a new file of the same type, leaving the sound track out. Nothing is decoded or re-encoded, so the picture is bit-for-bit the same and the job takes about as long as reading the file.',

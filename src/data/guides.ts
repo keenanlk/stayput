@@ -723,7 +723,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-cloudconvert-safe',
     title: 'Is CloudConvert Safe? What Happens to Your Files, and When to Keep Them Local',
-    description: 'CloudConvert is a reputable German service with ISO 27001 certification and 24-hour deletion. What that covers, and how to convert without uploading.',
+    description: 'As of October 2026, CloudConvert says it holds ISO 27001 certification and deletes files within 24 hours. What that covers, and how to convert without uploading.',
     heading: 'Is CloudConvert safe?',
     dek: 'For most files, yes: it is an established, certified service. The real question is whether a given file should leave your computer at all.',
     keywords: ['is cloudconvert safe', 'cloudconvert safe', 'cloudconvert privacy', 'is cloudconvert legit', 'cloudconvert security', 'cloudconvert alternative no upload'],
@@ -772,7 +772,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is CloudConvert legit?', a: 'Yes. It is run by Lunaweb GmbH in Munich, Germany, has been operating for years, publishes its security practices and holds ISO 27001 certification.' },
-      { q: 'How long does CloudConvert keep my files?', a: 'According to its privacy policy, until you delete them with the × button, and automatically after 24 hours at the latest.' },
+      { q: 'How long does CloudConvert keep my files?', a: 'As of October 2026, according to its privacy policy, until you delete them with the × button, and automatically after 24 hours at the latest.' },
       { q: 'Can CloudConvert staff see my files?', a: 'Its security page says conversions run in isolated containers and that staff cannot technically access your files; for support cases it asks you to send files manually.' },
       { q: 'Is there a way to convert without uploading anything?', a: 'Yes, for common formats. Tools that run in the browser, such as Stayput’s image, audio and video converters, process the file on your device. You can confirm it with airplane mode: they keep working offline after one visit.' },
     ],
@@ -780,7 +780,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-freeconvert-safe',
     title: 'Is FreeConvert Safe? Its File Policy Explained, and a No-Upload Option',
-    description: 'FreeConvert stores uploads on AWS in Ireland and deletes them after 8 hours. What that means for private files, and how to convert common formats without uploading.',
+    description: 'As of October 2026, FreeConvert says it stores uploads on AWS in Ireland and deletes them after 8 hours. What that means for private files, and how to convert common formats without uploading.',
     heading: 'Is FreeConvert safe?',
     dek: 'FreeConvert is a legitimate service with a clear deletion policy. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
     keywords: ['is freeconvert safe', 'freeconvert safe', 'is freeconvert.com safe', 'freeconvert privacy', 'is freeconvert legit', 'freeconvert virus'],
@@ -828,7 +828,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is FreeConvert legit?', a: 'Yes. Its terms name TransMedia Inc. of Toronto, Canada as the operator, and its privacy policy gives a fixed deletion period.' },
-      { q: 'How long does FreeConvert keep my files?', a: 'Its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
+      { q: 'How long does FreeConvert keep my files?', a: 'As of October 2026, its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
       { q: 'Where are FreeConvert files stored?', a: 'On Amazon Web Services in Ireland, according to its privacy policy.' },
       { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; after one visit, switch on airplane mode and they still work.' },
     ],
@@ -836,7 +836,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-ilovepdf-safe',
     title: 'Is iLovePDF Safe? How It Handles Your PDFs, and How to Keep Them Local',
-    description: 'iLovePDF is a Europe-based, ISO 27001 certified PDF service that deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
+    description: 'As of October 2026, iLovePDF says it is ISO 27001 certified and deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
     heading: 'Is iLovePDF safe?',
     dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
     keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
@@ -884,7 +884,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is iLovePDF legit?', a: 'Yes. It is an established Europe-based service with ISO/IEC 27001 certification and GDPR compliance, according to its security page.' },
-      { q: 'How long does iLovePDF keep my files?', a: 'Its security policy says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
+      { q: 'How long does iLovePDF keep my files?', a: 'As of October 2026, its security page says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
       { q: 'Does iLovePDF have an offline version?', a: 'Yes. Per its desktop page, iLovePDF Desktop for Windows and Mac processes files offline. Browser tools like Stayput’s are another option that needs no installation.' },
       { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after one visit, it keeps working with the network switched off.' },
     ],
@@ -892,9 +892,9 @@ export const guides: Guide[] = [
   {
     slug: 'is-smallpdf-safe',
     title: 'Is Smallpdf Safe? File Retention, Storage and a No-Upload Option',
-    description: 'Smallpdf says it deletes files within an hour for signed-in users, unless they are saved to file storage. What that means for private files, and how to edit PDFs without uploading.',
+    description: 'As of October 2026, Smallpdf says it deletes files within an hour for signed-in users, unless they are saved to file storage. What that means for private files, and how to edit PDFs without uploading.',
     heading: 'Is Smallpdf safe?',
-    dek: 'Smallpdf is a reputable Swiss company with ISO 27001 certification. What changes the answer for you is which of its storage rules applies to your file.',
+    dek: 'Smallpdf is a reputable Swiss company with published retention rules. What changes the answer for you is which of its storage rules applies to your file.',
     keywords: ['is smallpdf safe', 'smallpdf safe', 'is smallpdf legit', 'smallpdf privacy', 'smallpdf security', 'smallpdf alternative'],
     updated: '2026-10-08',
     tools: ['compress-pdf', 'merge-pdf', 'pdf-to-word', 'sign-pdf'],
@@ -947,7 +947,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-ezgif-safe',
     title: 'Is Ezgif Safe? What Happens to Your Uploads, and a No-Upload GIF Maker',
-    description: 'Ezgif is a long-running GIF editor that deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
+    description: 'As of October 2026, ezgif says it deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
     heading: 'Is ezgif safe?',
     dek: 'Ezgif is a legitimate, popular GIF tool with a short deletion window. The file you are about to drop in decides whether uploading it is fine.',
     keywords: ['is ezgif safe', 'ezgif safe', 'is ezgif legit', 'is ezgif.com safe', 'ezgif privacy', 'ezgif virus', 'ezgif alternative'],
@@ -1058,7 +1058,7 @@ export const guides: Guide[] = [
   {
     slug: 'is-convertio-safe',
     title: 'Is Convertio Safe? Its File Deletion Rules, and Converting Without Uploading',
-    description: 'Convertio is run from Cyprus, keeps files in the EU and deletes outputs within 24 hours. What that covers, and how to convert common formats locally.',
+    description: 'As of October 2026, Convertio says it keeps files in the EU and deletes outputs within 24 hours. What that covers, and how to convert common formats locally.',
     heading: 'Is Convertio safe?',
     dek: 'Convertio is a well-known converter with a published deletion policy. For private files, the safer choice is a converter that never receives them.',
     keywords: ['is convertio safe', 'convertio safe', 'is convertio legit', 'is convertio.co safe', 'convertio privacy', 'convertio virus'],
@@ -1107,15 +1107,15 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is Convertio legit?', a: 'Yes. It is operated by Convertio Limited, registered in Cyprus, and is one of the most used online converters.' },
-      { q: 'How long does Convertio keep my files?', a: 'Its privacy page says input files are removed right after conversion and converted files are deleted when you click ×, or after 24 hours automatically.' },
+      { q: 'How long does Convertio keep my files?', a: 'As of October 2026, its privacy page says input files are removed right after conversion and converted files are deleted when you click ×, or after 24 hours automatically.' },
       { q: 'Where does Convertio store files?', a: 'In the European Union, according to its privacy page.' },
       { q: 'How do I convert HEIC to JPG without uploading?', a: 'Use a converter that runs in the browser, such as Stayput’s HEIC to JPG. The photo is decoded and re-encoded on your device.' },
     ],
   },
   {
     slug: 'is-zamzar-safe',
-    title: 'Is Zamzar Safe? Seven-Day Storage, Email Links and a Local Alternative',
-    description: 'Zamzar is a UK converter that keeps free conversions for up to seven days. What that means for private files, and how to convert without uploading.',
+    title: 'Is Zamzar Safe? How Long It Keeps Files, Email Links and a Local Alternative',
+    description: 'As of October 2026, Zamzar says it stores files for no longer than seven days. What that means for private files, and how to convert without uploading.',
     heading: 'Is Zamzar safe?',
     dek: 'Zamzar is one of the oldest online converters. Its storage window is longer than most, which is the detail worth knowing.',
     keywords: ['is zamzar safe', 'zamzar safe', 'is zamzar legit', 'is zamzar.com safe', 'zamzar privacy', 'zamzar virus'],
@@ -1164,7 +1164,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is Zamzar legit?', a: 'Yes. It is operated by Zamzar Limited, a company registered in England, and has run online conversions since 2006.' },
-      { q: 'How long does Zamzar keep my files?', a: 'Its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
+      { q: 'How long does Zamzar keep my files?', a: 'As of October 2026, its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
       { q: 'Does Zamzar use analytics?', a: 'As of October 2026, its privacy policy says it uses Google Analytics, with cookies that store a client and session id.' },
       { q: 'Can I convert files without uploading them?', a: 'Yes, for common image, PDF and audio formats. Browser-based tools like Stayput’s process files on your device and work offline once loaded.' },
     ],
@@ -2885,7 +2885,7 @@ export const guides: Guide[] = [
   {
     slug: 'convertio-alternative',
     title: 'A Free Convertio Alternative With No File Size Cap',
-    description: 'Convertio\'s free tier allows files up to 1 GB and 10 conversion credits per 24 hours. Here is what that looks like, and a browser-based alternative with no daily credits for common formats.',
+    description: 'Convertio\'s free tier limits file size and the number of conversion credits per day. Here is what that looks like, and a browser-based alternative with no daily credits for common formats.',
     heading: 'A free Convertio alternative with no file size cap',
     dek: 'Convertio\'s free plan caps both file size and how many conversions you get per day. Here is an alternative with no such ceiling.',
     keywords: ['convertio alternative', 'free convertio alternative', 'convertio alternative no limit', 'convertio free plan limit', 'convertio without upload'],
@@ -2928,9 +2928,9 @@ export const guides: Guide[] = [
   {
     slug: 'zamzar-alternative',
     title: 'A Free Zamzar Alternative With No Daily Limit',
-    description: 'Zamzar\'s free service allows two conversions in any 24-hour period, with files up to 50MB. Here is what that looks like, and a browser-based alternative with neither restriction.',
+    description: 'Zamzar\'s free service limits both the number of conversions per day and the file size. Here is what that looks like, and a browser-based alternative with neither restriction.',
     heading: 'A free Zamzar alternative with no daily limit',
-    dek: 'Zamzar\'s free service allows two files per 24 hours, up to 50MB each. Here is an alternative with no such cap.',
+    dek: 'Zamzar\'s free service limits how many files you can convert and how big each can be. Here is an alternative with no such cap.',
     keywords: ['zamzar alternative', 'free zamzar alternative', 'zamzar alternative no limit', 'zamzar free plan limit', 'zamzar without upload'],
     updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
@@ -2971,9 +2971,9 @@ export const guides: Guide[] = [
   {
     slug: 'freeconvert-alternative',
     title: 'A Free FreeConvert Alternative With No Processing Time Cap',
-    description: 'FreeConvert\'s free plan gives 20 conversion minutes a day and caps processing at 5 minutes per file. Here is what that looks like, and a browser-based alternative with no such cap.',
+    description: 'FreeConvert\'s free plan limits conversion minutes per day and processing time per file. Here is what that looks like, and a browser-based alternative with no such cap.',
     heading: 'A free FreeConvert alternative with no processing time cap',
-    dek: 'FreeConvert\'s free plan limits each file to 5 minutes of processing time and the day to 20 conversion minutes. Here is an alternative with nothing to time out.',
+    dek: 'FreeConvert\'s free plan limits the processing time for each file and for the day. Here is an alternative with nothing to time out.',
     keywords: ['freeconvert alternative', 'free freeconvert alternative', 'freeconvert alternative no limit', 'freeconvert free plan limit', 'freeconvert without upload'],
     updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
@@ -3016,7 +3016,7 @@ export const guides: Guide[] = [
     title: 'A PDF24 Alternative That Works in Your Browser Without Uploading',
     description: 'PDF24 says its free online tools have no artificial limits, but they process your PDF on its servers; its desktop app, PDF24 Creator, is Windows only. Here is an alternative that works anywhere without uploading your files.',
     heading: 'A PDF24 alternative that works in your browser without uploading',
-    dek: 'PDF24 itself recommends its offline app for privacy, but that app is Windows only. Here is an alternative that skips the upload, in any modern browser.',
+    dek: 'PDF24 itself points to its desktop app for keeping files on your PC, but that app is Windows only. Here is an alternative that skips the upload, in any modern browser.',
     keywords: ['pdf24 alternative', 'pdf24 alternative mac', 'pdf24 without upload', 'pdf24 alternative no install', 'pdf24 creator alternative'],
     updated: '2026-10-08',
     tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf', 'rotate-pdf', 'reorder-pdf'],
@@ -3057,7 +3057,7 @@ export const guides: Guide[] = [
   {
     slug: 'ezgif-alternative',
     title: 'A Free Ezgif Alternative With No File Size Cap',
-    description: 'Ezgif\'s video tools list a 200MB maximum file size and process your upload on its servers. Here is a browser-based GIF alternative that is limited only by your device’s memory, with no upload.',
+    description: 'Ezgif\'s video tools limit the size of the file you upload and process it on its servers. Here is a browser-based GIF alternative that is limited only by your device’s memory, with no upload.',
     heading: 'A free ezgif alternative with no file size cap',
     dek: 'Ezgif caps how big a file you can upload. Here is an alternative where your video is never uploaded.',
     keywords: ['ezgif alternative', 'free ezgif alternative', 'ezgif alternative no ads', 'ezgif file size limit', 'gif maker without upload'],
@@ -3466,7 +3466,7 @@ export const guides: Guide[] = [
   {
     slug: 'otter-ai-alternative',
     title: 'A Free Otter.ai Alternative With No Monthly Minute Cap',
-    description: 'Otter.ai\'s free plan lists 300 transcription minutes a month, 30 minutes per conversation and 3 lifetime file imports; paid plans raise those limits. Here is a browser-based alternative with none of them.',
+    description: 'Otter.ai\'s free plan limits monthly transcription minutes, the length of each conversation and the number of file imports; paid plans raise those limits. Here is a browser-based alternative with none of them.',
     heading: 'A free Otter.ai alternative with no monthly minute cap',
     dek: 'Otter.ai\'s free tier meters your minutes each month and caps how long a single recording can run. Here is what that looks like, and an alternative with nothing to meter.',
     keywords: ['otter.ai alternative', 'otter ai alternative free', 'free alternative to otter ai', 'otter ai alternative no limit', 'transcription app without subscription'],
@@ -3508,7 +3508,7 @@ export const guides: Guide[] = [
   {
     slug: 'camscanner-alternative',
     title: 'A Free CamScanner Alternative With No Watermark',
-    description: 'CamScanner\'s free account has limits such as 1 GB of cloud storage and 3 free uses of advanced text extraction, with a Premium plan above it. Here is a browser-based scanning alternative with no watermark, no account and no upload.',
+    description: 'CamScanner\'s free account has storage and text-extraction limits, with a Premium plan above it. Here is a browser-based scanning alternative with no watermark, no account and no upload.',
     heading: 'A free CamScanner alternative with no watermark',
     dek: 'CamScanner\'s free account has storage and feature limits, with a Premium plan above it. Here is a scanning alternative with no watermark and no tier to pay for.',
     keywords: ['camscanner alternative', 'camscanner alternative free', 'camscanner alternative no watermark', 'free document scanner no watermark', 'scan document without app'],
