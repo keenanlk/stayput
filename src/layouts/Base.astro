@@ -66,8 +66,11 @@ const ogImage = new URL(ogPath, Astro.site);
     <!-- Umami, self-hosted, cookie-free, loaded by src/lib/analytics.ts (skipped for automated browsers and opted-out owners). Records page views and the anonymous events listed there; never file names or contents. -->
     <script>
       import { loadAnalytics, trackPageContext } from '../lib/analytics';
+      import { sweepHandoff } from '../lib/handoff';
       loadAnalytics();
       trackPageContext();
+      // Deletes any file saved for a next tool that was never picked up (see src/lib/handoff.ts).
+      void sweepHandoff();
     </script>
   </body>
 </html>
