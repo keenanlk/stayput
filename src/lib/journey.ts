@@ -78,7 +78,8 @@ const SOURCES: [RegExp, string][] = [
   [/(^|\.)instagram\.com$/, 'instagram'],
   [/(^|\.)youtube\.com$|^youtu\.be$/, 'youtube'],
   [/(^|\.)tiktok\.com$/, 'tiktok'],
-  [/^(mastodon\.social|fosstodon\.org|mastodon\.online)$/, 'mastodon'],
+  // Large Mastodon instances by exact host, plus any two-label host whose first label is mastodon, mstdn or masto (e.g. mastodon.xyz).
+  [/^(?:mastodon\.social|mastodon\.online|fosstodon\.org|hachyderm\.io|mas\.to|infosec\.exchange|mstdn\.social|mastodon\.world|techhub\.social|universeodon\.com|mastodon\.art|mastodon\.ie|mastodon\.scot|mstdn\.ca|aus\.social|social\.vivaldi\.net|ioc\.exchange|sfba\.social|kolektiva\.social|toot\.community|chaos\.social|troet\.cafe|det\.social|mastodon\.nl|piaille\.fr|mamot\.fr|mastodon\.uno|mathstodon\.xyz|scholar\.social|tech\.lgbt|mastodon\.green|c\.im|phpc\.social|ruby\.social|front-end\.social|indieweb\.social|hci\.social|sigmoid\.social|dair-community\.social|journa\.host|newsie\.social|masto\.ai|mastodon\.sdf\.org)$|^(?:mastodon|mstdn|masto)\.[a-z]{2,}$/, 'mastodon'],
   [/^registry\.modelcontextprotocol\.io$/, 'mcpregistry'],
   [/(^|\.)glama\.ai$/, 'glama'],
   [/(^|\.)mcp\.so$/, 'mcpso'],
