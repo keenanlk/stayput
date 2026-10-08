@@ -116,6 +116,13 @@ test('the referring site is reduced to a known name', async ({ page }) => {
   ];
   for (const [url, name] of named) expect(sourceOf(url, 'stayput.dev'), url).toBe(name);
   expect(sourceOf('https://notmastodon.social.example/', 'stayput.dev')).toBe('other');
+  for (const h of ['hachyderm.io', 'mas.to', 'infosec.exchange', 'mstdn.social', 'chaos.social', 'social.vivaldi.net', 'mastodon.sdf.org', 'c.im', 'mathstodon.xyz'])
+    expect(sourceOf(`https://${h}/@a/1`, 'stayput.dev'), h).toBe('mastodon');
+  for (const h of ['mastodon.xyz', 'mstdn.jp', 'masto.host', 'mastodon.cloud'])
+    expect(sourceOf(`https://${h}/`, 'stayput.dev'), h).toBe('mastodon');
+  for (const h of ['mastodon.social.evil.com', 'notmastodon.social', 'x-mastodon.com', 'evilmastodon.social.example.com', 'evil.com.hachyderm.io.example', 'example.com', 'mastodon', 'sub.mastodon.xyz'])
+    expect(sourceOf(`https://${h}/`, 'stayput.dev'), h).toBe('other');
+  expect(sourceOf('https://bsky.app/profile/a', 'stayput.dev')).toBe('bluesky');
   expect(sourceOf('https://someones-blog.example/post', 'stayput.dev')).toBe('other');
   expect(sourceOf('https://stayput.dev/guides', 'stayput.dev')).toBe('internal');
   void page;
