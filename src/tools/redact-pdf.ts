@@ -14,6 +14,8 @@ const findText = document.getElementById('find-text') as HTMLInputElement;
 const findResult = document.getElementById('find-result')!;
 
 let pdf: PdfJs.PDFDocumentProxy | undefined;
+/** Settles when the file being opened is ready (or has failed to open). */
+let opening: Promise<unknown> = Promise.resolve();
 let pageCount = 0;
 let current = 0;
 let pageSizes: { w: number; h: number }[] = [];
@@ -124,6 +126,8 @@ layer.addEventListener('pointercancel', () => {
 
 /* Finding text. */
 async function find(query: string | Pattern, label: string) {
+  // A search sent while the file is still opening (slow on a phone) waits for it rather than doing nothing.
+  await opening;
   if (!pdf) return;
   const re = matcher(query);
   let found = 0;
@@ -182,13 +186,17 @@ const shell = createShell({
     await reset();
     const f = files[0];
     if (!f) return;
-    const bytes = new Uint8Array(await f.file.arrayBuffer());
-    const doc = await loadDocument(bytes);
-    pageSizes = doc.getPages().map((p) => displayedSize(p));
-    pdf = await openWithPdfJs(bytes);
-    pageCount = pdf.numPages;
-    panel.hidden = false;
-    await showPage(0);
+    const open = (async () => {
+      const bytes = new Uint8Array(await f.file.arrayBuffer());
+      const doc = await loadDocument(bytes);
+      pageSizes = doc.getPages().map((p) => displayedSize(p));
+      pdf = await openWithPdfJs(bytes);
+      pageCount = pdf.numPages;
+      panel.hidden = false;
+      await showPage(0);
+    })();
+    opening = open.catch(() => {});
+    await open;
   },
   async process(files, progress) {
     const entry = files[0]!;
