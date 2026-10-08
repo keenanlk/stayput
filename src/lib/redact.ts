@@ -14,7 +14,7 @@
 import type * as PdfLib from 'pdf-lib';
 import type * as PdfJs from 'pdfjs-dist';
 import { canvasToBlob } from './image';
-import { loadDocument, loadPdfLib, renderPage } from './pdf';
+import { getTextContent, loadDocument, loadPdfLib, renderPage } from './pdf';
 import { removePdfMetadata } from './pdf-meta';
 
 export interface RedactBox {
@@ -171,7 +171,7 @@ function textWidth(s: string, family: string): number {
 export async function findOnPage(pdf: PdfJs.PDFDocumentProxy, index: number, re: RegExp): Promise<RedactBox[]> {
   const page = await pdf.getPage(index + 1);
   const vp = page.getViewport({ scale: 1 });
-  const content = await page.getTextContent();
+  const content = await getTextContent(page);
   const out: RedactBox[] = [];
   for (const item of content.items) {
     if (!('str' in item) || !item.str) continue;

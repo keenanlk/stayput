@@ -6,6 +6,7 @@
  * font size. Headings are lines noticeably larger than the body text.
  */
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { getTextContent } from './pdf';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 
 export interface Paragraph {
@@ -107,7 +108,7 @@ function toParagraphs(lines: Line[], body: number): Paragraph[] {
 
 async function pageLines(doc: PDFDocumentProxy, pageNumber: number): Promise<Line[]> {
   const page = await doc.getPage(pageNumber);
-  const content = await page.getTextContent();
+  const content = await getTextContent(page);
   const runs: Run[] = [];
   for (const item of content.items) {
     if (!('str' in item)) continue;

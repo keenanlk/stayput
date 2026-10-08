@@ -6,7 +6,7 @@
  * the same thing Acrobat's "Recognize text" and ocrmypdf do.
  */
 import type * as PdfLib from 'pdf-lib';
-import { closePdfJs, loadDocument, loadPdfLib, openWithPdfJs } from './pdf';
+import { closePdfJs, getTextContent, loadDocument, loadPdfLib, openWithPdfJs } from './pdf';
 import { readWords } from './ocr';
 import { placeWords, winAnsi } from './ocr-layer';
 
@@ -55,7 +55,7 @@ export async function ocrPdf(
       const page = await js.getPage(i + 1);
       const at = (f: number) => (i + f) / total;
       if (!opts.redo) {
-        const content = await page.getTextContent();
+        const content = await getTextContent(page);
         const chars = content.items.reduce((n, it) => n + ('str' in it ? it.str.replace(/\s/g, '').length : 0), 0);
         if (chars >= HAS_TEXT) {
           skipped++;
