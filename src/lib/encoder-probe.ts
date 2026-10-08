@@ -8,6 +8,12 @@
  * Mediabunny as its H.264 encoder; when none answers, the caller is told so it
  * can send the person to Video to subtitles instead of letting them wait.
  * The test frames are drawn here; no file is read.
+ *
+ * On WebKit the same encoder class also puts frames back in presentation
+ * order before they are encoded. Safari's decoder can hand over the frames of
+ * a video with B-frames (an iPhone H.264 .mov) slightly out of order, and an
+ * encoder that is given a frame older than one it already took writes a file
+ * whose timestamps run backwards, which Mediabunny's muxer refuses.
  */
 import { EncoderStall } from './encoder-watchdog';
 import { CustomVideoEncoder, EncodedPacket, registerEncoder, type VideoCodec, type VideoSample } from 'mediabunny';
@@ -22,6 +28,8 @@ const VARIANTS: Variant[] = [
 ];
 
 export const PROBE_MS = 2500;
+/** How many frames the encoder holds back to sort them; more than the few places H.264 B-frames can be out of order by. */
+export const REORDER_FRAMES = 6;
 const PROBE_FRAMES = 8;
 /** What Mediabunny writes for H.264 when nothing else is said. */
 const DEFAULT_CODEC = 'avc1.640016';
@@ -65,10 +73,16 @@ async function answers(config: VideoEncoderConfig, ms: number): Promise<'yes' | 
   }
 }
 
-/** Mediabunny's H.264 encoder, with the settings that were seen to answer. */
+/** The same test Mediabunny uses for "WebKit or a browser wrapping it" (Safari, and every browser on iOS). */
+const isWebKit = () => typeof navigator !== 'undefined' && /apple/i.test(navigator.vendor ?? '');
+
+/** Mediabunny's H.264 encoder, with the settings that were seen to answer, taking frames in presentation order. */
 function encoderClass(variant: Variant) {
   return class extends CustomVideoEncoder {
     private native!: VideoEncoder;
+    /** Frames waiting to be sorted, oldest first. */
+    private held: { frame: VideoFrame; options: VideoEncoderEncodeOptions }[] = [];
+    private lastTimestamp = -Infinity;
     static override supports(codec: VideoCodec, config: VideoEncoderConfig): boolean {
       // Mediabunny offers a quantizer-rate config first; WebKit has none, and refusing it here makes Mediabunny move on to the bitrate one.
       return codec === 'avc' && typeof VideoEncoder !== 'undefined' && /^avc1\./.test(config.codec) && config.bitrateMode !== 'quantizer';
@@ -82,16 +96,28 @@ function encoderClass(variant: Variant) {
     }
     encode(sample: VideoSample, options: VideoEncoderEncodeOptions) {
       const frame = sample.toVideoFrame();
+      let at = this.held.length;
+      while (at > 0 && this.held[at - 1]!.frame.timestamp > frame.timestamp) at--;
+      this.held.splice(at, 0, { frame, options });
+      while (this.held.length > REORDER_FRAMES) this.send(this.held.shift()!);
+    }
+    /** Encodes one frame, unless an equal or later one already went in (the encoder cannot take it back). */
+    private send({ frame, options }: { frame: VideoFrame; options: VideoEncoderEncodeOptions }) {
       try {
-        this.native.encode(frame, options);
+        if (frame.timestamp > this.lastTimestamp) {
+          this.lastTimestamp = frame.timestamp;
+          this.native.encode(frame, options);
+        }
       } finally {
         frame.close();
       }
     }
     flush() {
+      while (this.held.length) this.send(this.held.shift()!);
       return this.native.flush();
     }
     close() {
+      for (const { frame } of this.held.splice(0)) frame.close();
       if (this.native.state !== 'closed') this.native.close();
     }
   };
@@ -113,7 +139,7 @@ export function ensureH264Encoder(): Promise<boolean> {
     for (const variant of VARIANTS) {
       const result = await answers(configFor(variant, base), PROBE_MS);
       if (result === 'yes') {
-        if (variant !== VARIANTS[0]) registerEncoder(encoderClass(variant));
+        if (variant !== VARIANTS[0] || isWebKit()) registerEncoder(encoderClass(variant));
         return true;
       }
       if (result === 'silent') offered = true;
