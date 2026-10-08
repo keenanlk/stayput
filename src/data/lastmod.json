@@ -284,16 +284,16 @@
   "hash": "0097571bf54110cb"
  },
  "/guides": {
-  "date": "2026-10-06",
-  "hash": "5c546510a3911872"
+  "date": "2026-10-08",
+  "hash": "9e9da334a7a88b24"
  },
  "/guides/camscanner-alternative": {
-  "date": "2026-09-30",
-  "hash": "fc7b4018f71ccdc2"
+  "date": "2026-10-08",
+  "hash": "06325eb6024568b2"
  },
  "/guides/cloudconvert-alternative": {
-  "date": "2026-09-29",
-  "hash": "8736f3af06baf4a3"
+  "date": "2026-10-08",
+  "hash": "73cda4ff3f997435"
  },
  "/guides/compress-pdf-without-losing-quality": {
   "date": "2026-09-25",
@@ -304,8 +304,8 @@
   "hash": "3d943bede3a251ef"
  },
  "/guides/convertio-alternative": {
-  "date": "2026-09-29",
-  "hash": "8df2f325c8e32bdc"
+  "date": "2026-10-08",
+  "hash": "99e9e2060a37d89c"
  },
  "/guides/does-discord-reddit-or-instagram-remove-exif-data": {
   "date": "2026-10-03",
@@ -316,12 +316,12 @@
   "hash": "fa0c4341d6ad39f8"
  },
  "/guides/ezgif-alternative": {
-  "date": "2026-09-29",
-  "hash": "2e387f15ec006928"
+  "date": "2026-10-08",
+  "hash": "c3a5c6c56109b4b4"
  },
  "/guides/freeconvert-alternative": {
-  "date": "2026-09-29",
-  "hash": "3e6736b9a43c8968"
+  "date": "2026-10-08",
+  "hash": "ada7b2826457e5fe"
  },
  "/guides/how-to-add-a-watermark-to-a-pdf": {
   "date": "2026-09-29",
@@ -600,60 +600,60 @@
   "hash": "1760bf4ebf8d0296"
  },
  "/guides/ilovepdf-alternative": {
-  "date": "2026-09-29",
-  "hash": "0cfbd779e3e672b6"
+  "date": "2026-10-08",
+  "hash": "e4bd7c13ba9fd574"
  },
  "/guides/is-cloudconvert-safe": {
-  "date": "2026-09-29",
-  "hash": "e59d09767078e09c"
+  "date": "2026-10-08",
+  "hash": "5ac4afbf3118fb90"
  },
  "/guides/is-convertio-safe": {
-  "date": "2026-09-29",
-  "hash": "b5f543e57da64158"
+  "date": "2026-10-08",
+  "hash": "346bf6e0fe7b8dd0"
  },
  "/guides/is-ezgif-safe": {
-  "date": "2026-09-29",
-  "hash": "08cb410368db5029"
+  "date": "2026-10-08",
+  "hash": "debfdd8364d03108"
  },
  "/guides/is-freeconvert-safe": {
-  "date": "2026-09-29",
-  "hash": "4d2c83b603351b00"
+  "date": "2026-10-08",
+  "hash": "f98d6601cbf3cac4"
  },
  "/guides/is-ilovepdf-safe": {
-  "date": "2026-09-29",
-  "hash": "d17db4263fdefb1a"
+  "date": "2026-10-08",
+  "hash": "606d50217c7e545a"
  },
  "/guides/is-it-safe-to-merge-pdfs-online": {
   "date": "2026-09-25",
   "hash": "ab9f34feb3045a5e"
  },
  "/guides/is-pdf24-safe": {
-  "date": "2026-09-29",
-  "hash": "4b9a538da469bf42"
+  "date": "2026-10-08",
+  "hash": "d13bbe0967f47917"
  },
  "/guides/is-remove-bg-safe": {
-  "date": "2026-09-29",
-  "hash": "54326052da2f5218"
+  "date": "2026-10-08",
+  "hash": "a1970a226de5dcab"
  },
  "/guides/is-smallpdf-safe": {
-  "date": "2026-09-29",
-  "hash": "7f849de9a12f9c92"
+  "date": "2026-10-08",
+  "hash": "3d164bfabb665c4b"
  },
  "/guides/is-zamzar-safe": {
-  "date": "2026-09-29",
-  "hash": "f4e9a5e97ad531cf"
+  "date": "2026-10-08",
+  "hash": "f3003a488e767429"
  },
  "/guides/open-heic-files-on-windows": {
   "date": "2026-09-25",
   "hash": "0dbd6666822c3ce8"
  },
  "/guides/otter-ai-alternative": {
-  "date": "2026-09-30",
-  "hash": "3cf743c78f305ba6"
+  "date": "2026-10-08",
+  "hash": "708fd2fd98e6dc62"
  },
  "/guides/pdf24-alternative": {
-  "date": "2026-09-29",
-  "hash": "4915bf605a6f698d"
+  "date": "2026-10-08",
+  "hash": "59aebe9455c3f3f9"
  },
  "/guides/reduce-image-size-for-email-and-uploads": {
   "date": "2026-09-25",
@@ -664,8 +664,8 @@
   "hash": "06c1ab8301e73d2e"
  },
  "/guides/remove-bg-alternative": {
-  "date": "2026-09-29",
-  "hash": "e9514388e7020c27"
+  "date": "2026-10-08",
+  "hash": "993f6600e7cf0cdb"
  },
  "/guides/remove-exif-data-from-android-photos": {
   "date": "2026-10-03",
@@ -692,8 +692,8 @@
   "hash": "9a4cf2f3d624009c"
  },
  "/guides/smallpdf-alternative": {
-  "date": "2026-09-29",
-  "hash": "09d069561042427c"
+  "date": "2026-10-08",
+  "hash": "980fd7f9fd659e93"
  },
  "/guides/strip-exif-without-re-encoding": {
   "date": "2026-09-29",
@@ -712,8 +712,8 @@
   "hash": "4d626e0dc9b00e4d"
  },
  "/guides/zamzar-alternative": {
-  "date": "2026-09-29",
-  "hash": "02fa2123ff031937"
+  "date": "2026-10-08",
+  "hash": "196fe934bca512e7"
  },
  "/guitar-tuner": {
   "date": "2026-10-06",
@@ -984,8 +984,8 @@
   "hash": "6f6efdf84c11716e"
  },
  "/png-compressor": {
-  "date": "2026-10-06",
-  "hash": "1be75950e7c052c0"
+  "date": "2026-10-08",
+  "hash": "3086762df16cf595"
  },
  "/png-to-bmp": {
   "date": "2026-10-07",
@@ -1044,8 +1044,8 @@
   "hash": "2e5ba629b2739090"
  },
  "/reduce-png-size": {
-  "date": "2026-10-06",
-  "hash": "4433912e637666d5"
+  "date": "2026-10-08",
+  "hash": "938a099dfd990bae"
  },
  "/remove-audio-from-video": {
   "date": "2026-10-06",
@@ -1244,8 +1244,8 @@
   "hash": "c305ee69ba76f964"
  },
  "/tools/compress-png": {
-  "date": "2026-10-06",
-  "hash": "ced148fc9f6b42aa"
+  "date": "2026-10-08",
+  "hash": "63bfd86a91de4bd4"
  },
  "/tools/compress-video": {
   "date": "2026-10-06",

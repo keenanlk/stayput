@@ -723,11 +723,11 @@ export const guides: Guide[] = [
   {
     slug: 'is-cloudconvert-safe',
     title: 'Is CloudConvert Safe? What Happens to Your Files, and When to Keep Them Local',
-    description: 'CloudConvert is a reputable German service with ISO 27001 certification and 24-hour deletion. What that covers, and how to convert without uploading.',
+    description: 'As of October 2026, CloudConvert says it holds ISO 27001 certification and deletes files within 24 hours. What that covers, and how to convert without uploading.',
     heading: 'Is CloudConvert safe?',
     dek: 'For most files, yes: it is an established, certified service. The real question is whether a given file should leave your computer at all.',
     keywords: ['is cloudconvert safe', 'cloudconvert safe', 'cloudconvert privacy', 'is cloudconvert legit', 'cloudconvert security', 'cloudconvert alternative no upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'video-to-mp3', 'heic-to-jpg', 'video-to-gif'],
     sections: [
       {
@@ -739,7 +739,7 @@ export const guides: Guide[] = [
       },
       {
         h: 'What CloudConvert says it does with your files',
-        p: ['From CloudConvert’s own security page and privacy policy, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per CloudConvert’s [security page](https://cloudconvert.com/security) and [privacy policy](https://cloudconvert.com/privacy):'],
         list: [
           '**Deletion.** Files are deleted when you press the delete (×) button, and automatically after 24 hours at the latest. It offers no permanent storage.',
           '**Isolation.** Each conversion runs in its own isolated container, and the company says its staff cannot technically access your files.',
@@ -772,7 +772,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is CloudConvert legit?', a: 'Yes. It is run by Lunaweb GmbH in Munich, Germany, has been operating for years, publishes its security practices and holds ISO 27001 certification.' },
-      { q: 'How long does CloudConvert keep my files?', a: 'According to its privacy policy, until you delete them with the × button, and automatically after 24 hours at the latest.' },
+      { q: 'How long does CloudConvert keep my files?', a: 'As of October 2026, according to its privacy policy, until you delete them with the × button, and automatically after 24 hours at the latest.' },
       { q: 'Can CloudConvert staff see my files?', a: 'Its security page says conversions run in isolated containers and that staff cannot technically access your files; for support cases it asks you to send files manually.' },
       { q: 'Is there a way to convert without uploading anything?', a: 'Yes, for common formats. Tools that run in the browser, such as Stayput’s image, audio and video converters, process the file on your device. You can confirm it with airplane mode: they keep working offline after one visit.' },
     ],
@@ -780,36 +780,36 @@ export const guides: Guide[] = [
   {
     slug: 'is-freeconvert-safe',
     title: 'Is FreeConvert Safe? Its File Policy Explained, and a No-Upload Option',
-    description: 'FreeConvert stores uploads on AWS in Ireland and deletes them after 8 hours. What that means for private files, and how to convert common formats without uploading.',
+    description: 'As of October 2026, FreeConvert says it stores uploads on AWS in Ireland and deletes them after 8 hours. What that means for private files, and how to convert common formats without uploading.',
     heading: 'Is FreeConvert safe?',
     dek: 'FreeConvert is a legitimate service with a clear deletion policy. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
     keywords: ['is freeconvert safe', 'freeconvert safe', 'is freeconvert.com safe', 'freeconvert privacy', 'is freeconvert legit', 'freeconvert virus'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'FreeConvert.com is a real, widely used converter, owned by TRMedia Inc., a Canadian software company. Files you convert there are not malware by virtue of passing through it, and its privacy policy sets out a clear retention period. For everyday files it is a reasonable choice.',
+          'FreeConvert.com is a real, widely used converter, operated by TransMedia Inc. of Toronto, Canada, according to its terms of service. Files you convert there are not malware by virtue of passing through it, and its privacy policy sets out a clear retention period. For everyday files it is a reasonable choice.',
           'Like every upload-based converter, it works by sending your file to its servers. So the practical question is not whether FreeConvert is trustworthy in general, but whether the file in front of you is one you are comfortable storing on a third party’s cloud for a few hours.',
         ],
       },
       {
         h: 'What FreeConvert’s policy says',
-        p: ['From FreeConvert’s privacy policy and about page, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per FreeConvert’s [privacy policy](https://www.freeconvert.com/privacy):'],
         list: [
           '**Deletion.** Uploaded files are automatically and permanently deleted after 8 hours, and you can delete them yourself sooner.',
           '**Storage.** Files are stored with Amazon Web Services in Ireland.',
           '**Access.** The company says it does not access or view your files without your written consent, unless legally required, and does not sell or share them. You keep ownership of your files.',
           '**Encryption.** Communication between your device and its systems is encrypted with SSL/TLS.',
-          '**Analytics.** The site uses Google Analytics, Sentry and similar services to measure use and errors; the policy says these do not collect your file contents.',
+          '**Cookies.** The policy says FreeConvert and some services it works with use cookies to provide the service.',
         ],
       },
       {
         h: 'Where the risk actually sits',
         p: [
-          'An eight-hour window on a major cloud provider is a normal design for a free converter. The exposure is not a secret flaw; it is the upload itself. During that window your document exists outside your control, under Canadian and EU-hosted terms, and deletion is something you trust rather than verify.',
-          'FreeConvert is also an ad-supported site. Ads are not a file risk, but they are where people sometimes click the wrong download button. Use the button inside the conversion result, not a large button in an ad slot.',
+          'An eight-hour window on a major cloud provider is a normal design for a free converter. The exposure is not a secret flaw; it is the upload itself. During that window your document exists outside your control, with files stored in Ireland, and deletion is something you trust rather than verify.',
+          'FreeConvert’s pricing page lists “No Ads” as a feature of its paid plans, as of October 2026, so the free site is ad-supported. Ads are not a file risk, but they are where people sometimes click the wrong download button. Use the button inside the conversion result, not a large button in an ad slot.',
         ],
       },
       {
@@ -827,8 +827,8 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is FreeConvert legit?', a: 'Yes. It is operated by TRMedia Inc., a Canadian company, and publishes a privacy policy with a fixed deletion period.' },
-      { q: 'How long does FreeConvert keep my files?', a: 'Its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
+      { q: 'Is FreeConvert legit?', a: 'Yes. Its terms name TransMedia Inc. of Toronto, Canada as the operator, and its privacy policy gives a fixed deletion period.' },
+      { q: 'How long does FreeConvert keep my files?', a: 'As of October 2026, its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
       { q: 'Where are FreeConvert files stored?', a: 'On Amazon Web Services in Ireland, according to its privacy policy.' },
       { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; after one visit, switch on airplane mode and they still work.' },
     ],
@@ -836,29 +836,29 @@ export const guides: Guide[] = [
   {
     slug: 'is-ilovepdf-safe',
     title: 'Is iLovePDF Safe? How It Handles Your PDFs, and How to Keep Them Local',
-    description: 'iLovePDF is a Barcelona-based, ISO 27001 certified PDF service that deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
+    description: 'As of October 2026, iLovePDF says it is ISO 27001 certified and deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
     heading: 'Is iLovePDF safe?',
     dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
     keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'iLovePDF is one of the most popular PDF websites, run by a company based in Barcelona, Spain. It is legitimate, holds ISO/IEC 27001 certification and operates under the EU’s GDPR. For ordinary PDFs it is a sensible choice.',
-          'Its tools work by uploading your PDF to its servers, processing it there and handing the result back. That means the document spends up to two hours outside your control. For payslips, bank statements, identity documents, medical or legal files, you may prefer tools that never send the file anywhere.',
+          'iLovePDF is one of the most popular PDF websites, a Europe-based company. It is legitimate, holds ISO/IEC 27001 certification and operates under the EU’s GDPR. For ordinary PDFs it is a sensible choice.',
+          'Its online tools work by uploading your PDF to its servers, processing it there and handing the result back. That means the document spends up to two hours outside your control. For payslips, bank statements, identity documents, medical or legal files, you may prefer tools that never send the file anywhere.',
         ],
       },
       {
         h: 'What iLovePDF says it does with your PDFs',
-        p: ['From iLovePDF’s security policy and FAQ, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per iLovePDF’s [security page](https://www.ilovepdf.com/help/security) and [desktop page](https://www.ilovepdf.com/desktop):'],
         list: [
           '**Deletion.** Processed files are automatically and permanently deleted within two hours; you can also delete them from the download screen straight away.',
           '**Signatures.** Documents signed through its e-signature service are kept for up to five years, for legal compliance.',
           '**Encryption.** Data is protected with HTTPS in transit, and the company says it is also encrypted at rest.',
           '**Certification and law.** ISO/IEC 27001 certified, GDPR compliant, and a Europe-based company.',
-          '**Offline option.** iLovePDF Desktop for Windows and Mac can process files offline, on your own computer.',
+          '**Desktop option.** iLovePDF Desktop is available for Windows and Mac and processes files on your own computer.',
         ],
       },
       {
@@ -872,7 +872,7 @@ export const guides: Guide[] = [
         h: 'Merge, split and compress PDFs without uploading',
         p: [
           'Stayput’s PDF tools run entirely in your browser tab. [Merge PDF](/tools/merge-pdf) joins files in the order you choose, [Split PDF](/tools/split-pdf) extracts pages or splits every page, [Compress PDF](/tools/compress-pdf) shrinks scanned documents, and [Sign PDF](/tools/sign-pdf) places a drawn or typed signature. The PDF is read from your disk and the result is written back; there is no upload, no account and no daily limit.',
-          'iLovePDF offers a wider set of tools, such as Office conversion, OCR, and legally binding e-signature workflows. If you need those, its desktop app keeps files on your machine; for the common jobs, a browser tool does the same without installing anything.',
+          'iLovePDF offers a wider set of tools and e-signature options. If you need those, its desktop app processes files on your machine; for the common jobs, a browser tool does the same without installing anything.',
         ],
       },
       {
@@ -883,51 +883,51 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is iLovePDF legit?', a: 'Yes. It is an established service run from Barcelona, Spain, with ISO/IEC 27001 certification and GDPR compliance.' },
-      { q: 'How long does iLovePDF keep my files?', a: 'Its security policy says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
-      { q: 'Does iLovePDF have an offline version?', a: 'Yes. iLovePDF Desktop for Windows and Mac works offline. Browser tools like Stayput’s are another option that needs no installation.' },
+      { q: 'Is iLovePDF legit?', a: 'Yes. It is an established Europe-based service with ISO/IEC 27001 certification and GDPR compliance, according to its security page.' },
+      { q: 'How long does iLovePDF keep my files?', a: 'As of October 2026, its security page says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
+      { q: 'Does iLovePDF have an offline version?', a: 'Yes. Per its desktop page, iLovePDF Desktop for Windows and Mac processes files offline. Browser tools like Stayput’s are another option that needs no installation.' },
       { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after one visit, it keeps working with the network switched off.' },
     ],
   },
   {
     slug: 'is-smallpdf-safe',
     title: 'Is Smallpdf Safe? File Retention, Storage and a No-Upload Option',
-    description: 'Smallpdf deletes uploads after one hour and keeps shared files for 14 days. What that means for private files, and how to edit PDFs without uploading.',
+    description: 'As of October 2026, Smallpdf says it deletes files within an hour for signed-in users, unless they are saved to file storage. What that means for private files, and how to edit PDFs without uploading.',
     heading: 'Is Smallpdf safe?',
-    dek: 'Smallpdf is a reputable Swiss company with ISO 27001 certification. What changes the answer for you is which of its storage rules applies to your file.',
+    dek: 'Smallpdf is a reputable Swiss company with published retention rules. What changes the answer for you is which of its storage rules applies to your file.',
     keywords: ['is smallpdf safe', 'smallpdf safe', 'is smallpdf legit', 'smallpdf privacy', 'smallpdf security', 'smallpdf alternative'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['compress-pdf', 'merge-pdf', 'pdf-to-word', 'sign-pdf'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'Smallpdf is a large, established PDF service run by Smallpdf AG in Zurich, Switzerland. It holds ISO 27001 certification and publishes clear retention rules. For everyday PDFs, it is a legitimate and reasonable choice.',
+          'Smallpdf is a large, established PDF service run by Smallpdf AG in Zurich, Switzerland. Its pricing page says it is ISO/IEC 27001 certified, and its privacy notice sets out retention rules. For everyday PDFs, it is a legitimate and reasonable choice.',
           'Like other web PDF services it processes files on its servers, and how long your file stays there depends on what you do with it. Knowing those rules, and knowing that you can avoid the upload entirely for common tasks, is what makes the answer useful.',
         ],
       },
       {
-        h: 'Smallpdf’s three retention rules',
-        p: ['From Smallpdf’s own help and trust pages, as checked on 29 September 2026:'],
+        h: 'Smallpdf’s retention rules',
+        p: ['As of October 2026, per Smallpdf’s [privacy notice](https://smallpdf.com/privacy):'],
         list: [
-          '**One hour** for ordinary processing: an uploaded file is deleted automatically an hour after processing.',
-          '**14 days** if you share the result by email or link, or send it for signature with its e-sign feature.',
-          '**Until you delete it** if you have an account and use document storage, which can be turned off in your settings.',
+          '**With an account:** files are deleted within one hour unless you save them to your file storage.',
+          '**Saved files:** when you delete them from storage, Smallpdf says it generally deletes them within 14 days.',
+          '**Without an account:** it aims to delete files within a reasonable period after they were last opened, and that period restarts each time you reopen the file.',
         ],
-        after: ['Transfers use TLS encryption, and the company is ISO 27001 certified.'],
+        after: ['Its pricing page says documents are processed under TLS encryption and that Smallpdf is ISO/IEC 27001 certified.'],
       },
       {
         h: 'Reading those rules for your file',
         p: [
-          'The one-hour window is short, and that is a well-designed default. The account storage option is the one to watch: it is convenient, but it means your documents live in a cloud account, protected by your password, until you remove them. If you signed up to try a feature, check whether storage is on.',
+          'For signed-in users the one-hour window is short, which is a well-designed default. The account storage option is the one to watch: it is convenient, but it means your documents live in a cloud account, protected by your password, until you remove them. Without an account the retention period is less precise, so it is worth knowing which case applies to you.',
           'The general caveat is the same for every upload service: deletion and access controls are commitments about a server you cannot see. For files your job, a client agreement or health privacy law says must stay under your control, choose a tool that does not upload.',
         ],
       },
       {
         h: 'Common PDF jobs without uploading',
         p: [
-          'Stayput’s PDF tools run in your browser, so the PDF stays on your device: [Compress PDF](/tools/compress-pdf) for oversized scans, [Merge PDF](/tools/merge-pdf) to combine documents, [PDF to Word](/tools/pdf-to-word) to get editable text into a .docx, and [Sign PDF](/tools/sign-pdf) to add a signature and date. There is no account and no storage to switch off, because nothing is ever stored.',
-          'Smallpdf does things a browser tool cannot, including OCR-heavy conversions, team workspaces and e-signature requests with audit trails. If you rely on those, its retention settings are worth a two-minute review; for one-off edits of private documents, local tools avoid the question.',
+          'Stayput’s PDF tools run in your browser, so the PDF stays on your device: [Compress PDF](/tools/compress-pdf) for oversized scans, [Merge PDF](/tools/merge-pdf) to combine documents, [PDF to Word](/tools/pdf-to-word) to get editable text into a .docx, and [Sign PDF](/tools/sign-pdf) to add a signature and date. There is no account and no cloud storage to switch off, because your files are not uploaded.',
+          'Smallpdf does things a browser tool cannot, including OCR, team plans and e-signature requests (all listed on its pricing page as of October 2026). If you rely on those, its retention settings are worth a two-minute review; for one-off edits of private documents, local tools avoid the question.',
         ],
       },
       {
@@ -939,38 +939,38 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is Smallpdf legit?', a: 'Yes. It is operated by Smallpdf AG in Zurich, Switzerland, is ISO 27001 certified, and is one of the most widely used PDF services.' },
-      { q: 'How long does Smallpdf keep my files?', a: 'One hour after processing by default; 14 days if you share the file or send it for e-signature; and indefinitely if you store it in an account, until you delete it or turn storage off.' },
-      { q: 'How do I stop Smallpdf storing my documents?', a: 'Signed-in users can turn off document storage in their Smallpdf settings, and delete files already stored there.' },
-      { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so the PDF never leaves your device. It keeps working with the network off once the page has loaded.' },
+      { q: 'How long does Smallpdf keep my files?', a: 'As of October 2026, per its privacy notice: within one hour for signed-in users unless the file is saved to file storage, and generally within 14 days after you delete a saved file. Without an account it aims to delete within a reasonable period after the file was last opened.' },
+      { q: 'How do I stop Smallpdf storing my documents?', a: 'Per its privacy notice, files are deleted within an hour for signed-in users unless you save them to file storage; you can delete saved files yourself.' },
+      { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so your PDF is not uploaded. It keeps working with the network off once the page has loaded.' },
     ],
   },
   {
     slug: 'is-ezgif-safe',
     title: 'Is Ezgif Safe? What Happens to Your Uploads, and a No-Upload GIF Maker',
-    description: 'Ezgif is a long-running GIF editor from Latvia that deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
+    description: 'As of October 2026, ezgif says it deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
     heading: 'Is ezgif safe?',
     dek: 'Ezgif is a legitimate, popular GIF tool with a short deletion window. The file you are about to drop in decides whether uploading it is fine.',
     keywords: ['is ezgif safe', 'ezgif safe', 'is ezgif legit', 'is ezgif.com safe', 'ezgif privacy', 'ezgif virus', 'ezgif alternative'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'Yes, in the ordinary sense. Ezgif.com has been one of the go-to GIF editors for years, and its about page says it is developed and hosted by Open Idea, a small company in Latvia. Using it does not put malware on your computer, and it states a short retention period for the files you give it.',
+          'Yes, in the ordinary sense. Ezgif.com has been one of the go-to GIF editors for years, and its about page says it is developed and hosted by Open Idea. Using it does not put malware on your computer, and it states a short retention period for the files you give it.',
           'Every ezgif tool works on its servers: the video or image you choose is uploaded, edited there, and the result is shown back to you. So for a meme or a game clip there is little to think about. For a screen recording that shows your inbox, a video of your children, or anything from work, the useful question is whether that file should be uploaded at all.',
         ],
       },
       {
         h: 'What ezgif’s privacy page says',
-        p: ['From ezgif’s privacy and about pages, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per ezgif’s [privacy page](https://ezgif.com/privacy) and [about page](https://ezgif.com/about):'],
         list: [
           '**Deletion.** Uploaded files stay on its servers for up to one hour after they were last used with its tools, then are deleted automatically.',
           '**Visibility.** File names are not listed publicly.',
           '**Cookies and ads.** The site uses cookies to analyse traffic with anonymised, aggregated data, to remember preferences and to serve advertisements.',
-          '**Operator.** Developed and hosted by Open Idea, Latvia. The site is served over HTTPS.',
+          '**Operator.** Developed and hosted by Open Idea.',
         ],
-        after: ['The privacy page does not describe certifications, encryption at rest or who else can reach the servers, which is typical for a small free tool rather than a warning sign.'],
+        after: ['The privacy page does not describe certifications, encryption or who else can reach the servers.'],
       },
       {
         h: 'The two real risks',
@@ -994,7 +994,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is ezgif legit?', a: 'Yes. It is a long-established free GIF editor, developed and hosted by Open Idea in Latvia according to its about page.' },
+      { q: 'Is ezgif legit?', a: 'Yes. It is a long-established free GIF editor, developed and hosted by Open Idea according to its about page.' },
       { q: 'How long does ezgif keep my files?', a: 'Its privacy page says uploads are kept up to one hour after they were last used with its tools and then deleted automatically.' },
       { q: 'Can ezgif give my computer a virus?', a: 'Converting a file there does not. The usual risk on ad-supported sites is clicking an advert that looks like a download button, so save the result from the output itself.' },
       { q: 'How do I make a GIF without uploading the video?', a: 'Use a converter that runs in the browser. Stayput’s Video to GIF encodes the GIF on your device; switch off the network after the page loads and it still works.' },
@@ -1003,29 +1003,28 @@ export const guides: Guide[] = [
   {
     slug: 'is-pdf24-safe',
     title: 'Is PDF24 Safe? Online Tools vs PDF24 Creator, and a No-Install Option',
-    description: 'PDF24 is run by Geek Software GmbH in Germany and deletes online uploads after one hour. How its versions differ, and how to edit PDFs without uploading.',
+    description: 'As of October 2026, PDF24’s privacy policy says its online uploads are usually deleted one hour after upload. How its versions differ, and how to edit PDFs without uploading.',
     heading: 'Is PDF24 safe?',
     dek: 'PDF24 is a long-standing German project, and it tells you itself that its offline app is the more private option. Here is how to choose between the two, and a third way.',
     keywords: ['is pdf24 safe', 'pdf24 safe', 'is pdf24 legit', 'is pdf24 tools safe', 'pdf24 privacy', 'pdf24 creator safe'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'PDF24 is legitimate. It is operated by Geek Software GmbH, a German company, which says it has been developing the PDF24 tools since 2006. Both its online tools and its PDF24 Creator desktop app are free.',
+          'PDF24 is legitimate. It is operated by Geek Software GmbH, a German company, which offers free online tools and a desktop app. Both its online tools and its PDF24 Creator desktop app are free.',
           'What makes PDF24 unusual is that it answers the privacy question on its own homepage: the online tools process files on its servers, and if you want to be more secure, it recommends PDF24 Creator, where files stay on your PC. So which PDF24 you use matters more than whether PDF24 is safe.',
         ],
       },
       {
         h: 'What PDF24 says about the online tools',
-        p: ['From tools.pdf24.org and the Geek Software privacy policy, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per [tools.pdf24.org](https://tools.pdf24.org/en/) and the [PDF24 privacy policy](https://www.pdf24.org/en/privacy-policy.html):'],
         list: [
           '**Processing.** The online tools run on PDF24’s own servers, not in your browser.',
-          '**Deletion.** Uploaded files are deleted from the server automatically after one hour, and you can remove them sooner yourself.',
-          '**Encryption.** File transfers to its servers are encrypted.',
-          '**Law.** As a German company it processes data under the GDPR.',
-          '**Offline option.** PDF24 Creator for Windows provides the same tools offline, with files kept on your computer.',
+          '**Deletion.** Files and results are usually deleted one hour after upload or creation; the policy says longer storage may be needed if processing takes longer than an hour.',
+          '**Encryption.** The homepage says file transfers to its servers are encrypted.',
+                    '**Desktop option.** PDF24 Creator, Windows software, provides the tools with files kept on your computer.',
         ],
       },
       {
@@ -1039,7 +1038,7 @@ export const guides: Guide[] = [
         h: 'PDF jobs in the browser, without uploading',
         p: [
           'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work in any modern browser on Windows, Mac, Android or iPhone and, after one visit, keep working with the network switched off.',
-          'PDF24 has a far larger toolbox, including Office conversions, OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on a Mac, a Chromebook or a phone, a browser tool avoids both the upload and the install.',
+          'PDF24 has a far larger toolbox, including OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on a Mac, a Chromebook or a phone, a browser tool avoids both the upload and the install.',
         ],
       },
       {
@@ -1050,8 +1049,8 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is PDF24 legit?', a: 'Yes. PDF24 is operated by Geek Software GmbH, a German company, and has been developed since 2006.' },
-      { q: 'How long does PDF24 keep uploaded files?', a: 'Its site says files uploaded to the online tools are deleted automatically after one hour, and can be removed manually before then.' },
+      { q: 'Is PDF24 legit?', a: 'Yes. PDF24 is operated by Geek Software GmbH, a German company, and offers its tools free of charge.' },
+      { q: 'How long does PDF24 keep uploaded files?', a: 'As of October 2026, its privacy policy says uploaded files and results are usually deleted one hour after upload or creation.' },
       { q: 'Is PDF24 Creator safer than the online tools?', a: 'PDF24 itself says so: Creator processes files on your own PC, so nothing is uploaded. It is Windows software, though.' },
       { q: 'How can I edit a PDF privately on a Mac or phone?', a: 'Use a tool that works in the browser without uploading, such as Stayput’s PDF tools. After one visit, they keep working offline.' },
     ],
@@ -1059,11 +1058,11 @@ export const guides: Guide[] = [
   {
     slug: 'is-convertio-safe',
     title: 'Is Convertio Safe? Its File Deletion Rules, and Converting Without Uploading',
-    description: 'Convertio is run from Cyprus, keeps files in the EU and deletes outputs within 24 hours. What that covers, and how to convert common formats locally.',
+    description: 'As of October 2026, Convertio says it keeps files in the EU and deletes outputs within 24 hours. What that covers, and how to convert common formats locally.',
     heading: 'Is Convertio safe?',
     dek: 'Convertio is a well-known converter with a published deletion policy. For private files, the safer choice is a converter that never receives them.',
     keywords: ['is convertio safe', 'convertio safe', 'is convertio legit', 'is convertio.co safe', 'convertio privacy', 'convertio virus'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf'],
     sections: [
       {
@@ -1075,7 +1074,7 @@ export const guides: Guide[] = [
       },
       {
         h: 'Convertio’s stated practices',
-        p: ['From Convertio’s privacy page and terms, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per Convertio’s [privacy page](https://convertio.co/privacy/) and [terms](https://convertio.co/terms/):'],
         list: [
           '**Input files** are removed right after conversion.',
           '**Converted files** are deleted when you click the × next to them, or automatically after 24 hours.',
@@ -1108,37 +1107,37 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is Convertio legit?', a: 'Yes. It is operated by Convertio Limited, registered in Cyprus, and is one of the most used online converters.' },
-      { q: 'How long does Convertio keep my files?', a: 'Its privacy page says input files are removed right after conversion and converted files are deleted when you click ×, or after 24 hours automatically.' },
+      { q: 'How long does Convertio keep my files?', a: 'As of October 2026, its privacy page says input files are removed right after conversion and converted files are deleted when you click ×, or after 24 hours automatically.' },
       { q: 'Where does Convertio store files?', a: 'In the European Union, according to its privacy page.' },
       { q: 'How do I convert HEIC to JPG without uploading?', a: 'Use a converter that runs in the browser, such as Stayput’s HEIC to JPG. The photo is decoded and re-encoded on your device.' },
     ],
   },
   {
     slug: 'is-zamzar-safe',
-    title: 'Is Zamzar Safe? Seven-Day Storage, Email Links and a Local Alternative',
-    description: 'Zamzar is a UK converter that keeps free conversions for up to seven days. What that means for private files, and how to convert without uploading.',
+    title: 'Is Zamzar Safe? How Long It Keeps Files, Email Links and a Local Alternative',
+    description: 'As of October 2026, Zamzar says it stores files for no longer than seven days. What that means for private files, and how to convert without uploading.',
     heading: 'Is Zamzar safe?',
-    dek: 'Zamzar is one of the oldest online converters and runs without third-party ads. Its storage window is longer than most, which is the detail worth knowing.',
+    dek: 'Zamzar is one of the oldest online converters. Its storage window is longer than most, which is the detail worth knowing.',
     keywords: ['is zamzar safe', 'zamzar safe', 'is zamzar legit', 'is zamzar.com safe', 'zamzar privacy', 'zamzar virus'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
     sections: [
       {
         h: 'The short answer',
         p: [
-          'Zamzar is legitimate. It is run by Zamzar Limited, a company registered in England, and has been converting files online since 2006. Its privacy policy was last updated in August 2026, and the site says it hosts no third-party advertising, which removes the fake-download-button problem common on free converters.',
+          'Zamzar is legitimate. It is run by Zamzar Limited, a company registered in England, and has been converting files online since 2006. Its privacy policy was last modified on 14 August 2026.',
           'The point to understand before uploading something personal is retention. Free conversions can stay on Zamzar’s systems for up to seven days, noticeably longer than services that delete within hours.',
         ],
       },
       {
         h: 'What Zamzar’s policy says',
-        p: ['From Zamzar’s privacy policy, last modified 14 August 2026, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per Zamzar’s [privacy policy](https://www.zamzar.com/privacy/), last modified 14 August 2026:'],
         list: [
           '**Free conversions.** Files you submit and their converted outputs are stored for no longer than 7 days.',
           '**Accounts.** For account holders, data is kept while the account is active; files are permanently removed 35 days after an account is deactivated.',
           '**Email.** If you give an email address, Zamzar sends links to download your converted files there.',
           '**Encryption.** Traffic to and from its servers uses TLS.',
-          '**Ads and analytics.** No third-party advertising on zamzar.com; it uses Google Analytics.',
+          '**Analytics.** It uses Google Analytics.',
           '**Service providers.** Data is shared with vendors for server hosting and content delivery.',
         ],
       },
@@ -1152,7 +1151,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting on your own device instead',
         p: [
-          'Stayput’s tools do the most common conversions inside your browser, so there is no copy on a server and no link to expire. Use the [image converter](/tools/convert-image) for JPG, PNG, WebP, HEIC and more, [Compress image](/tools/compress-image) to shrink photos for upload forms, [PDF to image](/tools/pdf-to-image) to turn pages into JPG or PNG, and [Video to MP3](/tools/video-to-mp3) for audio. The result downloads straight from the page.',
+          'Stayput’s tools do the most common conversions inside your browser, so your files are not uploaded, there is no copy on a server and no link to expire. Use the [image converter](/tools/convert-image) for JPG, PNG, WebP, HEIC and more, [Compress image](/tools/compress-image) to shrink photos for upload forms, [PDF to image](/tools/pdf-to-image) to turn pages into JPG or PNG, and [Video to MP3](/tools/video-to-mp3) for audio. The result downloads straight from the page.',
           'Zamzar covers many more formats and offers an API and account features. For obscure formats with nothing private inside, it remains a solid choice.',
         ],
       },
@@ -1165,51 +1164,50 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is Zamzar legit?', a: 'Yes. It is operated by Zamzar Limited, a company registered in England, and has run online conversions since 2006.' },
-      { q: 'How long does Zamzar keep my files?', a: 'Its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
-      { q: 'Does Zamzar have ads?', a: 'Its privacy policy says it does not host third-party advertising on zamzar.com. It does use Google Analytics.' },
+      { q: 'How long does Zamzar keep my files?', a: 'As of October 2026, its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
+      { q: 'Does Zamzar use analytics?', a: 'As of October 2026, its privacy policy says it uses Google Analytics, with cookies that store a client and session id.' },
       { q: 'Can I convert files without uploading them?', a: 'Yes, for common image, PDF and audio formats. Browser-based tools like Stayput’s process files on your device and work offline once loaded.' },
     ],
   },
   {
     slug: 'is-remove-bg-safe',
-    title: 'Is remove.bg Safe? Uploads, AI Training and a No-Upload Option',
-    description: 'remove.bg deletes uploads shortly after processing, but its policy lets account uploads train AI. What that means, and how to cut out photos locally.',
+    title: 'Is remove.bg Safe? Uploads and a No-Upload Option',
+    description: 'As of October 2026, remove.bg says it deletes uploads shortly after processing, and that its standalone site is moving to Canva. What that means, and how to cut out photos locally.',
     heading: 'Is remove.bg safe?',
-    dek: 'remove.bg is a legitimate Canva-owned service. Two details in its privacy policy matter more than the usual deletion promise: training and preview-only free downloads.',
+    dek: 'remove.bg is a legitimate Canva-owned service. Its policy gives no exact deletion time, and its website is closing, so it is worth knowing the options.',
     keywords: ['is remove.bg safe', 'remove.bg safe', 'is remove bg safe', 'is remove.bg legit', 'remove.bg privacy', 'remove.bg alternative no upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-image'],
     sections: [
       {
         h: 'The short answer',
         p: [
           'Yes, remove.bg is legitimate and widely used. It belongs to Canva: its privacy policy names the operator as Canva Austria GmbH in Vienna, the company behind Kaleido, remove.bg, Unscreen and Designify. Using it will not harm your computer, and the policy says uploads are deleted shortly after processing.',
-          'On the website every cut-out is made on its servers, so each photo is uploaded. For a product shot that is rarely a concern. For a picture of your children, a selfie or anyone who did not agree to it, two parts of the policy are worth reading before you drop the file in.',
+          'On the website every cut-out is made on its servers, so each photo is uploaded. For a product shot that is rarely a concern. For a picture of your children, a selfie or anyone who did not agree to it, the policy is worth reading before you drop the file in.',
         ],
       },
       {
         h: 'What remove.bg’s policy says',
-        p: ['From the remove.bg privacy policy (last updated 16 July 2025) and pricing page, as checked on 29 September 2026:'],
+        p: ['As of October 2026, per the remove.bg [privacy policy](https://www.remove.bg/privacy) (last updated 16 July 2025) and [pricing page](https://www.remove.bg/pricing):'],
         list: [
           '**Deletion.** Files are uploaded, processed, offered for download and then deleted “shortly after”. The policy gives no exact time.',
-          '**AI training.** The company may analyse media uploads and related data in your account to train its algorithms, models and AI products. Separately, the site asks some users to opt in with “Contribute this image & help us make remove.bg better”.',
-          '**Location.** Data is stored and processed in Europe and in any other country where the company, its affiliates or service providers have facilities. Server logs are kept for up to three months.',
-          '**Analytics.** Google Analytics collects usage data through cookies.',
-          '**Free vs paid.** Preview images are free on the website; each full-resolution result costs a credit.',
+          '**Location.** Data is stored and processed in Europe and in any other country where the company, its affiliates or service providers have facilities.',
+          '**Analytics.** Cookies served by Google Analytics collect limited usage data.',
+          '**The site is closing.** The pricing page says the standalone website will no longer be available from 1 December 2026, with background removal moving to Canva.',
         ],
       },
       {
         h: 'What that means for your photos',
         p: [
-          'Short-lived storage is the norm for upload tools. The training clause is the part to weigh: it covers uploads tied to an account, which is exactly where people who buy credits end up. If you would rather your family photos or client work did not feed a model, that is a reason to avoid signing in or to use a different tool.',
-          'The preview limit changes the calculation too. To get a full-size cut-out for free, many people end up uploading the same photo to several sites in turn, multiplying the copies on other people’s servers.',
+          'Short-lived storage is the norm for upload tools, but “shortly after” is not a number, so for private photos the safest copy is the one that is never uploaded.',
+          'The move to Canva is the other thing to weigh: if you rely on remove.bg’s site, check the pricing page for what replaces it after 1 December 2026.',
         ],
       },
       {
         h: 'Cutting out a photo without uploading it',
         p: [
-          'Stayput’s [background remover](/tools/remove-background) runs an open segmentation model inside your browser tab. The photo is never sent anywhere, the result is at your photo’s full resolution, and there are no credits or watermark. Use [Make background transparent](/make-background-transparent) for a PNG with a see-through background, or [White background](/white-background) for marketplace-ready product shots. To hide a face instead of cutting it out, use [Blur image](/tools/blur-image).',
-          'remove.bg’s own model is very good at difficult hair and busy scenes, and it offers an API, desktop apps and a Photoshop plug-in for bulk work. For a quick cut-out of a private photo, a local tool avoids the upload, the training question and the preview limit in one go.',
+          'Stayput’s [background remover](/tools/remove-background) runs an open segmentation model inside your browser tab. Your photo is not uploaded, the result is at your photo’s full resolution, and there are no credits or watermark. Use [Make background transparent](/make-background-transparent) for a PNG with a see-through background, or [White background](/white-background) for marketplace-ready product shots. To hide a face instead of cutting it out, use [Blur image](/tools/blur-image).',
+          'remove.bg’s own model is very good at difficult hair and busy scenes, and it offers an API, desktop apps and a Photoshop plug-in for bulk work. For a quick cut-out of a private photo, a local tool avoids the upload.',
         ],
       },
       {
@@ -1221,8 +1219,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is remove.bg legit?', a: 'Yes. It is a Canva brand, operated by Canva Austria GmbH in Vienna, Austria, and is one of the best-known background removers.' },
-      { q: 'Does remove.bg keep my photos?', a: 'Its privacy policy says uploaded files are deleted shortly after processing, without giving an exact time. Server logs are kept for up to three months.' },
-      { q: 'Does remove.bg use my photos to train AI?', a: 'Its privacy policy says it may analyse media uploads and related data in your account to train its algorithms and AI products. It also asks some users to contribute images voluntarily.' },
+      { q: 'Does remove.bg keep my photos?', a: 'As of October 2026, its privacy policy says uploaded files are deleted shortly after processing, without giving an exact time.' },
       { q: 'How can I remove a background without uploading the photo?', a: 'Use a tool that runs the model in your browser, such as Stayput’s background remover. After the model has downloaded once, it works with the network switched off.' },
     ],
   },
@@ -2716,11 +2713,11 @@ export const guides: Guide[] = [
   {
     slug: 'smallpdf-alternative',
     title: 'A Free Smallpdf Alternative With No Daily Limit',
-    description: 'Smallpdf\'s free plan caps you at two tasks a day; unlimited use needs a paid plan. Here is what that free limit actually looks like, and a browser-based alternative with no daily task cap and no upload.',
+    description: 'Smallpdf\'s free plan has a daily limit on downloads and tasks; unlimited use needs a paid plan. Here is what that looks like, and a browser-based alternative with no daily task cap, where your files are not uploaded.',
     heading: 'A free Smallpdf alternative with no daily limit',
-    dek: 'Smallpdf\'s free plan is genuinely limited, not just ad-supported. Here is what that limit looks like, and a way around it that never uploads your files at all.',
+    dek: 'Smallpdf\'s free plan has daily limits. Here is what that means, and a way around it where your files are never uploaded.',
     keywords: ['smallpdf alternative', 'free smallpdf alternative', 'smallpdf alternative no limit', 'smallpdf free plan limit', 'smallpdf without sign up'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'unlock-pdf', 'protect-pdf', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf', 'pdf-page-numbers', 'pdf-to-word'],
     sections: [
       {
@@ -2732,26 +2729,26 @@ export const guides: Guide[] = [
       {
         h: 'Why people look for an alternative',
         p: [
-          'The free plan is capped: as of when this page was checked, Smallpdf limited free accounts to around two tasks a day, with unlimited use requiring a paid Pro plan (its pricing page listed Pro Personal starting around $15 a month). For an occasional user, hitting that daily cap mid-task, or being asked to subscribe just to merge a second PDF that day, is the usual reason to look elsewhere.',
-          'The other factor is the upload itself: every Smallpdf tool sends your file to its servers to process it, however briefly it keeps it afterward. For details on Smallpdf\'s own file retention and privacy practices, see [Is Smallpdf safe?](/guides/is-smallpdf-safe).',
+          'The free plan is capped: as of October 2026, per [smallpdf.com/pricing](https://smallpdf.com/pricing), the Free plan lists a daily download limit on tools such as merge, split, compress and sign, while access to all its tools without that limit needs a paid plan such as Pro. For an occasional user, hitting the daily cap mid-task, or being asked to subscribe just to finish a job, is the usual reason to look elsewhere.',
+          'The other factor is the upload itself: Smallpdf\'s website tools process your file on its servers rather than on your device (its pricing page, as of October 2026, describes documents being processed under TLS encryption). For details on Smallpdf\'s own file retention and privacy practices, see [Is Smallpdf safe?](/guides/is-smallpdf-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s PDF tools run entirely inside the browser tab, so there is no server-side task to count and nothing to upload: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [sign PDF](/tools/sign-pdf), [unlock PDF](/tools/unlock-pdf), [protect PDF](/tools/protect-pdf) with AES-256 encryption, [rotate PDF](/tools/rotate-pdf), [reorder and delete pages](/tools/reorder-pdf), [watermark PDF](/tools/watermark-pdf), [add page numbers](/tools/pdf-page-numbers) and [PDF to Word](/tools/pdf-to-word). There is no daily limit, no account, and no subscription, because processing a tenth PDF costs nothing more than processing the first.',
+          'Stayput\'s PDF tools run entirely inside the browser tab, so your files are not uploaded and there is no server-side task to count: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [sign PDF](/tools/sign-pdf), [unlock PDF](/tools/unlock-pdf), [protect PDF](/tools/protect-pdf) with AES-256 encryption, [rotate PDF](/tools/rotate-pdf), [reorder and delete pages](/tools/reorder-pdf), [watermark PDF](/tools/watermark-pdf), [add page numbers](/tools/pdf-page-numbers) and [PDF to Word](/tools/pdf-to-word). There is no daily limit, no account, and no subscription, because processing a tenth PDF costs nothing more than processing the first.',
         ],
       },
       {
         h: 'Where Smallpdf still has the edge',
         p: [
-          'Smallpdf\'s OCR-heavy conversions, its e-signature workflow with audit trails for legally binding signatures, team workspaces and some Office document conversions go beyond what a browser can currently do unassisted. If you need those specifically, Smallpdf (or its desktop app, which also avoids uploading) remains the more complete tool. For the everyday jobs above, a local tool with no daily cap is usually the simpler choice.',
+          'Smallpdf\'s pricing page lists OCR, conversions to and from Word, Excel and PowerPoint, an e-signature workflow with an activity timeline and certificate of completion, and team plans (as of October 2026). Those go beyond what a browser can currently do unassisted. If you need them specifically, Smallpdf remains the more complete tool. For the everyday jobs above, a local tool with no daily cap is usually the simpler choice.',
         ],
       },
     ],
     faq: [
       { q: 'Is there a free Smallpdf alternative with no daily task limit?', a: 'Yes. A tool that processes PDFs entirely in the browser, like Stayput, has no per-day task count to hit, since there is no server-side job being metered.' },
-      { q: 'Do I need to sign up to use a Smallpdf alternative?', a: 'Not for a browser-based tool: there is no account system because there is nothing stored on a server to attach an account to.' },
+      { q: 'Do I need to sign up to use a Smallpdf alternative?', a: 'Not for a browser-based tool like Stayput: it is free with no account, and your files are not uploaded.' },
       { q: 'Does a no-upload PDF tool do everything Smallpdf does?', a: 'Not quite; heavier OCR conversions, legally binding e-signature workflows and team features are still easier on a service like Smallpdf, but merging, splitting, compressing, signing, unlocking, protecting, rotating, reordering, watermarking and numbering pages are covered.' },
       { q: 'Is a browser-based PDF tool actually free, or does it have hidden limits?', a: 'A tool that runs locally has no meaningful marginal cost per file, so there is no natural reason to cap daily use the way a server-based service, which pays for the compute, typically does.' },
     ],
@@ -2759,97 +2756,97 @@ export const guides: Guide[] = [
   {
     slug: 'ilovepdf-alternative',
     title: 'A Free iLovePDF Alternative With No Task Limits or Ads',
-    description: 'iLovePDF\'s free tier limits document size and batch processing and shows ads; Premium removes both for a monthly fee. Here is a browser-based alternative with neither restriction.',
+    description: 'iLovePDF\'s free plan limits document processing, batches and file size per task, and Premium lifts those limits and is ad-free. Here is a browser-based alternative with none of those restrictions, where your files are not uploaded.',
     heading: 'A free iLovePDF alternative with no task limits or ads',
-    dek: 'iLovePDF\'s free tier works, but with limits on file size and batches, plus ads. Here is what changes with a tool that never uploads the file at all.',
+    dek: 'iLovePDF\'s free plan works, but with limits on documents, batches and file size. Here is what changes with a tool that never uploads the file at all.',
     keywords: ['ilovepdf alternative', 'free ilovepdf alternative', 'ilovepdf alternative no ads', 'ilovepdf without limits', 'ilovepdf premium alternative free'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'unlock-pdf', 'protect-pdf', 'rotate-pdf', 'reorder-pdf', 'watermark-pdf', 'pdf-page-numbers'],
     sections: [
       {
         h: 'What iLovePDF does well',
         p: [
-          'iLovePDF is one of the most popular PDF sites on the web, with a wide toolset covering merging, splitting, compressing, converting, signing and OCR, along with desktop and mobile apps. It is a legitimate, widely used service.',
+          'iLovePDF is one of the most popular PDF sites on the web, with a wide toolset covering merging, splitting, compressing, converting and signing, along with desktop and mobile apps. It is a legitimate, widely used service.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'iLovePDF\'s free tier, as of when this page was checked, limited document size, batch processing and showed banner ads; removing those limits and the ads meant subscribing to Premium, listed on its pricing page at around €5 a month billed annually or €9 a month billed monthly. For someone who needs to merge or compress a PDF once in a while, paying a recurring fee just to skip a size cap or an ad is a common reason to look elsewhere.',
-          'As with any upload-based service, there is also the file itself to consider: iLovePDF processes documents on its servers. Its own retention and security practices are covered separately in [Is iLovePDF safe?](/guides/is-ilovepdf-safe).',
+          'As of October 2026, per [ilovepdf.com/pricing](https://www.ilovepdf.com/pricing), the free Basic plan lists limited document processing, limited batch processing and a limited file size per task, while Premium lists processing without that limit, an ad-free experience and a price of $5 a month ($60 billed annually). For someone who needs to merge or compress a PDF once in a while, paying a recurring fee just to lift a limit is a common reason to look elsewhere.',
+          'As with any upload-based service, there is also the file itself to consider: iLovePDF processes documents on its servers (its pricing page lists regional file processing as a Premium feature). Its own retention and security practices are covered separately in [Is iLovePDF safe?](/guides/is-ilovepdf-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s PDF tools run inside the browser tab rather than on a server, so there is no file-size tier, no batch cap and no ads to work around: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [sign PDF](/tools/sign-pdf), [unlock PDF](/tools/unlock-pdf), [protect PDF](/tools/protect-pdf), [rotate PDF](/tools/rotate-pdf), [reorder and delete pages](/tools/reorder-pdf), [watermark PDF](/tools/watermark-pdf) and [add page numbers](/tools/pdf-page-numbers) are all free with no daily count and no subscription.',
+          'Stayput\'s PDF tools run inside the browser tab rather than on a server, so your files are not uploaded, and there is no file-size tier, no batch cap and no ads to work around: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [sign PDF](/tools/sign-pdf), [unlock PDF](/tools/unlock-pdf), [protect PDF](/tools/protect-pdf), [rotate PDF](/tools/rotate-pdf), [reorder and delete pages](/tools/reorder-pdf), [watermark PDF](/tools/watermark-pdf) and [add page numbers](/tools/pdf-page-numbers) are all free with no daily count and no subscription.',
         ],
       },
       {
         h: 'Where iLovePDF still has the edge',
         p: [
-          'iLovePDF\'s OCR, Office document conversion and legally binding e-signature workflow are more capable than what runs client-side today, and its desktop app is a reasonable private option if you need those specifically. For everyday merging, splitting, compressing, signing and organizing PDFs, a browser tool with no daily task cap covers most of what people actually search for iLovePDF to do.',
+          'iLovePDF\'s pricing page lists advanced e-signatures, workflows, AI credits and desktop and mobile apps for its paid plans (as of October 2026), which go beyond what runs client-side today. For everyday merging, splitting, compressing, signing and organizing PDFs, a browser tool with no daily task cap covers most of what people actually search for iLovePDF to do.',
         ],
       },
     ],
     faq: [
-      { q: 'Is there a completely free iLovePDF alternative?', a: 'Yes. A browser-based PDF tool has no server-side task to limit or advertising to fund, so it can be free without a daily cap or a Premium tier.' },
+      { q: 'Is there a completely free iLovePDF alternative?', a: 'Yes. A browser-based PDF tool has no server-side task to limit, so it can be free with no account, without a daily cap or a Premium tier.' },
       { q: 'Does a no-upload PDF tool have file size limits like iLovePDF\'s free plan?', a: 'Since the file is processed on your own device rather than a server with fixed resources, there is no per-plan file size ceiling to hit.' },
-      { q: 'What does iLovePDF do that a browser tool cannot?', a: 'OCR-heavy conversions, Office document conversion and legally binding e-signature workflows remain more capable on a full service like iLovePDF; ordinary merging, splitting, compressing and signing are well covered locally.' },
-      { q: 'Are there ads on a browser-based PDF tool?', a: 'A tool that costs nothing to run per file has less need to fund itself with advertising the way a free tier on a server-based service typically does.' },
+      { q: 'What does iLovePDF do that a browser tool cannot?', a: 'Advanced e-signatures, workflows and desktop and mobile apps are part of what iLovePDF\'s paid plans list; ordinary merging, splitting, compressing and signing are well covered locally.' },
+      { q: 'Are there ads on a browser-based PDF tool?', a: 'Stayput shows no ads. iLovePDF lists an ad-free experience as a Premium feature, as of October 2026.' },
     ],
   },
   {
     slug: 'cloudconvert-alternative',
     title: 'A Free CloudConvert Alternative for Everyday Files',
-    description: 'CloudConvert\'s free plan is metered in conversion minutes per day, not files, which can run out unpredictably. Here is a browser-based alternative for common formats with no metering at all.',
+    description: 'CloudConvert\'s free plan is metered in conversion credits per day, not files, which can run out unpredictably. Here is a browser-based alternative for common formats with no metering at all.',
     heading: 'A free CloudConvert alternative for everyday files',
-    dek: 'CloudConvert measures its free tier in minutes, not files, which makes it hard to predict when you will hit the limit. Here is an alternative with nothing to meter.',
+    dek: 'CloudConvert measures its free tier in credits tied to conversion time, not files, which makes it hard to predict when you will hit the limit. Here is an alternative with nothing to meter.',
     keywords: ['cloudconvert alternative', 'free cloudconvert alternative', 'cloudconvert alternative no limit', 'cloudconvert free plan limit', 'cloudconvert without upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'video-to-gif', 'audio-converter'],
     sections: [
       {
         h: 'What CloudConvert does well',
         p: [
-          'CloudConvert supports an unusually wide range of formats, including many document, e-book, CAD and professional video and audio formats that a browser cannot decode on its own. It is a legitimate, established converter used by developers as well as everyday users, including through an API.',
+          'CloudConvert supports an unusually wide range of formats, including document and office formats that a browser cannot convert on its own. It is a legitimate, established converter used by developers as well as everyday users, including through an API.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'CloudConvert\'s free plan, as of when this page was checked, was metered in conversion minutes per day (around 25) rather than a simple file count, so the point at which you hit the limit depends on how long each conversion takes to run, not how many files you have converted. That makes the free tier harder to predict than a flat daily count, and paid usage is sold as packages or subscriptions of conversion minutes.',
-          'It is also, like any converter of this kind, an upload-based service: your file is sent to its servers to be processed. Its stated retention and security practices are covered in [Is CloudConvert safe?](/guides/is-cloudconvert-safe).',
+          'As of October 2026, per [cloudconvert.com/pricing](https://cloudconvert.com/pricing), the free plan gives 10 conversion credits a day, with files up to 1 GB and a 5-minute maximum processing time. Credits typically cost one per minute of conversion time, plus a base cost per conversion, so the point at which you hit the limit depends on how long each conversion takes to run, not how many files you have converted. Paid usage is sold as one-time credit packages (from $17) or monthly subscriptions (from $9 a month).',
+          'It is also, like any converter of this kind, an upload-based service: your file is uploaded to its servers to be processed. Its stated retention and security practices are covered in [Is CloudConvert safe?](/guides/is-cloudconvert-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'For the formats browsers can already decode and encode, a local tool has nothing to meter: Stayput\'s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and more, [HEIC to JPG](/tools/heic-to-jpg) covers iPhone photos, the [audio converter](/tools/audio-converter) handles MP3, WAV, FLAC, M4A and OGG, [Video to MP3](/tools/video-to-mp3) pulls sound out of a video, and [Video to GIF](/tools/video-to-gif) turns a clip into an animation. None of it counts against a daily minute budget, because there is no server-side conversion running at all.',
+          'For the formats browsers can already decode and encode, a local tool has nothing to meter: Stayput\'s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and more, [HEIC to JPG](/tools/heic-to-jpg) covers iPhone photos, the [audio converter](/tools/audio-converter) handles MP3, WAV, FLAC, M4A and OGG, [Video to MP3](/tools/video-to-mp3) pulls sound out of a video, and [Video to GIF](/tools/video-to-gif) turns a clip into an animation. None of it counts against a daily credit budget, because your files are not uploaded and no server-side conversion runs.',
         ],
       },
       {
         h: 'Where CloudConvert still has the edge',
         p: [
-          'CloudConvert\'s format coverage is genuinely broader: office documents, e-books, CAD files, and professional video and audio codecs that browsers cannot handle natively still need a server-based converter. For the common image, audio and video formats most people convert day to day, a browser tool avoids the minute-based limit entirely.',
+          'CloudConvert\'s format coverage is broader: its pricing page lists conversion types such as Office to PDF, iWork to PDF and PDF to Office (as of October 2026), which a browser tool does not cover. For the common image, audio and video formats most people convert day to day, a browser tool avoids the credit-based limit entirely.',
         ],
       },
     ],
     faq: [
-      { q: 'Why does CloudConvert\'s free plan run out at different times for different files?', a: 'Because its free tier is measured in conversion minutes rather than a file count, so a longer or more complex conversion uses up more of the daily allowance than a quick one.' },
-      { q: 'Is there a free alternative to CloudConvert with no minute limit?', a: 'Yes, for common formats. A browser-based converter processes the file on your device, so there is no server time being metered against a daily budget.' },
-      { q: 'Does a browser converter support as many formats as CloudConvert?', a: 'No, CloudConvert supports far more formats, including many document, e-book and professional media formats a browser cannot decode; for common image, audio and video formats, a browser tool covers the same ground with no daily cap.' },
-      { q: 'Can I convert files without uploading them at all?', a: 'Yes, for formats the browser itself can read and write. Stayput\'s converters process the file on your device, and you can confirm it by switching on airplane mode after the page loads.' },
+      { q: 'Why does CloudConvert\'s free plan run out at different times for different files?', a: 'Because its free tier is measured in conversion credits rather than a file count, and credits typically cost one per minute of conversion time, so a longer conversion uses up more of the daily allowance than a quick one.' },
+      { q: 'Is there a free alternative to CloudConvert with no credit limit?', a: 'Yes, for common formats. A browser-based converter processes the file on your device, so there is no server time being metered against a daily budget.' },
+      { q: 'Does a browser converter support as many formats as CloudConvert?', a: 'No, CloudConvert supports more formats, including office documents a browser cannot convert; for common image, audio and video formats, a browser tool covers the same ground with no daily cap.' },
+      { q: 'Can I convert files without uploading them at all?', a: 'Yes, for formats the browser itself can read and write. Stayput\'s converters process the file on your device, and you can confirm in your browser\'s network panel that your files are not uploaded.' },
     ],
   },
   {
     slug: 'remove-bg-alternative',
     title: 'A Free remove.bg Alternative With No Resolution Cap',
-    description: 'remove.bg\'s free tier only gives you a low-resolution result; full resolution needs paid credits. Here is a browser-based background remover with no resolution limit at all.',
+    description: 'remove.bg lists max-quality exports as a paid feature, and says its standalone site is moving to Canva. Here is a browser-based background remover that returns the photo at its original resolution, with no upload.',
     heading: 'A free remove.bg alternative with no resolution cap',
-    dek: 'remove.bg\'s free result is capped at low resolution; the full-size image needs a paid credit. Here is a way to remove a background at full size for free.',
+    dek: 'remove.bg lists max-quality exports as a paid feature. Here is a way to remove a background at full size for free, without uploading the photo.',
     keywords: ['remove.bg alternative', 'free remove.bg alternative', 'remove.bg alternative full resolution', 'remove.bg free high resolution', 'background remover no upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
     sections: [
       {
@@ -2861,8 +2858,8 @@ export const guides: Guide[] = [
       {
         h: 'Why people look for an alternative',
         p: [
-          'The free result on remove.bg\'s website, as of when this page was checked, was capped at a low resolution (up to about 0.25 megapixels, roughly 625 by 400 pixels) for personal use; getting the full-resolution cutout back requires a paid credit, sold individually or through a monthly subscription. For anything beyond a small web thumbnail, such as a print, a listing photo or a portrait for a profile, the free tier\'s output is usually too small to use directly.',
-          'Every remove.bg request also uploads the photo to its servers to run the cutout model. Its stated retention practices, including a detail about account uploads being used for AI training, are covered in [Is remove.bg safe?](/guides/is-remove-bg-safe).',
+          'As of October 2026, per [remove.bg/pricing](https://www.remove.bg/pricing), remove.bg sells credits (pay-as-you-go packs and a monthly subscription) and lists max-quality exports as a paid feature. The same page says the standalone website will no longer be available from 1 December 2026, with background removal moving to Canva. For a print, a listing photo or a profile portrait, paying per image is the usual reason to look elsewhere.',
+          'remove.bg is also a web service that processes photos on its servers. Its stated retention practices are covered in [Is remove.bg safe?](/guides/is-remove-bg-safe).',
         ],
       },
       {
@@ -2874,81 +2871,81 @@ export const guides: Guide[] = [
       {
         h: 'Where remove.bg still has the edge',
         p: [
-          'remove.bg\'s model has been refined over years on a very large dataset and can handle some especially difficult edge cases (fine hair strands, motion blur, very low contrast subjects) more reliably than a smaller model that runs entirely in a browser tab. For most everyday product photos, portraits and pet pictures, a full-resolution local cutout with no fee is the more practical choice.',
+          'remove.bg\'s model may handle some especially difficult edge cases (fine hair strands, motion blur, very low contrast subjects) better than a smaller model that runs entirely in a browser tab. For most everyday product photos, portraits and pet pictures, a full-resolution local cutout with no fee is the more practical choice.',
         ],
       },
     ],
     faq: [
-      { q: 'Is there a free way to remove a background at full resolution?', a: 'Yes. A background remover that runs the cutout model in your own browser returns the full-resolution result with no watermark, because the model runs on your device and nothing is uploaded.' },
-      { q: 'Why does remove.bg give me a small image for free?', a: 'Its free tier on the website is limited to a low resolution for personal use; the full-size result requires a paid credit or subscription, according to its pricing page.' },
+      { q: 'Is there a free way to remove a background at full resolution?', a: 'Yes. A background remover that runs the cutout model in your own browser returns the full-resolution result with no watermark, because the model runs on your device and your photo is not uploaded.' },
+      { q: 'Does remove.bg charge for full-quality results?', a: 'As of October 2026, its pricing page lists max-quality exports as a paid feature, sold as credits or a monthly subscription.' },
       { q: 'Does a browser-based background remover work as well as remove.bg?', a: 'For most everyday photos, yes; remove.bg\'s model can have an edge on especially difficult cases like very fine hair or low-contrast subjects, refined over a larger dataset.' },
-      { q: 'Is my photo uploaded to remove a background locally?', a: 'No. A tool that runs the cutout model in the browser processes the image on your device; you can confirm this with the browser\'s network panel or by trying it in airplane mode after the page loads.' },
+      { q: 'Is my photo uploaded to remove a background locally?', a: 'No. A tool that runs the cutout model in the browser processes the image on your device, and you can confirm that the photo is never uploaded in your browser\'s network panel. The model itself downloads once, on first use.' },
     ],
   },
   {
     slug: 'convertio-alternative',
     title: 'A Free Convertio Alternative With No File Size Cap',
-    description: 'Convertio\'s free plan limits files to 100MB and 10 conversions a day. Here is what that looks like, and a browser-based alternative with neither limit for common formats.',
+    description: 'Convertio\'s free tier limits file size and the number of conversion credits per day. Here is what that looks like, and a browser-based alternative with no daily credits for common formats.',
     heading: 'A free Convertio alternative with no file size cap',
     dek: 'Convertio\'s free plan caps both file size and how many conversions you get per day. Here is an alternative with no such ceiling.',
     keywords: ['convertio alternative', 'free convertio alternative', 'convertio alternative no limit', 'convertio free plan limit', 'convertio without upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf', 'audio-converter'],
     sections: [
       {
         h: 'What Convertio does well',
         p: [
-          'Convertio supports a very wide range of file types across documents, images, audio, video and archives, with a simple drag-and-drop interface. It is a legitimate, widely used converter run by Convertio Limited.',
+          'Convertio supports a very wide range of file types across documents, images, audio, video and archives, with a simple drag-and-drop interface. It is a legitimate, widely used converter run by Convertio ltd.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'Convertio\'s free plan, as of when this page was checked, capped files at 100MB and limited free accounts to around 10 conversions a day; going beyond either meant a paid plan, with its lowest tier listed around $9.99 a month for a higher daily count and larger files, up to a top tier that removes the daily cap entirely. A single large video or archive can hit the 100MB ceiling on its own, well before the conversion count matters.',
-          'It is also, like any converter of this kind, an upload-based service. Its stated file-handling and retention practices are covered separately in [Is Convertio safe?](/guides/is-convertio-safe).',
+          'As of October 2026, per [Convertio\'s help center](https://support.convertio.co/hc/en-us/articles/360004386774-Free-tier-limit-for-file-conversions), the free tier allows files up to 1 GB, 10 conversion credits per 24 hours and 10 concurrent conversions; past any of those it offers a paid plan. Per [convertio.co/pricing](https://convertio.co/pricing/), paid plans start at $6.99 a month billed yearly for 1,000 conversion credits a month, with larger file sizes on higher tiers.',
+          'It is also, like any converter of this kind, an upload-based service: files are sent to its servers. Its stated file-handling and retention practices are covered separately in [Is Convertio safe?](/guides/is-convertio-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'For formats a browser can already decode and encode, there is no file to upload and nothing to count: Stayput\'s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and more with no size ceiling other than what your device can hold in memory, [HEIC to JPG](/tools/heic-to-jpg) covers iPhone photos, [image to PDF](/tools/image-to-pdf) turns photos into documents, the [audio converter](/tools/audio-converter) handles MP3, WAV, FLAC, M4A and OGG, and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack.',
+          'For formats a browser can already decode and encode, your files are not uploaded and there is nothing to count: Stayput\'s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and more with no size ceiling other than what your device can hold in memory, [HEIC to JPG](/tools/heic-to-jpg) covers iPhone photos, [image to PDF](/tools/image-to-pdf) turns photos into documents, the [audio converter](/tools/audio-converter) handles MP3, WAV, FLAC, M4A and OGG, and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack.',
         ],
       },
       {
         h: 'Where Convertio still has the edge',
         p: [
-          'Convertio\'s format coverage extends well beyond what a browser can read natively, including many document, e-book, archive and specialist formats. For a common image, audio or video conversion where the file is a reasonable size, a browser tool sidesteps both the size cap and the daily count entirely.',
+          'Convertio\'s format coverage extends well beyond what a browser can read natively, including many document, e-book, archive and specialist formats. For a common image, audio or video conversion, a browser tool sidesteps both the size limit and the daily credits entirely.',
         ],
       },
     ],
     faq: [
-      { q: 'Is there a free Convertio alternative without the 100MB file limit?', a: 'Yes, for formats a browser can already handle. A tool that converts locally has no server-side size tier to enforce, so the practical limit is only what your device can process.' },
-      { q: 'How many free conversions does Convertio allow per day?', a: 'Its free plan, as of when this page was checked, allowed around 10 conversions a day, with paid tiers raising that count and the 100MB file size cap.' },
-      { q: 'Does a browser converter support as many formats as Convertio?', a: 'No, Convertio covers many more file types, particularly documents, e-books and archives; for common image, audio and video formats, a browser tool matches it with no daily cap.' },
-      { q: 'Can I convert a large file without hitting a size cap?', a: 'For formats the browser can decode locally, size is limited only by your device\'s memory, not a fixed plan tier the way an upload-based converter enforces.' },
+      { q: 'Is there a free Convertio alternative without a file size or daily limit?', a: 'Yes, for formats a browser can already handle. A tool that converts locally has no server-side size tier or credit count to enforce, so the practical limit is only what your device can process.' },
+      { q: 'How many free conversions does Convertio allow per day?', a: 'As of October 2026, per its help center, the free tier allows 10 conversion credits per 24 hours and files up to 1 GB; paid plans raise the credits and file sizes.' },
+      { q: 'Does a browser converter support as many formats as Convertio?', a: 'No, Convertio covers many more file types; for common image, audio and video formats, a browser tool covers the same ground with no daily cap.' },
+      { q: 'Can I convert a large file without hitting a size cap?', a: 'For formats the browser can decode locally, size is limited only by your device\'s memory, not a fixed plan tier.' },
     ],
   },
   {
     slug: 'zamzar-alternative',
     title: 'A Free Zamzar Alternative With No Daily Limit',
-    description: 'Zamzar\'s free plan allows just two conversions a day with a 50MB file cap. Here is what that looks like, and a browser-based alternative with neither restriction.',
+    description: 'Zamzar\'s free service limits both the number of conversions per day and the file size. Here is what that looks like, and a browser-based alternative with neither restriction.',
     heading: 'A free Zamzar alternative with no daily limit',
-    dek: 'Zamzar\'s free plan is one of the tightest around: two conversions a day, 50MB per file. Here is an alternative with no such cap.',
+    dek: 'Zamzar\'s free service limits how many files you can convert and how big each can be. Here is an alternative with no such cap.',
     keywords: ['zamzar alternative', 'free zamzar alternative', 'zamzar alternative no limit', 'zamzar free plan limit', 'zamzar without upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
     sections: [
       {
         h: 'What Zamzar does well',
         p: [
-          'Zamzar has converted files online since 2006 and covers a large number of formats, with an API for developers and no third-party advertising on its site, which avoids the fake-download-button problem common on free converters. It is a long-running, legitimate service run by Zamzar Limited.',
+          'Zamzar has converted files online since 2006 and covers a large number of formats, with an API for developers. It is a long-running, legitimate service run by Zamzar Limited.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'Zamzar\'s free plan, as of when this page was checked, was notably tight: about two conversions within any 24-hour period, and a 50MB cap per file. Paid plans, listed from around $12 a month, raise those limits substantially. For anyone converting more than a couple of files in a day, or a single file over 50MB, the free tier runs out quickly.',
-          'As with any upload-based converter, the file also spends time on Zamzar\'s servers to be processed; its retention practices (including a seven-day storage window for free conversions) are covered in [Is Zamzar safe?](/guides/is-zamzar-safe).',
+          'As of October 2026, per [zamzar.com/faq](https://www.zamzar.com/faq/), the free service converts up to 2 files in any 24-hour period, with files up to 50MB. Per [zamzar.com/signup](https://www.zamzar.com/signup/), paid plans start at $12 a month (Basic, files up to 200MB). For anyone converting more than a couple of files in a day, or a single file over 50MB, the free tier runs out quickly.',
+          'As with any upload-based converter, the file also spends time on Zamzar\'s servers to be processed; as of October 2026, [its privacy policy](https://www.zamzar.com/privacy/) says submitted files and their outputs are stored for no longer than 7 days. Its retention practices are covered in [Is Zamzar safe?](/guides/is-zamzar-safe).',
         ],
       },
       {
@@ -2965,94 +2962,94 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'How many free conversions does Zamzar allow per day?', a: 'Its free plan, as of when this page was checked, allowed about two conversions within a 24-hour period, with a 50MB file size cap.' },
+      { q: 'How many free conversions does Zamzar allow per day?', a: 'As of October 2026, per its FAQ, the free service allows 2 files converted in any 24-hour period, with a 50MB file size limit.' },
       { q: 'Is there a Zamzar alternative with no daily conversion limit?', a: 'Yes, for common formats. A browser-based converter processes files on your device, so there is no per-day count to run out of.' },
       { q: 'Can I convert a file bigger than 50MB for free?', a: 'With a tool that converts in the browser, file size is limited by your device\'s memory rather than a fixed plan tier.' },
-      { q: 'Does Zamzar have ads?', a: 'According to its privacy policy, zamzar.com does not host third-party advertising, though it does use Google Analytics.' },
+      { q: 'How long does Zamzar keep my files?', a: 'As of October 2026, per zamzar.com/privacy, submitted files and their converted outputs are stored for no longer than 7 days. With a browser-based converter, your files are not uploaded in the first place.' },
     ],
   },
   {
     slug: 'freeconvert-alternative',
     title: 'A Free FreeConvert Alternative With No Processing Time Cap',
-    description: 'FreeConvert\'s free plan is generous on file size but caps processing at 5 minutes per file. Here is what that looks like, and a browser-based alternative with no such cap.',
+    description: 'FreeConvert\'s free plan limits conversion minutes per day and processing time per file. Here is what that looks like, and a browser-based alternative with no such cap.',
     heading: 'A free FreeConvert alternative with no processing time cap',
-    dek: 'FreeConvert\'s free plan allows large files, but each one only gets 5 minutes of processing time. Here is an alternative with nothing to time out.',
+    dek: 'FreeConvert\'s free plan limits the processing time for each file and for the day. Here is an alternative with nothing to time out.',
     keywords: ['freeconvert alternative', 'free freeconvert alternative', 'freeconvert alternative no limit', 'freeconvert free plan limit', 'freeconvert without upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
     sections: [
       {
         h: 'What FreeConvert does well',
         p: [
-          'FreeConvert.com, operated by TRMedia Inc., supports a wide range of formats and, compared to many competitors, is relatively generous with free-tier file size, reportedly allowing files up to around 1GB. It is a legitimate, widely used converter.',
+          'FreeConvert.com supports a wide range of formats for images, video, audio and documents, and lets you convert without creating an account. It is a legitimate, widely used converter.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'The catch on FreeConvert\'s free plan, as of when this page was checked, was a processing time cap of about 5 minutes per file, alongside a daily conversion count around 25; a large or complex file that needs longer than 5 minutes to process can fail or get cut off on the free tier, and its Pro plan (around $9.99 a month) removes the time limit and raises the file size ceiling further.',
-          'It is also an upload-based service, sending your file to its servers for the full duration of that processing window. Its stated retention practices are covered in [Is FreeConvert safe?](/guides/is-freeconvert-safe).',
+          'As of October 2026, per the FAQ on [freeconvert.com/pricing](https://www.freeconvert.com/pricing), free users get 20 conversion minutes a day and a limit of 5 conversion minutes per file, with no account needed. Paid plans are listed from $12.99 a month (1,500 conversion minutes a month, files up to 1.5 GB) and list no ads. A large or complex file that needs longer than 5 minutes can be cut off on the free tier.',
+          'It is also an upload-based service: its pricing FAQ describes conversion minutes as the time it takes to convert your files on its servers. Its stated retention practices are covered in [Is FreeConvert safe?](/guides/is-freeconvert-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'A tool that converts inside your browser has nothing to time out, because there is no shared server queue: Stayput\'s [image converter](/tools/convert-image) and [compress image](/tools/compress-image) handle common image formats, [Video to GIF](/tools/video-to-gif) turns clips into animations, and [Video to MP3](/tools/video-to-mp3) extracts audio, all limited only by your own device\'s speed, not a fixed processing window.',
+          'A tool that converts inside your browser has nothing to time out, because there is no shared server queue: Stayput\'s [image converter](/tools/convert-image) and [compress image](/tools/compress-image) handle common image formats, [Video to GIF](/tools/video-to-gif) turns clips into animations, and [Video to MP3](/tools/video-to-mp3) extracts audio, all limited only by your own device\'s speed, not a fixed processing window, and your files are not uploaded.',
         ],
       },
       {
         h: 'Where FreeConvert still has the edge',
         p: [
-          'FreeConvert covers document, e-book and archive formats a browser cannot read natively, and its generous size allowance on paid tiers suits very large files that need server-grade processing power. For common image, audio and video conversions, a browser tool avoids the processing-time cap entirely.',
+          'FreeConvert covers formats a browser cannot read natively, and its paid plans list file sizes up to 20 GB on the Scale plan (as of October 2026), which suits very large files that need server-grade processing power. For common image, audio and video conversions, a browser tool avoids the processing-time cap entirely.',
         ],
       },
     ],
     faq: [
-      { q: 'Why does my FreeConvert conversion fail or time out?', a: 'Its free plan, as of when this page was checked, capped processing at around 5 minutes per file; a large or complex file that needs longer can fail to finish on the free tier.' },
+      { q: 'Why does my FreeConvert conversion fail or time out?', a: 'As of October 2026, its pricing FAQ lists a limit of 5 conversion minutes per file for free use; a large or complex file that needs longer can fail to finish on the free tier.' },
       { q: 'Is there a FreeConvert alternative with no time limit?', a: 'Yes, for common formats. A browser-based converter runs at the speed of your own device with no shared processing queue to be timed out of.' },
-      { q: 'How big a file can I convert for free with FreeConvert?', a: 'Its free plan, as of when this page was checked, allowed files up to around 1GB, though the 5-minute processing cap can still cut off a large or complex conversion before it finishes.' },
-      { q: 'Does a browser converter have ads like FreeConvert?', a: 'A tool with no server cost per conversion has less need to fund itself with advertising the way a free tier on an upload-based service typically does.' },
+      { q: 'How many files can I convert for free with FreeConvert?', a: 'As of October 2026, its pricing FAQ says free users get 20 conversion minutes a day, which it describes as up to 20 files a day if each takes a minute or less.' },
+      { q: 'Does a browser converter have ads?', a: 'Stayput shows no ads. FreeConvert\'s pricing page lists "No Ads" under its paid plans, as of October 2026.' },
     ],
   },
   {
     slug: 'pdf24-alternative',
     title: 'A PDF24 Alternative That Works in Your Browser Without Uploading',
-    description: 'PDF24\'s free online tools have no size limits, but they still upload your PDF to a server; its private offline option, PDF24 Creator, is Windows only. Here is an alternative that works anywhere without uploading.',
+    description: 'PDF24 says its free online tools have no artificial limits, but they process your PDF on its servers; its desktop app, PDF24 Creator, is Windows only. Here is an alternative that works anywhere without uploading your files.',
     heading: 'A PDF24 alternative that works in your browser without uploading',
-    dek: 'PDF24 itself recommends its offline app for privacy, but that app is Windows only. Here is an alternative that skips the upload, in any modern browser.',
+    dek: 'PDF24 itself points to its desktop app for keeping files on your PC, but that app is Windows only. Here is an alternative that skips the upload, in any modern browser.',
     keywords: ['pdf24 alternative', 'pdf24 alternative mac', 'pdf24 without upload', 'pdf24 alternative no install', 'pdf24 creator alternative'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf', 'rotate-pdf', 'reorder-pdf'],
     sections: [
       {
         h: 'What PDF24 does well',
         p: [
-          'PDF24, run by Geek Software GmbH in Germany, has offered free PDF tools since 2006, and as of when this page was checked its online tools carried no file size or task limits, which is unusually generous compared to most free converters. It is a legitimate, long-running service.',
+          'PDF24, run by Geek Software GmbH, offers free PDF tools. As of October 2026, per [tools.pdf24.org](https://tools.pdf24.org/en/), it says all its tools are free without restrictions, paid for by some advertising on the web pages, and that there are no artificial limits. It is a legitimate service.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'PDF24\'s own homepage points out the trade-off itself: the online tools process files on its servers, and for more privacy it recommends PDF24 Creator, a desktop app where files stay on your PC. The catch is that PDF24 Creator is Windows-only, so it is not an option on a Mac, a Chromebook, a phone or a locked-down work laptop, which is exactly where people go looking for an alternative.',
+          'PDF24\'s own homepage points out the trade-off itself: the online tools process files on its servers, and if you prefer to keep files on your own computer it offers PDF24 Creator, a desktop app where files stay on your PC. The catch is that, per [its FAQ](https://tools.pdf24.org/en/creator) (as of October 2026), PDF24 Creator can only be installed on Windows, so it is not an option on a Mac, a Chromebook, a phone or a locked-down work laptop, which is exactly where people go looking for an alternative.',
           'PDF24\'s stated retention and security practices for the online tools are covered in [Is PDF24 safe?](/guides/is-pdf24-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s PDF tools run inside the browser tab itself, so there is no upload regardless of device: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [unlock PDF](/tools/unlock-pdf), [rotate PDF](/tools/rotate-pdf) and [reorder and delete pages](/tools/reorder-pdf) all work the same way on Windows, Mac, Linux, Chromebooks and phones, without installing anything.',
+          'Stayput\'s PDF tools run inside the browser tab itself, so your files are not uploaded, whatever the device: [merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf), [compress PDF](/tools/compress-pdf), [unlock PDF](/tools/unlock-pdf), [rotate PDF](/tools/rotate-pdf) and [reorder and delete pages](/tools/reorder-pdf) all work the same way on Windows, Mac, Linux, Chromebooks and phones, without installing anything.',
         ],
       },
       {
         h: 'Where PDF24 still has the edge',
         p: [
-          'PDF24\'s toolbox is larger, including OCR, Office conversions and a virtual PDF printer available in Creator on Windows. If you are on Windows and need those specifically, Creator remains a solid private choice; for the everyday jobs above, a browser tool matches PDF24\'s lack of size limits without the upload or the install.',
+          'PDF24\'s toolbox is larger, including OCR, redaction and comparing PDFs, and its Windows app adds a PDF printer. If you are on Windows and need those specifically, Creator keeps files on your PC; for the everyday jobs above, a browser tool matches PDF24\'s lack of limits without the upload or the install.',
         ],
       },
     ],
     faq: [
       { q: 'Is PDF24 Creator available for Mac?', a: 'No, PDF24 Creator is Windows-only; on other platforms, PDF24\'s online tools upload the file to its servers instead.' },
-      { q: 'Does PDF24\'s online version have file size limits?', a: 'As of when this page was checked, PDF24 stated no artificial usage limits on its free online tools, unlike most competing converters.' },
+      { q: 'Does PDF24\'s online version have file size limits?', a: 'As of October 2026, per tools.pdf24.org, PDF24 says there are no artificial limits on its tools and that they are free without restrictions, paid for by some advertising.' },
       { q: 'Is there a way to edit PDFs privately on a Mac or phone?', a: 'Yes, a tool that runs inside the browser, such as Stayput\'s PDF tools, processes the file on your device without uploading it, on any platform.' },
       { q: 'Why does PDF24 recommend its desktop app over the website?', a: 'Its own homepage explains that the online tools process files on its servers, while the desktop app keeps everything on your own PC, which it frames as the more private option.' },
     ],
@@ -3060,44 +3057,44 @@ export const guides: Guide[] = [
   {
     slug: 'ezgif-alternative',
     title: 'A Free Ezgif Alternative With No File Size Cap',
-    description: 'Ezgif caps uploads at 200MB and shows ads around the download. Here is a browser-based GIF alternative that is limited only by your device’s memory, with nothing to click around.',
+    description: 'Ezgif\'s video tools limit the size of the file you upload and process it on its servers. Here is a browser-based GIF alternative that is limited only by your device’s memory, with no upload.',
     heading: 'A free ezgif alternative with no file size cap',
-    dek: 'Ezgif caps how big a file you can upload and runs ads around the result. Here is an alternative with neither.',
+    dek: 'Ezgif caps how big a file you can upload. Here is an alternative where your video is never uploaded.',
     keywords: ['ezgif alternative', 'free ezgif alternative', 'ezgif alternative no ads', 'ezgif file size limit', 'gif maker without upload'],
-    updated: '2026-09-29',
+    updated: '2026-10-08',
     tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
     sections: [
       {
         h: 'What ezgif does well',
         p: [
-          'Ezgif.com, run by Open Idea in Latvia, has been one of the most popular free GIF editors for years, with frame-by-frame editing, effects and text overlays that go beyond simple conversion. It is a legitimate, long-running tool.',
+          'Ezgif.com is a free online GIF maker and toolset, with editing, effects and text overlays that go beyond simple conversion. It is a legitimate, long-running tool.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'Ezgif is upload-based: as of when this page was checked, it capped uploads at 200MB (with some individual tools limited lower, around 100MB), which a longer or higher-resolution video can exceed easily. It is also ad-supported, and on ad-funded download sites the recurring complaint is a large advertisement styled to look like the actual download button.',
-          'Its stated retention practices, including a roughly one-hour deletion window after last use, are covered in [Is ezgif safe?](/guides/is-ezgif-safe).',
+          'Ezgif is upload-based: as of October 2026, per [ezgif.com/video-to-gif](https://ezgif.com/video-to-gif), its Video to GIF page lists a maximum file size of 200MB, which a longer or higher-resolution video can exceed easily, and limits the length you can convert depending on the frame rate.',
+          'The same page says uploaded files are automatically deleted 1 hour after upload; its other retention practices are covered in [Is ezgif safe?](/guides/is-ezgif-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs directly on your device, [GIF to MP4](/tools/gif-to-mp4) goes the other way, and [crop image](/tools/crop-image) and [compress image](/tools/compress-image) handle stills, all with no upload size cap beyond what your device can hold in memory, and no advertising around the result.',
+          'Stayput\'s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs directly on your device, [GIF to MP4](/tools/gif-to-mp4) goes the other way, and [crop image](/tools/crop-image) and [compress image](/tools/compress-image) handle stills, all with no upload (your files stay on your device) and no size cap beyond what your device can hold in memory, and no advertising around the result.',
         ],
       },
       {
         h: 'Where ezgif still has the edge',
         p: [
-          'Ezgif\'s frame-by-frame GIF editing, text overlays and effects are more specialized than what a browser conversion tool offers. For turning a clip into a GIF or back, or basic image edits, a browser tool with no ads, limited only by your device’s memory, covers the common case.',
+          'Ezgif\'s frame-by-frame GIF editing, text overlays and effects are more specialized than what a browser conversion tool offers. For turning a clip into a GIF or back, or basic image edits, a browser tool, limited only by your device’s memory, covers the common case.',
         ],
       },
     ],
     faq: [
-      { q: 'What is ezgif\'s file size limit?', a: 'As of when this page was checked, ezgif capped uploads at 200MB, with some individual tools limited to around 100MB.' },
+      { q: 'What is ezgif\'s file size limit?', a: 'As of October 2026, per its Video to GIF page, ezgif lists a maximum file size of 200MB.' },
       { q: 'Is there a GIF maker with no upload size limit?', a: 'Yes, for video-to-GIF conversion specifically. A tool that encodes the GIF in your browser is limited by your device\'s memory rather than a fixed upload cap.' },
-      { q: 'Does ezgif have ads?', a: 'Yes, the site is ad-supported; the usual advice is to use the download link directly under the result rather than a large advertisement styled as a button.' },
-      { q: 'Can I make a GIF without uploading the video?', a: 'Yes, a browser-based converter like Stayput\'s Video to GIF processes the clip on your device; switching on airplane mode after the page loads confirms it keeps working.' },
+      { q: 'How long does ezgif keep uploaded files?', a: 'As of October 2026, its Video to GIF page says uploaded files are automatically deleted 1 hour after upload.' },
+      { q: 'Can I make a GIF without uploading the video?', a: 'Yes, a browser-based converter like Stayput\'s Video to GIF processes the clip on your device, and your browser\'s network panel shows the video is not uploaded.' },
     ],
   },
   {
@@ -3469,11 +3466,11 @@ export const guides: Guide[] = [
   {
     slug: 'otter-ai-alternative',
     title: 'A Free Otter.ai Alternative With No Monthly Minute Cap',
-    description: 'Otter.ai\'s free plan limits monthly transcription minutes and caps recording length; a Pro subscription lifts both for a monthly fee. Here is a browser-based alternative with neither limit.',
+    description: 'Otter.ai\'s free plan limits monthly transcription minutes, the length of each conversation and the number of file imports; paid plans raise those limits. Here is a browser-based alternative with none of them.',
     heading: 'A free Otter.ai alternative with no monthly minute cap',
     dek: 'Otter.ai\'s free tier meters your minutes each month and caps how long a single recording can run. Here is what that looks like, and an alternative with nothing to meter.',
     keywords: ['otter.ai alternative', 'otter ai alternative free', 'free alternative to otter ai', 'otter ai alternative no limit', 'transcription app without subscription'],
-    updated: '2026-09-30',
+    updated: '2026-10-08',
     tools: ['transcribe', 'video-to-subtitles', 'mp3-to-text'],
     sections: [
       {
@@ -3485,7 +3482,7 @@ export const guides: Guide[] = [
       {
         h: 'Why people look for an alternative',
         p: [
-          'Otter\'s free plan meters transcription in minutes per month, and, as of when this page was checked, capped a single recording\'s length; going over either needs a paid Pro or Business plan. For someone who wants to transcribe an occasional long interview or a batch of old voice memos, hitting a monthly cap partway through, or being capped on the length of one file, is the usual friction.',
+          'As of October 2026, per [otter.ai/pricing](https://otter.ai/pricing), the free Basic plan lists 300 transcription minutes a month, a 30-minute maximum per conversation and 3 lifetime audio or video file imports. Pro (listed at $8.33 per user per month, with the annual toggle) raises those to 1,200 minutes a month, 90 minutes per conversation and 10 file imports a month. For someone who wants to transcribe an occasional long interview or a batch of old voice memos, hitting the file-import or minute limit partway through is the usual friction.',
         ],
       },
       {
@@ -3497,25 +3494,25 @@ export const guides: Guide[] = [
       {
         h: 'Where Otter.ai still has the edge',
         p: [
-          'Otter\'s live meeting transcription, speaker labels, and calendar and video-call integrations are beyond what a single-file browser tool does. For transcribing files you already have, without a monthly limit, a local tool covers the common case.',
+          'Otter\'s pricing page lists live transcription, speaker identification and Zoom, Microsoft Teams and Google Meet support (as of October 2026), which are beyond what a single-file browser tool does. For transcribing files you already have, without a monthly limit, a local tool covers the common case.',
         ],
       },
     ],
     faq: [
-      { q: 'What is Otter.ai\'s free plan limit?', a: 'As of when this page was checked, Otter\'s free plan metered transcription minutes per month and capped the length of a single recording, with a paid plan needed to lift either.' },
+      { q: 'What is Otter.ai\'s free plan limit?', a: 'As of October 2026, per otter.ai/pricing, the free Basic plan lists 300 transcription minutes a month, a 30-minute maximum per conversation and 3 lifetime audio or video file imports.' },
       { q: 'Is there a transcription tool with no monthly minute cap?', a: 'Yes. A tool that runs the transcription model in your browser, like Stayput\'s, has no server-side minutes to meter, so there is no natural reason to cap monthly use.' },
       { q: 'Does a free Otter.ai alternative include speaker labels?', a: 'Not the browser-based ones generally, including Stayput\'s: they write what was said, not who said it. Otter\'s speaker labelling remains an advantage for meeting notes specifically.' },
-      { q: 'Can I get subtitles from an Otter.ai alternative?', a: 'Yes, Stayput\'s transcribe tool can output SRT subtitles or WebVTT captions timed to the speech, which Otter does not offer directly.' },
+      { q: 'Can I get subtitles from an Otter.ai alternative?', a: 'Yes, Stayput\'s transcribe tool can output SRT subtitles or WebVTT captions timed to the speech.' },
     ],
   },
   {
     slug: 'camscanner-alternative',
     title: 'A Free CamScanner Alternative With No Watermark',
-    description: 'CamScanner\'s free tier watermarks PDFs and limits pages; unlocking both needs a subscription. Here is a browser-based scanning alternative with neither restriction.',
+    description: 'CamScanner\'s free account has storage and text-extraction limits, with a Premium plan above it. Here is a browser-based scanning alternative with no watermark, no account and no upload.',
     heading: 'A free CamScanner alternative with no watermark',
-    dek: 'CamScanner\'s free version puts a watermark on your scans and links a subscription to remove it. Here is a scanning alternative with no watermark to begin with.',
+    dek: 'CamScanner\'s free account has storage and feature limits, with a Premium plan above it. Here is a scanning alternative with no watermark and no tier to pay for.',
     keywords: ['camscanner alternative', 'camscanner alternative free', 'camscanner alternative no watermark', 'free document scanner no watermark', 'scan document without app'],
-    updated: '2026-09-30',
+    updated: '2026-10-08',
     tools: ['document-scanner', 'scan-to-pdf', 'receipt-scanner'],
     sections: [
       {
@@ -3527,13 +3524,13 @@ export const guides: Guide[] = [
       {
         h: 'Why people look for an alternative',
         p: [
-          'As of when this page was checked, CamScanner\'s free tier stamped a watermark across every exported PDF and image, and capped features like OCR and batch export behind a subscription. For a one-off scan of a form or a receipt, paying monthly to remove a watermark from a single document feels disproportionate. CamScanner has also drawn scrutiny in the past over its handling of user data on some of its app versions, which matters for scanning IDs and personal documents.',
+          'As of October 2026, per [camscanner.com/premium](https://www.camscanner.com/premium), the Basic account lists 1 GB of cloud storage and 3 free uses of advanced text extraction, while Premium lists 10 GB of storage and 1,000 advanced text extractions a month. For a one-off scan of a form or a receipt, signing up for an account and a subscription feels disproportionate, especially for an ID or other personal document.',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [document scanner](/tools/document-scanner) tool takes photos you have already taken and straightens, flattens and cleans them up entirely in the browser, with no watermark on the result at any tier, because there is no tier: [scan a stack of pages into one PDF](/scan-to-pdf) or [a single receipt](/receipt-scanner), in colour, greyscale or black-and-white, for free. Since nothing is uploaded, there is also nothing sent to a third-party server to scan an ID or a signed contract.',
+          'Stayput\'s [document scanner](/tools/document-scanner) tool takes photos you have already taken and straightens, flattens and cleans them up entirely in the browser, with no watermark on the result at any tier, because there is no tier: [scan a stack of pages into one PDF](/scan-to-pdf) or [a single receipt](/receipt-scanner), in colour, greyscale or black-and-white, for free. Since your photos are not uploaded, an ID or a signed contract is not sent to a third-party server to be scanned.',
         ],
       },
       {
@@ -3544,9 +3541,9 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Does CamScanner put a watermark on free scans?', a: 'Yes, as of when this page was checked, CamScanner\'s free tier watermarked exported PDFs and images, with a subscription needed to remove it.' },
-      { q: 'Is there a document scanner with no watermark and no subscription?', a: 'Yes. A browser-based scanner like Stayput\'s document scanner adds no watermark, and nothing is uploaded.' },
-      { q: 'Is it safe to scan an ID or personal document without an app?', a: 'A tool that processes the photo entirely in your browser, without uploading it anywhere, avoids sending the document to any third-party server at all.' },
+      { q: 'What are CamScanner\'s free account limits?', a: 'As of October 2026, per camscanner.com/premium, the Basic account lists 1 GB of cloud storage and 3 free uses of advanced text extraction; Premium lists 10 GB and 1,000 a month.' },
+      { q: 'Is there a document scanner with no watermark and no subscription?', a: 'Yes. A browser-based scanner like Stayput\'s document scanner adds no watermark, and your photos are not uploaded.' },
+      { q: 'Is it safe to scan an ID or personal document without an app?', a: 'A tool that processes the photo entirely in your browser, without uploading it anywhere, avoids sending the document itself to a third-party server.' },
       { q: 'Can a browser scanner combine multiple pages into one PDF?', a: 'Yes, Stayput\'s document scanner combines several scanned photos, in the order you drop them, into a single PDF.' },
     ],
   },
