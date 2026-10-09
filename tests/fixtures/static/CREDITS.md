@@ -9,3 +9,5 @@
 - `tone-16k-mono.mp4`: 4 s test pattern with a 440 Hz tone (H.264 and mono 16 kHz AAC), generated for the video encoder tests; no third-party material.
 - `speech.mov`: the first 11 s of `jfk.wav` under a generated test pattern, in a QuickTime .mov with AAC sound like an iPhone camera file, for the caption tests; no third-party material beyond `jfk.wav`.
 - `iphone-portrait.mov` and `iphone-hevc.mov`: 4 s test pattern (1280x720, turned 90 degrees by the file so it shows upright as 720x1280, like an iPhone held upright) with a 440 Hz tone, 44.1 kHz stereo AAC, in a QuickTime .mov: H.264 and HEVC. For the Resize video tests; no third-party material.
+- `layered.psd` and `transparent.psd`: 160x120 Photoshop documents written by `make-psd.mjs` with ag-psd (MIT) for the PSD pair-page tests; generated shapes and flat colours, no third-party material.
+- `layered.psd` and `transparent.psd`: 160x120 Photoshop documents written by `make-psd.mjs` with ag-psd (MIT) for the PSD pair-page tests; generated shapes and flat colours, no third-party material.

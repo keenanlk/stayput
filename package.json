@@ -30,6 +30,7 @@
     "@noble/ciphers": "2.4.0",
     "@shiguredo/rnnoise-wasm": "2025.1.5",
     "@tesseract.js-data/eng": "1.0.0",
+    "ag-psd": "31.0.3",
     "astro": "7.3.5",
     "fflate": "0.8.3",
     "gifenc": "1.0.3",
