@@ -581,7 +581,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'webp-to-gif', 'png-to-gif', 'jpg-to-gif', 'jpg-to-tiff', 'png-to-tiff', 'ico-to-png'];
+  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'psd-to-jpg', 'psd-to-png', 'webp-to-gif', 'png-to-gif', 'jpg-to-gif', 'jpg-to-tiff', 'png-to-tiff', 'ico-to-png'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));

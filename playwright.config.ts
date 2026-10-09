@@ -32,10 +32,10 @@ export default defineConfig({
         launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {},
       },
     },
-    // WebKit (Safari's engine) runs only the caption-encoder, video-encoder, mic-verdict, mov-audio and handoff specs: Safari's video encoder is the odd one out.
+    // WebKit (Safari's engine) runs only the caption-encoder, video-encoder, mic-verdict, mov-audio, handoff and psd-pairs specs: Safari's video encoder is the odd one out.
     // On in CI, or locally with PW_WEBKIT=1.
     ...(process.env.CI || process.env.PW_WEBKIT
-      ? [{ name: 'webkit', testMatch: /((caption|video)-encoder|mic-verdict|mov-audio|handoff\.spec)/, use: { browserName: 'webkit' as const } }]
+      ? [{ name: 'webkit', testMatch: /((caption|video)-encoder|mic-verdict|mov-audio|handoff\.spec|psd-pairs)/, use: { browserName: 'webkit' as const } }]
       : []),
     // Firefox runs a small smoke spec only. It is on in CI, or locally with PW_FIREFOX=1
     // once `npx playwright install firefox` has been run.

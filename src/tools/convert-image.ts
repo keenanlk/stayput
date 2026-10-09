@@ -31,7 +31,7 @@ void supportsWebpEncoding().then((ok) => {
 function caveat(f: OutputFormat): string | undefined {
   const kinds = new Set(detected.map((d) => d.kind).filter(Boolean));
   if (kinds.size === 1 && kinds.has(f.kind)) return `Same format as your file${detected.length > 1 ? 's' : ''}: it is re-encoded${f.quality ? ' at the quality you pick' : ''}.`;
-  const transparentSources = [...kinds].some((k) => k === 'png' || k === 'webp' || k === 'gif' || k === 'svg' || k === 'avif' || k === 'ico' || k === 'tiff' || k === 'jxl');
+  const transparentSources = [...kinds].some((k) => k === 'png' || k === 'webp' || k === 'gif' || k === 'svg' || k === 'avif' || k === 'ico' || k === 'tiff' || k === 'jxl' || k === 'psd');
   if (!f.alpha && transparentSources) return 'Transparent areas get the background colour.';
   if (f.type === 'image/gif' && kinds.has('gif')) return 'Keeps only the first frame of an animation.';
   return undefined;
