@@ -93,7 +93,9 @@ test('an encoder that never answers is caught at once, with a plain message and 
 
 // The redraw can run out of memory long after the captions were written (the whole file is built in memory).
 // The captions must survive it: a plain message, the .srt to download, and a named error kind, not the raw message.
-test('a redraw that runs out of memory keeps the written subtitles and says so plainly', async ({ page }) => {
+test('a redraw that runs out of memory keeps the written subtitles and says so plainly', async ({ page }, info) => {
+  // The fixture's Opus sound track is not decodable in Linux WebKit; the error path is the same code in every browser.
+  test.skip(info.project.name === 'webkit', 'the webm sound track is decoded in Chromium only here');
   test.setTimeout(150_000);
   await page.addInitScript(() => {
     const w = window as unknown as { __explode?: boolean };
