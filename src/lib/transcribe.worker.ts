@@ -7,6 +7,7 @@
  */
 import { env, pipeline, Tensor, type AutomaticSpeechRecognitionPipeline } from '@huggingface/transformers';
 import { vendorDir } from './vendor';
+import { loadWithRetry } from './retry';
 import { looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, type SpeechError } from './speech-errors';
 
 export const MODEL = 'whisper-base';
@@ -85,16 +86,9 @@ function start(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
   return asr;
 }
 
-/** Load the model; a dropped connection gets one more try. */
+/** Load the model; a dropped connection gets two more tries, after a short wait. */
 async function load(id: number): Promise<AutomaticSpeechRecognitionPipeline> {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      return await start(id);
-    } catch (err) {
-      if (attempt >= 1) throw err;
-      if (!looksLikeNetwork(err)) throw err;
-    }
-  }
+  return loadWithRetry(() => start(id), looksLikeNetwork);
 }
 
 /** The named error for a failure while loading the model or while recognising. */

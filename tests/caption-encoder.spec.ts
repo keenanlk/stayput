@@ -90,3 +90,45 @@ test('an encoder that never answers is caught at once, with a plain message and 
   await link.click();
   await expect(page).toHaveURL(/\/video-to-subtitles$/);
 });
+
+// The redraw can run out of memory long after the captions were written (the whole file is built in memory).
+// The captions must survive it: a plain message, the .srt to download, and a named error kind, not the raw message.
+test('a redraw that runs out of memory keeps the written subtitles and says so plainly', async ({ page }, info) => {
+  // The fixture's Opus sound track is not decodable in Linux WebKit; the error path is the same code in every browser.
+  test.skip(info.project.name === 'webkit', 'the webm sound track is decoded in Chromium only here');
+  test.setTimeout(150_000);
+  await page.addInitScript(() => {
+    const w = window as unknown as { __explode?: boolean };
+    const real = VideoEncoder.prototype.encode;
+    VideoEncoder.prototype.encode = function (...args: Parameters<VideoEncoder['encode']>) {
+      if (w.__explode) throw new RangeError('Array buffer allocation failed');
+      return real.apply(this, args);
+    };
+    // Break the encode only once the captions exist and the redraw has begun.
+    new MutationObserver(() => {
+      if (document.getElementById('progress-text')?.textContent?.startsWith('Adding subtitles')) w.__explode = true;
+    }).observe(document, { subtree: true, childList: true, characterData: true });
+    // The site skips analytics in automated browsers; pretend to be a person so the stub below loads.
+    Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false });
+  });
+  await page.route('https://stats.keenankaufman.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: `window.umami={track:(n,d)=>{const a=JSON.parse(sessionStorage.getItem('__ev')||'[]');a.push({n,d});sessionStorage.setItem('__ev',JSON.stringify(a));}};`,
+    }),
+  );
+  await open(page);
+  await page.locator('#file-input').setInputFiles(fileURLToPath(new URL('./fixtures/static/talk.webm', import.meta.url)));
+  await page.locator('#run').click();
+  const error = page.locator('#error');
+  await expect(error).toHaveClass(/is-active/, { timeout: 120_000 });
+  await expect(error).toContainText('too long for your browser to redraw with captions');
+  await expect(error).not.toContainText('allocation');
+  await expect(error).not.toContainText('RangeError');
+  await expect(page.locator('#results')).toHaveClass(/is-active/);
+  const download = page.waitForEvent('download');
+  await page.locator('#results-list button', { hasText: 'Download' }).click();
+  expect((await download).suggestedFilename()).toMatch(/\.srt$/);
+  const runs = (await page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]') as { n: string; d: Record<string, string> }[])).filter((e) => e.n === 'tool_run');
+  expect(runs.at(-1)!.d.error_class).toBe('OutOfMemoryError');
+});

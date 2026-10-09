@@ -27,6 +27,9 @@ export const outOfMemoryError = () =>
 export const audioDecodeError = (message = 'No audio could be read from this file. It may have no sound track, or use an audio format this browser cannot decode.') => make('AudioDecodeError', message);
 export const workerCrashError = () =>
   make('WorkerCrashError', 'The speech model stopped unexpectedly, which usually means the browser ran short of memory. Close other tabs and try again, or use a shorter recording.');
+/** The re-encode ran out of memory after the captions were written. The tool attaches the caption file it already made. */
+export const encodeMemoryError = () =>
+  make('OutOfMemoryError', 'This video is too long for your browser to redraw with captions. Your subtitles are ready: download the .srt below, or trim or split the video and try again.');
 export const speechModelError = () => make('SpeechModelError', 'The speech model could not read this recording. Try again, or try a shorter recording or another file.');
 export const noSpeechFound = (message: string) => make('NoSpeechFound', message);
 
@@ -50,4 +53,23 @@ export function looksLikeNetwork(e: unknown): boolean {
 /** Rebuild an error that came across the worker boundary from its name. Unknown names become SpeechModelError. */
 export function fromWorker(name: string, message: string): SpeechError {
   return new SpeechError((SPEECH_ERRORS as readonly string[]).includes(name) ? (name as SpeechErrorName) : 'SpeechModelError', message);
+}
+
+/**
+ * An error from a caption step that no one wrote a message for, shown as a
+ * plain sentence. It keeps the original error's name (a class name only), so
+ * a failed run still records what went wrong; the original message is not shown.
+ */
+export function unknownCaptionError(e: unknown): Error {
+  const name = e instanceof Error && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(e.name) ? e.name : 'Error';
+  const err = new Error('Something went wrong while writing the captions. Reload the page and try again, or try a shorter video or another file.');
+  err.name = name;
+  return err;
+}
+
+/** The error to show for a failed caption step: our own named errors pass through, the rest become plain ones. */
+export function plainCaptionError(e: unknown): Error {
+  if (e instanceof SpeechError) return e;
+  if (looksLikeMemory(e)) return outOfMemoryError();
+  return unknownCaptionError(e);
 }
