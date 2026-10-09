@@ -4,7 +4,7 @@
  * can be a WebP; the converter shows the real format and decodes accordingly.
  */
 
-export type ImageKind = 'jpeg' | 'png' | 'gif' | 'webp' | 'bmp' | 'ico' | 'tiff' | 'heic' | 'avif' | 'jxl' | 'svg' | 'pdf';
+export type ImageKind = 'jpeg' | 'png' | 'gif' | 'webp' | 'bmp' | 'ico' | 'tiff' | 'heic' | 'avif' | 'jxl' | 'svg' | 'pdf' | 'psd';
 
 export const KIND_LABEL: Record<ImageKind, string> = {
   jpeg: 'JPG',
@@ -19,6 +19,7 @@ export const KIND_LABEL: Record<ImageKind, string> = {
   jxl: 'JPEG XL',
   svg: 'SVG',
   pdf: 'PDF',
+  psd: 'PSD',
 };
 
 /** How many leading bytes `sniffKind` wants. SVG may start with a long XML prologue or comment. */
@@ -36,6 +37,7 @@ export function sniffKind(b: Uint8Array): ImageKind | undefined {
   if (b.length >= 4 && b[0] === 0 && b[1] === 0 && (b[2] === 1 || b[2] === 2) && b[3] === 0) return 'ico';
   if (b.length >= 4 && ((ascii(b, 0, 2) === 'II' && b[2] === 42 && b[3] === 0) || (ascii(b, 0, 2) === 'MM' && b[2] === 0 && b[3] === 42))) return 'tiff';
   if (b.length >= 5 && ascii(b, 0, 5) === '%PDF-') return 'pdf';
+  if (b.length >= 4 && ascii(b, 0, 4) === '8BPS') return 'psd';
   if (b.length >= 2 && b[0] === 0xff && b[1] === 0x0a) return 'jxl';
   if (b.length >= 12 && b[0] === 0 && b[1] === 0 && b[2] === 0 && b[3] === 0x0c && ascii(b, 4, 8) === 'JXL ') return 'jxl';
   if (b.length >= 12 && ascii(b, 4, 8) === 'ftyp') {
@@ -63,7 +65,7 @@ export function kindFromName(name: string, type: string): ImageKind | undefined 
   const byExt: Record<string, ImageKind> = {
     jpg: 'jpeg', jpeg: 'jpeg', jfif: 'jpeg', jpe: 'jpeg', pjpeg: 'jpeg', png: 'png', apng: 'png', gif: 'gif', webp: 'webp',
     bmp: 'bmp', dib: 'bmp', ico: 'ico', cur: 'ico', tif: 'tiff', tiff: 'tiff', heic: 'heic', heif: 'heic', hif: 'heic',
-    avif: 'avif', jxl: 'jxl', svg: 'svg', pdf: 'pdf',
+    avif: 'avif', jxl: 'jxl', svg: 'svg', pdf: 'pdf', psd: 'psd',
   };
   if (byExt[ext]) return byExt[ext];
   const sub = type.replace(/^image\//, '').replace(/^x-/, '');

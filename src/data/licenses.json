@@ -994,6 +994,23 @@
    "copyright": "Copyright (c) 2017 Photopea"
   },
   {
+   "id": "ag-psd",
+   "name": "ag-psd",
+   "version": "31.0.3",
+   "npm": "ag-psd",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/Agamnentzar/ag-psd",
+   "source": "https://www.npmjs.com/package/ag-psd/v/31.0.3",
+   "shipped": "Bundled into the site JavaScript (PSD)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2016 Agamnentzar"
+  },
+  {
    "id": "wasm-media-encoders",
    "name": "wasm-media-encoders",
    "version": "0.7.0",

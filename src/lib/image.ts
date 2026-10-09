@@ -1,6 +1,7 @@
 import { decodeHeic } from './heic';
 import { decodeWithWasm, sniffWasmCodec, type WasmCodec } from './codecs';
 import { extOf, isHeicFile, readHead } from './files';
+import { decodePsd, isPsdFile } from './psd';
 import { decodeTiffPages, isTiffFile } from './tiff';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
@@ -61,6 +62,9 @@ export async function decodeImage(file: File): Promise<Decoded> {
   let bitmap: ImageBitmap;
   if (ext === 'svg' || file.type === 'image/svg+xml') {
     bitmap = await loadViaImageElement(file);
+  } else if (await isPsdFile(file)) {
+    // Browsers have no PSD decoder (Safari's behaviour varies), so ag-psd reads the saved composite everywhere.
+    bitmap = await decodePsd(file);
   } else {
     try {
       bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
