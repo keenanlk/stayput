@@ -4,7 +4,7 @@ import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
 import { CaptionsUnavailable, ensureH264Encoder } from '../lib/encoder-probe';
 import { EncoderStall } from '../lib/encoder-watchdog';
-import { noSpeechFound } from '../lib/speech-errors';
+import { encodeMemoryError, looksLikeMemory, noSpeechFound, plainCaptionError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
 import { phoneLimitNote } from '../lib/phone-limit';
 
@@ -17,6 +17,11 @@ import { phoneLimitNote } from '../lib/phone-limit';
  */
 
 const isSubs = (f: File) => /\.(srt|vtt)$/i.test(f.name);
+
+function srtOutput(file: File, segments: Segment[]): OutputFile {
+  const body = toSrt(segments);
+  return { name: suffixName(file.name, '', 'srt'), blob: new Blob([body], { type: 'application/x-subrip;charset=utf-8' }), note: `${segments.length} caption${segments.length === 1 ? '' : 's'}`, text: body };
+}
 
 const shell = createShell({
   // A video too big for a phone to caption is said so now, not after the browser gives up.
@@ -54,7 +59,9 @@ const shell = createShell({
       else {
         const { transcribeFile, releaseSpeechModel } = await import('../lib/speech');
         // Writing the captions is roughly the first 40% of the work, encoding the rest.
-        const speech = await transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) });
+        const speech = await transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
+          throw plainCaptionError(e);
+        });
         // The model is no longer needed; free its memory before the video is redrawn.
         releaseSpeechModel();
         segments = speech.segments;
@@ -86,7 +93,14 @@ const shell = createShell({
         onProgress: (f) => progress.set(`Adding subtitles to ${file.name}: ${Math.round(f * 100)}%`, share(start + f * (1 - start))),
       }).catch((e) => {
         // A stall part way through: the same plain message and link as the early check.
-        throw e instanceof EncoderStall ? new CaptionsUnavailable() : e;
+        if (e instanceof EncoderStall) throw new CaptionsUnavailable();
+        // Out of memory while redrawing: the captions already exist, so hand them over with the message.
+        if (looksLikeMemory(e)) {
+          const err = encodeMemoryError() as Error & { salvage?: OutputFile[] };
+          if (!given) err.salvage = [srtOutput(file, segments)];
+          throw err;
+        }
+        throw unknownCaptionError(e);
       });
       if (shown === 0) throw new Error(`None of the subtitles fall within ${file.name}. Check that the subtitle file belongs to this video.`);
       outputs.push({
@@ -95,10 +109,7 @@ const shell = createShell({
         originalSize: file.size,
         note: `${describeEdit(r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}`,
       });
-      if (saveSrt) {
-        const body = toSrt(segments);
-        outputs.push({ name: suffixName(file.name, '', 'srt'), blob: new Blob([body], { type: 'application/x-subrip;charset=utf-8' }), note: `${segments.length} caption${segments.length === 1 ? '' : 's'}`, text: body });
-      }
+      if (saveSrt) outputs.push(srtOutput(file, segments));
     }
     return outputs;
   },

@@ -336,7 +336,7 @@ export function createShell(opts: ShellOptions) {
     if (!b) progressApi.set('', 0);
   }
 
-  function showResults(outs: OutputFile[]) {
+  function showResults(outs: OutputFile[], autoDownload = true) {
     outputs = outs;
     resultsList.innerHTML = '';
     resultsTitle.textContent = opts.resultsTitle?.(outs) ?? (outs.length === 1 ? 'Done' : `Done: ${outs.length} files`);
@@ -417,7 +417,7 @@ export function createShell(opts: ShellOptions) {
     downloadAll.hidden = outs.length < 2;
     results.classList.add('is-active');
     results.dataset.count = String(outs.length);
-    if (outs.length === 1 && (opts.autoDownloadSingle ?? true)) downloadBlob(outs[0]!.blob, outs[0]!.name);
+    if (autoDownload && outs.length === 1 && (opts.autoDownloadSingle ?? true)) downloadBlob(outs[0]!.blob, outs[0]!.name);
     // The run bar is pinned to the screen, so the results can land out of sight below it.
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     results.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
@@ -458,6 +458,9 @@ export function createShell(opts: ShellOptions) {
     } catch (e) {
       console.error(e);
       showError(e instanceof Error ? e.message : String(e), (e as { link?: { href: string; text: string } } | null)?.link);
+      // Work finished before the failure (captions written before the video could be redrawn) stays downloadable.
+      const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
+      if (salvage?.length) showResults(salvage, false);
       trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e) });
     } finally {
       setBusy(false);

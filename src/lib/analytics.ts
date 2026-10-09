@@ -12,8 +12,9 @@
  * - tool_run: every run. The above plus outcome, output, duration, prev_tool,
  *   run_n, tools_used, run_gap, and attempt ("first-ok" on the first success
  *   since files_added, so completion rate = first-ok runs / files_added),
- *   and ns (experiment E2 arm, "on" or "off"). The image converter adds
- *   format, the output format picked ("ico"; never anything about the file).
+ *   and ns (experiment E2 arm, "on" or "off"). Tools that
+ *   produce a set kind of file add format, the kind or option picked ("mp4",
+ *   "ico", "aes-zip"; always a fixed choice, never anything about the file).
  * - next_step: a click on a suggested next tool. tool, to, ns.
  * - search_open: the header search was opened. page.
  * - search_pick: a header search result was opened. to (a site path), kind

@@ -3,7 +3,7 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
 import { toSrt, toText, toVtt } from '../lib/captions';
 import { transcribeFile } from '../lib/speech';
-import { noSpeechFound } from '../lib/speech-errors';
+import { noSpeechFound, plainCaptionError } from '../lib/speech-errors';
 import type { Request } from '../lib/transcribe.worker';
 
 /**
@@ -28,6 +28,8 @@ createShell({
         language,
         task,
         onProgress: (message, f) => progress.set(message, share(f)),
+      }).catch((e) => {
+        throw plainCaptionError(e);
       });
       if (tidy.length === 0) throw noSpeechFound('No speech was found in this recording.');
       const body = format === 'srt' ? toSrt(tidy) : format === 'vtt' ? toVtt(tidy) : toText(tidy);
