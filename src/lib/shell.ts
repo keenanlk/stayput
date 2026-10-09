@@ -11,6 +11,7 @@ import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
 import { warmDecoders } from './vendor';
 import { droppedFiles } from './folder-drop';
+import { takeHandoff } from './handoff';
 
 export interface ShellFile {
   id: number;
@@ -159,6 +160,8 @@ export function createShell(opts: ShellOptions) {
   // files arrive after a successful run. files_added fires once per attempt, and
   // tool_run marks the attempt's first success, so completion = first successes / files_added.
   let attempt: { ok: boolean } | undefined;
+  // The file carried over from the previous tool, while it is still in the list (see adoptHandoff).
+  let carriedFile: File | undefined;
 
   const isImage = (f: File) => f.type.startsWith('image/') || /\.(heic|heif|avif|jxl)$/i.test(f.name);
 
@@ -277,6 +280,10 @@ export function createShell(opts: ShellOptions) {
     clear.hidden = files.length === 0;
     drop.classList.toggle('is-compact', files.length > 0);
     root.dataset.count = String(files.length);
+    if (carriedFile && !files.some((f) => f.file === carriedFile)) {
+      carriedFile = undefined;
+      document.getElementById('handoff-note')?.remove();
+    }
   }
 
   function iconButton(text: string, label: string, onClick: () => void, disabled = false): HTMLButtonElement {
@@ -447,7 +454,7 @@ export function createShell(opts: ShellOptions) {
         showError(`${skipped.length} of ${files.length} files ${skipped.length === 1 ? 'was' : 'were'} skipped: ${list}${skipped.length > 5 ? '; …' : ''}.`);
       }
       trackToolRun({ tool, outcome: 'ok', firstOk, files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started, format: opts.outputFormat?.() });
-      root.dispatchEvent(new CustomEvent('stayput:done'));
+      root.dispatchEvent(new CustomEvent('stayput:done', { detail: outs }));
     } catch (e) {
       console.error(e);
       showError(e instanceof Error ? e.message : String(e), (e as { link?: { href: string; text: string } } | null)?.link);
@@ -520,6 +527,34 @@ export function createShell(opts: ShellOptions) {
       downloadAll.disabled = false;
     }
   });
+  /**
+   * A file carried over from the previous tool (see handoff.ts) goes in as if it had been chosen,
+   * with a line saying where it came from and a way to pick something else. Without one, nothing changes.
+   */
+  async function adoptHandoff() {
+    const carried = await takeHandoff(input.accept);
+    if (!carried) return;
+    const note = document.createElement('div');
+    note.className = 'handoff-note';
+    note.id = 'handoff-note';
+    note.setAttribute('role', 'status');
+    const text = document.createElement('span');
+    text.textContent = `Using ${carried.file.name} (${formatBytes(carried.file.size)}) from ${carried.from}.`;
+    const other = document.createElement('button');
+    other.type = 'button';
+    other.className = 'btn btn-sm btn-ghost';
+    other.textContent = 'Choose a different file';
+    other.addEventListener('click', () => {
+      note.remove();
+      clear.click();
+      input.click();
+    });
+    note.append(text, other);
+    list.before(note);
+    carriedFile = carried.file;
+    await addFiles([carried.file]);
+  }
+
   // Re-running with the same files should be possible after changing options.
   document.getElementById('options')?.addEventListener('change', () => hideResults());
 
@@ -530,6 +565,7 @@ export function createShell(opts: ShellOptions) {
   warmDecoders(input.accept);
   // Landing pages load the tool module on demand; this marks the shell as live.
   root.dataset.ready = 'true';
+  void adoptHandoff();
 
   return {
     get files() {

@@ -9,6 +9,7 @@ import { presets } from '../data/presets';
 import { guidesFor } from '../data/guides';
 import { engineFor } from '../data/engine';
 import { nextSteps } from '../data/next-steps';
+import { handoffs } from '../data/handoff';
 import { inline, inlineLinks, plainLinks } from '../lib/inline';
 import { lastmodFor } from '../lib/lastmod';
 import { leadFor, offlineBadge, needsFirstUse, defaultSizeBadge } from '../data/leads';
@@ -130,7 +131,7 @@ const jsonLd = [
   </section>
 
   <section class="wrap">
-    <div class="tool-panel" id="tool" data-slug={tool.slug} data-base={base} data-multiple={String(tool.multiple)}>
+    <div class="tool-panel" id="tool" data-slug={tool.slug} data-name={tool.name} data-base={base} data-multiple={String(tool.multiple)}>
       <div class="dropzone" id="drop" tabindex="0" role="button" aria-describedby="drop-hint">
         <Icon name="upload" />
         <strong>{tool.dropLabel}</strong>
@@ -166,7 +167,7 @@ const jsonLd = [
         {next.length > 0 && (
           <nav class="next-steps" id="next-steps" aria-label="Next step" hidden>
             <span class="muted small">Next step, also on your device:</span>
-            <ul class="chips">{next.map((t) => <li><a href={toolPath(t)} data-to={t.slug}>{t.name}</a></li>)}</ul>
+            <ul class="chips">{next.map((t) => <li><a href={toolPath(t)} data-to={t.slug} data-handoff={handoffs[base ?? tool.slug]?.includes(t.slug) ? '' : undefined}>{t.name}</a></li>)}</ul>
           </nav>
         )}
       </div>
