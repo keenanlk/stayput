@@ -51,7 +51,7 @@ createShell({
     progress.set('Checking this browser can write the video…', 0);
     if (!hasVideoEncoder()) throw new EncoderUnavailable();
     await requireH264Encoder();
-    progress.set('Loading the person finder, once (16 MB)…', 0.01);
+    progress.set('Loading the person finder, once (about 28 MB)…', 0.01);
     const { Matte, loadPersonMask } = await import('../lib/person-mask');
     await loadPersonMask();
     const { editVideo } = await import('../lib/video-edit');

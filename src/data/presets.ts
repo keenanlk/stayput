@@ -4576,7 +4576,7 @@ export const presets: Preset[] = [
     lead:
       'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB), and after that it works offline; the longest video you can caption depends on your device’s memory.',
     base: 'add-subtitles-to-video',
-    sizeFact: 'No watermark. On a phone, up to about 200 MB (2 minutes of iPhone video)',
+    sizeFact: 'No watermark. On a phone, a video over about 200 MB (2 minutes of iPhone video) may run out of memory',
     name: 'Auto caption video',
     title: 'Auto Caption Video Free: Captions Burned In, No Upload | Stayput',
     description: 'Automatic captions for Reels, TikTok and Shorts, written from the speech by Whisper on your device and burned into the video. Large text, no watermark, no upload.',
@@ -4600,7 +4600,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Which look reads best on a phone?', a: 'White with a black edge works on most footage. On busy or bright backgrounds such as snow, sky or a white kitchen, the dark band keeps every word readable. Yellow is the traditional choice for subtitles over film and stands out on grey or blue scenes.' },
       { q: 'Does it do word-by-word animated captions?', a: 'No. Each caption shows a phrase of one or two lines for as long as it is spoken, like TV subtitles. Animated, word-highlighting styles need an editing app.' },
-      { q: 'Can it caption a video in another language?', a: 'Yes. The language is detected from the first seconds, or you can choose it. Tick Translate the speech to English for English captions on a video in another language.' },
+      { q: 'Can it caption a video in another language?', a: 'Yes, with limits. The language is detected from the first seconds, or you can choose it. The speech model is small, so it is most accurate in English and makes more mistakes in other languages, especially on short or noisy clips; if the words come out wrong, choose the language yourself. Tick Translate the speech to English for rough English captions on a video in another language, and check them before you post.' },
       { q: 'Can I get a separate subtitle file instead?', a: 'Yes. [Video to subtitles](/video-to-subtitles) is a subtitle generator that makes an SRT or WebVTT file from the speech, without touching the video.' },
       { q: 'Is my video uploaded?', a: 'No. The speech is transcribed and the frames are redrawn in this tab. Unposted clips, family videos and client footage stay on your device.' },
       noAccount,
@@ -4727,7 +4727,7 @@ export const presets: Preset[] = [
       { q: 'Will the blur hide text and faces behind me?', a: 'At the default strength, text on a wall or screen and faces in photos behind you become unreadable. Check the result before sharing: if you move quickly, a sliver of background can stay sharp next to you for a frame or two.' },
       { q: 'Does it work with more than one person?', a: 'Yes. Everyone the model sees as a person stays sharp, whether one or several.' },
       { q: 'Why does something I hold get blurred?', a: 'The model looks for people, not objects. A mug, a phone or a pet counts as background unless it overlaps your body.' },
-      { q: 'Is the video uploaded?', a: 'No. The whole job runs in this tab, on your device.' },
+      { q: 'Is the video uploaded?', a: 'No. The whole job runs in this tab, on your device.' },      { q: 'Why does the browser console mention a Google address?', a: 'The open-source MediaPipe engine that finds the person tries to send its own usage log to a Google address. This site’s security policy makes the browser refuse that request, so it fails and you see an error in the console. Your video is not part of it and it never leaves your device.' },
     ],
   },
   {
@@ -4757,7 +4757,7 @@ export const presets: Preset[] = [
       { q: 'Why not just a transparent video?', a: 'MP4, the format every editor and phone reads, cannot hold transparency. A flat key colour does the same job in one click in any editor, and plays everywhere as it is.' },
       { q: 'Which green should I use?', a: 'Chroma green, #00B140, is the standard broadcast key colour and the default here. Use blue if the person or their clothes are green.' },
       { q: 'Will hair look natural after keying?', a: 'Short and tidy hair keys well. Loose strands and flyaway hair are simplified by the model into a smooth outline, which looks fine at normal viewing size but not in extreme close-ups.' },
-      { q: 'Is my video uploaded?', a: 'No. The frames are redrawn and encoded in this tab, on your device.' },
+      { q: 'Is my video uploaded?', a: 'No. The frames are redrawn and encoded in this tab, on your device.' },      { q: 'Why does the browser console mention a Google address?', a: 'The open-source MediaPipe engine that finds the person tries to send its own usage log to a Google address. This site’s security policy makes the browser refuse that request, so it fails and you see an error in the console. Your video is not part of it and it never leaves your device.' },
     ],
   },
   {

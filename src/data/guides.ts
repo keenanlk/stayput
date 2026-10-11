@@ -599,9 +599,9 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'Working offline after your first visit, and installing it',
+        h: 'Working offline once a page has loaded, and installing it',
         p: [
-          'Because every tool is a static page and a script, the site caches itself after the first visit and works with the network off from then on. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
+          'Because every tool is a static page and a script, the site caches its pages and code once a page has loaded, and most tools keep working with the network off from then on; the few that download a model or engine need one online run first. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
         ],
       },
     ],

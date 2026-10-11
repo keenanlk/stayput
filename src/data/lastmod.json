@@ -1,7 +1,7 @@
 {
  "/": {
-  "date": "2026-10-06",
-  "hash": "cd6530fee04f8905"
+  "date": "2026-10-11",
+  "hash": "38557aece6c9dc15"
  },
  "/2x2-photo": {
   "date": "2026-10-06",
@@ -20,8 +20,8 @@
   "hash": "ee9d64e26c886d07"
  },
  "/about": {
-  "date": "2026-10-09",
-  "hash": "efdeb50772bb7219"
+  "date": "2026-10-11",
+  "hash": "92241e84878cdfe4"
  },
  "/acapella-extractor": {
   "date": "2026-10-06",
@@ -45,11 +45,11 @@
  },
  "/audio-to-text": {
   "date": "2026-10-11",
-  "hash": "7b86236221a84f39"
+  "hash": "6201e0f5922fd86b"
  },
  "/auto-caption-video": {
   "date": "2026-10-11",
-  "hash": "afc02f957e0da7e9"
+  "hash": "2d7514da47cf2bf8"
  },
  "/avif-to-jpg": {
   "date": "2026-10-06",
@@ -76,8 +76,8 @@
   "hash": "b6e0e91672fe1976"
  },
  "/blur-video-background": {
-  "date": "2026-10-06",
-  "hash": "290f6d551a2843fb"
+  "date": "2026-10-11",
+  "hash": "9534791600562e9d"
  },
  "/bmp-to-jpg": {
   "date": "2026-10-06",
@@ -93,7 +93,7 @@
  },
  "/burn-subtitles-into-video": {
   "date": "2026-10-11",
-  "hash": "824dfc91605b2410"
+  "hash": "a6a6457f1dffffec"
  },
  "/change-video-resolution": {
   "date": "2026-10-11",
@@ -284,8 +284,8 @@
   "hash": "a6d5bba8ae3354ec"
  },
  "/green-screen-video": {
-  "date": "2026-10-06",
-  "hash": "0097571bf54110cb"
+  "date": "2026-10-11",
+  "hash": "e3d855c0575b9488"
  },
  "/guides": {
   "date": "2026-10-08",
@@ -305,7 +305,7 @@
  },
  "/guides/convert-files-without-uploading": {
   "date": "2026-09-25",
-  "hash": "3d943bede3a251ef"
+  "hash": "8f0ee3ee29780b22"
  },
  "/guides/convertio-alternative": {
   "date": "2026-10-08",
@@ -905,7 +905,7 @@
  },
  "/mp3-to-text": {
   "date": "2026-10-11",
-  "hash": "54e70887978dee28"
+  "hash": "37a9fa13a14ec850"
  },
  "/mp3-to-wav": {
   "date": "2026-10-06",
@@ -1028,12 +1028,12 @@
   "hash": "5df8b4c5ced7d465"
  },
  "/press": {
-  "date": "2026-10-06",
-  "hash": "94bac38c83a3e142"
+  "date": "2026-10-11",
+  "hash": "67ba55a87cfbe17e"
  },
  "/privacy": {
   "date": "2026-10-11",
-  "hash": "403caf4382bdc6ca"
+  "hash": "9657b51b01a30b14"
  },
  "/psd-to-jpg": {
   "date": "2026-10-09",
@@ -1197,7 +1197,7 @@
  },
  "/tools/add-subtitles-to-video": {
   "date": "2026-10-11",
-  "hash": "547a3b42b1536868"
+  "hash": "3464352b38b74b1b"
  },
  "/tools/add-text-to-image": {
   "date": "2026-10-07",
@@ -1224,8 +1224,8 @@
   "hash": "5af5513b42e2b3e3"
  },
  "/tools/blur-face-video": {
-  "date": "2026-10-06",
-  "hash": "758d092c7e1d533e"
+  "date": "2026-10-11",
+  "hash": "7c9653fe484c0bbf"
  },
  "/tools/blur-image": {
   "date": "2026-10-06",
@@ -1333,7 +1333,7 @@
  },
  "/tools/heic-to-jpg": {
   "date": "2026-10-11",
-  "hash": "042e0802f1b591c2"
+  "hash": "608362f963a44d1c"
  },
  "/tools/image-to-pdf": {
   "date": "2026-10-11",
@@ -1425,7 +1425,7 @@
  },
  "/tools/remove-background": {
   "date": "2026-10-11",
-  "hash": "61e9f2720a053e9b"
+  "hash": "bba6fbe369315694"
  },
  "/tools/remove-noise": {
   "date": "2026-10-07",
@@ -1488,8 +1488,8 @@
   "hash": "1cb7ad294b5fa62f"
  },
  "/tools/sticker-maker": {
-  "date": "2026-10-06",
-  "hash": "1aafce6d547885da"
+  "date": "2026-10-11",
+  "hash": "b87cad0f9d57e2e6"
  },
  "/tools/strip-exif": {
   "date": "2026-10-06",
@@ -1497,7 +1497,7 @@
  },
  "/tools/transcribe": {
   "date": "2026-10-11",
-  "hash": "83d603fdad092850"
+  "hash": "ecc8caf9395ccd84"
  },
  "/tools/trim-audio": {
   "date": "2026-10-06",
@@ -1520,8 +1520,8 @@
   "hash": "4c44631a21480efa"
  },
  "/tools/video-background-remover": {
-  "date": "2026-10-06",
-  "hash": "a5d70a9c8e9d0bf8"
+  "date": "2026-10-11",
+  "hash": "43516b59968bde8c"
  },
  "/tools/video-speed": {
   "date": "2026-10-06",
@@ -1544,8 +1544,8 @@
   "hash": "8ea0593534bf0e9c"
  },
  "/tools/vocal-remover": {
-  "date": "2026-10-06",
-  "hash": "78cea90c19a1eda5"
+  "date": "2026-10-11",
+  "hash": "27353cb0c79b9977"
  },
  "/tools/voice-recorder": {
   "date": "2026-10-11",
@@ -1597,11 +1597,11 @@
  },
  "/video-to-subtitles": {
   "date": "2026-10-11",
-  "hash": "f5cfb28c2f7f862c"
+  "hash": "dd0e0110ec7a9082"
  },
  "/video-to-text": {
   "date": "2026-10-11",
-  "hash": "7032a9d31f1aa3f4"
+  "hash": "42314e8430fe665b"
  },
  "/watermark-id-copy": {
   "date": "2026-10-06",

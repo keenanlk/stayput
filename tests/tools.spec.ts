@@ -6144,7 +6144,7 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   const p = await phone.newPage();
   await p.goto('/auto-caption-video');
   await expect(p.locator('#tool')).toHaveAttribute('data-ready', 'true');
-  await expect(p.getByText('On a phone, up to about 200 MB').first()).toBeVisible();
+  await expect(p.getByText('On a phone, a video over about 200 MB').first()).toBeVisible();
   await p.locator('#file-input').setInputFiles(big);
   await expect(p.locator('#run-hint')).toBeVisible();
   await expect(p.locator('#run-hint')).toContainText('about 200 MB');
