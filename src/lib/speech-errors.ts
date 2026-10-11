@@ -30,6 +30,8 @@ export const workerCrashError = () =>
 /** The re-encode ran out of memory after the captions were written. The tool attaches the caption file it already made. */
 export const encodeMemoryError = (cause?: unknown) => {
   const err = make('OutOfMemoryError', 'This video is too long for your browser to redraw with captions. Your subtitles are ready: download the .srt below, or trim or split the video and try again. To try again, reload the page first.');
+  // Kept so the page can tell a reclaimed codec from a real memory failure; never shown or recorded.
+  if (cause !== undefined) err.cause = cause;
   // A browser error nobody named as memory keeps its class name, so a failed run still records what it was.
   if (cause !== undefined && !looksLikeMemory(cause)) err.name = classNameOf(cause) as SpeechErrorName;
   return err;
@@ -37,6 +39,7 @@ export const encodeMemoryError = (cause?: unknown) => {
 /** The speech step failed on a phone with a video over the phone limit, with an error that names no cause: out of memory, as far as anything can tell. There is no caption file yet. */
 export const phoneSpeechMemoryError = (cause?: unknown) => {
   const err = make('OutOfMemoryError', 'This phone ran out of memory while writing captions for a video this big. Trim the video to about 2 minutes or less, or use a computer. If you try again, reload the page first.');
+  if (cause !== undefined) err.cause = cause;
   if (cause !== undefined && !looksLikeMemory(cause) && !(cause instanceof SpeechError)) err.name = classNameOf(cause) as SpeechErrorName;
   return err;
 };
@@ -44,6 +47,7 @@ export const phoneSpeechMemoryError = (cause?: unknown) => {
 export function encodeFailedError(cause: unknown): Error {
   const err = new Error('The video could not be redrawn with captions. Your subtitles are ready: download the .srt below, then try a shorter video or another file.');
   err.name = classNameOf(cause);
+  err.cause = cause;
   return err;
 }
 export const speechModelError = () => make('SpeechModelError', 'The speech model could not read this recording. Try again, or try a shorter recording or another file.');
@@ -79,6 +83,7 @@ export function fromWorker(name: string, message: string): SpeechError {
 export function unknownCaptionError(e: unknown): Error {
   const err = new Error('Something went wrong while writing the captions. Reload the page and try again, or try a shorter video or another file.');
   err.name = classNameOf(e);
+  err.cause = e;
   return err;
 }
 

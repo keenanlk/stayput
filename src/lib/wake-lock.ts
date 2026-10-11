@@ -74,6 +74,9 @@ export function guardRun(doc: Document = document, nav: Navigator = navigator): 
 
 /** A codec the browser took back, or closed under the run, as far as its error tells. */
 export function looksReclaimed(e: unknown): boolean {
+  // The caption steps wrap a codec's error in a plain message and keep the original as its cause.
+  const cause = typeof e === 'object' && e ? (e as { cause?: unknown }).cause : undefined;
+  if (cause !== undefined && cause !== e && looksReclaimed(cause)) return true;
   const name = typeof e === 'object' && e ? (e as { name?: string }).name ?? '' : '';
   const text = e instanceof Error ? e.message : typeof e === 'string' ? e : '';
   if (/reclaim|inactiv/i.test(text)) return true;
