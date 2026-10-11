@@ -171,6 +171,10 @@ export const engines: Record<string, Engine> = {
     how: 'A QR encoder written for this site (byte mode, versions 1 to 40, Reed–Solomon error correction and the standard’s mask scoring) turns your text into the grid of squares in your tab. The PNG is drawn on a canvas by your browser and the SVG is written as one path, so both are exact, with no blur.',
     versus: 'Most QR code sites make you sign up, send your link and Wi-Fi password to their servers, and hand out “dynamic” codes that redirect through their domain, so they can count scans and switch your code off when a trial ends. Here the code holds your text directly, never expires, and nothing you type leaves your device.',
   },
+  'barcode-generator': {
+    how: 'JsBarcode (MIT), a small open-source library, turns your number or text into the pattern of bars in this page. The page first checks the number against the rules of the type you chose and works out the check digit itself. The PNG is painted on a canvas by your browser, the SVG is written as plain rectangles, and the PDF is made by pdf-lib (MIT) in the tab.',
+    versus: 'Some online barcode makers draw the picture on their own server, so the number you type, which may be an unreleased product or an internal asset ID, travels to them first. Here the barcode is drawn on your device and the number never leaves it.',
+  },
   'screen-recorder': {
     how: 'Your browser’s own screen picker (getDisplayMedia) lets you choose what to share, and its built-in recorder (MediaRecorder) writes the video in your tab, as MP4 in Chrome, Edge and Safari or WebM in Firefox. When you stop, Mediabunny (MPL-2.0) copies the video into a fresh file without re-encoding so its length is written and players can seek it.',
     versus: 'Online screen recorders make you install an extension or desktop app, sign up, stamp a watermark on free recordings, cap them at a few minutes, and upload the video to their servers to share it. Screens show emails, chats, dashboards and customer data. Here the recording never leaves your device.',

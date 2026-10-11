@@ -77,6 +77,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Pitch and speed changer](https://stayput.dev/tools/pitch-changer) (change key by semitones, speed up or slow down) | |
 | [Audio converter](https://stayput.dev/tools/audio-converter) (MP3, WAV, FLAC, M4A, OGG) | |
 | [QR code generator](https://stayput.dev/tools/qr-code-generator) (link, Wi-Fi, contact, email, phone; PNG or SVG) | |
+| [Barcode generator](https://stayput.dev/tools/barcode-generator) (Code 128, Code 39, UPC, EAN, ITF-14; PNG, SVG or PDF) | |
 | [Voice recorder](https://stayput.dev/tools/voice-recorder) (microphone to MP3, WAV or M4A) | |
 | [Merge audio](https://stayput.dev/tools/merge-audio) (join MP3, WAV, M4A with silence or crossfades) | |
 | [Metronome](https://stayput.dev/tools/metronome) (any time signature, subdivisions, tap tempo) | |

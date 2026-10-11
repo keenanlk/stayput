@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import BarcodeStage from '../../components/BarcodeStage.astro';
+const tool = toolBySlug('barcode-generator')!;
+---
+<ToolLayout tool={tool}>
+  <BarcodeStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/barcode-generator.ts"></script>

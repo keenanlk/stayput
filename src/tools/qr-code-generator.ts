@@ -1,6 +1,7 @@
 import { bool, createShell, num, radio, str } from '../lib/shell';
 import { downloadBlob } from '../lib/files';
 import { trackToolRun } from '../lib/analytics';
+import { luminance } from '../lib/contrast';
 import { drawQr, emailPayload, encodeQr, qrSvg, vcardPayload, wifiPayload, type Ecc, type QrCode } from '../lib/qr';
 
 /**
@@ -51,12 +52,6 @@ function payload(): string {
 
 function colours() {
   return { dark: str('qr-dark', '#000000'), light: bool('qr-clear') ? null : str('qr-light', '#ffffff'), margin: num('qr-margin', 4) };
-}
-
-/** Relative luminance, to warn when the code is lighter than its background. */
-function luminance(hex: string): number {
-  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
 }
 
 function say(text: string, warn = false) {

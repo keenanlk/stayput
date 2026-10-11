@@ -266,6 +266,23 @@
    "note": "The npm package says MIT; the data itself comes from tessdata_best, whose repository states Apache-2.0 for all data."
   },
   {
+   "id": "jsbarcode",
+   "name": "JsBarcode",
+   "version": "3.12.3",
+   "npm": "jsbarcode",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/lindell/JsBarcode",
+   "source": "https://github.com/lindell/JsBarcode/tree/v3.12.3",
+   "shipped": "Bundled into the site JavaScript (barcode generator)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2016 Johan Lindell"
+  },
+  {
    "id": "fflate",
    "name": "fflate",
    "version": "0.8.3",

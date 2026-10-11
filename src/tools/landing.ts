@@ -40,6 +40,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'trim-audio': () => import('./trim-audio'),
   'audio-to-video': () => import('./audio-to-video'),
   'qr-code-generator': () => import('./qr-code-generator'),
+  'barcode-generator': () => import('./barcode-generator'),
   'screen-recorder': () => import('./screen-recorder'),
   'merge-audio': () => import('./merge-audio'),
   'collage-maker': () => import('./collage-maker'),

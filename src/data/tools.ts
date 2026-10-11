@@ -1828,6 +1828,82 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'barcode-generator',
+    name: 'Barcode generator',
+    title: 'Free Barcode Generator: PNG, SVG, PDF, No Sign-up | Stayput',
+    description:
+      'Make a Code 128, Code 39, UPC-A, EAN-13 or ITF-14 barcode and save it as PNG, SVG or PDF. No sign-up, no watermark. What you type is not uploaded.',
+    heading: 'Make a barcode',
+    tagline: 'Type a number or text, pick the barcode type, and save the barcode as an image or a PDF. It is drawn on this page.',
+    category: 'images',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Make a barcode',
+    action: 'Download',
+    sizeFact: 'No watermark, no sign-up',
+    keywords: ['barcode generator', 'free barcode generator', 'barcode generator online', 'barcode maker', 'make a barcode', 'create barcode', 'barcode generator no sign up', 'barcode generator png'],
+    steps: [
+      'Choose the barcode type. Code 128 takes any text; UPC-A, EAN-13, EAN-8 and ITF-14 take digits only, and the page adds the last (check) digit if you leave it out.',
+      'Type the number or text. The barcode redraws as you type, and a message tells you at once if a character or the length is not allowed for that type.',
+      'Set the bar width, height and colours if you need to, then save a PNG, an SVG or a PDF. Test-scan a printed copy with a barcode scanner before you print a run.',
+    ],
+    sections: [
+      {
+        heading: 'Which barcode type to choose',
+        bullets: [
+          '[UPC-A](/upc-barcode-generator): 12 digits, for products sold in North America.',
+          '[EAN-13](/ean-13-barcode-generator): 13 digits, for products sold in most other countries. A book’s [ISBN barcode](/isbn-barcode-generator) is an EAN-13.',
+          'EAN-8: 8 digits, for very small packages. UPC-E: a short 8-digit form of some UPC-A numbers.',
+          '[ITF-14](/itf-14-barcode-generator): 14 digits, for cartons and cases. ITF: any even number of digits, for your own labels and cartons.',
+          '[Code 128](/code-128-barcode-generator): letters, digits and punctuation, up to 80 characters here. The flexible choice for labels, inventory and shipping.',
+          '[Code 39](/code-39-barcode-generator): capital letters, digits and a few symbols, with an optional check character. Older systems and asset tags.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It does not issue product numbers. A shop or marketplace number (a GTIN) comes from GS1, and this page draws the barcode for a number you already have.',
+          'It does not make QR codes or other two-dimensional codes. Use the [QR code generator](/tools/qr-code-generator) for those.',
+          'It does not draw the small price add-on printed beside some book and magazine barcodes.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'Which barcode type should I choose?',
+        a: 'It depends on who will scan it. Products sold in shops use UPC-A (North America) or EAN-13 (most other countries), and cartons use ITF-14. For your own labels, shelves, inventory and shipping, Code 128 is a common choice because it holds any text and stays compact; Code 39 is the older option some systems still ask for. If a customer, shop or marketplace named a type, use that one.',
+      },
+      {
+        q: 'Can I make a barcode for a product I want to sell in shops?',
+        a: 'This page draws the barcode, but it cannot give you the number. Shops and marketplaces generally expect product numbers (GTINs) issued to your company by GS1, and a number you invent may already belong to someone else’s product. Get your number first, type it in here, and the page adds the check digit and draws the barcode.',
+      },
+      {
+        q: 'What is the check digit, and does the page add it?',
+        a: 'The last digit of UPC-A, EAN-13, EAN-8 and ITF-14 is a check digit, worked out from the other digits so a scanner can tell when it misread. If you type the number without it (11, 12, 7 or 13 digits), the page adds it and shows you which digit it added. If you type the full number and the last digit is wrong, the page tells you what it should be instead of drawing a barcode a shop’s system would reject.',
+      },
+      {
+        q: 'PNG, SVG or PDF?',
+        a: 'PNG for documents, slides and web pages. SVG for print and design tools: the bars are exact rectangles, so they stay sharp at any size. PDF when you want a single file to send to a printer or open in any PDF reader; it holds the PNG image on a page the size of the image.',
+      },
+      {
+        q: 'How big should I print it?',
+        a: 'Bar width and height here are in pixels on screen. In print, what matters is the width of the narrowest bar, so save the SVG, scale it in your layout program, and keep the blank space (the quiet zone) left and right of the bars. Shops, carriers and warehouses often publish the size range they accept; follow theirs, then scan a printed copy before you print a whole sheet.',
+      },
+      {
+        q: 'Why does the page say my text is not allowed?',
+        a: 'Each type has its own alphabet. UPC, EAN and ITF are digits only. Code 39 takes capital letters, digits, space and - . $ / + %, and the page turns lowercase letters into capitals. Code 128 here takes the characters on a standard keyboard, which covers letters, digits and punctuation but not accented letters or emoji.',
+      },
+      {
+        q: 'Does it make QR codes too?',
+        a: 'No. A QR code is a different, two-dimensional type. Use the [QR code generator](/tools/qr-code-generator) for a link, Wi-Fi network or contact card.',
+      },
+      {
+        q: 'Is what I type uploaded anywhere?',
+        a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.',
+      },
+    ],
+  },
+  {
     slug: 'screen-recorder',
     name: 'Screen recorder',
     title: 'Free Online Screen Recorder, No Upload or Watermark | Stayput',
