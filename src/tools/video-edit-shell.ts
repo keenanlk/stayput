@@ -29,6 +29,7 @@ export function videoEditShell(config: {
   note?: () => string | undefined;
 }) {
   return createShell({
+    keepAwake: true,
     async process(files, progress) {
       // About 400 KB of video code, loaded only when someone runs the tool.
       const { editVideo } = await import('../lib/video-edit');

@@ -8,6 +8,7 @@ import { encodeFailedError, encodeMemoryError, looksLikeMemory, noSpeechFound, p
 import { describeEdit } from './video-edit-shell';
 import { overPhoneLimit, phoneLimitNote } from '../lib/phone-limit';
 import { InputError } from '../lib/input-error';
+import { pageHiddenDuringRun } from '../lib/wake-lock';
 
 /**
  * Add subtitles to a video, burned into the picture. The captions come from
@@ -32,6 +33,7 @@ let reloadAdvised = false;
 const RELOAD_NOTE = 'The last run ran out of memory. Reload the page before captioning another video.';
 
 const shell = createShell({
+  keepAwake: true,
   // A video too big for a phone to caption is said so now, not after the browser gives up.
   onFilesChanged(files) {
     // Clear: nothing is held for the next run. The worker restarts from the stored model, with no new download.
@@ -47,7 +49,8 @@ const shell = createShell({
     try {
       return await run(files, progress);
     } catch (e) {
-      if ((e as { memory?: boolean } | null)?.memory) {
+      // A run that failed after the page was hidden says so (see the shell), not that it ran out of memory.
+      if ((e as { memory?: boolean } | null)?.memory && !pageHiddenDuringRun()) {
         reloadAdvised = true;
         shell.setHint(RELOAD_NOTE);
       }

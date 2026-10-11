@@ -13,6 +13,7 @@ const clock = (s: number) => {
 };
 
 createShell({
+  keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const mute = bool('mute');

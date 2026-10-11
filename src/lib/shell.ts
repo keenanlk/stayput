@@ -13,6 +13,8 @@ import { warmDecoders } from './vendor';
 import { droppedFiles } from './folder-drop';
 import { takeHandoff } from './handoff';
 import { releaseOutput } from './opfs-output';
+import { guardRun, interruptedError, KEEP_SCREEN_ON_HINT } from './wake-lock';
+import { isPhoneBrowser } from './phone-limit';
 
 export interface ShellFile {
   id: number;
@@ -49,6 +51,8 @@ export interface ShellOptions {
   autoDownloadSingle?: boolean;
   /** Open dropped folders and add the files inside them (see folder-drop.ts). Default false. */
   folders?: boolean;
+  /** A long video job: keep the screen on while it runs, and say so if the page was hidden when it failed. */
+  keepAwake?: boolean;
 }
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -157,6 +161,7 @@ export function createShell(opts: ShellOptions) {
   let nextId = 1;
   let outputs: OutputFile[] = [];
   let busy = false;
+  let guard: ReturnType<typeof guardRun> | undefined;
   // An attempt starts when files are added and ends at a clear or when new
   // files arrive after a successful run. files_added fires once per attempt, and
   // tool_run marks the attempt's first success, so completion = first successes / files_added.
@@ -430,8 +435,9 @@ export function createShell(opts: ShellOptions) {
 
   /** A line above the run button saying what is still needed before Run (empty hides it). */
   function setHint(text = '') {
-    hint.textContent = text;
-    hint.hidden = !text;
+    const line = [text, opts.keepAwake && isPhoneBrowser() ? KEEP_SCREEN_ON_HINT : ''].filter(Boolean).join(' ');
+    hint.textContent = line;
+    hint.hidden = !line;
   }
 
   async function execute() {
@@ -443,6 +449,7 @@ export function createShell(opts: ShellOptions) {
     const started = performance.now();
     const inputBytes = files.reduce((n, f) => n + f.file.size, 0);
     const tool = root.dataset.slug ?? 'unknown';
+    const mine = (guard = opts.keepAwake ? guardRun() : undefined);
     try {
       const result = await opts.process(files, progressApi);
       const outs = Array.isArray(result) ? result : result.outputs;
@@ -460,14 +467,16 @@ export function createShell(opts: ShellOptions) {
       }
       trackToolRun({ tool, outcome: 'ok', firstOk, files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started, format: opts.outputFormat?.() });
       root.dispatchEvent(new CustomEvent('stayput:done', { detail: outs }));
-    } catch (e) {
-      console.error(e);
+    } catch (raw) {
+      const e = mine ? interruptedError(raw, mine.wasHidden(), run.textContent ?? '') : raw;
+      console.error(raw);
       showError(e instanceof Error ? e.message : String(e), (e as { link?: { href: string; text: string } } | null)?.link);
       // Work finished before the failure (captions written before the video could be redrawn) stays downloadable.
       const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
       if (salvage?.length) showResults(salvage, false);
       trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e) });
     } finally {
+      mine?.release();
       setBusy(false);
     }
   }
@@ -518,6 +527,8 @@ export function createShell(opts: ShellOptions) {
   clear.addEventListener('click', () => {
     files = [];
     attempt = undefined;
+    // Clear while a run is going: the screen no longer needs holding for it.
+    guard?.release();
     setHint();
     hideResults();
     hideError();
@@ -567,6 +578,7 @@ export function createShell(opts: ShellOptions) {
   document.getElementById('options')?.addEventListener('change', () => hideResults());
 
   render();
+  if (opts.keepAwake) setHint();
   mountNetProof(root);
   mountInstallPrompt(root);
   mountNextSteps(root);

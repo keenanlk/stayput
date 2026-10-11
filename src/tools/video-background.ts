@@ -34,6 +34,7 @@ function cover(ctx: CanvasRenderingContext2D, img: ImageBitmap) {
 }
 
 createShell({
+  keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const pictures = files.filter((f) => isImage(f.file));

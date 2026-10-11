@@ -14,6 +14,7 @@ const clock = (s: number) => {
 };
 
 createShell({
+  keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     if (files.length < 2) throw new InputError('Add at least two videos to merge.');

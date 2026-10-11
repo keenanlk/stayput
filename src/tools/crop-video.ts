@@ -43,6 +43,7 @@ async function load(file: File) {
 }
 
 const shell = createShell({
+  keepAwake: true,
   async onFilesChanged(files) {
     if (files.length === 0) return unload();
     try {
