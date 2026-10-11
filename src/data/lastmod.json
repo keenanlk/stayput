@@ -112,8 +112,8 @@
   "hash": "391f1e78ae4f1598"
  },
  "/combine-images-into-pdf": {
-  "date": "2026-10-06",
-  "hash": "eb138dc933608389"
+  "date": "2026-10-11",
+  "hash": "d7a0c44173d62317"
  },
  "/combine-pdf": {
   "date": "2026-10-06",
@@ -268,8 +268,8 @@
   "hash": "3706cdc523aa23ab"
  },
  "/gif-to-pdf": {
-  "date": "2026-10-06",
-  "hash": "a5ce2bc8263b2440"
+  "date": "2026-10-11",
+  "hash": "07a6090b007b0e87"
  },
  "/gif-to-png": {
   "date": "2026-10-06",
@@ -725,7 +725,7 @@
  },
  "/heic-to-pdf": {
   "date": "2026-10-11",
-  "hash": "958b4270e4d9d7ae"
+  "hash": "a8b21bf6e3fb021b"
  },
  "/heic-to-png": {
   "date": "2026-10-06",
@@ -784,8 +784,8 @@
   "hash": "4c61ba6bca4e4fa3"
  },
  "/jpg-to-pdf": {
-  "date": "2026-10-06",
-  "hash": "a1f990b2140e7ca3"
+  "date": "2026-10-11",
+  "hash": "f29b43257228f8b6"
  },
  "/jpg-to-png": {
   "date": "2026-10-06",
@@ -1008,8 +1008,8 @@
   "hash": "13261a8a3f5713d3"
  },
  "/png-to-pdf": {
-  "date": "2026-10-06",
-  "hash": "944d6d5d4f2f3166"
+  "date": "2026-10-11",
+  "hash": "06a0f8a2f209353e"
  },
  "/png-to-svg": {
   "date": "2026-10-06",
@@ -1125,7 +1125,7 @@
  },
  "/screenshot-to-pdf": {
   "date": "2026-10-11",
-  "hash": "bb5d81f5112b2587"
+  "hash": "b45a918bc1259715"
  },
  "/screenshot-to-text": {
   "date": "2026-10-06",
@@ -1180,8 +1180,8 @@
   "hash": "5ddb36565903995b"
  },
  "/tiff-to-pdf": {
-  "date": "2026-10-06",
-  "hash": "290a9d083e6f95de"
+  "date": "2026-10-11",
+  "hash": "bcf9fcd0eb822f6d"
  },
  "/tiff-to-png": {
   "date": "2026-10-06",
@@ -1253,7 +1253,7 @@
  },
  "/tools/compress-pdf": {
   "date": "2026-10-11",
-  "hash": "f8556d47132c1807"
+  "hash": "c04ba9e520f428f9"
  },
  "/tools/compress-png": {
   "date": "2026-10-08",
@@ -1333,11 +1333,11 @@
  },
  "/tools/heic-to-jpg": {
   "date": "2026-10-11",
-  "hash": "cfe512e33fa5c2b1"
+  "hash": "042e0802f1b591c2"
  },
  "/tools/image-to-pdf": {
-  "date": "2026-10-06",
-  "hash": "4d2a6e3ede6b7fdd"
+  "date": "2026-10-11",
+  "hash": "6e3b394033ded89e"
  },
  "/tools/image-to-svg": {
   "date": "2026-10-06",
@@ -1640,8 +1640,8 @@
   "hash": "7fee8f5cad39e118"
  },
  "/webp-to-pdf": {
-  "date": "2026-10-06",
-  "hash": "58e1c6287a5e50b1"
+  "date": "2026-10-11",
+  "hash": "17157cc9e0e6d485"
  },
  "/webp-to-png": {
   "date": "2026-10-06",

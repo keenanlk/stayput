@@ -56,7 +56,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Uploading a document to protect it hands the unprotected copy to a stranger first. Here the only copy that ever exists outside your device is the encrypted one you choose to send.',
   },
   'image-to-pdf': {
-    how: 'JPG and PNG images are embedded directly into the PDF by pdf-lib without re-encoding. Other formats are decoded by your browser (HEIC via libheif, TIFF via UTIF.js, one page per TIFF page) and embedded as JPG or PNG. Page size, orientation and margins are applied while laying out each page in memory.',
+    how: 'A JPG is embedded directly into the PDF by pdf-lib, unchanged, unless it needs rotating by its EXIF orientation (as sideways phone photos often do), in which case it is decoded and re-encoded at high quality. A PNG is embedded losslessly. Other formats are decoded by your browser (HEIC via libheif, TIFF via UTIF.js, one page per TIFF page) and embedded as high-quality JPG. Page size, orientation and margins are applied while laying out each page in memory.',
     versus: 'Uploading a folder of receipts or ID scans to make one PDF is exactly the kind of thing that should not need a server. The PDF is assembled on your device in the time it takes to pick the files.',
   },
   'pdf-to-image': {
