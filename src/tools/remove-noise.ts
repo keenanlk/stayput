@@ -5,6 +5,7 @@ import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioForma
 import { DENOISE_RATE, denoise, loadRnnoise, resample } from '../lib/denoise';
 import { SAMPLE_RATE, decodePcm } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
+import { audioDecodeError } from '../lib/speech-errors';
 
 const BITRATES = [96, 128, 160, 192, 256, 320];
 const STRENGTH: Record<string, number> = { strong: 1, medium: 0.85, light: 0.65 };
@@ -38,7 +39,7 @@ createShell({
       progress.set(`Reading the sound of ${file.name}…`, share(0.05));
       if (await hasVideo(file)) {
         const pcm = await decodePcm(file);
-        if (!pcm || !pcm[0]?.length) throw new Error(`${file.name} has no sound to clean.`);
+        if (!pcm || !pcm[0]?.length) throw audioDecodeError(`${file.name} has no sound to clean.`);
         const wav = new File([encodeWav(await clean(pcm, SAMPLE_RATE), SAMPLE_RATE)], 'sound.wav', { type: 'audio/wav' });
         const r = await addAudio(file, wav, { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.7 + f * 0.3)) });
         const out: OutputFile = { name: suffixName(file.name, '-clean', r.ext), blob: r.blob, originalSize: file.size, note: `${voiceNote(voice)}, picture copied, ${formatDuration(r.duration)}` };

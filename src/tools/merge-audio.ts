@@ -2,6 +2,7 @@ import { createShell, str } from '../lib/shell';
 import type { OutputFile } from '../lib/files';
 import { SAMPLE_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, formatDuration, type Bitrate } from '../lib/audio';
 import { joinParts, parseBetween } from '../lib/audio-merge';
+import { InputError } from '../lib/input-error';
 
 /**
  * Merge audio. Each file is decoded by the browser at 44.1 kHz, the sounds are
@@ -21,7 +22,7 @@ createShell({
   outputFormat: format,
   resultsTitle: () => 'Merged',
   async process(files, progress) {
-    if (files.length < 2) throw new Error('Add at least two audio files to merge.');
+    if (files.length < 2) throw new InputError('Add at least two audio files to merge.');
     const parts: Float32Array[][] = [];
     for (const [i, entry] of files.entries()) {
       progress.set(`Reading ${entry.file.name} (${i + 1} of ${files.length})…`, (i / files.length) * 0.4);

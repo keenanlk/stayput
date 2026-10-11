@@ -31,6 +31,7 @@ import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
+import { InputError } from './input-error';
 
 export interface MergeOptions {
   mute: boolean;
@@ -86,7 +87,7 @@ async function copyClipSound(target: EncodedAudioPacketSource, track: InputAudio
 }
 
 export async function mergeVideos(files: File[], opts: MergeOptions): Promise<MergeResult> {
-  if (files.length < 2) throw new Error('Add at least two videos to join.');
+  if (files.length < 2) throw new InputError('Add at least two videos to join.');
   const inputs = files.map((f) => new Input({ source: new BlobSource(f), formats: [MP4, QTFF, WEBM, MATROSKA] }));
   try {
     const clips: { track: InputVideoTrack; first: number; length: number; name: string }[] = [];

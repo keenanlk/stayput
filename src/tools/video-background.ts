@@ -2,6 +2,7 @@ import { bindRange, createShell, num, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/encoder-probe';
 import { describeEdit } from './video-edit-shell';
+import { InputError } from '../lib/input-error';
 
 /**
  * Video background remover: the people in each frame are found by MediaPipe's
@@ -37,11 +38,11 @@ createShell({
   async process(files, progress) {
     const pictures = files.filter((f) => isImage(f.file));
     const videos = files.filter((f) => !isImage(f.file));
-    if (videos.length === 0) throw new Error('Add a video too: the picture is only the new background.');
-    if (pictures.length > 1) throw new Error('Add one picture for the background, with the videos to put it behind.');
+    if (videos.length === 0) throw new InputError('Add a video too: the picture is only the new background.');
+    if (pictures.length > 1) throw new InputError('Add one picture for the background, with the videos to put it behind.');
     let bgKind = kind();
     if (pictures.length === 1) bgKind = 'image';
-    else if (bgKind === 'image') throw new Error('Add a picture with the video to use as the new background, or choose Blur or Colour.');
+    else if (bgKind === 'image') throw new InputError('Add a picture with the video to use as the new background, or choose Blur or Colour.');
     const strength = num('strength', 6);
     const color = str('bg-color', '#00b140');
     const picture = pictures[0] ? await createImageBitmap(pictures[0].file) : undefined;

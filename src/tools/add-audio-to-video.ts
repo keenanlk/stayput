@@ -1,5 +1,6 @@
 import { bool, createShell, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { InputError, UnreadableFile } from '../lib/input-error';
 
 /**
  * Add audio to video. The picture is copied as it is and the new sound is
@@ -15,13 +16,13 @@ const clock = (s: number) => {
 createShell({
   outputFormat: () => 'mp4',
   async process(files, progress) {
-    if (files.length !== 2) throw new Error('Add one video and one sound file (MP3, WAV, M4A, or another video to take the sound from).');
+    if (files.length !== 2) throw new InputError('Add one video and one sound file (MP3, WAV, M4A, or another video to take the sound from).');
     const { addAudio, hasVideo } = await import('../lib/video-audio');
     progress.set('Reading the files…', 0.01);
     const withPicture = await Promise.all(files.map((f) => hasVideo(f.file)));
     // The first file with a picture is the video; the other one gives the sound.
     const vi = withPicture.indexOf(true);
-    if (vi < 0) throw new Error('Neither file is a video this page can read (MP4, MOV, WebM or MKV).');
+    if (vi < 0) throw new UnreadableFile('Neither file is a video this page can read (MP4, MOV, WebM or MKV).');
     const videoFile = files[vi]!.file;
     const soundFile = files[1 - vi]!.file;
     const mode = str('mode', 'replace') === 'mix' ? 'mix' : 'replace';

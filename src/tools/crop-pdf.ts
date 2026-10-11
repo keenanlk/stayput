@@ -3,6 +3,7 @@ import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, renderPage } fr
 import { contentBounds, cropPdf, type CropRect } from '../lib/crop-pdf';
 import type * as PdfJs from 'pdfjs-dist';
 import { suffixName, type OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 const panel = document.getElementById('crop-panel')!;
 const stage = document.getElementById('stage')!;
@@ -171,7 +172,7 @@ const shell = createShell({
   },
   async process(files, progress) {
     const entry = files[0]!;
-    if (rects.size === 0) throw new Error('Choose what to keep first: press Trim white margins, or drag a box on the page.');
+    if (rects.size === 0) throw new InputError('Choose what to keep first: press Trim white margins, or drag a box on the page.');
     progress.set('Cropping', 0.3);
     const bytes = await cropPdf(new Uint8Array(await entry.file.arrayBuffer()), rects);
     progress.set('Done', 1);

@@ -1,5 +1,6 @@
 import { bindRange, num, radio, str } from '../lib/shell';
 import { drawWatermark, type Layout, type WatermarkOptions } from '../lib/watermark';
+import { InputError } from '../lib/input-error';
 
 bindRange('wm-size', 'wm-size-out');
 bindRange('wm-opacity', 'wm-opacity-out');
@@ -15,7 +16,7 @@ export function watermarkOptions(): WatermarkOptions {
 }
 
 export function requireText(o: WatermarkOptions): void {
-  if (!o.text.trim()) throw new Error('Type the watermark text first.');
+  if (!o.text.trim()) throw new InputError('Type the watermark text first.');
 }
 
 const panel = document.getElementById('wm-panel')!;

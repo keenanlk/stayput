@@ -2,6 +2,7 @@ import { createShell, processEach, bindRange, num, str, radio } from '../lib/she
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { baseName, type OutputFile } from '../lib/files';
 import { planGrid, type TileShape } from '../lib/image-grid';
+import { InputError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('grid-panel');
@@ -101,7 +102,7 @@ const shell = createShell({
   async process(files, progress) {
     const c = cols();
     const r = rows();
-    if (c * r < 2) throw new Error('Choose at least two tiles; one tile would be the same picture.');
+    if (c * r < 2) throw new InputError('Choose at least two tiles; one tile would be the same picture.');
     const sh = shape();
     const post = radio('order', 'reading') === 'post';
     const choice = str('format', 'keep');

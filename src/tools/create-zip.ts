@@ -1,6 +1,7 @@
 import { bool, createShell, str } from '../lib/shell';
 import { pathOf } from '../lib/folder-drop';
 import { encryptedZip, plainZip, zipPath, type ZipEntry } from '../lib/zip-write';
+import { InputError } from '../lib/input-error';
 
 /**
  * Pack files, or whole folders, into one ZIP in the tab, optionally locked
@@ -27,7 +28,7 @@ createShell({
   async process(files, progress) {
     const locked = bool('lock');
     const password = str('password', '');
-    if (locked && !password) throw new Error('Type a password to lock the ZIP with, or untick "Lock with a password".');
+    if (locked && !password) throw new InputError('Type a password to lock the ZIP with, or untick "Lock with a password".');
     const taken = new Set<string>();
     const entries: ZipEntry[] = [];
     for (const [i, f] of files.entries()) {

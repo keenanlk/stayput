@@ -207,6 +207,39 @@ test('a file with no readable sound fails with AudioDecodeError before any model
   expect(models).toEqual([]);
 });
 
+/** One failed run from the files given: the page shows `shown`, and the one tool_run event carries only the class name. */
+async function failedRun(page: Page, baseURL: string, path: string, files: Parameters<ReturnType<Page['locator']>['setInputFiles']>[0]) {
+  const sent = await captureAnalytics(page, baseURL);
+  await page.goto(`${SITE}${path}`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(files);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
+  const run = sent.find((s) => s.payload.name === 'tool_run')!;
+  expect(violations(run), JSON.stringify(run)).toEqual([]);
+  return { shown: (await page.locator('#error').innerText()).replace(/\s+/g, ' '), data: run.payload.data as Record<string, string>, raw: JSON.stringify(sent) };
+}
+
+test('pressing Run without what the tool needs is recorded as InputError, not as a failure', async ({ page, baseURL }) => {
+  const srt = { name: 'secret-captions.srt', mimeType: 'text/plain', buffer: Buffer.from('1\n00:00:00,000 --> 00:00:02,000\nsecret-words\n') };
+  const out = await failedRun(page, baseURL!, '/tools/add-subtitles-to-video', srt);
+  expect(out.shown).toContain('Add the video too');
+  expect(out.data).toMatchObject({ tool: 'add-subtitles-to-video', outcome: 'error', error_class: 'InputError' });
+  for (const secret of ['secret-captions', 'secret-words']) expect(out.raw).not.toContain(secret);
+});
+
+test('a file with no readable sound in an audio tool fails with AudioDecodeError, not the generic class', async ({ page, baseURL }) => {
+  const out = await failedRun(page, baseURL!, '/tools/volume-booster', fx('anim.gif'));
+  expect(out.data).toMatchObject({ tool: 'volume-booster', outcome: 'error', error_class: 'AudioDecodeError' });
+});
+
+test('a file that is not a video fails with UnreadableFile in a video edit', async ({ page, baseURL }) => {
+  const out = await failedRun(page, baseURL!, '/blur-video-background', { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
+  expect(out.shown).toContain('not a video this page can read');
+  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'UnreadableFile' });
+});
+
 test('search and next-step events send only what /privacy lists, and never the typed words', async ({ page, baseURL }) => {
   const sent = await captureAnalytics(page, baseURL!);
   await page.addInitScript(() => (Math.random = () => 0.1)); // experiment arm "on": next steps are shown

@@ -3,6 +3,7 @@ import { createShell, num, str, bool, type ShellFile } from '../lib/shell';
 import { decodeImage, drawScaled, thumbnail } from '../lib/image';
 import { formatBytes, type OutputFile } from '../lib/files';
 import { frameSize, place, playOrder, type GifFit } from '../lib/gif-maker';
+import { InputError } from '../lib/input-error';
 
 /**
  * Make one animated GIF from a set of pictures, in the order listed. Each
@@ -126,7 +127,7 @@ const shell = createShell({
     }
   },
   async process(files, progress) {
-    if (files.length < 2) throw new Error('Add at least two pictures to make an animated GIF.');
+    if (files.length < 2) throw new InputError('Add at least two pictures to make an animated GIF.');
     if (files.length > MAX_FRAMES) throw new Error(`That is ${files.length} pictures; the limit is ${MAX_FRAMES}. A GIF that long would be too large to share.`);
     const s = settings();
     const frames: ImageBitmap[] = [];

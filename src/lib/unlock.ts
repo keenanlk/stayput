@@ -14,6 +14,7 @@
  * once; the outputs are written without encryption.
  */
 import { vendorDir } from './vendor';
+import { InputError } from './input-error';
 
 interface QpdfModule {
   FS: {
@@ -167,7 +168,7 @@ export async function decryptPdf(bytes: Uint8Array, password = ''): Promise<Uint
  * nothing is restricted once it is open.
  */
 export async function encryptPdf(bytes: Uint8Array, password: string): Promise<Uint8Array> {
-  if (!password) throw new Error('Enter a password to protect the PDF with.');
+  if (!password) throw new InputError('Enter a password to protect the PDF with.');
   const { stderr, out } = await runQpdf(bytes, ['--encrypt', `--user-password=${password}`, `--owner-password=${password}`, '--bits=256', '--']);
   if (!out) {
     const detail = lastLine(stderr);

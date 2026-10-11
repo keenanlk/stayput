@@ -3,6 +3,7 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
 import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioFormat } from '../lib/audio-convert';
 import { semitoneRatio, speedAndPitch } from '../lib/pitch';
+import { InputError } from '../lib/input-error';
 
 const BITRATES = [96, 128, 160, 192, 256, 320];
 const range = document.getElementById('semitones') as HTMLInputElement;
@@ -34,7 +35,7 @@ createShell({
     const semitones = Number(str('semitones', '0'));
     const speed = Number(str('speed', '1'));
     const tape = bool('tape');
-    if (!semitones && speed === 1) throw new Error('Choose a pitch or a speed to change: both are set to leave the sound as it is.');
+    if (!semitones && speed === 1) throw new InputError('Choose a pitch or a speed to change: both are set to leave the sound as it is.');
     const pitch = semitoneRatio(semitones) * (tape ? speed : 1);
     const choice = str('format', 'same');
     const suffix = semitones && speed === 1 ? (semitones > 0 ? `-up${semitones}` : `-down${-semitones}`) : speed > 1 ? '-faster' : speed < 1 ? '-slower' : '-pitched';

@@ -7,6 +7,7 @@
 import { BlobSource, CanvasSink, Input, MATROSKA, MP4, QTFF, WEBM } from 'mediabunny';
 import { canvasToBlob } from './image';
 import { unplayable } from './video-compress';
+import { UnreadableFile } from './input-error';
 
 /** 'all' for every frame, a number for that many frames a second, or 'spread:N' for N frames across the video. */
 export type FrameEvery = 'all' | number | `spread:${number}`;
@@ -53,8 +54,8 @@ export async function extractFrames(file: File, opts: FramesOptions): Promise<Fr
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    if (!(await video.canDecode())) throw new Error(unplayable());
+    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    if (!(await video.canDecode())) throw new UnreadableFile(unplayable());
     const first = await video.getFirstTimestamp();
     const duration = Math.max(0, (await video.computeDuration()) - first);
     const stats = await video.computePacketStats(200).catch(() => null);
