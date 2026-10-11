@@ -7,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 // A long video job holds the screen on, and a run that failed after the page was hidden (or with a codec the
 // browser took back) says so instead of the generic failure. The speech worker and the encoder are stand-ins.
 const clip = fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url));
-const talk = fileURLToPath(new URL('./fixtures/static/talk.webm', import.meta.url));
+// Chromium here decodes the webm's Opus sound; WebKit decodes the .mov's AAC (through the demuxer, as iPhone Safari does).
+const talkFor = (project: string) => fileURLToPath(new URL(project === 'webkit' ? './fixtures/static/speech.mov' : './fixtures/static/talk.webm', import.meta.url));
 const PHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1';
 
 function srtFile(): string {
@@ -183,11 +184,10 @@ test.describe('a run interrupted by the screen locking', () => {
 
   for (const kind of ['hidden', 'reclaimed'] as const) {
     test(`${kind}: says the screen locked, offers the SRT, records a class name, and a second try works`, async ({ page }, info) => {
-      test.skip(info.project.name !== 'chromium', 'Chromium decodes this clip’s sound; the worker is a stand-in');
       test.setTimeout(150_000);
       await stubSpeech(page, kind);
       await open(page);
-      await page.locator('#file-input').setInputFiles(talk);
+      await page.locator('#file-input').setInputFiles(talkFor(info.project.name));
       await page.locator('#run').click();
       const error = page.locator('#error');
       await expect(error).toHaveClass(/is-active/, { timeout: 100_000 });
@@ -211,14 +211,13 @@ test.describe('a run interrupted by the screen locking', () => {
   }
 
   test('on a phone the message says phone, and the page hints to keep the screen on', async ({ browser }, info) => {
-    test.skip(info.project.name !== 'chromium', 'Chromium decodes this clip’s sound; the worker is a stand-in');
     test.setTimeout(150_000);
     const ctx = await browser.newContext({ userAgent: PHONE, hasTouch: true });
     const page = await ctx.newPage();
     await stubSpeech(page, 'hidden');
     await open(page);
     await expect(page.locator('#run-hint')).toContainText('Keep the screen on while it works.');
-    await page.locator('#file-input').setInputFiles(talk);
+    await page.locator('#file-input').setInputFiles(talkFor(info.project.name));
     await page.locator('#run').click();
     const error = page.locator('#error');
     await expect(error).toHaveClass(/is-active/, { timeout: 100_000 });
