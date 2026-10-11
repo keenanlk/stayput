@@ -43,6 +43,12 @@ export interface Tool {
 
 export const toolPath = (t: Pick<Tool, 'slug' | 'path'>): string => t.path ?? `/tools/${t.slug}`;
 
+/** FAQ entry for the pages whose lead says no account and no watermark; backed by the grep recorded in the PR that added it. */
+const NOACCOUNT: Faq = {
+  q: 'Do I need an account, and is there a watermark?',
+  a: 'No account and no sign-up: open the page and drop a file. Nothing is added to your file, so there is no watermark or logo. It is free, and your files are not uploaded.',
+};
+
 export const tools: Tool[] = [
   {
     slug: 'heic-to-jpg',
@@ -59,6 +65,8 @@ export const tools: Tool[] = [
     dropLabel: 'Drop HEIC photos here',
     action: 'Convert',
     sizeFact: 'No sign-up, no watermark',
+    lead:
+      'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and gives you the results as one zip. Location and camera details are left out unless you tick Keep EXIF metadata. It is free, needs no account and adds no watermark, and your photos are not uploaded: a HEIC decoder runs in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
     sections: [
       {
         heading: 'How to open or convert HEIC on Windows, Mac and iPhone',
@@ -74,6 +82,12 @@ export const tools: Tool[] = [
           'HEIC is the photo format iPhones and iPads have used since iOS 11. It stores the same picture in about half the space of a JPG, but Windows, many websites and older programs cannot open it, which is why people convert HEIC to JPG. Need a lossless copy? Use [HEIC to PNG](/heic-to-png). Photos carry their date and GPS location; to take it off a JPG you already have, use [Remove EXIF data](/tools/strip-exif).',
         ],
       },
+      {
+        heading: 'A worked example: a day of photos for a Windows PC',
+        paragraphs: [
+          'Say you copied 30 photos from an iPhone to a Windows PC and the Photos app shows blanks. Select all the .heic files and drop them on this page, leave JPG chosen at quality 92, and press Convert. Each photo comes back with its own name and a .jpg ending, and Download all as zip gives you one file. The location is left out unless you tick Keep EXIF metadata first.',
+        ],
+      },
     ],
     keywords: ['heic to jpg', 'heic to png', 'convert heic', 'heic converter', 'iphone photo to jpg'],
     steps: [
@@ -87,12 +101,16 @@ export const tools: Tool[] = [
         a: 'Since iOS 11, iPhones save photos in HEIC (High Efficiency Image Container) because it stores the same picture in about half the space of JPG. Windows, many websites and older programs still cannot open HEIC, so people convert to JPG to share or upload them.',
       },
       {
-        q: 'Are my photos uploaded to a server?',
-        a: 'No. The HEIC decoder (libheif compiled to WebAssembly) runs inside your browser tab. Your photos are read from your disk, converted in memory and saved back to your disk. You can turn off your network after the page loads and it still works.',
+        q: 'Can I convert HEIC to JPG without uploading my photos?',
+        a: 'Yes. The HEIC decoder (libheif compiled to WebAssembly) runs inside your browser tab. Your photos are read from your disk, converted in memory and saved back to your disk. You can turn off your network after the page loads and it still works.',
       },
       {
         q: 'Is there a file size or quantity limit?',
         a: 'There is no file size cap from us, and no quota because there is no server. Very large batches depend on your device’s memory.',
+      },
+      {
+        q: 'Can I convert many HEIC photos at once?',
+        a: 'Yes. Drop them all together and download the results as one zip. Very large batches depend on your device’s memory.',
       },
       {
         q: 'Does converting lose quality?',
@@ -114,6 +132,7 @@ export const tools: Tool[] = [
         q: 'How do I open a HEIC file on Windows?',
         a: 'Install Microsoft’s HEIF image extension from the Microsoft Store, or convert the photo to JPG on this page and open that. Nothing is uploaded either way. The Windows guide linked above has the steps.',
       },
+      NOACCOUNT,
     ],
   },
   {
@@ -373,9 +392,20 @@ export const tools: Tool[] = [
     name: 'Merge PDF',
     title: 'Merge PDF Files Online, Free, No Upload | Stayput',
     description:
-      'Combine multiple PDF files into one in your browser. Reorder pages, no watermark, no account. Your documents never leave your device.',
+      'Combine PDFs into one file in your browser: set the order with the arrows, then download merged.pdf. Nothing is uploaded, no watermark, no account.',
     heading: 'Merge PDF files',
-    tagline: 'Combine PDFs into a single document. Drag to reorder. No file size caps beyond what your device can hold, no watermark, nothing uploaded.',
+    tagline: 'Combine PDFs into one document and set the order with the arrows. No watermark, nothing uploaded, and the only size limit is your device’s memory.',
+    lead:
+      'Combines two or more PDF files into one PDF, in the top-to-bottom order you set with the arrows, and saves it as merged.pdf. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: the pages are copied together in your browser, so text stays selectable and images are not recompressed. The only size limit is your device’s memory, and after one visit the page works offline.',
+    sections: [
+      {
+        heading: 'A worked example: a cover letter, a CV and a certificate in one file',
+        paragraphs: [
+          'Say you are applying for a job and the form takes one PDF. Drop the three files; each shows its first page as a thumbnail. Press the up and down arrows until the cover letter is on top, then press Merge PDFs. You get merged.pdf with the pages of all three files one after another, and a note that says 3 files combined.',
+          'A merge needs at least two files. If a file is damaged or is not a PDF, the merge stops with a message that names it, and nothing is saved until you remove it.',
+        ],
+      },
+    ],
     category: 'pdf',
     accept: 'application/pdf,.pdf',
     multiple: true,
@@ -393,17 +423,22 @@ export const tools: Tool[] = [
         a: 'No. Other free tools cap you at two or three tasks an hour or a set file size because they pay for servers. This tool has no server, so the only limit is your device memory. Merging fifty PDFs or a few hundred megabytes is fine on a normal laptop.',
       },
       {
-        q: 'Are my PDFs uploaded?',
-        a: 'No. The merge is performed by pdf-lib, a JavaScript library that runs inside your browser. You can confirm this in your browser network panel: no request carries your file.',
+        q: 'Can I merge PDFs without uploading them?',
+        a: 'Yes. The merge is done by pdf-lib, a JavaScript library that runs inside your browser tab, so your PDFs are read from your disk and the merged file is written back to it. Open your browser’s network tab while you merge and no request carries a PDF.',
       },
       {
         q: 'Will bookmarks, links and form fields survive?',
-        a: 'Page content, images, fonts and internal links within a page are preserved. Bookmarks (outlines) and form fields are not carried across when copying pages between documents. Password-protected PDFs need to be unlocked first.',
+        a: 'Page content, images, fonts and internal links within a page are preserved. Bookmarks (outlines) and form fields are not carried across when copying pages between documents. A PDF that only restricts printing or copying is unlocked in your tab and merges normally. One that needs a password to open asks for it once. The unlocking program is downloaded from this site the first time such a file is dropped.',
       },
       {
         q: 'Can I merge only some pages of a file?',
         a: 'Use the Split PDF tool first to extract the pages you need, then merge the results.',
       },
+      {
+        q: 'How do I change the order of the PDFs before merging?',
+        a: 'After you drop the files, use the up and down arrows beside each one. Files are combined from top to bottom. To change the order of pages inside a single file afterwards, use [Reorder PDF](/tools/reorder-pdf).',
+      },
+      NOACCOUNT,
     ],
   },
   {
@@ -453,6 +488,8 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop PDF files here',
     action: 'Compress PDF',
+    lead:
+      'Makes a PDF smaller in four ways: a lossless cleanup, image recompression that keeps text selectable, flattening pages to pictures, or fitting it under a size you type, such as 1 MB or 200 KB. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: everything runs in your browser on your device. The only size limit is your device’s memory, and after one visit the page works offline.',
     sections: [
       {
         heading: 'Compress to a set size: 100 KB, 200 KB, 500 KB, 1 MB, 2 MB',
@@ -473,6 +510,12 @@ export const tools: Tool[] = [
           'If one file stays over the limit, [split the PDF](/tools/split-pdf) and send it in parts. To see what each level does to the pages, read [how to compress a PDF without losing quality](/guides/compress-pdf-without-losing-quality).',
         ],
       },
+      {
+        heading: 'A worked example: a scan that must be under 2 MB',
+        paragraphs: [
+          'Say a portal rejects your 14 MB scanned application and accepts files up to 2 MB. Drop the PDF, choose Fit a file size, type 2 and leave the unit on MB, then press Compress PDF. The page tries a lossless rewrite first, then image compression at falling quality, and flattens the pages to pictures only if nothing gentler fits. The result line says which step worked, for example under 2 MB: images at quality 75. If none fits, it says how small it got and suggests splitting the file.',
+        ],
+      },
     ],
     keywords: ['compress pdf', 'reduce pdf size', 'shrink pdf', 'pdf compressor', 'make pdf smaller'],
     steps: [
@@ -486,12 +529,12 @@ export const tools: Tool[] = [
         a: '"Lossless cleanup" rewrites the file with compressed object streams and drops unused data; text and images stay identical. "Recompress images" additionally re-encodes embedded photos at a lower JPG quality and caps their resolution, which is where most of the savings come from in scanned or photo-heavy PDFs. "Flatten pages" renders each page to an image at the resolution you choose. It gives the smallest files for scans but text is no longer selectable.',
       },
       {
-        q: 'Can it get a PDF under a set size, like 1 MB?',
-        a: 'Yes. Choose "Fit a file size" and type the limit in KB or MB. The page tries the gentlest settings first (a lossless rewrite, then lighter image compression that keeps text selectable) and flattens pages to pictures only when nothing else fits. The result says which step it took. 1 MB counts as 1,000,000 bytes, so the file passes however a form counts.',
+        q: 'Can it get a PDF under a set size, like 1 MB, without uploading it?',
+        a: 'Yes, and the PDF is not uploaded: it runs in your browser. Choose "Fit a file size" and type the limit in KB or MB. The page tries the gentlest settings first (a lossless rewrite, then lighter image compression that keeps text selectable) and flattens pages to pictures only when nothing else fits. The result says which step it took. 1 MB counts as 1,000,000 bytes, so the file passes however a form counts.',
       },
       {
         q: 'Why did my PDF barely shrink?',
-        a: 'PDFs made from text (Word exports, invoices) are already small and consist mostly of fonts and vector data that cannot be compressed further without losing content. Compression helps most on files with large photos or scans.',
+        a: 'PDFs made from text (Word exports, invoices) are already small and consist mostly of fonts and vector data that cannot be compressed further without losing content. Compression helps most on files with large photos or scans. At the lossless and image levels you never get back a larger file than you dropped: the original is kept instead, and the result says so.',
       },
       {
         q: 'How do I compress a scanned PDF?',
@@ -509,6 +552,7 @@ export const tools: Tool[] = [
         q: 'Is the PDF uploaded to a server?',
         a: 'No. Everything runs in your browser using pdf-lib and pdf.js. That is why there is no upload and no queue.',
       },
+      NOACCOUNT,
     ],
   },
   {
@@ -755,7 +799,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'What if the PDF is a form or is password protected?',
-        a: 'Forms work: the signature is drawn on top of the page. Password-protected PDFs need to be unlocked first; the tool will tell you if it cannot open the file.',
+        a: 'Forms work: the signature is drawn on top of the page. A PDF that needs a password to open asks for it once, in your browser; the tool will tell you if it cannot open the file.',
       },
     ],
   },
@@ -1196,7 +1240,7 @@ export const tools: Tool[] = [
     name: 'Compress video',
     title: 'Video Compressor, Compress MP4 Without Uploading | Stayput',
     description:
-      'Compress MP4, MOV and WebM videos in your browser: make a video small enough for Discord, email or WhatsApp. No upload, no watermark, no sign-up.',
+      'Compress MP4, MOV and WebM videos in your browser: fit under 10 MB for Discord, 16 MB for WhatsApp or 25 MB for email. No upload, no watermark, no sign-up.',
     heading: 'Compress a video',
     tagline: 'Make a video a fraction of the size, or fit it under a limit like 10 MB for Discord or 25 MB for email. It is compressed on this device and never uploaded.',
     category: 'media',
@@ -1204,6 +1248,16 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop videos to compress',
     action: 'Compress',
+    lead:
+      'Makes MP4, MOV, WebM and MKV videos smaller and saves an MP4, either at a quality level or fitted under a size you pick: 8, 10, 16, 25, 50 or 100 MB. It is free, needs no account and adds no watermark, and your videos are not uploaded: your browser’s own video encoder re-encodes them on your device. The only size limit is your device’s memory, and after one visit the page works offline.',
+    sections: [
+      {
+        heading: 'A worked example: a clip for Discord',
+        paragraphs: [
+          'Say a phone clip is 38 MB and Discord’s free limit is 10 MB. Drop it, set Compression to Fit a file size, pick 10 MB (Discord free) and press Compress. The page works out the bitrate from the video’s length and lowers the resolution if it has to. You get clip-compressed.mp4, and the result line lists its resolution, length and video codec. If it still comes out a little over, the line says so and suggests the next size down.',
+        ],
+      },
+    ],
     keywords: ['video compressor', 'compress video', 'compress mp4', 'reduce video size', 'video compressor for discord', 'compress video for email', 'make video smaller'],
     steps: [
       'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
@@ -1212,8 +1266,8 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
-        q: 'Is my video uploaded?',
-        a: 'No. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for and no copy left on someone else’s computer. After one visit you can switch off Wi-Fi and it still works.',
+        q: 'Can I compress a video without uploading it?',
+        a: 'Yes. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for and no copy left on someone else’s computer. After one visit you can switch off Wi-Fi and it still works.',
       },
       {
         q: 'How much smaller will it get?',
@@ -1224,6 +1278,10 @@ export const tools: Tool[] = [
         a: 'Choose Fit a file size and pick 10 MB. The page works out the bitrate from the length of the video and lowers the resolution if it needs to. About 1 minute fits at 720p; longer videos come out at lower resolutions, and very long ones are refused with how long a clip will fit.',
       },
       {
+        q: 'Which file sizes can I fit a video under?',
+        a: '8, 10, 16, 25, 50 or 100 MB. 10 MB is Discord’s free limit, 16 MB is WhatsApp’s and 25 MB is the attachment limit for Gmail and Outlook. Choose Fit a file size and the resolution is lowered automatically when a long video needs it.',
+      },
+      {
         q: 'Which formats can I compress?',
         a: 'MP4, M4V and MOV (from phones, cameras and screen recorders), WebM and MKV, as long as your browser can decode the video inside. iPhone videos in HEVC need Safari, or Chrome or Edge on a Mac or recent Windows. The result is always an MP4, with H.264 video where your browser can write it.',
       },
@@ -1231,6 +1289,7 @@ export const tools: Tool[] = [
         q: 'Why does it take a while?',
         a: 'Every frame is decoded and encoded again, which is real work: on a recent laptop expect roughly real time or faster for 1080p, slower on a phone. Keep the tab open until it finishes. Lowering the resolution also makes it faster.',
       },
+      NOACCOUNT,
     ],
   },
   {
@@ -3196,7 +3255,7 @@ export const tools: Tool[] = [
     name: 'Remove background',
     title: 'Remove Background from Image, Free, No Upload | Stayput',
     description:
-      'Remove the background from a photo in your browser. Get a transparent PNG or a white or coloured background, at full resolution. Nothing is uploaded.',
+      'Remove the background from a photo in your browser: a transparent PNG, a white or coloured background, or blur it. Full resolution, nothing is uploaded, no watermark.',
     heading: 'Remove the background from an image',
     tagline: 'Cut out people, pets and products at full resolution. The photo never leaves this device.',
     category: 'images',
@@ -3204,6 +3263,16 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop photos to remove the background',
     action: 'Remove background',
+    lead:
+      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model (about 46 MB) to your browser, and after that the tool works offline.',
+    sections: [
+      {
+        heading: 'A worked example: a product photo on a white background',
+        paragraphs: [
+          'Say you have a 12-megapixel JPG of a mug on a kitchen table for a marketplace listing. Drop it, choose White, set Save as to JPG and press Remove background. The first photo downloads the model once; after that each photo takes a few seconds. You get mug-no-bg.jpg at the same 4000 × 3000 size, and the result line shows that size. If part of the mug goes missing, set Keep around the edges to More and run it again.',
+        ],
+      },
+    ],
     keywords: ['remove background', 'background remover', 'remove background from image', 'transparent background', 'make background transparent', 'remove bg', 'cut out image', 'white background'],
     steps: [
       'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
@@ -3212,8 +3281,8 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
-        q: 'Is my photo uploaded?',
-        a: 'No. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only download is the model itself, fetched from this site the first time. After your first run you can turn off Wi-Fi and it keeps working.',
+        q: 'Can I remove a background without uploading the photo?',
+        a: 'Yes. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only download is the model itself, fetched from this site the first time. After your first run you can turn off Wi-Fi and it keeps working.',
       },
       {
         q: 'Why is the first photo slow?',
@@ -3235,6 +3304,15 @@ export const tools: Tool[] = [
         q: 'Can I blur the background instead of removing it?',
         a: 'Yes. Choose Blur and set the strength: the subject stays sharp and the scene behind softens, like the portrait mode on a phone camera. It works on photos taken with any camera, including ones that were never shot in portrait mode.',
       },
+      {
+        q: 'Which file types can I save the result as?',
+        a: 'PNG, WebP or JPG. JPG has no transparency, so it is offered only once you pick a white, coloured or blurred background; for a transparent cut-out use PNG or WebP.',
+      },
+      {
+        q: 'Does it work on iPhone HEIC photos?',
+        a: 'Yes. The page accepts HEIC and HEIF as well as JPG, PNG, WebP, AVIF and JPEG XL, and the cut-out keeps the photo’s full resolution.',
+      },
+      NOACCOUNT,
       {
         q: 'Which model does this use?',
         a: 'ISNet general-use from the DIS research project (see the licenses page for its licensing), converted to 8-bit weights so it downloads faster. It runs with onnxruntime-web, Microsoft’s open-source runtime for machine learning models in the browser.',
