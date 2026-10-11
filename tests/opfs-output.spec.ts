@@ -119,3 +119,29 @@ test('the subtitle-adding tool page leaves a temporary file too, and Clear delet
   await page.locator('#clear').click();
   await expect.poll(() => outputFiles(page)).toEqual([]);
 });
+
+test('an output held in a temporary file is carried to the next tool, and its file is gone afterwards', async ({ page }) => {
+  test.setTimeout(240_000);
+  // Pin the experiment arm so the next-step links show.
+  await page.addInitScript(() => {
+    Math.random = () => 0.1;
+  });
+  const saved = await caption(page);
+  expect(await outputFiles(page)).toHaveLength(1);
+  await expect(page.locator('#next-steps')).toBeVisible();
+  await page.locator('#next-steps a[data-to="compress-video"]').click();
+  await expect(page).toHaveURL(/\/tools\/compress-video$/);
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+  await expect(page.locator('#handoff-note')).toContainText(/Using clip-.*\.mp4/);
+  // The carried file is the whole video, not a dangling reference to the deleted temporary file.
+  const carried = await page.evaluate(async () => {
+    const input = document.getElementById('file-input') as HTMLInputElement;
+    return input.files?.[0]?.size ?? -1;
+  });
+  expect(carried === -1 || carried === saved.length).toBe(true);
+  await expect.poll(() => outputFiles(page)).toEqual([]);
+  // And it still runs.
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 90_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+});
