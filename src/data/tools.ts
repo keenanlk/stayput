@@ -1099,6 +1099,10 @@ export const tools: Tool[] = [
         q: 'Can I get a WAV instead?',
         a: 'Yes. Choose WAV and you get uncompressed 16-bit, 44.1 kHz audio, the format audio editors and some upload forms ask for. It is about ten times the size of an MP3.',
       },
+      {
+        q: 'Do I need the audio if I only want the words?',
+        a: 'No. To get the speech as text, drop the video straight on [Video to text](/video-to-text): it reads the soundtrack itself, so you do not have to extract the audio first.',
+      },
     ],
   },
   {
@@ -1837,6 +1841,10 @@ export const tools: Tool[] = [
       {
         q: 'Is there a time limit?',
         a: 'No. The recording is held in memory until you save it; an hour of speech is only a few tens of megabytes. Saving a very long recording as MP3 takes a little while, and WAV is fastest.',
+      },
+      {
+        q: 'Can I turn the recording into text?',
+        a: 'Yes. Save it, then drop the file on [Audio to text](/audio-to-text): a speech model running in your browser writes it out, and the recording is not uploaded.',
       },
     ],
   },
@@ -2744,7 +2752,7 @@ export const tools: Tool[] = [
   {
     slug: 'transcribe',
     name: 'Transcribe audio to text',
-    title: 'Transcribe Audio and Video to Text or Subtitles, Private | Stayput',
+    title: 'Transcribe Video to Text: Free, Private, No Upload | Stayput',
     description:
       'Turn speech in an MP3, WAV, M4A, MP4 or MOV into text, SRT subtitles or WebVTT captions with Whisper running on your device. 16+ languages, no upload, no account.',
     heading: 'Transcribe audio and video to text',
@@ -2781,12 +2789,16 @@ export const tools: Tool[] = [
         q: 'Does it tell speakers apart?',
         a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph in the text version, which usually falls where the speaker changes.',
       },
+      {
+        q: 'Can I turn a video into text?',
+        a: 'Yes. Drop an MP4, MOV, M4V, MKV or WebM file and choose Text (.txt): only the soundtrack is read, in this tab, and the video is not uploaded. For a recorded lecture or a Zoom MP4 there is a page set up for it, [Video to text](/video-to-text). For timed captions instead of paragraphs, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text).',
+      },
     ],
   },
   {
     slug: 'add-subtitles-to-video',
     name: 'Add subtitles to video',
-    title: 'Add Subtitles to Video: Auto Captions Burned In, No Upload | Stayput',
+    title: 'Add Subtitles or Captions to a Video: Burned In, No Upload | Stayput',
     description:
       'Burn captions into an MP4, MOV or WebM: written from the speech by Whisper on your device, or from your own SRT or VTT file. Three looks, no watermark, no upload.',
     heading: 'Add subtitles to a video',

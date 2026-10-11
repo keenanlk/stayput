@@ -3104,7 +3104,7 @@ export const guides: Guide[] = [
     heading: 'How to transcribe audio to text',
     dek: 'Every platform has a way to turn speech into text now, at very different prices. Here is what each one offers, and a free option that never uploads the recording.',
     keywords: ['how to transcribe audio to text', 'transcribe audio to text free', 'transcribe audio to text iphone', 'how to transcribe an interview', 'voice memo to text'],
-    updated: '2026-09-30',
+    updated: '2026-10-10',
     tools: ['transcribe', 'video-to-subtitles', 'mp3-to-text'],
     sections: [
       {
@@ -3134,7 +3134,7 @@ export const guides: Guide[] = [
       {
         h: 'Transcribing without uploading or paying per minute',
         p: [
-          'Stayput\'s [transcribe](/tools/transcribe) tool runs Whisper, OpenAI\'s speech-recognition model, directly in the browser tab: drop an MP3, WAV, M4A, MP4 or MOV file, and the model downloads once and then works entirely on your device. It writes plain text, or timed [SRT subtitles](/video-to-subtitles) and WebVTT captions for a video, in over a dozen languages, with no per-minute cost and no upload of the recording itself.',
+          'Stayput\'s [transcribe](/tools/transcribe) tool runs Whisper, OpenAI\'s speech-recognition model, directly in the browser tab: drop an MP3, WAV, M4A, MP4 or MOV file, and the model downloads once and then works entirely on your device. It writes plain text (see [audio to text](/audio-to-text) and [video to text](/video-to-text)), or timed [SRT subtitles](/video-to-subtitles) and WebVTT captions for a video, in over a dozen languages, with no per-minute cost and no upload of the recording itself.',
           'It does not label who is speaking, and it struggles with the same things every automatic transcriber does: heavy accents, overlapping speech, and specialist terms. For a recording where the wording actually matters, read the result against the audio before using it.',
         ],
       },
