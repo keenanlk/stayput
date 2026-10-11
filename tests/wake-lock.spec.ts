@@ -108,6 +108,22 @@ test.describe('screen wake lock', () => {
     expect(await lock(page)).toEqual({ requests: 1, releases: 1 });
   });
 
+  test('is let go at Clear, even while the run is still going', async ({ page }) => {
+    test.setTimeout(120_000);
+    await stubWakeLock(page, 'ok');
+    // An encoder that never finishes, so the run is still going when Clear is pressed.
+    await page.addInitScript(() => {
+      VideoEncoder.prototype.flush = () => new Promise(() => {});
+    });
+    await open(page);
+    await page.locator('#file-input').setInputFiles([clip, srtFile()]);
+    await page.locator('#run').click();
+    await expect(page.locator('#progress-text')).toContainText('Adding subtitles', { timeout: 60_000 });
+    expect(await lock(page)).toEqual({ requests: 1, releases: 0 });
+    await page.locator('#clear').click();
+    await expect.poll(() => lock(page)).toEqual({ requests: 1, releases: 1 });
+  });
+
   for (const mode of ['missing', 'denied'] as const) {
     test(`a ${mode} wake lock changes nothing and logs no error`, async ({ page }) => {
       test.setTimeout(120_000);
