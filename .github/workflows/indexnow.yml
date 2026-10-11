@@ -5,6 +5,19 @@ name: IndexNow
 on:
   deployment_status:
   workflow_dispatch:
+    inputs:
+      all:
+        description: Resubmit every URL in the sitemap (use rarely; off submits only the changed pages)
+        type: boolean
+        default: false
+      from:
+        description: Diff mode, base revision (default HEAD~1)
+        type: string
+        default: ''
+      to:
+        description: Diff mode, head revision (default HEAD)
+        type: string
+        default: ''
 
 jobs:
   ping:
@@ -13,7 +26,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 2
+          # A manual run may diff an older revision, so it needs the history.
+          fetch-depth: ${{ github.event_name == 'workflow_dispatch' && 0 || 2 }}
       - id: changed
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] || git diff --name-only HEAD~1 HEAD | grep -qE '^(src/|public/|astro\.config|vercel\.json)'; then
@@ -25,11 +39,25 @@ jobs:
         if: steps.changed.outputs.site == 'true'
         with:
           node-version: 22
+      # Remembers pings from the last few minutes so a repeat of the same URL set is skipped.
+      # The newest earlier entry is restored; each run saves its own, carrying the records forward.
+      - uses: actions/cache@v6
+        if: steps.changed.outputs.site == 'true'
+        with:
+          path: .indexnow-recent
+          key: indexnow-recent-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: indexnow-recent-
       - if: steps.changed.outputs.site == 'true'
-        # A manual run resubmits every page; a deploy submits only the pages whose lastmod changed.
+        # A deploy, or a manual run with the default inputs, submits only the pages whose lastmod
+        # changed (at most 50). Only a manual run with "all" ticked resubmits the whole sitemap.
+        env:
+          EVENT: ${{ github.event_name }}
+          ALL: ${{ inputs.all }}
+          FROM: ${{ inputs.from }}
+          TO: ${{ inputs.to }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            node scripts/indexnow.mjs --all
+          if [ "$EVENT" = "workflow_dispatch" ] && [ "$ALL" = "true" ]; then
+            node scripts/indexnow.mjs --all --force --dedup-file=.indexnow-recent/pings.json
           else
-            node scripts/indexnow.mjs --from=HEAD~1 --to=HEAD
+            node scripts/indexnow.mjs --from="${FROM:-HEAD~1}" --to="${TO:-HEAD}" --dedup-file=.indexnow-recent/pings.json
           fi
