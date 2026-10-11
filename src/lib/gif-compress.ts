@@ -30,8 +30,13 @@ export interface GifCompressOptions {
   scale: number;
   /** Keep every frame (1), every second (2) or every third (3). */
   keepEvery: number;
-  /** Draw every frame into an exact box instead of scaling: fitted inside (transparent bars) or cropped around the centre. */
-  box?: { width: number; height: number; fit: 'contain' | 'cover' };
+  /**
+   * Draw every frame into an exact box instead of scaling: stretched to fill it, fitted inside
+   * (transparent bars) or cropped around the centre.
+   */
+  box?: { width: number; height: number; fit: 'contain' | 'cover' | 'stretch' };
+  /** Keep only this rectangle (GIF pixels, whole numbers) of every composited frame, before any scaling. Not together with `box`. */
+  crop?: { x: number; y: number; width: number; height: number };
   /** Always return the rewritten GIF, even if it is not smaller than the input. */
   force?: boolean;
   onProgress?: (fraction: number) => void;
@@ -88,12 +93,22 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
   const { colors, fuzz } = LEVELS[opts.level];
   const scale = Math.min(1, Math.max(0.05, opts.scale));
   const box = opts.box;
-  const width = box ? box.width : Math.max(1, Math.round(gw * scale));
-  const height = box ? box.height : Math.max(1, Math.round(gh * scale));
-  // Source and destination rectangles for each frame: the whole GIF, unless it is fitted into or cropped to a box.
-  let src = [0, 0, gw, gh];
+  const crop = opts.crop;
+  if (crop && box) throw new Error('A crop and a box cannot be used together.');
+  if (crop) {
+    const whole = [crop.x, crop.y, crop.width, crop.height].every(Number.isInteger);
+    if (!whole || crop.x < 0 || crop.y < 0 || crop.width < 1 || crop.height < 1 || crop.x + crop.width > gw || crop.y + crop.height > gh) {
+      throw new Error('The crop rectangle is not inside the GIF.');
+    }
+  }
+  const width = box ? box.width : crop ? Math.max(1, Math.round(crop.width * scale)) : Math.max(1, Math.round(gw * scale));
+  const height = box ? box.height : crop ? Math.max(1, Math.round(crop.height * scale)) : Math.max(1, Math.round(gh * scale));
+  // Source and destination rectangles for each frame: the whole GIF, unless it is cropped, stretched, fitted into or cropped to a box.
+  let src = crop ? [crop.x, crop.y, crop.width, crop.height] : [0, 0, gw, gh];
   let dst = [0, 0, width, height];
-  if (box?.fit === 'cover') {
+  if (box?.fit === 'stretch') {
+    // Source and destination stay the whole GIF and the whole box, so no row or column is left unpainted.
+  } else if (box?.fit === 'cover') {
     const k = Math.max(width / gw, height / gh);
     const sw = Math.min(gw, width / k);
     const sh = Math.min(gh, height / k);
@@ -287,6 +302,25 @@ function lzwStream() {
     bytesView: () => buf.subarray(0, n),
     bytes: () => buf.slice(0, n),
   };
+}
+
+/**
+ * The GIF's first frame as the browser plays it, on a canvas of the GIF's own logical screen size
+ * (the size in its header). Used when the browser's own decoder hands back a picture of another size.
+ */
+export function firstFrameCanvas(input: ArrayBuffer): OffscreenCanvas {
+  const gif = parseGIF(input);
+  const frame = gif.frames.find((f): f is GifFrame => 'image' in f);
+  const gw = gif.lsd.width;
+  const gh = gif.lsd.height;
+  if (!frame || !gw || !gh) throw new Error('This GIF has no frames.');
+  const canvas = new OffscreenCanvas(gw, gh);
+  const f = decompressFrame(frame, gif.gct, true);
+  const { left, top, width, height } = f.dims;
+  if (width > 0 && height > 0) {
+    canvas.getContext('2d')!.putImageData(new ImageData(new Uint8ClampedArray(f.patch), width, height), left, top);
+  }
+  return canvas;
 }
 
 /** How many image frames a GIF holds (1 for a still GIF). */

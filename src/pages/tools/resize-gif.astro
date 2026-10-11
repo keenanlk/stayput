@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ResizeGif from '../../components/options/ResizeGif.astro';
+const tool = toolBySlug('resize-gif')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><ResizeGif /></Fragment>
+</ToolLayout>
+<script src="../../tools/resize-gif.ts"></script>

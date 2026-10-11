@@ -1,7 +1,7 @@
 /**
  * What can go wrong when compressing a GIF, each with its own error name (the
  * short kind a failed run records; the message is never sent) and a message
- * that says what to try next. Used by the Compress GIF tool only.
+ * that says what to try next. Used by the GIF tools (compress, resize and crop).
  */
 
 class GifError extends Error {
@@ -26,8 +26,8 @@ export class DamagedGif extends GifError {
 }
 
 export class GifTooLarge extends GifError {
-  constructor() {
-    super('GifTooLarge', "This GIF is too large for this device's memory. Try a desktop browser, or set Size to 50% and Frames to \"Drop every second frame\" and run it again.");
+  constructor(advice = 'Try a desktop browser, or set Size to 50% and Frames to "Drop every second frame" and run it again.') {
+    super('GifTooLarge', `This GIF is too large for this device's memory. ${advice}`);
   }
 }
 
@@ -56,24 +56,30 @@ export function gifSize(b: Uint8Array): { width: number; height: number } | unde
   return { width: b[6]! | (b[7]! << 8), height: b[8]! | (b[9]! << 8) };
 }
 
-/** Throws the error to show before any work starts: not a GIF, or too big to hold. `frames` is the count after any frames are dropped. */
-export function checkGif(bytes: Uint8Array, frames: (() => number) | undefined, scale: number, keepEvery: number): void {
+/**
+ * Throws the error to show before any work starts: not a GIF, or too big to hold. `frames` is the
+ * count before any frames are dropped. `out` is the output size when it is not `scale` times the
+ * GIF's own (an enlarged or cropped GIF); the memory estimate then uses it. `advice` replaces the
+ * default "what to try" sentence of GifTooLarge, for tools that have no Size or Frames setting.
+ */
+export function checkGif(bytes: Uint8Array, frames: (() => number) | undefined, scale: number, keepEvery: number, out?: { width: number; height: number }, advice?: string): void {
   if (String.fromCharCode(...bytes.subarray(0, 3)) !== 'GIF') throw new NotAGif(sniff(bytes));
   const size = gifSize(bytes);
   if (!size) throw new DamagedGif();
   if (!frames) return;
   const k = Math.min(1, Math.max(0.05, scale));
   const kept = Math.ceil(frames() / Math.max(1, Math.round(keepEvery)));
-  if (size.width * k * size.height * k * 4 * kept > MEMORY_BUDGET) throw new GifTooLarge();
+  const pixels = out ? out.width * out.height : size.width * k * size.height * k;
+  if (pixels * 4 * kept > MEMORY_BUDGET) throw new GifTooLarge(advice);
 }
 
 /** The error a failure while compressing should be shown as: out-of-memory kinds become GifTooLarge, anything else is passed on. */
-export function explain(e: unknown): unknown {
+export function explain(e: unknown, advice?: string): unknown {
   if (e instanceof GifError) return e;
   const msg = e instanceof Error ? e.message : '';
-  if (e instanceof RangeError || (e instanceof DOMException && e.name === 'QuotaExceededError') || /memory|array length|allocation/i.test(msg)) return new GifTooLarge();
+  if (e instanceof RangeError || (e instanceof DOMException && e.name === 'QuotaExceededError') || /memory|array length|allocation/i.test(msg)) return new GifTooLarge(advice);
   // getContext() returns nothing when a canvas is bigger than the device allows.
-  if (e instanceof TypeError && /null/.test(msg)) return new GifTooLarge();
+  if (e instanceof TypeError && /null/.test(msg)) return new GifTooLarge(advice);
   if (msg === 'This GIF has no frames.') return new DamagedGif();
   return e;
 }

@@ -217,6 +217,7 @@ test('every shipped pair is one of the tool\'s next steps', () => {
 
 // What each source tool makes, as a file of that kind for the receiving page to open.
 const kindOf = (from: string): { name: string; type: string; bytes: number[] } => {
+  if (/gif/.test(from)) return { name: 'out.gif', type: 'image/gif', bytes: [...readFileSync(fx('generated/anim.gif'))] };
   if (/pdf/.test(from)) return { name: 'out.pdf', type: 'application/pdf', bytes: [...readFileSync(fx('generated/text.pdf'))] };
   if (['audio-converter', 'volume-booster', 'pitch-changer', 'remove-noise', 'remove-silence', 'compress-audio', 'merge-audio', 'vocal-remover'].includes(from))
     return { name: 'out.wav', type: 'audio/wav', bytes: [...readFileSync(fx('generated/tone.wav'))] };

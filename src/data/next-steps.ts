@@ -28,6 +28,8 @@ export const nextSteps: Record<string, [string, string]> = {
   'compress-video': ['video-to-mp3', 'video-to-gif'],
   'video-to-mp4': ['compress-video', 'video-to-gif'],
   'compress-png': ['crop-image', 'favicon-generator'],
+  'resize-gif': ['compress-gif', 'gif-to-mp4'],
+  'crop-gif': ['resize-gif', 'compress-gif'],
   'compress-gif': ['gif-to-mp4', 'crop-image'],
   'trim-video': ['compress-video', 'video-to-gif'],
   'mute-video': ['video-to-mp3', 'compress-video'],

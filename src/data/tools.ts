@@ -253,7 +253,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How do I get a GIF under a size limit?',
-        a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels. Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB.',
+        a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels (to set exact pixel dimensions instead, use [Resize GIF](/tools/resize-gif)). Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB.',
       },
       {
         q: 'Will the animation play at the same speed?',
@@ -922,6 +922,10 @@ export const tools: Tool[] = [
       {
         q: 'Which sizes are built in?',
         a: 'Free, square, 4:5 and 9:16 for Instagram and stories, 16:9 for covers and video thumbnails, 3:2 and 4:3 photo ratios in both orientations, and the 35 by 45 mm passport photo ratio used by most countries. For a US 2 by 2 inch passport photo use square.',
+      },
+      {
+        q: 'Can I crop an animated GIF?',
+        a: 'This page crops one picture. For an animated GIF, use [Crop GIF](/tools/crop-gif), which crops every frame to the same box and keeps the timing.',
       },
       {
         q: 'Is the photo uploaded?',
@@ -2695,6 +2699,100 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'resize-gif',
+    name: 'Resize GIF',
+    title: 'Resize GIF to Exact Pixels or Percent, No Upload | Stayput',
+    description:
+      'Change a GIF’s width and height by percent or exact pixels in your browser. The animation and timing stay. Your GIF is not uploaded; no watermark.',
+    heading: 'Resize a GIF',
+    tagline: 'Set a new width and height for an animated GIF, by percent or in exact pixels. The animation plays as before, and the GIF stays on this device.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to resize',
+    action: 'Resize',
+    sizeFact: 'No watermark. The limit is your device’s memory: a long or very large GIF may need a computer.',
+    keywords: ['resize gif', 'gif resizer', 'resize gif online', 'change gif dimensions', 'resize animated gif', 'make gif bigger'],
+    steps: [
+      'Drop one or more GIFs, or tap to pick them.',
+      'Choose a percentage, or type a width or height in pixels. Proportions are kept unless you switch that off.',
+      'Resize. Each GIF keeps its timing and looping; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Does resizing change how fast the GIF plays?',
+        a: 'No. Every frame keeps its own delay and the loop setting is copied, so a resized GIF lasts as long as the original and repeats the same way. Only the width and height change.',
+      },
+      {
+        q: 'Can I make a GIF bigger?',
+        a: 'Yes, up to 4096 pixels on the longer side, but the picture does not gain detail: a GIF drawn at 200 pixels wide looks soft at 800. The file also gets larger, because it holds more pixels. Making a GIF smaller than the original keeps the picture sharper than enlarging it does.',
+      },
+      {
+        q: 'How do I resize a GIF without stretching it?',
+        a: 'Leave Keep proportions ticked and type only the width or only the height. The other number follows. If you need an exact shape such as 100 by 100 from a wide GIF, untick it and choose Fill and crop to cut the extra from the sides, or Fit inside to leave transparent bars instead of cropping.',
+      },
+      {
+        q: 'Why does the GIF keep its transparent background?',
+        a: 'Transparent pixels stay transparent when frames are rewritten. If you pick Fit inside, the bars added around the picture are transparent too, so a page with a coloured background shows through them.',
+      },
+      {
+        q: 'Can I resize a GIF to a size for Discord or Twitch?',
+        a: 'Type the pixel size the platform asks for, such as 128 by 128. Those platforms also cap the file size in kilobytes, which resizing alone may not meet. The [emote resizer](/tools/emote-resizer) fits both size and limit in one step, and [Compress GIF](/tools/compress-gif) makes a GIF lighter without changing its dimensions.',
+      },
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is read and rewritten by code running in this page, with no server in the process, and the only limit is your device’s memory. The page keeps working offline after one visit.',
+      },
+    ],
+  },
+  {
+    slug: 'crop-gif',
+    name: 'Crop GIF',
+    title: 'Crop GIF Online to Any Box or Square, No Upload | Stayput',
+    description:
+      'Crop an animated GIF to a box you draw, a square or 16:9. Every frame is cropped and the timing stays. Your GIF is not uploaded; no watermark.',
+    heading: 'Crop a GIF',
+    tagline: 'Drag a box over the part of the animation you want to keep. Every frame is cropped to it, and the GIF never leaves this device.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: false,
+    dropLabel: 'Drop a GIF to crop',
+    action: 'Crop',
+    sizeFact: 'No watermark. The limit is your device’s memory: a long or very large GIF may need a computer.',
+    keywords: ['crop gif', 'gif cropper', 'crop gif online', 'crop gif to square', 'crop animated gif', 'cut part of a gif'],
+    steps: [
+      'Drop a GIF, or tap to pick one. The first frame appears with a crop box.',
+      'Drag the box into place and resize it from the corners, or pick a shape such as square, 16:9 or 9:16 and type exact pixels.',
+      'Crop. The cropped GIF keeps its timing and looping and downloads from your browser.',
+    ],
+    faq: [
+      {
+        q: 'Does cropping make the GIF shorter?',
+        a: 'No. Cropping removes parts of the picture, not parts of the time, so every frame is kept and the GIF lasts as long as before. To make a GIF play for less time, cut the video it came from with [Trim video](/tools/trim-video) and make a new GIF with [Video to GIF](/tools/video-to-gif).',
+      },
+      {
+        q: 'How do I crop a GIF to a square?',
+        a: 'Pick Square (1:1) in the Shape list. The box becomes the largest square that fits, centred; drag it to the part you want, or change the Left and Top numbers. The result is as many pixels wide as it is tall, such as 400 by 400.',
+      },
+      {
+        q: 'Does cropping lower the picture quality?',
+        a: 'The pixels inside the box are copied as they are, with no resizing. A GIF is limited to 256 colours per frame and each frame is written again, so keep Keep all colours selected if you want the colours to stay as close as possible to the original.',
+      },
+      {
+        q: 'Can I crop a GIF into a circle?',
+        a: 'Not yet. A GIF has no soft edges: a pixel is either fully shown or fully see-through, so a circle would come out with jagged edges. Crop it to a square here, then use the shape your site or app offers.',
+      },
+      {
+        q: 'Can I crop on an iPhone?',
+        a: 'Yes. Open this page in Safari, pick the GIF from Files, and drag the box with your finger. Drag the corners to resize it, or pick a shape and type exact numbers.',
+      },
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded and cropped by code running in this page, with no server in the process, and the only limit is your device’s memory. The page keeps working offline after one visit.',
+      },
+    ],
+  },
+  {
     slug: 'gif-maker',
     name: 'GIF maker',
     title: 'GIF Maker: Make an Animated GIF from Images, No Upload | Stayput',
@@ -3759,7 +3857,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I resize an animated GIF emote?',
-        a: 'Yes, for Twitch emotes, Discord emoji and Slack emoji. An animated GIF comes out as animated GIFs at each size, with compression stepped up and frames thinned only as far as needed to get under the limit, and Twitch’s 60 frame cap applied. Sub badges and Discord stickers cannot move, so a GIF becomes a still PNG there.',
+        a: 'Yes, for Twitch emotes, Discord emoji and Slack emoji. An animated GIF comes out as animated GIFs at each size, with compression stepped up and frames thinned only as far as needed to get under the limit, and Twitch’s 60 frame cap applied. Sub badges and Discord stickers cannot move, so a GIF becomes a still PNG there. For any other size, [Resize GIF](/tools/resize-gif) sets exact pixels and keeps the animation.',
       },
       {
         q: 'What does trimming the edges do?',

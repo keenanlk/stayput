@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(95);
+  expect(await page.locator('.index .tool-card').count()).toBe(97);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -569,7 +569,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3420,6 +3420,334 @@ test('Compress GIF hands back a GIF that is already tight unchanged', async ({ p
   expect(out.length).toBeLessThanOrEqual(original.length);
   expect(gifCompare(out, fx('anim.gif'), 2)).toMatchObject({ frames: 3, duration: 1000 });
   if (out.length === original.length) await expect(page.locator('#results-list .result-item')).toContainText('original kept');
+});
+
+/**
+ * A small animated GIF with known pixels, made in Node with gifenc: every frame has its own
+ * background colour (so no frame equals the one before), a darker left half, and a square that
+ * moves right. With `clear` the leftmost `clear` columns are fully transparent.
+ */
+async function colourGif(opts: { w: number; h: number; frames: number; delays: number[]; repeat: number; clear?: number; name?: string }): Promise<string> {
+  const mod = await import('gifenc');
+  const { GIFEncoder, quantize, applyPalette } = ((mod as unknown as { default?: typeof mod }).default ?? mod);
+  const { w, h, frames, delays, repeat, clear = 0 } = opts;
+  const gif = GIFEncoder();
+  for (let f = 0; f < frames; f++) {
+    const rgba = new Uint8Array(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const q = (y * w + x) * 4;
+        const left = x < w / 2;
+        let c = [48 + f * 40, left ? 80 : 160, 200 - f * 30];
+        const sx = 4 + f * 3;
+        if (x >= sx && x < sx + 6 && y >= 6 && y < 12) c = [248, 216, 16];
+        rgba.set(x < clear ? [0, 0, 0, 0] : [c[0]!, c[1]!, c[2]!, 255], q);
+      }
+    }
+    if (clear) {
+      const palette = quantize(rgba, 256, { format: 'rgba4444', oneBitAlpha: true });
+      const index = applyPalette(rgba, palette, 'rgba4444');
+      gif.writeFrame(index, w, h, { palette, delay: delays[f % delays.length]!, repeat, transparent: true, transparentIndex: palette.findIndex((c: number[]) => c[3] === 0), dispose: 2 });
+    } else {
+      const palette = quantize(rgba, 256);
+      gif.writeFrame(applyPalette(rgba, palette), w, h, { palette, delay: delays[f % delays.length]!, repeat });
+    }
+  }
+  gif.finish();
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), opts.name ?? 'colours.gif');
+  writeFileSync(file, gif.bytes());
+  return file;
+}
+
+const pil = (script: string, args: string[]) => JSON.parse(execFileSync('python3', ['-c', ['import sys,json', 'from PIL import Image', script].join('\n'), ...args], { encoding: 'utf8' }));
+const saved = (bytes: Uint8Array) => {
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'out.gif');
+  writeFileSync(file, bytes);
+  return file;
+};
+
+/** Frame count, size, loop, per-frame delays and the lowest alpha of each frame, as Pillow reads a GIF. */
+function gifFacts(bytes: Uint8Array): { frames: number; size: number[]; loop: number; delays: number[]; minAlpha: number[] } {
+  return pil(
+    [
+      'a=Image.open(sys.argv[1]);d=[];m=[]',
+      'for i in range(a.n_frames):',
+      '  a.seek(i);d.append(a.info.get("duration",0));m.append(min(a.convert("RGBA").getchannel("A").getdata()))',
+      'print(json.dumps({"frames":a.n_frames,"size":list(a.size),"loop":a.info.get("loop",-1),"delays":d,"minAlpha":m}))',
+    ].join('\n'),
+    [saved(bytes)],
+  );
+}
+
+/** The biggest channel difference between frame k of `out` and the rectangle (x, y, w, h) of frame k of `source`; transparent pixels compare by alpha only. */
+function gifRectDiff(bytes: Uint8Array, source: string, rect: number[], k: number): { diff: number; transparent: number } {
+  return pil(
+    [
+      'a=Image.open(sys.argv[1]);b=Image.open(sys.argv[2]);k=int(sys.argv[3]);x,y,w,h=map(int,sys.argv[4:8])',
+      'a.seek(k);b.seek(k)',
+      'p=a.convert("RGBA");q=b.convert("RGBA").crop((x,y,x+w,y+h))',
+      'assert p.size==q.size,(p.size,q.size)',
+      'd=0;t=0',
+      'for u,v in zip(p.getdata(),q.getdata()):',
+      '  if u[3]==0 and v[3]==0: t+=1;continue',
+      '  d=max(d,max(abs(u[i]-v[i]) for i in range(4)))',
+      'print(json.dumps({"diff":d,"transparent":t}))',
+    ].join('\n'),
+    [saved(bytes), source, String(k), ...rect.map(String)],
+  );
+}
+
+test('Resize GIF sets the size by percent, keeps frames, timing and loop, and paints every pixel when enlarging', async ({ page }) => {
+  const errors = await open(page, 'resize-gif');
+  const src = await colourGif({ w: 60, h: 40, frames: 4, delays: [50, 70, 90, 110], repeat: 3, name: 'party.gif' });
+  const net = watchNetwork(page);
+  // 50% is the default.
+  const half = await run(page, [src]);
+  expect(half.downloads[0]!.suggestedFilename()).toBe('party-30x20.gif');
+  const small = gifFacts(await bytesOf(half.downloads[0]!));
+  expect(small).toMatchObject({ frames: 4, size: [30, 20], loop: 3, delays: [50, 70, 90, 110] });
+  await expect(page.locator('#results-list .result-item')).toContainText('30×20, 4 frames');
+  net.assertNothingLeft(['party.gif']);
+
+  // 200%: enlarged through an exact box, so no row or column is left see-through.
+  await page.reload();
+  const twice = await run(page, [src], async () => {
+    await page.locator('#percent').selectOption('200');
+  });
+  expect(twice.downloads[0]!.suggestedFilename()).toBe('party-120x80.gif');
+  const big = gifFacts(await bytesOf(twice.downloads[0]!));
+  expect(big).toMatchObject({ frames: 4, size: [120, 80], loop: 3, delays: [50, 70, 90, 110] });
+  expect(big.minAlpha).toEqual([255, 255, 255, 255]);
+  expect(errors).toEqual([]);
+});
+
+test('Resize GIF in pixels: proportions follow the other side, odd shapes leave no transparent edge, and fit inside adds bars', async ({ page }) => {
+  await open(page, 'resize-gif');
+  const src = await colourGif({ w: 60, h: 40, frames: 3, delays: [60], repeat: 0, name: 'tile.gif' });
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(src);
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+  await page.locator('input[name="by"][value="pixels"]').evaluate((el) => (el as HTMLInputElement).click());
+  await expect(page.locator('#by-pixels')).toBeVisible();
+  await expect(page.locator('#fit-field')).toBeHidden();
+  // Typing the width fills the height from the GIF's own ratio.
+  await page.locator('#width').fill('90');
+  await expect(page.locator('#height')).toHaveValue('60');
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
+  await page.locator('#run').click();
+  await expect.poll(() => downloads.length, { timeout: 30_000 }).toBe(1);
+  expect(downloads[0]!.suggestedFilename()).toBe('tile-90x60.gif');
+  expect(gifFacts(await bytesOf(downloads[0]!))).toMatchObject({ frames: 3, size: [90, 60], loop: 0, delays: [60, 60, 60] });
+
+  // A shape that is not the GIF's: stretch to fit is the default, and an odd size leaves no unpainted line.
+  await page.locator('#clear').click();
+  await page.locator('#file-input').setInputFiles(src);
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+  await page.locator('#keep').evaluate((el) => (el as HTMLInputElement).click());
+  await expect(page.locator('#fit-field')).toBeVisible();
+  await page.locator('#width').fill('97');
+  await page.locator('#height').fill('64');
+  await page.locator('#run').click();
+  await expect.poll(() => downloads.length, { timeout: 30_000 }).toBe(2);
+  expect(downloads[1]!.suggestedFilename()).toBe('tile-97x64.gif');
+  const odd = gifFacts(await bytesOf(downloads[1]!));
+  expect(odd.size).toEqual([97, 64]);
+  expect(odd.minAlpha).toEqual([255, 255, 255]);
+
+  // Fit inside: the picture is centred and the bars are transparent.
+  await page.locator('#fit').selectOption('contain');
+  await page.locator('#width').fill('100');
+  await page.locator('#height').fill('100');
+  await page.locator('#run').click();
+  await expect.poll(() => downloads.length, { timeout: 30_000 }).toBe(3);
+  expect(downloads[2]!.suggestedFilename()).toBe('tile-100x100.gif');
+  const bars = gifFacts(await bytesOf(downloads[2]!));
+  expect(bars.size).toEqual([100, 100]);
+  expect(Math.min(...bars.minAlpha)).toBe(0);
+});
+
+test('Resize GIF counts memory at the output size, so an enlargement is refused before any work', async ({ page }) => {
+  await open(page, 'resize-gif');
+  // 100 by 100 and 20 frames is tiny as it is, but 4096 by 4096 times 20 frames would need about 1.3 GB.
+  const src = await colourGif({ w: 100, h: 100, frames: 20, delays: [40], repeat: 0, name: 'many.gif' });
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(src);
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+  await page.locator('input[name="by"][value="pixels"]').evaluate((el) => (el as HTMLInputElement).click());
+  await page.locator('#width').fill('4096');
+  await expect(page.locator('#height')).toHaveValue('4096');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText("too large for this device's memory. Try a desktop browser, or choose a smaller size");
+  // The same GIF at 1000 by 1000 is fine.
+  await page.locator('#width').fill('1000');
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect(page.locator('#results-list .result-item')).toContainText('1000×1000, 20 frames');
+});
+
+test('Resize GIF refuses a PNG, and asks for a size in pixels mode', async ({ page }) => {
+  await open(page, 'resize-gif');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'photo.gif', mimeType: 'image/gif', buffer: readFileSync(fx('swatches.png')) });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('This file is not a GIF.');
+  await page.locator('#clear').click();
+  const src = await colourGif({ w: 60, h: 40, frames: 2, delays: [60], repeat: 0 });
+  await page.locator('#file-input').setInputFiles(src);
+  await page.locator('input[name="by"][value="pixels"]').evaluate((el) => (el as HTMLInputElement).click());
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('Type a width or a height in pixels.');
+});
+
+async function setCrop(page: Page, values: Record<string, string>) {
+  for (const [id, v] of Object.entries(values)) {
+    // The stage redraws its fields when the picture first settles; retry if that lands between typing and the change.
+    await expect(async () => {
+      await page.locator(`#${id}`).fill(v);
+      await page.locator(`#${id}`).dispatchEvent('change');
+      await expect(page.locator(`#${id}`)).toHaveValue(v, { timeout: 500 });
+    }).toPass({ timeout: 10_000 });
+  }
+}
+
+test('Crop GIF cuts every frame to the box: pixels match the source, timing and loop stay, the whole picture is refused', async ({ page }) => {
+  const errors = await open(page, 'crop-gif');
+  const src = await colourGif({ w: 80, h: 50, frames: 4, delays: [50, 70, 90, 110], repeat: 3, name: 'pan.gif' });
+  const net = watchNetwork(page);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(src);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '0,0,80,50');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('The crop box covers the whole picture. Drag its edges or pick a shape first.');
+  await setCrop(page, { 'crop-x': '12', 'crop-y': '7', 'crop-w': '33', 'crop-h': '21' });
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '12,7,33,21');
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
+  await page.locator('#run').click();
+  await expect.poll(() => downloads.length, { timeout: 30_000 }).toBe(1);
+  expect(downloads[0]!.suggestedFilename()).toBe('pan-cropped.gif');
+  const out = await bytesOf(downloads[0]!);
+  expect(gifFacts(out)).toMatchObject({ frames: 4, size: [33, 21], loop: 3, delays: [50, 70, 90, 110], minAlpha: [255, 255, 255, 255] });
+  // Same pixels as the source's rectangle, first and last frame.
+  for (const k of [0, 3]) expect(gifRectDiff(out, src, [12, 7, 33, 21], k), `frame ${k}`).toMatchObject({ diff: 0, transparent: 0 });
+  await expect(page.locator('#results-list .result-item')).toContainText('33×21, 4 frames');
+  net.assertNothingLeft(['pan.gif']);
+  expect(errors.filter((e) => !e.includes('covers the whole picture'))).toEqual([]);
+});
+
+test('Crop GIF keeps transparency, and Square picks the largest centred square', async ({ page }) => {
+  await open(page, 'crop-gif');
+  const src = await colourGif({ w: 80, h: 50, frames: 3, delays: [80], repeat: 0, clear: 20, name: 'cut.gif' });
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(src);
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  await page.locator('#aspect').selectOption('1:1');
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '15,0,50,50');
+  // A box over the transparent left edge and some picture beside it.
+  await page.locator('#aspect').selectOption('free');
+  await setCrop(page, { 'crop-x': '10', 'crop-y': '10', 'crop-w': '30', 'crop-h': '30' });
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
+  await page.locator('#run').click();
+  await expect.poll(() => downloads.length, { timeout: 30_000 }).toBe(1);
+  const out = await bytesOf(downloads[0]!);
+  const facts = gifFacts(out);
+  expect(facts).toMatchObject({ frames: 3, size: [30, 30], loop: 0 });
+  expect(facts.minAlpha).toEqual([0, 0, 0]);
+  for (const k of [0, 2]) {
+    const d = gifRectDiff(out, src, [10, 10, 30, 30], k);
+    expect(d.diff, `frame ${k}`).toBe(0);
+    // Columns 10 to 19 of the source are transparent: 10 of the 30 columns.
+    expect(d.transparent, `frame ${k}`).toBe(10 * 30);
+  }
+});
+
+test('Crop GIF measures the box in the GIF’s own screen when its first frame is a smaller patch', async ({ page }) => {
+  await open(page, 'crop-gif');
+  // Logical screen 90 x 60, but the only frame is a 40 x 30 red patch at (20, 10).
+  const u16 = (n: number) => [n & 255, n >> 8];
+  // LZW with 3-bit codes: a clear code every two pixels keeps the code size from growing.
+  const codes: number[] = [];
+  for (let i = 0; i < 40 * 30; i++) {
+    if (i % 2 === 0) codes.push(4);
+    codes.push(1);
+  }
+  codes.push(5);
+  let bits = 0;
+  let nbits = 0;
+  const data: number[] = [];
+  for (const c of codes) {
+    bits |= c << nbits;
+    nbits += 3;
+    while (nbits >= 8) {
+      data.push(bits & 255);
+      bits >>= 8;
+      nbits -= 8;
+    }
+  }
+  if (nbits) data.push(bits & 255);
+  const chunks: number[] = [];
+  for (let i = 0; i < data.length; i += 255) chunks.push(Math.min(255, data.length - i), ...data.slice(i, i + 255));
+  const patch = Buffer.from([
+    ...Buffer.from('GIF89a'), ...u16(90), ...u16(60), 0x80 | 1, 0, 0, // a global table of 4 colours
+    0, 0, 0, 255, 0, 0, 0, 0, 255, 255, 255, 255,
+    0x2c, ...u16(20), ...u16(10), ...u16(40), ...u16(30), 0, 2, ...chunks, 0, 0x3b,
+  ]);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'patch.gif', mimeType: 'image/gif', buffer: patch });
+  await expect(page.locator('#crop-panel')).toBeVisible();
+  await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '0,0,90,60');
+  await setCrop(page, { 'crop-x': '20', 'crop-y': '10', 'crop-w': '40', 'crop-h': '30' });
+  const [download] = await Promise.all([page.waitForEvent('download', { timeout: 30_000 }), page.locator('#run').click()]);
+  const out = await bytesOf(download);
+  expect(gifFacts(out)).toMatchObject({ frames: 1, size: [40, 30], minAlpha: [255] });
+  const red = pil('a=Image.open(sys.argv[1]).convert("RGB");print(json.dumps(sorted(set(a.getdata()))))', [saved(out)]);
+  expect(red).toEqual([[255, 0, 0]]);
+});
+
+test.describe('Crop GIF with a finger', () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+
+  test('dragging the box and a corner works with touch on a coarse-pointer phone', async ({ page }) => {
+    await open(page, 'crop-gif');
+    expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true);
+    const src = await colourGif({ w: 300, h: 200, frames: 2, delays: [80], repeat: 0, name: 'phone.gif' });
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await page.locator('#file-input').setInputFiles(src);
+    await expect(page.locator('#crop-panel')).toBeVisible();
+    await page.locator('#aspect').selectOption('1:1');
+    await expect(page.locator('#crop-panel')).toHaveAttribute('data-rect', '50,0,200,200');
+    const cdp = await page.context().newCDPSession(page);
+    const touch = async (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) =>
+      cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] });
+    const drag = async (from: { x: number; y: number }, by: { x: number; y: number }) => {
+      await touch('touchStart', from.x, from.y);
+      for (let i = 1; i <= 5; i++) await touch('touchMove', from.x + (by.x * i) / 5, from.y + (by.y * i) / 5);
+      await touch('touchEnd', 0, 0);
+    };
+    const rectOf = async () => ((await page.locator('#crop-panel').getAttribute('data-rect')) ?? '').split(',').map(Number);
+    // Centre the box in the viewport: the pinned Run bar would otherwise sit over the lower handles.
+    await page.locator('#crop-box').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const box = (await page.locator('#crop-box').boundingBox())!;
+    const canvas = (await page.locator('#crop-canvas').boundingBox())!;
+    const k = canvas.width / 300;
+    // Move: drag the middle of the box left by 30 screen px.
+    const before = await rectOf();
+    await drag({ x: box.x + box.width / 2, y: box.y + box.height / 2 }, { x: -30, y: 0 });
+    const moved = await rectOf();
+    expect(moved[0]).toBe(Math.max(0, Math.round(before[0]! - 30 / k)));
+    expect(moved[2]).toBe(before[2]);
+    // Resize: drag the bottom right corner handle up and left; the square shape keeps width equal to height.
+    await page.locator('#crop-box').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const handle = (await page.locator('.crop-handle-se').boundingBox())!;
+    await drag({ x: handle.x + handle.width / 2, y: handle.y + handle.height / 2 }, { x: -40, y: -40 });
+    const resized = await rectOf();
+    expect(resized[2]).toBeLessThan(moved[2]!);
+    expect(resized[2]).toBe(resized[3]);
+    await page.screenshot({ path: join(tmpdir(), 'crop-gif-touch.png') });
+  });
 });
 
 test('Crop video cuts the picture to the box, snaps to 9:16 on the TikTok page, and no bytes leave the tab', async ({ page }) => {
