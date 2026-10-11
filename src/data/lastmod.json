@@ -179,6 +179,10 @@
   "date": "2026-10-06",
   "hash": "c5448503f62b58fb"
  },
+ "/compress-pdf-to-5mb": {
+  "date": "2026-10-11",
+  "hash": "8a1b4c799031aeec"
+ },
  "/compress-video-for-discord": {
   "date": "2026-10-11",
   "hash": "0dcadead152e223d"
@@ -186,6 +190,10 @@
  "/compress-video-for-email": {
   "date": "2026-10-06",
   "hash": "1ba76663a2ed85ab"
+ },
+ "/compress-video-for-whatsapp": {
+  "date": "2026-10-11",
+  "hash": "360e24a11392b5d5"
  },
  "/compress-wav": {
   "date": "2026-10-06",
@@ -196,8 +204,8 @@
   "hash": "23224e1de0ab6a74"
  },
  "/conversions": {
-  "date": "2026-10-09",
-  "hash": "75e6d227216ca8c2"
+  "date": "2026-10-11",
+  "hash": "b2d10709da742fc8"
  },
  "/crop-image-to-circle": {
   "date": "2026-10-06",
@@ -234,6 +242,10 @@
  "/ean-13-barcode-generator": {
   "date": "2026-10-11",
   "hash": "e22858e884261e2f"
+ },
+ "/email-qr-code": {
+  "date": "2026-10-11",
+  "hash": "6e8e52f4771fac8e"
  },
  "/enlarge-image": {
   "date": "2026-10-06",
@@ -743,6 +755,10 @@
   "date": "2026-10-06",
   "hash": "210fa2249cb62246"
  },
+ "/heif-to-jpg": {
+  "date": "2026-10-11",
+  "hash": "0d58cffe4baeec06"
+ },
  "/hex-color-from-image": {
   "date": "2026-10-06",
   "hash": "c34028c1ff3e95aa"
@@ -859,6 +875,10 @@
   "date": "2026-10-06",
   "hash": "a15842fc3cc9dce7"
  },
+ "/m4v-to-mp4": {
+  "date": "2026-10-11",
+  "hash": "066dc465fb7d4102"
+ },
  "/magic-eraser": {
   "date": "2026-10-06",
   "hash": "16e738061e9f8087"
@@ -910,6 +930,10 @@
  "/mp3-cutter": {
   "date": "2026-10-06",
   "hash": "ec722d22a62683fa"
+ },
+ "/mp3-to-flac": {
+  "date": "2026-10-11",
+  "hash": "d627e0d3471eee8e"
  },
  "/mp3-to-m4a": {
   "date": "2026-10-06",
@@ -990,6 +1014,10 @@
  "/pdf-to-tiff": {
   "date": "2026-10-06",
   "hash": "086d70caa2866c7c"
+ },
+ "/phone-number-qr-code": {
+  "date": "2026-10-11",
+  "hash": "a9f44ef00e6ab9a0"
  },
  "/photo-to-pencil-sketch": {
   "date": "2026-10-06",
@@ -1158,6 +1186,10 @@
  "/sharpen-image": {
   "date": "2026-10-06",
   "hash": "d0b67f12580b8eb4"
+ },
+ "/slack-emoji-resizer": {
+  "date": "2026-10-11",
+  "hash": "bce9b825995c1f56"
  },
  "/slow-down-audio": {
   "date": "2026-10-06",

@@ -18,7 +18,7 @@ const PLATFORMS: Record<string, Platform> = {
   'twitch-badge': { sizes: [72, 36, 18], limit: 25_000, label: 'Twitch', limitLabel: '25 KB' },
   'discord-emoji': { sizes: [128], limit: 256_000, label: 'Discord', limitLabel: '256 KB', animated: { maxFrames: Infinity } },
   'discord-sticker': { sizes: [320], limit: 512_000, label: 'Discord', limitLabel: '512 KB' },
-  'slack-emoji': { sizes: [128], limit: 128_000, label: 'Slack', limitLabel: '128 KB', animated: { maxFrames: Infinity } },
+  'slack-emoji': { sizes: [128], limit: 128_000, label: 'Slack', limitLabel: '128 KB', animated: { maxFrames: 50 } },
 };
 
 /** Sizes at or below this get a light unsharp mask, since downscaling softens fine lines most there. */
