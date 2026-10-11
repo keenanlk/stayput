@@ -20,6 +20,8 @@
  * which asks for a file as it always has. Nothing here ever shows an error.
  */
 
+import { retainOutput } from './opfs-output';
+
 const DB_NAME = 'stayput-handoff';
 const STORE = 'files';
 const NOTE_KEY = 'stayput:handoff';
@@ -176,6 +178,8 @@ export async function saveHandoff(file: { name: string; blob: Blob }, to: string
         db.close();
       }
     })();
+    // A video written to a temporary file on this device must stay until the copy above has been read from it.
+    retainOutput(file.blob, saved);
     const ok = await Promise.race([saved, new Promise<false>((r) => (timer = setTimeout(() => r(false), SAVE_WAIT_MS)))]);
     if (!ok) {
       // A slow save may still land; the timestamp lets the next page load's sweep remove it.
