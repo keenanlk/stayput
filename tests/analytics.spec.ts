@@ -128,6 +128,30 @@ test('the referring site is reduced to a known name', async ({ page }) => {
   void page;
 });
 
+test('gemini, copilot and utm_source fallback resolve to known names only', async ({ page }) => {
+  const { sourceOf, visitSource } = await import('../src/lib/journey.ts');
+  const own = 'stayput.dev';
+  expect(sourceOf('https://gemini.google.com/app', own)).toBe('gemini');
+  expect(sourceOf('https://bard.google.com/', own)).toBe('gemini');
+  expect(sourceOf('https://copilot.microsoft.com/chats/1', own)).toBe('copilot');
+  expect(sourceOf('https://www.google.com/', own)).toBe('google');
+  expect(sourceOf('https://www.bing.com/', own)).toBe('bing');
+  for (const h of ['hachyderm.io', 'mas.to', 'infosec.exchange', 'mstdn.social', 'mastodon.world', 'techhub.social'])
+    expect(visitSource(`https://${h}/`, own, ''), h).toBe('mastodon');
+  expect(visitSource('', own, '?utm_source=chatgpt.com')).toBe('chatgpt');
+  expect(visitSource('', own, '?utm_source=perplexity.ai')).toBe('perplexity');
+  expect(visitSource('', own, '?utm_source=claude.ai')).toBe('claude');
+  expect(visitSource('', own, '?utm_source=gemini.google.com')).toBe('gemini');
+  expect(visitSource('', own, '?a=1&utm_source=ChatGPT.com&utm_medium=x')).toBe('chatgpt');
+  // A real referrer wins over utm, even an unknown one.
+  expect(visitSource('https://www.google.com/', own, '?utm_source=chatgpt.com')).toBe('google');
+  expect(visitSource('https://someones-blog.example/', own, '?utm_source=chatgpt.com')).toBe('other');
+  // Unknown, malformed or absent utm values stay direct and are never passed through.
+  for (const q of ['', '?utm_source=newsletter', '?utm_source=', '?utm_source=evil.example', '?utm_source=stayput.dev', '?utm_source=http://', '?utm_source=a b', '?ref=chatgpt.com', '?utm_source=chatgpt.com.evil.example'])
+    expect(visitSource('', own, q), q).toBe('direct');
+  void page;
+});
+
 /** Pin the experiment arm by fixing Math.random for the page (arm "on" below 0.5). */
 async function arm(page: Page, value: 'on' | 'off') {
   await page.addInitScript((r) => {
