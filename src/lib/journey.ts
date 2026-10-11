@@ -51,6 +51,9 @@ export interface Journey {
 }
 
 const SOURCES: [RegExp, string][] = [
+  // Gemini and Copilot first: gemini.google.com would otherwise match the generic google rule.
+  [/^gemini\.google\.com$|^bard\.google\.com$/, 'gemini'],
+  [/^copilot\.microsoft\.com$/, 'copilot'],
   [/(^|\.)google\./, 'google'],
   [/(^|\.)bing\.com$/, 'bing'],
   [/(^|\.)duckduckgo\.com$/, 'duckduckgo'],
@@ -104,6 +107,25 @@ export function sourceOf(referrer: string, ownHost: string): string {
   if (host === ownHost) return 'internal';
   for (const [re, name] of SOURCES) if (re.test(host)) return name;
   return 'other';
+}
+
+/**
+ * The source of a visit's first page. A real referrer always decides. Only
+ * when the browser sent none is the landing link's utm_source tag read, and
+ * only to be matched against the same known-site list: the tag's text is
+ * never kept or sent, and a value that names nothing known stays "direct".
+ */
+export function visitSource(referrer: string, ownHost: string, search: string): string {
+  if (referrer) return sourceOf(referrer, ownHost);
+  let tag: string | null;
+  try {
+    tag = new URLSearchParams(search).get('utm_source');
+  } catch {
+    return 'direct';
+  }
+  if (!tag || tag.length > 100) return 'direct';
+  const named = sourceOf(`https://${tag.trim().toLowerCase()}/`, ownHost);
+  return named === 'other' || named === 'internal' ? 'direct' : named;
 }
 
 /** Whole days between two local YYYY-MM-DD dates. */
@@ -172,7 +194,7 @@ export function journey(): Journey {
   const isNewVisit = !tab;
   // The visit bucket is fixed when the visit starts, so every event in it agrees.
   const visit = isNewVisit ? gapBucket(saved.lastVisit, today) : (read<{ visit: string }>(session, TAB_KEY + ':visit')?.visit ?? 'new');
-  const state: TabState = tab ?? { landing: path, ref: sourceOf(document.referrer, location.hostname), page: path, runs: 0 };
+  const state: TabState = tab ?? { landing: path, ref: visitSource(document.referrer, location.hostname, location.search), page: path, runs: 0 };
   const from = isNewVisit ? '(none)' : state.page;
   state.page = path;
   state.ns ??= Math.random() < 0.5 ? 'on' : 'off';
