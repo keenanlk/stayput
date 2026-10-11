@@ -35,6 +35,9 @@ export interface Preset {
 
 const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. After one visit you can turn off Wi-Fi and it still works.' };
 
+/** FAQ entry on the pages whose lead says no account and no watermark; no tool behind them draws a mark on its output. */
+const noAccount = { q: 'Do I need an account, and is there a watermark?', a: 'No account and no sign-up: open the page and drop a file. Nothing is added to your file, so there is no watermark or logo. It is free, and your files are not uploaded.' };
+
 export const presets: Preset[] = [
   {
     slug: 'compress-pdf-to-100kb',
@@ -241,7 +244,7 @@ export const presets: Preset[] = [
     ],
     steps: [
       'Drop HEIC or HEIF photos from an iPhone or iPad, or tap to pick them.',
-      'Choose the page size, orientation and margin. Reorder pages with the arrows.',
+      'Choose the page size, orientation and margin. Reorder the photos with the arrows.',
       'Convert. The PDF downloads from your browser with nothing sent anywhere.',
     ],
     faq: [
@@ -2235,7 +2238,7 @@ export const presets: Preset[] = [
     base: 'image-to-pdf',
     name: 'Screenshot to PDF',
     title: 'Screenshot to PDF: Combine Screenshots, No Upload | Stayput',
-    description: 'Turn screenshots into one PDF in your browser, text kept pixel-sharp. For receipts, chats, bookings and evidence. Reorder pages, nothing uploaded.',
+    description: 'Turn screenshots into one PDF in your browser, text kept pixel-sharp. For receipts, chats, bookings and evidence. Reorder the images, nothing uploaded.',
     heading: 'Convert screenshots to PDF',
     tagline: 'Combine phone or desktop screenshots into a single, sharp PDF, in the order you choose, without uploading them.',
     keywords: ['screenshot to pdf', 'convert screenshot to pdf', 'screenshots to pdf', 'combine screenshots into pdf', 'png screenshot to pdf', 'iphone screenshot to pdf'],
@@ -2322,11 +2325,13 @@ export const presets: Preset[] = [
     slug: 'compress-video-for-discord',
     base: 'compress-video',
     name: 'Compress video for Discord',
-    title: 'Compress Video for Discord (Under 10 MB), No Upload | Stayput',
-    description: 'Get any video under Discord’s 10 MB limit in your browser. Works out the bitrate from the length, lowers the resolution if needed. Free, no upload.',
+    title: 'Compress Video for Discord: 8, 10, 25 or 50 MB, No Upload | Stayput',
+    description: 'Fit a video under Discord’s 10 MB limit, or 8, 25 or 50 MB, in your browser. Works out the bitrate from the length. Free, no account, no upload, no watermark.',
+    lead:
+      'Fits a video under Discord’s 10 MB limit, or 8, 25 or 50 MB, by working out the bitrate from its length and lowering the resolution if needed, and saves an MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: it is re-encoded in your browser on your device. The only size limit is your device’s memory, and after one visit the page works offline.',
     heading: 'Compress a video for Discord',
     tagline: 'Fit a clip under Discord’s 10 MB upload limit for free accounts, without uploading it anywhere first.',
-    keywords: ['compress video for discord', 'discord video compressor', 'video compressor for discord', 'compress video to 10mb', 'discord 10mb video', 'make video smaller for discord'],
+    keywords: ['compress video for discord', 'discord video compressor', 'video compressor for discord', 'compress video to 10mb', 'discord 10mb video', 'make video smaller for discord', 'compress video to 8mb', 'compress video to 25mb', 'compress video to 50mb'],
     dropLabel: 'Drop a video to fit under 10 MB',
     defaults: { mode: 'size', size: '10' },
     intro: [
@@ -2343,6 +2348,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'What is the Discord upload limit?', a: 'Free accounts can upload files up to 10 MB. Nitro Basic raises it to 50 MB and Nitro to 500 MB. Pick the matching size here.' },
+      noAccount,
       { q: 'Why does my long video come out blurry?', a: 'A fixed size has to be shared across every second of video, so a longer clip gets fewer bits per second. The page lowers the resolution to keep it watchable, but the best fix is to trim the video to the part you want to share.' },
       { q: 'How long a video can I fit in 10 MB?', a: 'About six minutes at the very most, and only at a small size. Below roughly 120 kilobits a second the picture is no longer watchable, so the page stops and tells you how many minutes to trim to. For a clip people will enjoy watching in Discord, aim for under a minute, or choose 50 MB if you have Nitro Basic.' },
       { q: 'Does 10 MB here mean the same as Discord\'s 10 MB?', a: 'The page counts a megabyte as 1,000,000 bytes and aims about ten percent below the target, so a 10 MB result is at most 10,000,000 bytes. That is under Discord\'s limit even if Discord counts megabytes the larger binary way, as 1,048,576 bytes, so the upload goes through.' },
@@ -4438,7 +4444,7 @@ export const presets: Preset[] = [
   {
     slug: 'video-to-subtitles',
     lead:
-      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (76 MB), and after that it works offline.',
+      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, needs no account and adds no watermark, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (76 MB), and after that it works offline.',
     base: 'transcribe',
     name: 'Video to subtitles',
     title: 'Subtitle Generator: Auto SRT Subtitles from Video, Free, No Upload | Stayput',
@@ -4467,6 +4473,7 @@ export const presets: Preset[] = [
       { q: 'Can I get plain text instead of subtitles?', a: 'Yes. Choose Text (.txt) here, or use [Video to text](/video-to-text), which is set up for a recorded lecture or meeting and gives paragraphs rather than timed captions. The general [transcribe](/tools/transcribe) tool offers all three formats.' },
       { q: 'Can I burn the subtitles into the picture or add them to a video?', a: 'Yes, with [Add subtitles to video](/tools/add-subtitles-to-video), which writes the words from the speech and draws them into every frame, or with [Burn subtitles into video](/burn-subtitles-into-video) if you already have the SRT. Both save a new video.' },
       { q: 'Is my video uploaded?', a: 'No. Only its soundtrack is read, in this tab, and the speech model runs on your device. Unreleased footage and private recordings stay with you.' },
+      noAccount,
     ],
   },
   {
@@ -4567,7 +4574,7 @@ export const presets: Preset[] = [
   {
     slug: 'auto-caption-video',
     lead:
-      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB), and after that it works offline; the longest video you can caption depends on your device’s memory.',
+      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB), and after that it works offline; the longest video you can caption depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     sizeFact: 'No watermark. On a phone, up to about 200 MB (2 minutes of iPhone video)',
     name: 'Auto caption video',
@@ -4596,12 +4603,13 @@ export const presets: Preset[] = [
       { q: 'Can it caption a video in another language?', a: 'Yes. The language is detected from the first seconds, or you can choose it. Tick Translate the speech to English for English captions on a video in another language.' },
       { q: 'Can I get a separate subtitle file instead?', a: 'Yes. [Video to subtitles](/video-to-subtitles) is a subtitle generator that makes an SRT or WebVTT file from the speech, without touching the video.' },
       { q: 'Is my video uploaded?', a: 'No. The speech is transcribed and the frames are redrawn in this tab. Unposted clips, family videos and client footage stay on your device.' },
+      noAccount,
     ],
   },
   {
     slug: 'burn-subtitles-into-video',
     lead:
-      'Burns an SRT or VTT subtitle file permanently into an MP4, MOV or WebM video, in the look, size and place you pick, and saves a new MP4. It is free, and your files are not uploaded: the video is re-encoded in your browser, and your own subtitle file needs no model. If you drop only the video, a speech model (76 MB) downloads once to write the subtitles, and the longest video you can burn depends on your device’s memory.',
+      'Burns an SRT or VTT subtitle file permanently into an MP4, MOV or WebM video, in the look, size and place you pick, and saves a new MP4. It is free, needs no account and adds no watermark, and your files are not uploaded: the video is re-encoded in your browser, and your own subtitle file needs no model. If you drop only the video, a speech model (76 MB) downloads once to write the subtitles, and the longest video you can burn depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     name: 'Burn subtitles into video',
     title: 'Burn SRT Subtitles into Video (Hardcode), Free, No Upload | Stayput',
@@ -4629,6 +4637,7 @@ export const presets: Preset[] = [
       { q: 'Which subtitle formats work?', a: 'SRT and WebVTT (.vtt). ASS and SSA files with positioned or animated styles are not read; convert them to SRT in a subtitle editor first.' },
       { q: 'How do I make the SRT file in the first place?', a: 'Use [Video to subtitles](/video-to-subtitles): it writes an SRT from the speech in the video, which you can correct and then burn in here.' },
       { q: 'Is my video uploaded?', a: 'No. The subtitle file is read and the video re-encoded by your browser, on your device. Neither file leaves it.' },
+      noAccount,
     ],
   },
   {
