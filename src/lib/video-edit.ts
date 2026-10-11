@@ -75,13 +75,13 @@ const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 
 /**
  * Size of the picture as it is shown, rotation applied. A file whose pixels are almost square
- * (an editor's scale step leaves a pixel aspect ratio such as 3075:3076) would otherwise show as
- * 1080x1921 and be written as 1080x1922, a size some encoders refuse or stall on; it is taken at
- * its coded size instead. Real non-square pixels (anamorphic, 4:3 and the like) are kept.
+ * (an editor's scale step leaves a pixel aspect ratio such as 3075:3076 or 99:100) would otherwise
+ * show as 1080x1921 and be written as 1080x1922, a size some encoders refuse or stall on; it is
+ * taken at its coded size instead. Real non-square pixels (anamorphic, 4:3 and the like) are kept.
  */
 export function shownSize(video: InputVideoTrack): { width: number; height: number } {
   const { num, den } = video.pixelAspectRatio;
-  if (num > 0 && den > 0 && Math.abs(num / den - 1) < 0.005) {
+  if (num > 0 && den > 0 && Math.abs(num / den - 1) < 0.015) {
     const turned = video.rotation % 180 !== 0;
     return turned ? { width: video.codedHeight, height: video.codedWidth } : { width: video.codedWidth, height: video.codedHeight };
   }

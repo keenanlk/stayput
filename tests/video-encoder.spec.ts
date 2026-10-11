@@ -12,9 +12,9 @@ const toneClip = fileURLToPath(new URL('./fixtures/static/tone-16k-mono.mp4', im
 const phoneMov = fileURLToPath(new URL('./fixtures/static/iphone-portrait.mov', import.meta.url));
 const phoneHevc = fileURLToPath(new URL('./fixtures/static/iphone-hevc.mov', import.meta.url));
 
-// 2 s of 1080x1920 H.264 whose pixel aspect ratio is 3075:3076, what an editor's scale step can leave: shown naively it is
-// 1080x1921, which would be written as 1080x1922 and which some encoders (the iOS Simulator's, at least) stall on.
-const nearSquare = fileURLToPath(new URL('./fixtures/static/pixel-aspect-3075-3076.mp4', import.meta.url));
+// 2 s of 640x360 H.264 whose pixel aspect ratio is 99:100, a hair off square as an editor's scale step can leave it: shown naively
+// it is 640x364. (At 1080x1920 the same thing makes 1080x1922, which the iOS Simulator's encoder stalls on.)
+const nearSquare = fileURLToPath(new URL('./fixtures/static/pixel-aspect-99-100.mp4', import.meta.url));
 
 async function open(page: Page, path: string) {
   await page.goto(path);
@@ -107,9 +107,9 @@ test('A video with almost square pixels is written at its coded size, not one pi
   await open(page, '/tools/rotate-video');
   await page.locator('#file-input').setInputFiles([nearSquare]);
   const bytes = await runOnce(page);
-  // Turned a quarter: 1080x1920 becomes 1920x1080 (it was 1922x1080 before the size was taken from the coded one).
+  // Turned a quarter: 640x360 becomes 360x640 (it was 364x640 before the size was taken from the coded one).
   const probe = await expectPlayableMp4(page, bytes);
-  expect([probe.width, probe.height]).toEqual([1920, 1080]);
+  expect([probe.width, probe.height]).toEqual([360, 640]);
 });
 
 test('Resize video turns an iPhone-style portrait .mov into a playable mp4 at the new size, with its sound', async ({ page, browserName }) => {
