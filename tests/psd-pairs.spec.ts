@@ -146,3 +146,9 @@ test('A file that is not a readable PSD says what to do, and a PSB is declined',
   await convert(page, 'psd-to-png', { name: 'big.psd', mimeType: 'image/vnd.adobe.photoshop', buffer: psb });
   await expect(page.locator('#results-list, #error').first()).toContainText(/PSB/, { timeout: 30_000 });
 });
+
+test('A CMYK PSD is declined with a message that says to save it as RGB', async ({ page }) => {
+  const downloads = await convert(page, 'psd-to-jpg', fx('cmyk.psd'));
+  await expect(page.locator('#results-list, #error').first()).toContainText(/CMYK, Lab or another colour mode this page cannot read.*Image → Mode → RGB Color/s, { timeout: 30_000 });
+  expect(downloads.length).toBe(0);
+});
