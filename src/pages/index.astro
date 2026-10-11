@@ -62,7 +62,7 @@ const jsonLd = [
       <div>
         <h1>Your files stay put.</h1>
         <p class="lede">
-          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is watermarked, and the only size limit is your device’s memory. It even works with the Wi-Fi off after your first visit.
+          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is watermarked, and the only size limit is your device’s memory. Once a page has loaded, most tools keep working with the Wi-Fi off; the ones that download a model or engine need one online run first.
         </p>
         <p class="start-label" id="start-h">What do you want to do? Pick one, then drop your file.</p>
         <ul class="start-tiles" aria-labelledby="start-h">
@@ -75,15 +75,15 @@ const jsonLd = [
           <div class="tabs"><span>Elements</span><span>Console</span><span class="on">Network</span><span>Application</span></div>
           <div class="rows">
             <div class="row head"><span>Name</span><span>Status</span><span>Size</span></div>
-            <div class="row"><span>heic-to-jpg</span><span class="ok">200</span><span>9.1 kB</span></div>
-            <div class="row"><span>heic-to-jpg.a8f3.js</span><span class="ok">200</span><span>31 kB</span></div>
-            <div class="row"><span>heic-to.min.js (decoder)</span><span class="ok">200</span><span>1.6 MB</span></div>
+            <div class="row"><span>heic-to-jpg</span><span class="ok">200</span><span>16.5 kB</span></div>
+            <div class="row"><span>heic-to-jpg.a8f3.js</span><span class="ok">200</span><span>0.96 kB</span></div>
+            <div class="row"><span>heic-to.min.js (decoder)</span><span class="ok">200</span><span>739 kB</span></div>
             <div class="drop">IMG_4021.HEIC, IMG_4022.HEIC, IMG_4023.HEIC added</div>
-            <div class="row"><span>api/st ×4 (usage count)</span><span class="ok">200</span><span>1.9 kB</span></div>
+            <div class="row"><span>stats.keenankaufman.com ×4 (usage count)</span><span class="ok">200</span><span>1.9 kB</span></div>
             <div class="empty"><b>No</b> request carried your photos.</div>
           </div>
         </div>
-        <figcaption>What your browser's Network tab shows while three iPhone photos convert: the page and its code load, then a few small anonymous usage-count requests. No request carries your photos. Press F12 and try it.</figcaption>
+        <figcaption>A simplified view of your browser's Network tab while three iPhone photos convert: the site's page and code load, the HEIC decoder loads once, then a few small anonymous usage-count requests go to our stats server. No request carries your photos. Press F12 and try it.</figcaption>
       </figure>
     </div>
   </section>
@@ -137,7 +137,7 @@ const jsonLd = [
       <div><dt>Uploads</dt><dd><b>None.</b> The site is static files; every conversion runs in your tab.</dd></div>
       <div><dt>Limits</dt><dd><b>No daily limit.</b> No "two tasks per hour" and no server-side size tier. Batch a hundred photos if your device can hold them.</dd></div>
       <div><dt>Account</dt><dd><b>None.</b> No sign-up wall, no watermark.</dd></div>
-      <div><dt>Offline</dt><dd><b>Yes, after your first visit.</b> Open a tool once and it is cached. Install it as an app from your browser menu to keep it a tap away.</dd></div>
+      <div><dt>Offline</dt><dd><b>Yes, once the page has loaded.</b> Tools that download a model or engine (video to MP3, background remover, captions, PDF unlock) need one online run first. Install it as an app from your browser menu to keep it a tap away.</dd></div>
       <div><dt>Tracking</dt><dd>An anonymous, cookie-free page count. Never file names or contents.</dd></div>
       <div><dt>Source</dt><dd>MIT licensed and <a href="https://github.com/keenanlk/stayput" rel="noopener">on GitHub</a>. Read the code, report a bug, or host your own copy.</dd></div>
     </dl>

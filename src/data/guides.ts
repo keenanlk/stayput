@@ -83,7 +83,7 @@ export const guides: Guide[] = [
       { q: 'Are big-name PDF sites safe?', a: 'They are professionally run and encrypt the transfer, which protects you from eavesdropping, not from the file being on their server. Read the retention section of the privacy policy and decide per document.' },
       { q: 'Does HTTPS mean my PDF is private?', a: 'HTTPS protects the file in transit between you and the server. Once it arrives it is stored and processed in the clear. It says nothing about what happens next.' },
       { q: 'Is a browser-only tool really safer?', a: 'The file never leaves your device, so there is nothing to retain, breach or subpoena. You can verify that in the network tab rather than trusting a policy.' },
-      { q: 'Can I merge PDFs offline on my phone?', a: 'Yes. Open the merge tool once, and it is cached; after that first visit it works in airplane mode and can be installed as an app from the browser menu.' },
+      { q: 'Can I merge PDFs offline on my phone?', a: 'Yes. Open the merge tool and give the page a few seconds to save itself; once it has loaded it works in airplane mode (a password-protected PDF needs its unlock engine downloaded online once) and it can be installed as an app from the browser menu.' },
     ],
   },
   {
@@ -490,7 +490,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Is a drawn or typed signature legally valid?', a: 'In the United States (ESIGN Act), the United Kingdom, the European Union (eIDAS "simple electronic signature") and most other jurisdictions, a signature you intend as your signature is valid for ordinary contracts. Certain documents, such as wills and some property deeds, have stricter rules.' },
       { q: 'Can the recipient remove the signature?', a: 'It is drawn into the page content like any other graphic. Editing it out is as hard, or as easy, as editing any part of a PDF, which is the same as for a scanned signature.' },
-      { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline after your first visit.' },
+      { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline once the page has loaded.' },
       { q: 'Is my document uploaded when I sign it here?', a: 'No. The signature is placed by code running in your browser; you can verify it in the network tab or, after one visit, by signing with the network switched off.' },
     ],
   },
@@ -599,15 +599,15 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'Working offline after your first visit, and installing it',
+        h: 'Working offline once a page has loaded, and installing it',
         p: [
-          'Because every tool is a static page and a script, the site caches itself after the first visit and works with the network off from then on. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
+          'Because every tool is a static page and a script, the site caches its pages and code once a page has loaded, and most tools keep working with the network off from then on; the few that download a model or engine need one online run first. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
         ],
       },
     ],
     faq: [
       { q: 'Is a browser tool slower than a desktop app?', a: 'For these jobs, not noticeably. WebAssembly runs the same code at close to native speed, and the work happens on your own processor.' },
-      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu; after your first visit it then works offline.' },
+      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu; once a page has loaded, most tools then work offline, and the few that download a model or engine need one online run first.' },
       { q: 'What about very large files?', a: 'The limit is your device\'s memory. A few hundred megabytes of PDF or a few hundred photos are fine on a laptop; a phone manages less at once.' },
       { q: 'How do I know the code does what it says?', a: 'It is open source under the MIT licence. The repository is linked in the footer of every page, and the network tab shows what the page does while you use it.' },
     ],
@@ -4151,7 +4151,7 @@ export const guides: Guide[] = [
       { q: "Does Hide Location in Photos remove the GPS data from the file?", a: "Apple describes it as hiding the location in Photos, and Revert to Original Location restores it, so the original file still has it. Apple does not say what an exported or shared copy contains. Run the copy through the [EXIF remover](/tools/strip-exif) to be sure." },
       { q: "Can Preview remove location data?", a: "Yes, location only: Preview's Inspector has a Remove Location Info button. Apple's Preview guide documents viewing the location (Tools, Show Location Info), not the button, and the date and camera details stay. Use the [EXIF remover](/tools/strip-exif) to remove everything, and check the result with the [EXIF viewer](/tools/exif-viewer)." },
       { q: "Will removing EXIF data change how the photo looks?", a: "Not for a JPG, PNG or WebP cleaned with the [EXIF remover](/tools/strip-exif): the picture data is copied unchanged. The only exception is a sideways photo with the orientation option ticked, which is re-encoded." },
-      { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline after your first visit. ExifTool is a separate install." },
+      { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline once the page has loaded. ExifTool is a separate install." },
     ],
   },
   {

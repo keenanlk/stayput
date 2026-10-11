@@ -71,7 +71,7 @@ const does: Record<string, string> = {
   'tuner': 'Tunes a guitar, bass, ukulele, violin or any instrument from your microphone, showing the note, the cents and a needle.',
   'metronome': 'Plays a steady metronome from 20 to 300 BPM, in any time signature, with subdivisions and tap tempo.',
   'fill-pdf-form': 'Lets you type into the fields of a fillable PDF form, tick its boxes and pick from its lists, then saves the filled PDF.',
-  'blur-face-video': 'Finds every face in a video (MP4, MOV, WebM) and blurs or pixelates it frame by frame.',
+  'blur-face-video': 'Finds the faces that look towards the camera in a video (MP4, MOV, WebM) and blurs or pixelates them frame by frame; you check the result before sharing.',
   'remove-silence': 'Cuts the long pauses out of a podcast, lecture or voice memo (MP3, WAV, M4A and more) and trims quiet starts and ends.',
   'image-to-svg': 'Traces a PNG or JPG into a vector SVG of filled shapes, in black and white, a few flat colours or full detail.',
   'gif-maker': 'Makes an animated GIF from photos, screenshots or drawings, with the order, timing, size and loop you set.',
@@ -129,7 +129,7 @@ const downloads: Record<string, Download> = {
   'ocr-pdf': { what: 'text reader', size: '6 MB' },
   'transcribe': { what: 'speech model', size: '76 MB' },
   'vocal-remover': { what: 'separation model', size: '67 MB' },
-  'video-background-remover': { what: 'person finder', size: '16 MB' },
+  'video-background-remover': { what: 'person finder', size: '28 MB' },
   'blur-face-video': { what: 'face detector', size: '4 MB' },
   'add-subtitles-to-video': {
     what: 'speech model',

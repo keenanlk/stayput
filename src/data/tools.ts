@@ -102,7 +102,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I convert HEIC to JPG without uploading my photos?',
-        a: 'Yes. The HEIC decoder (libheif compiled to WebAssembly) runs inside your browser tab. Your photos are read from your disk, converted in memory and saved back to your disk. After one visit it works with your network turned off.',
+        a: 'Yes. The HEIC decoder (libheif compiled to WebAssembly) runs inside your browser tab. Your photos are read from your disk, converted in memory and saved back to your disk. Give the page a short while after your first visit to save itself and the decoder for offline use; after that you can turn off your network and it still works.',
       },
       {
         q: 'Is there a file size or quantity limit?',
@@ -2581,9 +2581,9 @@ export const tools: Tool[] = [
     name: 'Blur faces in video',
     title: 'Blur Faces in a Video Automatically, No Upload | Stayput',
     description:
-      'Blur or pixelate every face in a video automatically, frame by frame, before you post it. MP4, MOV, WebM. The video never leaves your device.',
+      'Blur or pixelate the faces in a video automatically, frame by frame, before you post it. MP4, MOV, WebM. The video never leaves your device.',
     heading: 'Blur faces in a video',
-    tagline: 'Every face found and covered, frame by frame, on your own device. For children, bystanders and anyone who did not agree to be filmed.',
+    tagline: 'Faces found and covered frame by frame, on your own device, for children, bystanders and anyone who did not agree to be filmed. Always watch the result before you share it.',
     category: 'media',
     accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv',
     multiple: true,
@@ -2830,7 +2830,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my recording uploaded?',
-        a: 'No. The sound is decoded in this tab and the Whisper speech model runs in your browser, so interviews, medical dictation, meetings and voice notes stay on your device. The only download is the model itself, from this site, the first time.',
+        a: 'No. The sound is decoded in this tab and the Whisper speech model runs in your browser, so interviews, medical dictation, meetings and voice notes stay on your device. The only downloads are the speech model and the engine that runs it, both from this site, the first time.',
       },
       {
         q: 'How accurate is it?',
@@ -2876,7 +2876,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The soundtrack is transcribed by a speech model running in this tab, and the frames are redrawn and encoded by your browser’s own video encoder. The only download is the model itself, from this site, the first time.',
+        a: 'No. The soundtrack is transcribed by a speech model running in this tab, and the frames are redrawn and encoded by your browser’s own video encoder. The only downloads are the speech model and the engine that runs it, both from this site, the first time.',
       },
       {
         q: 'What is the difference between burned-in and separate subtitles?',
@@ -2918,7 +2918,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my song uploaded?',
-        a: 'No. The song is decoded in this tab and the separation model runs on your device, so unreleased demos, stems for a client and your own recordings stay with you. The only download is the model itself, from this site, the first time.',
+        a: 'No. The song is decoded in this tab and the separation model runs on your device, so unreleased demos, stems for a client and your own recordings stay with you. The only downloads are the separation model and the engine that runs it, both from this site, the first time.',
       },
       {
         q: 'How good is the separation?',
@@ -2977,6 +2977,10 @@ export const tools: Tool[] = [
       {
         q: 'How long does it take?',
         a: 'Every frame is examined and encoded again, so it depends on the length and resolution of the video and on your device. Keep the tab open while it works; the progress bar shows how far it has got.',
+      },
+      {
+        q: 'Why does the browser console mention a Google address?',
+        a: 'The open-source MediaPipe engine that finds the person tries to send its own usage log to a Google address. This site’s security policy makes the browser refuse that request, so it fails and you see an error in the console. Your video is not part of it and it never leaves your device.',
       },
     ],
   },
@@ -3282,7 +3286,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Can I remove a background without uploading the photo?',
-        a: 'Yes. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only download is the model itself, fetched from this site the first time. After your first run you can turn off Wi-Fi and it keeps working.',
+        a: 'Yes. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only downloads are the model and the WebAssembly runtime that runs it, both fetched from this site the first time. After your first run you can turn off Wi-Fi and it keeps working.',
       },
       {
         q: 'Why is the first photo slow?',
@@ -3525,7 +3529,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my photo uploaded?',
-        a: 'No. The cut-out model runs inside your browser tab, and the border and file are made there too. Photos of your friends, kids and pets stay on your device. The only download is the model, fetched from this site once and then cached.',
+        a: 'No. The cut-out model runs inside your browser tab, and the border and file are made there too. Photos of your friends, kids and pets stay on your device. The only downloads are the model and the WebAssembly runtime that runs it, fetched from this site once and then cached.',
       },
       {
         q: 'How do I use it in WhatsApp?',
