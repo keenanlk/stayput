@@ -7,7 +7,7 @@
  * The file never leaves the device and has no name from the user: it is called stayput-<time>-<random>.
  * It is deleted when the results are cleared or replaced, when the page is left, and, for anything a
  * closed tab left behind, on the next visit to any page (sweepOutputs). A file that is being carried to
- * the next tool (handoff.ts) is kept until that save has finished.
+ * the next tool (handoff.ts) is copied out of the file first (detachOutput), so deleting it cannot hurt that copy.
  *
  * Where this browser cannot write to OPFS from a worker (no OPFS, private mode, a failed write at
  * start) openOpfsOutput resolves undefined and the caller keeps the output in memory, as before.
@@ -38,7 +38,7 @@ export interface OpfsOutput {
 }
 
 /** Blob handed out by finish() → how to delete its file. */
-const owned = new Map<Blob, { remove: () => Promise<void>; holds: Set<Promise<unknown>> }>();
+const owned = new Map<Blob, { remove: () => Promise<void> }>();
 let installed = false;
 
 export function opfsOutputAvailable(): boolean {
@@ -129,7 +129,7 @@ export async function openOpfsOutput(expectedBytes = 0): Promise<OpfsOutput | un
         finished = true;
         // A Blob over the file: nothing is copied into memory.
         const blob = file.slice(0, file.size, type);
-        owned.set(blob, { remove, holds: new Set() });
+        owned.set(blob, { remove });
         return blob;
       },
       async abort() {
@@ -142,13 +142,13 @@ export async function openOpfsOutput(expectedBytes = 0): Promise<OpfsOutput | un
   }
 }
 
-/** Hold off deleting this output's file until `until` settles (the next tool's copy being saved). Blobs not from OPFS are ignored. */
-export function retainOutput(blob: Blob, until: Promise<unknown>): void {
-  const entry = owned.get(blob);
-  if (!entry) return;
-  const hold = until.catch(() => undefined);
-  entry.holds.add(hold);
-  void hold.then(() => entry.holds.delete(hold));
+/**
+ * A copy of this output that does not depend on its temporary file, for carrying to the next tool: browsers may store
+ * a file-backed Blob by reference, and the file is deleted when this page is left. Anything else is returned as it is.
+ */
+export async function detachOutput(blob: Blob): Promise<Blob> {
+  if (!owned.has(blob)) return blob;
+  return new Blob([await blob.arrayBuffer()], { type: blob.type });
 }
 
 /** Delete the file behind an output, once nothing is still reading it. Does nothing for an ordinary Blob. */
@@ -156,7 +156,6 @@ export async function releaseOutput(blob: Blob): Promise<void> {
   const entry = owned.get(blob);
   if (!entry) return;
   owned.delete(blob);
-  await Promise.all([...entry.holds]);
   await entry.remove();
 }
 
