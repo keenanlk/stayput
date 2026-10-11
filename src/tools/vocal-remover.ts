@@ -3,6 +3,7 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { SAMPLE_RATE, decodeAudio, encodeMp3, encodeWav, formatDuration } from '../lib/audio';
 import type { Reply, Request } from '../lib/vocals.worker';
 import { InputError } from '../lib/input-error';
+import { fromWorkerFailure } from '../lib/worker-error';
 
 /**
  * Vocal remover: split a song into the instrumental (karaoke) and the vocals
@@ -27,7 +28,7 @@ function split(left: Float32Array, right: Float32Array, onLoading: (f: number) =
       if (msg.type === 'progress') return onPiece(msg.done, msg.total, msg.engine);
       done();
       if (msg.type === 'done') resolve(msg);
-      else reject(new Error(msg.message));
+      else reject(fromWorkerFailure(msg.name, msg.message));
     };
     const onError = (e: ErrorEvent) => {
       done();
