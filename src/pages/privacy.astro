@@ -37,8 +37,9 @@ import Base from '../layouts/Base.astro';
     <h2>Offline storage</h2>
     <p>To work offline, the site asks your browser to cache its own pages and scripts using a service worker. This cache contains only the site's code, never your files. You can clear it at any time from your browser's site settings.</p>
     <p>When you follow a "next step" link after a job, such as from Auto caption to Compress video, the site can carry the finished file to the next tool so you do not have to pick it again. To do that it keeps one temporary copy in your browser's own storage on your device, and a note of it in this tab. The next tool deletes the copy as soon as it has picked it up. If you leave without that happening, the copy is deleted when you leave the page, or after five minutes the next time any Stayput page opens; if the tab was closed first, it stays on your device until then. The copy never leaves your device: it is not uploaded, no request carries it, and no analytics event mentions it. Files over 200 MB are not carried, and if your browser will not store a copy the next tool simply asks for the file.</p>
+    <p>Tools that write a video, such as Auto caption, save the finished video as a temporary file in your browser's own storage on your device while it is made, so a long video does not have to fit in memory. The file never leaves your device and has a random name, not yours. It is deleted when you clear the results or run the tool again, and when you leave the page; if the tab was closed first, it is deleted the next time any Stayput page opens. If your browser does not allow this, the video is held in memory instead.</p>
     <h2>Open source</h2>
     <p>The full source code is at <a href="https://github.com/keenanlk/stayput" rel="noopener">github.com/keenanlk/stayput</a>, so anyone can confirm the above.</p>
-    <p class="muted small">Last updated October 9, 2026.</p>
+    <p class="muted small">Last updated October 11, 2026.</p>
   </article>
 </Base>

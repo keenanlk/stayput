@@ -67,10 +67,13 @@ const ogImage = new URL(ogPath, Astro.site);
     <script>
       import { loadAnalytics, trackPageContext } from '../lib/analytics';
       import { sweepHandoff } from '../lib/handoff';
+      import { sweepOutputs } from '../lib/opfs-output';
       loadAnalytics();
       trackPageContext();
       // Deletes any file saved for a next tool that was never picked up (see src/lib/handoff.ts).
       void sweepHandoff();
+      // Deletes temporary video outputs a closed tab left on this device (see src/lib/opfs-output.ts).
+      void sweepOutputs();
     </script>
   </body>
 </html>

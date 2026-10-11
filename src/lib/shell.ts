@@ -12,6 +12,7 @@ import { mountNextSteps } from './next-steps';
 import { warmDecoders } from './vendor';
 import { droppedFiles } from './folder-drop';
 import { takeHandoff } from './handoff';
+import { releaseOutput } from './opfs-output';
 
 export interface ShellFile {
   id: number;
@@ -317,7 +318,11 @@ export function createShell(opts: ShellOptions) {
     const next = document.getElementById('next-steps');
     if (next) next.hidden = true;
     resultsList.innerHTML = '';
-    for (const o of outputs) if (o.previewUrl) URL.revokeObjectURL(o.previewUrl);
+    for (const o of outputs) {
+      if (o.previewUrl) URL.revokeObjectURL(o.previewUrl);
+      // A video written to a temporary file on this device: delete the file (no-op for anything in memory).
+      void releaseOutput(o.blob);
+    }
     outputs = [];
   }
 

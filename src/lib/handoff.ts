@@ -20,6 +20,8 @@
  * which asks for a file as it always has. Nothing here ever shows an error.
  */
 
+import { detachOutput } from './opfs-output';
+
 const DB_NAME = 'stayput-handoff';
 const STORE = 'files';
 const NOTE_KEY = 'stayput:handoff';
@@ -158,6 +160,8 @@ export async function saveHandoff(file: { name: string; blob: Blob }, to: string
       if (!db) return false;
       try {
         local()?.setItem(MARKER_KEY, String(at));
+        // A video held in a temporary file on this device is copied out of it first: that file is deleted when this page is left.
+        const blob = await detachOutput(file.blob);
         const put = async (body: Pick<Saved, 'blob' | 'bytes'>) => {
           const tx = db.transaction(STORE, 'readwrite');
           const record: Saved = { id, ...body, name: file.name, type: file.blob.type, from, to, at };
@@ -165,11 +169,11 @@ export async function saveHandoff(file: { name: string; blob: Blob }, to: string
           await finished(tx);
         };
         try {
-          await put({ blob: file.blob });
+          await put({ blob });
         } catch {
           // Some browsers and modes refuse to store a Blob; a smaller file can go in as bytes instead.
-          if (file.blob.size > HANDOFF_MAX_BYTES_FALLBACK) return false;
-          await put({ bytes: await file.blob.arrayBuffer() });
+          if (blob.size > HANDOFF_MAX_BYTES_FALLBACK) return false;
+          await put({ bytes: await blob.arrayBuffer() });
         }
         return true;
       } finally {

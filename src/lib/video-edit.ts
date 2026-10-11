@@ -29,6 +29,7 @@ import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile } from './input-error';
+import { openOpfsOutput } from './opfs-output';
 
 export interface EditOptions {
   mute?: boolean;
@@ -70,6 +71,25 @@ export interface EditResult {
   audio: boolean;
   /** Set when the input had sound this browser could not carry over. */
   audioDropped: boolean;
+}
+
+/**
+ * Where to write the output: a file on this device where the browser allows it (the tab then never holds the
+ * whole video), otherwise a buffer in memory as before.
+ */
+async function outputTarget(inputBytes: number) {
+  const disk = await openOpfsOutput(inputBytes);
+  if (disk) return { target: disk.target, disk, buffer: undefined };
+  const buffer = new BufferTarget();
+  return { target: buffer, disk: undefined, buffer };
+}
+
+/** The finished output as a Blob: the file on disk, or the in-memory buffer. */
+async function finishOutput(out: { disk?: Awaited<ReturnType<typeof openOpfsOutput>>; buffer?: BufferTarget }, type: string): Promise<Blob> {
+  if (out.disk) return out.disk.finish(type);
+  const buffer = out.buffer?.buffer;
+  if (!buffer) throw new Error('The video could not be written.');
+  return new Blob([buffer], { type });
 }
 
 const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
@@ -119,18 +139,27 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
 
     if (!reencode) {
       // Only the sound changes: copy the picture as it is, into the same kind of file.
+      const out = await outputTarget(file.size);
+      // On disk the metadata is written after the pictures (the file is written out of order); in memory it goes in front.
+      const fastStart = out.disk ? false : 'in-memory';
       const outFormat =
-        format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
-      const output = new Output({ format: outFormat, target: new BufferTarget() });
-      const conversion = await Conversion.init({ input, output, tracks: 'primary', video: {}, audio: opts.mute ? { discard: true } : {} });
-      if (!conversion.isValid) throw new Error('This browser cannot rewrite this video.');
-      conversion.onProgress = (p) => opts.onProgress?.(p);
-      await conversion.execute();
-      const buffer = output.target.buffer;
-      if (!buffer) throw new Error('The video could not be written.');
+        format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart }) : new Mp4OutputFormat({ fastStart });
+      let blob: Blob;
+      let conversion: Conversion;
+      try {
+        const output = new Output({ format: outFormat, target: out.target });
+        conversion = await Conversion.init({ input, output, tracks: 'primary', video: {}, audio: opts.mute ? { discard: true } : {} });
+        if (!conversion.isValid) throw new Error('This browser cannot rewrite this video.');
+        conversion.onProgress = (p) => opts.onProgress?.(p);
+        await conversion.execute();
+        blob = await finishOutput(out, outFormat.mimeType);
+      } catch (e) {
+        await out.disk?.abort();
+        throw e;
+      }
       const kept = !opts.mute && !!sound && !conversion.discardedTracks.some((d) => d.track.isAudioTrack());
       return {
-        blob: new Blob([buffer], { type: outFormat.mimeType }),
+        blob,
         ext: outFormat.fileExtension.replace(/^\./, ''),
         ...shown,
         duration,
@@ -189,49 +218,56 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       frame = canvas.getContext('2d', { willReadFrequently: opts.readsBack !== false }) ?? undefined;
       if (!frame) throw new Error('Canvas is not available in this browser.');
     }
-    const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-    const conversion = await Conversion.init({
-      input,
-      output,
-      tracks: 'primary',
-      video: {
-        codec: videoCodec,
-        bitrate: QUALITY_HIGH,
-        rotate: rotate as Rotation,
-        flip,
-        crop,
-        width,
-        height,
-        fit: 'fill',
-        forceTranscode: true,
-        // Bake the rotation and flip into the pixels so every player shows the result the same way.
-        allowTransformationMetadata: false,
-        process:
-          paint && frame
-            ? async (sample) => {
-                sample.draw(frame!, 0, 0, width, height);
-                const at = sample.timestamp;
-                // Let go of the decoded frame now, and give the browser a turn between frames: without
-                // it the frames pile up faster than they are freed (about 10 MB per second of 1080p video in Safari).
-                sample.close();
-                await paint(frame!, at);
-                await new Promise((r) => setTimeout(r, 0));
-                return frame!.canvas;
-              }
-            : undefined,
-      },
-      audio: opts.mute ? { discard: true } : {},
-    });
-    if (!conversion.isValid) {
-      const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw reason === 'undecodable_source_codec' ? new UnreadableFile(unplayable()) : new Error('This browser cannot edit this video.');
+    const out = await outputTarget(file.size);
+    const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
+    let blob: Blob;
+    let conversion: Conversion;
+    try {
+      conversion = await Conversion.init({
+        input,
+        output,
+        tracks: 'primary',
+        video: {
+          codec: videoCodec,
+          bitrate: QUALITY_HIGH,
+          rotate: rotate as Rotation,
+          flip,
+          crop,
+          width,
+          height,
+          fit: 'fill',
+          forceTranscode: true,
+          // Bake the rotation and flip into the pixels so every player shows the result the same way.
+          allowTransformationMetadata: false,
+          process:
+            paint && frame
+              ? async (sample) => {
+                  sample.draw(frame!, 0, 0, width, height);
+                  const at = sample.timestamp;
+                  // Let go of the decoded frame now, and give the browser a turn between frames: without
+                  // it the frames pile up faster than they are freed (about 10 MB per second of 1080p video in Safari).
+                  sample.close();
+                  await paint(frame!, at);
+                  await new Promise((r) => setTimeout(r, 0));
+                  return frame!.canvas;
+                }
+              : undefined,
+        },
+        audio: opts.mute ? { discard: true } : {},
+      });
+      if (!conversion.isValid) {
+        const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
+        throw reason === 'undecodable_source_codec' ? new UnreadableFile(unplayable()) : new Error('This browser cannot edit this video.');
+      }
+      await executeWatched(conversion, opts.onProgress);
+      blob = await finishOutput(out, 'video/mp4');
+    } catch (e) {
+      await out.disk?.abort();
+      throw e;
     }
-    await executeWatched(conversion, opts.onProgress);
-    const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
     const kept = !opts.mute && !!sound && !conversion.discardedTracks.some((d) => d.track.isAudioTrack());
     return {
-      blob: new Blob([buffer], { type: 'video/mp4' }),
+      blob,
       ext: 'mp4',
       width,
       height,
