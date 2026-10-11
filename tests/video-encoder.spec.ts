@@ -12,6 +12,10 @@ const toneClip = fileURLToPath(new URL('./fixtures/static/tone-16k-mono.mp4', im
 const phoneMov = fileURLToPath(new URL('./fixtures/static/iphone-portrait.mov', import.meta.url));
 const phoneHevc = fileURLToPath(new URL('./fixtures/static/iphone-hevc.mov', import.meta.url));
 
+// 2 s of 640x360 H.264 whose pixel aspect ratio is 99:100, a hair off square as an editor's scale step can leave it: shown naively
+// it is 640x364. (At 1080x1920 the same thing makes 1080x1922, which the iOS Simulator's encoder stalls on.)
+const nearSquare = fileURLToPath(new URL('./fixtures/static/pixel-aspect-99-100.mp4', import.meta.url));
+
 async function open(page: Page, path: string) {
   await page.goto(path);
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
@@ -96,6 +100,18 @@ test('Video to MP4 keeps the sound: a mono 16 kHz AAC track decodes cleanly', as
   const bytes = await runOnce(page);
   await expectPlayableMp4(page, bytes);
   await expectAudioDecodes(page, bytes, 1);
+});
+
+test('A video with almost square pixels is written at its coded size, not one pixel taller', async ({ page, browserName }) => {
+  // The sizing is the same in every engine; Linux WebKit in CI never finishes this still-picture clip (macOS WebKit does).
+  test.skip(browserName === 'webkit', 'covered in Chromium; Linux WebKit stalls on this clip');
+  test.setTimeout(240_000);
+  await open(page, '/tools/rotate-video');
+  await page.locator('#file-input').setInputFiles([nearSquare]);
+  const bytes = await runOnce(page);
+  // Turned a quarter: 640x360 becomes 360x640 (it was 364x640 before the size was taken from the coded one).
+  const probe = await expectPlayableMp4(page, bytes);
+  expect([probe.width, probe.height]).toEqual([360, 640]);
 });
 
 test('Resize video turns an iPhone-style portrait .mov into a playable mp4 at the new size, with its sound', async ({ page, browserName }) => {
@@ -234,6 +250,28 @@ test('an encoder that never answers is caught at once, with a plain message and 
   await expect(error).not.toContainText('captions');
   await expect(error.locator('a')).toHaveCount(0);
 });
+
+// Some browsers (Firefox for Android among them) have no VideoEncoder at all. The tools that re-encode must say so at once, before
+// downloading a model that could never be used, rather than failing minutes later with a plain "Error".
+for (const [path, model, message] of [
+  ['/green-screen-video', 'selfie_multiclass', "can't write video yet"],
+  ['/auto-caption-video', 'whisper', 'it has no video encoder'],
+] as const) {
+  test(`${path} says at once when the browser has no video encoder, without fetching its model`, async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, 'VideoEncoder', { value: undefined, configurable: true });
+    });
+    const fetched: string[] = [];
+    page.on('request', (r) => r.url().includes('/models/') && fetched.push(r.url()));
+    await open(page, path);
+    await page.locator('#file-input').setInputFiles([clip]);
+    await page.locator('#run').click();
+    const error = page.locator('#error');
+    await expect(error).toHaveClass(/is-active/, { timeout: 20_000 });
+    await expect(error).toContainText(message);
+    expect(fetched.filter((u) => u.includes(model))).toEqual([]);
+  });
+}
 
 // Safari's decoder can hand over the frames of a video with B-frames out of presentation order (seen on an iPhone H.264 .mov in iOS 18.4).
 // Sending that to the encoder as it came wrote timestamps that run backwards, which the muxer refuses. This makes the decoder do the same

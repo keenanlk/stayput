@@ -166,9 +166,24 @@ export async function requireH264Encoder(): Promise<void> {
 export class CaptionsUnavailable extends Error {
   /** A link the tool shell shows after the message. */
   readonly link = { href: '/video-to-subtitles', text: 'Make a subtitle file with Video to subtitles' };
-  constructor() {
-    super("Burned-in captions don't work in this browser yet, because its video encoder doesn't respond. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.");
+  constructor(message = "Burned-in captions don't work in this browser yet, because its video encoder doesn't respond. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.") {
+    super(message);
     // The kind a failed run records: the same one a stuck encoder already reports.
     this.name = 'EncoderStall';
   }
 }
+
+/**
+ * Thrown where a tool that writes video finds the browser has no video encoder at all (WebCodecs'
+ * VideoEncoder is missing, as in some Firefox builds), or none for the size asked. The name is the
+ * short error kind a failed run records, so these no longer show up as a plain "Error".
+ */
+export class EncoderUnavailable extends Error {
+  constructor(message = "This browser can't write video yet, so it can't make the new file. Use a recent Chrome, Edge or Safari.") {
+    super(message);
+    this.name = 'EncoderUnavailable';
+  }
+}
+
+/** Whether this browser has a video encoder to ask. False means no tool that re-encodes can work here. */
+export const hasVideoEncoder = () => typeof VideoEncoder !== 'undefined';
