@@ -1,12 +1,12 @@
-import { bool, createShell, radio, str } from '../lib/shell';
+import { bool, createShell, radio, str, type Progress, type ShellFile } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../lib/captions';
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
 import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/encoder-probe';
 import { EncoderStall } from '../lib/encoder-watchdog';
-import { encodeMemoryError, looksLikeMemory, noSpeechFound, plainCaptionError, unknownCaptionError } from '../lib/speech-errors';
+import { encodeFailedError, encodeMemoryError, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
-import { phoneLimitNote } from '../lib/phone-limit';
+import { overPhoneLimit, phoneLimitNote } from '../lib/phone-limit';
 import { InputError } from '../lib/input-error';
 
 /**
@@ -24,95 +24,129 @@ function srtOutput(file: File, segments: Segment[]): OutputFile {
   return { name: suffixName(file.name, '', 'srt'), blob: new Blob([body], { type: 'application/x-subrip;charset=utf-8' }), note: `${segments.length} caption${segments.length === 1 ? '' : 's'}`, text: body };
 }
 
+/** Set once the speech model is loaded: stops its worker and gives back the ~0.7 GB it holds. */
+let releaseSpeechModel: (() => void) | undefined;
+let running = false;
+/** A run ran out of memory. A phone's browser may not give all of it back, so the page says to reload before the next try. */
+let reloadAdvised = false;
+const RELOAD_NOTE = 'The last run ran out of memory. Reload the page before captioning another video.';
+
 const shell = createShell({
   // A video too big for a phone to caption is said so now, not after the browser gives up.
   onFilesChanged(files) {
+    // Clear: nothing is held for the next run. The worker restarts from the stored model, with no new download.
+    if (files.length === 0 && !running) releaseSpeechModel?.();
     const videos = files.filter((f) => !isSubs(f.file));
     const speech = !files.some((f) => isSubs(f.file));
-    shell.setHint(speech ? phoneLimitNote(Math.max(0, ...videos.map((f) => f.file.size))) : '');
+    const note = speech ? phoneLimitNote(Math.max(0, ...videos.map((f) => f.file.size))) : '';
+    shell.setHint([reloadAdvised ? RELOAD_NOTE : '', note].filter(Boolean).join(' '));
   },
   outputFormat: () => 'mp4',
   async process(files, progress) {
-    const subsFiles = files.filter((f) => isSubs(f.file));
-    const videos = files.filter((f) => !isSubs(f.file));
-    if (videos.length === 0) throw new InputError('Add the video too: the subtitle file only says what to write.');
-    if (subsFiles.length > 1) throw new InputError('Add one subtitle file at a time, with the video it belongs to.');
-    if (subsFiles.length === 1 && videos.length > 1) throw new InputError('A subtitle file fits one video. Add just that video with it.');
-    const given = subsFiles[0] ? parseSubtitles(await subsFiles[0].file.text()) : undefined;
-    if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
-
-    const look = radio('look', 'outline') as Look;
-    const size = radio('size', 'medium') as Size;
-    const place = radio('place', 'bottom') as Place;
-    const language = str('language', 'auto');
-    const saveSrt = bool('save-srt');
-    const { editVideo } = await import('../lib/video-edit');
-    // Find out now, in a second or two, that this browser cannot encode, not after minutes of transcribing.
-    progress.set('Checking this browser can write the video…', 0);
-    if (!hasVideoEncoder()) throw new CaptionsUnavailable("Burned-in captions don't work in this browser yet, because it has no video encoder. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.");
-    if (!(await ensureH264Encoder())) throw new CaptionsUnavailable();
-    const outputs: OutputFile[] = [];
-    for (const [index, entry] of videos.entries()) {
-      const file = entry.file;
-      const share = (f: number) => (index + f) / videos.length;
-      let segments: Segment[];
-      let from = 'from your subtitle file';
-      if (given) segments = given;
-      else {
-        const { transcribeFile, releaseSpeechModel } = await import('../lib/speech');
-        // Writing the captions is roughly the first 40% of the work, encoding the rest.
-        const speech = await transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
-          throw plainCaptionError(e);
-        });
-        // The model is no longer needed; free its memory before the video is redrawn.
-        releaseSpeechModel();
-        segments = speech.segments;
-        if (segments.length === 0) throw noSpeechFound(`No speech was found in ${file.name}, so there are no subtitles to add.`);
-        const spoken = new Intl.DisplayNames(['en'], { type: 'language' }).of(speech.language) ?? speech.language;
-        from = bool('translate') ? `translated to English from ${spoken} speech` : `written from ${spoken} speech`;
+    running = true;
+    try {
+      return await run(files, progress);
+    } catch (e) {
+      if ((e as { memory?: boolean } | null)?.memory) {
+        reloadAdvised = true;
+        shell.setHint(RELOAD_NOTE);
       }
-      const start = given ? 0.01 : 0.4;
-      let fitted: Segment[] | undefined;
-      let shown = 0;
-      let last: Segment | undefined;
-      const r = await editVideo(file, {
-        readsBack: false,
-        paint(ctx, t) {
-          const { width, height } = ctx.canvas;
-          const { font, px, maxWidth } = captionFont(width, height, size);
-          if (!fitted) {
-            ctx.save();
-            ctx.font = font;
-            fitted = fitCaptions(segments, (s) => ctx.measureText(s).width, maxWidth);
-            ctx.restore();
-          }
-          const cap = captionAt(fitted, t);
-          if (!cap) return;
-          drawCaption(ctx, cap.text, look, place, px, font);
-          if (cap !== last) shown++;
-          last = cap;
-        },
-        onProgress: (f) => progress.set(`Adding subtitles to ${file.name}: ${Math.round(f * 100)}%`, share(start + f * (1 - start))),
-      }).catch((e) => {
-        // A stall part way through: the same plain message and link as the early check.
-        if (e instanceof EncoderStall) throw new CaptionsUnavailable();
-        // Out of memory while redrawing: the captions already exist, so hand them over with the message.
-        if (looksLikeMemory(e)) {
-          const err = encodeMemoryError() as Error & { salvage?: OutputFile[] };
-          if (!given) err.salvage = [srtOutput(file, segments)];
-          throw err;
-        }
-        throw unknownCaptionError(e);
-      });
-      if (shown === 0) throw new InputError(`None of the subtitles fall within ${file.name}. Check that the subtitle file belongs to this video.`);
-      outputs.push({
-        name: suffixName(file.name, '-subtitled', r.ext),
-        blob: r.blob,
-        originalSize: file.size,
-        note: `${describeEdit(r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}`,
-      });
-      if (saveSrt) outputs.push(srtOutput(file, segments));
+      throw e;
+    } finally {
+      // Every way out, success or not: the model's worker does not outlive the run.
+      running = false;
+      releaseSpeechModel?.();
     }
-    return outputs;
   },
 });
+
+/** An error the page will show as "out of memory", marked so the page can advise a reload. */
+const asMemory = <T extends Error>(e: T): T => Object.assign(e, { memory: true });
+
+async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]> {
+  const subsFiles = files.filter((f) => isSubs(f.file));
+  const videos = files.filter((f) => !isSubs(f.file));
+  if (videos.length === 0) throw new InputError('Add the video too: the subtitle file only says what to write.');
+  if (subsFiles.length > 1) throw new InputError('Add one subtitle file at a time, with the video it belongs to.');
+  if (subsFiles.length === 1 && videos.length > 1) throw new InputError('A subtitle file fits one video. Add just that video with it.');
+  const given = subsFiles[0] ? parseSubtitles(await subsFiles[0].file.text()) : undefined;
+  if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
+
+  const look = radio('look', 'outline') as Look;
+  const size = radio('size', 'medium') as Size;
+  const place = radio('place', 'bottom') as Place;
+  const language = str('language', 'auto');
+  const saveSrt = bool('save-srt');
+  const { editVideo } = await import('../lib/video-edit');
+  // Find out now, in a second or two, that this browser cannot encode, not after minutes of transcribing.
+  progress.set('Checking this browser can write the video…', 0);
+  if (!hasVideoEncoder()) throw new CaptionsUnavailable("Burned-in captions don't work in this browser yet, because it has no video encoder. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.");
+  if (!(await ensureH264Encoder())) throw new CaptionsUnavailable();
+  const outputs: OutputFile[] = [];
+  for (const [index, entry] of videos.entries()) {
+    const file = entry.file;
+    const share = (f: number) => (index + f) / videos.length;
+    let segments: Segment[];
+    let from = 'from your subtitle file';
+    if (given) segments = given;
+    else {
+      const speechModule = await import('../lib/speech');
+      releaseSpeechModel = speechModule.releaseSpeechModel;
+      // Writing the captions is roughly the first 40% of the work, encoding the rest.
+      const speech = await speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
+        const plain = plainCaptionError(e);
+        // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.
+        const unnamed = !(plain instanceof SpeechError) || ['WorkerCrashError', 'SpeechModelError'].includes(plain.name);
+        if (overPhoneLimit(file.size) && unnamed) throw asMemory(phoneSpeechMemoryError(e));
+        throw plain.name === 'OutOfMemoryError' || plain.name === 'WorkerCrashError' ? asMemory(plain) : plain;
+      });
+      // The model is no longer needed; free its memory before the video is redrawn.
+      speechModule.releaseSpeechModel();
+      segments = speech.segments;
+      if (segments.length === 0) throw noSpeechFound(`No speech was found in ${file.name}, so there are no subtitles to add.`);
+      const spoken = new Intl.DisplayNames(['en'], { type: 'language' }).of(speech.language) ?? speech.language;
+      from = bool('translate') ? `translated to English from ${spoken} speech` : `written from ${spoken} speech`;
+    }
+    const start = given ? 0.01 : 0.4;
+    let fitted: Segment[] | undefined;
+    let shown = 0;
+    let last: Segment | undefined;
+    const r = await editVideo(file, {
+      readsBack: false,
+      paint(ctx, t) {
+        const { width, height } = ctx.canvas;
+        const { font, px, maxWidth } = captionFont(width, height, size);
+        if (!fitted) {
+          ctx.save();
+          ctx.font = font;
+          fitted = fitCaptions(segments, (s) => ctx.measureText(s).width, maxWidth);
+          ctx.restore();
+        }
+        const cap = captionAt(fitted, t);
+        if (!cap) return;
+        drawCaption(ctx, cap.text, look, place, px, font);
+        if (cap !== last) shown++;
+        last = cap;
+      },
+      onProgress: (f) => progress.set(`Adding subtitles to ${file.name}: ${Math.round(f * 100)}%`, share(start + f * (1 - start))),
+    }).catch((e) => {
+      // A stall part way through: the same plain message and link as the early check.
+      if (e instanceof EncoderStall) throw new CaptionsUnavailable();
+      // Any other failure while redrawing: the captions written from speech already exist, so hand them over with the message.
+      // Out of memory, or an unnamed failure on a phone with a video this big (Safari's EncodingError "Unknown error"), says so.
+      const memory = looksLikeMemory(e) || overPhoneLimit(file.size);
+      const err = (memory ? asMemory(encodeMemoryError(e)) : given ? unknownCaptionError(e) : encodeFailedError(e)) as Error & { salvage?: OutputFile[] };
+      if (!given) err.salvage = [srtOutput(file, segments)];
+      throw err;
+    });
+    if (shown === 0) throw new InputError(`None of the subtitles fall within ${file.name}. Check that the subtitle file belongs to this video.`);
+    outputs.push({
+      name: suffixName(file.name, '-subtitled', r.ext),
+      blob: r.blob,
+      originalSize: file.size,
+      note: `${describeEdit(r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}`,
+    });
+    if (saveSrt) outputs.push(srtOutput(file, segments));
+  }
+  return outputs;
+}

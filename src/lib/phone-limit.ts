@@ -13,8 +13,11 @@ export function isPhoneBrowser(nav: Pick<Navigator, 'userAgent' | 'maxTouchPoint
   return /iPhone|iPad|iPod|Android/i.test(nav.userAgent) || (/Macintosh/.test(nav.userAgent) && nav.maxTouchPoints > 1);
 }
 
+/** A video bigger than a phone can caption reliably, on a phone. */
+export const overPhoneLimit = (bytes: number, phone = isPhoneBrowser()): boolean => phone && bytes > PHONE_SAFE_BYTES;
+
 /** The warning for a video too big to caption reliably on a phone, or '' when there is nothing to say. */
 export function phoneLimitNote(bytes: number, phone = isPhoneBrowser()): string {
-  if (!phone || bytes <= PHONE_SAFE_BYTES) return '';
+  if (!overPhoneLimit(bytes, phone)) return '';
   return `This video is ${formatBytes(bytes)}. A phone can run out of memory captioning more than about 200 MB (around 2 minutes of iPhone video, or 30 seconds at 4K). Trim it first, or use a computer.`;
 }
