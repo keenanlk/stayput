@@ -57,7 +57,11 @@ function load(): Promise<ImageSegmenter> {
     return e;
   });
   return mine.catch((e) => {
-    throw isAbort(e) ? new MemoryError() : e;
+    if (isAbort(e)) throw new MemoryError();
+    // Whatever stopped the person finder from starting is one kind, and the message stays as it was.
+    const failed = new Error(e instanceof Error && e.message ? e.message : 'The person finder could not be started in this browser.');
+    failed.name = 'ModelLoadError';
+    throw failed;
   });
 }
 
