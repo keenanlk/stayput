@@ -2,6 +2,7 @@ import { createShell, processEach, radio, str } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
 import type { Backdrop, Shape } from '../lib/audio-video';
+import { InputError } from '../lib/input-error';
 
 /**
  * Audio to video. Each sound file becomes an MP4 showing one still picture
@@ -16,8 +17,8 @@ createShell({
   async process(files, progress) {
     const pictures = files.filter((f) => isImage(f.file));
     const sounds = files.filter((f) => !isImage(f.file));
-    if (sounds.length === 0) throw new Error('Add a sound file (MP3, WAV, M4A…) to turn into a video.');
-    if (pictures.length > 1) throw new Error('Add one picture: it is shown for the whole video. Remove the others.');
+    if (sounds.length === 0) throw new InputError('Add a sound file (MP3, WAV, M4A…) to turn into a video.');
+    if (pictures.length > 1) throw new InputError('Add one picture: it is shown for the whole video. Remove the others.');
     const { audioToVideo } = await import('../lib/audio-video');
     let bitmap: ImageBitmap | null = null;
     if (pictures[0]) {

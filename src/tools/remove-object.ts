@@ -2,6 +2,7 @@ import { createShell, bindRange, num, str } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { inpaint } from '../lib/inpaint';
+import { InputError } from '../lib/input-error';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -287,7 +288,7 @@ const shell = createShell({
       progress.set('Erasing…', 0.1);
       await erase((text) => progress.set(text, 0.3));
     }
-    if (history.length === 0) throw new Error('Paint over the thing to remove first, then press Erase or Save.');
+    if (history.length === 0) throw new InputError('Paint over the thing to remove first, then press Erase or Save.');
     const type = outputType(entry.file, str('format', 'keep'));
     const quality = num('quality', 92) / 100;
     progress.set('Saving…', 0.85);

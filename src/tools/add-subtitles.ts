@@ -7,6 +7,7 @@ import { EncoderStall } from '../lib/encoder-watchdog';
 import { encodeMemoryError, looksLikeMemory, noSpeechFound, plainCaptionError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
 import { phoneLimitNote } from '../lib/phone-limit';
+import { InputError } from '../lib/input-error';
 
 /**
  * Add subtitles to a video, burned into the picture. The captions come from
@@ -34,11 +35,11 @@ const shell = createShell({
   async process(files, progress) {
     const subsFiles = files.filter((f) => isSubs(f.file));
     const videos = files.filter((f) => !isSubs(f.file));
-    if (videos.length === 0) throw new Error('Add the video too: the subtitle file only says what to write.');
-    if (subsFiles.length > 1) throw new Error('Add one subtitle file at a time, with the video it belongs to.');
-    if (subsFiles.length === 1 && videos.length > 1) throw new Error('A subtitle file fits one video. Add just that video with it.');
+    if (videos.length === 0) throw new InputError('Add the video too: the subtitle file only says what to write.');
+    if (subsFiles.length > 1) throw new InputError('Add one subtitle file at a time, with the video it belongs to.');
+    if (subsFiles.length === 1 && videos.length > 1) throw new InputError('A subtitle file fits one video. Add just that video with it.');
     const given = subsFiles[0] ? parseSubtitles(await subsFiles[0].file.text()) : undefined;
-    if (given && given.length === 0) throw new Error(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
+    if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
 
     const look = radio('look', 'outline') as Look;
     const size = radio('size', 'medium') as Size;
@@ -103,7 +104,7 @@ const shell = createShell({
         }
         throw unknownCaptionError(e);
       });
-      if (shown === 0) throw new Error(`None of the subtitles fall within ${file.name}. Check that the subtitle file belongs to this video.`);
+      if (shown === 0) throw new InputError(`None of the subtitles fall within ${file.name}. Check that the subtitle file belongs to this video.`);
       outputs.push({
         name: suffixName(file.name, '-subtitled', r.ext),
         blob: r.blob,

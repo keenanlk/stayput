@@ -1,6 +1,7 @@
 import { createShell, str, processEach } from '../lib/shell';
 import { unlockPdf, encryptPdf } from '../lib/unlock';
 import type { OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 const fields = ['password', 'password-confirm'].map((id) => document.getElementById(id) as HTMLInputElement);
 document.getElementById('show-password')?.addEventListener('change', (e) => {
@@ -11,7 +12,7 @@ document.getElementById('show-password')?.addEventListener('change', (e) => {
 createShell({
   async process(files, progress) {
     const password = str('password');
-    if (!password) throw new Error('Enter a password to protect the PDF with.');
+    if (!password) throw new InputError('Enter a password to protect the PDF with.');
     if (password !== str('password-confirm')) throw new Error('The two passwords do not match. Type the same password in both boxes.');
     return processEach(files, progress, 'Protecting', async (entry) => {
       const src = new Uint8Array(await entry.file.arrayBuffer());

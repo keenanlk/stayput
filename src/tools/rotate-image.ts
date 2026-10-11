@@ -1,6 +1,7 @@
 import { createShell, processEach, bindRange, num, str, radio, bool } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('rotate-panel');
@@ -113,7 +114,7 @@ const shell = createShell({
     const deg = turn();
     const h = bool('flip-h');
     const v = bool('flip-v');
-    if (deg === 0 && !h && !v) throw new Error('Pick a rotation or a flip first; the image would come out unchanged.');
+    if (deg === 0 && !h && !v) throw new InputError('Pick a rotation or a flip first; the image would come out unchanged.');
     const choice = str('format', 'keep');
     const quality = num('quality', 92) / 100;
     const d = describe(deg, h, v);

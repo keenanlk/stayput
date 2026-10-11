@@ -3,6 +3,7 @@ import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, renderPage } fr
 import { findOnPage, matcher, redactPdf, type Pattern, type RedactBox } from '../lib/redact';
 import type * as PdfJs from 'pdfjs-dist';
 import { suffixName, type OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 const panel = document.getElementById('redact-panel')!;
 const stage = document.getElementById('stage')!;
@@ -200,7 +201,7 @@ const shell = createShell({
   },
   async process(files, progress) {
     const entry = files[0]!;
-    if (!pdf) throw new Error('Drop a PDF first.');
+    if (!pdf) throw new InputError('Drop a PDF first.');
     if (boxes.length === 0) throw new Error('Mark something to redact first: search for text, or drag a box over the page.');
     const pages = new Set(boxes.map((b) => b.page)).size;
     progress.set('Redacting', 0.05);

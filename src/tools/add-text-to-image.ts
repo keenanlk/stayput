@@ -2,6 +2,7 @@ import { createShell, processEach, bindRange, num, str, bool } from '../lib/shel
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { drawText, loadFont, type Box, type Effect, type FontChoice, type TextBlock, type TextStyle } from '../lib/image-text';
+import { InputError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('text-panel');
@@ -169,7 +170,7 @@ const shell = createShell({
   },
   async process(files, progress) {
     const list = blocks();
-    if (!list.some((b) => b.text.trim())) throw new Error('Type some text first; the image would come out unchanged.');
+    if (!list.some((b) => b.text.trim())) throw new InputError('Type some text first; the image would come out unchanged.');
     const s = style();
     await loadFont(s.font);
     const choice = str('format', 'keep');

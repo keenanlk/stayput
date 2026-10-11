@@ -6,6 +6,7 @@
  * the small writer below.
  */
 import { vendorDir } from './vendor';
+import { audioDecodeError } from './speech-errors';
 
 /** MP3 is almost always 44.1 kHz; decoding resamples to it. */
 export const SAMPLE_RATE = 44100;
@@ -28,10 +29,9 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
  * track's packets are lifted out with the demuxer and decoded from a small MP4 wrapper.
  */
 async function decodeThroughDemuxer(file: File, rate: number): Promise<AudioBuffer> {
-  const none = new Error('No audio could be read from this file. It may have no sound track, or use an audio format this browser cannot decode.');
   const { demuxedFileSound } = await import('./demux-audio');
   const chans = await demuxedFileSound(file, rate, false).catch(() => null);
-  if (!chans?.length) throw none;
+  if (!chans?.length) throw audioDecodeError();
   const buffer = new AudioBuffer({ length: chans[0]!.length, numberOfChannels: chans.length, sampleRate: rate });
   chans.forEach((ch, c) => buffer.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
   return buffer;

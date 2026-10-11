@@ -2,6 +2,7 @@ import { createShell, radio, str } from '../lib/shell';
 import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, renderPage, stampPdf, type Stamp } from '../lib/pdf';
 import type * as PdfJs from 'pdfjs-dist';
 import { suffixName, type OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -455,7 +456,7 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     if (!pdf) await loadDocument(new Uint8Array(await entry.file.arrayBuffer()));
-    if (placements.length === 0) throw new Error('Add your signature to a page first: draw or type it, then click "Add signature to this page".');
+    if (placements.length === 0) throw new InputError('Add your signature to a page first: draw or type it, then click "Add signature to this page".');
     progress.set('Placing signatures', 0.2);
     const stamps: Stamp[] = placements.map((p) => ({ page: p.page, png: p.png, x: p.x, y: p.y, width: p.width, height: p.height }));
     const bytes = await stampPdf(new Uint8Array(await entry.file.arrayBuffer()), stamps, (done, total) => progress.set(`Placing ${done} of ${total}`, 0.2 + (0.7 * done) / total));

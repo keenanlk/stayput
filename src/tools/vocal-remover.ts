@@ -2,6 +2,7 @@ import { createShell, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { SAMPLE_RATE, decodeAudio, encodeMp3, encodeWav, formatDuration } from '../lib/audio';
 import type { Reply, Request } from '../lib/vocals.worker';
+import { InputError } from '../lib/input-error';
 
 /**
  * Vocal remover: split a song into the instrumental (karaoke) and the vocals
@@ -60,7 +61,7 @@ createShell({
       const mixL = buffer.getChannelData(0).slice();
       const mixR = (buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : buffer.getChannelData(0)).slice();
       const seconds = mixL.length / SAMPLE_RATE;
-      if (seconds < 1) throw new Error(`${file.name} is too short to separate.`);
+      if (seconds < 1) throw new InputError(`${file.name} is too short to separate.`);
       const started = performance.now();
       let firstPieceAt = 0;
       const res = await split(

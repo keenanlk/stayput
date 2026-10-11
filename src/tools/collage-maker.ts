@@ -2,6 +2,7 @@ import { createShell, bindRange, num, str, radio, bool, type ShellFile } from '.
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import type { OutputFile } from '../lib/files';
 import { planCollage, type CollageOptions, type Fit, type Layout, type Size } from '../lib/collage';
+import { InputError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('collage-panel');
@@ -113,7 +114,7 @@ const shell = createShell({
     }
   },
   async process(files, progress) {
-    if (files.length < 2) throw new Error('Add at least two pictures to make a collage.');
+    if (files.length < 2) throw new InputError('Add at least two pictures to make a collage.');
     const type = str('format', 'image/jpeg') as EncodeType;
     const clear = bool('transparent') && type !== 'image/jpeg';
     const quality = num('quality', 90) / 100;

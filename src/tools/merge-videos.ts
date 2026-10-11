@@ -1,5 +1,6 @@
 import { bool, createShell } from '../lib/shell';
 import type { OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 /**
  * Merge videos. The clips are decoded, laid end to end and encoded once into
@@ -15,7 +16,7 @@ const clock = (s: number) => {
 createShell({
   outputFormat: () => 'mp4',
   async process(files, progress) {
-    if (files.length < 2) throw new Error('Add at least two videos to merge.');
+    if (files.length < 2) throw new InputError('Add at least two videos to merge.');
     const mute = bool('mute');
     const { mergeVideos } = await import('../lib/video-merge');
     progress.set(`Reading ${files.length} videos…`, 0.01);

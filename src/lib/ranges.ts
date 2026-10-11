@@ -1,3 +1,5 @@
+import { InputError } from './input-error';
+
 /**
  * Parse a page range like "1-3, 7, 10-12" into zero-based page indexes.
  * Pages are 1-based in the input. Out-of-range pages throw.
@@ -5,7 +7,7 @@
 export function parsePageRange(input: string, pageCount: number): number[] {
   const out: number[] = [];
   const text = input.trim();
-  if (!text) throw new Error('Enter at least one page or range, for example 1-3, 5.');
+  if (!text) throw new InputError('Enter at least one page or range, for example 1-3, 5.');
   for (const rawPart of text.split(/[,;\s]+/)) {
     const part = rawPart.trim();
     if (!part) continue;
@@ -19,7 +21,7 @@ export function parsePageRange(input: string, pageCount: number): number[] {
     const step = a <= b ? 1 : -1;
     for (let p = a; step > 0 ? p <= b : p >= b; p += step) out.push(p - 1);
   }
-  if (out.length === 0) throw new Error('Enter at least one page.');
+  if (out.length === 0) throw new InputError('Enter at least one page.');
   return out;
 }
 

@@ -1,6 +1,7 @@
 import { createShell, describeError } from '../lib/shell';
 import { closePdfJs, loadDocument, mergePdfs, openWithPdfJs, pageThumbnail } from '../lib/pdf';
 import type { OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 createShell({
   async thumbnail(file) {
@@ -10,7 +11,7 @@ createShell({
     return url;
   },
   async process(files, progress) {
-    if (files.length < 2) throw new Error('Add at least two PDF files to merge.');
+    if (files.length < 2) throw new InputError('Add at least two PDF files to merge.');
     const sources: Uint8Array[] = [];
     for (const [i, f] of files.entries()) {
       progress.set(`Reading ${f.file.name} (${i + 1} of ${files.length})`, (i / files.length) * 0.3);

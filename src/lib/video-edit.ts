@@ -28,6 +28,7 @@ import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
+import { UnreadableFile } from './input-error';
 
 export interface EditOptions {
   mute?: boolean;
@@ -93,7 +94,7 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
     return { ...shownSize(video), duration: await input.computeDuration() };
   } finally {
     input.dispose?.();
@@ -104,9 +105,9 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const format = await input.getFormat().catch(() => null);
-    if (!format) throw new Error('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
-    if (!video) throw new Error('This file has no video track.');
+    if (!video) throw new UnreadableFile('This file has no video track.');
     const duration = await input.computeDuration();
     const sound = await input.getPrimaryAudioTrack();
 
@@ -140,7 +141,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       };
     }
 
-    if (!(await video.canDecode())) throw new Error(unplayable());
+    if (!(await video.canDecode())) throw new UnreadableFile(unplayable());
     const crop = opts.crop
       ? {
           left: Math.max(0, Math.round(opts.crop.left)),
@@ -223,7 +224,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot edit this video.');
+      throw reason === 'undecodable_source_codec' ? new UnreadableFile(unplayable()) : new Error('This browser cannot edit this video.');
     }
     await executeWatched(conversion, opts.onProgress);
     const buffer = output.target.buffer;

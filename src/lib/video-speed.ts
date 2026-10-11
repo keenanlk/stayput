@@ -27,6 +27,7 @@ import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { timeStretch } from './stretch';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
+import { InputError } from './input-error';
 
 export interface SpeedOptions {
   /** 2 plays twice as fast, 0.5 at half speed. */
@@ -49,7 +50,7 @@ const MAX_FPS = 60;
 
 export async function changeSpeed(file: File, opts: SpeedOptions): Promise<SpeedResult> {
   const speed = opts.speed;
-  if (!(speed >= 0.1 && speed <= 16)) throw new Error('Choose a speed between 0.1× and 16×.');
+  if (!(speed >= 0.1 && speed <= 16)) throw new InputError('Choose a speed between 0.1× and 16×.');
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
