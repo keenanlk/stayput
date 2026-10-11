@@ -3945,7 +3945,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Can I put an ITF-14 on the single item?', a: 'It is meant for cartons and cases, not for items scanned at a shop’s till. Use an EAN-13 or UPC-A for the item itself.' },
       { q: 'Does a case need its own number?', a: 'A case is a different trade item from the units inside it, so it normally gets its own GTIN-14, made from the item’s number as shown above. Your GS1 member service or your customer’s guide has the rules for your products.' },
-      { q: 'What are bearer bars?', a: 'The thick frame around the barcode. GS1’s guidance for ITF-14 asks for it, because a carton barcode without one risks being misread. This page draws a full frame while the box is ticked, and it is ticked by default.' },
+      { q: 'What are bearer bars?', a: 'The thick frame around the barcode. GS1’s guidance for ITF-14 asks for it, because a carton barcode without one risks being misread. This page draws a full frame while the box is ticked, and it is ticked by default. On the printed label GS1 asks for a frame 4.8 mm thick; a PNG or SVG has no fixed physical size, so download the SVG and set its size when you print so the frame comes out at 4.8 mm.' },
       { q: 'Why does the page refuse a number with 12 digits?', a: 'An ITF-14 needs 13 digits plus the check digit. A 12-digit UPC-A needs a 0 in front, and then the packaging indicator digit, before it makes a carton number.' },
       { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
     ],
