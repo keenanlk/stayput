@@ -2258,7 +2258,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'How do I turn iPhone screenshots into a PDF?', a: 'Open this page in Safari, tap the drop zone and choose Photo Library, then select the screenshots in order. The PDF is saved to Downloads in the Files app, ready to attach or share.' },
-      { q: 'Will the text in my screenshots stay sharp?', a: 'Yes. PNG screenshots are stored losslessly inside the PDF, pixel for pixel, and JPG ones are embedded unchanged. Nothing is re-compressed.' },
+      { q: 'Will the text in my screenshots stay sharp?', a: 'Yes. PNG screenshots are stored losslessly inside the PDF, pixel for pixel, and JPG ones are embedded unchanged unless they need rotating, in which case they are re-encoded at high quality. HEIC and WebP screenshots are decoded and stored as high-quality JPG.' },
       { q: 'Can I search or copy the text in the PDF?', a: 'Not directly: the pages are pictures of text. To get the words out, run the screenshots through Image to text first, which reads them in your browser.' },
       { q: 'Can I redact something before making the PDF?', a: 'Yes. Cover account numbers or names with a solid box on Blur text in image first, then add the edited screenshots here. A black box cannot be reversed; blur on small text sometimes can.' },
       noUpload,
