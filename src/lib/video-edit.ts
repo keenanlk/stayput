@@ -21,10 +21,12 @@ import {
   QUALITY_HIGH,
   WEBM,
   WebMOutputFormat,
+  type InputVideoTrack,
   type Rotation,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
+import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 
 export interface EditOptions {
@@ -71,13 +73,28 @@ export interface EditResult {
 
 const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 
+/**
+ * Size of the picture as it is shown, rotation applied. A file whose pixels are almost square
+ * (an editor's scale step leaves a pixel aspect ratio such as 3075:3076) would otherwise show as
+ * 1080x1921 and be written as 1080x1922, a size some encoders refuse or stall on; it is taken at
+ * its coded size instead. Real non-square pixels (anamorphic, 4:3 and the like) are kept.
+ */
+export function shownSize(video: InputVideoTrack): { width: number; height: number } {
+  const { num, den } = video.pixelAspectRatio;
+  if (num > 0 && den > 0 && Math.abs(num / den - 1) < 0.005) {
+    const turned = video.rotation % 180 !== 0;
+    return turned ? { width: video.codedHeight, height: video.codedWidth } : { width: video.codedWidth, height: video.codedHeight };
+  }
+  return { width: video.displayWidth, height: video.displayHeight };
+}
+
 /** Size of the picture as it is shown (rotation metadata applied), before any edit. */
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    return { width: video.displayWidth, height: video.displayHeight, duration: await input.computeDuration() };
+    return { ...shownSize(video), duration: await input.computeDuration() };
   } finally {
     input.dispose?.();
   }
@@ -94,8 +111,9 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     const sound = await input.getPrimaryAudioTrack();
 
     const quarter = opts.rotate === 90 || opts.rotate === 270;
-    const turnedW = quarter ? video.displayHeight : video.displayWidth;
-    const turnedH = quarter ? video.displayWidth : video.displayHeight;
+    const shown = shownSize(video);
+    const turnedW = quarter ? shown.height : shown.width;
+    const turnedH = quarter ? shown.width : shown.height;
     const reencode = !!(opts.rotate || opts.flip || opts.flipVertical || opts.crop || opts.width || opts.height || opts.paint);
 
     if (!reencode) {
@@ -113,8 +131,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       return {
         blob: new Blob([buffer], { type: outFormat.mimeType }),
         ext: outFormat.fileExtension.replace(/^\./, ''),
-        width: video.displayWidth,
-        height: video.displayHeight,
+        ...shown,
         duration,
         videoCodec: CODEC_NAMES[video.codec ?? ''] ?? video.codec ?? 'video',
         reencoded: false,
@@ -151,7 +168,9 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     height = even(height);
 
     const videoCodec = await pickVideoCodec({ width, height, bitrate: QUALITY_HIGH });
-    if (!videoCodec) throw new Error('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.');
+    if (!videoCodec) {
+      throw hasVideoEncoder() ? new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.') : new EncoderUnavailable();
+    }
     // Rotating 180 degrees then mirroring left to right is the same as mirroring top to bottom.
     let rotate = (opts.rotate ?? 0) as number;
     let flip = !!opts.flip;

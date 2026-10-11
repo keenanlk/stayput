@@ -2,7 +2,7 @@ import { bool, createShell, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../lib/captions';
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
-import { CaptionsUnavailable, ensureH264Encoder } from '../lib/encoder-probe';
+import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/encoder-probe';
 import { EncoderStall } from '../lib/encoder-watchdog';
 import { encodeMemoryError, looksLikeMemory, noSpeechFound, plainCaptionError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
@@ -48,6 +48,7 @@ const shell = createShell({
     const { editVideo } = await import('../lib/video-edit');
     // Find out now, in a second or two, that this browser cannot encode, not after minutes of transcribing.
     progress.set('Checking this browser can write the video…', 0);
+    if (!hasVideoEncoder()) throw new CaptionsUnavailable("Burned-in captions don't work in this browser yet, because it has no video encoder. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.");
     if (!(await ensureH264Encoder())) throw new CaptionsUnavailable();
     const outputs: OutputFile[] = [];
     for (const [index, entry] of videos.entries()) {
