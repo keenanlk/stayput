@@ -28,8 +28,24 @@ export const audioDecodeError = (message = 'No audio could be read from this fil
 export const workerCrashError = () =>
   make('WorkerCrashError', 'The speech model stopped unexpectedly, which usually means the browser ran short of memory. Close other tabs and try again, or use a shorter recording.');
 /** The re-encode ran out of memory after the captions were written. The tool attaches the caption file it already made. */
-export const encodeMemoryError = () =>
-  make('OutOfMemoryError', 'This video is too long for your browser to redraw with captions. Your subtitles are ready: download the .srt below, or trim or split the video and try again.');
+export const encodeMemoryError = (cause?: unknown) => {
+  const err = make('OutOfMemoryError', 'This video is too long for your browser to redraw with captions. Your subtitles are ready: download the .srt below, or trim or split the video and try again. To try again, reload the page first.');
+  // A browser error nobody named as memory keeps its class name, so a failed run still records what it was.
+  if (cause !== undefined && !looksLikeMemory(cause)) err.name = classNameOf(cause) as SpeechErrorName;
+  return err;
+};
+/** The speech step failed on a phone with a video over the phone limit, with an error that names no cause: out of memory, as far as anything can tell. There is no caption file yet. */
+export const phoneSpeechMemoryError = (cause?: unknown) => {
+  const err = make('OutOfMemoryError', 'This phone ran out of memory while writing captions for a video this big. Trim the video to about 2 minutes or less, or use a computer. If you try again, reload the page first.');
+  if (cause !== undefined && !looksLikeMemory(cause) && !(cause instanceof SpeechError)) err.name = classNameOf(cause) as SpeechErrorName;
+  return err;
+};
+/** The redraw failed for a reason no one named, after the captions were written: say so, and that the subtitles are ready. */
+export function encodeFailedError(cause: unknown): Error {
+  const err = new Error('The video could not be redrawn with captions. Your subtitles are ready: download the .srt below, then try a shorter video or another file.');
+  err.name = classNameOf(cause);
+  return err;
+}
 export const speechModelError = () => make('SpeechModelError', 'The speech model could not read this recording. Try again, or try a shorter recording or another file.');
 export const noSpeechFound = (message: string) => make('NoSpeechFound', message);
 
@@ -61,10 +77,14 @@ export function fromWorker(name: string, message: string): SpeechError {
  * a failed run still records what went wrong; the original message is not shown.
  */
 export function unknownCaptionError(e: unknown): Error {
-  const name = e instanceof Error && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(e.name) ? e.name : 'Error';
   const err = new Error('Something went wrong while writing the captions. Reload the page and try again, or try a shorter video or another file.');
-  err.name = name;
+  err.name = classNameOf(e);
   return err;
+}
+
+/** An error's class name when it looks like one, else 'Error': the only part of a failure that is recorded. */
+function classNameOf(e: unknown): string {
+  return e instanceof Error && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(e.name) ? e.name : 'Error';
 }
 
 /** The error to show for a failed caption step: our own named errors pass through, the rest become plain ones. */
