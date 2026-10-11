@@ -113,7 +113,11 @@ test.describe('screen wake lock', () => {
     await stubWakeLock(page, 'ok');
     // An encoder that never finishes, so the run is still going when Clear is pressed.
     await page.addInitScript(() => {
-      VideoEncoder.prototype.flush = () => new Promise(() => {});
+      // Only once the redraw has begun: the encoder probe flushes too.
+      const real = VideoEncoder.prototype.flush;
+      VideoEncoder.prototype.flush = function () {
+        return document.getElementById('progress-text')?.textContent?.startsWith('Adding subtitles') ? new Promise<void>(() => {}) : real.call(this);
+      };
     });
     await open(page);
     await page.locator('#file-input').setInputFiles([clip, srtFile()]);
