@@ -312,8 +312,8 @@
   "hash": "e3d855c0575b9488"
  },
  "/guides": {
-  "date": "2026-10-08",
-  "hash": "9e9da334a7a88b24"
+  "date": "2026-10-11",
+  "hash": "059d65b2adfc2fec"
  },
  "/guides/camscanner-alternative": {
   "date": "2026-10-08",
@@ -660,8 +660,8 @@
   "hash": "d13bbe0967f47917"
  },
  "/guides/is-remove-bg-safe": {
-  "date": "2026-10-08",
-  "hash": "a1970a226de5dcab"
+  "date": "2026-10-12",
+  "hash": "5dbb2878c301e753"
  },
  "/guides/is-smallpdf-safe": {
   "date": "2026-10-08",
@@ -688,12 +688,12 @@
   "hash": "3ec1b26c6377d6bf"
  },
  "/guides/remove-background-from-a-photo": {
-  "date": "2026-09-29",
-  "hash": "06c1ab8301e73d2e"
+  "date": "2026-10-12",
+  "hash": "df2e305f5f4a7253"
  },
  "/guides/remove-bg-alternative": {
-  "date": "2026-10-08",
-  "hash": "993f6600e7cf0cdb"
+  "date": "2026-10-12",
+  "hash": "3791f0dcf6b8bd62"
  },
  "/guides/remove-exif-data-from-android-photos": {
   "date": "2026-10-03",
@@ -1485,7 +1485,7 @@
  },
  "/tools/remove-background": {
   "date": "2026-10-11",
-  "hash": "bba6fbe369315694"
+  "hash": "b924c53502cb0c04"
  },
  "/tools/remove-noise": {
   "date": "2026-10-07",

@@ -1176,7 +1176,7 @@ export const guides: Guide[] = [
     heading: 'Is remove.bg safe?',
     dek: 'remove.bg is a legitimate Canva-owned service. Its policy gives no exact deletion time, and its website is closing, so it is worth knowing the options.',
     keywords: ['is remove.bg safe', 'remove.bg safe', 'is remove bg safe', 'is remove.bg legit', 'remove.bg privacy', 'remove.bg alternative no upload'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-image'],
     sections: [
       {
@@ -1201,6 +1201,7 @@ export const guides: Guide[] = [
         p: [
           'Short-lived storage is the norm for upload tools, but “shortly after” is not a number, so for private photos the safest copy is the one that is never uploaded.',
           'The move to Canva is the other thing to weigh: if you rely on remove.bg’s site, check the pricing page for what replaces it after 1 December 2026.',
+          'If you are looking for a replacement, see the [remove.bg alternative](/guides/remove-bg-alternative) guide.',
         ],
       },
       {
@@ -1230,7 +1231,7 @@ export const guides: Guide[] = [
     heading: 'How to remove the background from a photo',
     dek: 'iPhone, Android, Windows and Mac can all do this without an app. Here is how on each, and where they fall short.',
     keywords: ['how to remove background from a photo', 'remove background from image', 'cut out background iphone', 'remove background from photo android', 'transparent background photo', 'background eraser'],
-    updated: '2026-09-29',
+    updated: '2026-10-12',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
     sections: [
       {
@@ -1267,6 +1268,7 @@ export const guides: Guide[] = [
         h: 'When the built-in tools fall short',
         p: [
           'These features are made for quick, single-photo edits: they can struggle with busy backgrounds, fine hair or fur, and low-contrast edges, and none of them let you process many photos at once or choose a plain white or blurred background instead of transparency. Stayput\'s [background remover](/tools/remove-background) runs an open-source segmentation model (ISNet) inside your browser tab, so it works offline after the model loads once, keeps your photo at full resolution, and never uploads anything. Use [Make background transparent](/make-background-transparent) for a PNG, [White background](/white-background) for product photos and headshots, or [Blur background](/blur-background) for a portrait-mode look.',
+          'If you have been using remove.bg, see [remove.bg is closing: alternatives](/guides/remove-bg-alternative).',
         ],
       },
     ],
@@ -2841,45 +2843,61 @@ export const guides: Guide[] = [
   },
   {
     slug: 'remove-bg-alternative',
-    title: 'A Free remove.bg Alternative With No Resolution Cap',
-    description: 'remove.bg lists max-quality exports as a paid feature, and says its standalone site is moving to Canva. Here is a browser-based background remover that returns the photo at its original resolution, with no upload.',
-    heading: 'A free remove.bg alternative with no resolution cap',
-    dek: 'remove.bg lists max-quality exports as a paid feature. Here is a way to remove a background at full size for free, without uploading the photo.',
-    keywords: ['remove.bg alternative', 'free remove.bg alternative', 'remove.bg alternative full resolution', 'remove.bg free high resolution', 'background remover no upload'],
-    updated: '2026-10-08',
+    title: 'remove.bg Alternative: It Closes 1 Dec 2026 (Free, No Upload)',
+    description: 'remove.bg says its website closes on 1 December 2026. Stayput removes backgrounds free, with no account, and your photos are not uploaded.',
+    heading: 'remove.bg is closing: a free alternative that does not upload your photos',
+    dek: 'remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). Stayput\'s background remover is free, needs no account, and your photos are not uploaded.',
+    keywords: ['remove.bg alternative', 'remove.bg shutting down', 'remove.bg closing', 'remove.bg canva', 'remove.bg replacement', 'free remove.bg alternative', 'background remover no upload', 'remove.bg alternative full resolution'],
+    updated: '2026-10-12',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
     sections: [
       {
-        h: 'What remove.bg does well',
+        h: 'remove.bg is closing on 1 December 2026',
         p: [
-          'remove.bg, owned by Canva, popularized instant AI background removal and produces clean cutouts on a wide range of photos, including tricky subjects like hair and fur. It is a legitimate, widely used tool.',
+          'remove.bg\'s site shows this notice (checked 8 October 2026): "remove.bg\'s background removal is moving to Canva. The standalone website will no longer be available from 1 December 2026 at 9:00am CET."',
+          'Its API page (checked 8 October 2026) says: "Starting December 1, 2026, background removal moves to Leonardo.Ai, also part of Canva." Its terms and conditions (checked 8 October 2026) say: "All credits (including pay-as-you-go (PAYG) credits, monthly rollover credits and any other type of credits) may be used until December 1 2026 only. Any unused credits will expire on that date and are non-refundable."',
+          'For what happens to subscriptions, refunds and accounts, read the notice on remove.bg itself (remove.bg/faq); we have not summarised it here.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'As of October 2026, per [remove.bg/pricing](https://www.remove.bg/pricing), remove.bg sells credits (pay-as-you-go packs and a monthly subscription) and lists max-quality exports as a paid feature. The same page says the standalone website will no longer be available from 1 December 2026, with background removal moving to Canva. For a print, a listing photo or a profile portrait, paying per image is the usual reason to look elsewhere.',
+          'On remove.bg\'s website, per its own site text (checked 8 October 2026), images up to 0.25 megapixels (for example 625 by 400 pixels) are always free; higher-resolution downloads up to 25 megapixels cost 1 credit per image.',
           'remove.bg is also a web service that processes photos on its servers. Its stated retention practices are covered in [Is remove.bg safe?](/guides/is-remove-bg-safe).',
         ],
       },
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, so the output comes back at the photo\'s original resolution with no watermark, and the photo is never uploaded to produce the result. [Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it.',
+          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, and it is free, with no account; your photos are not uploaded. The result is the same size as your photo (a 12 megapixel photo gives a 12 megapixel cut-out), limited by what your device can hold in memory, with no watermark and no credits. The first photo downloads the cut-out model (about 46 MB); the first run needs a connection, and after that the model is cached. After your first run you can turn off Wi-Fi and it keeps working.',
+          '[Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it. For a step-by-step walkthrough, see [how to remove the background from a photo](/guides/remove-background-from-a-photo).',
         ],
       },
       {
-        h: 'Where remove.bg still has the edge',
+        h: 'Where remove.bg and Stayput differ',
         p: [
-          'remove.bg\'s model may handle some especially difficult edge cases (fine hair strands, motion blur, very low contrast subjects) better than a smaller model that runs entirely in a browser tab. For most everyday product photos, portraits and pet pictures, a full-resolution local cutout with no fee is the more practical choice.',
+          'Stayput has no API, no desktop app and no Photoshop plug-in. If you used remove.bg through its API, that moves to Leonardo.Ai per remove.bg\'s API page (checked 8 October 2026).',
+          'We use one general-purpose model (ISNet, 8-bit weights). We have not run a side-by-side comparison with remove.bg, so we cannot say which cuts fine hair or low-contrast subjects better. Fine hair and fur are kept as soft edges; if part of the subject goes missing or background stays, try the "Keep around the edges" setting.',
+          'Each photo takes a few seconds depending on your device, and the first run waits for the 46 MB download.',
+          'You can drop several photos and download them in one zip.',
+        ],
+      },
+      {
+        h: 'Before 1 December',
+        p: [
+          'Per remove.bg\'s terms (checked 8 October 2026), unused credits expire on 1 December 2026 and are non-refundable, so use them or finish your cut-outs before then.',
         ],
       },
     ],
     faq: [
-      { q: 'Is there a free way to remove a background at full resolution?', a: 'Yes. A background remover that runs the cutout model in your own browser returns the full-resolution result with no watermark, because the model runs on your device and your photo is not uploaded.' },
-      { q: 'Does remove.bg charge for full-quality results?', a: 'As of October 2026, its pricing page lists max-quality exports as a paid feature, sold as credits or a monthly subscription.' },
-      { q: 'Does a browser-based background remover work as well as remove.bg?', a: 'For most everyday photos, yes; remove.bg\'s model can have an edge on especially difficult cases like very fine hair or low-contrast subjects, refined over a larger dataset.' },
-      { q: 'Is my photo uploaded to remove a background locally?', a: 'No. A tool that runs the cutout model in the browser processes the image on your device, and you can confirm that the photo is never uploaded in your browser\'s network panel. The model itself downloads once, on first use.' },
+      { q: 'Is remove.bg shutting down?', a: 'Its own site says so. A notice on remove.bg (checked 8 October 2026) states: "The standalone website will no longer be available from 1 December 2026 at 9:00am CET." It says background removal is moving to Canva.' },
+      { q: 'What happens to my remove.bg credits?', a: 'Its terms and conditions (checked 8 October 2026) say unused credits expire on 1 December 2026 and are non-refundable.' },
+      { q: 'What happens to the remove.bg API?', a: 'Its API page (checked 8 October 2026) says that from 1 December 2026 background removal moves to Leonardo.Ai, also part of Canva. Stayput has no API.' },
+      { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model (about 46 MB), so it needs a connection then.' },
+      { q: 'Does it work as well as remove.bg?', a: 'We have not compared them side by side. Stayput uses one general-purpose model, and fine hair and low-contrast subjects may need a second try with the edge setting. There is no API, desktop app or plug-in.' },
+      { q: 'Is the result full resolution?', a: 'It is the same size as your photo: a 12 megapixel photo gives a 12 megapixel cut-out, limited by what your device can hold in memory. There is no low-resolution preview and no watermark.' },
+      { q: 'Can I do many photos at once?', a: 'Yes. Drop several photos and download them all in one zip.' },
+      { q: 'Why is remove.bg\'s free result small?', a: 'Per its site text (checked 8 October 2026), images up to 0.25 megapixels are free and higher-resolution downloads cost a credit.' },
     ],
   },
   {
