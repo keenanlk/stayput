@@ -9,6 +9,7 @@
  */
 import type { InferenceSession, Tensor } from 'onnxruntime-web';
 import { vendorDir } from './vendor';
+import { workerFailure } from './worker-error';
 import { INST_HQ_3, Mdx, separate } from './mdx';
 
 export const MODEL_URL = '/models/uvr-mdx-net-inst-hq-3.onnx';
@@ -20,7 +21,7 @@ export type Reply =
   | { id: number; type: 'loading'; fraction: number }
   | { id: number; type: 'progress'; done: number; total: number; engine: 'gpu' | 'cpu' }
   | { id: number; type: 'done'; left: Float32Array; right: Float32Array; engine: 'gpu' | 'cpu' }
-  | { id: number; type: 'error'; message: string };
+  | { id: number; type: 'error'; name: string; message: string };
 
 type Ort = typeof import('onnxruntime-web');
 interface Loaded { ort: Ort; session: InferenceSession; engine: 'gpu' | 'cpu' }
@@ -114,6 +115,6 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     }
     post({ id, type: 'done', left: l, right: r, engine }, [l.buffer, r.buffer]);
   } catch (err) {
-    post({ id, type: 'error', message: err instanceof Error ? err.message : String(err) });
+    post({ id, type: 'error', ...workerFailure(err) });
   }
 };

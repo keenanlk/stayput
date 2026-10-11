@@ -5,6 +5,8 @@
  * (inpaint.worker.ts); only the painted pixels are replaced, the rest of the
  * picture is copied through untouched.
  */
+import { fromWorkerFailure } from './worker-error';
+
 let worker: Worker | undefined;
 let nextId = 0;
 
@@ -22,14 +24,14 @@ export function inpaint(rgba: Uint8ClampedArray, hole: Uint8Array, width: number
   const w = getWorker();
   return new Promise((resolve, reject) => {
     const onMessage = (e: MessageEvent) => {
-      const msg = e.data as { id: number; type: string; fraction?: number; rgba?: Uint8ClampedArray<ArrayBuffer>; message?: string };
+      const msg = e.data as { id: number; type: string; fraction?: number; rgba?: Uint8ClampedArray<ArrayBuffer>; name?: string; message?: string };
       if (msg.id !== id) return;
       if (msg.type === 'loading') return opts.onLoading?.(msg.fraction ?? 0);
       if (msg.type === 'working') return opts.onWorking?.();
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       if (msg.type === 'done') resolve(msg.rgba!);
-      else reject(new Error(msg.message ?? 'Removing the object failed.'));
+      else reject(fromWorkerFailure(msg.name, msg.message ?? 'Removing the object failed.'));
     };
     const onError = (e: ErrorEvent) => {
       w.removeEventListener('message', onMessage);

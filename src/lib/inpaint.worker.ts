@@ -8,6 +8,7 @@
  */
 import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
+import { workerFailure } from './worker-error';
 
 export const MODEL_URL = '/models/migan-pipeline-v2.onnx';
 
@@ -17,7 +18,7 @@ export type Reply =
   | { id: number; type: 'loading'; fraction: number }
   | { id: number; type: 'working' }
   | { id: number; type: 'done'; rgba: Uint8ClampedArray; width: number; height: number }
-  | { id: number; type: 'error'; message: string };
+  | { id: number; type: 'error'; name: string; message: string };
 
 let session: Promise<ort.InferenceSession> | undefined;
 
@@ -94,6 +95,6 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     const result = await inpaint(s, rgba, hole, width, height);
     post({ id, type: 'done', rgba: result, width, height }, [result.buffer]);
   } catch (err) {
-    post({ id, type: 'error', message: err instanceof Error ? err.message : String(err) });
+    post({ id, type: 'error', ...workerFailure(err) });
   }
 };

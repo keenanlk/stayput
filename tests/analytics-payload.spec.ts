@@ -221,6 +221,41 @@ async function failedRun(page: Page, baseURL: string, path: string, files: Param
   return { shown: (await page.locator('#error').innerText()).replace(/\s+/g, ' '), data: run.payload.data as Record<string, string>, raw: JSON.stringify(sent) };
 }
 
+/**
+ * A model worker fails on a named error (a refused model download throws a TypeError inside the worker):
+ * the name must cross postMessage and reach the one tool_run event, with no message and no file name.
+ */
+test('Remove object: an error named inside the worker is recorded under that name', async ({ page, baseURL }) => {
+  const sent = await captureAnalytics(page, baseURL!);
+  await page.route(`${SITE}/models/**/*.onnx`, (route) => route.abort('connectionreset'));
+  await page.goto(`${SITE}/tools/remove-object`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fx('photo.jpg'));
+  await expect(page.locator('#erase-panel')).toBeVisible();
+  const canvas = page.locator('#erase-canvas');
+  await canvas.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const b = (await canvas.boundingBox())!;
+  await page.mouse.move(b.x + b.width * 0.4, b.y + b.height * 0.4);
+  await page.mouse.down();
+  await page.mouse.move(b.x + b.width * 0.6, b.y + b.height * 0.5, { steps: 4 });
+  await page.mouse.up();
+  await expect(page.locator('#erase-panel')).toHaveAttribute('data-strokes', '1');
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
+  const run = sent.find((s) => s.payload.name === 'tool_run')!;
+  expect(violations(run), JSON.stringify(run)).toEqual([]);
+  expect(run.payload.data).toMatchObject({ tool: 'remove-object', outcome: 'error', error_class: 'TypeError' });
+  expect(JSON.stringify(sent)).not.toContain('photo');
+});
+
+test('Vocal remover: an error named inside the worker is recorded under that name', async ({ page, baseURL }) => {
+  const sent = await captureAnalytics(page, baseURL!);
+  await page.route(`${SITE}/models/**/*.onnx`, (route) => route.abort('connectionreset'));
+  const out = await failedCaptionRun(page, baseURL!, 'vocal-remover', sent);
+  expect(out.data).toMatchObject({ tool: 'vocal-remover', outcome: 'error', error_class: 'TypeError' });
+});
+
 test('pressing Run without what the tool needs is recorded as InputError, not as a failure', async ({ page, baseURL }) => {
   const srt = { name: 'secret-captions.srt', mimeType: 'text/plain', buffer: Buffer.from('1\n00:00:00,000 --> 00:00:02,000\nsecret-words\n') };
   const out = await failedRun(page, baseURL!, '/tools/add-subtitles-to-video', srt);
