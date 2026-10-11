@@ -107,6 +107,14 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser plays the video from the file on your device so you can pick the start and end. Mediabunny (MPL-2.0) then reads the MP4, MOV, WebM or MKV container in your tab and copies the packets between those two points into a new file of the same type, starting from the nearest key frame within half a second. When there is none that close, or when you ask for an exact cut, the clip is decoded and re-encoded by your browser’s own video encoder (WebCodecs).',
     versus: 'Online video cutters upload the whole file just to throw most of it away, cap free videos at a few hundred megabytes and often add a watermark. Here nothing is uploaded, and a clip from a 2 GB recording is cut in seconds because the video is copied rather than re-encoded.',
   },
+  'resize-gif': {
+    how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. Each frame is drawn at the new width and height on a canvas, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
+    versus: 'Online GIF resizers upload the file to change its size on their server, cap free files at a few dozen megabytes, and some add a watermark. Reaction GIFs and screen recordings are often personal. Here the GIF never leaves your device, and you can resize several at once.',
+  },
+  'crop-gif': {
+    how: 'Your browser draws the first frame of the GIF so you can place the box. gifuct-js (MIT) then reads the GIF byte by byte in your tab and every frame is composited the way browsers play it; the part inside the box is cut from each frame, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
+    versus: 'Online GIF croppers upload the file to cut it on their server, cap free files at a few dozen megabytes, and some add a watermark. Here the GIF never leaves your device.',
+  },
   'compress-gif': {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. The frames are then written back with gifenc’s (MIT) colour quantizer and LZW coder: each frame after the first stores only the rectangle that changed, with unchanged pixels left transparent, and the stronger levels use fewer colours and ignore changes too small to see. The new GIF is assembled in memory.',
     versus: 'Online GIF compressors upload the file to optimise it on their server, cap free files at around 50 MB, keep uploads for a while, and some add a watermark. Screen recordings and reaction GIFs of friends are often personal. Here the GIF never leaves your device, and you can compress a whole folder at once.',

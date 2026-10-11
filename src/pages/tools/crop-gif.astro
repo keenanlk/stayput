@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import CropGif from '../../components/options/CropGif.astro';
+import CropStage from '../../components/CropStage.astro';
+const tool = toolBySlug('crop-gif')!;
+---
+<ToolLayout tool={tool}>
+  <CropStage slot="panel" />
+  <Fragment slot="options"><CropGif /></Fragment>
+</ToolLayout>
+<script src="../../tools/crop-gif.ts"></script>

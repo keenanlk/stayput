@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-11",
-  "hash": "38557aece6c9dc15"
+  "hash": "31e48d78f52d88b7"
  },
  "/2x2-photo": {
   "date": "2026-10-06",
@@ -1244,8 +1244,8 @@
   "hash": "f88e8781dd44d090"
  },
  "/tools/compress-gif": {
-  "date": "2026-10-06",
-  "hash": "276f11e19c139a9e"
+  "date": "2026-10-11",
+  "hash": "0eaf6509f74d1654"
  },
  "/tools/compress-image": {
   "date": "2026-10-06",
@@ -1271,9 +1271,13 @@
   "date": "2026-10-06",
   "hash": "7b8bc5e7f27d5c2c"
  },
+ "/tools/crop-gif": {
+  "date": "2026-10-11",
+  "hash": "f72b06d5b1051221"
+ },
  "/tools/crop-image": {
-  "date": "2026-10-06",
-  "hash": "45cc1b5e5e1f0e83"
+  "date": "2026-10-11",
+  "hash": "26d29f057a114201"
  },
  "/tools/crop-pdf": {
   "date": "2026-10-06",
@@ -1288,8 +1292,8 @@
   "hash": "a9450cbc8c5e79eb"
  },
  "/tools/emote-resizer": {
-  "date": "2026-10-06",
-  "hash": "1c69515cce5d5a86"
+  "date": "2026-10-11",
+  "hash": "5f9ac989478f619a"
  },
  "/tools/epub-to-pdf": {
   "date": "2026-10-06",
@@ -1446,6 +1450,10 @@
  "/tools/reorder-pdf": {
   "date": "2026-10-06",
   "hash": "086af995db8504e3"
+ },
+ "/tools/resize-gif": {
+  "date": "2026-10-11",
+  "hash": "c9d219fd58d7e48e"
  },
  "/tools/resize-pdf": {
   "date": "2026-10-06",

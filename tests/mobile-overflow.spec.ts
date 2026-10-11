@@ -13,6 +13,8 @@ const pages = [
   '/tools/add-audio-to-video',
   '/tools/add-border-to-image',
   '/tools/crop-video',
+  '/tools/resize-gif',
+  '/tools/crop-gif',
   '/press',
   '/licenses',
 ];

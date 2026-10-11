@@ -13,7 +13,8 @@
  * - tools whose output is several files, a zip, text or a recording made in the page
  *   (screen recorder, voice recorder, transcribe, pdf-to-word, split-pdf, ...)
  * - image tools: runs often make several files, and a handoff carries exactly one;
- *   the pairs below are the single-output video, audio and PDF jobs
+ *   the pairs below are the single-output video, audio and PDF jobs, plus the GIF
+ *   tools, whose one-file run makes one GIF
  * A run that makes more than one file never hands anything over, whatever the pair.
  */
 export const handoffs: Record<string, string[]> = {
@@ -30,6 +31,9 @@ export const handoffs: Record<string, string[]> = {
   'reverse-video': ['video-to-gif'],
   'blur-face-video': ['compress-video', 'trim-video'],
   'merge-videos': ['compress-video'],
+  // GIF → GIF (a run that makes several files never hands anything over)
+  'resize-gif': ['compress-gif', 'gif-to-mp4'],
+  'crop-gif': ['resize-gif', 'compress-gif'],
   // Audio → audio
   'audio-converter': ['trim-audio'],
   'volume-booster': ['trim-audio', 'audio-converter'],

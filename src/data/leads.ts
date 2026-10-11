@@ -15,6 +15,8 @@ const does: Record<string, string> = {
   'heic-to-jpg': 'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and can keep or drop the location data.',
   'convert-image': 'Converts images between JPG, PNG, WebP, GIF, BMP, TIFF, ICO and PDF, and reads HEIC, AVIF, JXL and SVG as input.',
   'compress-image': 'Makes JPG, PNG and WebP images smaller: pick a quality, fit a file size such as 100 KB, or resize to exact pixels, for a single file or a batch.',
+  'resize-gif': 'Changes the width and height of animated GIFs by percent or in exact pixels, keeping the animation, frame timing and loop.',
+  'crop-gif': 'Crops an animated GIF to a box you draw, a square, 16:9 or 9:16, keeping every frame, its timing and the loop.',
   'compress-gif': 'Shrinks animated GIFs by dropping unchanged pixels, reducing colours, resizing or removing frames, and saves a smaller GIF.',
   'compress-png': 'Compresses PNG files with a smart colour palette or losslessly, keeps transparency, and saves smaller PNGs.',
   'strip-exif': 'Removes EXIF metadata, GPS location and camera details from JPG, PNG and WebP photos without re-encoding the picture.',
