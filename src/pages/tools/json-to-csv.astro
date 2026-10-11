@@ -1,0 +1,31 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import JsonToCsv from '../../components/options/JsonToCsv.astro';
+const tool = toolBySlug('json-to-csv')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" class="jc-paste">
+    <label for="jc-text">Or paste JSON or CSV here</label>
+    <textarea id="jc-text" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder='[{"name": "Ada", "city": "London"}]  or  name,city&#10;Ada,London'></textarea>
+    <p id="jc-detected" class="muted small" role="status" aria-live="polite" hidden></p>
+  </div>
+  <Fragment slot="options"><JsonToCsv /></Fragment>
+</ToolLayout>
+<style is:global>
+  .jc-group { display: contents; }
+  .jc-group[hidden] { display: none; }
+  .jc-paste { display: grid; gap: 8px; margin-top: 16px; }
+  .jc-paste label { font-weight: 560; color: var(--ink); }
+  .jc-paste textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; font: 13px var(--mono); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); resize: vertical; }
+  .jc-result { margin-top: 16px; display: grid; gap: 10px; }
+  .jc-result .jc-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; justify-content: space-between; }
+  .jc-result .jc-stats { font-size: 14px; color: var(--ink-2); }
+  .jc-result .jc-note { margin: 0; font-size: 13px; color: var(--muted); }
+  .jc-scroll { overflow: auto; max-height: 22rem; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
+  .jc-table { border-collapse: collapse; font: 13px var(--mono); width: 100%; }
+  .jc-table th, .jc-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: pre; max-width: 24rem; overflow: hidden; text-overflow: ellipsis; }
+  .jc-table th { position: sticky; top: 0; background: var(--surface); color: var(--ink); }
+  .jc-pre { margin: 0; padding: 10px 12px; font: 13px var(--mono); white-space: pre; color: var(--ink); }
+</style>
+<script src="../../tools/json-to-csv.ts"></script>

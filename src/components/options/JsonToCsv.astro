@@ -1,0 +1,61 @@
+---
+/** Option controls for JSON ↔ CSV. Groups are shown for the direction in use (see tools/json-to-csv.ts). */
+---
+<div class="field wide">
+  <label>Direction</label>
+  <div class="segmented" role="radiogroup" aria-label="Direction">
+    <label><input type="radio" name="direction" value="auto" checked /><span>Pick from my data</span></label>
+    <label><input type="radio" name="direction" value="json-to-csv" /><span>JSON to CSV</span></label>
+    <label><input type="radio" name="direction" value="csv-to-json" /><span>CSV to JSON</span></label>
+  </div>
+</div>
+<div class="jc-group" id="jc-to-csv">
+  <div class="field">
+    <label for="jc-out-delimiter">Delimiter</label>
+    <select id="jc-out-delimiter">
+      <option value="," selected>Comma</option>
+      <option value=";">Semicolon</option>
+      <option value="&#9;">Tab</option>
+      <option value="|">Pipe</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="jc-eol">Line ending</label>
+    <select id="jc-eol">
+      <option value="crlf" selected>CRLF (Windows, Excel)</option>
+      <option value="lf">LF (Mac, Linux)</option>
+    </select>
+  </div>
+  <div class="field wide">
+    <label class="check"><input type="checkbox" id="jc-flatten" checked /> Flatten nested objects</label>
+    <label class="check"><input type="checkbox" id="jc-join" /> Join arrays with ;</label>
+    <label class="check"><input type="checkbox" id="jc-bom" checked /> UTF-8 with BOM (for Excel)</label>
+  </div>
+  <div class="field" id="jc-which-field" hidden>
+    <label for="jc-which">Which list</label>
+    <select id="jc-which"></select>
+  </div>
+</div>
+<div class="jc-group" id="jc-to-json" hidden>
+  <div class="field">
+    <label for="jc-in-delimiter">Delimiter</label>
+    <select id="jc-in-delimiter">
+      <option value="auto" selected>Detect it</option>
+      <option value=",">Comma</option>
+      <option value=";">Semicolon</option>
+      <option value="&#9;">Tab</option>
+      <option value="|">Pipe</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="jc-pretty">Output</label>
+    <select id="jc-pretty">
+      <option value="pretty" selected>Pretty (2 spaces)</option>
+      <option value="min">Minified</option>
+    </select>
+  </div>
+  <div class="field wide">
+    <label class="check"><input type="checkbox" id="jc-headers" checked /> First row is headers (off gives an array of arrays)</label>
+    <label class="check"><input type="checkbox" id="jc-types" /> Detect types (numbers, true, false, null)</label>
+  </div>
+</div>

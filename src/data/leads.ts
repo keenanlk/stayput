@@ -112,6 +112,7 @@ const does: Record<string, string> = {
   'crop-pdf': 'Crops PDF pages to an area you draw, or trims white margins from every page in one click.',
   'redact-pdf': 'Blacks out names, numbers and addresses in a PDF so the text underneath is removed, not just covered.',
   'file-checksum': 'Computes the MD5, SHA-1 or SHA-256 checksum of a file so you can compare it with the one the publisher lists.',
+  'json-to-csv': 'Converts JSON to CSV or CSV to JSON, flattening nested objects, with the delimiter, headers and Excel-friendly encoding you choose.',
 };
 
 interface Download {
@@ -195,6 +196,7 @@ const free: Record<string, string> = {
   'qr-code-scanner': freeLine('your images and the picture from your camera are'),
   'qr-code-generator': freeLine('what you type is'),
   'barcode-generator': freeLine('what you type is'),
+  'json-to-csv': freeLine('what you paste and the files you drop are'),
   'signature-maker': freeLine('what you draw, type or photograph is'),
   'screen-recorder': freeLine('your recordings are'),
   'voice-recorder': freeLine('your recordings are'),

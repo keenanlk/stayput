@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(100);
+  expect(await page.locator('.index .tool-card').count()).toBe(101);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -569,7 +569,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'signature-maker', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'signature-maker', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image', 'json-to-csv'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -2552,6 +2552,29 @@ test('Archive extractor asks for the password of a locked ZIP, rejects a wrong o
   const [d] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
   expect(d.suggestedFilename()).toBe('notes.txt');
   expect(new TextDecoder().decode(await bytesOf(d))).toBe('Meeting notes\n');
+});
+
+test('JSON to CSV converts a file and pasted text both ways, with no bytes leaving the tab', async ({ page }) => {
+  const errors = await open(page, 'json-to-csv');
+  const net = watchNetwork(page);
+  const dir = mkdtempSync(join(tmpdir(), 'jsoncsv-'));
+  const file = join(dir, 'people.json');
+  writeFileSync(file, JSON.stringify([{ name: 'Ada', address: { city: 'London' } }, { name: 'Bob' }]));
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(file);
+  await expect(page.locator('#jc-detected')).toContainText('JSON to CSV');
+  await page.locator('#jc-bom').uncheck();
+  await page.locator('#jc-eol').selectOption('lf');
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#results-list button', { hasText: 'Download' }).click()]);
+  expect(new TextDecoder().decode(await bytesOf(download))).toBe('name,address.city\nAda,London\nBob,\n');
+  await page.locator('#jc-text').fill('k;v\n1;"a ""b"""\n');
+  await expect(page.locator('#jc-detected')).toContainText('CSV to JSON');
+  await page.locator('#run').click();
+  await expect(page.locator('.jc-pre')).toContainText('"v": "a \\"b\\""');
+  net.assertNothingLeft(['people.json']);
+  expect(errors).toEqual([]);
 });
 
 test('Create ZIP packs a picked folder with its subfolders plus loose files, and no bytes leave the tab', async ({ page }) => {
