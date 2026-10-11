@@ -102,7 +102,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I convert HEIC to JPG without uploading my photos?',
-        a: 'Yes. The HEIC decoder (libheif compiled to WebAssembly) runs inside your browser tab. Your photos are read from your disk, converted in memory and saved back to your disk. You can turn off your network after the page loads and it still works.',
+        a: 'Yes. The HEIC decoder (libheif compiled to WebAssembly) runs inside your browser tab. Your photos are read from your disk, converted in memory and saved back to your disk. After one visit it works with your network turned off.',
       },
       {
         q: 'Is there a file size or quantity limit?',
@@ -480,7 +480,7 @@ export const tools: Tool[] = [
     name: 'Compress PDF',
     title: 'Compress PDF Online: Free, No Upload, Set a Size | Stayput',
     description:
-      'Compress a PDF in your browser, or fit it under a limit like 1 MB or 200 KB. Three levels, from lossless cleanup to aggressive. No upload, no watermark.',
+      'Compress a PDF in your browser, or fit it under a limit like 1 MB or 200 KB. Four modes, from lossless cleanup to a target size. No upload, no watermark.',
     heading: 'Compress a PDF',
     tagline: 'Shrink a PDF for email or an upload limit. Pick a level, or type the size you need, like 1 MB, and the page tries the gentlest setting that fits. Processed on your device.',
     category: 'pdf',

@@ -183,7 +183,7 @@ export const presets: Preset[] = [
     dropLabel: 'Drop JPG photos here',
     defaults: { 'page-size': 'fit' },
     intro: [
-      'Scanned receipts, photographed forms, a set of pictures a client asked for "as one document": JPG to PDF is the conversion people need most often, and it is the one most upload-based sites push through a queue and a sign-up wall. Here the PDF is written by pdf-lib inside your browser. Each JPG is embedded as-is, without re-encoding, so the pages look exactly like the photos and the PDF is barely larger than the JPGs combined.',
+      'Scanned receipts, photographed forms, a set of pictures a client asked for "as one document": JPG to PDF is the conversion people need most often, and it is the one most upload-based sites push through a queue and a sign-up wall. Here the PDF is written by pdf-lib inside your browser. A JPG goes into the PDF unchanged, unless the photo needs rotating (as sideways phone photos often do), in which case it is re-encoded at high quality. So the pages look like the photos and the PDF is barely larger than the JPGs combined.',
       'Drop several photos and they become pages in the order shown; use the arrows to reorder. "Fit to each image" makes every page the size of its photo, which is right for screenshots and scans. Pick A4 or US Letter with a margin when the PDF is going to be printed or attached to a form.',
     ],
     steps: [
@@ -193,7 +193,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Can I combine several JPGs into one PDF?', a: 'Yes. Every photo you add becomes a page in the same PDF, in the order listed. Drag the arrows to change the order before converting.' },
-      { q: 'Does converting to PDF reduce the photo quality?', a: 'No. The JPG data is embedded in the PDF unchanged, byte for byte. If you want a smaller PDF, shrink the photos first with the compress tool and then convert.' },
+      { q: 'Does converting to PDF reduce the photo quality?', a: 'Usually not. A JPG goes into the PDF unchanged, unless the photo needs rotating (as sideways phone photos often do), in which case it is re-encoded at high quality (92). If you want a smaller PDF, shrink the photos first with the compress tool and then convert.' },
       { q: 'What page size should I pick?', a: '"Fit to each image" for screenshots, scans and anything viewed on screen; A4 or Letter with a 10 mm margin for anything that will be printed or filed.' },
       noUpload,
     ],
@@ -1165,7 +1165,7 @@ export const presets: Preset[] = [
     defaults: { 'page-size': 'a4', margin: '10' },
     intro: [
       'The usual reason for this job: a landlord, school, insurer or visa office asks for "one PDF" and you have a dozen phone photos of pages, receipts or ID cards, some of them screenshots, some HEIC straight from an iPhone. Uploading all of that to a converter means handing over exactly the documents you would least like copied. Here the PDF is assembled in your browser tab, and the images never leave it.',
-      'Formats can be mixed freely: JPG and PNG go into the PDF without re-encoding, and HEIC, WebP, GIF, BMP and AVIF are decoded and stored as high-quality JPG. Every image becomes one page. This page starts on A4 with a 10 mm margin, because a combined document is usually going to be printed or read like paper; switch to US Letter, or to "Fit to each image" for a PDF of screenshots.',
+      'Formats can be mixed freely: a JPG goes in unchanged unless it needs rotating (then it is re-encoded at high quality), a PNG is kept lossless, and HEIC, WebP, GIF, BMP and AVIF are decoded and stored as high-quality JPG. Every image becomes one page. This page starts on A4 with a 10 mm margin, because a combined document is usually going to be printed or read like paper; switch to US Letter, or to "Fit to each image" for a PDF of screenshots.',
       'Order matters most when combining. Drop everything at once, then use the arrows to put the pages in sequence before you convert. Phone photos are turned upright using their orientation tag, so sideways shots come out the right way round.',
     ],
     steps: [
@@ -2247,7 +2247,7 @@ export const presets: Preset[] = [
     defaults: { 'page-size': 'fit', margin: '0' },
     intro: [
       'Screenshots end up as PDFs when someone needs a record: an order confirmation or receipt for an expense claim, a boarding pass, a chat thread for a landlord dispute, HR or a lawyer, error messages for a support ticket, a bank transfer confirmation, or a set of app screens for a client. A single PDF keeps them in order, opens on anything, and attaches to a form that takes one file.',
-      'Screenshots are mostly text and flat colour, which JPG compression smears. This page keeps PNG screenshots as PNG inside the PDF, so letters stay pixel-sharp at any zoom. JPG and WebP screenshots are embedded as they are, and iPhone screenshots saved as HEIC are decoded in the browser first. Each screenshot gets its own page at its own size, with no margin, so the PDF looks like the screens themselves.',
+      'Screenshots are mostly text and flat colour, which JPG compression smears. This page keeps PNG screenshots as PNG inside the PDF, so letters stay pixel-sharp at any zoom. JPG screenshots go in unchanged (unless they need rotating, when they are re-encoded at high quality), WebP screenshots are decoded and stored as high-quality JPG, and iPhone screenshots saved as HEIC are decoded in the browser first. Each screenshot gets its own page at its own size, with no margin, so the PDF looks like the screens themselves.',
       'Long scrolling screenshots of a web page or chat come out as one tall page. Acrobat and some older viewers cap page length at 200 inches, about 14,400 pixels at this page’s scale; browsers and phone viewers show taller pages fine. For printing, pick A4 or US Letter, which scales each screenshot to fit a page.',
       'Screenshots are often the most private images on a phone: bank balances, messages, medical portals, addresses. Nothing here leaves your device. The PDF is assembled by pdf-lib in this tab, and the page keeps working with the network off once it has loaded.',
     ],
@@ -2258,7 +2258,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'How do I turn iPhone screenshots into a PDF?', a: 'Open this page in Safari, tap the drop zone and choose Photo Library, then select the screenshots in order. The PDF is saved to Downloads in the Files app, ready to attach or share.' },
-      { q: 'Will the text in my screenshots stay sharp?', a: 'Yes. PNG screenshots are stored losslessly inside the PDF, pixel for pixel, and JPG ones are embedded unchanged. Nothing is re-compressed.' },
+      { q: 'Will the text in my screenshots stay sharp?', a: 'Yes. PNG screenshots are stored losslessly inside the PDF, pixel for pixel, and JPG ones are embedded unchanged unless they need rotating, in which case they are re-encoded at high quality. HEIC and WebP screenshots are decoded and stored as high-quality JPG.' },
       { q: 'Can I search or copy the text in the PDF?', a: 'Not directly: the pages are pictures of text. To get the words out, run the screenshots through Image to text first, which reads them in your browser.' },
       { q: 'Can I redact something before making the PDF?', a: 'Yes. Cover account numbers or names with a solid box on Blur text in image first, then add the edited screenshots here. A black box cannot be reversed; blur on small text sometimes can.' },
       noUpload,
