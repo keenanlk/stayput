@@ -1050,8 +1050,26 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#delay')).toHaveValue('1');
       await expect(page.locator('#width')).toHaveValue('640');
     }],
-    ['video-to-subtitles', 'transcribe', async () => expect(page.locator('#format')).toHaveValue('srt')],
+    ['video-to-subtitles', 'transcribe', async () => {
+      await expect(page.locator('#format')).toHaveValue('srt');
+      await expect(page).toHaveTitle('Subtitle Generator: Auto SRT Subtitles from Video, Free, No Upload | Stayput');
+      await expect(page.locator('h1')).toHaveText('Subtitle generator: make an SRT from a video');
+    }],
     ['mp3-to-text', 'transcribe', async () => expect(page.locator('#format')).toHaveValue('txt')],
+    ['audio-to-text', 'transcribe', async () => {
+      await expect(page.locator('#format')).toHaveValue('txt');
+      await expect(page).toHaveTitle('Audio to Text: Transcribe Any Audio File Privately, Free | Stayput');
+      const accept = await page.locator('#file-input').getAttribute('accept');
+      for (const ext of ['.wav', '.ogg', '.flac', '.m4a', '.mp3']) expect(accept).toContain(ext);
+      expect(accept).not.toContain('.mp4');
+    }],
+    ['video-to-text', 'transcribe', async () => {
+      await expect(page.locator('#format')).toHaveValue('txt');
+      await expect(page).toHaveTitle('Video to Text: Transcribe an MP4 Privately, Free, No Upload | Stayput');
+      const accept = await page.locator('#file-input').getAttribute('accept');
+      for (const ext of ['video/*', '.mp4', '.mov', '.m4v', '.webm', '.mkv']) expect(accept).toContain(ext);
+      expect(accept).not.toContain('.mp3');
+    }],
     ['auto-caption-video', 'add-subtitles-to-video', async () => expect(page.locator('input[name="size"][value="large"]')).toBeChecked()],
     ['burn-subtitles-into-video', 'add-subtitles-to-video', async () => expect(page.locator('input[name="look"][value="box"]')).toBeChecked()],
     ['karaoke-maker', 'vocal-remover', async () => expect(page.locator('#stems')).toHaveValue('instrumental')],
@@ -1130,6 +1148,35 @@ test('preset landing pages render, run their base tool with the preset options a
     expect((await page.request.get(`/og/${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
     await check();
     expect(errors, slug).toEqual([]);
+  }
+});
+
+test('the transcription pages carry their search titles and link to each other', async ({ page }) => {
+  await stubAnalytics(page);
+  const titles: [string, string][] = [
+    ['/tools/transcribe', 'Transcribe Video to Text: Free, Private, No Upload | Stayput'],
+    ['/tools/add-subtitles-to-video', 'Add Subtitles or Captions to a Video: Burned In, No Upload | Stayput'],
+  ];
+  for (const [path, title] of titles) {
+    await page.goto(path);
+    await expect(page, path).toHaveTitle(title);
+  }
+  await page.goto('/tools/transcribe');
+  await expect(page.getByText('Can I turn a video into text?')).toHaveCount(1);
+  const links: [string, string[]][] = [
+    ['/tools/transcribe', ['/video-to-text', '/audio-to-text', '/video-to-subtitles']],
+    ['/video-to-subtitles', ['/tools/transcribe', '/video-to-text', '/tools/add-subtitles-to-video']],
+    ['/mp3-to-text', ['/audio-to-text', '/tools/transcribe']],
+    ['/audio-to-text', ['/mp3-to-text', '/video-to-text', '/tools/transcribe']],
+    ['/video-to-text', ['/audio-to-text', '/video-to-subtitles', '/tools/transcribe', '/tools/video-to-mp3']],
+    ['/tools/voice-recorder', ['/audio-to-text']],
+    ['/tools/video-to-mp3', ['/video-to-text']],
+    ['/burn-subtitles-into-video', ['/video-to-subtitles']],
+    ['/auto-caption-video', ['/video-to-subtitles']],
+  ];
+  for (const [path, hrefs] of links) {
+    await page.goto(path);
+    for (const href of hrefs) await expect(page.locator(`main a[href="${href}"]`).first(), `${path} → ${href}`).toBeAttached();
   }
 });
 

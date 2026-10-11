@@ -43,9 +43,13 @@
   "date": "2026-10-06",
   "hash": "8800b8030317ea98"
  },
+ "/audio-to-text": {
+  "date": "2026-10-11",
+  "hash": "7b86236221a84f39"
+ },
  "/auto-caption-video": {
-  "date": "2026-10-07",
-  "hash": "827dce8845e1e2f0"
+  "date": "2026-10-11",
+  "hash": "d139d2b1182b809c"
  },
  "/avif-to-jpg": {
   "date": "2026-10-06",
@@ -88,8 +92,8 @@
   "hash": "3056c6492dbe7c04"
  },
  "/burn-subtitles-into-video": {
-  "date": "2026-10-06",
-  "hash": "c644410d0e18dd95"
+  "date": "2026-10-11",
+  "hash": "25f0c57d6cbef9c7"
  },
  "/change-video-resolution": {
   "date": "2026-10-06",
@@ -572,8 +576,8 @@
   "hash": "6364d81619c42654"
  },
  "/guides/how-to-transcribe-audio-to-text": {
-  "date": "2026-09-30",
-  "hash": "62a8a556a2dd9446"
+  "date": "2026-10-10",
+  "hash": "fab48481bf287817"
  },
  "/guides/how-to-trim-a-video-without-an-app": {
   "date": "2026-09-29",
@@ -900,8 +904,8 @@
   "hash": "32971b7d018f0b03"
  },
  "/mp3-to-text": {
-  "date": "2026-10-06",
-  "hash": "37089fef2f84946f"
+  "date": "2026-10-11",
+  "hash": "54e70887978dee28"
  },
  "/mp3-to-wav": {
   "date": "2026-10-06",
@@ -1184,8 +1188,8 @@
   "hash": "773fb79f7659bce7"
  },
  "/tools/add-subtitles-to-video": {
-  "date": "2026-10-06",
-  "hash": "0eb87a8dec5dfcff"
+  "date": "2026-10-11",
+  "hash": "547a3b42b1536868"
  },
  "/tools/add-text-to-image": {
   "date": "2026-10-07",
@@ -1484,8 +1488,8 @@
   "hash": "b1da2b11ab04217a"
  },
  "/tools/transcribe": {
-  "date": "2026-10-06",
-  "hash": "93bb539d42653617"
+  "date": "2026-10-11",
+  "hash": "83d603fdad092850"
  },
  "/tools/trim-audio": {
   "date": "2026-10-06",
@@ -1524,8 +1528,8 @@
   "hash": "601b842e0eb43a9f"
  },
  "/tools/video-to-mp3": {
-  "date": "2026-10-06",
-  "hash": "e8b3bb88d7e897bb"
+  "date": "2026-10-11",
+  "hash": "8262d482962eacad"
  },
  "/tools/video-to-mp4": {
   "date": "2026-10-06",
@@ -1536,8 +1540,8 @@
   "hash": "78cea90c19a1eda5"
  },
  "/tools/voice-recorder": {
-  "date": "2026-10-06",
-  "hash": "775bbd7ca017164e"
+  "date": "2026-10-11",
+  "hash": "08303a91cccb65b4"
  },
  "/tools/volume-booster": {
   "date": "2026-10-07",
@@ -1584,8 +1588,12 @@
   "hash": "663ea8926fe3db11"
  },
  "/video-to-subtitles": {
-  "date": "2026-10-06",
-  "hash": "5bc7d3078b99f014"
+  "date": "2026-10-11",
+  "hash": "a0173ca03fdcb195"
+ },
+ "/video-to-text": {
+  "date": "2026-10-11",
+  "hash": "7032a9d31f1aa3f4"
  },
  "/watermark-id-copy": {
   "date": "2026-10-06",
