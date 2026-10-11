@@ -581,7 +581,7 @@ test('every tool page renders with structured data and no errors', async ({ page
 });
 
 test('format-pair pages render, preset the converter and link a social image', async ({ page }) => {
-  const pairs = ['heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'psd-to-jpg', 'psd-to-png', 'webp-to-gif', 'png-to-gif', 'jpg-to-gif', 'jpg-to-tiff', 'png-to-tiff', 'ico-to-png'];
+  const pairs = ['heic-to-png', 'heif-to-jpg', 'png-to-jpg', 'jpg-to-png', 'webp-to-png', 'webp-to-jpg', 'png-to-webp', 'jpg-to-webp', 'avif-to-jpg', 'avif-to-png', 'svg-to-png', 'jxl-to-png', 'jxl-to-jpg', 'jfif-to-jpg', 'jfif-to-png', 'svg-to-jpg', 'gif-to-png', 'gif-to-jpg', 'png-to-ico', 'jpg-to-ico', 'bmp-to-png', 'bmp-to-jpg', 'png-to-bmp', 'tiff-to-jpg', 'tiff-to-png', 'psd-to-jpg', 'psd-to-png', 'webp-to-gif', 'png-to-gif', 'jpg-to-gif', 'jpg-to-tiff', 'png-to-tiff', 'ico-to-png'];
   for (const slug of pairs) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -7210,4 +7210,147 @@ test('Image to text says so when a photo has no text, instead of showing noise',
   await expect(page.locator('#error')).toContainText('No clear text found');
   await expect(page.locator('#error')).toContainText('try cropping to the text');
   await expect(page.locator('#results-list .result-text')).toHaveCount(0);
+});
+
+/** An animated GIF of `frames` small frames with a square sliding across, 40 ms each, made in Node with gifenc. */
+async function manyFrameGif(frames: number): Promise<string> {
+  const mod = await import('gifenc');
+  const { GIFEncoder, quantize, applyPalette } = ((mod as unknown as { default?: typeof mod }).default ?? mod);
+  const w = 64;
+  const h = 64;
+  const gif = GIFEncoder();
+  for (let f = 0; f < frames; f++) {
+    const rgba = new Uint8Array(w * h * 4);
+    for (let i = 0; i < w * h; i++) rgba.set([30, 60, 140, 255], i * 4);
+    const sx = (f * 3) % (w - 16);
+    for (let y = 24; y < 40; y++) for (let x = sx; x < sx + 16; x++) rgba.set([250, 210, 20, 255], (y * w + x) * 4);
+    const palette = quantize(rgba, 16);
+    gif.writeFrame(applyPalette(rgba, palette), w, h, { palette, delay: 40, repeat: 0 });
+  }
+  gif.finish();
+  const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), `frames-${frames}.gif`);
+  writeFileSync(file, gif.bytes());
+  return file;
+}
+
+test('Slack emoji resizer cuts a 120-frame GIF to at most 50 frames, keeps its running time and stays under 128 KB', async ({ page }) => {
+  await stubAnalytics(page);
+  const net = watchNetwork(page);
+  const gif = await manyFrameGif(120);
+  await page.goto('/slack-emoji-resizer');
+  await expect(page.locator('#platform')).toHaveValue('slack-emoji');
+  const { downloads, items } = await run(page, [gif]);
+  expect(items).toBe(1);
+  const out = await bytesOf(downloads[0]!);
+  const info = gifCompare(out, gif, 0);
+  // 120 frames over a cap of 50 keeps every third frame: 40 frames, each holding three frames' time.
+  expect(info.frames).toBeLessThanOrEqual(50);
+  expect(info.frames).toBe(40);
+  expect(info.size).toEqual([128, 128]);
+  expect(info.duration).toBeGreaterThanOrEqual(4700);
+  expect(info.duration).toBeLessThanOrEqual(4900);
+  expect(out.length).toBeLessThanOrEqual(128_000);
+  await expect(page.locator('#results-list .result-item').first()).toContainText('40 of 120 frames');
+  net.assertNothingLeft(['frames-120.gif']);
+});
+
+test('Slack emoji resizer keeps every frame of a GIF that is already within 50', async ({ page }) => {
+  await stubAnalytics(page);
+  const gif = await manyFrameGif(30);
+  await page.goto('/slack-emoji-resizer');
+  const { downloads } = await run(page, [gif]);
+  const info = gifCompare(await bytesOf(downloads[0]!), gif, 0);
+  expect(info.frames).toBe(30);
+  expect(info.size).toEqual([128, 128]);
+});
+
+test('the eight pages added from the October preset spec open their tool preset, carry their lead and six FAQs in structured data', async ({ page }) => {
+  const pages: [string, string, string, () => Promise<void>][] = [
+    ['heif-to-jpg', 'convert-image', 'Convert .heif and .heic photos to JPG in your browser', async () => {
+      await expect(page.locator('#format')).toHaveValue('image/jpeg');
+      const accept = await page.locator('#file-input').getAttribute('accept');
+      expect(accept).toContain('.heif');
+      expect(accept).toContain('.heic');
+      expect(accept).not.toContain('.hif');
+      await expect(page.locator('#drop')).toContainText('Drop HEIF files here');
+    }],
+    ['m4v-to-mp4', 'video-to-mp4', 'Converts M4V video files to MP4', async () => {
+      await expect(page.locator('#mute')).not.toBeChecked();
+      expect(await page.locator('#file-input').getAttribute('accept')).toContain('.m4v');
+    }],
+    ['mp3-to-flac', 'audio-converter', 'Converts MP3 files to FLAC', async () => {
+      await expect(page.locator('#format')).toHaveValue('flac');
+      expect(await page.locator('#file-input').getAttribute('accept')).toContain('.mp3');
+    }],
+    ['phone-number-qr-code', 'qr-code-generator', 'Makes a QR code that holds a phone number', async () => {
+      await expect(page.locator('input[name="qr-kind"][value="phone"]')).toBeChecked();
+      await expect(page.locator('#qr-number')).toBeVisible();
+      await expect(page.locator('#qr-text')).toBeHidden();
+    }],
+    ['slack-emoji-resizer', 'emote-resizer', 'Resizes a picture or an animated GIF into a square 128 × 128 pixel Slack custom emoji', async () => {
+      await expect(page.locator('#platform')).toHaveValue('slack-emoji');
+    }],
+    ['compress-video-for-whatsapp', 'compress-video', 'Shrinks a video to fit under 16 MB', async () => {
+      await expect(page.locator('#mode')).toHaveValue('size');
+      await expect(page.locator('#size')).toHaveValue('16');
+      await expect(page.locator('#size-field')).toBeVisible();
+    }],
+    ['compress-pdf-to-5mb', 'compress-pdf', 'Makes a PDF smaller until it fits under 5 MB', async () => {
+      await expect(page.locator('input[name="mode"][value="size"]')).toBeChecked();
+      await expect(page.locator('#target-size')).toHaveValue('5');
+      await expect(page.locator('#target-unit')).toHaveValue('MB');
+    }],
+    ['email-qr-code', 'qr-code-generator', 'Makes a QR code that opens a new email', async () => {
+      await expect(page.locator('input[name="qr-kind"][value="email"]')).toBeChecked();
+      await expect(page.locator('#qr-to')).toBeVisible();
+      await expect(page.locator('#qr-text')).toBeHidden();
+    }],
+  ];
+  for (const [slug, base, leadStart, check] of pages) {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('#tool')).toHaveAttribute('data-base', base);
+    await expect(page.locator('.hero-lead'), slug).toContainText(leadStart);
+    await expect(page.locator('.hero-lead'), slug).toContainText('free');
+    await expect(page.locator('.hero-lead'), slug).toContainText('not uploaded');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.dev/${slug}`);
+    expect((await page.request.get(`/og/${slug}.png`)).status(), `og image for ${slug}`).toBe(200);
+    const ld = await page.locator('script[type="application/ld+json"]').evaluateAll((els) => els.map((e) => JSON.parse(e.textContent ?? '{}')));
+    const faqPage = ld.find((d) => d['@type'] === 'FAQPage');
+    expect(faqPage, `${slug} FAQPage`).toBeTruthy();
+    expect(faqPage.mainEntity, slug).toHaveLength(6);
+    await expect(page.locator('.faq details'), slug).toHaveCount(6);
+    await check();
+    expect(errors, slug).toEqual([]);
+  }
+});
+
+test('Phone number and email QR pages write tel: and mailto: codes and send nothing typed', async ({ page }) => {
+  await stubAnalytics(page);
+  const net = watchNetwork(page);
+  await page.goto('/phone-number-qr-code');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#qr-number').fill('+1 (555) 010-0000');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-state', 'ready');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-version', '2');
+  await expect(page.locator('#qr-info')).toContainText('25 × 25 squares');
+  await expect(page.locator('#qr-info')).toContainText('16 characters');
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-png').click()]);
+  expect(png.suggestedFilename()).toBe('phone-qr-code.png');
+
+  await page.goto('/email-qr-code');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#qr-to').fill('sales@example.com');
+  await page.locator('#qr-subject').fill('Quote request');
+  await page.locator('#qr-body').fill('Hello, please send me a quote.');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-state', 'ready');
+  await expect(page.locator('#qr-frame')).toHaveAttribute('data-version', '6');
+  await expect(page.locator('#qr-info')).toContainText('41 × 41 squares');
+  await expect(page.locator('#qr-info')).toContainText('96 characters');
+  const [mail] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-png').click()]);
+  expect(mail.suggestedFilename()).toBe('email-qr-code.png');
+  net.assertNothingLeft(['5550100000', 'sales@example.com', 'Quote request']);
 });
