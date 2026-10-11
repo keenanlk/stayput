@@ -1,0 +1,126 @@
+---
+/**
+ * The barcode maker: the type, the number or text, how it looks, and a live
+ * preview with PNG, SVG and PDF downloads. It replaces the drop zone, since
+ * nothing is dropped. Driven by src/tools/barcode-generator.ts; what each type
+ * accepts is decided by src/lib/barcode.ts.
+ */
+import { SYMBOLOGIES } from '../lib/barcode';
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const symbology = defaults.symbology ?? 'code128';
+const bearer = defaults.bearer === 'true';
+const current = SYMBOLOGIES.find((s) => s.id === symbology) ?? SYMBOLOGIES[0]!;
+---
+<div id="bc-panel" class="bc-panel">
+  <div class="bc-form">
+    <div class="bc-grid bc-main">
+      <div class="field">
+        <label for="bc-type">Barcode type</label>
+        <select id="bc-type">
+          {SYMBOLOGIES.map((s) => <option value={s.id} selected={s.id === current.id}>{s.label}</option>)}
+        </select>
+      </div>
+      <div class="field bc-wide">
+        <label for="bc-value">Number or text</label>
+        <input type="text" id="bc-value" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder={current.example} />
+        <p class="muted small bc-hint"><button type="button" class="bc-example" id="bc-example">Try an example</button></p>
+      </div>
+    </div>
+
+    <details class="bc-look">
+      <summary>Size, colours and options</summary>
+      <div class="bc-grid">
+        <div class="field">
+          <label for="bc-bar">Bar width</label>
+          <select id="bc-bar">
+            <option value="1">1 px</option>
+            <option value="2">2 px</option>
+            <option value="3" selected>3 px</option>
+            <option value="4">4 px</option>
+            <option value="6">6 px</option>
+            <option value="8">8 px</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="bc-height">Height (px)</label>
+          <input type="number" id="bc-height" min="30" max="400" step="10" value="100" inputmode="numeric" />
+        </div>
+        <div class="field">
+          <label for="bc-quiet">Blank space beside the bars</label>
+          <select id="bc-quiet">
+            <option value="0">None</option>
+            <option value="5">5 bar widths</option>
+            <option value="7">7 bar widths</option>
+            <option value="9">9 bar widths</option>
+            <option value="11" selected>11 bar widths</option>
+            <option value="15">15 bar widths</option>
+            <option value="20">20 bar widths</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="check"><input type="checkbox" id="bc-text" checked /> Show the number</label>
+          <label for="bc-size">Number size (px)</label>
+          <input type="number" id="bc-size" min="10" max="40" step="1" value="20" inputmode="numeric" />
+        </div>
+        <div class="field">
+          <label for="bc-dark">Bar colour</label>
+          <input type="color" id="bc-dark" value="#000000" />
+        </div>
+        <div class="field">
+          <label for="bc-light">Background</label>
+          <input type="color" id="bc-light" value="#ffffff" />
+          <label class="check"><input type="checkbox" id="bc-clear" /> Transparent background</label>
+        </div>
+        <div class="field bc-opt" data-for="code39">
+          <label class="check"><input type="checkbox" id="bc-mod43" /> Add check character</label>
+        </div>
+        <div class="field bc-opt" data-for="itf14">
+          <label class="check"><input type="checkbox" id="bc-bearer" checked={bearer} /> Bearer bars (frame)</label>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="bc-out">
+    <div class="bc-frame" id="bc-frame" data-state="empty">
+      <canvas id="bc-canvas" width="300" height="150" role="img" aria-label="Barcode preview"></canvas>
+      <p class="bc-empty" id="bc-empty">Type above and the barcode appears here.</p>
+    </div>
+    <p class="muted small bc-info" id="bc-info" aria-live="polite"></p>
+    <div class="bc-actions">
+      <button type="button" class="btn btn-primary" id="bc-png" disabled>Download PNG</button>
+      <button type="button" class="btn" id="bc-svg" disabled>Download SVG</button>
+      <button type="button" class="btn" id="bc-pdf" disabled>Download PDF</button>
+    </div>
+  </div>
+</div>
+<style is:global>
+  .tool-panel:has(#bc-panel) #drop,
+  .tool-panel:has(#bc-panel) .run-dock,
+  .tool-panel:has(#bc-panel) #file-list { display: none; }
+  .bc-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 420px); gap: 28px; align-items: start; }
+  .bc-form { display: grid; gap: 18px; min-width: 0; }
+  .bc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px 20px; }
+  .bc-wide { grid-column: 1 / -1; }
+  .bc-form input[type='text'], .bc-form input[type='number'], .bc-form select { width: 100%; min-width: 0; }
+  .bc-hint { margin: 6px 0 0; }
+  .bc-example { font: inherit; font-size: 13px; background: none; border: 0; padding: 0; color: var(--accent, inherit); text-decoration: underline; cursor: pointer; }
+  .bc-look summary { cursor: pointer; font-size: 14px; font-weight: 620; color: var(--ink-2); }
+  .bc-look[open] summary { margin-bottom: 14px; }
+  .bc-opt:not(.is-active) { display: none; }
+  .bc-out { display: grid; gap: 10px; position: sticky; top: 84px; min-width: 0; }
+  .bc-frame { position: relative; min-height: 140px; border: 1px solid var(--line); border-radius: var(--radius); display: grid; place-items: center; padding: 14px; overflow: hidden;
+    background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 50% / 16px 16px; }
+  .bc-frame canvas { max-width: 100%; height: auto; image-rendering: pixelated; }
+  .bc-frame[data-state='empty'] canvas { display: none; }
+  .bc-frame:not([data-state='empty']) .bc-empty { display: none; }
+  .bc-empty { margin: 0; padding: 24px; text-align: center; color: var(--muted); }
+  .bc-info { margin: 0; overflow-wrap: anywhere; }
+  .bc-info.is-warn { color: var(--warn); font-weight: 600; }
+  .bc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  @media (max-width: 720px) {
+    .bc-panel { grid-template-columns: minmax(0, 1fr); }
+    .bc-out { position: static; }
+  }
+</style>

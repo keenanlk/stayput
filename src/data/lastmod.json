@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-11",
-  "hash": "31e48d78f52d88b7"
+  "hash": "c3f3fd900e7653fb"
  },
  "/2x2-photo": {
   "date": "2026-10-06",
@@ -98,6 +98,14 @@
  "/change-video-resolution": {
   "date": "2026-10-11",
   "hash": "eced5e00484a4a65"
+ },
+ "/code-128-barcode-generator": {
+  "date": "2026-10-11",
+  "hash": "ad2a4f3e9f59ff88"
+ },
+ "/code-39-barcode-generator": {
+  "date": "2026-10-11",
+  "hash": "d41318bd670d3277"
  },
  "/color-palette-from-image": {
   "date": "2026-10-06",
@@ -222,6 +230,10 @@
  "/discord-sticker-resizer": {
   "date": "2026-10-06",
   "hash": "09846ebee742277c"
+ },
+ "/ean-13-barcode-generator": {
+  "date": "2026-10-11",
+  "hash": "e22858e884261e2f"
  },
  "/enlarge-image": {
   "date": "2026-10-06",
@@ -767,6 +779,14 @@
   "date": "2026-10-06",
   "hash": "22b54930bf33e9b3"
  },
+ "/isbn-barcode-generator": {
+  "date": "2026-10-11",
+  "hash": "c3d9c4de82545f20"
+ },
+ "/itf-14-barcode-generator": {
+  "date": "2026-10-11",
+  "hash": "9635817923d58a2f"
+ },
  "/jfif-to-jpg": {
   "date": "2026-10-06",
   "hash": "23cbeb63a3d54296"
@@ -824,8 +844,8 @@
   "hash": "7293d14dd6dc3f14"
  },
  "/licenses": {
-  "date": "2026-10-09",
-  "hash": "a3d35b85a1b3fcab"
+  "date": "2026-10-11",
+  "hash": "a72b651387a18776"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-06",
@@ -1219,6 +1239,10 @@
   "date": "2026-10-07",
   "hash": "0a794b540f3c90d3"
  },
+ "/tools/barcode-generator": {
+  "date": "2026-10-11",
+  "hash": "19e72178a4e9bbfd"
+ },
  "/tools/black-and-white-image": {
   "date": "2026-10-07",
   "hash": "5af5513b42e2b3e3"
@@ -1590,6 +1614,10 @@
  "/ukulele-tuner": {
   "date": "2026-10-06",
   "hash": "dc38642df048f52f"
+ },
+ "/upc-barcode-generator": {
+  "date": "2026-10-11",
+  "hash": "56637fa1b2d340f7"
  },
  "/vcard-qr-code-generator": {
   "date": "2026-10-06",

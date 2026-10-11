@@ -15,6 +15,8 @@ const pages = [
   '/tools/crop-video',
   '/tools/resize-gif',
   '/tools/crop-gif',
+  '/tools/barcode-generator',
+  '/itf-14-barcode-generator',
   '/press',
   '/licenses',
 ];

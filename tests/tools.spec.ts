@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(97);
+  expect(await page.locator('.index .tool-card').count()).toBe(98);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -569,7 +569,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4619,6 +4619,165 @@ test('Wi-Fi QR code page opens on Wi-Fi and keeps the password in the page', asy
   expect(run.format).toBe('wifi-png');
   expect(JSON.stringify(run)).not.toContain('hunter2');
   net.assertNothingLeft(['hunter2-secret', 'Guest Net']);
+});
+
+const usageRuns = (page: Page) => page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run').map((e) => e.d));
+
+test('Barcode generator checks the number as you type, downloads PNG, SVG and PDF, and nothing typed leaves the tab', async ({ page }) => {
+  const errors = await open(page, 'barcode-generator');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  for (const id of ['#bc-png', '#bc-svg', '#bc-pdf']) await expect(page.locator(id)).toBeDisabled();
+  await page.locator('#bc-type').selectOption('ean13');
+  await page.locator('#bc-value').fill('5901234123457');
+  await expect(page.locator('#bc-frame')).toHaveAttribute('data-state', 'ready');
+  await expect(page.locator('#bc-info')).toContainText('Check digit 7 is correct.');
+  await page.locator('#bc-value').fill('590123412345');
+  await expect(page.locator('#bc-info')).toContainText('Check digit added: 7.');
+  await page.locator('#bc-value').fill('5901234123458');
+  await expect(page.locator('#bc-info')).toContainText('should be 7, not 8');
+  await expect(page.locator('#bc-frame')).toHaveAttribute('data-state', 'empty');
+  for (const id of ['#bc-png', '#bc-svg', '#bc-pdf']) await expect(page.locator(id)).toBeDisabled();
+  await page.locator('#bc-value').fill('5901234123457');
+  await expect(page.locator('#bc-frame')).toHaveAttribute('data-state', 'ready');
+
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#bc-png').click()]);
+  expect(png.suggestedFilename()).toBe('barcode-ean13-5901234123457.png');
+  const bytes = await bytesOf(png);
+  // Quiet zone 11 bar widths of 3 px, then the 12-module spacer under the first digit: the first guard bar starts at x = 69.
+  expect(await pixelAt(page, bytes, 70, 60)).toEqual([0, 0, 0, 255]);
+  expect(await pixelAt(page, bytes, 5, 60)).toEqual([255, 255, 255, 255]);
+
+  await page.locator('.bc-look summary').click();
+  await page.locator('#bc-clear').check();
+  const [svg] = await Promise.all([page.waitForEvent('download'), page.locator('#bc-svg').click()]);
+  expect(svg.suggestedFilename()).toBe('barcode-ean13-5901234123457.svg');
+  const text = Buffer.from(await bytesOf(svg)).toString();
+  expect(text).toContain('viewBox="0 0 ');
+  expect(text).toContain('<rect');
+  expect(text).not.toContain('fill="#ffffff"');
+  await page.locator('#bc-clear').uncheck();
+  const [svgSolid] = await Promise.all([page.waitForEvent('download'), page.locator('#bc-svg').click()]);
+  expect(Buffer.from(await bytesOf(svgSolid)).toString()).toContain('fill="#ffffff"');
+
+  const [pdf] = await Promise.all([page.waitForEvent('download'), page.locator('#bc-pdf').click()]);
+  expect(pdf.suggestedFilename()).toBe('barcode-ean13-5901234123457.pdf');
+  expect(Buffer.from((await bytesOf(pdf)).slice(0, 4)).toString()).toBe('%PDF');
+
+  // The usage ping names the type and the file type, never the number.
+  await expect.poll(async () => (await usageRuns(page)).length).toBe(4);
+  const runs = await usageRuns(page);
+  expect(runs.map((r) => r.format)).toEqual(['ean13-png', 'ean13-svg', 'ean13-svg', 'ean13-pdf']);
+  for (const r of runs) {
+    expect(r.tool).toBe('barcode-generator');
+    expect(JSON.stringify(r)).not.toContain('5901234123457');
+  }
+  net.assertNothingLeft(['5901234123457', '590123412345']);
+  expect(errors).toEqual([]);
+});
+
+test('Barcode generator says what is wrong with the number, in the page, and draws nothing', async ({ page }) => {
+  await open(page, 'barcode-generator');
+  const cases = [
+    ['code39', 'hello!', 'cannot hold'],
+    ['upca', '12345', 'needs 11 digits'],
+    ['isbn', '0306406153', 'check digit should be 2'],
+    ['code128', 'café', 'standard keyboard characters'],
+    ['itf', '123', 'even number of digits'],
+  ] as const;
+  for (const [type, value, shown] of cases) {
+    await page.locator('#bc-type').selectOption(type);
+    await page.locator('#bc-value').fill(value);
+    await expect(page.locator('#bc-info')).toContainText(shown);
+    await expect(page.locator('#bc-info')).toHaveClass(/is-warn/);
+    for (const id of ['#bc-png', '#bc-svg', '#bc-pdf']) await expect(page.locator(id)).toBeDisabled();
+  }
+  // The example button fills a valid number for the type.
+  await page.locator('#bc-type').selectOption('upce');
+  await page.locator('#bc-example').click();
+  await expect(page.locator('#bc-value')).toHaveValue('01234565');
+  await expect(page.locator('#bc-frame')).toHaveAttribute('data-state', 'ready');
+});
+
+test('Barcode generator: Code 39 check character, contrast and blank-space warnings', async ({ page }) => {
+  await open(page, 'barcode-generator');
+  await page.locator('#bc-type').selectOption('code39');
+  await page.locator('#bc-value').fill('HELLO');
+  await page.locator('.bc-look summary').click();
+  await page.locator('#bc-mod43').check();
+  await expect(page.locator('#bc-info')).toContainText('Check character added: B.');
+  await page.locator('#bc-dark').fill('#ffffff');
+  await page.locator('#bc-light').fill('#000000');
+  await expect(page.locator('#bc-info')).toContainText('lighter than the background');
+  await page.locator('#bc-dark').fill('#000000');
+  await page.locator('#bc-light').fill('#ffffff');
+  await page.locator('#bc-quiet').selectOption('5');
+  await expect(page.locator('#bc-info')).toContainText('Scanners need blank space beside the bars');
+  await page.locator('#bc-quiet').selectOption('11');
+  await page.locator('#bc-bar').selectOption('1');
+  await expect(page.locator('#bc-info')).toContainText('At 1 px per bar');
+});
+
+test('Barcode generator: ITF-14 bearer bars add a frame of five bar widths on every side', async ({ page }) => {
+  await open(page, 'barcode-generator');
+  await page.locator('#bc-type').selectOption('itf14');
+  await page.locator('#bc-value').fill('1234567890123');
+  await expect(page.locator('#bc-info')).toContainText('Check digit added: 1.');
+  await page.locator('.bc-look summary').click();
+  await page.locator('#bc-bearer').check();
+  const [withBearer] = await Promise.all([page.waitForEvent('download'), page.locator('#bc-png').click()]);
+  const on = pngSize(await bytesOf(withBearer));
+  await page.locator('#bc-bearer').uncheck();
+  const [without] = await Promise.all([page.waitForEvent('download'), page.locator('#bc-png').click()]);
+  const off = pngSize(await bytesOf(without));
+  expect(on.width - off.width).toBe(2 * 5 * 3);
+  expect(on.height - off.height).toBe(2 * 5 * 3);
+  // The frame itself: the top-left corner pixel is the bar colour with the frame on.
+  expect(await pixelAt(page, await bytesOf(withBearer), 1, 1)).toEqual([0, 0, 0, 255]);
+  expect(await pixelAt(page, await bytesOf(without), 1, 1)).toEqual([255, 255, 255, 255]);
+});
+
+for (const [slug, type] of [
+  ['upc-barcode-generator', 'upca'],
+  ['ean-13-barcode-generator', 'ean13'],
+  ['code-128-barcode-generator', 'code128'],
+  ['code-39-barcode-generator', 'code39'],
+  ['isbn-barcode-generator', 'isbn'],
+  ['itf-14-barcode-generator', 'itf14'],
+] as const) {
+  test(`${slug} opens on ${type}, with structured data and a social image`, async ({ page, request }) => {
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('#bc-type')).toHaveValue(type);
+    await expect(page.locator('#bc-type')).toBeVisible();
+    await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(3);
+    const schema = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(schema.some((t) => t.includes('"FAQPage"'))).toBe(true);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.dev/${slug}`);
+    const og = await page.locator('meta[property="og:image"]').getAttribute('content');
+    expect(og).toBe(`https://stayput.dev/og/${slug}.png`);
+    expect((await request.get(`/og/${slug}.png`)).status()).toBe(200);
+    if (type === 'itf14') {
+      await page.locator('.bc-look summary').click();
+      await expect(page.locator('#bc-bearer')).toBeChecked();
+    }
+  });
+}
+
+test('the ISBN page converts an ISBN-10, names the digit it worked out and keeps the ISBN in the tab', async ({ page }) => {
+  await stubAnalytics(page);
+  const net = watchNetwork(page);
+  await page.goto('/isbn-barcode-generator');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#bc-value').fill('0-306-40615-2');
+  await expect(page.locator('#bc-info')).toContainText('ISBN-10 converted to ISBN-13: 9780306406157.');
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#bc-png').click()]);
+  expect(png.suggestedFilename()).toBe('barcode-isbn-9780306406157.png');
+  await expect.poll(async () => (await usageRuns(page)).map((r) => r.format)).toEqual(['isbn-png']);
+  const [run] = await usageRuns(page);
+  expect(run!.tool).toBe('isbn-barcode-generator');
+  net.assertNothingLeft(['0-306-40615-2', '0306406152', '9780306406157']);
 });
 
 /**

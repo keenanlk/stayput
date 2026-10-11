@@ -56,6 +56,7 @@ const does: Record<string, string> = {
   'trim-audio': 'Cuts the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, with fades, and saves MP3 or WAV.',
   'audio-converter': 'Converts audio between MP3, WAV, FLAC, M4A and OGG, or pulls the sound out of a video, for one file or a batch.',
   'qr-code-generator': 'Makes a QR code for a link, Wi-Fi network, contact card, email or phone number, and saves it as PNG or SVG.',
+  'barcode-generator': 'Makes a Code 128, Code 39, UPC-A, EAN-13, ITF-14 or other barcode from the number or text you type, and saves it as PNG, SVG or PDF.',
   'screen-recorder': 'Records your screen, a window or a browser tab, with sound and your microphone if you choose, and saves the video.',
   'voice-recorder': 'Records your voice with your microphone and saves it as MP3, WAV or M4A.',
   'volume-booster': 'Makes an MP3, voice memo or video louder or quieter, or normalizes a batch to the same loudness.',
@@ -171,6 +172,7 @@ export const defaultSizeBadge = 'No watermark · limit is your device’s memory
 /** Tools with no file to size-limit; their fact says what is true of them instead. */
 const facts: Record<string, string> = {
   'qr-code-generator': 'The codes are static, so they never expire, and after one visit the page works offline.',
+  'barcode-generator': 'The barcodes are drawn on this page, and after one visit the page works offline.',
   'screen-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit the page works offline.',
   'voice-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit the page works offline.',
   'mic-test': 'Your browser asks for microphone permission, and after one visit the page works offline.',
@@ -187,6 +189,7 @@ const free: Record<string, string> = {
   'mic-test': freeLine('the sound from your microphone is'),
   'webcam-test': freeLine('the picture from your camera is'),
   'qr-code-generator': freeLine('what you type is'),
+  'barcode-generator': freeLine('what you type is'),
   'screen-recorder': freeLine('your recordings are'),
   'voice-recorder': freeLine('your recordings are'),
 };

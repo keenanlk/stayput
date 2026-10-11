@@ -3707,6 +3707,297 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'upc-barcode-generator',
+    base: 'barcode-generator',
+    name: 'UPC barcode generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'UPC Barcode Generator: UPC-A, Free, No Upload | Stayput',
+    description: 'Draw a UPC-A barcode from your 11 or 12 digit number, with the check digit worked out for you. Save PNG, SVG or PDF; the number is not uploaded.',
+    heading: 'Make a UPC barcode',
+    tagline: 'Type the 11 or 12 digits of your UPC-A number and the page draws the barcode with its check digit.',
+    keywords: ['upc barcode generator', 'upc a barcode generator', 'free upc barcode generator', 'upc barcode maker', 'upc a barcode', 'make a upc barcode'],
+    dropLabel: 'Make a UPC barcode',
+    action: 'Download',
+    defaults: { symbology: 'upca' },
+    intro: [
+      'A UPC-A barcode is the 12-digit bar pattern on most products sold in North America. The digits are a company number, an item number and one last check digit, and the bars are those digits written in a form a scanner can read. This page draws the bars from the number you give it.',
+      'You need the number first. This page cannot issue one, and a number you make up may already belong to another company’s product. Shops and online marketplaces normally ask for numbers licensed to your company through GS1. If you have your 11 digits, type them: the page works out the 12th, shows it to you, and draws the barcode.',
+      'If you have all 12 digits, type all 12. When the last digit does not fit the other eleven, the page says what it should be, instead of drawing a barcode that a shop’s system would reject.',
+    ],
+    steps: [
+      'Type your 11 digits, or all 12 if you already have the check digit. Spaces and hyphens are ignored.',
+      'Look at the 12th digit the page shows. If you typed 12 digits and it disagrees with yours, the page tells you the right one.',
+      'Save a PNG, SVG or PDF, then test-scan a printed copy.',
+    ],
+    sections: [
+      {
+        heading: 'What the 12 digits are',
+        bullets: [
+          'Digit 1 is the number system digit. 0, 1, 6, 7, 8 and 9 start ordinary product numbers. 2 is reserved for a store’s own use, for items sold by weight; 3 is for drugs; 4 is reserved for a store’s own use, such as loyalty cards; 5 is for coupons.',
+          'Digits 2 to 11 hold the company prefix and the item number. Companies get prefixes of different lengths, so where one ends and the other starts is not fixed.',
+          'Digit 12 is the check digit.',
+        ],
+      },
+      {
+        heading: 'How the check digit is worked out',
+        bullets: [
+          'Add the digits in positions 1, 3, 5, 7, 9 and 11 and multiply the sum by 3. Add the digits in positions 2, 4, 6, 8 and 10. The check digit is what brings the total up to the next multiple of 10. For 01234567890 that is (0+2+4+6+8+0) × 3 = 60, plus (1+3+5+7+9) = 25, a total of 85, so the check digit is 5 and the number is 012345678905.',
+        ],
+      },
+      {
+        heading: 'UPC-A and EAN-13',
+        bullets: [
+          'A UPC-A number is an EAN-13 number with a 0 in front, so a scanner that reads EAN-13 reads UPC-A too. If a marketplace asks for an EAN-13, put a 0 before your 12 digits and use the [EAN-13 barcode generator](/ean-13-barcode-generator).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I just make up a UPC number?', a: 'You can draw a barcode from any 11 digits and a scanner will read it. But the number may match one that already belongs to another company’s product, so shops and marketplaces that look the number up can reject it or mix it up with theirs. For anything you sell outside your own premises, use numbers licensed to you.' },
+      { q: 'What happens if my 12th digit is wrong?', a: 'The page does not draw the barcode. It shows the digit that the first eleven call for, so you can see whether you mistyped a digit or copied a number that was wrong to begin with.' },
+      { q: 'What is the difference between UPC-A and UPC-E?', a: 'UPC-E is a short, 8-digit version for small packages. It is made by dropping zeros from certain UPC-A numbers, so not every UPC-A number has a short form. This page makes UPC-A; the [barcode generator](/tools/barcode-generator) can also draw UPC-E.' },
+      { q: 'Do UPC barcodes work outside North America?', a: 'Yes. Most retail scanners in other countries read UPC-A as an EAN-13 with a leading 0. Some marketplaces still ask for the 13-digit form in their listing forms, so check what yours expects.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'code-128-barcode-generator',
+    base: 'barcode-generator',
+    name: 'Code 128 barcode generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'Code 128 Barcode Generator, Free, No Upload | Stayput',
+    description: 'Make a Code 128 barcode from any text or numbers, for labels, inventory and shipping. Save PNG, SVG or PDF; what you type is not uploaded.',
+    heading: 'Make a Code 128 barcode',
+    tagline: 'Letters, digits and punctuation in one compact barcode, with no check digit for you to work out.',
+    keywords: ['code 128 barcode generator', 'code128 barcode generator', 'code 128 generator free', 'make a code 128 barcode', 'code 128 barcode online'],
+    dropLabel: 'Make a Code 128 barcode',
+    action: 'Download',
+    defaults: { symbology: 'code128' },
+    intro: [
+      'Code 128 holds letters, digits and punctuation in one compact barcode, which is why it is a common choice for inventory labels, shelf and bin tags, order numbers and shipping labels. It is the type to pick when no one has told you otherwise.',
+      'It works by switching between three character sets. Set B holds capitals, lowercase letters, digits and punctuation, set A holds capitals, digits and control characters, and set C packs two digits into every bar character, so a long run of digits comes out much narrower. This page picks the sets for you and switches inside the barcode where that makes it shorter.',
+      'The type also adds its own checksum character, and the scanner checks it and does not pass it on, so you have nothing to calculate and nothing extra appears in the scanned text.',
+    ],
+    steps: [
+      'Type your text or number. Capitals, lowercase, digits, spaces and punctuation are all fine.',
+      'Watch the width. A longer text makes a wider barcode; digits take half the room.',
+      'Save a PNG, SVG or PDF and test-scan a printed copy.',
+    ],
+    sections: [
+      {
+        heading: 'What Code 128 can hold here',
+        bullets: [
+          'Printable ASCII characters: A–Z, a–z, 0–9, space and punctuation. Case is kept, so ab and AB are different barcodes.',
+          'Up to 80 characters on this page. The type itself has no fixed limit, but a longer barcode gets too wide to print or scan comfortably.',
+          'Not accented letters, emoji or non-Latin text. This page does not use the type’s extended character options.',
+        ],
+      },
+      {
+        heading: 'Code 128 and GS1-128',
+        bullets: [
+          'GS1-128 is Code 128 with a special first character and a defined structure of numbered data fields, used on supply-chain labels. This page draws plain Code 128, so a scanner reads exactly the text you typed.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does a Code 128 barcode need a check digit?', a: 'It has one built in, and the page adds it. Unlike UPC or EAN, you never type it, and it does not show in the printed text or the scanned result.' },
+      { q: 'Why is my barcode so wide?', a: 'Every character takes the same room, so a long text makes a long barcode. Digits in a run are packed in pairs and take half as much room. Shorten the text, use a smaller bar width, or put the long part in a lookup instead of the barcode.' },
+      { q: 'Does case matter?', a: 'Yes. Code 128 keeps capitals and lowercase letters as typed, so a scanner that reads order-a1 reports order-a1, not ORDER-A1. Code 39 is capitals only.' },
+      { q: 'Will my scanner read it?', a: 'Code 128 is one of the most widely supported types, and most barcode scanners and scanner apps read it. A very old or specialised scanner may have it switched off, in which case its settings or manual list the types it reads.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'code-39-barcode-generator',
+    base: 'barcode-generator',
+    name: 'Code 39 barcode generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'Code 39 Barcode Generator, Free, No Upload | Stayput',
+    description: 'Make a Code 39 barcode from capital letters, digits and a few symbols, with an optional check character. Save PNG, SVG or PDF; not uploaded.',
+    heading: 'Make a Code 39 barcode',
+    tagline: 'Capital letters, digits and a few symbols, with the start and stop asterisks added for you.',
+    keywords: ['code 39 barcode generator', 'code39 barcode generator', 'code 39 generator free', 'make a code 39 barcode', 'code 39 with check digit'],
+    dropLabel: 'Make a Code 39 barcode',
+    action: 'Download',
+    defaults: { symbology: 'code39' },
+    intro: [
+      'Code 39 is one of the oldest general-purpose barcodes. It holds capital letters, digits, space and the symbols - . $ / + %, 43 characters in all, and some older inventory, asset-tag and ID systems still ask for it by name.',
+      'Every Code 39 barcode starts and ends with a * character. The page adds both, so type only your own text. A * inside the text is refused, because a scanner would take it for the end.',
+      'Lowercase letters are changed to capitals as you type. This page does not use the extended version of Code 39 that spells out lowercase with pairs of characters, so anything outside the 43 characters is refused with a message that names it.',
+    ],
+    steps: [
+      'Type capitals, digits, space or - . $ / + %. Lowercase letters become capitals.',
+      'Tick Add check character only if the system that will read the barcode expects one.',
+      'Save a PNG, SVG or PDF and test-scan a printed copy.',
+    ],
+    sections: [
+      {
+        heading: 'The optional check character',
+        bullets: [
+          'Code 39 does not need one, but some systems ask for it. Tick Add check character and the page adds one character, worked out by giving every character a value (0 to 9, then A to Z as 10 to 35, then - . space $ / + % as 36 to 42), adding the values and dividing the total by 43. The remainder is the value of the check character.',
+          'HELLO adds up to 17+14+21+21+24 = 97. 97 divided by 43 leaves 11, which is the letter B, so the barcode carries HELLOB. The extra B is shown under the bars, and the system reading it has to expect it.',
+        ],
+      },
+      {
+        heading: 'Wider than Code 128',
+        bullets: [
+          'Each Code 39 character takes more room than a Code 128 character, so the same text makes a wider barcode. When no one asks for Code 39, the [Code 128 barcode generator](/code-128-barcode-generator) gives a shorter barcode for the same text.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Do I type the asterisks?', a: 'No. The page adds the * at the start and the end. If you type one, the page asks you to leave it out.' },
+      { q: 'Why does my scanner show an extra character at the end?', a: 'If Add check character is ticked, the last character is the check character, and a scanner that is not set to verify it passes it on with the text. Leave the box unticked if the receiving system does not use it.' },
+      { q: 'Can I use lowercase letters?', a: 'Not as lowercase. Code 39 has only capitals, so the page turns them into capitals and shows you the result. Use [Code 128](/code-128-barcode-generator) if case has to survive.' },
+      { q: 'Should I choose Code 39 or Code 128?', a: 'Choose Code 128 unless a customer, a form or an older system names Code 39. Code 128 holds more characters and makes a shorter barcode.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'isbn-barcode-generator',
+    base: 'barcode-generator',
+    name: 'ISBN barcode generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'ISBN Barcode Generator for Book Covers, Free | Stayput',
+    description: 'Turn an ISBN-10 or ISBN-13 into the EAN-13 barcode printed on a book cover. Hyphens are fine. Save PNG, SVG or PDF; not uploaded.',
+    heading: 'Make an ISBN barcode',
+    tagline: 'Type the ISBN as printed, with or without hyphens, and get the barcode for the back cover.',
+    keywords: ['isbn barcode generator', 'isbn to barcode', 'isbn barcode maker', 'make an isbn barcode', 'book barcode generator'],
+    dropLabel: 'Make an ISBN barcode',
+    action: 'Download',
+    defaults: { symbology: 'isbn' },
+    intro: [
+      'The barcode on a book’s back cover is its ISBN-13 written as an EAN-13: the 13 digits of the ISBN, which start with 978 or 979, drawn as bars. The bars add nothing to the number. They are the same digits in a form a shop till or a warehouse scanner can read.',
+      'Type the ISBN with or without hyphens or spaces. If you have an older 10-digit ISBN, the page converts it to the 13-digit form and tells you the number it used, so you can check it against the one on your copyright page.',
+      'The ISBN itself comes from your country’s ISBN agency or from the publishing service that issued it. This page draws the barcode for a number you already have; it does not issue numbers.',
+    ],
+    steps: [
+      'Type the ISBN-13 or ISBN-10. Hyphens and spaces are ignored, and an X at the end of an ISBN-10 is fine.',
+      'Check the 13-digit number the page shows under the barcode.',
+      'Save a PNG, SVG or PDF for the cover file, and place it with a clear margin around it.',
+    ],
+    sections: [
+      {
+        heading: 'From ISBN-10 to ISBN-13',
+        bullets: [
+          'Take the first nine digits of the ISBN-10, put 978 in front, and work out a new last digit with the EAN-13 rule. The old check digit, which could be an X, is dropped. 0-306-40615-2 becomes 978-0-306-40615-7.',
+          'The page also checks the ISBN-10’s own last digit before converting, so a typing slip is caught instead of being carried into the barcode.',
+        ],
+      },
+      {
+        heading: 'What the digits of an ISBN-13 mean',
+        bullets: [
+          '978 or 979 is the prefix that marks the number as a book. Then come a group number for the language or country area, a number for the publisher, a number for the title and format, and the check digit. The hyphens only show those splits, and the barcode carries the 13 digits without them.',
+        ],
+      },
+      {
+        heading: 'The price add-on',
+        bullets: [
+          'Some books carry a second, smaller barcode beside the main one, a 5-digit add-on that holds a price code. This page draws the main barcode only, so a printer that needs the add-on has to place it from another source.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is an ISBN barcode different from an EAN?', a: 'It is an EAN-13 whose digits happen to be the ISBN. Any scanner that reads EAN-13 reads it, and the [EAN-13 barcode generator](/ean-13-barcode-generator) makes the same image from the same 13 digits.' },
+      { q: 'Why did the digits change from my ISBN-10?', a: 'The 13-digit ISBN is the ISBN-10 with 978 in front and a new last digit. ISBNs have had 13 digits since 1 January 2007, so a book published before that may show only the 10-digit form.' },
+      { q: 'Does the barcode contain the price?', a: 'No. The main barcode holds the ISBN only. Prices, where they are printed in bars at all, go in a separate 5-digit add-on that this page does not draw.' },
+      { q: 'The page says my number is not an ISBN. What is wrong?', a: 'ISBN-13s start with 978 or 979, and an ISBN-10 has 10 characters (digits, and X as the last one). A 13-digit number that starts differently is an ordinary product number; use the [EAN-13 barcode generator](/ean-13-barcode-generator) for it.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'itf-14-barcode-generator',
+    base: 'barcode-generator',
+    name: 'ITF-14 barcode generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'ITF-14 Barcode Generator for Cartons, Free | Stayput',
+    description: 'Make an ITF-14 barcode for shipping cartons from a 13 or 14 digit GTIN, with the check digit added. Save PNG, SVG or PDF; not uploaded.',
+    heading: 'Make an ITF-14 barcode',
+    tagline: 'The carton barcode: 14 digits, with the check digit added for you and bearer bars if you want them.',
+    keywords: ['itf 14 barcode generator', 'itf-14 barcode', 'gtin 14 barcode generator', 'carton barcode generator', 'case barcode generator'],
+    dropLabel: 'Make an ITF-14 barcode',
+    action: 'Download',
+    defaults: { symbology: 'itf14', bearer: 'true' },
+    intro: [
+      'ITF-14 is the barcode printed on the outer carton or case that holds several retail items. It carries a 14-digit GTIN-14: one packaging indicator digit, the first 12 digits of the item’s own number, and a new check digit.',
+      'It is built to print well on rough corrugated board, which is why the bars are wide, and it is printed with thick bearer bars, a frame around the barcode. The page draws the frame by default, and you can untick it.',
+      'Type 13 digits and the page adds the 14th, or type all 14 and it checks the last one.',
+    ],
+    steps: [
+      'Type 13 digits, or all 14. Spaces and hyphens are ignored.',
+      'Leave Bearer bars ticked for the frame, unless your customer’s labelling guide says otherwise.',
+      'Save a PNG, SVG or PDF and test-scan a printed copy on the board you will print on.',
+    ],
+    sections: [
+      {
+        heading: 'Making a carton number from an item number',
+        bullets: [
+          'Start from the item’s EAN-13, drop its last digit (the old check digit), put a packaging indicator digit in front, and add a new check digit. The indicator digit is your company’s choice of how to tell pack levels apart, for example 1 for a case. For the item 5901234123457 and indicator 1, the 13 digits are 1590123412345, the check digit is 4, and the carton number is 15901234123454.',
+          'From a UPC-A, put a 0 in front of its 11 digits first, then the indicator digit. The page does not check which indicator digit you chose.',
+        ],
+      },
+      {
+        heading: 'Why 14 digits',
+        bullets: [
+          'ITF writes digits two at a time: one digit in the bars and the next in the spaces between them. That is why an ITF barcode always has an even number of digits, and why 14 works while 13 does not.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can I put an ITF-14 on the single item?', a: 'It is meant for cartons and cases, not for items scanned at a shop’s till. Use an EAN-13 or UPC-A for the item itself.' },
+      { q: 'Does a case need its own number?', a: 'A case is a different trade item from the units inside it, so it normally gets its own GTIN-14, made from the item’s number as shown above. Your GS1 member service or your customer’s guide has the rules for your products.' },
+      { q: 'What are bearer bars?', a: 'The thick frame around the barcode. GS1’s guidance for ITF-14 asks for it, because a carton barcode without one risks being misread. This page draws a full frame while the box is ticked, and it is ticked by default. On the printed label GS1 asks for a frame 4.8 mm thick; a PNG or SVG has no fixed physical size, so download the SVG and set its size when you print so the frame comes out at 4.8 mm.' },
+      { q: 'Why does the page refuse a number with 12 digits?', a: 'An ITF-14 needs 13 digits plus the check digit. A 12-digit UPC-A needs a 0 in front, and then the packaging indicator digit, before it makes a carton number.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'ean-13-barcode-generator',
+    base: 'barcode-generator',
+    name: 'EAN-13 barcode generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'EAN-13 Barcode Generator, Free, No Upload | Stayput',
+    description: 'Draw an EAN-13 barcode from 12 or 13 digits, with the check digit worked out for you. Save PNG, SVG or PDF; the number is not uploaded.',
+    heading: 'Make an EAN-13 barcode',
+    tagline: 'Type 12 digits and the page adds the 13th, or type all 13 and it checks the last one.',
+    keywords: ['ean 13 barcode generator', 'ean barcode generator', 'ean13 barcode', 'ean-13 generator free', 'make an ean 13 barcode'],
+    dropLabel: 'Make an EAN-13 barcode',
+    action: 'Download',
+    defaults: { symbology: 'ean13' },
+    intro: [
+      'EAN-13 is the 13-digit barcode on products sold in most of the world, and the form that many shops and marketplaces outside North America ask for. It carries a GTIN-13: a GS1 prefix, the company number, an item number and a check digit.',
+      'The first two or three digits are the GS1 prefix. It says which GS1 office issued the number range, not where the product was made, so a number that starts with 5 does not mean the product comes from any particular country.',
+      'Type 12 digits and the page adds the 13th. Type all 13 and it confirms that the last one fits the rest. Either way you see the digit it used, and what gets drawn is a number a scanner can verify.',
+    ],
+    steps: [
+      'Type 12 digits, or all 13. Spaces and hyphens are ignored.',
+      'Read the last digit the page shows. If you typed 13 digits and it does not fit, the page tells you which digit it should be.',
+      'Save a PNG, SVG or PDF and test-scan a printed copy.',
+    ],
+    sections: [
+      {
+        heading: 'Prefixes with a special meaning',
+        bullets: [
+          '978 and 979: books. An ISBN-13 is an EAN-13 with one of these prefixes; the [ISBN barcode generator](/isbn-barcode-generator) takes the ISBN as printed, hyphens included.',
+          '20 to 29: restricted circulation, meant for in-store and internal numbers that are not unique across companies. Do not use them on a product you sell through shops or marketplaces.',
+          'A leading 0: the number is a UPC-A with a 0 in front. The [UPC barcode generator](/upc-barcode-generator) takes the 12-digit form.',
+        ],
+      },
+      {
+        heading: 'Worked check digit',
+        bullets: [
+          'Take 590123412345. Add the digits in positions 1, 3, 5, 7, 9 and 11 (5+0+2+4+2+4 = 17). Add the digits in positions 2, 4, 6, 8, 10 and 12 and multiply by 3 ((9+1+3+1+3+5) × 3 = 66). The total is 83, so the check digit is 7 and the barcode number is 5901234123457.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does the first digit tell you the country of a product?', a: 'No. The first digits are a GS1 prefix that shows which GS1 office issued the company’s number range. A company can make its products anywhere, so the prefix is not a country of origin.' },
+      { q: 'What is the difference between EAN-13 and UPC-A?', a: 'They are one system at two lengths. EAN-13 has 13 digits and UPC-A has 12, and a UPC-A number becomes an EAN-13 when a 0 is put in front. Listings and scanners outside North America usually expect the 13-digit form.' },
+      { q: 'Why does the page reject my 13-digit number?', a: 'The last digit is a check digit, and for your number it does not fit the other twelve. The page shows the digit it should be. That usually means one digit was mistyped or the number was copied wrongly from a spreadsheet.' },
+      { q: 'Can it draw the small add-on barcode beside a magazine or book?', a: 'No. That extra bar pattern (an EAN-2 or EAN-5 add-on) is a separate symbol, and this page draws the main EAN-13 only.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
     slug: 'whatsapp-sticker-maker',
     base: 'sticker-maker',
     name: 'WhatsApp sticker maker',
