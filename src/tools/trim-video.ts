@@ -110,6 +110,7 @@ endInput.addEventListener('change', () => {
 });
 
 const shell = createShell({
+  keepAwake: true,
   async onFilesChanged(files) {
     if (files.length === 0) return unload();
     try {

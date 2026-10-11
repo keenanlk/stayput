@@ -14,6 +14,7 @@ const clock = (s: number) => {
 };
 
 createShell({
+  keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     if (files.length !== 2) throw new InputError('Add one video and one sound file (MP3, WAV, M4A, or another video to take the sound from).');

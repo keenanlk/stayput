@@ -6150,7 +6150,8 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   await expect(p.locator('#run-hint')).toContainText('about 200 MB');
   await p.locator('#clear').click();
   await p.locator('#file-input').setInputFiles(small);
-  await expect(p.locator('#run-hint')).toBeHidden();
+  // Only the keep-the-screen-on line is left for a video that is small enough.
+  await expect(p.locator('#run-hint')).toHaveText('Keep the screen on while it works.');
   await phone.close();
   const desktop = await browser.newContext();
   const d = await desktop.newPage();

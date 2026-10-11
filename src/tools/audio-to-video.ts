@@ -13,6 +13,7 @@ import { InputError } from '../lib/input-error';
 const isImage = (f: File) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif|avif|bmp)$/i.test(f.name);
 
 createShell({
+  keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const pictures = files.filter((f) => isImage(f.file));
