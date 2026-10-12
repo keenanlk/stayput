@@ -19,6 +19,7 @@ const VISIT = ['landing', 'ref', 'from', 'visit', 'via'];
 const EVENTS: Record<string, { label: string; keys: string[] }> = {
   visit_start: { label: 'Visit start', keys: ['landing', 'ref', 'visit'] },
   files_added: { label: 'Files added', keys: ['tool', 'files', 'input', ...VISIT] },
+  tool_start: { label: 'Tool start', keys: ['tool', 'files', 'input', 'format', ...VISIT] },
   tool_run: {
     label: 'Tool run',
     keys: ['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', ...VISIT, 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns'],
@@ -195,6 +196,39 @@ for (const slug of SPEECH_TOOLS) {
     const crashed = await failedCaptionRun(page, baseURL!, slug, sent);
     expect(crashed.data).toMatchObject({ outcome: 'error', error_class: 'WorkerCrashError' });
     expect(JSON.stringify(sent)).not.toContain('secret-worker-message');
+  });
+}
+
+/** The caption tools send one tool_start when Run is pressed, with details tool_run also sends and nothing else. */
+for (const [path, slug, format] of [
+  ['/tools/transcribe', 'transcribe', 'txt'],
+  ['/video-to-subtitles', 'video-to-subtitles', 'srt'],
+  ['/auto-caption-video', 'auto-caption-video', 'mp4'],
+  ['/tools/add-subtitles-to-video', 'add-subtitles-to-video', 'mp4'],
+] as const) {
+  test(`${slug}: pressing Run sends exactly one tool_start with only fields tool_run also sends`, async ({ page, baseURL }) => {
+    test.setTimeout(120_000);
+    const sent = await captureAnalytics(page, baseURL!);
+    await page.route(`${SITE}/models/**/*.onnx`, (route) => route.abort('connectionreset'));
+    await page.goto(`${SITE}${path}`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    if (slug === 'video-to-subtitles') await page.locator('#format').selectOption('srt');
+    await page.locator('#file-input').setInputFiles(SPOKEN);
+    await page.locator('#run').click();
+    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+    await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
+    const starts = sent.filter((s) => s.payload.name === 'tool_start');
+    expect(starts).toHaveLength(1);
+    expect(violations(starts[0]!), JSON.stringify(starts[0])).toEqual([]);
+    const data = starts[0]!.payload.data as Record<string, string>;
+    expect(Object.keys(data).sort()).toEqual(['files', 'format', 'from', 'input', 'landing', 'ref', 'tool', 'visit']);
+    expect(data).toMatchObject({ tool: slug, files: '1', input: '<1MB', format });
+    const runKeys = Object.keys((sent.find((s) => s.payload.name === 'tool_run')!.payload.data as Record<string, string>));
+    for (const k of Object.keys(data)) expect(runKeys, `tool_start.${k} is not sent by tool_run`).toContain(k);
+    expect(JSON.stringify(starts)).not.toContain('jfk');
+    // Sent before the work, so before the run's own event.
+    const order = sent.map((s) => s.payload.name);
+    expect(order.indexOf('tool_start')).toBeLessThan(order.indexOf('tool_run'));
   });
 }
 

@@ -4,6 +4,7 @@ import { formatDuration } from '../lib/audio';
 import { toSrt, toText, toVtt } from '../lib/captions';
 import { transcribeFile } from '../lib/speech';
 import { noSpeechFound, plainCaptionError } from '../lib/speech-errors';
+import { MODEL_DOWNLOAD_NOTE, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
 import type { Request } from '../lib/transcribe.worker';
 
 /**
@@ -15,7 +16,15 @@ const NAMES = new Intl.DisplayNames(['en'], { type: 'language' });
 const EXT = { txt: 'txt', srt: 'srt', vtt: 'vtt' } as const;
 const TYPE = { txt: 'text/plain', srt: 'application/x-subrip', vtt: 'text/vtt' } as const;
 
-createShell({
+const shell = createShell({
+  keepAwake: true,
+  announceStart: true,
+  // A video too big for a phone to transcribe is said so now, not after the browser gives up.
+  onFilesChanged(files) {
+    const videos = files.filter((f) => !f.file.type.startsWith('audio/'));
+    const note = phoneLimitNote(Math.max(0, ...videos.map((f) => f.file.size)));
+    shell.setHint([note, MODEL_DOWNLOAD_NOTE].filter(Boolean).join(' '), TRIM_LINK);
+  },
   outputFormat: () => str('format', 'txt'),
   async process(files, progress) {
     const language = str('language', 'auto');
@@ -49,3 +58,5 @@ createShell({
   },
   resultsTitle: () => 'Transcript',
 });
+// Before any file is added, the hint above Run already says what the first run downloads.
+shell.setHint(MODEL_DOWNLOAD_NOTE);

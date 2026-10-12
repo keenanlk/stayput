@@ -21,3 +21,9 @@ export function phoneLimitNote(bytes: number, phone = isPhoneBrowser()): string 
   if (!overPhoneLimit(bytes, phone)) return '';
   return `This video is ${formatBytes(bytes)}. A phone can run out of memory captioning more than about 200 MB (around 2 minutes of iPhone video, or 30 seconds at 4K). Trim it first, or use a computer.`;
 }
+
+/** The link in the warning above: a trim is the way to get a long video under the limit. */
+export const TRIM_LINK = { text: 'Trim it first', href: '/tools/trim-video' };
+
+/** Shown above Run before any run, so the download is no surprise on mobile data. */
+export const MODEL_DOWNLOAD_NOTE = 'The first run downloads the speech model, about 76 MB, once.';
