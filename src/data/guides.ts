@@ -39,7 +39,7 @@ export const guides: Guide[] = [
     heading: 'Is it safe to merge PDFs online?',
     dek: 'It depends on one thing: whether the file leaves your computer. Here is how to tell, and how to merge without it leaving.',
     keywords: ['is it safe to merge pdfs online', 'online pdf merger safe', 'merge pdf privacy', 'merge pdf without uploading', 'secure pdf merge'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['merge-pdf', 'combine-pdf', 'split-pdf'],
     sections: [
       {
@@ -62,13 +62,13 @@ export const guides: Guide[] = [
         h: 'How to tell whether a tool uploads your file',
         p: [
           'You do not have to take anyone\'s word for it. Open the tool in your browser, press **F12** (or Cmd-Option-I on a Mac), pick the **Network** tab, then add your PDFs and run the merge. Every request the page makes appears in that list. An upload shows up as a **POST** or **PUT** request whose size matches your files. If the list stays empty after you add files, apart from small analytics pings, nothing left your computer. The [full walkthrough](/guides/does-this-website-upload-my-files) has screenshots of what each case looks like.',
-          'A second test is cruder and just as convincing: after the page has loaded, switch to airplane mode and try to merge. A tool that needs a server fails immediately.',
+          'A second test is cruder and just as convincing: after one visit and a short wait, switch to airplane mode and try to merge. A tool that needs a server fails immediately.',
         ],
       },
       {
         h: 'Merging without uploading',
         p: [
-          'PDF merging does not need a server. A PDF is a container of pages, and copying pages from several containers into a new one is something a browser can do in JavaScript with a library such as pdf-lib. Stayput\'s [merge tool](/tools/merge-pdf) does exactly that: your files are read from disk into your tab\'s memory, the combined document is written there, and the download comes from your own browser. After one visit the page works with the network switched off, and its own request counter shows you the list.',
+          'PDF merging does not need a server. A PDF is a container of pages, and copying pages from several containers into a new one is something a browser can do in JavaScript with a library such as pdf-lib. Stayput\'s [merge tool](/tools/merge-pdf) does exactly that: your files are read from disk into your tab\'s memory, the combined document is written there, and the download comes from your own browser. After one visit and a short wait the page works with the network switched off, and its own request counter shows you the list.',
           'The same goes for [splitting](/tools/split-pdf), [compressing](/tools/compress-pdf), [rotating](/tools/rotate-pdf) and [signing](/tools/sign-pdf). None of these need anything a browser cannot do.',
         ],
       },
@@ -83,7 +83,7 @@ export const guides: Guide[] = [
       { q: 'Are big-name PDF sites safe?', a: 'They are professionally run and encrypt the transfer, which protects you from eavesdropping, not from the file being on their server. Read the retention section of the privacy policy and decide per document.' },
       { q: 'Does HTTPS mean my PDF is private?', a: 'HTTPS protects the file in transit between you and the server. Once it arrives it is stored and processed in the clear. It says nothing about what happens next.' },
       { q: 'Is a browser-only tool really safer?', a: 'The file never leaves your device, so there is nothing to retain, breach or subpoena. You can verify that in the network tab rather than trusting a policy.' },
-      { q: 'Can I merge PDFs offline on my phone?', a: 'Yes. Open the merge tool and give the page a few seconds to save itself; once it has loaded it works in airplane mode (a password-protected PDF needs its unlock engine downloaded online once) and it can be installed as an app from the browser menu.' },
+      { q: 'Can I merge PDFs offline on my phone?', a: 'Yes. Open the merge tool and give the page a short while to save itself after one visit; then it works in airplane mode (a password-protected PDF needs its unlock engine downloaded online once) and it can be installed as an app from the browser menu.' },
     ],
   },
   {
@@ -105,7 +105,7 @@ export const guides: Guide[] = [
       {
         h: 'The quick way: in your browser, no app',
         p: [
-          'Open the [location remover](/remove-location-from-photos) in your browser, drop the photos in, and it shows you what each one contains, GPS coordinates included. One click removes the location, camera and date metadata and gives you a clean copy. The image data is not re-compressed, so the quality is identical, apart from one case: a JPG stored sideways is re-encoded if you leave "Apply orientation" ticked, and unticking it avoids that. The photo never leaves your device: the removal runs inside the browser tab. It works on iPhone, Android, Windows, Mac and Linux, and offline after the first visit.',
+          'Open the [location remover](/remove-location-from-photos) in your browser, drop the photos in, and it shows you what each one contains, GPS coordinates included. One click removes the location, camera and date metadata and gives you a clean copy. The image data is not re-compressed, so the quality is identical, apart from one case: a JPG stored sideways is re-encoded if you leave "Apply orientation" ticked, and unticking it avoids that. The photo never leaves your device: the removal runs inside the browser tab. It works on iPhone, Android, Windows, Mac and Linux, and offline after the first visit and a short wait.',
           'For HEIC photos straight from an iPhone, use the [HEIC to JPG converter](/tools/heic-to-jpg); the JPG it produces has no metadata unless you tick the box to keep it.',
         ],
       },
@@ -224,7 +224,7 @@ export const guides: Guide[] = [
     heading: 'How to open HEIC files on Windows',
     dek: 'Why iPhone photos will not open, the three fixes, and the fastest free way to convert a whole batch to JPG.',
     keywords: ['open heic files windows', 'heic to jpg windows', 'how to open heic on windows 11', 'windows cannot open heic', 'heic viewer windows', 'convert heic to jpg windows 10'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['heic-to-jpg', 'heic-to-png', 'heic-to-pdf'],
     sections: [
       {
@@ -236,8 +236,8 @@ export const guides: Guide[] = [
       {
         h: 'Fix 1: convert them to JPG in your browser',
         p: [
-          'If what you actually want is to use the photos, attach them or send them, converting is the direct answer. Open the [HEIC to JPG converter](/tools/heic-to-jpg) in Edge, Chrome or Firefox, drop the whole folder of photos, and download them as JPGs or as one zip. The decoder (libheif, the same open-source library Linux desktops use) runs inside the browser tab, so the photos are not uploaded and there is no cap on how many you convert beyond your device’s memory. Choose PNG on the [HEIC to PNG page](/heic-to-png) for a lossless copy, or [HEIC to PDF](/heic-to-pdf) for photographed documents.',
-          'The conversion drops the location and camera metadata unless you tick "Keep EXIF metadata", which is worth knowing before you upload the results anywhere.',
+          'If what you actually want is to use the photos, attach them or send them, converting is the direct answer. Open the [HEIC to JPG converter](/tools/heic-to-jpg) in Edge, Chrome or Firefox, drop the whole folder of photos, and download them as JPGs or as one zip. The decoder (libheif, the same open-source library Linux desktops use) runs inside the browser tab, so the photos are not uploaded and there is no cap on how many you convert beyond your device’s memory (phones hold less). Choose PNG on the [HEIC to PNG page](/heic-to-png) for a lossless copy, or [HEIC to PDF](/heic-to-pdf) for photographed documents.',
+          'The conversion drops the location and camera metadata unless you choose JPG and tick "Keep EXIF metadata", which is worth knowing before you upload the results anywhere.',
         ],
       },
       {
@@ -328,7 +328,7 @@ export const guides: Guide[] = [
     heading: 'How to reduce an image\'s file size',
     dek: 'Two settings do almost all the work. Here are the numbers to use for email, forms, listings and websites.',
     keywords: ['reduce image file size', 'make image smaller for email', 'compress image for upload', 'image too large to upload', 'reduce photo size to 1mb', 'shrink photo size'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['compress-image', 'compress-jpg', 'resize-image', 'convert-image'],
     sections: [
       {
@@ -374,7 +374,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Does reducing file size reduce quality?', a: 'Reducing dimensions discards pixels you would not have seen; lowering JPG quality discards fine detail. Both are invisible at sensible settings, and both are irreversible, so keep the original.' },
-      { q: 'How do I make a photo smaller on my phone?', a: 'Open the compress page in the phone\'s browser, pick the photos, set the size, and save the results. It works on iPhone and Android without an app, and offline once loaded.' },
+      { q: 'How do I make a photo smaller on my phone?', a: 'Open the compress page in the phone\'s browser, pick the photos, set the size, and save the results. It works on iPhone and Android without an app, and offline after one visit and a short wait.' },
       { q: 'Why is my PNG so big?', a: 'PNG is lossless, so a photo saved as PNG is several times the size of the same photo as JPG. Convert photos to JPG; keep PNG for screenshots with text and for transparency.' },
       { q: 'Can I compress without changing the dimensions?', a: 'Yes. Choose "Keep size" in the resize options and only the quality slider applies.' },
     ],
@@ -386,7 +386,7 @@ export const guides: Guide[] = [
     heading: 'Does this website upload my files? How to check',
     dek: 'A five-minute check with tools already in your browser. No trust required.',
     keywords: ['does this website upload my files', 'check if website uploads files', 'browser network tab file upload', 'client side processing verify', 'is this online tool private'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['strip-exif', 'merge-pdf', 'heic-to-jpg', 'file-checksum'],
     sections: [
       {
@@ -419,7 +419,7 @@ export const guides: Guide[] = [
       {
         h: 'Step 4: the airplane-mode test',
         p: [
-          'For a second opinion that needs no panel at all: after one visit, switch on airplane mode or unplug the network and run it. (Tools that fetch a model or engine on first use, such as the background remover, need one run first.) A tool that processes locally keeps working. A tool that uploads fails at once. This also catches the case where a site processes locally but "phones home" with the result.',
+          'For a second opinion that needs no panel at all: after one visit and a short wait, switch on airplane mode or unplug the network and run it. (Tools that fetch a model or engine on first use, such as the background remover, need one run first.) A tool that processes locally keeps working. A tool that uploads fails at once. This also catches the case where a site processes locally but "phones home" with the result.',
         ],
       },
       {
@@ -453,7 +453,7 @@ export const guides: Guide[] = [
     heading: 'How to sign a PDF without Adobe Acrobat',
     dek: 'Sign a contract in your browser in a minute, with nothing uploaded, and the built-in options on every platform.',
     keywords: ['sign pdf without adobe', 'how to sign a pdf', 'sign pdf free', 'add signature to pdf', 'sign pdf online safe', 'electronic signature pdf free'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['sign-pdf', 'merge-pdf', 'pdf-page-numbers'],
     sections: [
       {
@@ -490,8 +490,8 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Will a drawn or typed signature be accepted?', a: 'That depends on who asked you to sign and on the rules where you are, and some documents have stricter requirements than others. Check with the person or organisation that sent the document.' },
       { q: 'Can the recipient remove the signature?', a: 'It is drawn into the page content like any other graphic. Editing it out is as hard, or as easy, as editing any part of a PDF, which is the same as for a scanned signature.' },
-      { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline once the page has loaded.' },
-      { q: 'Is my document uploaded when I sign it here?', a: 'No. The signature is placed by code running in your browser; you can verify it in the network tab or, after one visit, by signing with the network switched off.' },
+      { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline after one visit and a short wait.' },
+      { q: 'Is my document uploaded when I sign it here?', a: 'No. The signature is placed by code running in your browser; you can verify it in the network tab or, after one visit and a short wait, by signing with the network switched off.' },
     ],
   },
   {
@@ -599,7 +599,7 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'Working offline once a page has loaded, and installing it',
+        h: 'Working offline after one visit, and installing it',
         p: [
           'Because every tool is a static page and a script, the site caches its pages and code once a page has loaded, and most tools keep working with the network off from then on; the few that download a model or engine need one online run first. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
         ],
@@ -607,7 +607,7 @@ export const guides: Guide[] = [
     ],
     faq: [
       { q: 'Is a browser tool slower than a desktop app?', a: 'For these jobs, not noticeably. WebAssembly runs the same code at close to native speed, and the work happens on your own processor.' },
-      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu; once a page has loaded, most tools then work offline, and the few that download a model or engine need one online run first.' },
+      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu; after one visit and a short wait, most tools then work offline, and the few that download a model or engine need one online run first.' },
       { q: 'What about very large files?', a: 'The limit is your device\'s memory. A few hundred megabytes of PDF or a few hundred photos are fine on a laptop; a phone manages less at once.' },
       { q: 'How do I know the code does what it says?', a: 'It is open source under the MIT licence. The repository is linked in the footer of every page, and the network tab shows what the page does while you use it.' },
     ],
@@ -727,7 +727,7 @@ export const guides: Guide[] = [
     heading: 'Is CloudConvert safe?',
     dek: 'For most files, yes: it is an established, certified service. The real question is whether a given file should leave your computer at all.',
     keywords: ['is cloudconvert safe', 'cloudconvert safe', 'cloudconvert privacy', 'is cloudconvert legit', 'cloudconvert security', 'cloudconvert alternative no upload'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['convert-image', 'video-to-mp3', 'heic-to-jpg', 'video-to-gif'],
     sections: [
       {
@@ -766,7 +766,7 @@ export const guides: Guide[] = [
       {
         h: 'How to check any converter yourself',
         p: [
-          'Whatever a site says, you can see whether it uploads. Open your browser’s network panel, add a file and watch for an outgoing request the size of your file; or, after the page has loaded, switch on airplane mode and try it. Our guide [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks in five minutes.',
+          'Whatever a site says, you can see whether it uploads. Open your browser’s network panel, add a file and watch for an outgoing request the size of your file; or, after one visit and a short wait, switch on airplane mode and try it. Our guide [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks in five minutes.',
         ],
       },
     ],
@@ -774,7 +774,7 @@ export const guides: Guide[] = [
       { q: 'Is CloudConvert legit?', a: 'Yes. It is run by Lunaweb GmbH in Munich, Germany, has been operating for years, publishes its security practices and holds ISO 27001 certification.' },
       { q: 'How long does CloudConvert keep my files?', a: 'As of October 2026, according to its privacy policy, until you delete them with the × button, and automatically after 24 hours at the latest.' },
       { q: 'Can CloudConvert staff see my files?', a: 'Its security page says conversions run in isolated containers and that staff cannot technically access your files; for support cases it asks you to send files manually.' },
-      { q: 'Is there a way to convert without uploading anything?', a: 'Yes, for common formats. Tools that run in the browser, such as Stayput’s image, audio and video converters, process the file on your device. You can confirm it with airplane mode: they keep working offline after one visit.' },
+      { q: 'Is there a way to convert without uploading anything?', a: 'Yes, for common formats. Tools that run in the browser, such as Stayput’s image, audio and video converters, process the file on your device. You can confirm it with airplane mode: they keep working offline after one visit and a short wait.' },
     ],
   },
   {
@@ -784,7 +784,7 @@ export const guides: Guide[] = [
     heading: 'Is FreeConvert safe?',
     dek: 'FreeConvert is a legitimate service with a clear deletion policy. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
     keywords: ['is freeconvert safe', 'freeconvert safe', 'is freeconvert.com safe', 'freeconvert privacy', 'is freeconvert legit', 'freeconvert virus'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
     sections: [
       {
@@ -815,7 +815,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting without uploading',
         p: [
-          'For the formats people convert most, a browser can do the work locally. Stayput’s tools run inside the page: [convert images](/tools/convert-image) between JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF, [compress images](/tools/compress-image), turn clips into GIFs with [Video to GIF](/tools/video-to-gif), and pull audio out of video with [Video to MP3](/tools/video-to-mp3). Your files are not uploaded, there are no file size caps from a pricing plan, only your device’s memory, and after one visit the pages keep working with the network switched off.',
+          'For the formats people convert most, a browser can do the work locally. Stayput’s tools run inside the page: [convert images](/tools/convert-image) between JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF, [compress images](/tools/compress-image), turn clips into GIFs with [Video to GIF](/tools/video-to-gif), and pull audio out of video with [Video to MP3](/tools/video-to-mp3). Your files are not uploaded, there are no file size caps from a pricing plan, only your device’s memory (phones hold less), and after one visit and a short wait the pages keep working with the network switched off.',
           'FreeConvert covers many more formats, such as documents, e-books and archives, and adds features like cloud imports. Choose by the file: sensitive and common, stay local; obscure and harmless, an upload service is the practical option.',
         ],
       },
@@ -830,7 +830,7 @@ export const guides: Guide[] = [
       { q: 'Is FreeConvert legit?', a: 'Yes. Its terms name TransMedia Inc. of Toronto, Canada as the operator, and its privacy policy gives a fixed deletion period.' },
       { q: 'How long does FreeConvert keep my files?', a: 'As of October 2026, its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
       { q: 'Where are FreeConvert files stored?', a: 'On Amazon Web Services in Ireland, according to its privacy policy.' },
-      { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; after one visit, switch on airplane mode and they still work.' },
+      { q: 'Can I convert a file without uploading it?', a: 'Yes, for common image, audio and video formats. Browser-based tools like Stayput process the file on your own device; after one visit and a short wait, switch on airplane mode and they still work.' },
     ],
   },
   {
@@ -840,7 +840,7 @@ export const guides: Guide[] = [
     heading: 'Is iLovePDF safe?',
     dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
     keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf'],
     sections: [
       {
@@ -886,7 +886,7 @@ export const guides: Guide[] = [
       { q: 'Is iLovePDF legit?', a: 'Yes. It is an established Europe-based service with ISO/IEC 27001 certification and GDPR compliance, according to its security page.' },
       { q: 'How long does iLovePDF keep my files?', a: 'As of October 2026, its security page says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
       { q: 'Does iLovePDF have an offline version?', a: 'Yes. Per its desktop page, iLovePDF Desktop for Windows and Mac processes files offline. Browser tools like Stayput’s are another option that needs no installation.' },
-      { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after one visit, it keeps working with the network switched off.' },
+      { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after one visit and a short wait, it keeps working with the network switched off.' },
     ],
   },
   {
@@ -896,7 +896,7 @@ export const guides: Guide[] = [
     heading: 'Is Smallpdf safe?',
     dek: 'Smallpdf is a reputable Swiss company with published retention rules. What changes the answer for you is which of its storage rules applies to your file.',
     keywords: ['is smallpdf safe', 'smallpdf safe', 'is smallpdf legit', 'smallpdf privacy', 'smallpdf security', 'smallpdf alternative'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['compress-pdf', 'merge-pdf', 'pdf-to-word', 'sign-pdf'],
     sections: [
       {
@@ -933,7 +933,7 @@ export const guides: Guide[] = [
       {
         h: 'How to see where a file goes',
         p: [
-          'You do not have to take any site’s word, including ours. [This guide](/guides/does-this-website-upload-my-files) shows how to watch the browser’s network panel for an upload, and how the airplane-mode test, run after the page has loaded, tells you in seconds whether a tool works locally.',
+          'You do not have to take any site’s word, including ours. [This guide](/guides/does-this-website-upload-my-files) shows how to watch the browser’s network panel for an upload, and how the airplane-mode test, run after one visit and a short wait, tells you in seconds whether a tool works locally.',
         ],
       },
     ],
@@ -941,7 +941,7 @@ export const guides: Guide[] = [
       { q: 'Is Smallpdf legit?', a: 'Yes. It is operated by Smallpdf AG in Zurich, Switzerland, is ISO 27001 certified, and is one of the most widely used PDF services.' },
       { q: 'How long does Smallpdf keep my files?', a: 'As of October 2026, per its privacy notice: within one hour for signed-in users unless the file is saved to file storage, and generally within 14 days after you delete a saved file. Without an account it aims to delete within a reasonable period after the file was last opened.' },
       { q: 'How do I stop Smallpdf storing my documents?', a: 'Per its privacy notice, files are deleted within an hour for signed-in users unless you save them to file storage; you can delete saved files yourself.' },
-      { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so your PDF is not uploaded. It keeps working with the network off once the page has loaded.' },
+      { q: 'Can I compress a PDF without uploading it?', a: 'Yes. Stayput’s Compress PDF runs inside your browser tab, so your PDF is not uploaded. It keeps working with the network off after one visit and a short wait.' },
     ],
   },
   {
@@ -951,7 +951,7 @@ export const guides: Guide[] = [
     heading: 'Is ezgif safe?',
     dek: 'Ezgif is a legitimate, popular GIF tool with a short deletion window. The file you are about to drop in decides whether uploading it is fine.',
     keywords: ['is ezgif safe', 'ezgif safe', 'is ezgif legit', 'is ezgif.com safe', 'ezgif privacy', 'ezgif virus', 'ezgif alternative'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
     sections: [
       {
@@ -982,14 +982,14 @@ export const guides: Guide[] = [
       {
         h: 'Making GIFs without uploading',
         p: [
-          'Modern browsers can decode video and encode GIFs on your own device. Stayput’s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs inside the page, with trimming, size and frame-rate settings. [GIF to MP4](/tools/gif-to-mp4) goes the other way for a much smaller file, [Crop image](/tools/crop-image) trims a still, and [Compress image](/tools/compress-image) shrinks one. Your files are not uploaded, there are no ads next to the download, and after one visit the pages work in airplane mode.',
+          'Modern browsers can decode video and encode GIFs on your own device. Stayput’s [Video to GIF](/tools/video-to-gif) turns MP4, MOV and WebM clips into GIFs inside the page, with trimming, size and frame-rate settings. [GIF to MP4](/tools/gif-to-mp4) goes the other way for a much smaller file, [Crop image](/tools/crop-image) trims a still, and [Compress image](/tools/compress-image) shrinks one. Your files are not uploaded, there are no ads next to the download, and after one visit and a short wait the pages work in airplane mode.',
           'Ezgif still does more GIF-specific editing than these tools, such as frame-by-frame editing, effects and text overlays on animations. For a harmless clip it is a fine choice; for a private recording, convert it locally.',
         ],
       },
       {
         h: 'Check any GIF site yourself',
         p: [
-          'Open the browser’s network panel, add your video, and watch for a request about the size of the file. Or, after the page has loaded, turn off Wi-Fi and try it. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both tests.',
+          'Open the browser’s network panel, add your video, and watch for a request about the size of the file. Or, after one visit and a short wait, turn off Wi-Fi and try it. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both tests.',
         ],
       },
     ],
@@ -997,7 +997,7 @@ export const guides: Guide[] = [
       { q: 'Is ezgif legit?', a: 'Yes. It is a long-established free GIF editor, developed and hosted by Open Idea according to its about page.' },
       { q: 'How long does ezgif keep my files?', a: 'Its privacy page says uploads are kept up to one hour after they were last used with its tools and then deleted automatically.' },
       { q: 'Can ezgif give my computer a virus?', a: 'Converting a file there does not. The usual risk on ad-supported sites is clicking an advert that looks like a download button, so save the result from the output itself.' },
-      { q: 'How do I make a GIF without uploading the video?', a: 'Use a converter that runs in the browser. Stayput’s Video to GIF encodes the GIF on your device; switch off the network after the page loads and it still works.' },
+      { q: 'How do I make a GIF without uploading the video?', a: 'Use a converter that runs in the browser. Stayput’s Video to GIF encodes the GIF on your device; after one visit and a short wait, switch off the network and it still works.' },
     ],
   },
   {
@@ -1007,7 +1007,7 @@ export const guides: Guide[] = [
     heading: 'Is PDF24 safe?',
     dek: 'PDF24 is a long-standing German project, and it tells you itself that its offline app is the more private option. Here is how to choose between the two, and a third way.',
     keywords: ['is pdf24 safe', 'pdf24 safe', 'is pdf24 legit', 'is pdf24 tools safe', 'pdf24 privacy', 'pdf24 creator safe'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf'],
     sections: [
       {
@@ -1037,14 +1037,14 @@ export const guides: Guide[] = [
       {
         h: 'PDF jobs in the browser, without uploading',
         p: [
-          'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work in any modern browser on Windows, Mac, Android or iPhone and, after one visit, keep working with the network switched off.',
+          'Stayput’s PDF tools read the file from your disk into the page and write the result straight back. [Merge PDF](/tools/merge-pdf) and [Split PDF](/tools/split-pdf) rearrange documents, [Compress PDF](/tools/compress-pdf) shrinks scans for email, and [Unlock PDF](/tools/unlock-pdf) removes a password you already know. They work in any modern browser on Windows, Mac, Android or iPhone and, after one visit and a short wait, keep working with the network switched off.',
           'PDF24 has a far larger toolbox, including OCR and a virtual PDF printer in Creator. If you are on Windows and need those, Creator is a good private choice; for quick jobs on a Mac, a Chromebook or a phone, a browser tool avoids both the upload and the install.',
         ],
       },
       {
         h: 'See for yourself where the file goes',
         p: [
-          'You can confirm PDF24’s own description, or ours, in a minute: watch the network panel while adding a PDF, or, after one visit, try the page in airplane mode. [This guide](/guides/does-this-website-upload-my-files) shows how, and [Is it safe to merge PDFs online?](/guides/is-it-safe-to-merge-pdfs-online) covers the wider risks.',
+          'You can confirm PDF24’s own description, or ours, in a minute: watch the network panel while adding a PDF, or, after one visit and a short wait, try the page in airplane mode. [This guide](/guides/does-this-website-upload-my-files) shows how, and [Is it safe to merge PDFs online?](/guides/is-it-safe-to-merge-pdfs-online) covers the wider risks.',
         ],
       },
     ],
@@ -1052,7 +1052,7 @@ export const guides: Guide[] = [
       { q: 'Is PDF24 legit?', a: 'Yes. PDF24 is operated by Geek Software GmbH, a German company, and offers its tools free of charge.' },
       { q: 'How long does PDF24 keep uploaded files?', a: 'As of October 2026, its privacy policy says uploaded files and results are usually deleted one hour after upload or creation.' },
       { q: 'Is PDF24 Creator safer than the online tools?', a: 'PDF24 itself says so: Creator processes files on your own PC, so nothing is uploaded. It is Windows software, though.' },
-      { q: 'How can I edit a PDF privately on a Mac or phone?', a: 'Use a tool that works in the browser without uploading, such as Stayput’s PDF tools. After one visit, they keep working offline.' },
+      { q: 'How can I edit a PDF privately on a Mac or phone?', a: 'Use a tool that works in the browser without uploading, such as Stayput’s PDF tools. After one visit and a short wait, they keep working offline.' },
     ],
   },
   {
@@ -1062,7 +1062,7 @@ export const guides: Guide[] = [
     heading: 'Is Convertio safe?',
     dek: 'Convertio is a well-known converter with a published deletion policy. For private files, the safer choice is a converter that never receives them.',
     keywords: ['is convertio safe', 'convertio safe', 'is convertio legit', 'is convertio.co safe', 'convertio privacy', 'convertio virus'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf'],
     sections: [
       {
@@ -1094,7 +1094,7 @@ export const guides: Guide[] = [
       {
         h: 'Common conversions that never leave your device',
         p: [
-          'For the formats most people convert, the browser can do the job locally. Stayput’s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF; [HEIC to JPG](/tools/heic-to-jpg) fixes iPhone photos; [Image to PDF](/tools/image-to-pdf) turns photos or scans into a PDF; and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack. The file is processed in the page, there are no ads, and after one visit airplane mode proves it.',
+          'For the formats most people convert, the browser can do the job locally. Stayput’s [image converter](/tools/convert-image) handles JPG, PNG, WebP, HEIC, AVIF, TIFF and GIF; [HEIC to JPG](/tools/heic-to-jpg) fixes iPhone photos; [Image to PDF](/tools/image-to-pdf) turns photos or scans into a PDF; and [Video to MP3](/tools/video-to-mp3) extracts a soundtrack. The file is processed in the page, there are no ads, and after one visit and a short wait airplane mode proves it.',
           'Convertio supports hundreds of formats that browsers cannot read, so for those a server is the only practical route. Keep it for files that would not matter if a stranger saw them.',
         ],
       },
@@ -1119,7 +1119,7 @@ export const guides: Guide[] = [
     heading: 'Is Zamzar safe?',
     dek: 'Zamzar is one of the oldest online converters. Its storage window is longer than most, which is the detail worth knowing.',
     keywords: ['is zamzar safe', 'zamzar safe', 'is zamzar legit', 'is zamzar.com safe', 'zamzar privacy', 'zamzar virus'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
     sections: [
       {
@@ -1158,7 +1158,7 @@ export const guides: Guide[] = [
       {
         h: 'How to tell whether a site uploads',
         p: [
-          'After one visit, switch on airplane mode and try a file: server-based tools fail, local ones keep working. [Our guide](/guides/does-this-website-upload-my-files) also shows the network-panel check.',
+          'After one visit and a short wait, switch on airplane mode and try a file: server-based tools fail, local ones keep working. [Our guide](/guides/does-this-website-upload-my-files) also shows the network-panel check.',
         ],
       },
     ],
@@ -1166,7 +1166,7 @@ export const guides: Guide[] = [
       { q: 'Is Zamzar legit?', a: 'Yes. It is operated by Zamzar Limited, a company registered in England, and has run online conversions since 2006.' },
       { q: 'How long does Zamzar keep my files?', a: 'As of October 2026, its privacy policy says free conversions are stored for no longer than 7 days. Account files are removed 35 days after the account is deactivated.' },
       { q: 'Does Zamzar use analytics?', a: 'As of October 2026, its privacy policy says it uses Google Analytics, with cookies that store a client and session id.' },
-      { q: 'Can I convert files without uploading them?', a: 'Yes, for common image, PDF and audio formats. Browser-based tools like Stayput’s process files on your device and work offline once loaded.' },
+      { q: 'Can I convert files without uploading them?', a: 'Yes, for common image, PDF and audio formats. Browser-based tools like Stayput’s process files on your device and work offline after one visit and a short wait.' },
     ],
   },
   {
@@ -1214,14 +1214,14 @@ export const guides: Guide[] = [
       {
         h: 'How to check where a photo goes',
         p: [
-          'Open your browser’s network panel, drop a photo into any background remover and look for an upload about the size of the file; or, after the page has loaded and one photo has run, turn on airplane mode and try again. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks.',
+          'Open your browser’s network panel, drop a photo into any background remover and look for an upload about the size of the file; or, once one photo has run and the page has had a short wait, turn on airplane mode and try again. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks.',
         ],
       },
     ],
     faq: [
       { q: 'Is remove.bg legit?', a: 'Yes. It is a Canva brand, operated by Canva Austria GmbH in Vienna, Austria, and is one of the best-known background removers.' },
       { q: 'Does remove.bg keep my photos?', a: 'As of October 2026, its privacy policy says uploaded files are deleted shortly after processing, without giving an exact time.' },
-      { q: 'How can I remove a background without uploading the photo?', a: 'Use a tool that runs the model in your browser, such as Stayput’s background remover. After the model has downloaded once, it works with the network switched off.' },
+      { q: 'How can I remove a background without uploading the photo?', a: 'Use a tool that runs the model in your browser, such as Stayput’s background remover. After the model and its runtime have downloaded once, it works with the network switched off.' },
     ],
   },
   {
@@ -1267,7 +1267,7 @@ export const guides: Guide[] = [
       {
         h: 'When the built-in tools fall short',
         p: [
-          'These features are made for quick, single-photo edits: they can struggle with busy backgrounds, fine hair or fur, and low-contrast edges, and none of them let you process many photos at once or choose a plain white or blurred background instead of transparency. Stayput\'s [background remover](/tools/remove-background) runs an open-source segmentation model (ISNet) inside your browser tab, so it works offline after the model loads once, keeps your photo at full resolution, and never uploads anything. Use [Make background transparent](/make-background-transparent) for a PNG, [White background](/white-background) for product photos and headshots, or [Blur background](/blur-background) for a portrait-mode look.',
+          'These features are made for quick, single-photo edits: they can struggle with busy backgrounds, fine hair or fur, and low-contrast edges, and none of them let you process many photos at once or choose a plain white or blurred background instead of transparency. Stayput\'s [background remover](/tools/remove-background) runs an open-source segmentation model (ISNet) inside your browser tab, so it works offline after the model and its runtime have downloaded once, keeps your photo at full resolution, and never uploads anything. Use [Make background transparent](/make-background-transparent) for a PNG, [White background](/white-background) for product photos and headshots, or [Blur background](/blur-background) for a portrait-mode look.',
           'If you have been using remove.bg, see [remove.bg is closing: alternatives](/guides/remove-bg-alternative).',
         ],
       },
@@ -1282,11 +1282,11 @@ export const guides: Guide[] = [
   {
     slug: 'how-to-make-a-gif-from-a-video',
     title: 'How to Make a GIF From a Video (iPhone, Android, Windows, Mac)',
-    description: 'A short clip is often more useful as a GIF than a video: it loops, plays without a tap, and works where video does not. Here is how to make one on each platform, and a browser tool with no upload, limited only by your device’s memory.',
+    description: 'A short clip is often more useful as a GIF than a video: it loops, plays without a tap, and works where video does not. Here is how to make one on each platform, and a browser tool with no upload, limited by your device’s memory (phones hold less).',
     heading: 'How to make a GIF from a video',
     dek: 'A GIF loops and plays anywhere without a tap. Here is how to make one on each platform, and a browser tool for when there is no built-in way.',
     keywords: ['how to make a gif from a video', 'convert video to gif', 'mp4 to gif', 'turn video into gif iphone', 'make a gif from a video clip'],
-    updated: '2026-09-29',
+    updated: '2026-10-12',
     tools: ['video-to-gif', 'mp4-to-gif', 'mov-to-gif'],
     sections: [
       {
@@ -1316,13 +1316,13 @@ export const guides: Guide[] = [
       {
         h: 'On a Mac',
         p: [
-          'macOS can export a **Live Photo** as a GIF (right-click it in Photos and choose "Save as GIF"), but that only works for Live Photos, not for a regular MOV or MP4 you already have. Converting an arbitrary video file to GIF on a Mac otherwise needs QuickTime Player plus a command-line tool such as ffmpeg, or a browser tool.',
+          'macOS can export a **Live Photo** as a GIF (right-click it in Photos and choose "Save as GIF"), but that only works for Live Photos, not for a regular MOV or MP4 you already have. Converting an arbitrary video file to GIF on a Mac otherwise needs QuickTime Player plus a command-line video tool, or a browser tool.',
         ],
       },
       {
         h: 'Converting without installing anything',
         p: [
-          'Stayput\'s [video to GIF](/tools/video-to-gif) converter reads the video and writes the GIF entirely in your browser tab, so there is no upload and the only size limit is your device’s memory. It handles [MP4](/mp4-to-gif), [MOV](/mov-to-gif) straight from an iPhone, and WebM. For a smaller file, lower the frame rate and the output width before converting; a GIF at 10-12 fps and 480px wide is usually plenty for chat and forum posts, and cuts the size dramatically compared to the source resolution and frame rate.',
+          'Stayput\'s [video to GIF](/tools/video-to-gif) converter reads the video and writes the GIF entirely in your browser tab, so there is no upload and the size limit is your device’s memory (phones hold less). It handles [MP4](/mp4-to-gif), [MOV](/mov-to-gif) straight from an iPhone, and WebM. For a smaller file, lower the frame rate and the output width before converting; a GIF at 10-12 fps and 480px wide is usually plenty for chat and forum posts, and cuts the size dramatically compared to the source resolution and frame rate.',
         ],
       },
     ],
@@ -1664,7 +1664,7 @@ export const guides: Guide[] = [
     heading: 'How to convert MOV to MP4',
     dek: 'MOV plays fine on Apple devices but not everywhere else. Here is how to convert it on a Mac and on Windows.',
     keywords: ['how to convert mov to mp4', 'mov to mp4 converter', 'convert mov to mp4 on mac', 'convert mov to mp4 windows', 'mov file wont play windows'],
-    updated: '2026-09-29',
+    updated: '2026-10-12',
     tools: ['video-to-mp4', 'mov-to-mp4'],
     sections: [
       {
@@ -1694,7 +1694,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting without re-encoding when possible',
         p: [
-          'Since most MOV files already contain H.264 video, Stayput\'s [video to MP4](/tools/video-to-mp4) converter (and the dedicated [MOV to MP4](/mov-to-mp4) page) checks first: if the video is already H.264, it repackages the container in seconds with no quality loss and no re-encoding at all; only HEVC or other codecs get re-encoded. Everything happens in your browser tab, so a private video is never uploaded, and the only size limit is your device’s memory.',
+          'Since most MOV files already contain H.264 video, Stayput\'s [video to MP4](/tools/video-to-mp4) converter (and the dedicated [MOV to MP4](/mov-to-mp4) page) checks first: if the video is already H.264, it repackages the container in seconds with no quality loss and no re-encoding at all; only HEVC or other codecs get re-encoded. Everything happens in your browser tab, so a private video is never uploaded, and the size limit is your device’s memory (phones hold less).',
         ],
       },
     ],
@@ -2869,7 +2869,7 @@ export const guides: Guide[] = [
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, and it is free, with no account; your photos are not uploaded. The result is the same size as your photo (a 12 megapixel photo gives a 12 megapixel cut-out), limited by what your device can hold in memory, with no watermark and no credits. The first photo downloads the cut-out model (about 46 MB); the first run needs a connection, and after that the model is cached. After your first run you can turn off Wi-Fi and it keeps working.',
+          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, and it is free, with no account; your photos are not uploaded. The result is the same size as your photo (a 12 megapixel photo gives a 12 megapixel cut-out), limited by what your device can hold in memory, with no watermark and no credits. The first photo downloads the cut-out model (about 46 MB) and the WebAssembly runtime that runs it; the first run needs a connection, and after that the model is cached. After your first run you can turn off Wi-Fi and it keeps working.',
           '[Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it. For a step-by-step walkthrough, see [how to remove the background from a photo](/guides/remove-background-from-a-photo).',
         ],
       },
@@ -2893,7 +2893,7 @@ export const guides: Guide[] = [
       { q: 'Is remove.bg shutting down?', a: 'Its own site says so. A notice on remove.bg (checked 8 October 2026) states: "The standalone website will no longer be available from 1 December 2026 at 9:00am CET." It says background removal is moving to Canva.' },
       { q: 'What happens to my remove.bg credits?', a: 'Its terms and conditions (checked 8 October 2026) say unused credits expire on 1 December 2026 and are non-refundable.' },
       { q: 'What happens to the remove.bg API?', a: 'Its API page (checked 8 October 2026) says that from 1 December 2026 background removal moves to Leonardo.Ai, also part of Canva. Stayput has no API.' },
-      { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model (about 46 MB), so it needs a connection then.' },
+      { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model (about 46 MB) and the WebAssembly runtime that runs it, so it needs a connection then.' },
       { q: 'Does it work as well as remove.bg?', a: 'We have not compared them side by side. Stayput uses one general-purpose model, and fine hair and low-contrast subjects may need a second try with the edge setting. There is no API, desktop app or plug-in.' },
       { q: 'Is the result full resolution?', a: 'It is the same size as your photo: a 12 megapixel photo gives a 12 megapixel cut-out, limited by what your device can hold in memory. There is no low-resolution preview and no watermark.' },
       { q: 'Can I do many photos at once?', a: 'Yes. Drop several photos and download them all in one zip.' },
@@ -2907,7 +2907,7 @@ export const guides: Guide[] = [
     heading: 'A free Convertio alternative with no file size cap',
     dek: 'Convertio\'s free plan caps both file size and how many conversions you get per day. Here is an alternative with no such ceiling.',
     keywords: ['convertio alternative', 'free convertio alternative', 'convertio alternative no limit', 'convertio free plan limit', 'convertio without upload'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf', 'audio-converter'],
     sections: [
       {
@@ -2940,7 +2940,7 @@ export const guides: Guide[] = [
       { q: 'Is there a free Convertio alternative without a file size or daily limit?', a: 'Yes, for formats a browser can already handle. A tool that converts locally has no server-side size tier or credit count to enforce, so the practical limit is only what your device can process.' },
       { q: 'How many free conversions does Convertio allow per day?', a: 'As of October 2026, per its help center, the free tier allows 10 conversion credits per 24 hours and files up to 1 GB; paid plans raise the credits and file sizes.' },
       { q: 'Does a browser converter support as many formats as Convertio?', a: 'No, Convertio covers many more file types; for common image, audio and video formats, a browser tool covers the same ground with no daily cap.' },
-      { q: 'Can I convert a large file without hitting a size cap?', a: 'For formats the browser can decode locally, size is limited only by your device\'s memory, not a fixed plan tier.' },
+      { q: 'Can I convert a large file without hitting a size cap?', a: 'For formats the browser can decode locally, size is limited by your device\'s memory (phones hold less), not a fixed plan tier.' },
     ],
   },
   {
@@ -2950,7 +2950,7 @@ export const guides: Guide[] = [
     heading: 'A free Zamzar alternative with no daily limit',
     dek: 'Zamzar\'s free service limits how many files you can convert and how big each can be. Here is an alternative with no such cap.',
     keywords: ['zamzar alternative', 'free zamzar alternative', 'zamzar alternative no limit', 'zamzar free plan limit', 'zamzar without upload'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
     sections: [
       {
@@ -2982,7 +2982,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'How many free conversions does Zamzar allow per day?', a: 'As of October 2026, per its FAQ, the free service allows 2 files converted in any 24-hour period, with a 50MB file size limit.' },
       { q: 'Is there a Zamzar alternative with no daily conversion limit?', a: 'Yes, for common formats. A browser-based converter processes files on your device, so there is no per-day count to run out of.' },
-      { q: 'Can I convert a file bigger than 50MB for free?', a: 'With a tool that converts in the browser, file size is limited by your device\'s memory rather than a fixed plan tier.' },
+      { q: 'Can I convert a file bigger than 50MB for free?', a: 'With a tool that converts in the browser, file size is limited by your device\'s memory (phones hold less) rather than a fixed plan tier.' },
       { q: 'How long does Zamzar keep my files?', a: 'As of October 2026, per zamzar.com/privacy, submitted files and their converted outputs are stored for no longer than 7 days. With a browser-based converter, your files are not uploaded in the first place.' },
     ],
   },
@@ -2993,7 +2993,7 @@ export const guides: Guide[] = [
     heading: 'A free FreeConvert alternative with no processing time cap',
     dek: 'FreeConvert\'s free plan limits the processing time for each file and for the day. Here is an alternative with nothing to time out.',
     keywords: ['freeconvert alternative', 'free freeconvert alternative', 'freeconvert alternative no limit', 'freeconvert free plan limit', 'freeconvert without upload'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
     sections: [
       {
@@ -3012,7 +3012,7 @@ export const guides: Guide[] = [
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'A tool that converts inside your browser has nothing to time out, because there is no shared server queue: Stayput\'s [image converter](/tools/convert-image) and [compress image](/tools/compress-image) handle common image formats, [Video to GIF](/tools/video-to-gif) turns clips into animations, and [Video to MP3](/tools/video-to-mp3) extracts audio, all limited only by your own device\'s speed, not a fixed processing window, and your files are not uploaded.',
+          'A tool that converts inside your browser has nothing to time out, because there is no shared server queue: Stayput\'s [image converter](/tools/convert-image) and [compress image](/tools/compress-image) handle common image formats, [Video to GIF](/tools/video-to-gif) turns clips into animations, and [Video to MP3](/tools/video-to-mp3) extracts audio, all limited by your own device\'s speed and memory (phones hold less), not a fixed processing window, and your files are not uploaded.',
         ],
       },
       {
@@ -3075,11 +3075,11 @@ export const guides: Guide[] = [
   {
     slug: 'ezgif-alternative',
     title: 'A Free Ezgif Alternative With No File Size Cap',
-    description: 'Ezgif\'s video tools limit the size of the file you upload and process it on its servers. Here is a browser-based GIF alternative that is limited only by your device’s memory, with no upload.',
+    description: 'Ezgif\'s video tools limit the size of the file you upload and process it on its servers. Here is a browser-based GIF alternative that is limited by your device’s memory (phones hold less), with no upload.',
     heading: 'A free ezgif alternative with no file size cap',
     dek: 'Ezgif caps how big a file you can upload. Here is an alternative where your video is never uploaded.',
     keywords: ['ezgif alternative', 'free ezgif alternative', 'ezgif alternative no ads', 'ezgif file size limit', 'gif maker without upload'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
     sections: [
       {
@@ -3104,7 +3104,7 @@ export const guides: Guide[] = [
       {
         h: 'Where ezgif still has the edge',
         p: [
-          'Ezgif\'s frame-by-frame GIF editing, text overlays and effects are more specialized than what a browser conversion tool offers. For turning a clip into a GIF or back, or basic image edits, a browser tool, limited only by your device’s memory, covers the common case.',
+          'Ezgif\'s frame-by-frame GIF editing, text overlays and effects are more specialized than what a browser conversion tool offers. For turning a clip into a GIF or back, or basic image edits, a browser tool, limited by your device’s memory (phones hold less), covers the common case.',
         ],
       },
     ],
@@ -3171,7 +3171,7 @@ export const guides: Guide[] = [
     heading: 'How to add subtitles to a video',
     dek: 'Captions written from the speech and burned into the picture, without a watermark or a length cap. Here is how, and a tool that does both steps on your own device.',
     keywords: ['how to add subtitles to a video', 'add subtitles to video free', 'burn subtitles into video', 'auto caption video free no watermark', 'add captions to video'],
-    updated: '2026-09-30',
+    updated: '2026-10-12',
     tools: ['add-subtitles-to-video', 'auto-caption-video', 'burn-subtitles-into-video'],
     sections: [
       {
@@ -3202,7 +3202,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'What is the difference between subtitles and captions burned in?', a: 'Subtitles are a separate file a player can switch on or off. Burned-in captions are part of the video image itself, so they show up everywhere, which is what most social platforms need.' },
       { q: 'Can I add subtitles to a video for free with no watermark?', a: 'Yes, with a tool that processes the video in your browser rather than a server, since nothing is uploaded and no watermark is added.' },
-      { q: 'Do auto-captions need an internet connection?', a: 'A browser-based tool works offline after it has downloaded its speech model once; a cloud-based captioning site needs a connection for every video.' },
+      { q: 'Do auto-captions need an internet connection?', a: 'A browser-based tool works offline after it has downloaded its speech model and engine once; a cloud-based captioning site needs a connection for every video.' },
       { q: 'Can I burn in subtitles I already wrote as an SRT file?', a: 'Yes. Stayput\'s add subtitles tool accepts an existing SRT or VTT file and burns those exact captions into the video instead of generating new ones from the speech.' },
     ],
   },
@@ -3397,9 +3397,9 @@ export const guides: Guide[] = [
     title: 'How to Convert EPUB to PDF (Free, No Email Required)',
     description: 'Some tools email you the file, cap the size, or need Calibre installed. Here is how to convert EPUB to PDF a few different ways, and a browser tool with none of those catches.',
     heading: 'How to convert EPUB to PDF',
-    dek: 'A few tools do this conversion, each with a catch: an email delivery, a size cap, or an app to install. Here is a browser one with none of those: nothing is emailed, and the only limit is your device’s memory.',
+    dek: 'A few tools do this conversion, each with a catch: an email delivery, a size cap, or an app to install. Here is a browser one with none of those: nothing is emailed, and the limit is your device’s memory (phones hold less).',
     keywords: ['how to convert epub to pdf', 'epub to pdf converter free', 'convert epub to pdf online free', 'epub to pdf no email', 'ebook to pdf converter'],
-    updated: '2026-09-30',
+    updated: '2026-10-12',
     tools: ['epub-to-pdf', 'pdf-to-epub', 'pdf-to-kindle'],
     sections: [
       {
@@ -3488,7 +3488,7 @@ export const guides: Guide[] = [
     heading: 'A free Otter.ai alternative with no monthly minute cap',
     dek: 'Otter.ai\'s free tier meters your minutes each month and caps how long a single recording can run. Here is what that looks like, and an alternative with nothing to meter.',
     keywords: ['otter.ai alternative', 'otter ai alternative free', 'free alternative to otter ai', 'otter ai alternative no limit', 'transcription app without subscription'],
-    updated: '2026-10-08',
+    updated: '2026-10-12',
     tools: ['transcribe', 'video-to-subtitles', 'mp3-to-text'],
     sections: [
       {
@@ -3506,7 +3506,7 @@ export const guides: Guide[] = [
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [transcribe](/tools/transcribe) tool runs Whisper directly in the browser tab, so there is no monthly minute budget and no per-recording length cap beyond what your device can hold in memory: drop an MP3, WAV, M4A, MP4 or MOV file and it downloads the speech model once, then transcribes entirely on your device into plain text, [SRT subtitles for video](/video-to-subtitles), or WebVTT captions. There is no account and no subscription, because a tenth file costs nothing more to process than the first.',
+          'Stayput\'s [transcribe](/tools/transcribe) tool runs Whisper directly in the browser tab, so there is no monthly minute budget and no per-recording length cap beyond what your device can hold in memory: drop an MP3, WAV, M4A, MP4 or MOV file and it downloads the speech model and its engine once, then transcribes entirely on your device into plain text, [SRT subtitles for video](/video-to-subtitles), or WebVTT captions. There is no account and no subscription, because a tenth file costs nothing more to process than the first.',
         ],
       },
       {
@@ -3824,7 +3824,7 @@ export const guides: Guide[] = [
     heading: 'How to record your screen',
     dek: 'A quick screen recording for a bug report, a tutorial or a demo does not need a downloaded app. Here is how to record it straight from your browser, free.',
     keywords: ['how to record your screen', 'screen recorder online free', 'record screen without downloading software', 'free screen recorder no watermark', 'record browser tab with audio'],
-    updated: '2026-09-30',
+    updated: '2026-10-12',
     tools: ['screen-recorder', 'screen-recorder-with-audio'],
     sections: [
       {
@@ -3849,7 +3849,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Can I record my screen without installing anything?', a: 'Yes, a browser-based recorder like Stayput\'s uses the browser\'s built-in screen-sharing permission, so there is nothing to download or install.' },
       { q: 'Can I record my microphone along with the screen?', a: 'Yes, Stayput\'s screen recorder with audio option captures your microphone alongside the screen and its own sound for a narrated recording.' },
-      { q: 'Is there a time limit on free screen recording?', a: 'Not with a browser-based tool like Stayput\'s: since nothing is uploaded or processed on a server, the only limit is how much storage your device has for the resulting file.' },
+      { q: 'Is there a time limit on free screen recording?', a: 'Not with a browser-based tool like Stayput\'s: since nothing is uploaded or processed on a server, the limit is how much memory and storage your device has for the resulting file, and phones have less.' },
       { q: 'Does a browser screen recorder add a watermark?', a: 'No. Watermarks on free screen recorders are usually there to push a paid upgrade for hosted, server-processed recordings; a tool that just captures locally in the browser has no such tier to gate.' },
     ],
   },
@@ -4064,7 +4064,7 @@ export const guides: Guide[] = [
     heading: 'How to convert a photo to black and white',
     dek: 'Just desaturating a colour photo often looks flat in black and white, because colours that looked different can turn into the same shade of grey. Here is why, and a free tool that fixes it.',
     keywords: ['how to convert photo to black and white', 'black and white photo converter free', 'convert image to grayscale online', 'make photo black and white free', 'photo to grayscale converter'],
-    updated: '2026-09-30',
+    updated: '2026-10-12',
     tools: ['black-and-white-image'],
     sections: [
       {
@@ -4131,7 +4131,7 @@ export const guides: Guide[] = [
       { q: "Does right-click Properties remove all EXIF data?", a: "It removes the properties Windows can edit for that file type, which varies. It is not guaranteed to remove everything, so check the result with a viewer before you share a sensitive photo." },
       { q: "Can I remove EXIF data from many photos at once on Windows?", a: "Yes. Select several files in File Explorer before opening Properties, or add a whole folder of photos to the [EXIF remover](/tools/strip-exif), which cleans them in one go and offers a zip." },
       { q: "Why are there no check boxes in the Remove Properties dialog?", a: "A property without a check box is one Windows cannot edit, so it cannot remove it. Use the [EXIF remover](/tools/strip-exif), which cuts the metadata blocks out of the file itself." },
-      { q: "Is it safe to use a website to remove EXIF data?", a: "Only if the photo stays on your computer. The [Stayput remover](/tools/strip-exif) runs in your browser tab and the photo is not uploaded; you can confirm in the browser's network tab, or by switching to airplane mode after the page has loaded." },
+      { q: "Is it safe to use a website to remove EXIF data?", a: "Only if the photo stays on your computer. The [Stayput remover](/tools/strip-exif) runs in your browser tab and the photo is not uploaded; you can confirm in the browser's network tab, or by switching to airplane mode after one visit and a short wait." },
     ],
   },
   {
@@ -4169,7 +4169,7 @@ export const guides: Guide[] = [
       { q: "Does Hide Location in Photos remove the GPS data from the file?", a: "Apple describes it as hiding the location in Photos, and Revert to Original Location restores it, so the original file still has it. Apple does not say what an exported or shared copy contains. Run the copy through the [EXIF remover](/tools/strip-exif) to be sure." },
       { q: "Can Preview remove location data?", a: "Yes, location only: Preview's Inspector has a Remove Location Info button. Apple's Preview guide documents viewing the location (Tools, Show Location Info), not the button, and the date and camera details stay. Use the [EXIF remover](/tools/strip-exif) to remove everything, and check the result with the [EXIF viewer](/tools/exif-viewer)." },
       { q: "Will removing EXIF data change how the photo looks?", a: "Not for a JPG, PNG or WebP cleaned with the [EXIF remover](/tools/strip-exif): the picture data is copied unchanged. The only exception is a sideways photo with the orientation option ticked, which is re-encoded." },
-      { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline once the page has loaded. ExifTool is a separate install." },
+      { q: "Do I need to install anything on my Mac?", a: "Not for the browser tool, and you can install it as an app from the browser menu to use it offline after one visit and a short wait. ExifTool is a separate install." },
     ],
   },
   {
@@ -4730,7 +4730,7 @@ export const guides: Guide[] = [
           "**Size:** keep the size, or 75%, 50% or 33%.",
           "**Frames:** keep every frame, drop every second, or keep one in three. Dropped frames give their time to the frame before, so the GIF plays at the same speed.",
         ],
-        after: ["On a generated 400 by 300 test GIF with 40 frames (65.8 KB), Light and Medium both gave 46.9 KB (27% smaller) and Strong gave 42.8 KB (33% smaller). Medium with the size at 50% and every second frame dropped gave 13.3 KB (79% smaller), at 200 by 150 pixels and 20 of the 40 frames. Real GIFs will differ: a screen recording with a still background shrinks a lot, while a busy filmed clip shrinks less. If the result would not be smaller, you get your original back and the page says so.", "Everything happens inside your browser tab, so the GIF never leaves your device, and the only size limit is your device’s memory."],
+        after: ["On a generated 400 by 300 test GIF with 40 frames (65.8 KB), Light and Medium both gave 46.9 KB (27% smaller) and Strong gave 42.8 KB (33% smaller). Medium with the size at 50% and every second frame dropped gave 13.3 KB (79% smaller), at 200 by 150 pixels and 20 of the 40 frames. Real GIFs will differ: a screen recording with a still background shrinks a lot, while a busy filmed clip shrinks less. If the result would not be smaller, you get your original back and the page says so.", "Everything happens inside your browser tab, so the GIF never leaves your device, and the size limit is your device’s memory (phones hold less)."],
       },
       {
         h: "When a video is better",

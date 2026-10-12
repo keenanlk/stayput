@@ -139,13 +139,13 @@ const downloads: Record<string, Download> = {
   'video-background-remover': {
     what: 'person finder',
     size: '28 MB',
-    text: 'The first run downloads the person finder (about 28 MB, or about 12 MB with the Fast option) to your browser, and after that the tool works offline.',
+    text: 'The first run downloads the person finder and its engine (about 28 MB, or about 12 MB with the Fast option) to your browser, and after that the tool works offline.',
   },
   'blur-face-video': { what: 'face detector', size: '4 MB' },
   'add-subtitles-to-video': {
     what: 'speech model',
     size: '76 MB',
-    text: 'Writing captions from speech downloads the speech model (76 MB) on first use and then works offline; burning in your own SRT or VTT file needs no model.',
+    text: 'Writing captions from speech downloads the speech model (76 MB) and the engine that runs it on first use and then works offline; burning in your own SRT or VTT file needs no model.',
   },
 };
 
@@ -172,25 +172,30 @@ export const needsFirstUse = (base: string): boolean => base in downloads || fir
 
 /** Rewrites "after one visit" to "after your first run" for a tool that needs a first run. */
 export const offlineWhen = (base: string, text: string): string =>
-  needsFirstUse(base) ? text.replace(/\bafter one visit\b/g, 'after your first run').replace(/\bAfter one visit\b/g, 'After your first run') : text;
+  needsFirstUse(base) ? text.replace(/\bafter one visit( and a short wait)?\b/g, 'after your first run').replace(/\bAfter one visit( and a short wait)?\b/g, 'After your first run') : text;
 
 /** The size badge: a tool's own `sizeFact`, else a watermark claim with the real limit. */
-export const defaultSizeBadge = 'No watermark · limit is your device’s memory';
+export const defaultSizeBadge = 'No watermark · limit is your device’s memory; phones hold less';
 
 /** Tools with no file to size-limit; their fact says what is true of them instead. */
 const facts: Record<string, string> = {
-  'qr-code-scanner': 'Your browser asks for camera permission only if you press the camera button, and after one visit the page works offline.',
-  'qr-code-generator': 'The codes are static, so they never expire, and after one visit the page works offline.',
-  'barcode-generator': 'The barcodes are drawn on this page, and after one visit the page works offline.',
-  'signature-maker': 'The signature is made on this page and never saved, and after one visit the page works offline.',
-  'screen-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit the page works offline.',
-  'voice-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit the page works offline.',
-  'mic-test': 'Your browser asks for microphone permission, and after one visit the page works offline.',
-  'webcam-test': 'Your browser asks for camera permission, and after one visit the page works offline.',
-  'tuner': 'Your browser asks for microphone permission, and after one visit the page works offline.',
-  'metronome': 'After one visit the page works offline.',
-  'bpm-key-finder': 'Files longer than 15 minutes are not analysed, and after one visit the page works offline.',
-  'blur-image': 'Finding faces downloads a small face detector (about 4 MB) the first time you use that button; marking areas by hand needs no download. After one visit the page works offline.',
+  'video-to-mp3': 'The limit is your device’s memory, which is smaller on a phone, and after your first run the page works offline.',
+  'qr-code-scanner': 'Your browser asks for camera permission only if you press the camera button, and after one visit and a short wait the page works offline.',
+  'qr-code-generator': 'The codes are static, so they never expire, and after one visit and a short wait the page works offline.',
+  'barcode-generator': 'The barcodes are drawn on this page, and after one visit and a short wait the page works offline.',
+  'signature-maker': 'The signature is made on this page and never saved, and after one visit and a short wait the page works offline.',
+  'screen-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit and a short wait the page works offline.',
+  'voice-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit and a short wait the page works offline.',
+  'mic-test': 'Your browser asks for microphone permission, and after one visit and a short wait the page works offline.',
+  'webcam-test': 'Your browser asks for camera permission, and after one visit and a short wait the page works offline.',
+  'tuner': 'Your browser asks for microphone permission, and after one visit and a short wait the page works offline.',
+  'metronome': 'After one visit and a short wait the page works offline.',
+  'json-to-csv': 'A file can be up to 200 MB, and a phone may run out of memory sooner; give the page a short while after one visit to save itself for offline use, and then it works offline.',
+  'gif-maker': 'A GIF can hold up to 300 pictures, and the limit is your device’s memory (phones hold less); give the page a short while after one visit to save itself for offline use, and then it works offline.',
+  'video-to-gif': 'A GIF is capped at 600 frames, and the video itself is limited by your device’s memory (phones hold less); give the page a short while after one visit to save itself for offline use, and then it works offline.',
+  'create-zip': 'A ZIP can be up to 4 GB, and phones hold less; give the page a short while after one visit to save itself for offline use, and then it works offline.',
+  'bpm-key-finder': 'Files longer than 15 minutes are not analysed, and after one visit and a short wait the page works offline.',
+  'blur-image': 'Finding faces downloads a small face detector (about 4 MB) the first time you use that button; marking areas by hand needs no download. After one visit and a short wait the page works offline.',
 };
 
 const freeLine = (what: string) => `It is free, and ${what} not uploaded: everything runs in your browser on your device.`;
@@ -206,9 +211,12 @@ const free: Record<string, string> = {
   'signature-maker': freeLine('what you draw, type or photograph is'),
   'screen-recorder': freeLine('your recordings are'),
   'voice-recorder': freeLine('your recordings are'),
+  // These tools exist to add a watermark, so they must not say they add none.
+  'watermark-image': freeLine('your files are'),
+  'watermark-pdf': freeLine('your files are'),
 };
-const freeFiles = freeLine('your files are');
-const memory = 'The only size limit is your device’s memory, and after one visit the page works offline.';
+const freeFiles = 'It is free, needs no account and adds no watermark, and your files are not uploaded: everything runs in your browser on your device.';
+const memory = 'The size limit is your device’s memory, and phones hold less; give the page a short while after one visit to save itself for offline use, and then it works offline.';
 
 /** The opening of a description: its first sentence, plus the next when that is short or a question, unless the next is a "no upload, no size caps" slogan. */
 function opening(text: string): string {
@@ -224,8 +232,8 @@ export function leadFor(tool: Tool, base: string = tool.slug, kind: 'tool' | 'la
   const first = kind === 'tool' ? does[tool.slug] : opening(tool.description);
   if (!first) throw new Error(`No lead sentence for ${tool.slug}`);
   const dl = downloads[base];
-  const third = dl ? (dl.text ?? `The first run downloads the ${dl.what} (about ${dl.size}) to your browser, and after that the tool works offline.`) : (facts[base] ?? (tool.sizeFact && /memory/i.test(tool.sizeFact) ? tool.sizeFact : memory));
+  const third = dl ? (dl.text ?? `The first run downloads the ${dl.what} (about ${dl.size}) and the WebAssembly engine that runs it to your browser, and after that the tool works offline.`) : (facts[base] ?? (tool.sizeFact && /memory/i.test(tool.sizeFact) ? tool.sizeFact : memory));
   // Tools that fetch an engine on first run are not offline after the visit alone.
-  const offline = firstUseEngines.includes(base) ? third.replace(/\bafter one visit\b/i, (m) => (m[0] === 'A' ? 'After' : 'after') + ' your first run') : third;
+  const offline = firstUseEngines.includes(base) ? third.replace(/\bafter one visit( and a short wait)?\b/i, (m) => (m[0] === 'A' ? 'After' : 'after') + ' your first run') : third;
   return [first, free[base] ?? freeFiles, offline].join(' ');
 }

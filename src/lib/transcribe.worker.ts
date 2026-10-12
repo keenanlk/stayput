@@ -1,5 +1,5 @@
 /**
- * Runs OpenAI's Whisper base speech model (Apache-2.0, ONNX export from
+ * Runs OpenAI's Whisper base speech model (MIT, ONNX export from
  * onnx-community, 8-bit weights) through transformers.js (Apache-2.0) and
  * onnxruntime-web, off the main thread. The model is served from
  * /models/whisper-base/ and onnxruntime's WebAssembly from /vendor/; nothing

@@ -33,7 +33,7 @@ export interface Preset {
   lead?: string;
 }
 
-const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. After one visit you can turn off Wi-Fi and it still works.' };
+const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. Give the page a short while after one visit to save itself for offline use; then you can turn off Wi-Fi and it still works.' };
 
 /** FAQ entry on the pages whose lead says no account and no watermark; no tool behind them draws a mark on its output. */
 const noAccount = { q: 'Do I need an account, and is there a watermark?', a: 'No account and no sign-up: open the page and drop a file. Nothing is added to your file, so there is no watermark or logo. It is free, and your files are not uploaded.' };
@@ -141,6 +141,7 @@ export const presets: Preset[] = [
       { q: 'Will my CV still be readable by applicant tracking systems?', a: 'Yes, as long as the result card does not say the pages were flattened: the lossless and image steps keep the text exactly as it was. A text-based CV over 1 MB is almost always a large photo or background image, which the image step shrinks.' },
       { q: 'How much quality is lost?', a: 'For a typical design-heavy PDF, none that you can see on screen. Photos are re-encoded at quality 75 and capped at 2400 pixels, still well above what a screen shows. Print at large sizes from the original.' },
       { q: 'Can I compress several PDFs at once?', a: 'Yes. Drop them all; each is fitted separately and they download together as a zip.' },
+      { q: 'What happens if my PDF cannot get under 1 MB?', a: 'The page says so instead of pretending. The result line gives the smallest size it reached and the step that produced it, and suggests splitting the file into parts. A PDF that is already under 1 MB is returned as it is, with a note that the original was kept.' },
       noUpload,
     ],
   },
@@ -175,7 +176,7 @@ export const presets: Preset[] = [
     base: 'image-to-pdf',
     name: 'JPG to PDF',
     title: 'JPG to PDF Converter, Free, No Upload | Stayput',
-    description: 'Turn JPG photos into a single PDF in your browser. Choose page size, orientation and margins. Nothing is uploaded, works offline after one visit.',
+    description: 'Turn JPG photos into a single PDF in your browser. Choose page size, orientation and margins. Nothing is uploaded, works offline after one visit and a short wait.',
     heading: 'Convert JPG to PDF',
     tagline: 'One PDF from one or many photos, made on your device, in the order you choose.',
     keywords: ['jpg to pdf', 'jpeg to pdf', 'convert jpg to pdf', 'jpg to pdf converter free', 'photo to pdf', 'combine jpg to pdf'],
@@ -203,7 +204,7 @@ export const presets: Preset[] = [
     base: 'image-to-pdf',
     name: 'PNG to PDF',
     title: 'PNG to PDF Converter, Free, No Upload | Stayput',
-    description: 'Convert PNG images or screenshots to a PDF in your browser. Several PNGs become one document. No upload, works offline after one visit.',
+    description: 'Convert PNG images or screenshots to a PDF in your browser. Several PNGs become one document. No upload, works offline after one visit and a short wait.',
     heading: 'Convert PNG to PDF',
     tagline: 'Screenshots and graphics into one PDF, on your device, with the sharp edges kept sharp.',
     keywords: ['png to pdf', 'convert png to pdf', 'png to pdf converter', 'screenshot to pdf', 'image to pdf free'],
@@ -231,7 +232,7 @@ export const presets: Preset[] = [
     base: 'image-to-pdf',
     name: 'HEIC to PDF',
     title: 'HEIC to PDF Converter, Free, No Upload | Stayput',
-    description: 'Convert iPhone HEIC photos straight to a PDF in your browser, several photos per document. No upload, works offline after one visit.',
+    description: 'Convert iPhone HEIC photos straight to a PDF in your browser, several photos per document. No upload, works offline after one visit and a short wait.',
     heading: 'Convert HEIC to PDF',
     tagline: 'iPhone photos into a PDF that opens anywhere, decoded and assembled on your device.',
     keywords: ['heic to pdf', 'convert heic to pdf', 'iphone photos to pdf', 'heic to pdf converter free'],
@@ -285,7 +286,7 @@ export const presets: Preset[] = [
     base: 'pdf-to-image',
     name: 'PDF to PNG',
     title: 'PDF to PNG Converter, Free, No Upload | Stayput',
-    description: 'Convert PDF pages to lossless PNG images in your browser. Pick the pages and the resolution. No upload, works offline after one visit.',
+    description: 'Convert PDF pages to lossless PNG images in your browser. Pick the pages and the resolution. No upload, works offline after one visit and a short wait.',
     heading: 'Convert PDF to PNG',
     tagline: 'Pixel-perfect PNGs of PDF pages, rendered on your device with no compression artefacts.',
     keywords: ['pdf to png', 'convert pdf to png', 'pdf to png converter', 'pdf page to png', 'pdf to image free'],
@@ -311,7 +312,7 @@ export const presets: Preset[] = [
     base: 'merge-pdf',
     name: 'Combine PDF',
     title: 'Combine PDF Files Into One, Free, No Upload | Stayput',
-    description: 'Combine several PDF files into a single document in your browser. Reorder before joining. No upload, no file size caps beyond what your device can hold, works offline after one visit.',
+    description: 'Combine several PDF files into a single document in your browser. Reorder before joining. No upload, no file size caps beyond what your device can hold, works offline after one visit and a short wait.',
     heading: 'Combine PDF files into one',
     tagline: 'Join contracts, scans and statements into a single PDF without sending any of them anywhere.',
     keywords: ['combine pdf', 'combine pdf files', 'pdf combiner', 'join pdf', 'put pdfs together', 'combine pdf files into one free'],
@@ -813,7 +814,7 @@ export const presets: Preset[] = [
     base: 'pdf-to-word',
     name: 'PDF to text',
     title: 'PDF to Text Converter, Free, No Upload | Stayput',
-    description: 'Extract the text of a PDF into a plain .txt file in your browser, paragraphs rebuilt, reading order kept. Nothing is uploaded, works offline after one visit.',
+    description: 'Extract the text of a PDF into a plain .txt file in your browser, paragraphs rebuilt, reading order kept. Nothing is uploaded, works offline after one visit and a short wait.',
     heading: 'Extract text from a PDF',
     tagline: 'Every word of a PDF as a plain text file, pulled out on your device.',
     keywords: ['pdf to text', 'extract text from pdf', 'pdf to txt', 'copy text from pdf', 'get text out of pdf', 'pdf text extractor'],
@@ -895,7 +896,7 @@ export const presets: Preset[] = [
     base: 'image-to-pdf',
     name: 'WebP to PDF',
     title: 'WebP to PDF Converter, Free, No Upload | Stayput',
-    description: 'Convert WebP images saved from websites into a PDF in your browser. Several WebPs become one document. No upload, no sign-up, works offline after one visit.',
+    description: 'Convert WebP images saved from websites into a PDF in your browser. Several WebPs become one document. No upload, no sign-up, works offline after one visit and a short wait.',
     heading: 'Convert WebP to PDF',
     tagline: 'Pictures saved from the web, turned into a PDF that opens anywhere.',
     keywords: ['webp to pdf', 'convert webp to pdf', 'webp to pdf converter', 'webp image to pdf', 'save webp as pdf'],
@@ -1279,7 +1280,7 @@ export const presets: Preset[] = [
     keywords: ['mp4 to gif', 'convert mp4 to gif', 'mp4 to gif converter', 'mp4 to gif no watermark', 'mp4 to animated gif', 'mp4 to gif high quality'],
     dropLabel: 'Drop an MP4 to turn into a GIF',
     intro: [
-      'MP4 is what phones, screen recorders and most download buttons produce, and a GIF is still what plays everywhere without a click: in a README, a support ticket, a Slack thread, an email or a slide. Most MP4 to GIF sites make you upload the whole video first, often with a 100 or 200 MB cap, then queue it on a server and hand back a GIF with their logo in the corner. This page does the conversion inside your browser instead, so there is no upload to wait for, and the size of the MP4 is limited only by your device’s memory.',
+      'MP4 is what phones, screen recorders and most download buttons produce, and a GIF is still what plays everywhere without a click: in a README, a support ticket, a Slack thread, an email or a slide. Most MP4 to GIF sites make you upload the whole video first, often with a 100 or 200 MB cap, then queue it on a server and hand back a GIF with their logo in the corner. This page does the conversion inside your browser instead, so there is no upload to wait for, and the size of the MP4 is limited by your device’s memory (phones hold less).',
       'Drop the file and it opens in a player. Scrub to the first moment you want and press Set start, then to the last and press Set end. The width and frame rate decide almost everything about the size of the GIF: 480 pixels wide at 10 frames per second is small enough for chat and sharp enough for a screen recording, while 640 pixels at 15 frames per second suits a product demo. The line under the options tells you how many frames the GIF will have before you make it.',
       'Your browser decodes the MP4 with the same H.264 decoder it uses to play video on any website, and each frame is reduced to its best 256 colours before it is written into the GIF. A 5 second clip usually takes a few seconds on a laptop and a little longer on a phone. Nothing about the video, not even its name, is sent anywhere.',
     ],
@@ -1418,7 +1419,7 @@ export const presets: Preset[] = [
     description: 'Convert MP4 to MP3 in your browser. Choose the quality, convert several files at once, and download. Your video is never uploaded; no sign-up.',
     heading: 'Convert MP4 to MP3',
     tagline: 'Drop an MP4, pick a quality and download the MP3. Your video is converted on this device and never uploaded. Use 96 to 128 kbps mono for speech, 192 kbps for music.',
-    sizeFact: 'No sign-up, no watermark',
+    sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
     sections: [
       {
         heading: 'MP4 to MP3 on a phone or computer',
@@ -1496,7 +1497,7 @@ export const presets: Preset[] = [
     defaults: { bitrate: '256' },
     intro: [
       'WAV is uncompressed audio: every sample stored as it was recorded, about 10 MB per minute in CD-quality stereo. It is what recorders, DAWs and sample packs use, and it is far too large to email, upload to most sites or keep hundreds of on a phone. MP3 at 256 kbps is about a fifth of that, and at 128 kbps about a tenth, with no difference most listeners can hear.',
-      'Because WAV files are big, uploading them to an online converter is the slow part: a 45 minute rehearsal recording is close to half a gigabyte. This page reads the WAV straight from your disk and encodes it with LAME inside your browser, so there is no upload and the only size limit is your device’s memory. Unreleased songs, stems and client recordings stay on your machine.',
+      'Because WAV files are big, uploading them to an online converter is the slow part: a 45 minute rehearsal recording is close to half a gigabyte. This page reads the WAV straight from your disk and encodes it with LAME inside your browser, so there is no upload and the size limit is your device’s memory (phones hold less). Unreleased songs, stems and client recordings stay on your machine.',
       'This page opens at 256 kbps, a good choice when the MP3 is the version you will share from a studio-quality source. Use 320 kbps for a master you will not re-encode again, or 128 kbps for demos and voice. Recordings made at 48 or 96 kHz are converted to 44.1 kHz, the standard MP3 rate.',
     ],
     steps: [
@@ -1624,7 +1625,7 @@ export const presets: Preset[] = [
       'Read text, then tap Copy text or save the .txt file.',
     ],
     faq: [
-      { q: 'Can I use it on my phone?', a: 'Yes. On an iPhone or Android phone, tap the drop area and choose a photo or take one with the camera. The first run downloads the reader, about 6 MB, so start it on Wi-Fi if your data plan is tight.' },
+      { q: 'Can I use it on my phone?', a: 'Yes. On an iPhone or Android phone, tap the drop area and choose a photo or take one with the camera. The first run downloads the reader and its engine, about 6 MB in all, so start it on Wi-Fi if your data plan is tight.' },
       { q: 'Does it read handwriting?', a: 'Only neat block capitals, and not reliably. The engine is trained on printed text. For handwritten notes expect to fix a good share of the words.' },
       { q: 'Can it read other languages?', a: 'It reads English. Languages written in the same alphabet mostly come through, but letters with accents, like é or ü, may be misread, so check names and words carefully. Text in other scripts, such as Cyrillic, Arabic, Hindi or Chinese, is not recognised and comes out as noise or not at all.' },
       { q: 'Why are lines from my photo mixed up?', a: 'This usually happens with a picture of two pages, several columns or a poster with text in separate blocks. The reader tries to work out the reading order and sometimes joins lines that sit side by side. Take one page or one column per picture and the order comes out right.' },
@@ -1831,7 +1832,7 @@ export const presets: Preset[] = [
     defaults: { bitrate: '192' },
     intro: [
       'OGG is an open container, and the audio inside is usually Vorbis or Opus. You get OGG files from more places than you might expect: sound effects and music ripped from video games, recordings made with Audacity or a Linux voice recorder, Wikipedia and Wikimedia Commons audio, some radio and podcast archives, and WhatsApp or Telegram voice notes exported from a desktop app. iPhones, older car stereos, many smart speakers and most DJ and video editing software will not play them.',
-      'Your browser already has Vorbis and Opus decoders built in, so the OGG is decoded right here in the tab, then the LAME encoder running in the page writes the MP3. There is no server step at all. That matters for voice notes and private recordings, which are exactly what people convert most, and it means there is no queue and the only size limit is your device’s memory: a two-hour recording converts as quickly as your device can manage.',
+      'Your browser already has Vorbis and Opus decoders built in, so the OGG is decoded right here in the tab, then the LAME encoder running in the page writes the MP3. There is no server step at all. That matters for voice notes and private recordings, which are exactly what people convert most, and it means there is no queue and the size limit is your device’s memory (phones hold less): a two-hour recording converts as quickly as your device can manage.',
       'This page starts at 192 kbps stereo, which keeps music transparent for most listeners. Game audio and short sound effects are fine at 128. For voice notes, pick 96 kbps and mono: a ten-minute memo comes out around 7 MB.',
     ],
     steps: [
@@ -1851,7 +1852,7 @@ export const presets: Preset[] = [
     base: 'video-to-mp3',
     name: 'FLAC to MP3',
     title: 'FLAC to MP3 Converter, up to 320 kbps, No Upload | Stayput',
-    description: 'Convert lossless FLAC albums to MP3 at up to 320 kbps in your browser, whole folders at once. No upload, limited only by your device’s memory, free.',
+    description: 'Convert lossless FLAC albums to MP3 at up to 320 kbps in your browser, whole folders at once. No upload, limited by your device’s memory (phones hold less), free.',
     heading: 'Convert FLAC to MP3',
     tagline: 'Lossless FLAC rips shrunk to MP3 for your phone, car or old player, on your own device.',
     keywords: ['flac to mp3', 'convert flac to mp3', 'flac to mp3 converter', 'flac to mp3 320kbps', 'flac to mp3 batch', 'flac to mp3 free'],
@@ -2070,7 +2071,7 @@ export const presets: Preset[] = [
     intro: [
       'Plenty of places that happily show a GIF will not take one as an upload. Instagram posts and stories, TikTok, YouTube Shorts and most video editors want a video file, and PowerPoint and Keynote play a video more smoothly than a large GIF. This page turns the GIF into an MP4 video with the same frames and the same timing.',
       'A video plays once where a GIF loops, and many apps reject clips under 3 seconds. So by default a short loop is repeated until the video is at least 3 seconds long; you can instead choose exactly how many times it plays, for example 10 plays of a 1 second reaction GIF for a story.',
-      'The conversion happens inside your browser: the GIF is decoded by code in this page and encoded by your browser’s built-in video encoder. Nothing is uploaded, there is no watermark, and the only size limit is your device’s memory.',
+      'The conversion happens inside your browser: the GIF is decoded by code in this page and encoded by your browser’s built-in video encoder. Nothing is uploaded, there is no watermark, and the size limit is your device’s memory (phones hold less).',
     ],
     steps: [
       'Drop one or more GIFs, or tap to pick them.',
@@ -2157,7 +2158,7 @@ export const presets: Preset[] = [
     defaults: { format: 'wav' },
     intro: [
       'M4A is AAC audio in an MP4 container. It is the format of iPhone Voice Memos, GarageBand and Music exports, many Android recorders and WhatsApp audio. It is small and sounds good, but a lot of tools that work on recordings want WAV: transcription and captioning services, speech analysis, older editors, hardware samplers, and research or legal workflows that must keep an unaltered, uncompressed copy.',
-      'Audacity is the usual stumbling block. It opens WAV out of the box but needs the separate FFmpeg library before it can import M4A, and installing that is where many people give up. Converting the memo to WAV first sidesteps it entirely.',
+      'Audacity is the usual stumbling block. It opens WAV out of the box but needs a separate codec library before it can import M4A, and installing that is where many people give up. Converting the memo to WAV first sidesteps it entirely.',
       'This page decodes the M4A with your browser’s own AAC decoder and writes a 16-bit, 44.1 kHz PCM WAV. Recordings made at 48 kHz are resampled to 44.1 kHz, with no audible change. A mono voice memo stays mono and takes about 5 MB per minute. A stereo recording takes about 10 MB per minute, or half that if you choose mono.',
       'Recordings of interviews, lectures, therapy or medical appointments, and notes to yourself are exactly what should not be handed to an upload site. Here the memo is read from your disk and the WAV is written back to it, and the audio never goes anywhere else.',
     ],
@@ -2250,7 +2251,7 @@ export const presets: Preset[] = [
       'Screenshots end up as PDFs when someone needs a record: an order confirmation or receipt for an expense claim, a boarding pass, a chat thread for a landlord dispute, HR or a lawyer, error messages for a support ticket, a bank transfer confirmation, or a set of app screens for a client. A single PDF keeps them in order, opens on anything, and attaches to a form that takes one file.',
       'Screenshots are mostly text and flat colour, which JPG compression smears. This page keeps PNG screenshots as PNG inside the PDF, so letters stay pixel-sharp at any zoom. JPG screenshots go in unchanged (unless they need rotating, when they are re-encoded at high quality), WebP screenshots are decoded and stored as high-quality JPG, and iPhone screenshots saved as HEIC are decoded in the browser first. Each screenshot gets its own page at its own size, with no margin, so the PDF looks like the screens themselves.',
       'Long scrolling screenshots of a web page or chat come out as one tall page. Acrobat and some older viewers cap page length at 200 inches, about 14,400 pixels at this page’s scale; browsers and phone viewers show taller pages fine. For printing, pick A4 or US Letter, which scales each screenshot to fit a page.',
-      'Screenshots are often the most private images on a phone: bank balances, messages, medical portals, addresses. Nothing here leaves your device. The PDF is assembled by pdf-lib in this tab, and the page keeps working with the network off once it has loaded.',
+      'Screenshots are often the most private images on a phone: bank balances, messages, medical portals, addresses. Nothing here leaves your device. The PDF is assembled by pdf-lib in this tab, and the page keeps working with the network off after one visit and a short wait.',
     ],
     steps: [
       'Drop your screenshots, or tap to pick them from your photos. Reorder them with the arrows.',
@@ -2303,7 +2304,7 @@ export const presets: Preset[] = [
     title: 'Free Video Compressor, No Upload, No Watermark | Stayput',
     description: 'Free video compressor that runs in your browser. Shrink MP4, MOV and WebM files from your phone or screen recorder. No upload, no watermark.',
     heading: 'Free video compressor',
-    tagline: 'Shrink big phone videos and screen recordings in your browser, with no upload, limited only by your device’s memory.',
+    tagline: 'Shrink big phone videos and screen recordings in your browser, with no upload, limited by your device’s memory (phones hold less).',
     keywords: ['video compressor', 'free video compressor', 'online video compressor', 'video compressor no watermark', 'mp4 compressor', 'compress video size'],
     dropLabel: 'Drop videos to compress',
     intro: [
@@ -2317,7 +2318,7 @@ export const presets: Preset[] = [
       'Compress, then compare the sizes in the results and download.',
     ],
     faq: [
-      { q: 'Is there a size limit?', a: 'This page sets none; the only limit is your device’s memory. Your device reads the video as it goes, so multi-gigabyte files work on a laptop; an older phone may run out of memory on very long 4K videos, in which case lower the resolution.' },
+      { q: 'Is there a size limit?', a: 'This page sets none; the limit is your device’s memory (phones hold less). Your device reads the video as it goes, so multi-gigabyte files work on a laptop; an older phone may run out of memory on very long 4K videos, in which case lower the resolution.' },
       { q: 'Does compressing lower the quality?', a: 'Some detail is always traded for size, but phone footage has a lot to spare. On Balanced most people cannot tell the difference on a phone or laptop screen. Keep the original if you might want to edit it later.' },
       noUpload,
     ],
@@ -2329,7 +2330,7 @@ export const presets: Preset[] = [
     title: 'Compress Video for Discord: 8, 10, 25 or 50 MB, No Upload | Stayput',
     description: 'Fit a video under Discord’s 10 MB limit, or 8, 25 or 50 MB, in your browser. Works out the bitrate from the length. Free, no account, no upload, no watermark.',
     lead:
-      'Fits a video under Discord’s 10 MB limit, or 8, 25 or 50 MB, by working out the bitrate from its length and lowering the resolution if needed, and saves an MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: it is re-encoded in your browser on your device. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Fits a video under Discord’s 10 MB limit, or 8, 25 or 50 MB, by working out the bitrate from its length and lowering the resolution if needed, and saves an MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: it is re-encoded in your browser on your device. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     heading: 'Compress a video for Discord',
     tagline: 'Fit a clip under Discord’s 10 MB upload limit for free accounts, without uploading it anywhere first.',
     keywords: ['compress video for discord', 'discord video compressor', 'video compressor for discord', 'compress video to 10mb', 'discord 10mb video', 'make video smaller for discord', 'compress video to 8mb', 'compress video to 25mb', 'compress video to 50mb'],
@@ -2402,7 +2403,7 @@ export const presets: Preset[] = [
     intro: [
       'MOV is Apple’s QuickTime format: iPhones, Mac screen recordings (Shift+Command+5) and many cameras save to it. Windows, Android, some video editors and plenty of upload forms want MP4 instead. The two formats are close cousins, and a MOV usually already holds H.264 video and AAC sound, the same streams an MP4 uses.',
       'So most MOV files convert here in the time it takes to read them: the video and sound are copied into an MP4 container without being re-encoded, and the picture stays exactly as it was. Only unusual codecs are re-encoded. iPhone videos in HEVC are re-encoded to H.264 by browsers that can decode HEVC, and copied as they are elsewhere.',
-      'The conversion runs in your browser tab. A long 4K clip from your phone is not uploaded to a converter site, the only size limit is your device’s memory, and the MP4 downloads straight to your device.',
+      'The conversion runs in your browser tab. A long 4K clip from your phone is not uploaded to a converter site, the size limit is your device’s memory (phones hold less), and the MP4 downloads straight to your device.',
     ],
     steps: [
       'Drop one or more MOV files, or tap to pick them from your files or camera roll.',
@@ -2429,7 +2430,7 @@ export const presets: Preset[] = [
     intro: [
       'MKV (Matroska) is a flexible container: OBS records to it by default because an MKV survives a crash mid-recording, and many downloads use it. But iPhones, a lot of smart TVs, Premiere and most social sites want MP4. An MKV from OBS usually holds H.264 video and AAC sound, which fit in an MP4 unchanged.',
       'This page copies those streams straight into an MP4 container, the same job as OBS’s own Remux Recordings, so a one-hour recording is ready in about the time it takes to read the file, with the picture untouched. MKVs with VP9, AV1 or other video are re-encoded by your browser. Only the main video and sound tracks are kept: extra audio tracks and subtitles are left out.',
-      'Everything happens in your browser. Game recordings, meetings and downloaded files stay on your machine, with no upload, limited only by your device’s memory.',
+      'Everything happens in your browser. Game recordings, meetings and downloaded files stay on your machine, with no upload, limited by your device’s memory (phones hold less).',
       'Newer OBS setups often record in HEVC or AV1 using an NVIDIA, AMD or Intel hardware encoder, and those recordings are not simply copied. AV1 is re-encoded to H.264, or to VP9 in a browser without an H.264 encoder. HEVC is re-encoded to H.264 when your browser can decode HEVC, and copied into the MP4 as HEVC when it cannot, which plays on Apple devices, Android and recent Windows. The line under each result says whether the video was copied or re-encoded, and to which codec.',
       'Films and series downloaded as MKV often carry sound that MP4 players handle badly, such as FLAC, Opus, AC-3 or DTS. When your browser can decode that sound, it is converted to AAC in stereo, and surround tracks are mixed down to two channels. When it cannot, which on many systems includes AC-3 and DTS, the MP4 is written without sound and the result line says the sound was left out. AAC and MP3 sound, the usual case for OBS, is copied untouched.',
     ],
@@ -2499,7 +2500,7 @@ export const presets: Preset[] = [
       'Compress and compare the savings in the results.',
     ],
     faq: [
-      { q: 'Is this as good as TinyPNG?', a: 'TinyPNG describes its method as selectively decreasing the number of colours in the image (tinypng.com, as of October 2026). This page does something similar: it reduces the image to a smart palette of up to 256 colours with full transparency. The difference is that your images are not uploaded and there is no cap on the number of files beyond your device’s memory.' },
+      { q: 'Is this as good as TinyPNG?', a: 'TinyPNG describes its method as selectively decreasing the number of colours in the image (tinypng.com, as of October 2026). This page does something similar: it reduces the image to a smart palette of up to 256 colours with full transparency. The difference is that your images are not uploaded and there is no cap on the number of files beyond your device’s memory (phones hold less).' },
       { q: 'Will my images look different?', a: 'On screenshots, logos, icons and illustrations, almost never at 256 colours. Smooth gradients and photos can show slight banding; use Lossless or keep more colours for those.' },
       { q: 'Are my images uploaded anywhere?', a: 'No. Your images are not uploaded: the compression runs in your browser tab, and you can confirm in your browser’s network panel that no image leaves your device.' },
     ],
@@ -2543,7 +2544,7 @@ export const presets: Preset[] = [
     intro: [
       'Most of the time you only need a slice of a video: the goal from a match, the answer from a two-hour call recording, the thirty seconds of a screen recording that shows the bug. Drop the file here, scrub to the first moment you want and press Set start, then to the last and press Set end.',
       'The clip is cut by copying the video and sound between those points into a new file, rather than re-encoding them. That is why it takes seconds even for a long 4K file, and why the clip looks exactly like the original. If the start needs to be precise to the frame, tick the exact option and the clip is re-encoded instead.',
-      'Cutting happens in your browser. Recordings of meetings, family videos and gameplay are not uploaded to a converter site, there is no watermark, and the only limit on the size of the video you start from is your device’s memory.',
+      'Cutting happens in your browser. Recordings of meetings, family videos and gameplay are not uploaded to a converter site, there is no watermark, and the limit on the size of the video you start from is your device’s memory (phones hold less).',
       'The Start and End boxes take seconds, not minutes, which catches people out on long recordings. To cut from 12:30 to 14:05, type 750 and 845, or play to those moments and press Set start and Set end instead. Below the boxes a line confirms what you will get, such as “Keeps 1:35.0, from 12:30.0 to 14:05.0”, and it turns into a warning if the end comes before the start, so you can check before you cut.',
       'The clip comes out in the same format as the file you started with: an iPhone MOV gives a MOV, an OBS recording in MKV gives an MKV, and a WebM gives a WebM, each with -trimmed added to the name. If the clip is going somewhere that wants MP4, such as an upload form or a Windows PC without the right codecs, convert it afterwards with Video to MP4, which for H.264 video copies the streams again and usually takes seconds.',
     ],
@@ -2707,7 +2708,7 @@ export const presets: Preset[] = [
     intro: [
       'Animated GIFs are one of the least efficient ways to store moving pictures ever invented, which is why a five second reaction GIF or screen capture can weigh 10 MB. Most of that weight is repetition: GIF makers often store every frame in full, even when only a corner of the picture moves.',
       'This compressor rewrites each frame to hold only what changed since the one before, the same frame optimisation gifsicle does, and at Medium or Strong it also ignores changes too small to see and trims the palette. For bigger savings, shrink the size or drop every second frame; the timing is kept either way.',
-      'Everything runs in your browser. Your GIFs are not uploaded to a website that keeps them for an hour, there is no watermark, and the only limit on file size or count is your device’s memory.',
+      'Everything runs in your browser. Your GIFs are not uploaded to a website that keeps them for an hour, there is no watermark, and the limit on file size or count is your device’s memory (phones hold less).',
       'The three Compression levels differ in two things. Light keeps the full 256 colours and only stores the changed part of each frame, so it looks identical and helps most on GIFs saved without any optimisation. Medium drops to 128 colours and treats very small changes as none, which removes much of the flicker noise in screen captures. Strong uses 64 colours and ignores larger changes; it suits cartoons and flat graphics better than photographs.',
       'If you are coming from an online optimiser that has separate pages for optimising, resizing and removing frames, here the three happen in one pass: Compression, Size and Frames are applied together, to a whole batch at once. The GIF keeps its loop setting, and each result is saved with -compressed added to its name, so the original stays untouched.',
     ],
@@ -2785,7 +2786,7 @@ export const presets: Preset[] = [
     intro: [
       'Slowing a video down is how you learn a dance routine, check a golf swing, or enjoy a jump that was over in a second. Pick 0.75× for a subtle slowdown, 0.5× for half speed, or 0.25× for real slow motion.',
       'Each frame is shown for longer and the video is encoded again in your browser. Videos filmed at 60 fps or more (most phones offer it) stay smooth when slowed; 30 fps footage looks steppier at 0.25×. The sound is slowed too, at the same pitch, or can be removed.',
-      'Nothing is uploaded, there is no watermark, and the page keeps working offline after one visit.',
+      'Nothing is uploaded, there is no watermark, and the page keeps working offline after one visit and a short wait.',
       'How smooth the slow motion looks depends on the frames the camera recorded, because this page does not invent new ones; each frame is simply held on screen for longer. A 60 fps clip slowed to 0.5× plays at an effective 30 frames a second, which looks like ordinary video. At 0.25× it drops to 15, and you start to see each step. A 30 fps clip gives 15 frames a second at 0.5× and under 8 at 0.25×. If you know you will want a moment in slow motion, film it at 60 fps or higher.',
       'For checking a golf swing, a tennis serve or a skateboard trick, cut the clip down to the two or three seconds around the moment with Trim video first, then slow that part to 0.25×. A 3 second swing becomes 12 seconds, long enough to pause on each position in any player. To learn a dance routine, 0.75× or 0.5× is usually enough, and because the music is stretched at the same pitch you can still count the beat. The slowed file is saved as an MP4 with the speed added to its name, such as -0_5x.',
     ],
@@ -2812,7 +2813,7 @@ export const presets: Preset[] = [
     intro: [
       'TikTok, Instagram Reels and YouTube Shorts are all vertical, 9:16, and a landscape clip posted as it is shows up as a thin strip with black bars. Cropping it to 9:16 fills the whole phone screen instead.',
       'Drop the video and a frame from it appears with a 9:16 box already in the middle. Drag the box sideways to keep the person or the action in shot, then press Crop. The video is cut to that area and encoded again in your browser, sound included.',
-      'The video is never uploaded, there is no watermark, and the only limit on its length or size is your device’s memory.',
+      'The video is never uploaded, there is no watermark, and the limit on its length or size is your device’s memory (phones hold less).',
       'The box stays in one place for the whole clip; it does not follow a moving subject. Before cropping, play the original through and watch where the action goes. If someone walks across the frame, a 9:16 slice will lose them for part of the clip, so either trim to the part where they stay in one area or place the box where they spend most of the time. The still you frame on is taken about a second into the video, so check the rest of the clip too.',
       'Resolution matters more than usual, because a 9:16 crop keeps less than a third of a landscape frame\'s width. From 1080p footage the crop is 608×1080, which TikTok and Reels enlarge to fill the screen, so it can look softer than video filmed upright. From 4K footage the same crop is 1216×2160, sharper than a full HD phone recording. If you know a landscape shot will end up vertical, film it in 4K and crop it here.',
     ],
@@ -2838,7 +2839,7 @@ export const presets: Preset[] = [
     intro: [
       'A holiday filmed in ten short clips, a recording that stopped halfway, a set of screen captures for one tutorial: combining them gives you one file to send or post.',
       'Drop the clips, put them in order with the arrows, and press Merge. Each clip keeps its sound. Clips can come from different phones or apps; the first one sets the size and the rest are fitted inside it.',
-      'Your videos are not uploaded to a website, there is no watermark, and the page keeps working offline after one visit.',
+      'Your videos are not uploaded to a website, there is no watermark, and the page keeps working offline after one visit and a short wait.',
     ],
     steps: ['Drop two or more clips.', 'Put them in order with the arrows.', 'Press Merge videos and save the MP4.'],
     faq: [
@@ -2967,7 +2968,7 @@ export const presets: Preset[] = [
       'For a logo on a plain white or coloured backdrop, the same model separates the mark from the page. Check the preview at the edges of thin strokes and small text: very fine detail on a busy background is the hardest case. If you need the file smaller for the web, choose WebP, which keeps the transparency at a fraction of the PNG size.',
     ],
     steps: [
-      'Drop the photos or logos, or tap to pick them. The first one downloads the cut-out model once (about 46 MB).',
+      'Drop the photos or logos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 46 MB).',
       'Keep Transparent and PNG, or choose WebP for a smaller file with the same transparency.',
       'Download the transparent images at their original size, or all of them in one zip.',
     ],
@@ -2997,7 +2998,7 @@ export const presets: Preset[] = [
       'The same fill works for profile pictures and staff photos where a busy room would distract. Pick Colour instead of White for a brand shade or a light grey. For photos that must meet an official passport or visa rule, check that service’s requirements too: they also set head size, lighting and shadow rules that a new background alone does not satisfy.',
     ],
     steps: [
-      'Drop the product photos or portraits, or tap to pick them. The first one downloads the cut-out model once (about 46 MB).',
+      'Drop the product photos or portraits, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 46 MB).',
       'Keep White, or choose Colour for another shade, and pick JPG or PNG.',
       'Download the photos on white at full size, or all of them in one zip.',
     ],
@@ -3053,7 +3054,7 @@ export const presets: Preset[] = [
       'It is useful for profile pictures and staff photos taken in the office, product shots on a busy desk, and for hiding what is behind you, such as house numbers, whiteboards or other people, while keeping a natural photo instead of a flat colour. For hiding a face or a number plate itself, use the blur image tool instead, which blurs the areas you mark.',
     ],
     steps: [
-      'Drop the photos, or tap to pick them. The first one downloads the cut-out model once (about 46 MB).',
+      'Drop the photos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 46 MB).',
       'Keep Blur, set the strength, and pick JPG, PNG or WebP.',
       'Download the photos with the blurred background at full size, or all of them in one zip.',
     ],
@@ -3155,7 +3156,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'How much smaller is the FLAC?', a: 'Usually 40 to 60 percent of the WAV for music, less for quiet speech and near silence, more for dense noise. The saving depends on the sound, not on a setting.' },
       { q: 'Is 24-bit kept?', a: 'No. The FLAC is 16-bit, like a CD. For 24-bit masters you will keep editing, keep the WAV.' },
-      { q: 'How can I check the FLAC is really lossless?', a: 'For a 16-bit WAV, convert the FLAC back to WAV on this same page and compare the two in an audio editor: invert one and mix it with the other, and the result is silence. Tools that print an audio checksum, such as ffmpeg\'s md5 output of the decoded samples, show the same numbers for both files.' },
+      { q: 'How can I check the FLAC is really lossless?', a: 'For a 16-bit WAV, convert the FLAC back to WAV on this same page and compare the two in an audio editor: invert one and mix it with the other, and the result is silence. Command-line audio tools that print a checksum of the decoded samples show the same numbers for both files.' },
       { q: 'Will the FLAC play on my phone and in my music app?', a: 'Android, Windows, VLC, foobar2000 and most music players read FLAC. On an iPhone the Files app and VLC play it, but the Apple Music app does not import FLAC. If the files are going into an Apple library, convert a copy to M4A for listening and keep the FLAC as the archive.' },
       noUpload,
     ],
@@ -3256,6 +3257,7 @@ export const presets: Preset[] = [
     slug: 'confidential-watermark',
     base: 'watermark-pdf',
     name: 'Confidential watermark',
+    sizeFact: 'The limit is your device’s memory (phones hold less)',
     title: 'Add CONFIDENTIAL Watermark to PDF, No Upload | Stayput',
     description: 'Stamp CONFIDENTIAL diagonally across every page of a PDF, in red or any colour, in your browser. The document is never uploaded.',
     heading: 'Mark a PDF as confidential',
@@ -3286,6 +3288,7 @@ export const presets: Preset[] = [
     slug: 'watermark-id-copy',
     base: 'watermark-image',
     name: 'Watermark an ID copy',
+    sizeFact: 'The limit is your device’s memory (phones hold less)',
     title: 'Watermark a Copy of Your ID or Passport, No Upload | Stayput',
     description: 'Cover a photo or scan of your passport, driving licence or ID card with a repeated watermark saying who it is for, before you send it. Nothing is uploaded.',
     heading: 'Watermark a copy of your ID',
@@ -3297,7 +3300,7 @@ export const presets: Preset[] = [
     intro: [
       'Landlords, letting agents, employers, hotels, car hire firms and online services all ask for a copy of your passport, driving licence or ID card, and each copy is a chance for identity fraud if it leaks from their inbox or their shared drive. A watermark across the whole image, naming who the copy is for and the date, makes it far less useful to anyone else: a bank or a fraudster’s buyer can see it was only ever meant for one purpose.',
       'This page repeats your text across the photo at an angle, like the watermarks some governments now recommend for ID copies (France’s FranceCopy app and the Dutch KopieID app do the same thing). The pattern covers every corner, so it cannot be cropped out, and it is light enough that the details the recipient needs stay readable.',
-      'Sending your ID to yet another website to add the watermark would defeat the point, so the image is processed entirely in your browser. Nothing is uploaded, and the page works offline after one visit.',
+      'Sending your ID to yet another website to add the watermark would defeat the point, so the image is processed entirely in your browser. Nothing is uploaded, and the page works offline after one visit and a short wait.',
     ],
     steps: [
       'Drop a photo or scan of the ID, or tap to pick it.',
@@ -3577,7 +3580,7 @@ export const presets: Preset[] = [
     defaults: { kind: 'wifi' },
     intro: [
       'A Wi-Fi QR code holds your network name, password and security type in the format phone cameras understand. Scanning it on an iPhone or Android phone shows a “Join network” prompt, so guests, customers and Airbnb visitors connect in one tap.',
-      'Typing your Wi-Fi password into a website is exactly what you should be wary of, and most QR sites do send it to their server. This page builds the code in your browser: the password never leaves your device, and after one visit the page works with your internet switched off.',
+      'Typing your Wi-Fi password into a website is exactly what you should be wary of, and most QR sites do send it to their server. This page builds the code in your browser: the password never leaves your device, and after one visit and a short wait the page works with your internet switched off.',
       'Print it for a guest room, a café table or a rental welcome book. If you change the password, make a new code; the old one stops joining.',
     ],
     steps: [
@@ -3757,7 +3760,7 @@ export const presets: Preset[] = [
       { q: 'What happens if my 12th digit is wrong?', a: 'The page does not draw the barcode. It shows the digit that the first eleven call for, so you can see whether you mistyped a digit or copied a number that was wrong to begin with.' },
       { q: 'What is the difference between UPC-A and UPC-E?', a: 'UPC-E is a short, 8-digit version for small packages. It is made by dropping zeros from certain UPC-A numbers, so not every UPC-A number has a short form. This page makes UPC-A; the [barcode generator](/tools/barcode-generator) can also draw UPC-E.' },
       { q: 'Do UPC barcodes work outside North America?', a: 'Yes. Most retail scanners in other countries read UPC-A as an EAN-13 with a leading 0. Some marketplaces still ask for the 13-digit form in their listing forms, so check what yours expects.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3804,7 +3807,7 @@ export const presets: Preset[] = [
       { q: 'Why is my barcode so wide?', a: 'Every character takes the same room, so a long text makes a long barcode. Digits in a run are packed in pairs and take half as much room. Shorten the text, use a smaller bar width, or put the long part in a lookup instead of the barcode.' },
       { q: 'Does case matter?', a: 'Yes. Code 128 keeps capitals and lowercase letters as typed, so a scanner that reads order-a1 reports order-a1, not ORDER-A1. Code 39 is capitals only.' },
       { q: 'Will my scanner read it?', a: 'Code 128 is one of the most widely supported types, and most barcode scanners and scanner apps read it. A very old or specialised scanner may have it switched off, in which case its settings or manual list the types it reads.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3850,7 +3853,7 @@ export const presets: Preset[] = [
       { q: 'Why does my scanner show an extra character at the end?', a: 'If Add check character is ticked, the last character is the check character, and a scanner that is not set to verify it passes it on with the text. Leave the box unticked if the receiving system does not use it.' },
       { q: 'Can I use lowercase letters?', a: 'Not as lowercase. Code 39 has only capitals, so the page turns them into capitals and shows you the result. Use [Code 128](/code-128-barcode-generator) if case has to survive.' },
       { q: 'Should I choose Code 39 or Code 128?', a: 'Choose Code 128 unless a customer, a form or an older system names Code 39. Code 128 holds more characters and makes a shorter barcode.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3902,7 +3905,7 @@ export const presets: Preset[] = [
       { q: 'Why did the digits change from my ISBN-10?', a: 'The 13-digit ISBN is the ISBN-10 with 978 in front and a new last digit. ISBNs have had 13 digits since 1 January 2007, so a book published before that may show only the 10-digit form.' },
       { q: 'Does the barcode contain the price?', a: 'No. The main barcode holds the ISBN only. Prices, where they are printed in bars at all, go in a separate 5-digit add-on that this page does not draw.' },
       { q: 'The page says my number is not an ISBN. What is wrong?', a: 'ISBN-13s start with 978 or 979, and an ISBN-10 has 10 characters (digits, and X as the last one). A 13-digit number that starts differently is an ordinary product number; use the [EAN-13 barcode generator](/ean-13-barcode-generator) for it.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3948,7 +3951,7 @@ export const presets: Preset[] = [
       { q: 'Does a case need its own number?', a: 'A case is a different trade item from the units inside it, so it normally gets its own GTIN-14, made from the item’s number as shown above. Your GS1 member service or your customer’s guide has the rules for your products.' },
       { q: 'What are bearer bars?', a: 'The thick frame around the barcode. GS1’s guidance for ITF-14 asks for it, because a carton barcode without one risks being misread. This page draws a full frame while the box is ticked, and it is ticked by default. On the printed label GS1 asks for a frame 4.8 mm thick; a PNG or SVG has no fixed physical size, so download the SVG and set its size when you print so the frame comes out at 4.8 mm.' },
       { q: 'Why does the page refuse a number with 12 digits?', a: 'An ITF-14 needs 13 digits plus the check digit. A 12-digit UPC-A needs a 0 in front, and then the packaging indicator digit, before it makes a carton number.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3995,7 +3998,7 @@ export const presets: Preset[] = [
       { q: 'What is the difference between EAN-13 and UPC-A?', a: 'They are one system at two lengths. EAN-13 has 13 digits and UPC-A has 12, and a UPC-A number becomes an EAN-13 when a 0 is put in front. Listings and scanners outside North America usually expect the 13-digit form.' },
       { q: 'Why does the page reject my 13-digit number?', a: 'The last digit is a check digit, and for your number it does not fit the other twelve. The page shows the digit it should be. That usually means one digit was mistyped or the number was copied wrongly from a spreadsheet.' },
       { q: 'Can it draw the small add-on barcode beside a magazine or book?', a: 'No. That extra bar pattern (an EAN-2 or EAN-5 add-on) is a separate symbol, and this page draws the main EAN-13 only.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -4016,7 +4019,7 @@ export const presets: Preset[] = [
       'Sticker apps usually upload the photo to cut it out, and they are full of ads. Here nothing leaves your device, which matters when the sticker is of someone who did not ask to be one.',
     ],
     steps: [
-      'Drop one or more photos with a clear subject. The first photo downloads the cut-out model once.',
+      'Drop one or more photos with a clear subject. The first photo downloads the cut-out model and its WebAssembly runtime once.',
       'Keep the defaults: thick white border, 512 × 512, WebP.',
       'Download the stickers, then add them on WhatsApp Web or desktop: sticker panel, Create, upload.',
     ],
@@ -4151,7 +4154,7 @@ export const presets: Preset[] = [
     defaults: { db: '10' },
     intro: [
       'Phone videos filmed from across a room, screen recordings with a quiet microphone and old camera clips often play too softly. This page turns the sound up by the amount you choose and puts it back with the original picture, which is copied as it is, so the video looks exactly the same and the job is quick.',
-      'A limiter keeps the loudest moments from clipping, so a +10 or +15 dB boost stays clean. Nothing is uploaded, there is no watermark, and the only size limit is your device’s memory.',
+      'A limiter keeps the loudest moments from clipping, so a +10 or +15 dB boost stays clean. Nothing is uploaded, there is no watermark, and the size limit is your device’s memory (phones hold less).',
       'Pick the amount by how quiet the video is now. +6 dB helps a clip that is a bit soft next to others; +10 dB suits a phone video where people speak from a few metres away; +15 or +20 dB is for a screen recording made with the laptop microphone turned low. Try one clip first, listen, and run the rest. If you are gathering clips from different phones and want them all at the same level, choose Normalize under Change instead of a fixed amount.',
       'A few things to expect. An iPhone MOV or an MKV comes back as an MP4 with the same picture; a WebM made with the VP8 codec stays a WebM so it still plays in Safari. The Save as list only affects audio files; videos always keep their picture and get new sound. Turning the sound up also lifts wind, hum and room noise, so a boost makes speech louder but not cleaner.',
     ],
@@ -4183,7 +4186,7 @@ export const presets: Preset[] = [
     intro: [
       'Audiobooks and lectures often arrive as dozens of short MP3 chapters, and a playlist or a mix is easier to share as one file. This page joins MP3 files end to end into a single MP3 that plays in any app, car stereo or phone.',
       'Drop the files in, sort them with the arrows (they keep the order you add them in), and choose whether to add a short pause or a crossfade between tracks. The joined file is written once at the quality you pick, so it plays without gaps or glitches at the joins.',
-      'The files are decoded and joined by your browser. Nothing is uploaded, so private recordings stay private and your device’s memory is the only limit on how many you join.',
+      'The files are decoded and joined by your browser. Nothing is uploaded, so private recordings stay private and your device’s memory (phones hold less) is the limit on how many you join.',
       'For an audiobook, the order is what usually goes wrong. Files join top to bottom in the order they were added, and a file picker often sorts Chapter 10 before Chapter 2. Check the list before you press Merge MP3 and fix the order with the arrows; naming files 01, 02, 03 before you start avoids it. Leave Between files on Nothing, straight on for chapters. For voice notes or separate talks, 1 or 2 seconds of silence makes each start easy to hear.',
       'Set the MP3 quality to match the files you start with. Chapters at 64 or 128 kbps gain nothing at 320 kbps and only make a larger file; 128 kbps is right for spoken word. Files do not need to match each other: different bitrates and sample rates are all decoded at 44.1 kHz, and a mono chapter is copied to both sides when the others are stereo. The result is saved as merged.mp3, so rename it before adding it to a library.',
     ],
@@ -4358,7 +4361,7 @@ export const presets: Preset[] = [
     dropLabel: 'Drop a wide photo to split',
     defaults: { layout: '3x1', shape: 'portrait' },
     intro: [
-      'A seamless carousel is one wide image cut into slides, so each swipe continues the picture. Instagram carousels are 4:5 or square, so a panorama is trimmed to fit the slides exactly, and the preview shows how much of the top and bottom goes.',
+      'A seamless carousel is one wide image cut into slides, so each swipe continues the picture. Instagram carousels take 4:5 and square slides, so a panorama is trimmed to fit the slides exactly, and the preview shows how much of the sides or of the top and bottom goes. Choose Keep the picture’s shape to cut it without trimming.',
       'The photo is cut in your browser and never uploaded. Each slide is a full-resolution piece of it, numbered in the order to add them to the post.',
       'The slide size comes from the photo’s height. With 4:5 slides each one is four fifths as wide as the photo is tall, so a panorama 2000 px tall gives slides of 1600 × 2000, and the width decides how many fit. Instagram shows posts about 1080 px wide, so a photo at least 1350 px tall keeps every slide sharp. If your panorama needs more than three slides, type a number into Columns (up to 10) and keep Rows at 1.',
       'Leave Number the tiles on Left to right. That numbers the slides 1, 2, 3 from the left edge, which is the order they go into the post. In posting order is for a profile grid and numbers them backwards. When you add the slides, keep Instagram’s crop on the 4:5 or square shape you chose here, or the app trims each slide again and the joins stop lining up.',
@@ -4583,7 +4586,7 @@ export const presets: Preset[] = [
       { q: 'Why is my reading half or double what a website says?', a: 'Both are the same pulse counted differently. Tap the snare on 2 and 4 of a fast song and you get half; tap every hi-hat and you get double. Pick whichever matches how the beat feels, or whichever figure your DJ software or DAW expects.' },
       { q: 'Can I use the keyboard?', a: 'Yes. Press Tab until the Tap tempo button is focused, then tap Enter or the space bar in time with the music.' },
       { q: 'Can it detect the BPM from a file automatically?', a: 'Not on this page: it counts your taps, which works for any song you can hear from any app or speaker, and this page never listens to it. If you have the song as a file, the [BPM and key finder](/tools/bpm-key-finder) works the tempo out from the audio on your device, and nothing is uploaded there either.' },
-      { q: 'Does it work offline?', a: 'Yes. After one visit the page opens and runs with no connection.' },
+      { q: 'Does it work offline?', a: 'Yes. After one visit and a short wait the page opens and runs with no connection.' },
     ],
   },
   {
@@ -4638,7 +4641,7 @@ export const presets: Preset[] = [
       { q: 'Can I find the key from the chords I know?', a: 'This page reads a recording, not chords. If you know the chords, the key is usually the chord the progression keeps resolving to, often the first or last chord of the song.' },
       { q: 'Does it work for a song I recorded myself?', a: 'Yes, if the recording has the whole song in it. A single note or a drum loop does not give it enough notes to work with and the result is marked Unsure.' },
       { q: 'How accurate is it?', a: 'In our own test on 15 recordings with a known key, it was exactly right on 7, the relative major or minor on 3 more, a fifth away on 2, and wrong or in the other mode on 3. Treat it as a good first guess and check it against your ears or an instrument.' },
-      { q: 'Is the song uploaded anywhere?', a: 'No. The key is worked out by code running in this page, so the song stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is the song uploaded anywhere?', a: 'No. The key is worked out by code running in this page, so the song stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -4697,7 +4700,7 @@ export const presets: Preset[] = [
       { q: 'Which Camelot codes mix well?', a: 'The same code, the codes one number up or down with the same letter, and the same number with the other letter. These keep six or seven notes in common. They are a guide; the genre, the tempo and the arrangement matter as much, and you should trust your ears.' },
       { q: 'Is the Camelot wheel the same as the circle of fifths?', a: 'It is the circle of fifths with different labels. Neighbouring codes are a fifth apart, as neighbouring keys are on the circle. Some programs use another numbering that starts the count in a different place, so check which one yours uses before you compare numbers.' },
       { q: 'Can I get a song’s Camelot code from a file here?', a: 'Yes. Drop the file above and the page shows its key and the code. The tempo is shown too, since DJs usually want the two together. In our own test the key was exactly right on 7 of 15 recordings and the relative key on 3 more, so check an Unsure result by ear.' },
-      { q: 'Is the song uploaded anywhere?', a: 'No. The code is worked out by this page on your device, so the song stays with you. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is the song uploaded anywhere?', a: 'No. The code is worked out by this page on your device, so the song stays with you. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -4850,12 +4853,12 @@ export const presets: Preset[] = [
   {
     slug: 'video-to-subtitles',
     lead:
-      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, needs no account and adds no watermark, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (76 MB), and after that it works offline.',
+      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, needs no account and adds no watermark, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (76 MB) and the engine that runs it, and after that it works offline.',
     base: 'transcribe',
     name: 'Video to subtitles',
     title: 'Subtitle Generator: Auto SRT Subtitles from Video, Free, No Upload | Stayput',
     description: 'Make an SRT subtitle file from the speech in an MP4, MOV or WebM video with Whisper running on your device. Ready for YouTube, Premiere, Resolve and VLC. No upload.',
-    heading: 'Subtitle generator: make an SRT from a video',
+    heading: 'Generate SRT subtitles from a video',
     tagline: 'Timed SRT captions written from what is said in your video, by a speech model running in this tab.',
     keywords: ['srt generator', 'generate subtitles from video', 'video to srt', 'auto subtitle generator', 'create subtitles for video', 'subtitle maker free'],
     accept: 'video/*,audio/*,.mp4,.mov,.m4v,.webm,.mkv,.mp3,.wav,.m4a',
@@ -4878,7 +4881,8 @@ export const presets: Preset[] = [
       { q: 'What about WebVTT?', a: 'Choose Web captions (.vtt) for an HTML5 video element’s track, or for players that ask for WebVTT. The timing is the same; only the file format differs.' },
       { q: 'Can I get plain text instead of subtitles?', a: 'Yes. Choose Text (.txt) here, or use [Video to text](/video-to-text), which is set up for a recorded lecture or meeting and gives paragraphs rather than timed captions. The general [transcribe](/tools/transcribe) tool offers all three formats.' },
       { q: 'Can I burn the subtitles into the picture or add them to a video?', a: 'Yes, with [Add subtitles to video](/tools/add-subtitles-to-video), which writes the words from the speech and draws them into every frame, or with [Burn subtitles into video](/burn-subtitles-into-video) if you already have the SRT. Both save a new video.' },
-      { q: 'Is my video uploaded?', a: 'No. Only its soundtrack is read, in this tab, and the speech model runs on your device. Unreleased footage and private recordings stay with you.' },
+      { q: 'Can I generate subtitles from a video without uploading it?', a: 'Yes. Only its soundtrack is read, in this tab, and the speech model runs on your device. Unreleased footage and private recordings stay with you.' },
+      { q: 'Which languages can it write subtitles in?', a: 'The language menu lists English, Spanish, French, German, Italian, Portuguese, Dutch, Polish, Russian, Ukrainian, Turkish, Arabic, Hindi, Japanese, Korean and Chinese, or you can leave it on automatic detection. The speech model is small, so it is most accurate in English and makes more mistakes in other languages, especially on short or noisy clips; if the words come out wrong, choose the language yourself.' },
       noAccount,
     ],
   },
@@ -4928,7 +4932,7 @@ export const presets: Preset[] = [
     intro: [
       'Audio recorders, meeting apps and phones all save sound in different formats: WAV from a handheld recorder, OGG or Opus from a chat app, FLAC from a lossless capture, M4A from a phone. This page reads all of them and writes out what is said as paragraphs of plain text you can search, quote and paste into your notes. For a single MP3 or a voice memo, [MP3 to text](/mp3-to-text) is the same tool with that case in mind.',
       'A worked example: a one-hour team meeting saved as a WAV by a recorder on the table. Drop it here with the language left on Detect. The sound is decoded in the tab, cut at pauses into pieces, and each piece is transcribed by Whisper on your device. A paragraph break falls wherever there was a pause of two seconds or more, which usually lands where someone else starts talking. It does not label who is speaking, so add names when you read it through.',
-      'The first run downloads the speech model (76 MB) from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer and need memory, since the whole recording is decoded first.',
+      'The first run downloads the speech model (76 MB) and the engine that runs it from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer and need memory, since the whole recording is decoded first.',
       'If the recording is a video, such as a recorded lecture or a Zoom MP4, use [Video to text](/video-to-text). For timed captions instead of plain text, choose Subtitles (.srt) on the general [transcribe](/tools/transcribe) tool.',
     ],
     steps: [
@@ -4961,7 +4965,7 @@ export const presets: Preset[] = [
     intro: [
       'A recorded lecture, a Zoom call, a screen recording of a demo: the words are in the video, but finding the one you need means watching it all. This page reads the soundtrack of the video and writes what is said as paragraphs of plain text you can search, quote and paste into your notes.',
       'A worked example: a 50-minute lecture saved from Zoom as an MP4. Drop it here with the language left on Detect. Only the soundtrack is decoded, in the tab; the picture is never touched. The speech is cut at pauses into pieces and transcribed by Whisper on your device, and a new paragraph starts wherever there was a pause of two seconds or more. Copy it, or download it as a .txt file.',
-      'The first run downloads the speech model (76 MB) from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer and need memory, since the whole soundtrack is decoded first. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
+      'The first run downloads the speech model (76 MB) and the engine that runs it from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer and need memory, since the whole soundtrack is decoded first. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
     ],
     steps: [
       'Drop the video: MP4, MOV, M4V, WebM or MKV.',
@@ -4980,16 +4984,16 @@ export const presets: Preset[] = [
   {
     slug: 'auto-caption-video',
     lead:
-      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB), and after that it works offline; the longest video you can caption depends on your device’s memory.',
+      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB) and the engine that runs it, and after that it works offline; the longest video you can caption depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     sizeFact: 'No watermark. On a phone, a video over about 200 MB (2 minutes of iPhone video) may run out of memory',
     name: 'Auto caption video',
     title: 'Auto Caption Video Free: Captions Burned In, No Upload | Stayput',
     description: 'Automatic captions for Reels, TikTok and Shorts, written from the speech by Whisper on your device and burned into the video. Large text, no watermark, no upload.',
-    heading: 'Auto caption a video',
+    heading: 'Add automatic captions to a video',
     tagline: 'Large, readable captions written from what is said and burned into the picture, for videos watched with the sound off.',
     keywords: ['auto caption video', 'automatic captions', 'auto subtitles', 'caption generator', 'add captions to reels', 'tiktok captions', 'captions for shorts'],
-    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv',
+    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,.srt,.vtt',
     dropLabel: 'Drop a video to caption',
     action: 'Caption video',
     defaults: { size: 'large' },
@@ -5008,7 +5012,8 @@ export const presets: Preset[] = [
       { q: 'Does it do word-by-word animated captions?', a: 'No. Each caption shows a phrase of one or two lines for as long as it is spoken, like TV subtitles. Animated, word-highlighting styles need an editing app.' },
       { q: 'Can it caption a video in another language?', a: 'Yes, with limits. The language is detected from the first seconds, or you can choose it. The speech model is small, so it is most accurate in English and makes more mistakes in other languages, especially on short or noisy clips; if the words come out wrong, choose the language yourself. Tick Translate the speech to English for rough English captions on a video in another language, and check them before you post.' },
       { q: 'Can I get a separate subtitle file instead?', a: 'Yes. [Video to subtitles](/video-to-subtitles) is a subtitle generator that makes an SRT or WebVTT file from the speech, without touching the video.' },
-      { q: 'Is my video uploaded?', a: 'No. The speech is transcribed and the frames are redrawn in this tab. Unposted clips, family videos and client footage stay on your device.' },
+      { q: 'Can I add captions to a video without uploading it?', a: 'Yes. The speech is transcribed and the frames are redrawn in this tab. Unposted clips, family videos and client footage stay on your device.' },
+      { q: 'How long a video can I caption?', a: 'The limit is your device’s memory, not a set length. On a phone, a video over about 200 MB (around 2 minutes of iPhone video) may run out of memory, and the page warns you before it starts. A laptop handles longer clips. The first run also downloads the speech model (76 MB).' },
       noAccount,
     ],
   },
@@ -5020,7 +5025,7 @@ export const presets: Preset[] = [
     name: 'Burn subtitles into video',
     title: 'Burn SRT Subtitles into Video (Hardcode), Free, No Upload | Stayput',
     description: 'Hardcode an SRT or VTT subtitle file into an MP4, MOV or WebM so the subtitles always show. Pick the look, size and place. Nothing is uploaded, no watermark.',
-    heading: 'Burn subtitles into a video',
+    heading: 'Burn SRT subtitles into a video',
     tagline: 'Your SRT or VTT file drawn permanently into the picture, so the subtitles show in every player and app.',
     keywords: ['burn subtitles into video', 'hardcode subtitles', 'srt to mp4', 'embed subtitles permanently', 'add srt to video', 'open captions'],
     accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,.srt,.vtt',
@@ -5029,7 +5034,7 @@ export const presets: Preset[] = [
     defaults: { look: 'box' },
     intro: [
       'A separate subtitle file only works where the player looks for it. Messaging apps, most social platforms and many TVs play the video alone, so the subtitles vanish. Burning them in, also called hardcoding or open captions, draws the words into the picture itself. This page takes the SRT or VTT file you already have, from a translator, a subtitle site or Video to subtitles, and burns it into the video.',
-      'A worked example: a 3-minute interview.mp4 in 1920×1080 and the Spanish translation interview.es.srt from your translator. Drop both files together. The SRT is read as it is, with no speech model and no download. White on a dark band is already chosen, which keeps text readable over any footage, and on a 1080p video Medium sets the text at about 70 pixels. Each caption is wrapped to fit the frame, at most two lines, and appears exactly on its timing. You get interview-subtitled.mp4 with the sound unchanged.',
+      'A worked example: a 3-minute interview.mp4 in 1920×1080 and the Spanish translation interview.es.srt from your translator. Drop both files together. The SRT is read as it is, with no speech model and no download. White on a dark band is already chosen, which keeps text readable over any footage, and on a 1080p video Medium sets the text at about 70 pixels. Each caption is wrapped to fit the frame, at most two lines, and appears exactly on its timing. You get interview-subtitled.mp4 with the sound carried across.',
       'The timing comes straight from the file. If the subtitles run early or late, the SRT was made for a different cut of the video; burning in cannot fix that, so correct the times in a subtitle editor first. Styling written into the file, such as italics or colour tags, is dropped so every caption uses the look you chose.',
     ],
     steps: [
@@ -5041,8 +5046,9 @@ export const presets: Preset[] = [
       { q: 'What if I do not have a subtitle file?', a: 'Drop only the video and the subtitles are written from the speech by a model running in this tab. To check the words first, tick Also save the subtitles as an SRT file, correct it, and run again with the fixed file.' },
       { q: 'Can I keep the subtitles as a track viewers can turn off instead?', a: 'Not here: this page draws them into the picture. Players such as VLC load an SRT with the same name as the video, and YouTube accepts the SRT as an upload in Studio.' },
       { q: 'Which subtitle formats work?', a: 'SRT and WebVTT (.vtt). ASS and SSA files with positioned or animated styles are not read; convert them to SRT in a subtitle editor first.' },
+      { q: 'What is the difference between burned-in and soft subtitles?', a: 'Burned-in subtitles (also called hardcoded or open captions) are drawn into the picture, so they show in every player and cannot be turned off. Soft subtitles are a separate file or track that a player can show or hide. This page makes burned-in ones; for a separate SRT file, use [Video to subtitles](/video-to-subtitles).' },
       { q: 'How do I make the SRT file in the first place?', a: 'Use [Video to subtitles](/video-to-subtitles): it writes an SRT from the speech in the video, which you can correct and then burn in here.' },
-      { q: 'Is my video uploaded?', a: 'No. The subtitle file is read and the video re-encoded by your browser, on your device. Neither file leaves it.' },
+      { q: 'Can I burn subtitles into a video without uploading it?', a: 'Yes. The subtitle file is read and the video re-encoded by your browser, on your device. Neither file leaves it.' },
       noAccount,
     ],
   },
@@ -5067,7 +5073,7 @@ export const presets: Preset[] = [
     steps: [
       'Drop the song; the music without vocals is already chosen.',
       'Choose MP3 or WAV.',
-      'Press Make karaoke track. The first run downloads the model once, then the backing track downloads.',
+      'Press Make karaoke track. The first run downloads the model and its engine once, then the backing track downloads.',
     ],
     faq: [
       { q: 'Will it work on a YouTube video?', a: 'It works on any audio or video file you have on your device, including a video saved from your phone. The soundtrack is separated and saved as audio; the picture is not kept.' },
@@ -5087,6 +5093,8 @@ export const presets: Preset[] = [
     keywords: ['acapella extractor', 'isolate vocals', 'extract vocals from song', 'vocal isolator', 'get acapella from song', 'separate vocals from music'],
     accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.webm,.mp4,.mov,.m4v,.mkv',
     dropLabel: 'Drop songs to take the vocals from',
+    lead:
+      'Isolate the vocals of a song as an acapella for remixes, samples, transcribing lyrics or learning harmonies. It is free, and your files are not uploaded: everything runs in your browser on your device. The first run downloads the separation model (about 67 MB) and the engine that runs it to your browser, and after that the tool works offline; choosing MP3 output fetches a small encoder the first time you use it.',
     action: 'Extract vocals',
     defaults: { stems: 'vocals', format: 'wav' },
     intro: [
@@ -5097,7 +5105,7 @@ export const presets: Preset[] = [
     steps: [
       'Drop the song; vocals only and WAV are already chosen.',
       'Choose Both if you also want the instrumental, lined up with the vocal.',
-      'Press Extract vocals. The first run downloads the model once, then the acapella downloads.',
+      'Press Extract vocals. The first run downloads the model and its engine once, then the acapella downloads.',
     ],
     faq: [
       { q: 'Why WAV and not MP3?', a: 'The acapella will usually be edited, stretched or mixed again. WAV keeps it lossless so each step does not add compression artefacts; choose MP3 if you only want to listen.' },
@@ -5162,7 +5170,7 @@ export const presets: Preset[] = [
       'Press Make green screen, then key out the colour in your editor.',
     ],
     faq: [
-      { q: 'Why not just a transparent video?', a: 'MP4, the format every editor and phone reads, cannot hold transparency. A flat key colour does the same job in one click in any editor, and plays everywhere as it is.' },
+      { q: 'Why not just a transparent video?', a: 'MP4 with H.264, the format every editor and phone reads, cannot hold transparency. A flat key colour does the same job in one click in any editor, and plays everywhere as it is.' },
       { q: 'Which green should I use?', a: 'Chroma green, #00B140, is the standard broadcast key colour and the default here. Use blue if the person or their clothes are green.' },
       { q: 'Will hair look natural after keying?', a: 'Short and tidy hair keys well. Loose strands and flyaway hair are simplified by the model into a smooth outline, which looks fine at normal viewing size but not in extreme close-ups.' },
       { q: 'Is my video uploaded?', a: 'No. The frames are redrawn and encoded in this tab, on your device.' },
@@ -5414,7 +5422,7 @@ export const presets: Preset[] = [
     title: 'M4V to MP4 Converter, Free, No Upload | Stayput',
     description: 'Convert M4V videos to MP4 in your browser. H.264 video is copied, not re-encoded, so most files take seconds and keep full quality. Nothing is uploaded.',
     lead:
-      'Converts M4V video files to MP4, copying H.264 video and AAC or MP3 sound across unchanged so most files finish in seconds with no quality loss. It is free, and your videos are not uploaded: the conversion runs in your browser tab. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Converts M4V video files to MP4, copying H.264 video and AAC or MP3 sound across unchanged so most files finish in seconds with no quality loss. It is free, and your videos are not uploaded: the conversion runs in your browser tab. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     heading: 'Convert M4V to MP4',
     tagline: 'Turn M4V videos into MP4s that play on Windows, Android, TVs and upload forms, without uploading them.',
     keywords: ['m4v to mp4', 'convert m4v to mp4', 'm4v to mp4 converter', 'm4v to mp4 free', 'm4v file to mp4', 'm4v to mp4 without losing quality'],
@@ -5481,7 +5489,7 @@ export const presets: Preset[] = [
     title: 'Phone Number QR Code Generator, Free, No Upload | Stayput',
     description: 'Make a QR code that offers to call a phone number when scanned. Type the number, check the preview, download PNG or SVG. Free, runs in your browser.',
     lead:
-      'Makes a QR code that holds a phone number, so a phone camera offers to call it when the code is scanned, and saves it as a PNG or SVG. It is free, and the number you type is not uploaded: the code is drawn in your browser. The codes are static, so they never expire, and after one visit the page works offline.',
+      'Makes a QR code that holds a phone number, so a phone camera offers to call it when the code is scanned, and saves it as a PNG or SVG. It is free, and the number you type is not uploaded: the code is drawn in your browser. The codes are static, so they never expire, and after one visit and a short wait the page works offline.',
     heading: 'Make a phone number QR code',
     tagline: 'Scan it and the phone offers to call the number: for a shop door, a flyer, a van or a business card.',
     keywords: ['phone number qr code', 'phone number qr code generator', 'qr code that calls a number', 'mobile number qr code', 'contact number qr code', 'free phone number qr code'],
@@ -5516,7 +5524,7 @@ export const presets: Preset[] = [
     title: 'Slack Emoji Resizer: 128 px, Under 128 KB, Free | Stayput',
     description: 'Resize any picture or GIF into a square 128 pixel Slack custom emoji under 128 KB, transparency kept. In your browser, nothing is uploaded.',
     lead:
-      'Resizes a picture or an animated GIF into a square 128 × 128 pixel Slack custom emoji and checks it against 128 KB, the size Slack recommends, keeping transparency. It is free, and your artwork is not uploaded: it is resized in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Resizes a picture or an animated GIF into a square 128 × 128 pixel Slack custom emoji and checks it against 128 KB, the size Slack recommends, keeping transparency. It is free, and your artwork is not uploaded: it is resized in your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     heading: 'Slack emoji resizer',
     tagline: 'Square 128 pixel emoji under 128 KB from any picture or animated GIF, made on this device.',
     keywords: ['slack emoji resizer', 'slack emoji size', 'slack emoji dimensions', 'resize image for slack emoji', 'slack emoji size limit', 'slack custom emoji size'],
@@ -5549,7 +5557,7 @@ export const presets: Preset[] = [
     title: 'Compress Video for WhatsApp (16 MB), No Upload | Stayput',
     description: 'Fit a video under 16 MB, the size WhatsApp lists for MP4 video, in your browser. Bitrate is worked out from the length. Free, no upload, no watermark.',
     lead:
-      'Shrinks a video to fit under 16 MB, the size WhatsApp lists for MP4 video, by working out the bitrate from the clip’s length and lowering the resolution when it has to. It is free, and your video is not uploaded: it is re-encoded in your browser and saved as an MP4. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Shrinks a video to fit under 16 MB, the size WhatsApp lists for MP4 video, by working out the bitrate from the clip’s length and lowering the resolution when it has to. It is free, and your video is not uploaded: it is re-encoded in your browser and saved as an MP4. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     heading: 'Compress a video for WhatsApp',
     tagline: 'Fit a clip under 16 MB so it goes through as a normal video message, without uploading it anywhere first.',
     keywords: ['compress video for whatsapp', 'whatsapp video compressor', 'compress video to 16mb', 'compress video for whatsapp status', 'reduce video size for whatsapp', 'whatsapp video size limit'],
@@ -5582,7 +5590,7 @@ export const presets: Preset[] = [
     title: 'Compress a PDF to 5 MB, Free, No Upload | Stayput',
     description: 'Fit a long scan, slide deck or report under 5 MB with the gentlest setting that works, keeping text selectable where possible. No upload.',
     lead:
-      'Makes a PDF smaller until it fits under 5 MB, trying a lossless cleanup first, then lighter image compression, and turning pages into pictures only if nothing else is enough. It is free, and your PDF is not uploaded: it is rewritten in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Makes a PDF smaller until it fits under 5 MB, trying a lossless cleanup first, then lighter image compression, and turning pages into pictures only if nothing else is enough. It is free, and your PDF is not uploaded: it is rewritten in your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     heading: 'Compress a PDF to under 5 MB',
     tagline: 'Long scans, slide decks and reports under 5 MB, compressed only as much as needed, on your own device.',
     keywords: ['compress pdf to 5mb', 'reduce pdf size to 5mb', 'pdf under 5mb', 'compress pdf to 5mb free', 'compress pdf below 5 mb', 'make pdf smaller than 5mb'],
@@ -5616,7 +5624,7 @@ export const presets: Preset[] = [
     title: 'Email QR Code Generator, Free, No Upload | Stayput',
     description: 'Make a QR code that opens a new email with the address, subject and message already filled in. Download PNG or SVG. Free, made in your browser.',
     lead:
-      'Makes a QR code that opens a new email with the address, subject and message you chose already filled in, and saves it as a PNG or SVG. It is free, and what you type is not uploaded: the code is drawn in your browser. The codes are static, so they never expire, and after one visit the page works offline.',
+      'Makes a QR code that opens a new email with the address, subject and message you chose already filled in, and saves it as a PNG or SVG. It is free, and what you type is not uploaded: the code is drawn in your browser. The codes are static, so they never expire, and after one visit and a short wait the page works offline.',
     heading: 'Make an email QR code',
     tagline: 'Scan it and the mail app opens a message addressed and worded for you, ready to send.',
     keywords: ['email qr code', 'email qr code generator', 'qr code to send email', 'mailto qr code', 'qr code for email address', 'free email qr code'],
@@ -5831,7 +5839,7 @@ export const presets: Preset[] = [
       { q: 'Can I use letters with accents?', a: 'Yes for the Latin alphabet with accents, such as é, ñ, ü, ç and ã. Letters from Polish, Czech or Vietnamese and other alphabets are not in these fonts, and the page shows a note when your name has one.' },
       { q: 'Can I choose a different colour?', a: 'Yes: black, blue or brown. The PNG has a transparent background, so the colour is the ink only.' },
       { q: 'Will a form accept a typed signature?', a: 'That depends on the form. This page makes an image of your name in a script style; whether a form, employer or office accepts that is their rule, and some want a signature made in their own system or a certificate-based digital signature, which this page does not make.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -5888,7 +5896,7 @@ export const presets: Preset[] = [
       { q: 'Why are parts of my signature missing?', a: 'The ink is too pale or too thin at that point for the current Ink strength. Raise it a little at a time. A darker pen on a second photo gives the best result.' },
       { q: 'Does it work on a scan or a screenshot?', a: 'Yes. A flat scan on white is the easiest case. A screenshot of a signature on a coloured page works if the signature is clearly darker than its background.' },
       { q: 'Why a PNG and not a JPG?', a: 'A JPG cannot be transparent, so it keeps a white box around the signature. A PNG keeps the see-through background, which is what lets the signature sit on a document, slide or PDF.' },
-      { q: 'Is my photo uploaded anywhere?', a: 'No. The photo is opened and processed by code running in this page, so it stays on your device and is not kept when you close the page. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is my photo uploaded anywhere?', a: 'No. The photo is opened and processed by code running in this page, so it stays on your device and is not kept when you close the page. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -5936,7 +5944,7 @@ export const presets: Preset[] = [
       { q: 'Does this make handwriting practice sheets?', a: 'No. It makes a signature image from the name you type. For your own hand, use Draw on the [signature maker](/tools/signature-maker).' },
       { q: 'Which style is the most cursive?', a: 'Formal script, which joins every letter and is the one this page starts with. Flowing is joined too and has a looser baseline. Handwriting keeps some letters apart.' },
       { q: 'Can I save it with a transparent background?', a: 'Yes. The PNG has a transparent background, so it can sit on a document, certificate or slide without a white box.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
 ];
@@ -5963,7 +5971,7 @@ export function presetAsTool(p: Preset): Tool {
     steps: p.steps,
     faq: p.faq.map((f) => ({ ...f, a: offlineWhen(p.base, f.a) })),
     taglineMd: undefined,
-    sizeFact: p.sizeFact,
+    sizeFact: p.sizeFact ?? base.sizeFact,
     sections: p.sections,
     lead: p.lead,
   };

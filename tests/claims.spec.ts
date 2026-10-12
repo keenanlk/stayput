@@ -14,7 +14,7 @@ const dist = new URL('../dist/', import.meta.url);
 const pages = [
   ...tools.map((t) => ({ path: toolPath(t), base: t.slug, sizeFact: t.sizeFact, kind: 'tool' })),
   ...pairs.map((p) => ({ path: `/${p.slug}`, base: 'convert-image', sizeFact: undefined, kind: 'pair' })),
-  ...presets.map((p) => ({ path: `/${p.slug}`, base: p.base, sizeFact: p.sizeFact, kind: 'preset' })),
+  ...presets.map((p) => ({ path: `/${p.slug}`, base: p.base, sizeFact: presetAsTool(p).sizeFact, kind: 'preset' })),
   ...guides.map((g) => ({ path: `/guides/${g.slug}`, base: '', sizeFact: undefined, kind: 'guide' })),
 ];
 

@@ -174,7 +174,7 @@ const jsonLd = [
       <div class="install" id="install" hidden role="region" aria-label="Install Stayput">
         <div>
           <strong>Keep Stayput a tap away.</strong>
-          <span>Install it as an app for a home-screen icon and offline use after your first {needsFirstUse(base ?? tool.slug) ? 'run' : 'visit'}.</span>
+          <span>Install it as an app for a home-screen icon and offline use after your first {needsFirstUse(base ?? tool.slug) ? 'run' : 'visit and a short wait'}.</span>
         </div>
         <div class="field-row">
           <button class="btn btn-sm btn-primary" id="install-yes" type="button">Install</button>
@@ -217,7 +217,7 @@ const jsonLd = [
     <div class="engine">
       <p>{engine.how}</p>
       <p class="versus"><strong>Compared with upload-based tools:</strong> {engine.versus}</p>
-      <p class="verify"><strong>Verify it yourself.</strong> After {needsFirstUse(base ?? tool.slug) ? 'your first run' : 'one visit'}, turn off Wi-Fi or switch to airplane mode and run the tool again. Or open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, and watch it while you convert. The panel above does the same count for you.</p>
+      <p class="verify"><strong>Verify it yourself.</strong> Give the page a short while after {needsFirstUse(base ?? tool.slug) ? 'your first run' : 'one visit'} to save itself for offline use, then turn off Wi-Fi or switch to airplane mode and run the tool again. Or open your browser's developer tools (F12, or Cmd-Option-I on a Mac), pick the Network tab, and watch it while you convert. The panel above does the same count for you.</p>
     </div>
   </section>
 
