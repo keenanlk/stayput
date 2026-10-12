@@ -1,0 +1,9 @@
+{
+ "url": "https://stayput.dev/tools/qr-code-scanner",
+ "wifi": "WIFI:T:WPA;S:Cafe Guest;P:correct-horse-battery;;",
+ "vcard": "BEGIN:VCARD\nVERSION:3.0\nN:Doe;Jane\nFN:Jane Doe\nORG:Example Co\nTEL:+15551234567\nEMAIL:jane@example.com\nURL:https://example.com\nEND:VCARD",
+ "small": "https://a.co/x",
+ "long": "https://example.com/path/to/a/very/long/page?utm_source=newsletter&utm_medium=email&utm_campaign=autumn-launch-2026&ref=abcdef0123456789&session=0123456789abcdef0123456789abcdef",
+ "mail": "mailto:hello@example.com?subject=Hi",
+ "tel": "tel:+15551234567"
+}

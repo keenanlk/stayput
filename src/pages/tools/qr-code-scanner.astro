@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ScanStage from '../../components/ScanStage.astro';
+const tool = toolBySlug('qr-code-scanner')!;
+---
+<ToolLayout tool={tool}>
+  <ScanStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/qr-code-scanner.ts"></script>

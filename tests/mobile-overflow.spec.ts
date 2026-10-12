@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 
 // The narrowest phones still in use are 320 px wide. Long <select> options and
 // long unbroken text must wrap or shrink inside their column, never push the
@@ -16,6 +17,8 @@ const pages = [
   '/tools/resize-gif',
   '/tools/crop-gif',
   '/tools/barcode-generator',
+  '/tools/qr-code-scanner',
+  '/qr-code-scanner-for-pc',
   '/itf-14-barcode-generator',
   '/press',
   '/licenses',
@@ -28,3 +31,12 @@ for (const path of pages) {
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
   });
 }
+
+test('the QR scanner wraps a very long address inside the card at 320 px', async ({ page }) => {
+  await page.goto('/tools/qr-code-scanner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fileURLToPath(new URL('./fixtures/qr/qr_long.png', import.meta.url)));
+  await expect(page.locator('#qs-results .qs-address')).toContainText('utm_campaign=autumn-launch-2026');
+  const [scrollWidth, clientWidth] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+  expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
+});

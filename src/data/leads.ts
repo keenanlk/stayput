@@ -56,6 +56,7 @@ const does: Record<string, string> = {
   'trim-audio': 'Cuts the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, with fades, and saves MP3 or WAV.',
   'audio-converter': 'Converts audio between MP3, WAV, FLAC, M4A and OGG, or pulls the sound out of a video, for one file or a batch.',
   'qr-code-generator': 'Makes a QR code for a link, Wi-Fi network, contact card, email or phone number, and saves it as PNG or SVG.',
+  'qr-code-scanner': 'Reads QR codes and barcodes from an image, a screenshot or your camera and shows what they hold, without opening anything for you.',
   'barcode-generator': 'Makes a Code 128, Code 39, UPC-A, EAN-13, ITF-14 or other barcode from the number or text you type, and saves it as PNG, SVG or PDF.',
   'screen-recorder': 'Records your screen, a window or a browser tab, with sound and your microphone if you choose, and saves the video.',
   'voice-recorder': 'Records your voice with your microphone and saves it as MP3, WAV or M4A.',
@@ -151,7 +152,7 @@ const downloads: Record<string, Download> = {
 const firstUseEngines = [
   'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-converter', 'compress-audio', 'volume-booster',
   'pitch-changer', 'remove-silence', 'voice-recorder', 'remove-noise', 'file-checksum',
-  'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image',
+  'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image', 'qr-code-scanner',
 ];
 
 /** The offline badge: after the first visit, or, for tools that fetch an engine on first run, after the first use. */
@@ -171,6 +172,7 @@ export const defaultSizeBadge = 'No watermark · limit is your device’s memory
 
 /** Tools with no file to size-limit; their fact says what is true of them instead. */
 const facts: Record<string, string> = {
+  'qr-code-scanner': 'Your browser asks for camera permission only if you press the camera button, and after one visit the page works offline.',
   'qr-code-generator': 'The codes are static, so they never expire, and after one visit the page works offline.',
   'barcode-generator': 'The barcodes are drawn on this page, and after one visit the page works offline.',
   'screen-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit the page works offline.',
@@ -188,6 +190,7 @@ const free: Record<string, string> = {
   'tuner': freeLine('the sound from your microphone is'),
   'mic-test': freeLine('the sound from your microphone is'),
   'webcam-test': freeLine('the picture from your camera is'),
+  'qr-code-scanner': freeLine('your images and the picture from your camera are'),
   'qr-code-generator': freeLine('what you type is'),
   'barcode-generator': freeLine('what you type is'),
   'screen-recorder': freeLine('your recordings are'),

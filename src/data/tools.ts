@@ -1904,6 +1904,83 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'qr-code-scanner',
+    name: 'QR code scanner',
+    title: 'Free QR Code Scanner Online: Image or Camera | Stayput',
+    description: 'Scan a QR code or barcode from an image, screenshot or your camera. Free, no sign-up, and nothing is uploaded or opened for you.',
+    heading: 'Scan a QR code',
+    tagline: 'Drop, paste or choose an image, or use your camera. The code is read on this page, and a link is shown to you, never opened for you.',
+    category: 'images',
+    accept: 'image/*',
+    multiple: true,
+    dropLabel: 'Drop an image with a QR code or barcode',
+    action: 'Read the code',
+    sizeFact: 'No watermark, no sign-up',
+    keywords: ['qr code scanner', 'qr code scanner online', 'qr code reader', 'qr code scanner from image', 'scan qr code from image', 'qr code scanner for pc', 'scan qr code from screenshot', 'free qr code scanner', 'barcode scanner online'],
+    steps: [
+      'Drop an image of a QR code or barcode on the box, paste a screenshot (Ctrl+V on Windows and Linux, Cmd+V on a Mac), or choose a file. Or press Scan with camera and point it at the code.',
+      'The code is read on this page and shown as a card: the address of a link, the details of a Wi-Fi network, a contact, or plain text.',
+      'Check what it says, then copy it. For a link, read the domain carefully and press Open link only if it is the site you expect. The page never opens anything for you.',
+    ],
+    sections: [
+      {
+        heading: 'What it reads',
+        bullets: [
+          'QR codes, including ones with a logo in the middle, upside down, mirrored or at an angle.',
+          'Barcodes on products and parcels: EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, Code 93, ITF and Codabar.',
+          'Other two-dimensional codes: Data Matrix, Aztec and PDF417.',
+          'Several codes in one picture: each is listed.',
+        ],
+      },
+      {
+        heading: 'What it does not do',
+        bullets: [
+          'It does not tell you whether a link is safe. It shows the full address and warns about the common tricks, but a link with no warnings can still be bad.',
+          'It does not look a product barcode up. A barcode holds a number; this page shows the number.',
+          'It does not read round or dotted codes that belong to one app. Those can only be read inside that app.',
+        ],
+      },
+      {
+        heading: 'Other tools',
+        paragraphs: ['Make your own with the [QR code generator](/tools/qr-code-generator) or the [barcode generator](/tools/barcode-generator).'],
+      },
+    ],
+    faq: [
+      {
+        q: 'Is the picture or the camera feed uploaded?',
+        a: 'No. The code is read by a program running in this page, on your device. Your picture and your camera feed are not sent anywhere. The first scan loads a reader of about 1 MB from this site and keeps it in your browser, so after your first run the page works offline.',
+      },
+      {
+        q: 'Does it open the link in the code?',
+        a: 'No. It shows you the full address, with the domain written out on its own line, and warns about common tricks such as look-alike letters or a hidden destination. A link opens only when you press the Open link button. Nothing is opened for you.',
+      },
+      {
+        q: 'How can I tell if a link in a QR code is safe?',
+        a: 'You cannot be sure from a code. Read the domain letter by letter, because look-alike sites change one letter, and be careful with links that ask you to sign in, pay or install something. If a code is on a sticker stuck over another code, or in a message you did not expect, do not open it.',
+      },
+      {
+        q: 'Do I need to install an app?',
+        a: 'No. It works in Safari on an iPhone, in Chrome on Android and in any recent desktop browser. To use the camera, press the button and allow it when your browser asks.',
+      },
+      {
+        q: 'Why can’t it use my camera?',
+        a: 'The camera is blocked for this page, in use by another app, or not found. The page tells you which, and how to turn it back on in Settings. You can always drop, paste or choose an image instead.',
+      },
+      {
+        q: 'It says no code was found. What can I try?',
+        a: 'Crop the picture so the code fills most of it, with a blank border around it, and use a sharp, bright image. If the code is on a screen, take a screenshot instead of a photo of the screen. Codes that are very small, very blurry or partly covered cannot be read.',
+      },
+      {
+        q: 'What happens to the Wi-Fi password in a Wi-Fi code?',
+        a: 'It is shown on this page, hidden behind a Show button, so you can copy it. It is not stored and not uploaded. A web page cannot join the network for you; copy it into your Wi-Fi settings, or scan with your phone’s camera app.',
+      },
+      {
+        q: 'Which codes can it read?',
+        a: 'QR codes (including Micro QR), Data Matrix, Aztec, PDF417, and the common barcodes on products and parcels: EAN, UPC, Code 128, Code 39, Code 93, ITF and Codabar.',
+      },
+    ],
+  },
+  {
     slug: 'screen-recorder',
     name: 'Screen recorder',
     title: 'Free Online Screen Recorder, No Upload or Watermark | Stayput',

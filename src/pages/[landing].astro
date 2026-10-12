@@ -43,6 +43,7 @@ import TrimAudio from '../components/options/TrimAudio.astro';
 import AudioToVideo from '../components/options/AudioToVideo.astro';
 import QrStage from '../components/QrStage.astro';
 import BarcodeStage from '../components/BarcodeStage.astro';
+import ScanStage from '../components/ScanStage.astro';
 import RecordStage from '../components/RecordStage.astro';
 import MergeAudio from '../components/options/MergeAudio.astro';
 import CollageMaker from '../components/options/CollageMaker.astro';
@@ -191,6 +192,7 @@ const options = {
   'sign-pdf': null,
   'qr-code-generator': null,
   'barcode-generator': null,
+  'qr-code-scanner': null,
   'screen-recorder': null,
   // The tuner keeps its instrument and A4 controls in its stage.
   'tuner': null,
@@ -208,6 +210,7 @@ const Options = options[base as keyof typeof options];
   {base === 'trim-audio' && <AudioStage slot="panel" />}
   {base === 'qr-code-generator' && <QrStage slot="panel" defaults={defaults} />}
   {base === 'barcode-generator' && <BarcodeStage slot="panel" defaults={defaults} />}
+  {base === 'qr-code-scanner' && <ScanStage slot="panel" defaults={defaults} />}
   {base === 'screen-recorder' && <RecordStage slot="panel" defaults={defaults} />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'remove-object' && <EraseStage slot="panel" />}
