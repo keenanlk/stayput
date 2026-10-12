@@ -3698,7 +3698,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Can I make a passport photo without uploading my photo?',
-        a: 'No. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
+        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
       },
       {
         q: 'How is the head sized?',
