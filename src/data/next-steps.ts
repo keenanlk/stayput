@@ -46,6 +46,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'voice-recorder': ['trim-audio', 'add-audio-to-video'],
   'volume-booster': ['trim-audio', 'audio-converter'],
   'pitch-changer': ['trim-audio', 'volume-booster'],
+  'bpm-key-finder': ['pitch-changer', 'trim-audio'],
   'merge-audio': ['trim-audio', 'add-audio-to-video'],
   'blur-face-video': ['compress-video', 'trim-video'],
   'remove-silence': ['compress-audio', 'trim-audio'],

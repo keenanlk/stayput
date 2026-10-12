@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import BpmStage from '../../components/BpmStage.astro';
+const tool = toolBySlug('bpm-key-finder')!;
+---
+<ToolLayout tool={tool}>
+  <BpmStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/bpm-key-finder.ts"></script>

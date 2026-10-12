@@ -283,6 +283,23 @@
    "copyright": "Copyright (c) 2016 Johan Lindell"
   },
   {
+   "id": "music-tempo",
+   "name": "music-tempo",
+   "version": "1.0.3",
+   "npm": "music-tempo",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/killercrush/music-tempo",
+   "source": "https://github.com/killercrush/music-tempo/tree/80c12cc4ea8c8ae35ac9f7fd0d2479628f545295",
+   "shipped": "Bundled into the site JavaScript (BPM and key finder)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2017 killercrush"
+  },
+  {
    "id": "fflate",
    "name": "fflate",
    "version": "0.8.3",

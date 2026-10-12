@@ -72,6 +72,7 @@ const does: Record<string, string> = {
   'split-image': 'Cuts a picture into a grid, a carousel or any number of rows and columns, and saves the tiles.',
   'collage-maker': 'Combines photos into one image as a grid, side by side or stacked, with spacing and a background colour.',
   'extract-pdf-images': 'Saves every picture inside a PDF as PNG or JPG, at the resolution it was stored.',
+  'bpm-key-finder': 'Finds the tempo (BPM) and musical key of a song from an audio file, and gives the Camelot code DJs use to match keys.',
   'pitch-changer': 'Shifts a song or recording up or down by semitones without changing its length, or changes its speed without changing its pitch (MP3, WAV, M4A, FLAC).',
   'tuner': 'Tunes a guitar, bass, ukulele, violin or any instrument from your microphone, showing the note, the cents and a needle.',
   'metronome': 'Plays a steady metronome from 20 to 300 BPM, in any time signature, with subdivisions and tap tempo.',
@@ -193,6 +194,7 @@ const facts: Record<string, string> = {
   'gif-maker': 'A GIF can hold up to 300 pictures, and the limit is your device’s memory (phones hold less); give the page a short while after one visit to save itself for offline use, and then it works offline.',
   'video-to-gif': 'A GIF is capped at 600 frames, and the video itself is limited by your device’s memory (phones hold less); give the page a short while after one visit to save itself for offline use, and then it works offline.',
   'create-zip': 'A ZIP can be up to 4 GB, and phones hold less; give the page a short while after one visit to save itself for offline use, and then it works offline.',
+  'bpm-key-finder': 'Files longer than 15 minutes are not analysed, and after one visit and a short wait the page works offline.',
   'blur-image': 'Finding faces downloads a small face detector (about 4 MB) the first time you use that button; marking areas by hand needs no download. After one visit and a short wait the page works offline.',
 };
 
