@@ -19,7 +19,7 @@ const does: Record<string, string> = {
   'crop-gif': 'Crops an animated GIF to a box you draw, a square, 16:9 or 9:16, keeping every frame, its timing and the loop.',
   'compress-gif': 'Shrinks animated GIFs by dropping unchanged pixels, reducing colours, resizing or removing frames, and saves a smaller GIF.',
   'compress-png': 'Compresses PNG files with a smart colour palette or losslessly, keeps transparency, and saves smaller PNGs.',
-  'strip-exif': 'Removes EXIF metadata, GPS location and camera details from JPG, PNG and WebP photos without re-encoding the picture.',
+  'strip-exif': 'Removes EXIF metadata, GPS location and camera details from JPG, PNG and WebP photos, copying the image data unchanged unless a sideways JPG is turned upright.',
   'exif-viewer': 'Shows the EXIF data inside a JPG, PNG, WebP, HEIC or TIFF photo: GPS location, camera, date and every other field.',
   'merge-pdf': 'Combines several PDF files into one PDF, in the order you set.',
   'split-pdf': 'Splits a PDF into single pages, a page range or chunks, and saves the pieces as PDFs.',

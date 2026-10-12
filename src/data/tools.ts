@@ -219,7 +219,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is metadata kept?',
-        a: 'No. Re-encoding drops EXIF data, including GPS location, which is usually what you want before sharing. If you only want to remove metadata without changing pixels, use the EXIF remover instead.',
+        a: 'No. Re-encoding drops EXIF data, including GPS location, which is usually what you want before sharing. If you only want to remove metadata without changing pixels, use the EXIF remover instead; it copies the image data unchanged, except a sideways JPG when its "Apply orientation" option is ticked.',
       },
     ],
   },
@@ -312,9 +312,9 @@ export const tools: Tool[] = [
     name: 'Remove EXIF Data',
     title: 'Remove EXIF and GPS Data From Photos, Private | Stayput',
     description:
-      'Strip EXIF metadata, GPS location and camera info from JPG, PNG and WebP photos without re-encoding. Lossless, free, runs entirely in your browser.',
+      'Strip EXIF metadata, GPS location and camera info from JPG, PNG and WebP photos in your browser. Image data is copied unchanged, except sideways JPGs with Apply orientation on.',
     heading: 'Remove EXIF and location data from photos',
-    tagline: 'See what a photo reveals, then delete it. Lossless: pixels are untouched, only the metadata is removed.',
+    tagline: 'See what a photo reveals, then delete it. The image data is copied unchanged and only the metadata is removed; a sideways JPG is re-encoded only if Apply orientation is on.',
     category: 'images',
     accept: 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp',
     multiple: true,
@@ -333,7 +333,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Does removing metadata reduce quality?',
-        a: 'No. This tool edits the file structure and drops only the metadata segments. The compressed image data is copied byte for byte, so the picture is identical to the original.',
+        a: 'Not in the normal case. This tool edits the file structure and drops only the metadata segments, and the compressed image data is copied byte for byte, so the picture is identical to the original. The exception is a JPG stored sideways with an EXIF orientation tag while "Apply orientation" is ticked (the default): that photo is decoded, turned upright and saved again as a JPG at quality 95, and its color profile is not carried over. Untick "Apply orientation" and every file is copied unchanged. PNG and WebP files are never re-encoded.',
       },
       {
         q: 'What is kept by default?',
@@ -341,7 +341,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'What about orientation?',
-        a: 'Phones often store photos sideways with an EXIF orientation tag telling viewers to rotate them. If you remove EXIF, that hint disappears. Leave "Apply orientation" on to bake the rotation into the pixels first, which does re-encode the image; turn it off for a purely lossless strip.',
+        a: 'Phones often store photos sideways with an EXIF orientation tag telling viewers to rotate them. If you remove EXIF, that hint disappears. With "Apply orientation" on (the default), a sideways JPG is turned upright and saved again as a JPG at quality 95, which re-encodes it and drops its color profile. Turn it off to keep the image data unchanged; a sideways photo may then show sideways. JPGs with no rotation tag, and PNG and WebP files, are never re-encoded.',
       },
     ],
   },
@@ -383,7 +383,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How do I remove what it found?',
-        a: 'Use the Remove EXIF Data tool (linked under the report). It deletes EXIF, GPS, XMP and IPTC without re-encoding, so the picture is unchanged. Drop the cleaned copy back here to confirm nothing is left.',
+        a: 'Use the Remove EXIF Data tool (linked under the report). It deletes EXIF, GPS, XMP and IPTC and copies the image data unchanged; only a sideways JPG is re-encoded, and only if "Apply orientation" is ticked there. Drop the cleaned copy back here to confirm nothing is left.',
       },
     ],
   },

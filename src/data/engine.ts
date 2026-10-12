@@ -24,7 +24,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Image compressors that upload your photos limit you to a few files, a small size, or a watermark until you pay. This one has no counter to reset because there is no server to keep one.',
   },
   'strip-exif': {
-    how: 'This tool does not re-encode your photo at all. It reads the JPG, PNG or WebP container byte by byte and removes only the metadata segments (EXIF, XMP, ICC, IPTC), writing the untouched image data back out. That is why the output is pixel-identical and the file only gets smaller.',
+    how: 'This tool reads the JPG, PNG or WebP container byte by byte and removes only the metadata segments (EXIF, XMP, IPTC and comments, plus the ICC colour profile if you untick Keep color profile), writing the image data back out unchanged. That is why the output is pixel-identical and the file only gets smaller. One case is re-encoded: a JPG stored sideways with an EXIF rotation tag, when Apply orientation is ticked (the default). It is decoded, turned upright and saved again as a JPG at quality 95, without its colour profile. Untick that option and every file is copied unchanged.',
     versus: 'Sending a photo to a website to remove its location data is a contradiction: the site has the location the moment you upload it. Here the GPS block is deleted on your device and never travels anywhere.',
   },
   'exif-viewer': {
