@@ -9,6 +9,7 @@ import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH,
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
 import { pickVideoCodec } from './video-codec';
+import { blur as boxBlur } from './blur';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 
 export type Shape = 'landscape' | 'square' | 'portrait';
@@ -28,6 +29,9 @@ export interface AudioVideoResult {
   videoCodec: string;
 }
 
+/** Longest side the blurred backdrop is made at; it is scaled up afterwards, which also softens it. */
+const BLUR_WORK = 480;
+
 /** Where a picture of `w`×`h` sits inside the frame when fitted whole (contain) or filling it (cover). */
 export function placeImage(w: number, h: number, frame: { width: number; height: number }, fit: 'contain' | 'cover') {
   const scale = fit === 'contain' ? Math.min(frame.width / w, frame.height / h) : Math.max(frame.width / w, frame.height / h);
@@ -44,11 +48,21 @@ export function drawStill(ctx: OffscreenCanvasRenderingContext2D | CanvasRenderi
   if (picture) {
     if (backdrop === 'blur') {
       const c = placeImage(picture.width, picture.height, frame, 'cover');
+      // Blurred by hand on a small copy, then scaled up: Safari has no canvas `filter`, and there a filter blur does nothing.
+      const k = Math.min(1, BLUR_WORK / Math.max(width, height));
+      const small = new OffscreenCanvas(Math.max(2, Math.round(width * k)), Math.max(2, Math.round(height * k)));
+      const sctx = small.getContext('2d', { willReadFrequently: true })!;
+      sctx.drawImage(picture, c.x * k, c.y * k, c.width * k, c.height * k);
+      // A Gaussian of about a fortieth of the long side; boxBlur's radius is twice the Gaussian's spread and reads clamped edges.
+      const sigma = (Math.max(width, height) / 40) * k;
+      boxBlur(sctx, { x: 0, y: 0, w: small.width, h: small.height }, Math.max(2, Math.round(sigma * 2)));
+      // Darkened to 60%, like the filter's brightness(0.6).
+      sctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      sctx.fillRect(0, 0, small.width, small.height);
       ctx.save();
-      ctx.filter = `blur(${Math.round(Math.max(width, height) / 40)}px) brightness(0.6)`;
-      // Overdraw a little so the blur does not fade at the edges.
-      const pad = Math.max(width, height) / 20;
-      ctx.drawImage(picture, c.x - pad, c.y - pad, c.width + pad * 2, c.height + pad * 2);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(small, 0, 0, width, height);
       ctx.restore();
     }
     const p = placeImage(picture.width, picture.height, frame, 'contain');
