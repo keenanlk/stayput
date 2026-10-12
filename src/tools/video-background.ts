@@ -3,6 +3,7 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/encoder-probe';
 import { describeEdit } from './video-edit-shell';
 import { InputError } from '../lib/input-error';
+import { blur as boxBlur } from '../lib/blur';
 
 /**
  * Video background remover: the people in each frame are found by MediaPipe's
@@ -23,6 +24,29 @@ const sync = () => {
 for (const r of document.querySelectorAll<HTMLInputElement>('input[name="bg"]')) r.addEventListener('change', sync);
 bindRange('strength', 'strength-out');
 sync();
+
+/** Longest side the blurred background is made at; it is scaled up afterwards, which also softens it. */
+const BLUR_WORK = 480;
+
+/**
+ * Draw `frame` blurred over the whole canvas. Done by hand on a small copy, not with the canvas `filter` property:
+ * Safari has no such property, and there the "blur" was a no-op that left the whole background sharp.
+ */
+function drawBlurred(ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement, small: HTMLCanvasElement, strength: number) {
+  const { width, height } = ctx.canvas;
+  // Same strength as before: a Gaussian of about min side x strength / 250 pixels, here measured on the small copy.
+  const k = Math.min(1, BLUR_WORK / Math.max(width, height));
+  small.width = Math.max(2, Math.round(width * k));
+  small.height = Math.max(2, Math.round(height * k));
+  const sctx = small.getContext('2d', { willReadFrequently: true })!;
+  sctx.drawImage(frame, 0, 0, small.width, small.height);
+  const sigma = Math.max(2, (Math.min(width, height) * strength) / 250) * k;
+  // boxBlur's radius is twice the Gaussian's spread; it reads clamped edges, so no dark border is pulled in.
+  boxBlur(sctx, { x: 0, y: 0, w: small.width, h: small.height }, Math.max(2, Math.round(sigma * 2)));
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(small, 0, 0, width, height);
+}
 
 /** Draw `img` to cover the whole canvas, cropping what does not fit. */
 function cover(ctx: CanvasRenderingContext2D, img: ImageBitmap) {
@@ -61,6 +85,7 @@ createShell({
       const file = entry.file;
       const share = (f: number) => (index + f) / videos.length;
       const matte = new Matte();
+      const blurred = document.createElement('canvas');
       const r = await editVideo(file, {
         // The frame is only drawn on and copied from; the person finder reads its own small canvas.
         readsBack: false,
@@ -70,14 +95,7 @@ createShell({
               c.fillStyle = color;
               c.fillRect(0, 0, c.canvas.width, c.canvas.height);
             } else if (bgKind === 'image') cover(c, picture!);
-            else {
-              const { width, height } = c.canvas;
-              const radius = Math.max(2, Math.round((Math.min(width, height) * strength) / 250));
-              c.filter = `blur(${radius}px)`;
-              // Drawn a little larger, so the blur does not pull dark edges in from outside the frame.
-              c.drawImage(frame, -2 * radius, -2 * radius, width + 4 * radius, height + 4 * radius);
-              c.filter = 'none';
-            }
+            else drawBlurred(c, frame, blurred, strength);
           });
         },
         onProgress: (f) => progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}%`, share(0.03 + f * 0.97)),
