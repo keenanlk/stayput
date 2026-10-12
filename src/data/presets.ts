@@ -4687,6 +4687,10 @@ export const presets: Preset[] = [
           'They are the same circle: moving one step clockwise goes up a fifth. The wheel only swaps note names for numbers and letters, and starts the count so that 8B is C major.',
         ],
       },
+      {
+        heading: 'Trademark',
+        paragraphs: ['Camelot is a trademark of Mixed In Key LLC. Stayput is not affiliated with Mixed In Key.'],
+      },
     ],
     faq: [
       { q: 'What does 8A or 8B mean?', a: 'The number is the position on the wheel and the letter is the mode: A for minor, B for major. 8A is A minor and 8B is C major. They share a number because they use the same seven notes.' },
