@@ -783,7 +783,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is this a legally binding signature?',
-        a: 'It adds an image of your signature to the document, the same as printing, signing and scanning. In most countries that is an accepted electronic signature for everyday documents such as leases, consent forms and contracts between people who trust each other. It is not a cryptographic digital certificate; if a counterparty requires one, they will usually say so.',
+        a: 'It adds an image of your signature to the document, the same as printing, signing and scanning. Whether a signature like this is accepted depends on who asked you to sign and the rules where you are, so check with them. It is not a cryptographic digital certificate; if a counterparty requires one, they will usually say so.',
       },
       {
         q: 'Is my document or signature stored anywhere?',

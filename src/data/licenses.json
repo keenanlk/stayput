@@ -1889,15 +1889,16 @@
    "npm": null,
    "licences": [
     {
-     "name": "Apache-2.0",
-     "url": "https://spdx.org/licenses/Apache-2.0.html"
+     "name": "OFL-1.1",
+     "url": "https://spdx.org/licenses/OFL-1.1.html"
     }
    ],
-   "project": "https://github.com/googlefonts/roboto",
+   "project": "https://github.com/googlefonts/roboto-classic",
    "source": "https://github.com/bpampuch/pdfmake/tree/0.3.11",
-   "shipped": "Bundled into the site JavaScript (EPUB to PDF)",
+   "shipped": "Bundled into the site JavaScript (EPUB to PDF); version 3.014 (licence at /fonts/OFL-Roboto.txt)",
    "kind": "font",
-   "via": "pdfmake"
+   "via": "pdfmake",
+   "copyright": "Copyright 2011 The Roboto Project Authors"
   },
   {
    "id": "umami",

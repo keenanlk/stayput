@@ -3023,12 +3023,12 @@ export const presets: Preset[] = [
       'A chorus for your ringtone, ten seconds of a song for a video, a talk without the silence at the start: an MP3 cutter keeps just the part you want.',
       'Drop the file, play it or click the waveform to find the moment, and press Set start and Set end. A short fade out is on so the cut does not end abruptly. Other formats work too: WAV, M4A, OGG, FLAC, or a video.',
       'The song is cut in your browser. Nothing is uploaded, and there are no ads between you and the download.',
-      'To make a ringtone, play the song and press Set start just before the part you want, usually the start of the chorus. Then press Set end 20 to 30 seconds later; for an iPhone, stay under 40 seconds. The line under the controls shows how long the cut is. You can also type exact times in seconds, to a tenth: one minute and five seconds is 65. Tick Fade in at the start as well if the cut begins mid note, and each fade lasts 1.5 seconds.',
+      'To make a ringtone, play the song and press Set start just before the part you want, usually the start of the chorus. Then press Set end 20 to 30 seconds later; for an iPhone, stay under 30 seconds. The line under the controls shows how long the cut is. You can also type exact times in seconds, to a tenth: one minute and five seconds is 65. Tick Fade in at the start as well if the cut begins mid note, and each fade lasts 1.5 seconds.',
       'The cut is saved as an MP3 at 192 kbps, whatever the original bitrate was, and its name ends in -trimmed. If you plan to edit the clip again, choose WAV under Save as so it is not encoded twice. The page keeps one continuous part of one file. To remove something from the middle, cut the part before it and the part after it, then join the two with Merge MP3.',
     ],
     steps: ['Drop an MP3.', 'Set the start and end on the waveform.', 'Press Trim audio and save the MP3.'],
     faq: [
-      { q: 'How do I use the cut as a ringtone?', a: 'On Android, copy the MP3 to your phone and pick it in Settings, Sound, Phone ringtone. On iPhone, ringtones are 40 seconds at most and must be added through GarageBand or the Music app on a computer.' },
+      { q: 'How do I use the cut as a ringtone?', a: 'On Android, copy the MP3 to your phone and pick it in Settings, Sound, Phone ringtone. On iPhone, ringtones are 30 seconds at most and are made in GarageBand.' },
       { q: 'Can I cut several MP3 files at once?', a: 'No. The cutter works on one file at a time, because each one needs its own start and end on the waveform. Cut the first, download it, then drop the next file in its place. If you only want to shorten a batch to a size limit rather than choose a part, Compress MP3 handles many files at once.' },
       { q: 'Does cutting an MP3 lower its quality?', a: 'Slightly, because the kept part is decoded and encoded again as MP3 at 192 kbps. For a ringtone or a clip in a video you will not hear it. From a 320 kbps original, or when the clip will be edited further, choose WAV, which keeps the decoded sound exactly and is about 10 MB a minute.' },
       noUpload,
@@ -3185,7 +3185,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Why does the M4A option not work in Firefox?', a: 'Browsers borrow the operating system\'s AAC encoder to write M4A, and Firefox, like Chrome on Linux, does not have one it can use. Open the page in Safari, or in Chrome or Edge on Windows or Mac. If the file is only going to an iPhone, you can also skip the conversion: iPhones play the MP3 as it is.' },
       { q: 'Is M4A better than MP3?', a: 'A file made from an original recording sounds a little better as AAC than as MP3 at the same size. A file made from an MP3 keeps the MP3’s quality, never more.' },
-      { q: 'Can I make an iPhone ringtone from the M4A?', a: 'Yes, with one more step. iPhone ringtones are AAC files with an .m4r name and 40 seconds at most. Cut the part you want first with the MP3 cutter, convert it here, then import the M4A into GarageBand on the iPhone and export it as a ringtone, or rename it to .m4r and add it through Finder or iTunes.' },
+      { q: 'Can I make an iPhone ringtone from the M4A?', a: 'Yes, with one more step. iPhone ringtones are 30 seconds at most. Cut the part you want first with the MP3 cutter, convert it here, then import the M4A into GarageBand on the iPhone and export it as a ringtone.' },
       { q: 'Are the song title, artist and cover art kept?', a: 'No. The M4A is a new file written from the decoded sound, so the tags from the MP3 are not copied across. If you are adding the files to the Music app, you can type the title and artist and paste cover art in the song\'s info window after importing.' },
       noUpload,
     ],
