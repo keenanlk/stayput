@@ -13,11 +13,11 @@ export interface Engine {
 export const engines: Record<string, Engine> = {
   'heic-to-jpg': {
     how: 'The page loads libheif, the same open-source HEIC decoder used by Linux desktops, compiled to WebAssembly. It decodes each photo to raw pixels inside your tab, and the browser’s own image encoder writes the JPG or PNG. The decoder is a program file downloaded once from this site and cached; your photos are never part of any request.',
-    versus: 'Upload-based HEIC converters send every photo, location data included, to a server you have never heard of, then cap you at a handful per day. Here a hundred photos convert in the time the first one would take to upload.',
+    versus: 'Upload-based HEIC converters send every photo, location data included, to a server you have never heard of, then cap you at a handful per day. Here the photos never leave your device, so there is no upload to wait for.',
   },
   'convert-image': {
     how: 'Stayput first reads the opening bytes of each file, where every image format writes its signature, so it knows what the file really is whatever it is called. Your browser decodes JPG, PNG, WebP, GIF, BMP, AVIF and SVG itself; TIFF goes through UTIF.js, HEIC through the libheif WebAssembly decoder, and JPEG XL (or AVIF, in a browser without native support) through the Squoosh decoders, all served from this site and cached. The browser re-encodes JPG, PNG and WebP; PDF, ICO, GIF, BMP and TIFF files are written by small encoders in the page. Nothing here needs a server.',
-    versus: 'Online converters upload your image, convert it on their machine, keep it for hours and cap you at a few files a day. This does the same conversion on your device, for as many files as you like, in less time than the upload.',
+    versus: 'Online converters upload your image, convert it on their machine, keep it for hours and cap you at a few files a day. This does the same conversion on your device, for as many files as your device’s memory can hold, with no upload to wait for.',
   },
   'compress-image': {
     how: 'Resizing uses stepped downscaling on a canvas so text and edges stay sharp, and the browser encodes the result at the quality you choose. Everything happens in memory in your tab. Large batches are processed one image at a time so the page stays responsive on a phone.',
@@ -40,7 +40,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Online splitters make you upload the whole document to extract two pages from it. Here the document stays on your disk and only the pages you asked for are written out.',
   },
   'compress-pdf': {
-    how: 'Lossless cleanup rewrites the PDF with pdf-lib using object streams and deduplicated resources. Image recompression uses pdf.js to find embedded images, re-encodes each one at a lower quality on a canvas, and pdf-lib swaps the new streams in. Flatten renders every page to an image at the resolution you pick. Each mode runs entirely in your browser.',
+    how: 'Lossless cleanup rewrites the PDF with pdf-lib using compressed object streams. Image recompression uses pdf.js to find embedded images, re-encodes each one at a lower quality on a canvas, and pdf-lib swaps the new streams in. Flatten renders every page to an image at the resolution you pick. Each mode runs entirely in your browser.',
     versus: 'PDF compressors online are the most upload-hungry tools there are, because the whole document has to go up before anything happens. Here a 50 MB scan is processed without a single byte leaving your machine.',
   },
   'rotate-pdf': {
@@ -48,7 +48,7 @@ export const engines: Record<string, Engine> = {
     versus: 'A sideways scan should take one click to fix, not an upload, a wait and a download page. The rotation here is instant because there is no round trip.',
   },
   'unlock-pdf': {
-    how: 'qpdf, the open-source PDF transformation tool, compiled to WebAssembly, is served by this site and loaded into the tab when you run the tool. It checks your password and rewrites each PDF without its encryption, copying every page, font and image as they are. The password is used in memory and dropped when you close the tab.',
+    how: 'qpdf, the open-source PDF transformation tool, compiled to WebAssembly, is served by this site and loaded into the tab the first time a protected PDF is dropped. It checks your password and rewrites each PDF without its encryption, copying every page, font and image as they are. The password is used in memory and dropped when you close the tab.',
     versus: 'Online unlockers ask for the file and its password together, which is everything someone would need to read it. Here neither leaves your device.',
   },
   'protect-pdf': {
@@ -101,7 +101,7 @@ export const engines: Record<string, Engine> = {
   },
   'video-to-mp3': {
     how: 'Your browser decodes the sound track with the same audio decoders it uses to play media on any website (AAC for MP4, MOV and M4A; Opus or Vorbis for WebM; FLAC, WAV and MP3). The samples are resampled to 44.1 kHz and handed to LAME, the reference MP3 encoder, compiled to WebAssembly and served by this site. WAV files are written directly by a few lines of code in the page. Everything happens in memory in your tab.',
-    versus: 'Online converters upload the whole video just to keep its sound, cap free files at a few hundred megabytes, and make you wait in a queue. Home videos, lectures and voice memos are personal. Here the file never leaves your device, so a 2 GB video converts as fast as your computer can read it.',
+    versus: 'Online converters upload the whole video just to keep its sound, cap free files at a few hundred megabytes, and make you wait in a queue. Home videos, lectures and voice memos are personal. Here the file never leaves your device, so a 1 GB video converts as fast as your computer can read it, and files must be under 2 GB.',
   },
   'trim-video': {
     how: 'Your browser plays the video from the file on your device so you can pick the start and end. Mediabunny (MPL-2.0) then reads the MP4, MOV, WebM or MKV container in your tab and copies the packets between those two points into a new file of the same type, starting from the nearest key frame within half a second. When there is none that close, or when you ask for an exact cut, the clip is decoded and re-encoded by your browser’s own video encoder (WebCodecs).',

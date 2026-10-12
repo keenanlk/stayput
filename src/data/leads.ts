@@ -178,6 +178,7 @@ export const defaultSizeBadge = 'No watermark · limit is your device’s memory
 
 /** Tools with no file to size-limit; their fact says what is true of them instead. */
 const facts: Record<string, string> = {
+  'video-to-mp3': 'The only size limit is your device’s memory, and a single file must be under 2 GB; after your first run the page works offline.',
   'qr-code-scanner': 'Your browser asks for camera permission only if you press the camera button, and after one visit the page works offline.',
   'qr-code-generator': 'The codes are static, so they never expire, and after one visit the page works offline.',
   'barcode-generator': 'The barcodes are drawn on this page, and after one visit the page works offline.',
@@ -206,7 +207,7 @@ const free: Record<string, string> = {
   'voice-recorder': freeLine('your recordings are'),
 };
 const freeFiles = freeLine('your files are');
-const memory = 'The only size limit is your device’s memory, and after one visit the page works offline.';
+const memory = 'The only size limit is your device’s memory; give the page a short while after one visit to save itself for offline use, and then it works offline.';
 
 /** The opening of a description: its first sentence, plus the next when that is short or a question, unless the next is a "no upload, no size caps" slogan. */
 function opening(text: string): string {

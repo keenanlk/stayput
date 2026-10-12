@@ -33,7 +33,7 @@ export interface Preset {
   lead?: string;
 }
 
-const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. After one visit you can turn off Wi-Fi and it still works.' };
+const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. Give the page a short while after one visit to save itself for offline use; then you can turn off Wi-Fi and it still works.' };
 
 /** FAQ entry on the pages whose lead says no account and no watermark; no tool behind them draws a mark on its output. */
 const noAccount = { q: 'Do I need an account, and is there a watermark?', a: 'No account and no sign-up: open the page and drop a file. Nothing is added to your file, so there is no watermark or logo. It is free, and your files are not uploaded.' };
@@ -3256,6 +3256,7 @@ export const presets: Preset[] = [
     slug: 'confidential-watermark',
     base: 'watermark-pdf',
     name: 'Confidential watermark',
+    sizeFact: 'The only limit is your device’s memory',
     title: 'Add CONFIDENTIAL Watermark to PDF, No Upload | Stayput',
     description: 'Stamp CONFIDENTIAL diagonally across every page of a PDF, in red or any colour, in your browser. The document is never uploaded.',
     heading: 'Mark a PDF as confidential',
@@ -3286,6 +3287,7 @@ export const presets: Preset[] = [
     slug: 'watermark-id-copy',
     base: 'watermark-image',
     name: 'Watermark an ID copy',
+    sizeFact: 'The only limit is your device’s memory',
     title: 'Watermark a Copy of Your ID or Passport, No Upload | Stayput',
     description: 'Cover a photo or scan of your passport, driving licence or ID card with a repeated watermark saying who it is for, before you send it. Nothing is uploaded.',
     heading: 'Watermark a copy of your ID',
@@ -3757,7 +3759,7 @@ export const presets: Preset[] = [
       { q: 'What happens if my 12th digit is wrong?', a: 'The page does not draw the barcode. It shows the digit that the first eleven call for, so you can see whether you mistyped a digit or copied a number that was wrong to begin with.' },
       { q: 'What is the difference between UPC-A and UPC-E?', a: 'UPC-E is a short, 8-digit version for small packages. It is made by dropping zeros from certain UPC-A numbers, so not every UPC-A number has a short form. This page makes UPC-A; the [barcode generator](/tools/barcode-generator) can also draw UPC-E.' },
       { q: 'Do UPC barcodes work outside North America?', a: 'Yes. Most retail scanners in other countries read UPC-A as an EAN-13 with a leading 0. Some marketplaces still ask for the 13-digit form in their listing forms, so check what yours expects.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3804,7 +3806,7 @@ export const presets: Preset[] = [
       { q: 'Why is my barcode so wide?', a: 'Every character takes the same room, so a long text makes a long barcode. Digits in a run are packed in pairs and take half as much room. Shorten the text, use a smaller bar width, or put the long part in a lookup instead of the barcode.' },
       { q: 'Does case matter?', a: 'Yes. Code 128 keeps capitals and lowercase letters as typed, so a scanner that reads order-a1 reports order-a1, not ORDER-A1. Code 39 is capitals only.' },
       { q: 'Will my scanner read it?', a: 'Code 128 is one of the most widely supported types, and most barcode scanners and scanner apps read it. A very old or specialised scanner may have it switched off, in which case its settings or manual list the types it reads.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3850,7 +3852,7 @@ export const presets: Preset[] = [
       { q: 'Why does my scanner show an extra character at the end?', a: 'If Add check character is ticked, the last character is the check character, and a scanner that is not set to verify it passes it on with the text. Leave the box unticked if the receiving system does not use it.' },
       { q: 'Can I use lowercase letters?', a: 'Not as lowercase. Code 39 has only capitals, so the page turns them into capitals and shows you the result. Use [Code 128](/code-128-barcode-generator) if case has to survive.' },
       { q: 'Should I choose Code 39 or Code 128?', a: 'Choose Code 128 unless a customer, a form or an older system names Code 39. Code 128 holds more characters and makes a shorter barcode.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3902,7 +3904,7 @@ export const presets: Preset[] = [
       { q: 'Why did the digits change from my ISBN-10?', a: 'The 13-digit ISBN is the ISBN-10 with 978 in front and a new last digit. ISBNs have had 13 digits since 1 January 2007, so a book published before that may show only the 10-digit form.' },
       { q: 'Does the barcode contain the price?', a: 'No. The main barcode holds the ISBN only. Prices, where they are printed in bars at all, go in a separate 5-digit add-on that this page does not draw.' },
       { q: 'The page says my number is not an ISBN. What is wrong?', a: 'ISBN-13s start with 978 or 979, and an ISBN-10 has 10 characters (digits, and X as the last one). A 13-digit number that starts differently is an ordinary product number; use the [EAN-13 barcode generator](/ean-13-barcode-generator) for it.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3948,7 +3950,7 @@ export const presets: Preset[] = [
       { q: 'Does a case need its own number?', a: 'A case is a different trade item from the units inside it, so it normally gets its own GTIN-14, made from the item’s number as shown above. Your GS1 member service or your customer’s guide has the rules for your products.' },
       { q: 'What are bearer bars?', a: 'The thick frame around the barcode. GS1’s guidance for ITF-14 asks for it, because a carton barcode without one risks being misread. This page draws a full frame while the box is ticked, and it is ticked by default. On the printed label GS1 asks for a frame 4.8 mm thick; a PNG or SVG has no fixed physical size, so download the SVG and set its size when you print so the frame comes out at 4.8 mm.' },
       { q: 'Why does the page refuse a number with 12 digits?', a: 'An ITF-14 needs 13 digits plus the check digit. A 12-digit UPC-A needs a 0 in front, and then the packaging indicator digit, before it makes a carton number.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -3995,7 +3997,7 @@ export const presets: Preset[] = [
       { q: 'What is the difference between EAN-13 and UPC-A?', a: 'They are one system at two lengths. EAN-13 has 13 digits and UPC-A has 12, and a UPC-A number becomes an EAN-13 when a 0 is put in front. Listings and scanners outside North America usually expect the 13-digit form.' },
       { q: 'Why does the page reject my 13-digit number?', a: 'The last digit is a check digit, and for your number it does not fit the other twelve. The page shows the digit it should be. That usually means one digit was mistyped or the number was copied wrongly from a spreadsheet.' },
       { q: 'Can it draw the small add-on barcode beside a magazine or book?', a: 'No. That extra bar pattern (an EAN-2 or EAN-5 add-on) is a separate symbol, and this page draws the main EAN-13 only.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -4358,7 +4360,7 @@ export const presets: Preset[] = [
     dropLabel: 'Drop a wide photo to split',
     defaults: { layout: '3x1', shape: 'portrait' },
     intro: [
-      'A seamless carousel is one wide image cut into slides, so each swipe continues the picture. Instagram carousels are 4:5 or square, so a panorama is trimmed to fit the slides exactly, and the preview shows how much of the top and bottom goes.',
+      'A seamless carousel is one wide image cut into slides, so each swipe continues the picture. Instagram carousels take 4:5 and square slides, so a panorama is trimmed to fit the slides exactly, and the preview shows how much of the sides or of the top and bottom goes. Choose Keep the picture’s shape to cut it without trimming.',
       'The photo is cut in your browser and never uploaded. Each slide is a full-resolution piece of it, numbered in the order to add them to the post.',
       'The slide size comes from the photo’s height. With 4:5 slides each one is four fifths as wide as the photo is tall, so a panorama 2000 px tall gives slides of 1600 × 2000, and the width decides how many fit. Instagram shows posts about 1080 px wide, so a photo at least 1350 px tall keeps every slide sharp. If your panorama needs more than three slides, type a number into Columns (up to 10) and keep Rows at 1.',
       'Leave Number the tiles on Left to right. That numbers the slides 1, 2, 3 from the left edge, which is the order they go into the post. In posting order is for a profile grid and numbers them backwards. When you add the slides, keep Instagram’s crop on the 4:5 or square shape you chose here, or the app trims each slide again and the joins stop lining up.',
@@ -4875,7 +4877,7 @@ export const presets: Preset[] = [
     heading: 'Auto caption a video',
     tagline: 'Large, readable captions written from what is said and burned into the picture, for videos watched with the sound off.',
     keywords: ['auto caption video', 'automatic captions', 'auto subtitles', 'caption generator', 'add captions to reels', 'tiktok captions', 'captions for shorts'],
-    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv',
+    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,.srt,.vtt',
     dropLabel: 'Drop a video to caption',
     action: 'Caption video',
     defaults: { size: 'large' },
@@ -4915,7 +4917,7 @@ export const presets: Preset[] = [
     defaults: { look: 'box' },
     intro: [
       'A separate subtitle file only works where the player looks for it. Messaging apps, most social platforms and many TVs play the video alone, so the subtitles vanish. Burning them in, also called hardcoding or open captions, draws the words into the picture itself. This page takes the SRT or VTT file you already have, from a translator, a subtitle site or Video to subtitles, and burns it into the video.',
-      'A worked example: a 3-minute interview.mp4 in 1920×1080 and the Spanish translation interview.es.srt from your translator. Drop both files together. The SRT is read as it is, with no speech model and no download. White on a dark band is already chosen, which keeps text readable over any footage, and on a 1080p video Medium sets the text at about 70 pixels. Each caption is wrapped to fit the frame, at most two lines, and appears exactly on its timing. You get interview-subtitled.mp4 with the sound unchanged.',
+      'A worked example: a 3-minute interview.mp4 in 1920×1080 and the Spanish translation interview.es.srt from your translator. Drop both files together. The SRT is read as it is, with no speech model and no download. White on a dark band is already chosen, which keeps text readable over any footage, and on a 1080p video Medium sets the text at about 70 pixels. Each caption is wrapped to fit the frame, at most two lines, and appears exactly on its timing. You get interview-subtitled.mp4 with the sound carried across.',
       'The timing comes straight from the file. If the subtitles run early or late, the SRT was made for a different cut of the video; burning in cannot fix that, so correct the times in a subtitle editor first. Styling written into the file, such as italics or colour tags, is dropped so every caption uses the look you chose.',
     ],
     steps: [
@@ -4973,6 +4975,8 @@ export const presets: Preset[] = [
     keywords: ['acapella extractor', 'isolate vocals', 'extract vocals from song', 'vocal isolator', 'get acapella from song', 'separate vocals from music'],
     accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.webm,.mp4,.mov,.m4v,.mkv',
     dropLabel: 'Drop songs to take the vocals from',
+    lead:
+      'Isolate the vocals of a song as an acapella for remixes, samples, transcribing lyrics or learning harmonies. It is free, and your files are not uploaded: everything runs in your browser on your device. The first run downloads the separation model (about 67 MB) to your browser, and after that the tool works offline; choosing MP3 output fetches a small encoder the first time you use it.',
     action: 'Extract vocals',
     defaults: { stems: 'vocals', format: 'wav' },
     intro: [
@@ -5048,7 +5052,7 @@ export const presets: Preset[] = [
       'Press Make green screen, then key out the colour in your editor.',
     ],
     faq: [
-      { q: 'Why not just a transparent video?', a: 'MP4, the format every editor and phone reads, cannot hold transparency. A flat key colour does the same job in one click in any editor, and plays everywhere as it is.' },
+      { q: 'Why not just a transparent video?', a: 'MP4 with H.264, the format every editor and phone reads, cannot hold transparency. A flat key colour does the same job in one click in any editor, and plays everywhere as it is.' },
       { q: 'Which green should I use?', a: 'Chroma green, #00B140, is the standard broadcast key colour and the default here. Use blue if the person or their clothes are green.' },
       { q: 'Will hair look natural after keying?', a: 'Short and tidy hair keys well. Loose strands and flyaway hair are simplified by the model into a smooth outline, which looks fine at normal viewing size but not in extreme close-ups.' },
       { q: 'Is my video uploaded?', a: 'No. The frames are redrawn and encoded in this tab, on your device.' },
@@ -5717,7 +5721,7 @@ export const presets: Preset[] = [
       { q: 'Can I use letters with accents?', a: 'Yes for the Latin alphabet with accents, such as é, ñ, ü, ç and ã. Letters from Polish, Czech or Vietnamese and other alphabets are not in these fonts, and the page shows a note when your name has one.' },
       { q: 'Can I choose a different colour?', a: 'Yes: black, blue or brown. The PNG has a transparent background, so the colour is the ink only.' },
       { q: 'Will a form accept a typed signature?', a: 'That depends on the form. This page makes an image of your name in a script style; whether a form, employer or office accepts that is their rule, and some want a signature made in their own system or a certificate-based digital signature, which this page does not make.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -5774,7 +5778,7 @@ export const presets: Preset[] = [
       { q: 'Why are parts of my signature missing?', a: 'The ink is too pale or too thin at that point for the current Ink strength. Raise it a little at a time. A darker pen on a second photo gives the best result.' },
       { q: 'Does it work on a scan or a screenshot?', a: 'Yes. A flat scan on white is the easiest case. A screenshot of a signature on a coloured page works if the signature is clearly darker than its background.' },
       { q: 'Why a PNG and not a JPG?', a: 'A JPG cannot be transparent, so it keeps a white box around the signature. A PNG keeps the see-through background, which is what lets the signature sit on a document, slide or PDF.' },
-      { q: 'Is my photo uploaded anywhere?', a: 'No. The photo is opened and processed by code running in this page, so it stays on your device and is not kept when you close the page. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is my photo uploaded anywhere?', a: 'No. The photo is opened and processed by code running in this page, so it stays on your device and is not kept when you close the page. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
   {
@@ -5822,7 +5826,7 @@ export const presets: Preset[] = [
       { q: 'Does this make handwriting practice sheets?', a: 'No. It makes a signature image from the name you type. For your own hand, use Draw on the [signature maker](/tools/signature-maker).' },
       { q: 'Which style is the most cursive?', a: 'Formal script, which joins every letter and is the one this page starts with. Flowing is joined too and has a looser baseline. Handwriting keeps some letters apart.' },
       { q: 'Can I save it with a transparent background?', a: 'Yes. The PNG has a transparent background, so it can sit on a document, certificate or slide without a white box.' },
-      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After one visit you can turn off your internet connection and it still works.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.' },
     ],
   },
 ];

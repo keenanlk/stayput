@@ -224,7 +224,7 @@ export const guides: Guide[] = [
     heading: 'How to open HEIC files on Windows',
     dek: 'Why iPhone photos will not open, the three fixes, and the fastest free way to convert a whole batch to JPG.',
     keywords: ['open heic files windows', 'heic to jpg windows', 'how to open heic on windows 11', 'windows cannot open heic', 'heic viewer windows', 'convert heic to jpg windows 10'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['heic-to-jpg', 'heic-to-png', 'heic-to-pdf'],
     sections: [
       {
@@ -237,7 +237,7 @@ export const guides: Guide[] = [
         h: 'Fix 1: convert them to JPG in your browser',
         p: [
           'If what you actually want is to use the photos, attach them or send them, converting is the direct answer. Open the [HEIC to JPG converter](/tools/heic-to-jpg) in Edge, Chrome or Firefox, drop the whole folder of photos, and download them as JPGs or as one zip. The decoder (libheif, the same open-source library Linux desktops use) runs inside the browser tab, so the photos are not uploaded and there is no cap on how many you convert beyond your device’s memory. Choose PNG on the [HEIC to PNG page](/heic-to-png) for a lossless copy, or [HEIC to PDF](/heic-to-pdf) for photographed documents.',
-          'The conversion drops the location and camera metadata unless you tick "Keep EXIF metadata", which is worth knowing before you upload the results anywhere.',
+          'The conversion drops the location and camera metadata unless you choose JPG and tick "Keep EXIF metadata", which is worth knowing before you upload the results anywhere.',
         ],
       },
       {
