@@ -1021,7 +1021,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is anything uploaded?',
-        a: 'No. Each image is decoded and redrawn on a canvas inside your browser tab, then saved from there. After one visit you can turn off Wi-Fi and it still works.',
+        a: 'No. Each image is decoded and redrawn on a canvas inside your browser tab, then saved from there. After your first visit and a short wait you can turn off Wi-Fi and it still works.',
       },
     ],
   },
@@ -1179,7 +1179,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser plays the video from the file on your device, Stayput copies the frames you asked for onto a canvas, and a small GIF encoder in the page writes the file. There is no server in the process; after one visit you can turn off Wi-Fi and it still works.',
+        a: 'No. Your browser plays the video from the file on your device, Stayput copies the frames you asked for onto a canvas, and a small GIF encoder in the page writes the file. There is no server in the process; after your first visit and a short wait you can turn off Wi-Fi and it still works.',
       },
       {
         q: 'How long can the GIF be?',
@@ -1815,7 +1815,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my Wi-Fi password sent anywhere?',
-        a: 'No. The code is built by code in this page from what you type, and what you type is never uploaded. After one visit you can turn off your internet connection and it still works.',
+        a: 'No. The code is built by code in this page from what you type, and what you type is never uploaded. After your first visit and a short wait you can turn off your internet connection and it still works.',
       },
       {
         q: 'Do you track who scans my code?',
@@ -1903,7 +1903,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is what I type uploaded anywhere?',
-        a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.',
+        a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After your first visit and a short wait you can turn off your internet connection and it still works.',
       },
     ],
   },
@@ -3303,7 +3303,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'What kind of video works best?',
-        a: 'One or two people, facing the camera, lit from the front: video calls, talking-head clips, presentations, dance videos. The person finder is built for people, so pets and objects are treated as background, and fine hair or fast hand movements can blur at the edge.',
+        a: 'One or two people, facing the camera, lit from the front: video calls, talking-head clips, presentations, dance videos. The person finder is built for people, so pets and objects are treated as background, and fine hair or fast hand movements can blur at the edge. The Fast option is rougher still around hair and in dim light, where it can lose the person altogether, so keep the default for those.',
       },
       {
         q: 'Can I get a transparent background?',
@@ -3315,7 +3315,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'Every frame is examined and encoded again, so it depends on the length and resolution of the video and on your device. Keep the tab open while it works; the progress bar shows how far it has got.',
+        a: 'Slower than the video plays, because every frame is examined and redrawn on your device. On a MacBook Pro with an M3 Max chip a 10-second 30 fps clip took about a minute, about 6 times its length, so a 10-minute clip would take about an hour (we timed 10 seconds, not 10 minutes). The Fast option is the quicker one: the same clip took about 13 seconds at 720p, and 14 to 22 seconds at 1080p, but its edges are rougher around hair and in dim light. Phones vary and we have not benchmarked one: a single run on an iPhone in Safari took roughly 5 to 10 minutes for a 2-minute video with the default finder, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
       },
       {
         q: 'Why does the browser console mention a Google address?',

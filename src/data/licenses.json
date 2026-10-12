@@ -1833,7 +1833,7 @@
   },
   {
    "id": "m-selfie",
-   "name": "Selfie multiclass segmenter (video background remover)",
+   "name": "Selfie multiclass segmenter (video background remover, Better edges option)",
    "version": "256x256 float32, \"latest\" as downloaded",
    "npm": null,
    "licences": [
@@ -1847,6 +1847,40 @@
    "shipped": "/models/selfie_multiclass_256x256.tflite",
    "kind": "model",
    "note": "Licence from the MediaPipe multiclass segmentation model card."
+  },
+  {
+   "id": "m-selfie-binary",
+   "name": "Selfie segmenter (video background remover)",
+   "version": "256x256 float16, \"latest\" as downloaded",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter",
+   "source": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
+   "shipped": "/models/selfie_segmenter.tflite",
+   "kind": "model",
+   "note": "Licence from the MediaPipe selfie segmentation model card. Used for portrait and square video."
+  },
+  {
+   "id": "m-selfie-binary-landscape",
+   "name": "Selfie segmenter, landscape (video background remover)",
+   "version": "144x256 float16, \"latest\" as downloaded",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter",
+   "source": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter_landscape/float16/latest/selfie_segmenter_landscape.tflite",
+   "shipped": "/models/selfie_segmenter_landscape.tflite",
+   "kind": "model",
+   "note": "Licence from the MediaPipe selfie segmentation model card. Used for wide video."
   },
   {
    "id": "f-archivo",

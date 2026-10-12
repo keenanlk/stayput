@@ -80,8 +80,8 @@
   "hash": "39839c75e6d5530e"
  },
  "/blur-video-background": {
-  "date": "2026-10-11",
-  "hash": "9534791600562e9d"
+  "date": "2026-10-12",
+  "hash": "5e57d0dccb5d078c"
  },
  "/bmp-to-jpg": {
   "date": "2026-10-12",
@@ -105,11 +105,11 @@
  },
  "/code-128-barcode-generator": {
   "date": "2026-10-12",
-  "hash": "ee6becbc7f9bce54"
+  "hash": "61b06497d3a1a08f"
  },
  "/code-39-barcode-generator": {
   "date": "2026-10-12",
-  "hash": "b04a8892fd449634"
+  "hash": "2f23c682b861aa3d"
  },
  "/color-palette-from-image": {
   "date": "2026-10-12",
@@ -225,7 +225,7 @@
  },
  "/cursive-signature-generator": {
   "date": "2026-10-12",
-  "hash": "402fa6765a4d912e"
+  "hash": "4ba09f10f5dc1763"
  },
  "/cut-video": {
   "date": "2026-10-12",
@@ -249,7 +249,7 @@
  },
  "/ean-13-barcode-generator": {
   "date": "2026-10-12",
-  "hash": "f50701f11f30548d"
+  "hash": "927bc547fbbcc995"
  },
  "/email-qr-code": {
   "date": "2026-10-11",
@@ -317,7 +317,7 @@
  },
  "/green-screen-video": {
   "date": "2026-10-12",
-  "hash": "4bb595cf4a1ec02a"
+  "hash": "eb7cf494a8eba91a"
  },
  "/guides": {
   "date": "2026-10-12",
@@ -680,8 +680,8 @@
   "hash": "f3003a488e767429"
  },
  "/guides/open-heic-files-on-windows": {
-  "date": "2026-09-25",
-  "hash": "0dbd6666822c3ce8"
+  "date": "2026-10-12",
+  "hash": "db4a5fbf5804d798"
  },
  "/guides/otter-ai-alternative": {
   "date": "2026-10-08",
@@ -765,7 +765,7 @@
  },
  "/heif-to-jpg": {
   "date": "2026-10-12",
-  "hash": "2665797e0fbf8a3e"
+  "hash": "800c9d69ac3583a7"
  },
  "/hex-color-from-image": {
   "date": "2026-10-12",
@@ -805,11 +805,11 @@
  },
  "/isbn-barcode-generator": {
   "date": "2026-10-12",
-  "hash": "4d5720900ccc3c44"
+  "hash": "91f419672ec53544"
  },
  "/itf-14-barcode-generator": {
   "date": "2026-10-12",
-  "hash": "a60aacb386e93bfc"
+  "hash": "cd85a80d7df928a3"
  },
  "/jfif-to-jpg": {
   "date": "2026-10-12",
@@ -869,7 +869,7 @@
  },
  "/licenses": {
   "date": "2026-10-12",
-  "hash": "28836d4ffb093050"
+  "hash": "b4caea4ed004872f"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-12",
@@ -1205,7 +1205,7 @@
  },
  "/signature-generator": {
   "date": "2026-10-12",
-  "hash": "ef0d1f6e32abc51f"
+  "hash": "95241fff93f95ab5"
  },
  "/slack-emoji-resizer": {
   "date": "2026-10-11",
@@ -1293,7 +1293,7 @@
  },
  "/tools/barcode-generator": {
   "date": "2026-10-12",
-  "hash": "50edeacca604842b"
+  "hash": "096bcdb031f6c37c"
  },
  "/tools/black-and-white-image": {
   "date": "2026-10-12",
@@ -1500,8 +1500,8 @@
   "hash": "3f8c7a0883701b4e"
  },
  "/tools/qr-code-generator": {
-  "date": "2026-10-07",
-  "hash": "5f79d89a25afec74"
+  "date": "2026-10-12",
+  "hash": "90211993c816d5c6"
  },
  "/tools/qr-code-scanner": {
   "date": "2026-10-12",
@@ -1553,7 +1553,7 @@
  },
  "/tools/rotate-image": {
   "date": "2026-10-12",
-  "hash": "b98fa3d390583515"
+  "hash": "8e4a163dddad0b81"
  },
  "/tools/rotate-pdf": {
   "date": "2026-10-12",
@@ -1616,8 +1616,8 @@
   "hash": "4c44631a21480efa"
  },
  "/tools/video-background-remover": {
-  "date": "2026-10-11",
-  "hash": "43516b59968bde8c"
+  "date": "2026-10-12",
+  "hash": "0db9aca59848c244"
  },
  "/tools/video-speed": {
   "date": "2026-10-12",
@@ -1625,7 +1625,7 @@
  },
  "/tools/video-to-gif": {
   "date": "2026-10-12",
-  "hash": "518a71dee74e31d2"
+  "hash": "fdda6d0670e365ff"
  },
  "/tools/video-to-jpg": {
   "date": "2026-10-12",
@@ -1665,7 +1665,7 @@
  },
  "/transparent-signature-png": {
   "date": "2026-10-12",
-  "hash": "480ec5d427b59dfe"
+  "hash": "b87b4cd0d6544b9a"
  },
  "/trim-mp4": {
   "date": "2026-10-12",
@@ -1685,7 +1685,7 @@
  },
  "/upc-barcode-generator": {
   "date": "2026-10-12",
-  "hash": "edf2b26f3f0351cc"
+  "hash": "88301a605b5d53d0"
  },
  "/vcard-qr-code-generator": {
   "date": "2026-10-06",

@@ -135,7 +135,11 @@ const downloads: Record<string, Download> = {
   'ocr-pdf': { what: 'text reader', size: '6 MB' },
   'transcribe': { what: 'speech model', size: '76 MB' },
   'vocal-remover': { what: 'separation model', size: '67 MB' },
-  'video-background-remover': { what: 'person finder', size: '28 MB' },
+  'video-background-remover': {
+    what: 'person finder',
+    size: '28 MB',
+    text: 'The first run downloads the person finder (about 28 MB, or about 12 MB with the Fast option) to your browser, and after that the tool works offline.',
+  },
   'blur-face-video': { what: 'face detector', size: '4 MB' },
   'add-subtitles-to-video': {
     what: 'speech model',

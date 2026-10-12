@@ -1,0 +1,97 @@
+--- a/src/lib/person-mask.ts
++++ b/src/lib/person-mask.ts
+@@ -45,7 +45,7 @@
+     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
+     const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
+     return ImageSegmenter.createFromOptions(fileset, {
+-      baseOptions: { modelAssetPath: MODEL, delegate: 'CPU' },
++      baseOptions: { modelAssetPath: ((window as any).__vbgModel ?? MODEL), delegate: ((window as any).__vbgDelegate ?? 'CPU') },
+       runningMode: 'VIDEO',
+       outputConfidenceMasks: true,
+       outputCategoryMask: false,
+@@ -84,7 +84,11 @@
+   async apply(ctx: CanvasRenderingContext2D, background: (ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement) => void) {
+     const seg = await load();
+     const { width, height } = ctx.canvas;
+-    const k = Math.min(1, WORK / Math.max(width, height));
++    const W: any = window;
++    if (W.__vbgSkip) return;
++    const k = Math.min(1, (W.__vbgWork ?? WORK) / Math.max(width, height));
++    const every: number = W.__vbgEvery ?? 1;
++    const reuse = every > 1 && this.frames % every !== 0 && !!this.prev;
+     const sw = Math.max(16, Math.round(width * k));
+     const sh = Math.max(16, Math.round(height * k));
+     if (this.small.width !== sw || this.small.height !== sh) {
+@@ -92,7 +96,12 @@
+       this.small.height = this.mask.height = sh;
+       this.prev = undefined;
+     }
++    const T: any = ((window as any).__vbg ??= { n: 0, down: 0, seg: 0, read: 0, post: 0, comp: 0, paint: 0 });
++    for (const k of ['n','down','seg','read','post','comp','bg']) T[k] ??= 0;
++    let t0 = performance.now();
++    if (!reuse) {
+     this.small.getContext('2d')!.drawImage(ctx.canvas, 0, 0, sw, sh);
++    T.down += performance.now() - t0; t0 = performance.now();
+     // Timestamps must only grow, across videos too; the frame's own time can repeat after a seek, so count instead.
+     clock += 33;
+     let result;
+@@ -103,11 +112,13 @@
+       drop();
+       throw new MemoryError();
+     }
++    T.seg += performance.now() - t0; t0 = performance.now();
+     const bg = result.confidenceMasks?.[0];
+     if (!bg) throw new Error('The person finder returned no mask.');
+     const conf = bg.getAsFloat32Array();
+     const mw = bg.width;
+     const mh = bg.height;
++    T.read += performance.now() - t0; t0 = performance.now();
+     const cur = new Float32Array(mw * mh);
+     for (let i = 0; i < cur.length; i++) cur[i] = 1 - conf[i]!;
+     result.close();
+@@ -130,6 +141,9 @@
+     this.frames++;
+     if (on / cur.length > 0.01) this.framesWithPerson++;
+ 
++    }
++    else this.frames++;
++    T.post += performance.now() - t0; t0 = performance.now();
+     if (this.person.width !== width || this.person.height !== height) {
+       this.person.width = width;
+       this.person.height = height;
+@@ -137,11 +151,16 @@
+     const p = this.person.getContext('2d')!;
+     p.globalCompositeOperation = 'copy';
+     p.drawImage(ctx.canvas, 0, 0);
++    const tb = performance.now();
+     background(ctx, this.person);
++    T.bg += performance.now() - tb;
+     p.globalCompositeOperation = 'destination-in';
+     p.imageSmoothingQuality = 'high';
+     p.drawImage(this.mask, 0, 0, width, height);
+     p.globalCompositeOperation = 'source-over';
+     ctx.drawImage(this.person, 0, 0);
++    T.comp += performance.now() - t0; T.n++;
++    T.first ??= performance.now();
++    T.last = performance.now();
+   }
+ }
+--- a/src/lib/video-edit.ts
++++ b/src/lib/video-edit.ts
+@@ -242,12 +242,16 @@
+           process:
+             paint && frame
+               ? async (sample) => {
++                  const td = performance.now();
+                   sample.draw(frame!, 0, 0, width, height);
++                  ((window as any).__vbg ??= {}).drawMs = (((window as any).__vbg.drawMs) || 0) + performance.now() - td;
+                   const at = sample.timestamp;
+                   // Let go of the decoded frame now, and give the browser a turn between frames: without
+                   // it the frames pile up faster than they are freed (about 10 MB per second of 1080p video in Safari).
+                   sample.close();
++                  const tp = performance.now();
+                   await paint(frame!, at);
++                  ((window as any).__vbg ??= {}).paintMs = (((window as any).__vbg.paintMs) || 0) + performance.now() - tp;
+                   await new Promise((r) => setTimeout(r, 0));
+                   return frame!.canvas;
+                 }
