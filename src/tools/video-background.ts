@@ -17,6 +17,7 @@ type Kind = 'blur' | 'color' | 'image';
 const isImage = (f: File) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|avif|gif|bmp)$/i.test(f.name);
 
 const kind = () => radio('bg', 'blur') as Kind;
+const finder = () => radio('finder', 'edges') as 'fast' | 'edges';
 const sync = () => {
   document.getElementById('strength-field')!.hidden = kind() !== 'blur';
   document.getElementById('color-field')!.hidden = kind() !== 'color';
@@ -77,15 +78,18 @@ createShell({
     progress.set('Checking this browser can write the video…', 0);
     if (!hasVideoEncoder()) throw new EncoderUnavailable();
     await requireH264Encoder();
-    progress.set('Loading the person finder, once (about 28 MB)…', 0.01);
+    const { editVideo, videoSize } = await import('../lib/video-edit');
+    const which = finder();
+    progress.set(`Loading the person finder, once (about ${which === 'fast' ? '12' : '28'} MB)…`, 0.01);
     const { Matte, loadPersonMask } = await import('../lib/person-mask');
-    await loadPersonMask();
-    const { editVideo } = await import('../lib/video-edit');
+    // The fast model has a wide variant; load the one that fits the first video (a later one loads itself if it differs).
+    const shape = await videoSize(videos[0]!.file).catch(() => undefined);
+    await loadPersonMask(which, shape);
     const outputs: OutputFile[] = [];
     for (const [index, entry] of videos.entries()) {
       const file = entry.file;
       const share = (f: number) => (index + f) / videos.length;
-      const matte = new Matte();
+      const matte = new Matte(which);
       const blurred = document.createElement('canvas');
       const timeLeft = new TimeLeft();
       const r = await editVideo(file, {

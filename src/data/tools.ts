@@ -3303,7 +3303,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'What kind of video works best?',
-        a: 'One or two people, facing the camera, lit from the front: video calls, talking-head clips, presentations, dance videos. The person finder is built for people, so pets and objects are treated as background, and fine hair or fast hand movements can blur at the edge.',
+        a: 'One or two people, facing the camera, lit from the front: video calls, talking-head clips, presentations, dance videos. The person finder is built for people, so pets and objects are treated as background, and fine hair or fast hand movements can blur at the edge. The Fast option is rougher still around hair and in dim light, where it can lose the person altogether, so keep the default for those.',
       },
       {
         q: 'Can I get a transparent background?',
@@ -3315,7 +3315,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'Slower than the video plays, because every frame is examined and redrawn on your device. On a MacBook Pro with an M3 Max chip a 30 fps video took about 6 times its length, so a 10-minute clip took about an hour. Phones vary and we have not benchmarked one: a single run on an iPhone in Safari took roughly 5 to 10 minutes for a 2-minute video, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
+        a: 'Slower than the video plays, because every frame is examined and redrawn on your device. On a MacBook Pro with an M3 Max chip a 10-second 30 fps clip took about a minute, about 6 times its length, so a 10-minute clip would take about an hour (we timed 10 seconds, not 10 minutes). The Fast option is the quicker one: the same clip took about 13 seconds at 720p, and 14 to 22 seconds at 1080p, but its edges are rougher around hair and in dim light. Phones vary and we have not benchmarked one: a single run on an iPhone in Safari took roughly 5 to 10 minutes for a 2-minute video with the default finder, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
       },
       {
         q: 'Why does the browser console mention a Google address?',

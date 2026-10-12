@@ -42,12 +42,28 @@ the instrumental; UVR scales that by 1.022. The vocal remover loads it on the
 first song and runs it in a web worker through onnxruntime-web, on WebGPU
 when the browser has it and WebAssembly otherwise, both served from /vendor/.
 
+`selfie_segmenter.tflite` and `selfie_segmenter_landscape.tflite` are Google's
+MediaPipe selfie segmenter (binary person mask, float16, 0.25 MB each, Apache
+License 2.0; see the MediaPipe image segmenter model card), from
+https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite
+and
+https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter_landscape/float16/latest/selfie_segmenter_landscape.tflite
+(SHA-256
+191ac9529ae506ee0beefa6b2c945a172dab9d07d1e802a290a4e4038226658b and
+490e9ea734313e0de10fa0cd9e3c6133e36ea4db2b7a49bde9ef019f72796b8e). The first takes 256 × 256 pictures and
+serves portrait and square video; the landscape one takes 256 × 144 and serves
+video that is 3:2 or wider. The video background remover loads one of them on
+the first video and runs it through @mediapipe/tasks-vision, served from
+/vendor/. Its confidence mask 0 is the person (the multiclass model's is the
+background).
+
 `selfie_multiclass_256x256.tflite` is Google's MediaPipe selfie multiclass
-segmenter (float32, Apache License 2.0; see the MediaPipe image segmenter
-model card), from
+segmenter (float32, 16 MB, Apache License 2.0; see the MediaPipe image
+segmenter model card), from
 https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite
-The video background remover loads it on the first video and runs it through
-@mediapipe/tasks-vision, served from /vendor/; only its background channel is used.
+The video background remover loads it only when "Better edges (slower)" is
+chosen, and runs it through @mediapipe/tasks-vision, served from /vendor/; only
+its background channel is used.
 
 Files here are served with a one-year immutable cache and cached by the service
 worker, so a changed model must get a new file name.
