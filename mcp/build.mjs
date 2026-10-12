@@ -14,6 +14,9 @@ const result = await build({
   metafile: true,
   entryPoints: ['src/index.ts'],
   outfile: 'dist/index.js',
+  // Use this package's tsconfig, not the site's ../tsconfig.json (which extends
+  // astro and would need the site's dependencies installed to build the server).
+  tsconfig: local('./tsconfig.json'),
   bundle: true,
   platform: 'node',
   format: 'esm',
