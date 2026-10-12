@@ -101,7 +101,7 @@ export const engines: Record<string, Engine> = {
   },
   'video-to-mp3': {
     how: 'Your browser decodes the sound track with the same audio decoders it uses to play media on any website (AAC for MP4, MOV and M4A; Opus or Vorbis for WebM; FLAC, WAV and MP3). The samples are resampled to 44.1 kHz and handed to LAME, the reference MP3 encoder, compiled to WebAssembly and served by this site. WAV files are written directly by a few lines of code in the page. Everything happens in memory in your tab.',
-    versus: 'Online converters upload the whole video just to keep its sound, cap free files at a few hundred megabytes, and make you wait in a queue. Home videos, lectures and voice memos are personal. Here the file never leaves your device, so a 1 GB video converts as fast as your computer can read it, and files must be under 2 GB.',
+    versus: 'Online converters upload the whole video just to keep its sound, cap free files at a few hundred megabytes, and make you wait in a queue. Home videos, lectures and voice memos are personal. Here the file never leaves your device, so a 1 GB video converts as fast as your computer can read it, and the limit is your device’s memory (phones hold less).',
   },
   'trim-video': {
     how: 'Your browser plays the video from the file on your device so you can pick the start and end. Mediabunny (MPL-2.0) then reads the MP4, MOV, WebM or MKV container in your tab and copies the packets between those two points into a new file of the same type, starting from the nearest key frame within half a second. When there is none that close, or when you ask for an exact cut, the clip is decoded and re-encoded by your browser’s own video encoder (WebCodecs).',

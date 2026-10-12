@@ -17,7 +17,7 @@
  },
  "/aac-to-mp3": {
   "date": "2026-10-12",
-  "hash": "3831dad7108527c1"
+  "hash": "3b18f22b87a66527"
  },
  "/about": {
   "date": "2026-10-12",
@@ -277,11 +277,11 @@
  },
  "/flac-to-mp3": {
   "date": "2026-10-12",
-  "hash": "06a465fa8dd06067"
+  "hash": "6e036f91972035b8"
  },
  "/flac-to-wav": {
   "date": "2026-10-12",
-  "hash": "424acba644811d2d"
+  "hash": "2242bd3f641dd89e"
  },
  "/flip-image": {
   "date": "2026-10-12",
@@ -877,11 +877,11 @@
  },
  "/m4a-to-mp3": {
   "date": "2026-10-12",
-  "hash": "6007fab3bf500dd0"
+  "hash": "104505b9d724d28d"
  },
  "/m4a-to-wav": {
   "date": "2026-10-12",
-  "hash": "52702bf35b61bd15"
+  "hash": "6c63599412bea519"
  },
  "/m4v-to-mp4": {
   "date": "2026-10-12",
@@ -913,7 +913,7 @@
  },
  "/mkv-to-mp3": {
   "date": "2026-10-12",
-  "hash": "e519148060d05aae"
+  "hash": "645cd3970729a267"
  },
  "/mkv-to-mp4": {
   "date": "2026-10-12",
@@ -925,7 +925,7 @@
  },
  "/mov-to-mp3": {
   "date": "2026-10-12",
-  "hash": "7621f9b09624e50f"
+  "hash": "35c482af55f22ab9"
  },
  "/mov-to-mp4": {
   "date": "2026-10-12",
@@ -933,7 +933,7 @@
  },
  "/mov-to-wav": {
   "date": "2026-10-12",
-  "hash": "2e0c58f985854e56"
+  "hash": "6c35f883f4d097dc"
  },
  "/mp3-cutter": {
   "date": "2026-10-12",
@@ -961,7 +961,7 @@
  },
  "/mp3-to-wav": {
   "date": "2026-10-12",
-  "hash": "d97927ede35af012"
+  "hash": "971ee0044536fb7c"
  },
  "/mp4-to-gif": {
   "date": "2026-10-12",
@@ -969,11 +969,11 @@
  },
  "/mp4-to-mp3": {
   "date": "2026-10-12",
-  "hash": "fcac54a4f7c64777"
+  "hash": "fd3117f86accf291"
  },
  "/mp4-to-wav": {
   "date": "2026-10-12",
-  "hash": "b992cc53a824dbd0"
+  "hash": "6a60616ef5ede6dd"
  },
  "/normalize-audio": {
   "date": "2026-10-12",
@@ -981,11 +981,11 @@
  },
  "/ogg-to-mp3": {
   "date": "2026-10-12",
-  "hash": "7e050c995e4b4a46"
+  "hash": "a86057a7dc018a0f"
  },
  "/ogg-to-wav": {
   "date": "2026-10-12",
-  "hash": "0fe20c227ec12ae9"
+  "hash": "3eee9b83cf2031c8"
  },
  "/open-7z-file": {
   "date": "2026-10-12",
@@ -993,7 +993,7 @@
  },
  "/opus-to-mp3": {
   "date": "2026-10-12",
-  "hash": "736b58a6af813043"
+  "hash": "dfc960a1378ce46f"
  },
  "/password-protect-zip-file": {
   "date": "2026-10-12",
@@ -1633,7 +1633,7 @@
  },
  "/tools/video-to-mp3": {
   "date": "2026-10-12",
-  "hash": "0d545501a5534312"
+  "hash": "98d303cdd12adc0f"
  },
  "/tools/video-to-mp4": {
   "date": "2026-10-12",
@@ -1721,7 +1721,7 @@
  },
  "/wav-to-mp3": {
   "date": "2026-10-12",
-  "hash": "6259ee341e9f0245"
+  "hash": "d7405e8b15a3468f"
  },
  "/webm-to-gif": {
   "date": "2026-10-12",
@@ -1729,7 +1729,7 @@
  },
  "/webm-to-mp3": {
   "date": "2026-10-12",
-  "hash": "fe5a8fd53b74cd51"
+  "hash": "135d9d61f6a4d013"
  },
  "/webm-to-mp4": {
   "date": "2026-10-12",
