@@ -209,8 +209,11 @@ const free: Record<string, string> = {
   'signature-maker': freeLine('what you draw, type or photograph is'),
   'screen-recorder': freeLine('your recordings are'),
   'voice-recorder': freeLine('your recordings are'),
+  // These tools exist to add a watermark, so they must not say they add none.
+  'watermark-image': freeLine('your files are'),
+  'watermark-pdf': freeLine('your files are'),
 };
-const freeFiles = freeLine('your files are');
+const freeFiles = 'It is free, needs no account and adds no watermark, and your files are not uploaded: everything runs in your browser on your device.';
 const memory = 'The size limit is your device’s memory, and phones hold less; give the page a short while after one visit to save itself for offline use, and then it works offline.';
 
 /** The opening of a description: its first sentence, plus the next when that is short or a question, unless the next is a "no upload, no size caps" slogan. */

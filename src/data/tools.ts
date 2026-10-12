@@ -3689,10 +3689,20 @@ export const tools: Tool[] = [
       'Pick the size, and keep the background or replace it with white or light grey. The first photo downloads the face finder, the cut-out model and their WebAssembly runtime once.',
       'Download the single photo for online applications, and the 4 × 6 sheet to print at a photo counter or at home, then cut along the grey lines.',
     ],
+    sections: [
+      {
+        heading: 'A worked example: a 2 × 2 inch photo for a US passport form',
+        paragraphs: [
+          'Say you need a 2 × 2 inch photo for a passport application and have a selfie taken against a plain wall. Drop it, leave 2 × 2 in chosen and press Make passport photo. The first photo downloads the face finder and the cut-out model once. You get selfie-passport.jpg, about 1200 × 1200 pixels, and selfie-passport-4x6-print.jpg, a 4 × 6 inch sheet to print at a photo counter and cut along the grey lines. Check your government’s current photo rules before you apply.',
+        ],
+      },
+    ],
+    lead:
+      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models (about 50 MB) to your browser, and after that the tool works offline.',
     faq: [
       {
-        q: 'Is my photo uploaded?',
-        a: 'No. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the two models and the WebAssembly runtime that runs them, fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
+        q: 'Can I make a passport photo without uploading my photo?',
+        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
       },
       {
         q: 'How is the head sized?',
