@@ -7,6 +7,13 @@
 # metadata code straight from ../../src/lib (see mcp/build.mjs):
 #   docker build -f glama/Dockerfile .
 #
+# Glama's published glama.json schema (https://glama.ai/mcp/schemas/server.json)
+# only defines `maintainers`; the build steps, CMD and env schema are entered on
+# the server's Dockerfile admin page. The values to enter there are:
+#   build steps: npm ci --ignore-scripts --prefix mcp && npm run build --prefix mcp
+#   CMD:         node mcp/dist/index.js
+# (This file is the same recipe as a runnable Docker build, kept for local checks.)
+#
 # No environment variables are required or read — the server only touches
 # files given as tool arguments and makes no network requests.
 
@@ -19,6 +26,7 @@ RUN cd mcp && npm ci --ignore-scripts
 COPY src/lib ./src/lib
 COPY src/data/vendor.json ./src/data/vendor.json
 COPY mcp/build.mjs ./mcp/build.mjs
+COPY mcp/tsconfig.json ./mcp/tsconfig.json
 COPY mcp/src ./mcp/src
 RUN cd mcp && npm run build
 
