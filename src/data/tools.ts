@@ -3025,7 +3025,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I crop on an iPhone?',
-        a: 'Yes. Open this page in Safari, pick the GIF from Files, and drag the box with your finger. Drag the corners to resize it, or pick a shape and type exact numbers.',
+        a: 'The page works in a mobile browser, and the crop box is built for touch: pick the GIF from Files or Photos, then drag the box with your finger. Drag the corners to resize it, or pick a shape and type exact numbers.',
       },
       {
         q: 'Is my GIF uploaded?',
