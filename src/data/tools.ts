@@ -66,7 +66,7 @@ export const tools: Tool[] = [
     action: 'Convert',
     sizeFact: 'No sign-up, no watermark',
     lead:
-      'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and gives you the results as one zip. Location and camera details are left out unless you tick Keep EXIF metadata. It is free, needs no account and adds no watermark, and your photos are not uploaded: a HEIC decoder runs in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and can give you a batch as one zip. Location and camera details are left out unless you choose JPG and tick Keep EXIF metadata. It is free, needs no account and adds no watermark, and your photos are not uploaded: a HEIC decoder runs in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
     sections: [
       {
         heading: 'How to open or convert HEIC on Windows, Mac and iPhone',
@@ -106,7 +106,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is there a file size or quantity limit?',
-        a: 'There is no file size cap from us, and no quota because there is no server. Very large batches depend on your device’s memory.',
+        a: 'There is no file size cap from us, and no quota because the conversion happens on your device, not on a server. Very large batches depend on your device’s memory.',
       },
       {
         q: 'Can I convert many HEIC photos at once?',
@@ -420,7 +420,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is there a limit on the number or size of files?',
-        a: 'No. Other free tools cap you at two or three tasks an hour or a set file size because they pay for servers. This tool has no server, so the only limit is your device memory. Merging fifty PDFs or a few hundred megabytes is fine on a normal laptop.',
+        a: 'No. Other free tools cap you at two or three tasks an hour or a set file size because they pay for servers. This tool does the work on your device, so the only limit is your device’s memory. Merging fifty PDFs or a few hundred megabytes is fine on a normal laptop.',
       },
       {
         q: 'Can I merge PDFs without uploading them?',
@@ -428,7 +428,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Will bookmarks, links and form fields survive?',
-        a: 'Page content, images, fonts and internal links within a page are preserved. Bookmarks (outlines) and form fields are not carried across when copying pages between documents. A PDF that only restricts printing or copying is unlocked in your tab and merges normally. One that needs a password to open asks for it once. The unlocking program is downloaded from this site the first time such a file is dropped.',
+        a: 'Page content, images, fonts and internal links within a page are preserved. Bookmarks (outlines) and form fields are not carried across when copying pages between documents. A PDF that only restricts printing or copying is unlocked in your tab and merges normally. One that needs a password to open asks for it once. The unlocking program is downloaded from this site the first time such a file is dropped, so offline you can only merge protected PDFs once that program has been downloaded.',
       },
       {
         q: 'Can I merge only some pages of a file?',
@@ -489,7 +489,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop PDF files here',
     action: 'Compress PDF',
     lead:
-      'Makes a PDF smaller in four ways: a lossless cleanup, image recompression that keeps text selectable, flattening pages to pictures, or fitting it under a size you type, such as 1 MB or 200 KB. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: everything runs in your browser on your device. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Makes a PDF smaller in four ways: a lossless cleanup, image recompression that keeps text selectable, flattening pages to pictures, or fitting it under a size you type, such as 1 MB or 200 KB. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: everything runs in your browser on your device. The only size limit is your device’s memory, and after one visit the page works offline; a password-protected PDF needs its unlock engine downloaded once first.',
     sections: [
       {
         heading: 'Compress to a set size: 100 KB, 200 KB, 500 KB, 1 MB, 2 MB',
@@ -526,7 +526,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'How does each level work?',
-        a: '"Lossless cleanup" rewrites the file with compressed object streams and drops unused data; text and images stay identical. "Recompress images" additionally re-encodes embedded photos at a lower JPG quality and caps their resolution, which is where most of the savings come from in scanned or photo-heavy PDFs. "Flatten pages" renders each page to an image at the resolution you choose. It gives the smallest files for scans but text is no longer selectable.',
+        a: '"Lossless cleanup" rewrites the file with compressed object streams; text and images stay identical, so a file that is already compact barely changes. "Recompress images" additionally re-encodes embedded photos at a lower JPG quality and caps their resolution, which is where most of the savings come from in scanned or photo-heavy PDFs. "Flatten pages" renders each page to an image at the resolution you choose. It gives the smallest files for scans but text is no longer selectable.',
       },
       {
         q: 'Can it get a PDF under a set size, like 1 MB, without uploading it?',
@@ -588,7 +588,7 @@ export const tools: Tool[] = [
   {
     slug: 'unlock-pdf',
     lead:
-      'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The only size limit is your device’s memory, and after your first run the page works offline.',
+      'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The only size limit is your device’s memory, and after your first run on a protected PDF the page works offline.',
     name: 'Unlock PDF',
     title: 'Unlock PDF: Remove a PDF Password, Free and Private | Stayput',
     description:
@@ -617,7 +617,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my PDF or password sent anywhere?',
-        a: 'No. The PDF is decrypted inside your browser tab by qpdf compiled to WebAssembly. The password is used in the tab and never leaves it, and the page works with the network off after your first run.',
+        a: 'No. The PDF is decrypted inside your browser tab by qpdf compiled to WebAssembly. The password is used in the tab and never leaves it. The unlocking program is downloaded from this site the first time you unlock a protected PDF; after that first run the page works with the network off.',
       },
     ],
   },
@@ -1423,7 +1423,7 @@ export const tools: Tool[] = [
     description:
       'Resize a video in your browser: 4K to 1080p, 1080p to 720p, half size or any width and height. MP4, MOV, WebM in, MP4 out. No upload, no watermark.',
     heading: 'Resize a video',
-    tagline: 'Change a video’s resolution, from 4K down to 240p or to an exact width and height. Resized on this device, never uploaded.',
+    tagline: 'Change a video’s resolution, from 4K down to 240p or to a width and height you choose. Resized on this device, never uploaded.',
     category: 'media',
     accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
     multiple: true,
@@ -3715,6 +3715,7 @@ export const tools: Tool[] = [
   {
     slug: 'watermark-image',
     name: 'Watermark image',
+    sizeFact: 'The only limit is your device’s memory',
     title: 'Add Watermark to Photo, Free, No Upload | Stayput',
     description:
       'Add a text watermark to photos in your browser: your name, a copyright line or a website, in a corner, across the middle or repeated. No upload, no sign-up.',
@@ -3761,6 +3762,7 @@ export const tools: Tool[] = [
   {
     slug: 'watermark-pdf',
     name: 'Watermark PDF',
+    sizeFact: 'The only limit is your device’s memory',
     title: 'Add Watermark to PDF, Free, No Upload | Stayput',
     description:
       'Stamp CONFIDENTIAL, DRAFT or any text on every page of a PDF, diagonally, repeated or in a corner. Runs in your browser; the document is never uploaded.',

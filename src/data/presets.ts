@@ -33,7 +33,7 @@ export interface Preset {
   lead?: string;
 }
 
-const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. After one visit you can turn off Wi-Fi and it still works.' };
+const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. Give the page a short while after one visit to save itself for offline use; then you can turn off Wi-Fi and it still works.' };
 
 /** FAQ entry on the pages whose lead says no account and no watermark; no tool behind them draws a mark on its output. */
 const noAccount = { q: 'Do I need an account, and is there a watermark?', a: 'No account and no sign-up: open the page and drop a file. Nothing is added to your file, so there is no watermark or logo. It is free, and your files are not uploaded.' };
@@ -3256,6 +3256,7 @@ export const presets: Preset[] = [
     slug: 'confidential-watermark',
     base: 'watermark-pdf',
     name: 'Confidential watermark',
+    sizeFact: 'The only limit is your device’s memory',
     title: 'Add CONFIDENTIAL Watermark to PDF, No Upload | Stayput',
     description: 'Stamp CONFIDENTIAL diagonally across every page of a PDF, in red or any colour, in your browser. The document is never uploaded.',
     heading: 'Mark a PDF as confidential',
@@ -3286,6 +3287,7 @@ export const presets: Preset[] = [
     slug: 'watermark-id-copy',
     base: 'watermark-image',
     name: 'Watermark an ID copy',
+    sizeFact: 'The only limit is your device’s memory',
     title: 'Watermark a Copy of Your ID or Passport, No Upload | Stayput',
     description: 'Cover a photo or scan of your passport, driving licence or ID card with a repeated watermark saying who it is for, before you send it. Nothing is uploaded.',
     heading: 'Watermark a copy of your ID',
@@ -4358,7 +4360,7 @@ export const presets: Preset[] = [
     dropLabel: 'Drop a wide photo to split',
     defaults: { layout: '3x1', shape: 'portrait' },
     intro: [
-      'A seamless carousel is one wide image cut into slides, so each swipe continues the picture. Instagram carousels are 4:5 or square, so a panorama is trimmed to fit the slides exactly, and the preview shows how much of the top and bottom goes.',
+      'A seamless carousel is one wide image cut into slides, so each swipe continues the picture. Instagram carousels take 4:5 and square slides, so a panorama is trimmed to fit the slides exactly, and the preview shows how much of the sides or of the top and bottom goes. Choose Keep the picture’s shape to cut it without trimming.',
       'The photo is cut in your browser and never uploaded. Each slide is a full-resolution piece of it, numbered in the order to add them to the post.',
       'The slide size comes from the photo’s height. With 4:5 slides each one is four fifths as wide as the photo is tall, so a panorama 2000 px tall gives slides of 1600 × 2000, and the width decides how many fit. Instagram shows posts about 1080 px wide, so a photo at least 1350 px tall keeps every slide sharp. If your panorama needs more than three slides, type a number into Columns (up to 10) and keep Rows at 1.',
       'Leave Number the tiles on Left to right. That numbers the slides 1, 2, 3 from the left edge, which is the order they go into the post. In posting order is for a profile grid and numbers them backwards. When you add the slides, keep Instagram’s crop on the 4:5 or square shape you chose here, or the app trims each slide again and the joins stop lining up.',
@@ -4875,7 +4877,7 @@ export const presets: Preset[] = [
     heading: 'Auto caption a video',
     tagline: 'Large, readable captions written from what is said and burned into the picture, for videos watched with the sound off.',
     keywords: ['auto caption video', 'automatic captions', 'auto subtitles', 'caption generator', 'add captions to reels', 'tiktok captions', 'captions for shorts'],
-    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv',
+    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,.srt,.vtt',
     dropLabel: 'Drop a video to caption',
     action: 'Caption video',
     defaults: { size: 'large' },
@@ -4915,7 +4917,7 @@ export const presets: Preset[] = [
     defaults: { look: 'box' },
     intro: [
       'A separate subtitle file only works where the player looks for it. Messaging apps, most social platforms and many TVs play the video alone, so the subtitles vanish. Burning them in, also called hardcoding or open captions, draws the words into the picture itself. This page takes the SRT or VTT file you already have, from a translator, a subtitle site or Video to subtitles, and burns it into the video.',
-      'A worked example: a 3-minute interview.mp4 in 1920×1080 and the Spanish translation interview.es.srt from your translator. Drop both files together. The SRT is read as it is, with no speech model and no download. White on a dark band is already chosen, which keeps text readable over any footage, and on a 1080p video Medium sets the text at about 70 pixels. Each caption is wrapped to fit the frame, at most two lines, and appears exactly on its timing. You get interview-subtitled.mp4 with the sound unchanged.',
+      'A worked example: a 3-minute interview.mp4 in 1920×1080 and the Spanish translation interview.es.srt from your translator. Drop both files together. The SRT is read as it is, with no speech model and no download. White on a dark band is already chosen, which keeps text readable over any footage, and on a 1080p video Medium sets the text at about 70 pixels. Each caption is wrapped to fit the frame, at most two lines, and appears exactly on its timing. You get interview-subtitled.mp4 with the sound carried across.',
       'The timing comes straight from the file. If the subtitles run early or late, the SRT was made for a different cut of the video; burning in cannot fix that, so correct the times in a subtitle editor first. Styling written into the file, such as italics or colour tags, is dropped so every caption uses the look you chose.',
     ],
     steps: [
@@ -4973,6 +4975,8 @@ export const presets: Preset[] = [
     keywords: ['acapella extractor', 'isolate vocals', 'extract vocals from song', 'vocal isolator', 'get acapella from song', 'separate vocals from music'],
     accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.webm,.mp4,.mov,.m4v,.mkv',
     dropLabel: 'Drop songs to take the vocals from',
+    lead:
+      'Isolate the vocals of a song as an acapella for remixes, samples, transcribing lyrics or learning harmonies. It is free, and your files are not uploaded: everything runs in your browser on your device. The first run downloads the separation model (about 67 MB) to your browser, and after that the tool works offline; choosing MP3 output fetches a small encoder the first time you use it.',
     action: 'Extract vocals',
     defaults: { stems: 'vocals', format: 'wav' },
     intro: [
@@ -5046,7 +5050,7 @@ export const presets: Preset[] = [
       'Press Make green screen, then key out the colour in your editor.',
     ],
     faq: [
-      { q: 'Why not just a transparent video?', a: 'MP4, the format every editor and phone reads, cannot hold transparency. A flat key colour does the same job in one click in any editor, and plays everywhere as it is.' },
+      { q: 'Why not just a transparent video?', a: 'MP4 with H.264, the format every editor and phone reads, cannot hold transparency. A flat key colour does the same job in one click in any editor, and plays everywhere as it is.' },
       { q: 'Which green should I use?', a: 'Chroma green, #00B140, is the standard broadcast key colour and the default here. Use blue if the person or their clothes are green.' },
       { q: 'Will hair look natural after keying?', a: 'Short and tidy hair keys well. Loose strands and flyaway hair are simplified by the model into a smooth outline, which looks fine at normal viewing size but not in extreme close-ups.' },
       { q: 'Is my video uploaded?', a: 'No. The frames are redrawn and encoded in this tab, on your device.' },      { q: 'Why does the browser console mention a Google address?', a: 'The open-source MediaPipe engine that finds the person tries to send its own usage log to a Google address. This site’s security policy makes the browser refuse that request, so it fails and you see an error in the console. Your video is not part of it and it never leaves your device.' },

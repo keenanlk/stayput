@@ -62,7 +62,7 @@ const jsonLd = [
       <div>
         <h1>Your files stay put.</h1>
         <p class="lede">
-          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is watermarked, and the only size limit is your device’s memory. Once a page has loaded, most tools keep working with the Wi-Fi off; the ones that download a model or engine need one online run first.
+          Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is watermarked, and the main limit is your device’s memory. Once a page has loaded, most tools keep working with the Wi-Fi off; the ones that download a model or engine need one online run first.
         </p>
         <p class="start-label" id="start-h">What do you want to do? Pick one, then drop your file.</p>
         <ul class="start-tiles" aria-labelledby="start-h">
@@ -102,8 +102,8 @@ const jsonLd = [
 
   <section class="wrap popular" id="tools" aria-labelledby="popular-h">
     <div class="index-head">
-      <h2 id="popular-h">Most used</h2>
-      <p>The tools people open first. All {tools.length} are listed below.</p>
+      <h2 id="popular-h">Popular starting points</h2>
+      <p>Where most jobs begin. All {tools.length} are listed below.</p>
     </div>
     <div class="tool-grid">{popularTools.map((t) => <ToolCard tool={t} />)}</div>
   </section>
@@ -127,7 +127,7 @@ const jsonLd = [
     <div class="spec-intro">
       <h2 id="spec-h">Open the network tab. Your files never appear in it.</h2>
       <p style="margin-top:16px">Every tool here is JavaScript and WebAssembly running in your tab. There is no server that could receive your files, so none does. You will see a few small anonymous usage-count requests; they carry the page, which tool, and rough ranges such as file count and size, never your file. Full list: <a href="/privacy">/privacy</a>.</p>
-      <p>Every tool page also counts its own requests after you add files and shows you the list, so you do not have to take our word for it.</p>
+      <p>Every tool that takes files also counts the requests this tab makes after you add them and lists them, so you do not have to take our word for it. Requests made inside background workers, such as a model download, are not in that list.</p>
       <div class="actions">
         <a class="btn btn-primary" href="/tools/heic-to-jpg">Try it with a photo</a>
         <a class="btn" href="https://github.com/keenanlk/stayput" rel="noopener">Read the source</a>

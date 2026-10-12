@@ -21,7 +21,7 @@ const sizes = [
   <select id="size">
     {sizes.map(([v, l]) => <option value={v} selected={v === size}>{l}</option>)}
   </select>
-  <p class="muted small">1080p and the others set the short side, so tall phone videos stay tall. The aspect ratio is kept.</p>
+  <p class="muted small">1080p and the others set the short side, so tall phone videos stay tall. The aspect ratio is kept, unless you fill in both a custom width and height.</p>
 </div>
 <div class="field-row" id="custom-size" hidden={size !== 'custom'}>
   <div class="field"><label for="width">Width (px)</label><input type="number" id="width" min="16" max="7680" step="2" value={defaults.width ?? ''} placeholder="Auto" /></div>

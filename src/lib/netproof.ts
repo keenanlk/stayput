@@ -79,7 +79,7 @@ export function mountNetProof(root: HTMLElement): void {
     }
     const note = document.createElement('li');
     note.className = 'muted';
-    note.textContent = 'Compare with your browser’s own network panel (F12 or Cmd-Option-I, then Network). The two lists should agree.';
+    note.textContent = 'Compare with your browser’s own network panel (F12 or Cmd-Option-I, then Network). This list covers requests made by the page itself; requests made inside background workers, such as a model download, appear only in the browser’s panel.';
     list.append(note);
   }
 }
