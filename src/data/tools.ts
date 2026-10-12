@@ -1118,7 +1118,7 @@ export const tools: Tool[] = [
     heading: 'Convert video or audio to MP3',
     tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
     taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3).',
-    sizeFact: 'No sign-up, no watermark. A file must be under 2 GB, and phones hold less.',
+    sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
     category: 'media',
     accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
     multiple: true,

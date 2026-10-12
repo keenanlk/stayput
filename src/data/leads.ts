@@ -178,7 +178,7 @@ export const defaultSizeBadge = 'No watermark · limit is your device’s memory
 
 /** Tools with no file to size-limit; their fact says what is true of them instead. */
 const facts: Record<string, string> = {
-  'video-to-mp3': 'A single file must be under 2 GB, a phone may run out of memory on a long video, and after your first run the page works offline.',
+  'video-to-mp3': 'The limit is your device’s memory, which is smaller on a phone, and after your first run the page works offline.',
   'qr-code-scanner': 'Your browser asks for camera permission only if you press the camera button, and after one visit and a short wait the page works offline.',
   'qr-code-generator': 'The codes are static, so they never expire, and after one visit and a short wait the page works offline.',
   'barcode-generator': 'The barcodes are drawn on this page, and after one visit and a short wait the page works offline.',

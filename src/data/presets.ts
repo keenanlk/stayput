@@ -1418,7 +1418,7 @@ export const presets: Preset[] = [
     description: 'Convert MP4 to MP3 in your browser. Choose the quality, convert several files at once, and download. Your video is never uploaded; no sign-up.',
     heading: 'Convert MP4 to MP3',
     tagline: 'Drop an MP4, pick a quality and download the MP3. Your video is converted on this device and never uploaded. Use 96 to 128 kbps mono for speech, 192 kbps for music.',
-    sizeFact: 'No sign-up, no watermark. A file must be under 2 GB, and phones hold less.',
+    sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
     sections: [
       {
         heading: 'MP4 to MP3 on a phone or computer',
