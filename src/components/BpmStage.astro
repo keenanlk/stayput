@@ -1,0 +1,33 @@
+---
+/**
+ * The results for the BPM and key finder: one card per file, filled in by
+ * src/tools/bpm-key-finder.ts after a run. `defaults.focus` only changes which
+ * block leads on a preset page: 'key' or 'camelot', else the tempo.
+ */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const focus = defaults.focus === 'key' || defaults.focus === 'camelot' ? defaults.focus : 'both';
+---
+<div class="bk-stage" id="bk-panel" data-focus={focus} hidden>
+  <div id="bk-report" class="bk-report" aria-live="polite"></div>
+</div>
+<style is:global>
+  .bk-report { display: grid; gap: 12px; }
+  .bk-card { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+  .bk-card > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .bk-card > header strong { color: var(--ink); overflow-wrap: anywhere; }
+  .bk-card > header span { font-size: 13px; color: var(--muted); }
+  .bk-body { display: flex; flex-direction: column; gap: 0; }
+  .bk-block { padding: 12px 14px; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+  .bk-block:last-child { border-bottom: 0; }
+  .bk-stage[data-focus='key'] .bk-key, .bk-stage[data-focus='camelot'] .bk-key { order: -1; }
+  .bk-big { font-size: 28px; font-weight: 650; color: var(--ink); line-height: 1.15; overflow-wrap: anywhere; }
+  .bk-camelot { font-family: var(--mono); font-weight: 650; color: var(--ink); }
+  .bk-stage[data-focus='camelot'] .bk-camelot { font-size: 28px; }
+  .bk-sub { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .bk-note { margin: 0; font-size: 13px; color: var(--muted); }
+  .bk-unsure { color: var(--warn); font-weight: 560; }
+  .bk-error { margin: 0; padding: 12px 14px; color: var(--warn); font-size: 14px; }
+  .bk-actions { padding: 10px 14px; display: flex; justify-content: flex-end; }
+  @media (max-width: 480px) { .bk-big { font-size: 24px; } }
+</style>

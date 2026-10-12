@@ -4571,7 +4571,7 @@ export const presets: Preset[] = [
       'Play the song, then tap the Tap tempo button (or click it with the mouse) on every beat: the kick drum, a foot tap, or the pulse you would clap along to. After two taps you get a reading, and it settles as you keep going. Eight steady taps are usually enough.',
       'A worked example: you tap along to a song and the gaps between your taps are 470, 480, 520, 475 and 480 milliseconds. One tap came late, but the reading uses the middle gap of your last eight rather than the average, so it lands on 480 ms, which is 125 BPM. Pause for more than two seconds and the next tap starts a fresh count, so you can measure the next song without reloading.',
       'Then press Start to hear a click at that tempo against the music. If the click drifts ahead of the song, nudge the tempo down with the minus button; if it falls behind, nudge it up. When the click and the kick stay together for a whole verse, you have the exact BPM.',
-      'Songs are often counted at half or double the tempo you tap. A track you tap at 70 BPM may be listed as 140 BPM if the snare hits on 2 and 4 of a fast bar. DJs and producers usually quote the faster figure for dance music, 120 to 130 BPM for house and around 170 for drum and bass.',
+      'Songs are often counted at half or double the tempo you tap. A track you tap at 70 BPM may be listed as 140 BPM if the snare hits on 2 and 4 of a fast bar. DJs and producers usually quote the faster figure for dance music, 120 to 130 BPM for house and around 170 for drum and bass. If the song is a file on your device, the [BPM and key finder](/tools/bpm-key-finder) reads its tempo and key from the audio instead.',
     ],
     steps: [
       'Play the song and tap Tap tempo on every beat.',
@@ -4582,8 +4582,118 @@ export const presets: Preset[] = [
       { q: 'How accurate is tapping?', a: 'Within about one BPM after eight or so steady taps. A single tap can be tens of milliseconds early or late, which is why the tempo comes from the middle gap of your recent taps rather than the last one.' },
       { q: 'Why is my reading half or double what a website says?', a: 'Both are the same pulse counted differently. Tap the snare on 2 and 4 of a fast song and you get half; tap every hi-hat and you get double. Pick whichever matches how the beat feels, or whichever figure your DJ software or DAW expects.' },
       { q: 'Can I use the keyboard?', a: 'Yes. Press Tab until the Tap tempo button is focused, then tap Enter or the space bar in time with the music.' },
-      { q: 'Can it detect the BPM from a file automatically?', a: 'Not on this page: it counts your taps. Tapping works for any song you can hear, from any app or speaker, and nothing about the song is sent anywhere because this page never listens to it.' },
+      { q: 'Can it detect the BPM from a file automatically?', a: 'Not on this page: it counts your taps, which works for any song you can hear from any app or speaker, and this page never listens to it. If you have the song as a file, the [BPM and key finder](/tools/bpm-key-finder) works the tempo out from the audio on your device, and nothing is uploaded there either.' },
       { q: 'Does it work offline?', a: 'Yes. After one visit the page opens and runs with no connection.' },
+    ],
+  },
+  {
+    slug: 'song-key-finder',
+    base: 'bpm-key-finder',
+    name: 'Song key finder',
+    title: 'Song Key Finder: Find the Key of a Song, Free | Stayput',
+    description: 'Find the musical key of a song from an audio file, with its relative key and Camelot code. Free, and the song is not uploaded.',
+    heading: 'Find the key of a song',
+    tagline: 'Drop a song and read its key, its relative major or minor, and its Camelot code.',
+    keywords: ['song key finder', 'key detector', 'find the key of a song', 'music key finder', 'audio key finder', 'song key detector', 'key of a song from mp3'],
+    dropLabel: 'Drop a song to find its key',
+    action: 'Find the key',
+    defaults: { focus: 'key' },
+    sizeFact: 'No account, no watermark',
+    intro: [
+      'The key of a song is the note it feels like it is coming home to, plus whether that home is a major or a minor scale. Singers want it to pick a song they can reach, guitarists to choose a capo position, and producers to find a sample that sits with the track. This page works it out from the recording itself.',
+      'It measures how much of each of the twelve notes is in the song, across the whole file, and compares that pattern with the 24 major and minor keys. The best match is the answer; the page also names the relative key (the major or minor that shares the same notes) and gives the Camelot code.',
+      'A worked example: a song comes out as A minor, Likely. Its relative major is C major, and the Camelot code is 8A. To sing it two semitones lower, the key you want is G minor, which you get by moving the pitch down 2 on [Pitch and speed changer](/tools/pitch-changer).',
+      'If it says Unsure, the notes did not point clearly to one key. That is common with drones, drums and bass lines on their own, and songs that change key part-way. Try a stretch of the song that has chords or a melody, cut with [Trim audio](/tools/trim-audio).',
+    ],
+    steps: [
+      'Drop the song, or tap to pick it. One file at a time is fastest; several are listed together.',
+      'Press Find the key and wait a few seconds.',
+      'Read the key and the relative key, and check them by playing the note on an instrument.',
+    ],
+    sections: [
+      {
+        heading: 'Key, relative key and mode',
+        bullets: [
+          'The key is the tonic note and a mode. In the major mode the music sounds bright, in the minor mode darker; the notes of C major and A minor are the same, so they are relative keys.',
+          'The parallel key is the other mode on the same tonic, such as A major against A minor. The page can mix these up when the third (the note that makes a chord major or minor) is rare or ambiguous in the song.',
+        ],
+      },
+      {
+        heading: 'Use the key',
+        bullets: [
+          'To sing or play in a different key, move the pitch by the number of semitones between the keys: from C to D is up 2. [Pitch and speed changer](/tools/pitch-changer) does that and keeps the tempo.',
+          'To mix two songs, look for the same or neighbouring [Camelot codes](/camelot-wheel).',
+        ],
+      },
+      {
+        heading: 'What can fool it',
+        bullets: [
+          'Detuned recordings (the page corrects for up to 40 cents either way), music with no harmony, very heavy bass, and sections in different keys all lower its accuracy. In our own test it was exactly right for 7 of 15 recordings, and the relative key for 3 more.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is the difference between a key and a scale?', a: 'A scale is the set of notes, such as the notes of A natural minor. A key is that scale together with the note that acts as home, so A minor and C major use the same notes in the same pattern but treat a different note as home.' },
+      { q: 'Why does it say the relative minor when I think it is major?', a: 'The two share every note, so the notes alone cannot always settle it. Many pop songs spend as much time on the minor chord as on the major one. The page shows the relative key right under the answer so you can choose the one that fits what you hear.' },
+      { q: 'Can I find the key from the chords I know?', a: 'This page reads a recording, not chords. If you know the chords, the key is usually the chord the progression keeps resolving to, often the first or last chord of the song.' },
+      { q: 'Does it work for a song I recorded myself?', a: 'Yes, if the recording has the whole song in it. A single note or a drum loop does not give it enough notes to work with and the result is marked Unsure.' },
+      { q: 'How accurate is it?', a: 'In our own test on 15 recordings with a known key, it was exactly right on 7, the relative major or minor on 3 more, a fifth away on 2, and wrong or in the other mode on 3. Treat it as a good first guess and check it against your ears or an instrument.' },
+      { q: 'Is the song uploaded anywhere?', a: 'No. The key is worked out by code running in this page, so the song stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'camelot-wheel',
+    base: 'bpm-key-finder',
+    name: 'Camelot wheel',
+    title: 'Camelot Wheel: All 24 Codes, and Find Your Song’s | Stayput',
+    description: 'See all 24 Camelot codes and which keys mix, then drop a song to find its code and key. Free; the song is not uploaded.',
+    heading: 'Camelot wheel and key finder',
+    tagline: 'The 24 codes at a glance, and a finder that reads your song’s code from the file.',
+    keywords: ['camelot wheel', 'camelot wheel chart', 'camelot key finder', 'camelot wheel keys', 'camelot code', 'harmonic mixing key finder'],
+    dropLabel: 'Drop a song to find its Camelot code',
+    action: 'Find the Camelot code',
+    defaults: { focus: 'camelot' },
+    sizeFact: 'No account, no watermark',
+    intro: [
+      'The Camelot wheel numbers the 24 major and minor keys from 1 to 12 and gives each number two letters: A for minor, B for major. Keys that blend well sit next to each other, so a DJ can pick the next record by looking at a number.',
+      'The codes below are fixed: 8A is A minor and 8B is C major. Drop a song under the table and the page works out its key from the audio and shows the code beside it.',
+    ],
+    steps: [
+      'Look up a key in the table, or drop a song to find its code.',
+      'Press Find the Camelot code.',
+      'Pick songs whose codes are the same, one number apart, or the same number with the other letter.',
+    ],
+    sections: [
+      {
+        heading: 'The 24 codes',
+        bullets: [
+          '1A: G♯ minor, 1B: B major · 2A: D♯ minor, 2B: F♯ major · 3A: B♭ minor, 3B: D♭ major · 4A: F minor, 4B: A♭ major',
+          '5A: C minor, 5B: E♭ major · 6A: G minor, 6B: B♭ major · 7A: D minor, 7B: F major · 8A: A minor, 8B: C major',
+          '9A: E minor, 9B: G major · 10A: B minor, 10B: D major · 11A: F♯ minor, 11B: A major · 12A: C♯ minor, 12B: E major',
+        ],
+      },
+      {
+        heading: 'Which codes mix',
+        bullets: [
+          'Same code: the same key, the safest blend.',
+          'One number up or down, same letter: a fifth away, which shares six of seven notes.',
+          'Same number, other letter: the relative major or minor, the same notes with a different home.',
+          'Further than that, expect a clash unless you change the key with the [Pitch and speed changer](/tools/pitch-changer).',
+        ],
+      },
+      {
+        heading: 'The wheel and the circle of fifths',
+        bullets: [
+          'They are the same circle: moving one step clockwise goes up a fifth. The wheel only swaps note names for numbers and letters, and starts the count so that 8B is C major.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What does 8A or 8B mean?', a: 'The number is the position on the wheel and the letter is the mode: A for minor, B for major. 8A is A minor and 8B is C major. They share a number because they use the same seven notes.' },
+      { q: 'Which Camelot codes mix well?', a: 'The same code, the codes one number up or down with the same letter, and the same number with the other letter. These keep six or seven notes in common. They are a guide; the genre, the tempo and the arrangement matter as much, and you should trust your ears.' },
+      { q: 'Is the Camelot wheel the same as the circle of fifths?', a: 'It is the circle of fifths with different labels. Neighbouring codes are a fifth apart, as neighbouring keys are on the circle. Some programs use another numbering that starts the count in a different place, so check which one yours uses before you compare numbers.' },
+      { q: 'Can I get a song’s Camelot code from a file here?', a: 'Yes. Drop the file above and the page shows its key and the code. The tempo is shown too, since DJs usually want the two together. In our own test the key was exactly right on 7 of 15 recordings and the relative key on 3 more, so check an Unsure result by ear.' },
+      { q: 'Is the song uploaded anywhere?', a: 'No. The code is worked out by this page on your device, so the song stays with you. After one visit you can turn off your internet connection and it still works.' },
     ],
   },
   {

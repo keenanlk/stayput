@@ -42,6 +42,7 @@ import VideoToJpg from '../components/options/VideoToJpg.astro';
 import TrimAudio from '../components/options/TrimAudio.astro';
 import AudioToVideo from '../components/options/AudioToVideo.astro';
 import QrStage from '../components/QrStage.astro';
+import BpmStage from '../components/BpmStage.astro';
 import BarcodeStage from '../components/BarcodeStage.astro';
 import SignatureStage from '../components/SignatureStage.astro';
 import ScanStage from '../components/ScanStage.astro';
@@ -193,6 +194,7 @@ const options = {
   'sign-pdf': null,
   'qr-code-generator': null,
   'barcode-generator': null,
+  'bpm-key-finder': null,
   'signature-maker': null,
   'qr-code-scanner': null,
   'screen-recorder': null,
@@ -212,6 +214,7 @@ const Options = options[base as keyof typeof options];
   {base === 'trim-audio' && <AudioStage slot="panel" />}
   {base === 'qr-code-generator' && <QrStage slot="panel" defaults={defaults} />}
   {base === 'barcode-generator' && <BarcodeStage slot="panel" defaults={defaults} />}
+  {base === 'bpm-key-finder' && <BpmStage slot="panel" defaults={defaults} />}
   {base === 'signature-maker' && <SignatureStage slot="panel" defaults={defaults} />}
   {base === 'qr-code-scanner' && <ScanStage slot="panel" defaults={defaults} />}
   {base === 'screen-recorder' && <RecordStage slot="panel" defaults={defaults} />}

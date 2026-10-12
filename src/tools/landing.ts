@@ -52,6 +52,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'volume-booster': () => import('./volume-booster'),
   'remove-noise': () => import('./remove-noise'),
   'pitch-changer': () => import('./pitch-changer'),
+  'bpm-key-finder': () => import('./bpm-key-finder'),
   'tuner': () => import('./tuner'),
   'metronome': () => import('./metronome'),
   'audio-converter': () => import('./audio-converter'),

@@ -2696,6 +2696,90 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'bpm-key-finder',
+    name: 'BPM and key finder',
+    title: 'BPM and Key Finder: Free, From a File, No Upload | Stayput',
+    description: 'Find the BPM and musical key of a song from an audio file, with its Camelot code. Free, no sign-up, and the song is not uploaded.',
+    heading: 'Find the BPM and key of a song',
+    tagline: 'Drop an audio file and read its tempo, key and Camelot code. The song is analysed on this device.',
+    category: 'media',
+    accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.webm,.mp4,.mov',
+    multiple: true,
+    dropLabel: 'Drop songs to find their BPM and key',
+    action: 'Find BPM and key',
+    sizeFact: 'No account, no watermark',
+    keywords: ['bpm finder', 'bpm and key finder', 'bpm detector', 'bpm finder mp3', 'bpm analyzer', 'song bpm finder', 'find bpm of a song', 'audio bpm finder', 'key and bpm finder'],
+    steps: [
+      'Drop one or more songs, or tap to pick them. MP3, WAV, M4A, FLAC, Ogg and most other audio files work; a video’s sound works too.',
+      'Press Find BPM and key. A three-minute song takes a few seconds.',
+      'Read the tempo, the key and the Camelot code. Check the tempo by ear, and treat a key marked Unsure as a guess.',
+    ],
+    sections: [
+      {
+        heading: 'How to read the result',
+        bullets: [
+          '**BPM** is beats per minute, the steady pulse you would tap your foot to. The page also shows the half and double of it, because a detector cannot always tell a slow song with busy drums from a fast one: 70 and 140 are the same song.',
+          '**Key** is the home note and the scale, such as A minor. Many songs sit between a major key and its relative minor (C major and A minor use the same notes), so the page names the relative key as well.',
+          '**Camelot code** is the key written as a number from 1 to 12 and a letter: A for minor, B for major. Two songs whose codes are the same, or one number apart, or the same number with the other letter, usually blend well. The [Camelot wheel](/camelot-wheel) page lists all 24.',
+          '**Unsure** means the notes in the song did not point clearly to one key. It happens with drones, drum-only tracks, heavy bass and songs that change key.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It assumes one steady tempo. A song that speeds up, slows down or is played without a click can get a tempo that matches only part of it.',
+          'It reads a file, not a link. A streaming-service or video link cannot be analysed here, because the page never fetches anything for you; use a file you have.',
+          'It does not find chords. It gives one key for the whole file.',
+          'It reads up to 15 minutes. For a longer file, cut the part you want with [Trim audio](/tools/trim-audio).',
+        ],
+      },
+      {
+        heading: 'Without a file',
+        bullets: [
+          'Tap along with a song you can only hear on the [Tap tempo](/tap-tempo) page, and check the answer against a click on the [online metronome](/tools/metronome).',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'How do I find the BPM of a song?',
+        a: 'Drop the audio file here and press Find BPM and key. The page decodes the file in your browser, finds the beat and shows the tempo in beats per minute, along with the half and double readings. If you only have the song playing and no file, use the [Tap tempo](/tap-tempo) page and tap along.',
+      },
+      {
+        q: 'Why does it say 70 when the song feels like 140?',
+        a: 'Both are right in the sense that they are the same pulse counted twice. A slow song with a busy hi-hat can be written either way, and detectors cannot always tell which one you mean. That is why the page always shows the half and the double next to the answer. Pick the one that matches how the song feels, or that your DJ software or session expects.',
+      },
+      {
+        q: 'How accurate is it?',
+        a: 'In our own test on 19 recordings (15 with a known tempo and 15 with a known key; some of them synthesised by us), the tempo came out within 2% of the label on 10 of 15, and at exactly half or double on 4 or 5 of the rest. The key was exactly right on 7 of 15 and the relative major or minor on 3 more; the others were a fifth away, in the other mode, or wrong. That is a small test, so use the result as a good first guess and check it by ear.',
+      },
+      {
+        q: 'What is the Camelot code?',
+        a: 'It is a way of writing the 24 major and minor keys as 1A to 12B so that keys that sound good together sit next to each other on a wheel. A is minor and B is major. A minor is 8A and its relative major, C major, is 8B. DJ software often shows it next to the BPM.',
+      },
+      {
+        q: 'Why does it show two keys?',
+        a: 'A major key and its relative minor use exactly the same notes, so from the notes alone it is often a close call which one the song treats as home. The page shows its best answer and names the relative key, because that is the most common near miss. Listen for which note feels like the place the music comes to rest.',
+      },
+      {
+        q: 'Can I paste a YouTube or Spotify link?',
+        a: 'No. The page analyses files on your device and does not fetch anything from other sites. Use an audio file you have, or tap the tempo with the [Tap tempo](/tap-tempo) page.',
+      },
+      {
+        q: 'What happens with songs that change tempo or key?',
+        a: 'The page assumes one steady tempo and one key for the whole file, so it reports what fits most of the song. If the song has a tempo change, cut the part you care about with [Trim audio](/tools/trim-audio) and analyse that.',
+      },
+      {
+        q: 'Which files work, and how long can they be?',
+        a: 'Whatever your browser can play: MP3, WAV, M4A, AAC, FLAC and Ogg are the usual ones. WMA files are not readable in any browser. Files up to 15 minutes are analysed; for a longer one, cut the part you want first.',
+      },
+      {
+        q: 'Is my audio uploaded anywhere?',
+        a: 'No. The file is decoded and analysed by code running in this page, and the results, including the file name in the results file, stay on your device. After one visit you can turn off your internet connection and it still works.',
+      },
+    ],
+  },
+  {
     slug: 'tuner',
     name: 'Online tuner',
     title: 'Online Tuner: Guitar, Bass, Ukulele, Chromatic, Private | Stayput',

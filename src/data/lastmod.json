@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-12",
-  "hash": "39a28ac9f8abdc95"
+  "hash": "5a158ebcbf7f9137"
  },
  "/2x2-photo": {
   "date": "2026-10-06",
@@ -98,6 +98,10 @@
  "/burn-subtitles-into-video": {
   "date": "2026-10-11",
   "hash": "a6a6457f1dffffec"
+ },
+ "/camelot-wheel": {
+  "date": "2026-10-12",
+  "hash": "24ad0ebc469adb94"
  },
  "/change-video-resolution": {
   "date": "2026-10-11",
@@ -869,7 +873,7 @@
  },
  "/licenses": {
   "date": "2026-10-12",
-  "hash": "b4caea4ed004872f"
+  "hash": "b0cd1ad7a7c29314"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-06",
@@ -1219,6 +1223,10 @@
   "date": "2026-10-06",
   "hash": "0d45778071ec3bf0"
  },
+ "/song-key-finder": {
+  "date": "2026-10-12",
+  "hash": "c9a0c0e2b28279c6"
+ },
  "/speed-up-audio": {
   "date": "2026-10-06",
   "hash": "075348f20197bfd1"
@@ -1240,8 +1248,8 @@
   "hash": "9a38f2a99b5d82a9"
  },
  "/tap-tempo": {
-  "date": "2026-10-06",
-  "hash": "1e12ffd94063b47a"
+  "date": "2026-10-12",
+  "hash": "e8e1841508a61977"
  },
  "/terms": {
   "date": "2026-09-27",
@@ -1306,6 +1314,10 @@
  "/tools/blur-image": {
   "date": "2026-10-06",
   "hash": "106b80e7d3703ac9"
+ },
+ "/tools/bpm-key-finder": {
+  "date": "2026-10-12",
+  "hash": "5179ad318c30cde8"
  },
  "/tools/collage-maker": {
   "date": "2026-10-07",
