@@ -320,8 +320,8 @@
   "hash": "e3d855c0575b9488"
  },
  "/guides": {
-  "date": "2026-10-11",
-  "hash": "059d65b2adfc2fec"
+  "date": "2026-10-12",
+  "hash": "3d0ebe67305b1ea9"
  },
  "/guides/camscanner-alternative": {
   "date": "2026-10-08",
@@ -336,16 +336,16 @@
   "hash": "e0f43aa6b56c06ac"
  },
  "/guides/convert-files-without-uploading": {
-  "date": "2026-09-25",
-  "hash": "f97bfadfd611659a"
+  "date": "2026-10-12",
+  "hash": "6870e2a43943427b"
  },
  "/guides/convertio-alternative": {
   "date": "2026-10-08",
   "hash": "99e9e2060a37d89c"
  },
  "/guides/does-discord-reddit-or-instagram-remove-exif-data": {
-  "date": "2026-10-03",
-  "hash": "0e742977bd22b5d3"
+  "date": "2026-10-12",
+  "hash": "dffebbfe14bbb31f"
  },
  "/guides/does-this-website-upload-my-files": {
   "date": "2026-09-25",
@@ -632,8 +632,8 @@
   "hash": "56d32b82cfe3b8ca"
  },
  "/guides/how-to-view-photo-metadata": {
-  "date": "2026-09-29",
-  "hash": "1760bf4ebf8d0296"
+  "date": "2026-10-12",
+  "hash": "b4d56ab036901ab2"
  },
  "/guides/ilovepdf-alternative": {
   "date": "2026-10-08",
@@ -704,24 +704,24 @@
   "hash": "3791f0dcf6b8bd62"
  },
  "/guides/remove-exif-data-from-android-photos": {
-  "date": "2026-10-03",
-  "hash": "09538b84b055d9a4"
+  "date": "2026-10-12",
+  "hash": "460ff05fe5222c5d"
  },
  "/guides/remove-exif-data-from-iphone-photos": {
-  "date": "2026-10-03",
-  "hash": "9e3e9819ad397615"
+  "date": "2026-10-12",
+  "hash": "f8b9f09605100ad7"
  },
  "/guides/remove-exif-data-from-photos-on-mac": {
-  "date": "2026-10-03",
-  "hash": "8c56798b6e88796f"
+  "date": "2026-10-12",
+  "hash": "f6c8874d5c51b7ec"
  },
  "/guides/remove-exif-data-from-photos-on-windows": {
-  "date": "2026-10-03",
-  "hash": "9fb366fd1c5656b0"
+  "date": "2026-10-12",
+  "hash": "3c607c02a5f67488"
  },
  "/guides/remove-location-data-from-photos": {
-  "date": "2026-09-25",
-  "hash": "a1fa9005208a73f9"
+  "date": "2026-10-12",
+  "hash": "f257781415ef014c"
  },
  "/guides/sign-a-pdf-without-adobe": {
   "date": "2026-09-25",
@@ -732,16 +732,16 @@
   "hash": "0394e57b3f384132"
  },
  "/guides/strip-exif-without-re-encoding": {
-  "date": "2026-09-29",
-  "hash": "7e9f3c994efbfbca"
+  "date": "2026-10-12",
+  "hash": "a09c7835856e47de"
  },
  "/guides/turn-off-location-tags-on-photos": {
-  "date": "2026-10-03",
-  "hash": "b86fafd8f81df24b"
+  "date": "2026-10-12",
+  "hash": "16a7aa9d74788a70"
  },
  "/guides/what-is-exif-data": {
-  "date": "2026-09-29",
-  "hash": "b0049cf27e00d214"
+  "date": "2026-10-12",
+  "hash": "5ea8da7df0dcfab4"
  },
  "/guides/which-image-format-to-use": {
   "date": "2026-09-26",
@@ -1132,8 +1132,8 @@
   "hash": "0a734e890a5de686"
  },
  "/remove-location-from-photos": {
-  "date": "2026-10-06",
-  "hash": "e64c7d4e094a05ca"
+  "date": "2026-10-12",
+  "hash": "d4439d36b30f3384"
  },
  "/remove-person-from-photo": {
   "date": "2026-10-06",
@@ -1324,8 +1324,8 @@
   "hash": "0eaf6509f74d1654"
  },
  "/tools/compress-image": {
-  "date": "2026-10-06",
-  "hash": "cf1945f0ef7fdda7"
+  "date": "2026-10-12",
+  "hash": "c050e67f35714e8a"
  },
  "/tools/compress-pdf": {
   "date": "2026-10-11",
@@ -1376,8 +1376,8 @@
   "hash": "2a618633c29bc20f"
  },
  "/tools/exif-viewer": {
-  "date": "2026-10-06",
-  "hash": "16b3583c03d84948"
+  "date": "2026-10-12",
+  "hash": "6b67d33cdf89d319"
  },
  "/tools/extract-pdf-images": {
   "date": "2026-10-07",
@@ -1588,8 +1588,8 @@
   "hash": "b87cad0f9d57e2e6"
  },
  "/tools/strip-exif": {
-  "date": "2026-10-06",
-  "hash": "b1da2b11ab04217a"
+  "date": "2026-10-12",
+  "hash": "fb2c8ebce6c90a72"
  },
  "/tools/transcribe": {
   "date": "2026-10-11",

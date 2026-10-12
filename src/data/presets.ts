@@ -786,15 +786,15 @@ export const presets: Preset[] = [
     base: 'strip-exif',
     name: 'Remove photo location',
     title: 'Remove Location Data From Photos, Free, No Upload | Stayput',
-    description: 'Delete the GPS location, camera and date metadata from JPG, PNG and WebP photos in your browser, without re-encoding. Nothing is uploaded.',
+    description: 'Delete the GPS location, camera and date metadata from JPG, PNG and WebP photos in your browser. The image data is copied unchanged, except sideways JPGs with Apply orientation on. Nothing is uploaded.',
     heading: 'Remove location data from photos',
-    tagline: 'See what a photo reveals, then delete the GPS and camera metadata on your device. The pixels are untouched.',
+    tagline: 'See what a photo reveals, then delete the GPS and camera metadata on your device. The pixels are left as they are, apart from sideways JPGs when Apply orientation is on.',
     keywords: ['remove location from photo', 'remove gps from photo', 'remove location data from photos', 'photo metadata remover', 'remove geotag from photo', 'delete exif location'],
     dropLabel: 'Drop photos here',
     action: 'Remove metadata',
     intro: [
       'Phones write the exact GPS coordinates of where a photo was taken into the file, along with the date, the phone model and sometimes the owner\'s name. Messaging apps usually strip this; email, cloud folders, marketplaces and many forums do not. Drop a photo here and the panel shows exactly what it contains, GPS included, before anything is changed.',
-      'Removing it is lossless. The tool deletes only the metadata segments of the JPG, PNG or WebP container and writes the untouched image data back, so the picture is pixel-identical and the file gets slightly smaller. Because this runs in your browser, the location never travels anywhere, which is the point of removing it.',
+      'Removing it is lossless in the normal case. The tool deletes only the metadata segments of the JPG, PNG or WebP container and writes the image data back unchanged, so the picture is pixel-identical and the file gets slightly smaller. The one exception is a JPG stored sideways with a rotation tag while Apply orientation is ticked (the default): it is turned upright and saved again at quality 95, and untick the option to avoid that. Because this runs in your browser, the location never travels anywhere, which is the point of removing it.',
     ],
     steps: [
       'Drop one or many photos, or tap to pick them. The panel lists what each one contains.',
@@ -805,7 +805,7 @@ export const presets: Preset[] = [
       { q: 'Which apps already remove location data?', a: 'WhatsApp, Signal, Messenger, Instagram, Facebook and X strip metadata from photos you post or send. Email attachments, Google Drive and Dropbox links, iMessage in full quality, marketplaces like Craigslist, and most forums keep it.' },
       { q: 'How can I check that the location is gone?', a: 'Drop the cleaned photo back onto this page. The panel reads the file and reports "GPS location: no" and no removable metadata.' },
       { q: 'Does it work for HEIC photos from an iPhone?', a: 'Use the HEIC to JPG converter with "Keep EXIF metadata" unticked, which is the default: the converted JPG has no metadata at all.' },
-      { q: 'Is the image re-compressed?', a: 'No. Only the metadata blocks are removed. The image data is copied byte for byte, so there is zero quality loss.' },
+      { q: 'Is the image re-compressed?', a: 'Not normally. Only the metadata blocks are removed and the image data is copied byte for byte, so there is no quality loss. The exception is a JPG stored sideways with a rotation tag while "Apply orientation to sideways photos" is ticked (the default): that photo is turned upright and saved again as a JPG at quality 95, and its color profile is dropped. Untick the option and it is copied unchanged, though it may then display sideways. PNG and WebP files are never re-compressed.' },
     ],
   },
   {

@@ -93,7 +93,7 @@ export const guides: Guide[] = [
     heading: 'How to remove location data from photos',
     dek: 'Every phone photo stores where it was taken. Here is how to remove it on each platform, and how to check.',
     keywords: ['remove location data from photos', 'remove gps from photos', 'how to remove location from photo iphone', 'remove geotag from photos', 'photo location metadata'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['remove-location-from-photos', 'strip-exif', 'heic-to-jpg'],
     sections: [
       {
@@ -105,7 +105,7 @@ export const guides: Guide[] = [
       {
         h: 'The quick way: in your browser, no app',
         p: [
-          'Open the [location remover](/remove-location-from-photos) in your browser, drop the photos in, and it shows you what each one contains, GPS coordinates included. One click removes the location, camera and date metadata and gives you a clean copy. The image itself is not re-compressed, so the quality is identical, and the photo never leaves your device: the removal runs inside the browser tab. It works on iPhone, Android, Windows, Mac and Linux, and offline after the first visit.',
+          'Open the [location remover](/remove-location-from-photos) in your browser, drop the photos in, and it shows you what each one contains, GPS coordinates included. One click removes the location, camera and date metadata and gives you a clean copy. The image data is not re-compressed, so the quality is identical, apart from one case: a JPG stored sideways is re-encoded if you leave "Apply orientation" ticked, and unticking it avoids that. The photo never leaves your device: the removal runs inside the browser tab. It works on iPhone, Android, Windows, Mac and Linux, and offline after the first visit.',
           'For HEIC photos straight from an iPhone, use the [HEIC to JPG converter](/tools/heic-to-jpg); the JPG it produces has no metadata unless you tick the box to keep it.',
         ],
       },
@@ -147,7 +147,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Does removing location data lower the photo quality?', a: 'Not if the tool only deletes metadata. Stayput\'s remover copies the image data byte for byte. Tools that re-save the image as a new JPG do lose a little quality each time.' },
+      { q: 'Does removing location data lower the photo quality?', a: 'Not if the tool only deletes metadata. Stayput\'s remover copies the image data byte for byte, with one exception: a JPG stored sideways is re-encoded at quality 95 if "Apply orientation" is ticked, which is the default, and unticking it avoids that. Tools that re-save the image as a new JPG do lose a little quality each time.' },
       { q: 'Do screenshots have location data?', a: 'No. Screenshots record the device and time but not GPS. Photos taken with the camera do.' },
       { q: 'Does a photo\'s location survive being sent by email?', a: 'Yes. Email attaches the file unchanged, metadata included. Remove it first.' },
       { q: 'Can someone find my home from one photo?', a: 'If it was taken at home with location on and shared with the metadata intact, the coordinates point to your house. That is why the messaging apps strip it, and why it is worth checking anything you post elsewhere.' },
@@ -160,7 +160,7 @@ export const guides: Guide[] = [
     heading: 'What is EXIF data, and what does a photo reveal?',
     dek: 'The information stored inside a photo file, what it can give away, and how to see and remove it.',
     keywords: ['what is exif data', 'exif metadata', 'photo metadata', 'what information is in a photo', 'exif viewer', 'remove exif data'],
-    updated: '2026-09-29',
+    updated: '2026-10-12',
     tools: ['strip-exif', 'exif-viewer', 'remove-location-from-photos'],
     sections: [
       {
@@ -199,7 +199,7 @@ export const guides: Guide[] = [
       {
         h: 'How to remove it',
         p: [
-          'Two approaches. **Re-saving** the image through any editor or converter drops EXIF as a side effect, but it also re-compresses the picture, losing a little quality each time. **Stripping** removes only the metadata segments from the file and leaves the image data untouched, which is what the [remover](/tools/strip-exif) does for JPG, PNG and WebP: the output is pixel-identical and a little smaller. Keep the colour profile (ICC) ticked; it contains no personal data and removing it can shift colours.',
+          'Two approaches. **Re-saving** the image through any editor or converter drops EXIF as a side effect, but it also re-compresses the picture, losing a little quality each time. **Stripping** removes only the metadata segments from the file and leaves the image data untouched, which is what the [remover](/tools/strip-exif) does for JPG, PNG and WebP: the output is pixel-identical and a little smaller. The one exception is a sideways JPG with "Apply orientation" ticked (the default), which is turned upright and re-encoded; untick it to avoid that. Keep the colour profile (ICC) ticked; it contains no personal data and removing it can shift colours.',
           'For HEIC photos, convert with the [HEIC to JPG tool](/tools/heic-to-jpg) and leave "Keep EXIF metadata" unticked. The [step-by-step guide](/guides/remove-location-data-from-photos) covers the built-in options on every phone and computer.',
         ],
       },
@@ -566,7 +566,7 @@ export const guides: Guide[] = [
     heading: 'How to convert and edit files without uploading them',
     dek: 'Browsers can do most file jobs themselves. What runs locally, why it is enough, and which tools to use.',
     keywords: ['convert files without uploading', 'offline file converter', 'browser based file tools', 'local file conversion', 'privacy file converter', 'no upload pdf tools'],
-    updated: '2026-09-25',
+    updated: '2026-10-12',
     tools: ['heic-to-jpg', 'merge-pdf', 'compress-image', 'strip-exif', 'file-checksum'],
     sections: [
       {
@@ -581,7 +581,7 @@ export const guides: Guide[] = [
         list: [
           '[HEIC to JPG or PNG](/tools/heic-to-jpg): libheif, the decoder used by Linux desktops, compiled to WebAssembly.',
           '[Image conversion](/tools/convert-image), [resizing](/resize-image) and [compression](/tools/compress-image): the browser\'s own decoders and encoders through the canvas API; JPEG XL and AVIF via the Squoosh decoders.',
-          '[Removing EXIF and location data](/tools/strip-exif): a lossless byte-level editor for JPG, PNG and WebP.',
+          '[Removing EXIF and location data](/tools/strip-exif): a byte-level editor for JPG, PNG and WebP that leaves the image data unchanged (a sideways JPG is only re-encoded if you leave Apply orientation on).',
           '[Merge](/tools/merge-pdf), [split](/tools/split-pdf), [rotate](/tools/rotate-pdf), [reorder](/tools/reorder-pdf), [sign](/tools/sign-pdf), [page numbers](/tools/pdf-page-numbers) and [compress](/tools/compress-pdf) for PDFs: pdf-lib for editing and pdf.js, Firefox\'s PDF engine, for rendering.',
           '[Images to PDF](/tools/image-to-pdf) and [PDF to images](/tools/pdf-to-image): the same two libraries.',
         ],
@@ -619,7 +619,7 @@ export const guides: Guide[] = [
     heading: "How to view photo metadata on iPhone, Android, Windows and Mac",
     dek: "Every phone and computer can show some of a photo's EXIF data. Here is where to look, what each one leaves out, and how to see all of it.",
     keywords: ["how to view photo metadata", "view photo metadata", "view photo metadata iphone", "how to view photo metadata on android", "exif viewer", "check photo location"],
-    updated: "2026-09-29",
+    updated: "2026-10-12",
     tools: ["exif-viewer", "strip-exif", "remove-location-from-photos"],
     sections: [
       {
@@ -649,7 +649,7 @@ export const guides: Guide[] = [
       },
       {
         h: "Check again after you remove it",
-        p: ["To remove all of it without changing the picture, use the [EXIF remover](/tools/strip-exif): it deletes the metadata blocks and copies the image data byte for byte, so the photo looks exactly the same. Then drop the cleaned copy on the [viewer](/tools/exif-viewer); it should say \"None stored\" for location and list no fields. The [location guide](/guides/remove-location-data-from-photos) covers the phone settings that stop new photos from recording location in the first place."],
+        p: ["To remove all of it without changing the picture, use the [EXIF remover](/tools/strip-exif): it deletes the metadata blocks and copies the image data byte for byte, so the photo looks exactly the same (a sideways JPG is re-encoded only if you leave \"Apply orientation\" ticked). Then drop the cleaned copy on the [viewer](/tools/exif-viewer); it should say \"None stored\" for location and list no fields. The [location guide](/guides/remove-location-data-from-photos) covers the phone settings that stop new photos from recording location in the first place."],
       },
     ],
     faq: [
@@ -661,17 +661,17 @@ export const guides: Guide[] = [
   },
   {
     slug: "strip-exif-without-re-encoding",
-    title: "Stripping EXIF Without Re-encoding the Image: How a Lossless Remover Works",
+    title: "Stripping EXIF Without Re-encoding the Image: How It Works, and the One Exception",
     description: "Remove EXIF, GPS and other metadata from JPEG, PNG and WebP by editing the file structure instead of re-saving the pixels: the segments, chunks, gotchas and code.",
     heading: "Stripping EXIF without re-encoding the JPEG",
-    dek: "How Stayput removes location and camera data from photos in the browser, byte for byte, in about 600 lines of TypeScript and no library.",
+    dek: "How Stayput removes location and camera data from photos in the browser by editing the file structure, in about 600 lines of TypeScript and no library, and the one case that still has to re-encode.",
     keywords: ["strip exif without re-encoding", "lossless exif removal", "remove exif javascript", "jpeg app1 segment", "remove metadata without losing quality", "exif remover how it works"],
-    updated: "2026-09-29",
+    updated: "2026-10-12",
     tools: ["strip-exif", "exif-viewer", "heic-to-jpg"],
     sections: [
       {
         h: "The problem with the usual answers",
-        p: ["There are two common ways to remove EXIF data from a photo, and both have a cost. The first is to re-save it: open it in an editor or pass it through a canvas, then export a new JPEG. The metadata is gone because the encoder never writes it, but the picture has been decoded and compressed again, so it loses a little quality and often grows in size. The second is to upload it to a website that does the same on a server, which removes the location from the file by handing it to someone else first.", "There is a third way. A photo file is a container: a sequence of labelled blocks, one of which holds the compressed picture and others that hold metadata. If you can read the container, you can copy every block except the metadata ones. The picture bytes are never decoded, so the result is pixel-identical and slightly smaller. That is how the [Stayput EXIF remover](/tools/strip-exif) works, entirely in the browser, and this page walks through it."],
+        p: ["There are two common ways to remove EXIF data from a photo, and both have a cost. The first is to re-save it: open it in an editor or pass it through a canvas, then export a new JPEG. The metadata is gone because the encoder never writes it, but the picture has been decoded and compressed again, so it loses a little quality and often grows in size. The second is to upload it to a website that does the same on a server, which removes the location from the file by handing it to someone else first.", "There is a third way. A photo file is a container: a sequence of labelled blocks, one of which holds the compressed picture and others that hold metadata. If you can read the container, you can copy every block except the metadata ones. The picture bytes are never decoded, so the result is pixel-identical and slightly smaller (apart from the orientation case covered below). That is how the [Stayput EXIF remover](/tools/strip-exif) works, entirely in the browser, and this page walks through it."],
       },
       {
         h: "What is actually in the file",
@@ -692,7 +692,7 @@ export const guides: Guide[] = [
       {
         h: "The gotchas",
         p: ["Most of the work is in the cases that break the simple version:"],
-        list: ["**Orientation.** Phones usually store a portrait photo sideways and set an EXIF orientation tag telling viewers to rotate it. Delete EXIF and the photo displays on its side. The remover reads the tag first and offers a choice: bake the rotation into the pixels (the one path that does re-encode) or keep the file lossless and accept the sideways display.", "**Padding and fill bytes.** JPEG allows any number of 0xFF fill bytes between segments, and standalone markers (restart markers, SOI) have no length field. Treat them as lengths and you walk off into the image data.", "**RIFF padding.** WebP chunks with an odd length are followed by a zero pad byte that is not counted in the chunk's length. Miss it and the next chunk header is read one byte early.", "**XMP in PNG.** XMP arrives as an iTXt chunk with the keyword \"XML:com.adobe.xmp\", so it is dropped along with the other text chunks rather than needing its own rule.", "**Thumbnails.** The EXIF block can embed a small JPEG preview in its second directory. Editors that crop the photo sometimes leave the old thumbnail, so a \"cropped\" photo still carries the uncropped picture. Dropping the whole EXIF segment takes the thumbnail with it."],
+        list: ["**Orientation.** Phones usually store a portrait photo sideways and set an EXIF orientation tag telling viewers to rotate it. Delete EXIF and the photo displays on its side. The remover reads the tag first and offers a choice: bake the rotation into the pixels (the one path that does re-encode: it applies only to JPEG, is on by default and saves a new JPEG at quality 95) or keep the file lossless and accept the sideways display.", "**Padding and fill bytes.** JPEG allows any number of 0xFF fill bytes between segments, and standalone markers (restart markers, SOI) have no length field. Treat them as lengths and you walk off into the image data.", "**RIFF padding.** WebP chunks with an odd length are followed by a zero pad byte that is not counted in the chunk's length. Miss it and the next chunk header is read one byte early.", "**XMP in PNG.** XMP arrives as an iTXt chunk with the keyword \"XML:com.adobe.xmp\", so it is dropped along with the other text chunks rather than needing its own rule.", "**Thumbnails.** The EXIF block can embed a small JPEG preview in its second directory. Editors that crop the photo sometimes leave the old thumbnail, so a \"cropped\" photo still carries the uncropped picture. Dropping the whole EXIF segment takes the thumbnail with it."],
       },
       {
         h: "Reading EXIF, for the report and the viewer",
@@ -714,7 +714,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: "Does removing EXIF this way reduce quality?", a: "No. The compressed picture data is copied byte for byte and never decoded. The only exception is when you ask the tool to apply the orientation tag to a sideways photo, which has to re-encode." },
+      { q: "Does removing EXIF this way reduce quality?", a: "No, with one exception. The compressed picture data is copied byte for byte and never decoded, for JPEG, PNG and WebP alike. The exception is a JPEG stored sideways while the tool's Apply orientation option is ticked (the default): it is decoded, rotated and saved again as a JPEG at quality 95. Untick the option and nothing is re-encoded." },
       { q: "Why not just draw the image on a canvas and export it?", a: "That works and is simpler, but it re-compresses the photo, loses some quality, discards the colour profile and usually makes a phone photo larger. It also takes more memory for big images." },
       { q: "Is this safe to run in the browser?", a: "Yes. The file is read with the File API into memory in your tab and the cleaned copy is handed to your browser's download. No request carries the file, which you can verify in the network tab." },
     ],
@@ -4102,11 +4102,11 @@ export const guides: Guide[] = [
   {
     slug: "remove-exif-data-from-photos-on-windows",
     title: "How to Remove Metadata (EXIF) From a Photo on Windows",
-    description: "Remove metadata, EXIF and GPS data from photos on Windows: the File Explorer option, what it leaves alone, and a lossless way to clean a whole folder in your browser.",
+    description: "Remove metadata, EXIF and GPS data from photos on Windows: the File Explorer option, what it leaves alone, and a way to clean a whole folder in your browser, copying the image data unchanged apart from sideways JPGs when Apply orientation is on.",
     heading: "How to remove metadata from a photo on Windows",
     dek: "File Explorer can strip some metadata from a photo. Here is how, what it does not promise, and how to clean a whole folder without re-saving the pictures.",
     keywords: ["remove metadata from photo windows","remove exif data windows", "remove exif data windows 11", "remove metadata from photo windows 10", "strip exif windows", "delete exif data from image windows"],
-    updated: "2026-10-03",
+    updated: "2026-10-12",
     tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
     sections: [
       {
@@ -4120,7 +4120,7 @@ export const guides: Guide[] = [
       },
       {
         h: "Cleaning a whole folder without re-saving the pictures",
-        p: ["To remove everything in one pass, open the [EXIF remover](/tools/strip-exif), then drop in the photos, or click the drop area and press Ctrl-A in the file picker to choose the whole folder. Before anything is changed, the page lists what each photo contains and whether it has GPS coordinates. Click **Remove metadata** and download the cleaned copies one by one or all together as a zip.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "It reads JPG, PNG and WebP. HEIC photos are not supported by the remover, so convert those first with the [HEIC to JPG converter](/tools/heic-to-jpg), which leaves metadata out unless you tick the box to keep it.", "Everything happens inside your browser tab, so the photos never leave your device."],
+        p: ["To remove everything in one pass, open the [EXIF remover](/tools/strip-exif), then drop in the photos, or click the drop area and press Ctrl-A in the file picker to choose the whole folder. Before anything is changed, the page lists what each photo contains and whether it has GPS coordinates. Click **Remove metadata** and download the cleaned copies one by one or all together as a zip.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box and every photo is copied unchanged, though a sideways one may then display sideways.", "It reads JPG, PNG and WebP. HEIC photos are not supported by the remover, so convert those first with the [HEIC to JPG converter](/tools/heic-to-jpg), which leaves metadata out unless you tick the box to keep it.", "Everything happens inside your browser tab, so the photos never leave your device."],
       },
       {
         h: "Check that it worked",
@@ -4137,11 +4137,11 @@ export const guides: Guide[] = [
   {
     slug: "remove-exif-data-from-photos-on-mac",
     title: "How to Remove Metadata and EXIF Data From Photos on a Mac",
-    description: "What Photos, Preview and the Terminal can do about photo metadata on a Mac, and a lossless way to strip EXIF and GPS from JPG, PNG and WebP in your browser.",
+    description: "What Photos, Preview and the Terminal can do about photo metadata on a Mac, and a way to strip EXIF and GPS from JPG, PNG and WebP in your browser, copying the image data unchanged apart from sideways JPGs when Apply orientation is on.",
     heading: "How to remove metadata from photos on a Mac",
     dek: "Photos can hide a location, Preview can show or remove one, and neither touches the rest of the metadata. Here is what each does and how to strip a photo for sure.",
     keywords: ["remove metadata from photo mac", "remove exif data mac", "strip exif macos", "mac remove gps from photo", "remove exif data mac terminal"],
-    updated: "2026-10-03",
+    updated: "2026-10-12",
     tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
     sections: [
       {
@@ -4158,7 +4158,7 @@ export const guides: Guide[] = [
       },
       {
         h: "The point-and-click way that checks itself",
-        p: ["Open the [EXIF remover](/tools/strip-exif) in Safari or any browser and drag the photos in from Finder. The page lists what each photo carries, whether it has GPS coordinates, the camera and the date, before it changes anything. Click **Remove metadata** and download the cleaned copies, or all of them in one zip.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "Photos from an iPhone or a recent camera may be HEIC. In Photos you can export them as JPEG (**File**, **Export**, Export Photos, then choose JPEG under **Photo Kind**) and drop the JPEGs on the remover, or use the [HEIC to JPG converter](/tools/heic-to-jpg). Everything happens inside your browser tab, so the photos never leave your device."],
+        p: ["Open the [EXIF remover](/tools/strip-exif) in Safari or any browser and drag the photos in from Finder. The page lists what each photo carries, whether it has GPS coordinates, the camera and the date, before it changes anything. Click **Remove metadata** and download the cleaned copies, or all of them in one zip.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box and every photo is copied unchanged, though a sideways one may then display sideways.", "Photos from an iPhone or a recent camera may be HEIC. In Photos you can export them as JPEG (**File**, **Export**, Export Photos, then choose JPEG under **Photo Kind**) and drop the JPEGs on the remover, or use the [HEIC to JPG converter](/tools/heic-to-jpg). Everything happens inside your browser tab, so the photos never leave your device."],
       },
       {
         h: "Check the result",
@@ -4179,7 +4179,7 @@ export const guides: Guide[] = [
     heading: "How to remove metadata from iPhone photos",
     dek: "Apple's built-in options handle location. For the date, device and everything else, here is how to strip a photo before you post it.",
     keywords: ["remove metadata from photo iphone", "remove location from photo iphone", "remove exif data iphone", "strip metadata iphone", "remove location from iphone photo before sharing", "delete exif data iphone photo"],
-    updated: "2026-10-03",
+    updated: "2026-10-12",
     tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
     sections: [
       {
@@ -4196,7 +4196,7 @@ export const guides: Guide[] = [
       },
       {
         h: "To remove everything, not just the location",
-        p: ["Apple's steps above deal with location. To remove the date, device and the rest of the EXIF block, open the [EXIF remover](/tools/strip-exif) in Safari and choose your photos. The page shows what each one contains, including whether it has GPS coordinates, before you click **Remove metadata**.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "iPhones save photos as HEIC by default, and the remover will tell you it cannot clean HEIC files losslessly. For those, use the [HEIC to JPG converter](/tools/heic-to-jpg): the JPG it makes has no metadata unless you tick \"Keep EXIF metadata\". Converting to JPG is a lossy step (the default quality is 92), while stripping a photo that is already a JPG is not. The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "Everything happens inside your browser tab, so the photos never leave your device."],
+        p: ["Apple's steps above deal with location. To remove the date, device and the rest of the EXIF block, open the [EXIF remover](/tools/strip-exif) in Safari and choose your photos. The page shows what each one contains, including whether it has GPS coordinates, before you click **Remove metadata**.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "iPhones save photos as HEIC by default, and the remover will tell you it cannot clean HEIC files losslessly. For those, use the [HEIC to JPG converter](/tools/heic-to-jpg): the JPG it makes has no metadata unless you tick \"Keep EXIF metadata\". Converting to JPG is a lossy step (the default quality is 92), while stripping a photo that is already a JPG is not. The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box and every photo is copied unchanged, though a sideways one may then display sideways.", "Everything happens inside your browser tab, so the photos never leave your device."],
       },
       {
         h: "Check before you post",
@@ -4217,7 +4217,7 @@ export const guides: Guide[] = [
     heading: "How to remove metadata from Android photos",
     dek: "Samsung can drop the location when you share. Google Photos cannot remove one your camera recorded. Here is what works, and how to strip everything.",
     keywords: ["remove exif data android", "remove metadata from photo android", "remove location from photo samsung", "strip metadata android", "remove gps from photo android pixel"],
-    updated: "2026-10-03",
+    updated: "2026-10-12",
     tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
     sections: [
       {
@@ -4234,7 +4234,7 @@ export const guides: Guide[] = [
       },
       {
         h: "Remove everything from a photo",
-        p: ["Open the [EXIF remover](/tools/strip-exif) in Chrome or Samsung Internet and choose your photos. The page lists what each contains, including whether it has GPS coordinates, then **Remove metadata** gives you cleaned copies to download.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "Android cameras mostly save JPG, which the remover handles. If yours saves HEIC, convert first with the [HEIC to JPG converter](/tools/heic-to-jpg). Everything happens inside your browser tab, so the photos never leave your device."],
+        p: ["Open the [EXIF remover](/tools/strip-exif) in Chrome or Samsung Internet and choose your photos. The page lists what each contains, including whether it has GPS coordinates, then **Remove metadata** gives you cleaned copies to download.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box and every photo is copied unchanged, though a sideways one may then display sideways.", "Android cameras mostly save JPG, which the remover handles. If yours saves HEIC, convert first with the [HEIC to JPG converter](/tools/heic-to-jpg). Everything happens inside your browser tab, so the photos never leave your device."],
       },
       {
         h: "Check before you post",
@@ -4255,7 +4255,7 @@ export const guides: Guide[] = [
     heading: "How to stop your phone putting your location in photos",
     dek: "One setting in the camera decides whether every photo carries GPS coordinates. Here is where it is on iPhone, Pixel and Samsung.",
     keywords: ["turn off geotagging iphone", "how to turn off location tags on photos", "disable geotagging android", "stop photos saving location", "turn off location on camera"],
-    updated: "2026-10-03",
+    updated: "2026-10-12",
     tools: ["exif-viewer", "strip-exif", "remove-location-from-photos"],
     sections: [
       {
@@ -4280,7 +4280,7 @@ export const guides: Guide[] = [
       },
       {
         h: "Photos you already took still have it",
-        p: ["The setting is not retroactive: earlier photos keep the location they recorded. To clean them, follow the [iPhone](/guides/remove-exif-data-from-iphone-photos) or [Android](/guides/remove-exif-data-from-android-photos) guide, or drop them on the [EXIF remover](/tools/strip-exif), which shows what each photo contains and removes the metadata from JPG, PNG and WebP without re-compressing the picture. Everything happens inside your browser tab, so the photos never leave your device."],
+        p: ["The setting is not retroactive: earlier photos keep the location they recorded. To clean them, follow the [iPhone](/guides/remove-exif-data-from-iphone-photos) or [Android](/guides/remove-exif-data-from-android-photos) guide, or drop them on the [EXIF remover](/tools/strip-exif), which shows what each photo contains and removes the metadata from JPG, PNG and WebP without re-compressing the picture (except a sideways JPG, if you leave Apply orientation ticked). Everything happens inside your browser tab, so the photos never leave your device."],
       },
       {
         h: "Check a new photo",
@@ -4301,7 +4301,7 @@ export const guides: Guide[] = [
     heading: "Do Discord, Reddit and Instagram remove EXIF data from photos?",
     dek: "Nobody documents it well, and the answer can differ by file type and how you send the photo. Here is what we could verify, how to test it, and the safe way.",
     keywords: ["does discord remove exif data", "does reddit remove exif data", "does instagram remove exif data", "does whatsapp remove metadata from photos", "do social media sites remove metadata"],
-    updated: "2026-10-03",
+    updated: "2026-10-12",
     tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
     sections: [
       {
@@ -4323,7 +4323,7 @@ export const guides: Guide[] = [
       },
       {
         h: "The dependable way: strip it before you post",
-        p: ["Open the [EXIF remover](/tools/strip-exif), add the photos and check the list of what each one contains, including whether it has GPS coordinates. Click **Remove metadata** and download the cleaned copies, or all of them in one zip. A cleaned copy has nothing for any platform to leak or keep.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box for a strictly lossless result.", "It reads JPG, PNG and WebP. HEIC photos are not supported by the remover, so convert those first with the [HEIC to JPG converter](/tools/heic-to-jpg), which leaves metadata out unless you tick the box to keep it. Everything happens inside your browser tab, so the photos never leave your device."],
+        p: ["Open the [EXIF remover](/tools/strip-exif), add the photos and check the list of what each one contains, including whether it has GPS coordinates. Click **Remove metadata** and download the cleaned copies, or all of them in one zip. A cleaned copy has nothing for any platform to leak or keep.", "In a JPG it removes the EXIF block (GPS position, date and time, camera and phone model, settings and the embedded thumbnail), XMP, IPTC, comments and the other application metadata segments. In PNG and WebP it removes the EXIF, text and XMP chunks. The colour profile is kept by default because it holds no personal data and removing it can shift colours.", "The cleaned copy is not re-compressed: the picture data is copied byte for byte and only the metadata blocks are cut out. One exception: with \"Apply orientation to sideways photos\" ticked (the default), a photo stored sideways with a rotation tag is re-encoded so it still displays upright, and its colour profile is dropped in that case. Untick the box and every photo is copied unchanged, though a sideways one may then display sideways.", "It reads JPG, PNG and WebP. HEIC photos are not supported by the remover, so convert those first with the [HEIC to JPG converter](/tools/heic-to-jpg), which leaves metadata out unless you tick the box to keep it. Everything happens inside your browser tab, so the photos never leave your device."],
       },
       {
         h: "Related guides",
