@@ -177,7 +177,7 @@ export const engines: Record<string, Engine> = {
   },
   'signature-maker': {
     how: 'Your strokes are kept as a list of points and painted on a canvas in this page, so they can be undone, recoloured and written out as an SVG. A typed name is set in an embedded script font and a photo is turned into a mask: the page estimates the paper around each pixel and keeps only what is darker. The PNG is written by your browser with a transparent background, trimmed to the signature.',
-    versus: 'Many signature makers ask for an account before they let you download, or keep a copy of the image you made. A signature is the kind of image you do not want on someone else’s server. Here it is made and saved on your device, and nothing is kept when you close the page.',
+    versus: 'A signature is the kind of image you do not want on someone else’s server. Here it is drawn, typed or cleaned up on your device, and the image is not uploaded.',
   },
   'qr-code-scanner': {
     how: 'ZXing-C++ (Apache-2.0), a widely used open-source barcode reader compiled to WebAssembly, finds and reads the code on this page. The reader is a 0.9 MB file served from this site, so it is fetched on your first scan and then kept in your browser. Camera pictures are read frame by frame in memory and are never saved.',
