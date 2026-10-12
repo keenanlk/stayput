@@ -1909,7 +1909,7 @@
    "licences": [
     {
      "name": "MIT",
-     "url": "/vendor/zxing-wasm@3.1.5/LICENSE"
+     "url": "https://spdx.org/licenses/MIT.html"
     }
    ],
    "project": "https://github.com/Sec-ant/zxing-wasm",
