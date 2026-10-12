@@ -68,8 +68,8 @@
   "hash": "08e1ecb49fe54da7"
  },
  "/blur-background": {
-  "date": "2026-10-06",
-  "hash": "71049bb89e17e433"
+  "date": "2026-10-12",
+  "hash": "ecc6b5e6eb6e8137"
  },
  "/blur-face": {
   "date": "2026-10-06",
@@ -104,12 +104,12 @@
   "hash": "eced5e00484a4a65"
  },
  "/code-128-barcode-generator": {
-  "date": "2026-10-11",
-  "hash": "ad2a4f3e9f59ff88"
+  "date": "2026-10-12",
+  "hash": "ee6becbc7f9bce54"
  },
  "/code-39-barcode-generator": {
-  "date": "2026-10-11",
-  "hash": "d41318bd670d3277"
+  "date": "2026-10-12",
+  "hash": "b04a8892fd449634"
  },
  "/color-palette-from-image": {
   "date": "2026-10-06",
@@ -248,8 +248,8 @@
   "hash": "09846ebee742277c"
  },
  "/ean-13-barcode-generator": {
-  "date": "2026-10-11",
-  "hash": "e22858e884261e2f"
+  "date": "2026-10-12",
+  "hash": "f50701f11f30548d"
  },
  "/email-qr-code": {
   "date": "2026-10-11",
@@ -804,12 +804,12 @@
   "hash": "22b54930bf33e9b3"
  },
  "/isbn-barcode-generator": {
-  "date": "2026-10-11",
-  "hash": "c3d9c4de82545f20"
+  "date": "2026-10-12",
+  "hash": "4d5720900ccc3c44"
  },
  "/itf-14-barcode-generator": {
-  "date": "2026-10-11",
-  "hash": "9635817923d58a2f"
+  "date": "2026-10-12",
+  "hash": "a60aacb386e93bfc"
  },
  "/jfif-to-jpg": {
   "date": "2026-10-06",
@@ -892,8 +892,8 @@
   "hash": "16e738061e9f8087"
  },
  "/make-background-transparent": {
-  "date": "2026-10-06",
-  "hash": "dc85a465b69a398e"
+  "date": "2026-10-12",
+  "hash": "2c841267870653ab"
  },
  "/make-pdf-searchable": {
   "date": "2026-10-06",
@@ -1292,8 +1292,8 @@
   "hash": "0a794b540f3c90d3"
  },
  "/tools/barcode-generator": {
-  "date": "2026-10-11",
-  "hash": "19e72178a4e9bbfd"
+  "date": "2026-10-12",
+  "hash": "50edeacca604842b"
  },
  "/tools/black-and-white-image": {
   "date": "2026-10-07",
@@ -1348,8 +1348,8 @@
   "hash": "7b8bc5e7f27d5c2c"
  },
  "/tools/crop-gif": {
-  "date": "2026-10-11",
-  "hash": "f72b06d5b1051221"
+  "date": "2026-10-12",
+  "hash": "39baa9bd07126dfc"
  },
  "/tools/crop-image": {
   "date": "2026-10-11",
@@ -1512,8 +1512,8 @@
   "hash": "588c3366c2aade47"
  },
  "/tools/remove-background": {
-  "date": "2026-10-11",
-  "hash": "b924c53502cb0c04"
+  "date": "2026-10-12",
+  "hash": "be5a97245d647c72"
  },
  "/tools/remove-noise": {
   "date": "2026-10-07",
@@ -1536,8 +1536,8 @@
   "hash": "086af995db8504e3"
  },
  "/tools/resize-gif": {
-  "date": "2026-10-11",
-  "hash": "c9d219fd58d7e48e"
+  "date": "2026-10-12",
+  "hash": "642c3c64260c59ef"
  },
  "/tools/resize-pdf": {
   "date": "2026-10-06",
@@ -1684,8 +1684,8 @@
   "hash": "dc38642df048f52f"
  },
  "/upc-barcode-generator": {
-  "date": "2026-10-11",
-  "hash": "56637fa1b2d340f7"
+  "date": "2026-10-12",
+  "hash": "edf2b26f3f0351cc"
  },
  "/vcard-qr-code-generator": {
   "date": "2026-10-06",
@@ -1756,8 +1756,8 @@
   "hash": "de918137d4ff7428"
  },
  "/white-background": {
-  "date": "2026-10-06",
-  "hash": "20085cd5f9a697f9"
+  "date": "2026-10-12",
+  "hash": "cab533a3f1ec95e7"
  },
  "/wifi-qr-code-generator": {
   "date": "2026-10-06",

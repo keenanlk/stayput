@@ -109,11 +109,11 @@ export const engines: Record<string, Engine> = {
   },
   'resize-gif': {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. Each frame is drawn at the new width and height on a canvas, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
-    versus: 'Online GIF resizers upload the file to change its size on their server, cap free files at a few dozen megabytes, and some add a watermark. Reaction GIFs and screen recordings are often personal. Here the GIF never leaves your device, and you can resize several at once.',
+    versus: 'Reaction GIFs and screen recordings are often personal. Here the GIF is resized in this tab: the file is not uploaded, there is no size cap beyond your device’s memory, no watermark is added, and you can resize several at once.',
   },
   'crop-gif': {
     how: 'Your browser draws the first frame of the GIF so you can place the box. gifuct-js (MIT) then reads the GIF byte by byte in your tab and every frame is composited the way browsers play it; the part inside the box is cut from each frame, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
-    versus: 'Online GIF croppers upload the file to cut it on their server, cap free files at a few dozen megabytes, and some add a watermark. Here the GIF never leaves your device.',
+    versus: 'Here the GIF is cropped in this tab: the file is not uploaded, there is no size cap beyond your device’s memory, and no watermark is added.',
   },
   'compress-gif': {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. The frames are then written back with gifenc’s (MIT) colour quantizer and LZW coder: each frame after the first stores only the rectangle that changed, with unchanged pixels left transparent, and the stronger levels use fewer colours and ignore changes too small to see. The new GIF is assembled in memory.',
@@ -173,7 +173,7 @@ export const engines: Record<string, Engine> = {
   },
   'barcode-generator': {
     how: 'JsBarcode (MIT), a small open-source library, turns your number or text into the pattern of bars in this page. The page first checks the number against the rules of the type you chose and works out the check digit itself. The PNG is painted on a canvas by your browser, the SVG is written as plain rectangles, and the PDF is made by pdf-lib (MIT) in the tab.',
-    versus: 'Some online barcode makers draw the picture on their own server, so the number you type, which may be an unreleased product or an internal asset ID, travels to them first. Here the barcode is drawn on your device and the number never leaves it.',
+    versus: 'The number you type may be an unreleased product or an internal asset ID. Here the barcode is drawn on your device, so the number never leaves it.',
   },
   'signature-maker': {
     how: 'Your strokes are kept as a list of points and painted on a canvas in this page, so they can be undone, recoloured and written out as an SVG. A typed name is set in an embedded script font and a photo is turned into a mask: the page estimates the paper around each pixel and keeps only what is darker. The PNG is written by your browser with a transparent background, trimmed to the signature.',
@@ -341,7 +341,7 @@ export const engines: Record<string, Engine> = {
   },
   'remove-background': {
     how: 'ISNet, an open image segmentation model, runs in a web worker through onnxruntime-web compiled to WebAssembly. Your photo is shrunk to 1024 × 1024 in memory, the model marks every pixel as subject or background, and that mask is scaled back up and applied to the original pixels on a canvas, so the cut-out keeps full resolution. The model and runtime are served from this site, downloaded once and cached.',
-    versus: 'Online background removers upload your photo, give back a small preview for free and charge for the full-size file. Here the full-size cut-out is made on your device, with no credits, no watermark and no copy of your photo on anyone’s server.',
+    versus: 'Your photo can show people, rooms and documents you would rather not upload. Here the full-size cut-out is made on your device, with no credits, no watermark and no copy of your photo on anyone’s server.',
   },
   'passport-photo': {
     how: 'Two open models run in your tab. MediaPipe’s BlazeFace face detector (Apache 2.0) finds your eyes and mouth, from which the chin is estimated, and ISNet running on onnxruntime-web finds the outline of your head, whose highest point is the top of your hair. The photo is scaled so the head fills the middle of the allowed range, drawn at 600 pixels per inch, and tiled onto a 4 × 6 inch sheet at 300 pixels per inch with cut lines.',
