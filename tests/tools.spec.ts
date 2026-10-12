@@ -1053,7 +1053,7 @@ test('preset landing pages render, run their base tool with the preset options a
     ['video-to-subtitles', 'transcribe', async () => {
       await expect(page.locator('#format')).toHaveValue('srt');
       await expect(page).toHaveTitle('Subtitle Generator: Auto SRT Subtitles from Video, Free, No Upload | Stayput');
-      await expect(page.locator('h1')).toHaveText('Subtitle generator: make an SRT from a video');
+      await expect(page.locator('h1')).toHaveText('Generate SRT subtitles from a video');
     }],
     ['mp3-to-text', 'transcribe', async () => expect(page.locator('#format')).toHaveValue('txt')],
     ['audio-to-text', 'transcribe', async () => {

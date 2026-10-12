@@ -171,6 +171,8 @@ export const pairs: Pair[] = [
       { q: 'Is transparency kept?', a: 'Yes. PNG supports alpha transparency, and the converter copies it through unchanged.' },
       { q: 'Why can’t I open WebP files in the first place?', a: 'WebP was created by Google in 2010 and every current browser supports it, but a lot of desktop software added support late or not at all. Converting to PNG sidesteps the problem without losing anything.' },
       { q: 'Are the images uploaded to a server?', a: 'No. The decode and encode happen inside your browser tab. Nothing about your image leaves the device.' },
+      { q: 'What happens to an animated WebP?', a: 'A PNG holds one image, so only the first frame is saved. To keep the animation, convert the file to GIF with [WebP to GIF](/webp-to-gif).' },
+      { q: 'Can I convert many WebP files at once?', a: 'Yes. Drop them all together and each one is converted in your browser. Very large batches depend on your device’s memory.' },
     ],
   },
   {
