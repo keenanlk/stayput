@@ -20,8 +20,8 @@
   "hash": "ee9d64e26c886d07"
  },
  "/about": {
-  "date": "2026-10-11",
-  "hash": "92241e84878cdfe4"
+  "date": "2026-10-12",
+  "hash": "abe5583647cae8f7"
  },
  "/acapella-extractor": {
   "date": "2026-10-06",
@@ -717,11 +717,11 @@
  },
  "/guides/sign-a-pdf-without-adobe": {
   "date": "2026-09-25",
-  "hash": "84764716c6ce08c6"
+  "hash": "641c8483ed905fcb"
  },
  "/guides/smallpdf-alternative": {
   "date": "2026-10-08",
-  "hash": "980fd7f9fd659e93"
+  "hash": "0394e57b3f384132"
  },
  "/guides/strip-exif-without-re-encoding": {
   "date": "2026-09-29",
@@ -860,8 +860,8 @@
   "hash": "7293d14dd6dc3f14"
  },
  "/licenses": {
-  "date": "2026-10-11",
-  "hash": "a72b651387a18776"
+  "date": "2026-10-12",
+  "hash": "fb6e0c8b2f602ea4"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-06",
@@ -928,16 +928,16 @@
   "hash": "21d73091f2e8423e"
  },
  "/mp3-cutter": {
-  "date": "2026-10-06",
-  "hash": "ec722d22a62683fa"
+  "date": "2026-10-12",
+  "hash": "c397ad5d9d00edbe"
  },
  "/mp3-to-flac": {
   "date": "2026-10-11",
   "hash": "d627e0d3471eee8e"
  },
  "/mp3-to-m4a": {
-  "date": "2026-10-06",
-  "hash": "60bdb28104c41375"
+  "date": "2026-10-12",
+  "hash": "bcb3024bcd5c52e6"
  },
  "/mp3-to-mp4": {
   "date": "2026-10-06",
@@ -1540,8 +1540,8 @@
   "hash": "2f04d15cc4f49819"
  },
  "/tools/sign-pdf": {
-  "date": "2026-10-11",
-  "hash": "36a2e1861d1d6ebd"
+  "date": "2026-10-12",
+  "hash": "6196c839be35b66f"
  },
  "/tools/split-image": {
   "date": "2026-10-07",

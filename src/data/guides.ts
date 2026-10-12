@@ -483,12 +483,12 @@ export const guides: Guide[] = [
       {
         h: 'Before you send it',
         p: [
-          'If the form has a "sign here" box on every page, use the tool\'s place-on-every-page option. If you are returning several documents, [merge them](/tools/merge-pdf) into one file so nothing gets lost. And if the recipient insists on a "certified" or "digital" signature, ask which platform they use rather than guessing; a drawn signature is legally fine for most everyday contracts but is not what they mean.',
+          'If the form has a "sign here" box on every page, use the tool\'s place-on-every-page option. If you are returning several documents, [merge them](/tools/merge-pdf) into one file so nothing gets lost. And if the recipient insists on a "certified" or "digital" signature, ask which platform they use rather than guessing; a drawn signature is not what they mean.',
         ],
       },
     ],
     faq: [
-      { q: 'Is a drawn or typed signature legally valid?', a: 'In the United States (ESIGN Act), the United Kingdom, the European Union (eIDAS "simple electronic signature") and most other jurisdictions, a signature you intend as your signature is valid for ordinary contracts. Certain documents, such as wills and some property deeds, have stricter rules.' },
+      { q: 'Will a drawn or typed signature be accepted?', a: 'That depends on who asked you to sign and on the rules where you are, and some documents have stricter requirements than others. Check with the person or organisation that sent the document.' },
       { q: 'Can the recipient remove the signature?', a: 'It is drawn into the page content like any other graphic. Editing it out is as hard, or as easy, as editing any part of a PDF, which is the same as for a scanned signature.' },
       { q: 'Does it work on a phone?', a: 'Yes. Drawing with a finger on a phone screen works well, and the tool is installable as an app that works offline once the page has loaded.' },
       { q: 'Is my document uploaded when I sign it here?', a: 'No. The signature is placed by code running in your browser; you can verify it in the network tab or, after one visit, by signing with the network switched off.' },
@@ -2751,7 +2751,7 @@ export const guides: Guide[] = [
     faq: [
       { q: 'Is there a free Smallpdf alternative with no daily task limit?', a: 'Yes. A tool that processes PDFs entirely in the browser, like Stayput, has no per-day task count to hit, since there is no server-side job being metered.' },
       { q: 'Do I need to sign up to use a Smallpdf alternative?', a: 'Not for a browser-based tool like Stayput: it is free with no account, and your files are not uploaded.' },
-      { q: 'Does a no-upload PDF tool do everything Smallpdf does?', a: 'Not quite; heavier OCR conversions, legally binding e-signature workflows and team features are still easier on a service like Smallpdf, but merging, splitting, compressing, signing, unlocking, protecting, rotating, reordering, watermarking and numbering pages are covered.' },
+      { q: 'Does a no-upload PDF tool do everything Smallpdf does?', a: 'Not quite; heavier OCR conversions, e-signature workflows with audit trails and team features are still easier on a service like Smallpdf, but merging, splitting, compressing, signing, unlocking, protecting, rotating, reordering, watermarking and numbering pages are covered.' },
       { q: 'Is a browser-based PDF tool actually free, or does it have hidden limits?', a: 'A tool that runs locally has no meaningful marginal cost per file, so there is no natural reason to cap daily use the way a server-based service, which pays for the compute, typically does.' },
     ],
   },
