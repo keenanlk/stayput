@@ -148,7 +148,7 @@ const SPEECH_TOOLS = ['transcribe', 'add-subtitles-to-video'] as const;
 const SPOKEN = fileURLToPath(new URL('./fixtures/static/jfk.wav', import.meta.url));
 
 /** A failed caption run: what the page shows and the one tool_run event, which must carry only the class name. */
-async function failedCaptionRun(page: Page, baseURL: string, slug: string, sent: Sent[], file = SPOKEN) {
+async function failedCaptionRun(page: Page, baseURL: string, slug: string, sent: Sent[], file: Parameters<ReturnType<Page['locator']>['setInputFiles']>[0] = SPOKEN) {
   await page.goto(`${SITE}/tools/${slug}`);
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(file);
@@ -206,6 +206,36 @@ test('a file with no readable sound fails with AudioDecodeError before any model
   expect(out.data).toMatchObject({ outcome: 'error', error_class: 'AudioDecodeError' });
   expect(models).toEqual([]);
 });
+
+/** A video from the static fixtures with its sound renamed to the AMR sample entry Android recorders write, which no browser decoder here reads. */
+function amrVideo(): { name: string; mimeType: string; buffer: Buffer } {
+  const mp4 = Buffer.from(readFileSync(fileURLToPath(new URL('./fixtures/static/tone-16k-mono.mp4', import.meta.url))));
+  // 'mp4a' becomes 'samr', and the AAC config box that would still say AAC is renamed away.
+  for (const [from, to] of [['mp4a', 'samr'], ['esds', 'wide']] as const) {
+    const at = mp4.indexOf(from);
+    expect(at).toBeGreaterThan(0);
+    mp4.write(to, at, 'latin1');
+  }
+  return { name: 'recording.mp4', mimeType: 'video/mp4', buffer: mp4 };
+}
+
+for (const [label, file] of [
+  ['a video with AMR sound', amrVideo()],
+  ['a bare AMR recording', { name: 'voice.amr', mimeType: 'audio/amr', buffer: Buffer.concat([Buffer.from('#!AMR\n'), Buffer.alloc(4096, 0x3c)]) }],
+] as const) {
+  test(`${label} names the format and still fails with AudioDecodeError, before any model is fetched`, async ({ page, baseURL }) => {
+    const sent = await captureAnalytics(page, baseURL!);
+    const models: string[] = [];
+    page.on('request', (r) => r.url().includes('/models/') && models.push(r.url()));
+    const out = await failedCaptionRun(page, baseURL!, 'transcribe', sent, file);
+    expect(out.data).toMatchObject({ outcome: 'error', error_class: 'AudioDecodeError' });
+    expect(out.shown).toContain("sound is AMR");
+    expect(out.shown).toContain("can't decode");
+    expect(Object.keys(out.data)).not.toContain('format_name');
+    expect(JSON.stringify(sent)).not.toMatch(/AMR|recording|voice/);
+    expect(models).toEqual([]);
+  });
+}
 
 /** One failed run from the files given: the page shows `shown`, and the one tool_run event carries only the class name. */
 async function failedRun(page: Page, baseURL: string, path: string, files: Parameters<ReturnType<Page['locator']>['setInputFiles']>[0]) {
