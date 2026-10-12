@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import SignatureStage from '../../components/SignatureStage.astro';
+const tool = toolBySlug('signature-maker')!;
+---
+<ToolLayout tool={tool}>
+  <SignatureStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/signature-maker.ts"></script>

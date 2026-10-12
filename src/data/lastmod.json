@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-12",
-  "hash": "5e694d46201c3dac"
+  "hash": "3893c5c62435d02e"
  },
  "/2x2-photo": {
   "date": "2026-10-06",
@@ -32,8 +32,8 @@
   "hash": "c48472e1e7570264"
  },
  "/add-signature-to-pdf": {
-  "date": "2026-10-06",
-  "hash": "34af7477470f3533"
+  "date": "2026-10-12",
+  "hash": "b96408299403e676"
  },
  "/animated-emote-resizer": {
   "date": "2026-10-06",
@@ -222,6 +222,10 @@
  "/crop-video-for-tiktok": {
   "date": "2026-10-06",
   "hash": "be15eba726a5a8ac"
+ },
+ "/cursive-signature-generator": {
+  "date": "2026-10-12",
+  "hash": "06d43d81e77834c6"
  },
  "/cut-video": {
   "date": "2026-10-06",
@@ -865,7 +869,7 @@
  },
  "/licenses": {
   "date": "2026-10-12",
-  "hash": "730b10d2bef9cb1f"
+  "hash": "28836d4ffb093050"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-06",
@@ -1084,8 +1088,8 @@
   "hash": "67ba55a87cfbe17e"
  },
  "/privacy": {
-  "date": "2026-10-11",
-  "hash": "1d589e93ebc20345"
+  "date": "2026-10-12",
+  "hash": "da47058d877299c9"
  },
  "/psd-to-jpg": {
   "date": "2026-10-09",
@@ -1198,6 +1202,10 @@
  "/sharpen-image": {
   "date": "2026-10-06",
   "hash": "d0b67f12580b8eb4"
+ },
+ "/signature-generator": {
+  "date": "2026-10-12",
+  "hash": "82f947d4e4afd541"
  },
  "/slack-emoji-resizer": {
   "date": "2026-10-11",
@@ -1557,7 +1565,11 @@
  },
  "/tools/sign-pdf": {
   "date": "2026-10-12",
-  "hash": "6196c839be35b66f"
+  "hash": "bd088d513d51286c"
+ },
+ "/tools/signature-maker": {
+  "date": "2026-10-12",
+  "hash": "5b586bdc0bee374d"
  },
  "/tools/split-image": {
   "date": "2026-10-07",
@@ -1646,6 +1658,10 @@
  "/tools/webcam-test": {
   "date": "2026-10-06",
   "hash": "293dbf98be969547"
+ },
+ "/transparent-signature-png": {
+  "date": "2026-10-12",
+  "hash": "23a02410ea31c862"
  },
  "/trim-mp4": {
   "date": "2026-10-06",

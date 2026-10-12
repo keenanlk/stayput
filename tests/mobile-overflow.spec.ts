@@ -18,6 +18,8 @@ const pages = [
   '/tools/crop-gif',
   '/tools/barcode-generator',
   '/tools/qr-code-scanner',
+  '/tools/signature-maker',
+  '/transparent-signature-png',
   '/qr-code-scanner-for-pc',
   '/itf-14-barcode-generator',
   '/press',

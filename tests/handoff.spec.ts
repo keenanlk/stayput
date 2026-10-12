@@ -53,7 +53,7 @@ async function store(page: Page) {
 }
 
 /** Save a file for `to` the way the sending page does, from a page on the same origin. */
-async function seed(page: Page, o: { to: string; name: string; type: string; bytes: number[]; ageMs?: number; note?: boolean }) {
+async function seed(page: Page, o: { to: string; name: string; type: string; bytes: number[]; ageMs?: number; note?: boolean; kind?: string }) {
   await page.evaluate(async (a) => {
     const at = Date.now() - (a.ageMs ?? 0);
     const id = `seed${at}`;
@@ -64,7 +64,7 @@ async function seed(page: Page, o: { to: string; name: string; type: string; byt
       open.onsuccess = () => {
         const db = open.result;
         const tx = db.transaction('files', 'readwrite');
-        tx.objectStore('files').put({ id, bytes: new Uint8Array(a.bytes).buffer, name: a.name, type: a.type, from: 'Seed tool', to: a.to, at });
+        tx.objectStore('files').put({ id, bytes: new Uint8Array(a.bytes).buffer, name: a.name, type: a.type, from: 'Seed tool', to: a.to, at, ...(a.kind ? { kind: a.kind } : {}) });
         tx.oncomplete = () => {
           db.close();
           resolve();
@@ -73,7 +73,7 @@ async function seed(page: Page, o: { to: string; name: string; type: string; byt
       };
     });
     localStorage.setItem('stayput:handoff-at', String(at));
-    if (a.note !== false) sessionStorage.setItem('stayput:handoff', JSON.stringify({ id, to: a.to }));
+    if (a.note !== false) sessionStorage.setItem('stayput:handoff', JSON.stringify({ id, to: a.to, ...(a.kind ? { kind: a.kind } : {}) }));
   }, o);
 }
 
@@ -241,3 +241,51 @@ for (const [from, targets] of Object.entries(handoffs)) {
     });
   }
 }
+
+// The signature maker carries a signature picture to Sign PDF with a `kind`; the shell of every other tool leaves such a record alone.
+/** A small transparent PNG with a dark squiggle, made in the page the way the signature maker makes one. */
+async function signaturePng(page: Page): Promise<number[]> {
+  return page.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = 240;
+    c.height = 80;
+    const ctx = c.getContext('2d')!;
+    ctx.strokeStyle = '#111111';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(10, 60);
+    ctx.bezierCurveTo(60, 0, 100, 90, 230, 20);
+    ctx.stroke();
+    const blob: Blob = await new Promise((r) => c.toBlob((b) => r(b!), 'image/png'));
+    return [...new Uint8Array(await blob.arrayBuffer())];
+  });
+}
+
+test('a signature record is not taken by the shell of a tool that would accept an image, and is left in place', async ({ page }) => {
+  await page.goto('/privacy');
+  await seed(page, { to: '/tools/compress-image', name: 'signature.png', type: 'image/png', bytes: await signaturePng(page), kind: 'signature' });
+  await ready(page, '/tools/compress-image');
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '0');
+  await expect(page.locator('#handoff-note')).toHaveCount(0);
+  const kept = await store(page);
+  expect(kept.records).toBe(1);
+  expect(JSON.parse(kept.note!).kind).toBe('signature');
+});
+
+test('Sign PDF picks up a signature record as its Image mode, and still adopts a PDF record as the file', async ({ page }) => {
+  await page.goto('/privacy');
+  await seed(page, { to: '/tools/sign-pdf', name: 'signature.png', type: 'image/png', bytes: await signaturePng(page), kind: 'signature' });
+  await ready(page, '/tools/sign-pdf');
+  await expect(page.locator('#sig-carried')).toHaveText('Your signature is ready. Drop the PDF to place it.');
+  await expect(page.locator('input[name="sig-mode"][value="image"]')).toBeChecked();
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '0');
+  expect(await store(page)).toEqual({ records: 0, note: null, marker: null });
+
+  await page.goto('/privacy');
+  await seed(page, { to: '/tools/sign-pdf', name: 'carried.pdf', type: 'application/pdf', bytes: [...readFileSync(fx('generated/text.pdf'))] });
+  await ready(page, '/tools/sign-pdf');
+  await expect(page.locator('#handoff-note')).toContainText('Using carried.pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
+  await expect(page.locator('#sig-carried')).toBeHidden();
+  await expect(page.locator('input[name="sig-mode"][value="draw"]')).toBeChecked();
+});

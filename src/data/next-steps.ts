@@ -82,6 +82,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'qr-code-generator': ['image-to-pdf', 'compress-png'],
   'barcode-generator': ['image-to-pdf', 'compress-png'],
   'qr-code-scanner': ['qr-code-generator', 'barcode-generator'],
+  'signature-maker': ['sign-pdf', 'compress-png'],
   'color-picker': ['crop-image', 'compress-image'],
   'remove-background': ['crop-image', 'compress-image'],
   'watermark-image': ['compress-image', 'strip-exif'],

@@ -574,6 +574,21 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
   font-display: swap;
   src: url('/fonts/caveat-500.woff2') format('woff2');
 }
+/* The signature maker's two other script fonts: a browser fetches each only when text in it is laid out (the Type tab). */
+@font-face {
+  font-family: 'Great Vibes';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/great-vibes.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Dancing Script';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/dancing-script-500.woff2') format('woff2');
+}
 .sign-panel { display: grid; gap: 18px; }
 .sign-maker { display: grid; gap: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px; background: var(--ground); }
 .sig-pad { display: block; width: 100%; max-width: 600px; aspect-ratio: 3 / 1; height: auto; background: #fdfdfa; background-image: linear-gradient(to bottom, transparent calc(74% - 1px), #d8d4c4 calc(74% - 1px), #d8d4c4 74%, transparent 74%); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); box-shadow: var(--shadow); touch-action: none; cursor: crosshair; }

@@ -3,6 +3,8 @@ import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, renderPage, sta
 import type * as PdfJs from 'pdfjs-dist';
 import { suffixName, type OutputFile } from '../lib/files';
 import { InputError } from '../lib/input-error';
+import { takeHandoff } from '../lib/handoff';
+import { hasTransparency, inkAlpha, trimAlpha } from '../lib/signature';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -21,6 +23,12 @@ const pageCanvas = document.getElementById('page-canvas') as HTMLCanvasElement;
 const layer = document.getElementById('stamp-layer')!;
 const pageLabel = document.getElementById('page-label')!;
 const placementCount = document.getElementById('placement-count')!;
+const imageBox = document.getElementById('image-box')!;
+const carriedNote = document.getElementById('sig-carried')!;
+const imageWrap = document.getElementById('sig-image-wrap')!;
+const imagePreview = document.getElementById('sig-image-preview') as HTMLImageElement;
+const imageNote = document.getElementById('sig-image-note')!;
+const imageFile = document.getElementById('sig-image-file') as HTMLInputElement;
 
 /* ------------------------------------------------------------------ */
 /* State                                                               */
@@ -49,6 +57,8 @@ let pageSizes: { w: number; h: number }[] = [];
 let placements: Placement[] = [];
 let nextId = 1;
 let drawn = false;
+/** A signature picture, carried from the signature maker or chosen from a file. */
+let signatureImage: { png: Uint8Array; aspect: number } | undefined;
 
 /* ------------------------------------------------------------------ */
 /* Signature pad                                                       */
@@ -175,6 +185,7 @@ function syncMode() {
   const mode = radio('sig-mode', 'draw');
   drawBox.hidden = mode !== 'draw';
   typeBox.hidden = mode !== 'type';
+  imageBox.hidden = mode !== 'image';
   syncPreview();
 }
 function syncPreview() {
@@ -187,6 +198,94 @@ sigText.addEventListener('input', syncPreview);
 sigFont.addEventListener('change', syncPreview);
 sigColor.addEventListener('change', syncPreview);
 syncMode();
+
+/* ------------------------------------------------------------------ */
+/* Signature image                                                     */
+/* ------------------------------------------------------------------ */
+const IMAGE_EDGE = 2400;
+
+/**
+ * A picture of a signature as a transparent PNG trimmed to its ink. One that is already
+ * transparent is kept as it is; one with no transparency is treated as ink on paper and has the
+ * paper taken out, in the ink colour chosen above.
+ */
+async function imageToSignature(blob: Blob): Promise<{ png: Uint8Array; aspect: number }> {
+  const bitmap = await createImageBitmap(blob);
+  try {
+    const k = Math.min(1, IMAGE_EDGE / Math.max(bitmap.width, bitmap.height));
+    const w = Math.max(1, Math.round(bitmap.width * k));
+    const h = Math.max(1, Math.round(bitmap.height * k));
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    const data = ctx.getImageData(0, 0, w, h);
+    if (!hasTransparency(data.data)) {
+      // Paper and ink: flatten, then keep only what is darker than the paper around it.
+      const alpha = inkAlpha(data.data, w, h, 50);
+      const rgb = [1, 3, 5].map((i) => parseInt(sigColor.value.slice(i, i + 2), 16));
+      for (let i = 0; i < alpha.length; i++) {
+        data.data[i * 4] = rgb[0]!;
+        data.data[i * 4 + 1] = rgb[1]!;
+        data.data[i * 4 + 2] = rgb[2]!;
+        data.data[i * 4 + 3] = alpha[i]!;
+      }
+      ctx.putImageData(data, 0, 0);
+    }
+    const alpha = new Uint8ClampedArray(w * h);
+    const px = ctx.getImageData(0, 0, w, h).data;
+    for (let i = 0; i < alpha.length; i++) alpha[i] = px[i * 4 + 3]!;
+    const r = trimAlpha(alpha, w, h);
+    if (r.w === 0) throw new InputError('No signature found in this image. Use dark ink on light paper, or a PNG with a transparent background.');
+    const out = document.createElement('canvas');
+    out.width = r.w;
+    out.height = r.h;
+    out.getContext('2d')!.drawImage(c, r.x, r.y, r.w, r.h, 0, 0, r.w, r.h);
+    c.width = c.height = 0;
+    return { png: await canvasPng(out), aspect: r.w / r.h };
+  } finally {
+    bitmap.close();
+  }
+}
+
+function showSignatureImage(made: { png: Uint8Array; aspect: number }) {
+  signatureImage = made;
+  const old = imagePreview.src;
+  imagePreview.src = URL.createObjectURL(new Blob([made.png as BlobPart], { type: 'image/png' }));
+  if (old.startsWith('blob:')) URL.revokeObjectURL(old);
+  imageWrap.hidden = false;
+}
+
+async function takeSignatureImage(blob: Blob) {
+  try {
+    showSignatureImage(await imageToSignature(blob));
+    imageNote.textContent = 'Ready: drop the PDF if you have not, then press "Add signature to this page".';
+  } catch (e) {
+    signatureImage = undefined;
+    imageWrap.hidden = true;
+    imageNote.textContent = e instanceof InputError ? e.message : 'This file is not an image this page can read. Try a PNG, JPG or WebP file.';
+  }
+}
+
+document.getElementById('sig-image-choose')!.addEventListener('click', () => imageFile.click());
+imageFile.addEventListener('change', () => {
+  const f = imageFile.files?.[0];
+  if (f) void takeSignatureImage(f);
+  imageFile.value = '';
+});
+
+/** A signature carried over from the signature maker: selected as Image mode, with a line to say so until the PDF arrives. */
+async function adoptSignature() {
+  const carried = await takeHandoff('image/png', 'signature');
+  if (!carried) return;
+  await takeSignatureImage(carried.file);
+  if (!signatureImage) return;
+  const imageRadio = document.querySelector<HTMLInputElement>('input[name="sig-mode"][value="image"]');
+  if (imageRadio) imageRadio.checked = true;
+  syncMode();
+  carriedNote.hidden = !panel.hidden;
+}
 
 /* ------------------------------------------------------------------ */
 /* Page viewer                                                         */
@@ -358,7 +457,8 @@ async function addPlacement(kind: Placement['kind'], make: () => Promise<{ png: 
   shell.hideError();
   const made = await make();
   if (!made) {
-    shell.showError(kind === 'signature' ? (radio('sig-mode', 'draw') === 'draw' ? 'Draw your signature first.' : 'Type your name first.') : 'Enter some text first.');
+    const mode = radio('sig-mode', 'draw');
+    shell.showError(kind === 'signature' ? (mode === 'draw' ? 'Draw your signature first.' : mode === 'image' ? 'Choose a signature image first.' : 'Type your name first.') : 'Enter some text first.');
     return;
   }
   const W = pageCanvas.clientWidth;
@@ -390,7 +490,9 @@ async function addPlacement(kind: Placement['kind'], make: () => Promise<{ png: 
 
 document.getElementById('add-signature')!.addEventListener('click', () =>
   void addPlacement('signature', async () => {
-    if (radio('sig-mode', 'draw') === 'draw') return padToPng();
+    const mode = radio('sig-mode', 'draw');
+    if (mode === 'draw') return padToPng();
+    if (mode === 'image') return signatureImage;
     const text = sigText.value.trim();
     if (!text) return undefined;
     return textToPng(text, fontFor(sigFont.value, 120), sigColor.value, 120);
@@ -451,6 +553,7 @@ const shell = createShell({
     pdf = await openWithPdfJs(bytes);
     pageCount = pdf.numPages;
     panel.hidden = false;
+    carriedNote.hidden = true;
     await showPage(0);
   },
   async process(files, progress) {
@@ -471,3 +574,5 @@ const shell = createShell({
   },
   resultsTitle: () => 'Signed',
 });
+
+void adoptSignature();

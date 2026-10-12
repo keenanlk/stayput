@@ -45,7 +45,9 @@ test.describe('search ranking', () => {
     // Both ways of making a GIF come up for the bare word.
     expect(top('gif', 4)).toEqual(expect.arrayContaining(['/tools/video-to-gif', '/tools/gif-maker']));
     expect(top('jpeg to png')).toEqual(['/jpg-to-png']);
-    expect(top('signature', 2)).toContain('/tools/sign-pdf');
+    // The signature maker and its generator page come up for the bare word, with Sign PDF after them.
+    expect(top('signature', 3)).toEqual(expect.arrayContaining(['/tools/sign-pdf', '/tools/signature-maker']));
+    expect(top('sign pdf')).toEqual(['/tools/sign-pdf']);
     expect(top('audio from video', 3)).toContain('/tools/video-to-mp3');
     expect(top('remove background', 1)).toContain('/tools/remove-background');
   });
