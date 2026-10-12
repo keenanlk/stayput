@@ -18,6 +18,8 @@ async function open(page: Page, finder: 'fast' | 'edges') {
 
 for (const finder of ['fast', 'edges'] as const) {
   test(`the ${finder} person finder keeps the person and paints the colour behind`, async ({ page, browserName }) => {
+    // Linux CI WebKit reads decoded video frames back blank, so its pixels say nothing; this runs in Mac WebKit with PW_WEBKIT=1.
+    test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit reads video frames back blank');
     test.setTimeout(420_000);
     const fetched: string[] = [];
     page.on('request', (r) => r.url().includes('/models/') && fetched.push(new URL(r.url()).pathname));
