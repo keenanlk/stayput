@@ -4,7 +4,7 @@
  * function and read their options through the helpers below.
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
-import { classifyError, trackFilesAdded, trackToolRun } from './analytics';
+import { classifyError, trackFilesAdded, trackToolRun, trackToolStart } from './analytics';
 import { EncoderStall } from './encoder-watchdog';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
@@ -53,6 +53,8 @@ export interface ShellOptions {
   folders?: boolean;
   /** A long video job: keep the screen on while it runs, and say so if the page was hidden when it failed. */
   keepAwake?: boolean;
+  /** Send one tool_start event when Run is pressed (the caption tools, where phones abandon runs). */
+  announceStart?: boolean;
 }
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -434,9 +436,18 @@ export function createShell(opts: ShellOptions) {
   }
 
   /** A line above the run button saying what is still needed before Run (empty hides it). */
-  function setHint(text = '') {
+  function setHint(text = '', link?: { text: string; href: string }) {
     const line = [text, opts.keepAwake && isPhoneBrowser() ? KEEP_SCREEN_ON_HINT : ''].filter(Boolean).join(' ');
     hint.textContent = line;
+    // One phrase in the line can be a link (the warning's "Trim it first").
+    const at = link ? line.indexOf(link.text) : -1;
+    if (link && at >= 0) {
+      const a = document.createElement('a');
+      a.href = link.href;
+      a.textContent = link.text;
+      hint.textContent = line.slice(0, at);
+      hint.append(a, line.slice(at + link.text.length));
+    }
     hint.hidden = !line;
   }
 
@@ -450,6 +461,7 @@ export function createShell(opts: ShellOptions) {
     const inputBytes = files.reduce((n, f) => n + f.file.size, 0);
     const tool = root.dataset.slug ?? 'unknown';
     const mine = (guard = opts.keepAwake ? guardRun() : undefined);
+    if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
     try {
       const result = await opts.process(files, progressApi);
       const outs = Array.isArray(result) ? result : result.outputs;

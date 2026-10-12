@@ -226,8 +226,27 @@ test.describe('a run interrupted by the screen locking', () => {
     await ctx.close();
   });
 
+  test('Transcribe holds the screen on while it runs, and releases it at the end', async ({ browser }) => {
+    test.setTimeout(120_000);
+    const ctx = await browser.newContext({ userAgent: PHONE, hasTouch: true });
+    const page = await ctx.newPage();
+    await stubWakeLock(page, 'ok');
+    // The model cannot be fetched, so the run ends quickly: the lock must still be given back.
+    await page.route('**/models/**/*.onnx', (route) => route.abort('connectionreset'));
+    await page.goto('/tools/transcribe');
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('#run-hint')).toContainText('Keep the screen on while it works.');
+    await page.locator('#file-input').setInputFiles(fileURLToPath(new URL('./fixtures/static/jfk.wav', import.meta.url)));
+    await page.locator('#run').click();
+    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 100_000 });
+    const l = await lock(page);
+    expect(l.requests).toBeGreaterThan(0);
+    expect(l.releases).toBeGreaterThan(0);
+    await ctx.close();
+  });
+
   test('a computer sees no keep-the-screen-on hint', async ({ page }) => {
     await open(page);
-    await expect(page.locator('#run-hint')).toBeHidden();
+    await expect(page.locator('#run-hint')).not.toContainText('Keep the screen on');
   });
 });

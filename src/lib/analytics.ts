@@ -15,6 +15,9 @@
  *   and ns (experiment E2 arm, "on" or "off"). Tools that
  *   produce a set kind of file add format, the kind or option picked ("mp4",
  *   "ico", "aes-zip"; always a fixed choice, never anything about the file).
+ * - tool_start: Run was pressed on a caption tool, before the work begins. tool, files,
+ *   input, format and the journey context: only details tool_run also sends, so the
+ *   runs that never finish (a phone's screen locking, a closed tab) can be counted.
  * - next_step: a click on a suggested next tool. tool, to, ns.
  * - search_open: the header search was opened. page.
  * - search_pick: a header search result was opened. to (a site path), kind
@@ -131,6 +134,21 @@ export function classifyError(e: unknown): string {
 export function trackFilesAdded(data: { tool: string; files: number; inputBytes: number }): void {
   try {
     track('files_added', { tool: data.tool, files: countBucket(data.files), input: sizeBucket(data.inputBytes), ...context() });
+  } catch {
+    // Analytics must never affect the tool.
+  }
+}
+
+/** Run was pressed. Carries only fields tool_run sends too; touches no run counters, so tool_run's run_n is unchanged. */
+export function trackToolStart(data: { tool: string; files: number; inputBytes: number; format?: string }): void {
+  try {
+    track('tool_start', {
+      tool: data.tool,
+      files: countBucket(data.files),
+      input: sizeBucket(data.inputBytes),
+      ...(data.format ? { format: data.format } : {}),
+      ...context(),
+    });
   } catch {
     // Analytics must never affect the tool.
   }

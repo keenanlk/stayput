@@ -6,7 +6,7 @@ import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/
 import { EncoderStall } from '../lib/encoder-watchdog';
 import { encodeFailedError, encodeMemoryError, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
-import { overPhoneLimit, phoneLimitNote } from '../lib/phone-limit';
+import { MODEL_DOWNLOAD_NOTE, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
 import { InputError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
 
@@ -34,6 +34,7 @@ const RELOAD_NOTE = 'The last run ran out of memory. Reload the page before capt
 
 const shell = createShell({
   keepAwake: true,
+  announceStart: true,
   // A video too big for a phone to caption is said so now, not after the browser gives up.
   onFilesChanged(files) {
     // Clear: nothing is held for the next run. The worker restarts from the stored model, with no new download.
@@ -41,7 +42,7 @@ const shell = createShell({
     const videos = files.filter((f) => !isSubs(f.file));
     const speech = !files.some((f) => isSubs(f.file));
     const note = speech ? phoneLimitNote(Math.max(0, ...videos.map((f) => f.file.size))) : '';
-    shell.setHint([reloadAdvised ? RELOAD_NOTE : '', note].filter(Boolean).join(' '));
+    shell.setHint([reloadAdvised ? RELOAD_NOTE : '', note, speech ? MODEL_DOWNLOAD_NOTE : ''].filter(Boolean).join(' '), TRIM_LINK);
   },
   outputFormat: () => 'mp4',
   async process(files, progress) {
@@ -62,6 +63,8 @@ const shell = createShell({
     }
   },
 });
+// Before any file is added, the hint above Run already says what the first run downloads.
+shell.setHint(MODEL_DOWNLOAD_NOTE);
 
 /** An error the page will show as "out of memory", marked so the page can advise a reload. */
 const asMemory = <T extends Error>(e: T): T => Object.assign(e, { memory: true });

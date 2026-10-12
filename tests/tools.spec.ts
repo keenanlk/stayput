@@ -6885,6 +6885,23 @@ test('Add subtitles to video writes captions from the speech and can save them a
   expect(errors).toEqual([]);
 });
 
+test('Video to subtitles shows the download line before any run and the phone size note with a trim link', async ({ browser }) => {
+  const big = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'long.mp4');
+  writeFileSync(big, '');
+  truncateSync(big, 201_000_000);
+  const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1' });
+  const p = await phone.newPage();
+  await p.goto('/video-to-subtitles');
+  await expect(p.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(p.locator('#run-hint')).toBeVisible();
+  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once. Keep the screen on while it works.');
+  await p.locator('#file-input').setInputFiles(big);
+  await expect(p.locator('#run-hint')).toContainText('about 200 MB');
+  await expect(p.locator('#run-hint')).toContainText('about 76 MB');
+  await expect(p.locator('#run-hint').getByRole('link', { name: 'Trim it first' })).toHaveAttribute('href', '/tools/trim-video');
+  await phone.close();
+});
+
 test('Auto caption video warns before a too-big video runs on a phone, and says nothing on a computer', async ({ browser }) => {
   const big = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'long.mp4');
   writeFileSync(big, '');
@@ -6899,10 +6916,11 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   await p.locator('#file-input').setInputFiles(big);
   await expect(p.locator('#run-hint')).toBeVisible();
   await expect(p.locator('#run-hint')).toContainText('about 200 MB');
+  await expect(p.locator('#run-hint').getByRole('link', { name: 'Trim it first' })).toHaveAttribute('href', '/tools/trim-video');
   await p.locator('#clear').click();
   await p.locator('#file-input').setInputFiles(small);
-  // Only the keep-the-screen-on line is left for a video that is small enough.
-  await expect(p.locator('#run-hint')).toHaveText('Keep the screen on while it works.');
+  // No size warning for a video that is small enough: the download line and the keep-the-screen-on line are left.
+  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once. Keep the screen on while it works.');
   await phone.close();
   const desktop = await browser.newContext();
   const d = await desktop.newPage();
@@ -6910,7 +6928,8 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   await expect(d.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await d.locator('#file-input').setInputFiles(big);
   await expect(d.locator('#run')).toBeVisible();
-  await expect(d.locator('#run-hint')).toBeHidden();
+  // No size warning and no keep-awake line on a computer; only what the first run downloads.
+  await expect(d.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once.');
   await desktop.close();
 });
 
