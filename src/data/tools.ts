@@ -3315,7 +3315,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'Every frame is examined and encoded again, so it depends on the length and resolution of the video and on your device. Keep the tab open while it works; the progress bar shows how far it has got.',
+        a: 'Slower than the video plays, because every frame is examined and redrawn on your device. On a MacBook Pro with an M3 Max chip a 30 fps video took about 6 times its length, so a 10-minute clip took about an hour. Phones vary and we have not benchmarked one: a single run on an iPhone in Safari took roughly 5 to 10 minutes for a 2-minute video, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
       },
       {
         q: 'Why does the browser console mention a Google address?',
