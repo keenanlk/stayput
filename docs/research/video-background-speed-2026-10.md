@@ -178,3 +178,53 @@ If wording must avoid a precise multiple, the safe, true general form is:
   The GPU rows depend on the Mac's GPU and are not a phone figure.
 - The binary-model runs timed inference and compositing with the person and background swapped (the mask
   polarity difference); the cost is identical, the picture was inverted.
+
+## Follow-up 1 result: the binary selfie segmenter, and the quality gate (2026-10-12)
+
+Built: `selfie_segmenter.tflite` (square; portrait and square video) and `selfie_segmenter_landscape.tflite`
+(video 1.5:1 and wider) are in `public/models/`, selectable as **Fast** on the tool and its two presets.
+Its mask 0 is the person, so `Matte.apply` does not invert it (the multiclass model's mask 0 is the background).
+
+### Quality check
+
+Side by side through the real pipeline (`bench-video-background.mjs --bg color --finder fast,edges --save`),
+green background, Chromium. Frames are in `video-background-selfie-compare/`, each as original | Better edges
+(multiclass) | Fast (binary). Clips are Mixkit stock videos, all under the *Mixkit Stock Video Free License*
+(commercial and personal use, no attribution required); the clips themselves are not in the repository, only
+these stills. Mixkit IDs are in the file names (`https://mixkit.co/free-stock-video/` plus the clip's page).
+
+| Clip | What it tests | Fast against Better edges |
+|---|---|---|
+| 52187 | curly hair, studio, microphone | Fast keeps a block of the background at the left and cuts the hair edge more bluntly: worse |
+| 16189 | hair thrown up, fine flying strands | Fast loses most strands and cuts chunks out of the hair: clearly worse |
+| 45893 | long hair, hair dryer, blurred room | similar on the hair; Fast keeps the hair dryer and a bit of the wall: slightly worse |
+| 33906 | low light, stage, coloured light | Fast finds **no person** at all in this frame: clearly worse |
+| 8784 | busy café, glasses, phone held up, blurred person behind | Fast keeps the blurred person behind as well as the phone; Better edges loses her: different, arguably better for Fast |
+| 50117 | glasses, two people | Fast keeps both people's outlines; Better edges drops the second person's shoulder: Fast better |
+| 41813 | two people, top-down, warm light | Fast keeps the whole scene including the table: worse (Better edges is rough too) |
+| 5497 | fast hands, gestures, camera in front | Fast keeps the camera and part of the desk: worse |
+| 4823 | walking, outdoors | about equal |
+| 42308 | 9:16, fast arm and umbrella | about equal; both rough on the umbrella |
+| 42323 | 9:16, curly hair, busy poster wall | about equal; Fast leaves a little more wall at the right |
+
+**Outcome: Better edges stays the default and Fast is the option.** The gate was "not visibly worse on any
+clip", and the binary model is visibly worse on hair detail (two clips) and loses the person in low light.
+It is better or equal on a few clips (two people, 9:16), so the Fast option is useful for them and for long videos.
+
+### Speed, re-measured
+
+Apple M3 Max, 36 GB, macOS; Playwright 1.63 Chromium (headless shell) and WebKit builds; local static server;
+blur background; a 10 s, 300-frame, 30 fps clip; 2 runs each (the two runs agree within 1 s). The 720p clip is
+the first 10 s of Mixkit 52187; the 1080p clip is the same footage scaled up, so it tests the pixel count, not
+1080p detail. Wall time includes starting the model from localhost.
+
+| Browser | Size | Better edges | Fast | Fast gain |
+|---|---|---|---|---|
+| Chromium | 720p | 59.9 s (6.0×) | 13.2 s (1.3×) | 4.5× |
+| Chromium | 1080p | 69.2 s (6.9×) | 22.0 s (2.2×) | 3.1× |
+| WebKit | 720p | 59.8 s (6.0×) | 13.0 s (1.3×) | 4.6× |
+| WebKit | 1080p | 60.6 s (6.1×) | 13.7 s (1.4×) | 4.4× |
+
+Across the 11 quality clips (Chromium, 7 to 24 s each, 24 to 30 fps, 720p; 720×1280 for two), Fast took 4.4 to 13.6 s
+and Better edges 30 to 105 s (4 to 8× real time). The first download falls from about 28 MB to about 12 MB with Fast.
+A 10-minute clip was not timed; the copy says "would take".
