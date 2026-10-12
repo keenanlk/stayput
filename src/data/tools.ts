@@ -3451,7 +3451,7 @@ export const tools: Tool[] = [
         ],
       },
     ],
-    keywords: ['remove background', 'background remover', 'remove background from image', 'transparent background', 'make background transparent', 'remove bg', 'cut out image', 'white background'],
+    keywords: ['remove background', 'background remover', 'remove background from image', 'transparent background', 'make background transparent', 'remove bg', 'remove.bg alternative', 'cut out image', 'white background'],
     steps: [
       'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
       'Choose a transparent, white or coloured background, or keep the scene and blur it, and the file type. The first photo downloads the cut-out model once; after that it is cached.',
@@ -3494,6 +3494,10 @@ export const tools: Tool[] = [
       {
         q: 'Which model does this use?',
         a: 'ISNet general-use from the DIS research project (see the licenses page for its licensing), converted to 8-bit weights so it downloads faster. It runs with onnxruntime-web, Microsoft’s open-source runtime for machine learning models in the browser.',
+      },
+      {
+        q: 'Is this an alternative to remove.bg?',
+        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model of about 46 MB. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
       },
     ],
   },

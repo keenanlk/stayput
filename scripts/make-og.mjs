@@ -36,8 +36,8 @@ const html = ({ heading, tagline, category }) => `<!doctype html>
   .brand { position: absolute; left: 72px; top: 64px; display: flex; align-items: center; gap: 16px; font-weight: 800; font-size: 34px; letter-spacing: -0.02em; }
   .brand svg { width: 52px; height: 52px; }
   .kicker { position: absolute; left: 72px; top: 150px; font-size: 22px; font-weight: 600; color: #1f6f5f; letter-spacing: 0.04em; text-transform: uppercase; }
-  h1 { position: absolute; left: 72px; top: 196px; margin: 0; width: 1000px; font-size: ${heading.length > 26 ? 66 : 78}px; line-height: 1.05; letter-spacing: -0.025em; font-weight: 800; }
-  p { position: absolute; left: 72px; top: ${heading.length > 26 ? 372 : 330}px; margin: 0; width: 960px; font-size: 30px; line-height: 1.35; color: #4a5057; }
+  h1 { position: absolute; left: 72px; top: 196px; margin: 0; width: 1000px; font-size: ${heading.length > 66 ? 54 : heading.length > 26 ? 66 : 78}px; line-height: 1.05; letter-spacing: -0.025em; font-weight: 800; }
+  p { position: absolute; left: 72px; top: ${heading.length > 66 ? 336 : heading.length > 26 ? 372 : 330}px; margin: 0; width: 960px; font-size: 30px; line-height: 1.35; color: #4a5057; }
   .bar { position: absolute; left: 72px; right: 72px; bottom: 56px; display: flex; gap: 14px; align-items: center; font-size: 22px; font-weight: 600; color: #145147; }
   .bar span { background: #dcefe8; padding: 8px 18px; border-radius: 999px; }
   .bar .url { margin-left: auto; background: none; color: #6f767e; font-weight: 500; }
