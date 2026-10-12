@@ -53,10 +53,10 @@ export function encodeFailedError(cause: unknown): Error {
 export const speechModelError = () => make('SpeechModelError', 'The speech model could not read this recording. Try again, or try a shorter recording or another file.');
 export const noSpeechFound = (message: string) => make('NoSpeechFound', message);
 
-/** A browser or runtime error that means "out of memory", as far as anything tells them apart. */
+/** A browser or runtime error that means "out of memory", as far as its message tells. */
 export function looksLikeMemory(e: unknown): boolean {
   if (typeof e === 'object' && e && (e as { name?: string }).name === 'QuotaExceededError') return false;
-  if (e instanceof RangeError) return true;
+  // A RangeError is memory only when its message says so: a bad buffer length is not, and keeps its own class name.
   const text = e instanceof Error ? e.message : typeof e === 'string' ? e : '';
   return /out of memory|memory|bad_alloc|allocation failed|array buffer allocation/i.test(text);
 }
