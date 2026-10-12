@@ -4,6 +4,7 @@ import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/
 import { describeEdit } from './video-edit-shell';
 import { InputError } from '../lib/input-error';
 import { blur as boxBlur } from '../lib/blur';
+import { TimeLeft } from '../lib/time-left';
 
 /**
  * Video background remover: the people in each frame are found by MediaPipe's
@@ -86,6 +87,7 @@ createShell({
       const share = (f: number) => (index + f) / videos.length;
       const matte = new Matte();
       const blurred = document.createElement('canvas');
+      const timeLeft = new TimeLeft();
       const r = await editVideo(file, {
         // The frame is only drawn on and copied from; the person finder reads its own small canvas.
         readsBack: false,
@@ -98,7 +100,11 @@ createShell({
             else drawBlurred(c, frame, blurred, strength);
           });
         },
-        onProgress: (f) => progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}%`, share(0.03 + f * 0.97)),
+        onProgress: (f) => {
+          // It is slower than the video plays, so say how long is left: a long run with only a percentage reads as stuck.
+          const left = timeLeft.update(f) ?? 'working out the time left';
+          progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}% · ${left}. Keep this tab open.`, share(0.03 + f * 0.97));
+        },
       });
       const found = matte.frames ? matte.framesWithPerson / matte.frames : 0;
       const what = bgKind === 'blur' ? 'background blurred' : bgKind === 'color' ? `background ${color}` : `background from ${pictures[0]!.file.name}`;
