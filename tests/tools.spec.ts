@@ -7637,6 +7637,7 @@ const makerButtons = ['#sm-png', '#sm-svg', '#sm-copy', '#sm-signpdf'];
 
 test('Signature maker draws, undoes, recolours and saves a transparent PNG and an SVG; nothing drawn leaves the tab', async ({ page }) => {
   const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const net = watchNetwork(page);
   await expect(page.locator('#drop')).toBeHidden();
   await expect(page.locator('input[name="sm-mode"]:checked')).toHaveValue('draw');
@@ -7708,6 +7709,7 @@ test('Signature maker draws, undoes, recolours and saves a transparent PNG and a
 
 test('Signature maker types a name in three script fonts, fetches the fonts only when Type opens, and warns about other alphabets', async ({ page }) => {
   const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const net = watchNetwork(page);
   const fonts: string[] = [];
   page.on('request', (r) => {
@@ -7757,6 +7759,7 @@ test('Signature maker types a name in three script fonts, fetches the fonts only
 
 test('Signature maker photo mode takes the paper out of an unevenly lit photo and says when there is no ink or not an image', async ({ page }) => {
   const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const net = watchNetwork(page);
   await choose(page.locator('input[name="sm-mode"][value="photo"]'));
   await expect(page.locator('#sm-photo-drop')).toContainText('Drop a photo of your signature here, or choose one');
@@ -7816,11 +7819,15 @@ test('Signature maker photo mode takes the paper out of an unevenly lit photo an
 
 test('Signature maker carries the signature to Sign PDF in the same tab, where it is placed on the PDF', async ({ page }) => {
   const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const net = watchNetwork(page);
   await scribble(page);
   await expect(page.locator('#sm-signpdf')).toBeEnabled();
   await page.locator('#sm-signpdf').click();
   await expect(page).toHaveURL(/\/tools\/sign-pdf$/);
+  // The note's text is in the HTML; it is shown only once the page's script has picked the signature up and wired the drop zone.
+  await expect(page.locator('#sig-carried')).toBeVisible();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#sig-carried')).toHaveText('Your signature is ready. Drop the PDF to place it.');
   await expect(page.locator('#sign-panel')).toBeHidden();
 
@@ -7852,6 +7859,7 @@ test('Signature maker carries the signature to Sign PDF in the same tab, where i
 
 test('Signature maker hand-off that cannot be saved stays on the page and says to download instead', async ({ page }) => {
   await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.evaluate(() => {
     IDBObjectStore.prototype.put = function () {
       throw new DOMException('The quota has been exceeded.', 'QuotaExceededError');
@@ -7865,6 +7873,7 @@ test('Signature maker hand-off that cannot be saved stays on the page and says t
 
 test('Sign PDF Image mode takes a signature image from a file: a transparent PNG as it is, a photo with its paper removed', async ({ page }) => {
   const errors = await open(page, 'sign-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
   await expect(page.locator('#sign-panel')).toBeVisible();
   await choose(page.locator('input[name="sig-mode"][value="image"]'));
