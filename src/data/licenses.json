@@ -1883,6 +1883,40 @@
    "copyright": "Copyright 2014 The Caveat Project Authors"
   },
   {
+   "id": "f-great-vibes",
+   "name": "Great Vibes font",
+   "version": "Regular, 2015 (Google Fonts v21)",
+   "npm": null,
+   "licences": [
+    {
+     "name": "OFL-1.1",
+     "url": "https://spdx.org/licenses/OFL-1.1.html"
+    }
+   ],
+   "project": "https://github.com/googlefonts/great-vibes",
+   "source": "https://github.com/googlefonts/great-vibes",
+   "shipped": "/fonts/great-vibes.woff2 (licence at /fonts/OFL-GreatVibes.txt)",
+   "kind": "font",
+   "copyright": "Copyright 2015 The Great Vibes Pro Project Authors"
+  },
+  {
+   "id": "f-dancing-script",
+   "name": "Dancing Script font",
+   "version": "500, 2016 (Google Fonts v29)",
+   "npm": null,
+   "licences": [
+    {
+     "name": "OFL-1.1",
+     "url": "https://spdx.org/licenses/OFL-1.1.html"
+    }
+   ],
+   "project": "https://github.com/googlefonts/DancingScript",
+   "source": "https://github.com/googlefonts/DancingScript",
+   "shipped": "/fonts/dancing-script-500.woff2 (licence at /fonts/OFL-DancingScript.txt)",
+   "kind": "font",
+   "copyright": "Copyright 2016 The Dancing Script Project Authors"
+  },
+  {
    "id": "f-roboto",
    "name": "Roboto font (in pdfmake)",
    "version": "as bundled in pdfmake 0.3.11",

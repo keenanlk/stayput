@@ -15,6 +15,10 @@
  *   this site is opened at least TTL later, which deletes every stale record
  *   (a timestamp in localStorage says whether there is anything to look for).
  *
+ * A record can carry a `kind`. Tools that take what the shell would call "the file" ignore a
+ * kind-tagged record and leave it where it is; only the page that asks for that kind picks it
+ * up. The signature maker uses it to carry a signature picture to Sign PDF, which takes a PDF.
+ *
  * Every step is best effort. If storing fails (quota, private mode, a missing
  * API) or the file is over the limit, the link simply goes to the next tool,
  * which asks for a file as it always has. Nothing here ever shows an error.
@@ -46,11 +50,16 @@ interface Saved {
   from: string;
   to: string;
   at: number;
+  kind?: HandoffKind;
 }
 interface Note {
   id: string;
   to: string;
+  kind?: HandoffKind;
 }
+
+/** What a record is for, when it is not "the file this tool works on". */
+export type HandoffKind = 'signature';
 
 const here = () => location.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
 
@@ -147,7 +156,7 @@ async function discard(note: Note): Promise<void> {
  * not (too big, storage refused or slow): the caller then follows the link
  * with nothing carried.
  */
-export async function saveHandoff(file: { name: string; blob: Blob }, to: string, from: string): Promise<boolean> {
+export async function saveHandoff(file: { name: string; blob: Blob }, to: string, from: string, kind?: HandoffKind): Promise<boolean> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     if (file.blob.size === 0 || file.blob.size > HANDOFF_MAX_BYTES) return false;
@@ -164,7 +173,7 @@ export async function saveHandoff(file: { name: string; blob: Blob }, to: string
         const blob = await detachOutput(file.blob);
         const put = async (body: Pick<Saved, 'blob' | 'bytes'>) => {
           const tx = db.transaction(STORE, 'readwrite');
-          const record: Saved = { id, ...body, name: file.name, type: file.blob.type, from, to, at };
+          const record: Saved = { id, ...body, name: file.name, type: file.blob.type, from, to, at, ...(kind ? { kind } : {}) };
           tx.objectStore(STORE).put(record);
           await finished(tx);
         };
@@ -185,7 +194,7 @@ export async function saveHandoff(file: { name: string; blob: Blob }, to: string
       // A slow save may still land; the timestamp lets the next page load's sweep remove it.
       return false;
     }
-    session()?.setItem(NOTE_KEY, JSON.stringify({ id, to } satisfies Note));
+    session()?.setItem(NOTE_KEY, JSON.stringify({ id, to, ...(kind ? { kind } : {}) } satisfies Note));
     return true;
   } catch {
     return false;
@@ -212,11 +221,14 @@ export interface CarriedFile {
  * The file saved for this page, if there is one: loaded, then deleted from
  * storage. Undefined when nothing is waiting, it has expired, or this tool
  * would not take it (the page then shows its normal upload prompt).
+ *
+ * `kind` must match the record's: a call without one takes only an ordinary file and leaves a
+ * signature record for the page that asks for it, and the other way round.
  */
-export async function takeHandoff(accept: string): Promise<CarriedFile | undefined> {
+export async function takeHandoff(accept: string, kind?: HandoffKind): Promise<CarriedFile | undefined> {
   try {
     const note = readNote();
-    if (!note || note.to !== here()) return undefined;
+    if (!note || note.to !== here() || note.kind !== kind) return undefined;
     session()?.removeItem(NOTE_KEY);
     const db = await openDb();
     if (!db) return undefined;
@@ -224,7 +236,7 @@ export async function takeHandoff(accept: string): Promise<CarriedFile | undefin
       const rec = (await request(db.transaction(STORE).objectStore(STORE).get(note.id))) as Saved | undefined;
       await tidy(db, note.id);
       const body = rec?.blob instanceof Blob ? rec.blob : rec?.bytes instanceof ArrayBuffer ? rec.bytes : undefined;
-      if (!rec || !body || Date.now() - rec.at > HANDOFF_TTL_MS) return undefined;
+      if (!rec || !body || rec.kind !== kind || Date.now() - rec.at > HANDOFF_TTL_MS) return undefined;
       if (!acceptedBy(accept, rec.name, rec.type)) return undefined;
       return { file: new File([body], rec.name, { type: rec.type }), from: rec.from };
     } finally {

@@ -790,6 +790,10 @@ export const tools: Tool[] = [
         a: 'No. The PDF, your signature drawing and the signed result exist only in this browser tab. Your files are not uploaded, and nothing is kept once you close or reload the page.',
       },
       {
+        q: 'Can I use a signature image I already have?',
+        a: 'Yes. Choose Image next to Draw and Type, then pick a PNG, JPG or WebP file of your signature, or make one first in the [signature maker](/tools/signature-maker) and press Use in Sign PDF. A picture with a plain paper background has the paper taken out before it is placed.',
+      },
+      {
         q: 'Can I sign several pages?',
         a: 'Yes. Place the signature on every page that needs it. Each placement can be moved and resized on its own. You can also add your initials or the date the same way.',
       },
@@ -1900,6 +1904,90 @@ export const tools: Tool[] = [
       {
         q: 'Is what I type uploaded anywhere?',
         a: 'No. The barcode is drawn by code running in this page, so the number or text you type stays on your device. After one visit you can turn off your internet connection and it still works.',
+      },
+    ],
+  },
+  {
+    slug: 'signature-maker',
+    name: 'Signature maker',
+    title: 'Free Signature Maker & Generator, Transparent PNG | Stayput',
+    description: 'Draw, type or photograph your signature and save it as a transparent PNG, or an SVG when drawn. Free, no sign-up; nothing you make is uploaded.',
+    heading: 'Make a signature',
+    tagline: 'Draw it with a finger or mouse, type your name in a script font, or take it from a photo. Save a transparent PNG for documents, or place it on a PDF.',
+    category: 'pdf',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Make a signature',
+    action: 'Download',
+    sizeFact: 'No watermark, no sign-up',
+    keywords: ['signature maker', 'signature generator', 'free signature maker', 'online signature maker', 'create a signature', 'signature maker transparent png', 'draw signature online', 'signature maker no sign up'],
+    steps: [
+      'Choose Draw, Type or Photo. Draw with a finger, pen or mouse; type your name and pick a script; or add a photo of your signature on white paper.',
+      'Check the preview on the checkerboard, which shows what is transparent. Change the ink, pen width or ink strength until it looks right, and use Undo or Clear to start again.',
+      'Download the PNG (or the SVG for a drawn signature), copy it to paste into a document, or press Use in Sign PDF to place it on a PDF.',
+    ],
+    sections: [
+      {
+        heading: 'Which mode to use',
+        bullets: [
+          'Draw: the closest to your real signature. Works best with a finger on a phone or a pen on a tablet; a mouse works but is harder to control.',
+          'Type: the quickest. Three script styles, and what you get is a typeface, not your own handwriting.',
+          'Photo: sign a plain white page with a dark pen, photograph it in daylight, and the page takes the paper out and keeps the ink. See the [transparent signature PNG](/transparent-signature-png) page for photo tips.',
+        ],
+      },
+      {
+        heading: 'What you get',
+        bullets: [
+          'PNG: transparent background, trimmed to the signature, 600, 1200 or 2400 pixels wide.',
+          'SVG: drawn signatures only; it holds your strokes as paths, so it stays sharp at any size.',
+          'Copy image: puts the PNG on the clipboard to paste into a document or slide.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It makes a picture of a signature. It does not make a certificate-based digital signature, and it does not decide whether a form or office accepts an image.',
+          'It does not save your signature. Download it, or close the page and it is gone.',
+          'It does not make fancy-letter text to paste into a bio or message.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'How do I make a signature with a transparent background?',
+        a: 'Draw it, type it or add a photo here, then press Download PNG. The background of the file is transparent, so the signature sits on a document or slide without a white box around it. The preview is shown on a checkerboard so you can see which parts are transparent.',
+      },
+      {
+        q: 'Should I draw, type or use a photo?',
+        a: 'Draw if you want it to look like your own signature. Type if you need something quick and neat; it is a script typeface, not your handwriting. Use a photo if you already have a signature you like on paper, because it keeps the real shape of your pen strokes.',
+      },
+      {
+        q: 'Will a form, employer or office accept this?',
+        a: 'It is a picture of a signature, the same as signing paper and scanning it. Many forms, employers and offices accept that; some want a signature made in their own system, or a certificate-based digital signature, and this page does not make one. Check what the person asking for it accepts.',
+      },
+      {
+        q: 'How do I put the signature on a PDF?',
+        a: 'Press Use in Sign PDF. The signature is carried to the [Sign PDF](/tools/sign-pdf) page in this tab, where you drop your PDF, drag the signature into place and download the signed file. Or download the PNG and insert it in any document editor.',
+      },
+      {
+        q: 'Is my signature uploaded or saved?',
+        a: 'No. It is made by code running in this page, so what you draw, type or photograph stays on your device. Nothing is kept when you close or reload the page, so download it if you want it. If you press Use in Sign PDF, one temporary copy is kept in this browser’s storage on your device until Sign PDF picks it up. After one visit you can turn off your internet connection and the page still works.',
+      },
+      {
+        q: 'How should I photograph my signature?',
+        a: 'Sign in dark ink on plain white paper, lay it flat in daylight or under a lamp so no shadow crosses the signature, and shoot straight down. Crop away printed lines and text first with [Crop image](/tools/crop-image), because the page keeps anything dark. If the paper still shows, lower Ink strength; if pale ink is missing, raise it.',
+      },
+      {
+        q: 'Can I get an SVG?',
+        a: 'For a drawn signature, yes: the SVG holds your strokes as paths and stays sharp at any size. A typed signature or a photo is saved as PNG only. To trace a photo of a signature into shapes, use [Image to SVG](/tools/image-to-svg).',
+      },
+      {
+        q: 'Can I copy it as text to paste into a bio or message?',
+        a: 'No. This makes an image, so use Copy image to paste it into a document, slide or chat that accepts pictures. Fancy-letter text that looks like handwriting is a different kind of tool.',
+      },
+      {
+        q: 'Can someone else reuse my signature image?',
+        a: 'Anyone who gets the file can place it on another document, the same as a copy of your signature on paper. Share it only with people you trust and do not post it publicly.',
       },
     ],
   },

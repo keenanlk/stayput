@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(99);
+  expect(await page.locator('.index .tool-card').count()).toBe(100);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -569,7 +569,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'signature-maker', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -7594,4 +7594,325 @@ test('Phone number and email QR pages write tel: and mailto: codes and send noth
   const [mail] = await Promise.all([page.waitForEvent('download'), page.locator('#qr-png').click()]);
   expect(mail.suggestedFilename()).toBe('email-qr-code.png');
   net.assertNothingLeft(['5550100000', 'sales@example.com', 'Quote request']);
+});
+
+/** What a downloaded PNG holds: its size, how many pixels are fully opaque, the colours of those, and the corner alpha. */
+async function alphaStats(page: Page, bytes: Uint8Array) {
+  return page.evaluate(async (b64) => {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([arr]));
+    const c = document.createElement('canvas');
+    c.width = bmp.width;
+    c.height = bmp.height;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(bmp, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    let opaque = 0;
+    let visible = 0;
+    const colours = new Set<string>();
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3]! > 8) visible++;
+      if (d[i + 3] === 255) {
+        opaque++;
+        colours.add(`${d[i]},${d[i + 1]},${d[i + 2]}`);
+      }
+    }
+    return { width: c.width, height: c.height, opaque, visible, colours: [...colours], corner: d[3]! };
+  }, Buffer.from(bytes).toString('base64'));
+}
+
+async function scribble(page: Page, id = '#sm-pad', dy = 0) {
+  const pad = page.locator(id);
+  await pad.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  const box = (await pad.boundingBox())!;
+  await page.mouse.move(box.x + 40, box.y + 80 + dy);
+  await page.mouse.down();
+  for (let i = 1; i <= 24; i++) await page.mouse.move(box.x + 40 + i * 10, box.y + 80 + dy + Math.sin(i / 2) * 30);
+  await page.mouse.up();
+}
+
+const makerButtons = ['#sm-png', '#sm-svg', '#sm-copy', '#sm-signpdf'];
+
+test('Signature maker draws, undoes, recolours and saves a transparent PNG and an SVG; nothing drawn leaves the tab', async ({ page }) => {
+  const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  await expect(page.locator('#drop')).toBeHidden();
+  await expect(page.locator('input[name="sm-mode"]:checked')).toHaveValue('draw');
+  for (const id of makerButtons) await expect(page.locator(id)).toBeDisabled();
+  await expect(page.locator('#sm-undo')).toBeDisabled();
+  await expect(page.locator('#sm-empty')).toHaveText('Your signature will appear here on a transparent background.');
+
+  await scribble(page);
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'ready');
+  for (const id of ['#sm-png', '#sm-svg', '#sm-signpdf', '#sm-undo', '#sm-clear']) await expect(page.locator(id)).toBeEnabled();
+  await expect(page.locator('#sm-info')).toContainText('Saved size: 1200 ×');
+  await expect(page.locator('#sm-info')).toContainText('px, transparent.');
+
+  // Undo removes the stroke; Ctrl/Cmd+Z does the same while focus is in the panel.
+  await page.locator('#sm-undo').click();
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'empty');
+  for (const id of makerButtons) await expect(page.locator(id)).toBeDisabled();
+  await scribble(page);
+  await expect(page.locator('#sm-png')).toBeEnabled();
+  await page.locator('#sm-ink').focus();
+  await page.keyboard.press('ControlOrMeta+z');
+  await expect(page.locator('#sm-png')).toBeDisabled();
+  await scribble(page);
+  await scribble(page, '#sm-pad', 70);
+  await expect(page.locator('#sm-png')).toBeEnabled();
+
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+  expect(png.suggestedFilename()).toBe('signature.png');
+  const black = await alphaStats(page, await bytesOf(png));
+  expect(black.width).toBe(1200);
+  expect(black.corner).toBe(0);
+  expect(black.opaque).toBeGreaterThan(500);
+  expect(black.colours).toEqual(['17,17,17']);
+
+  await page.locator('#sm-ink').selectOption('#1a3f8f');
+  const [blue] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+  expect((await alphaStats(page, await bytesOf(blue))).colours).toEqual(['26,63,143']);
+
+  await page.locator('#sm-out').selectOption('600');
+  const [small] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+  expect(pngSize(await bytesOf(small)).width).toBe(600);
+
+  const [svg] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-svg').click()]);
+  expect(svg.suggestedFilename()).toBe('signature.svg');
+  const text = Buffer.from(await bytesOf(svg)).toString();
+  expect(text.match(/<path /g)).toHaveLength(2);
+  expect(text).toContain('stroke="#1a3f8f"');
+  expect(text).not.toContain('<rect');
+
+  // Pen width and smoothing change the picture but not its trim: a bolder pen has more ink.
+  await page.locator('#sm-width').selectOption('8');
+  await scribble(page, '#sm-pad', -40);
+  const [bold] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+  expect((await alphaStats(page, await bytesOf(bold))).opaque).toBeGreaterThan((await alphaStats(page, await bytesOf(small))).opaque);
+
+  // Only a mode, an output and the usual buckets are ever sent.
+  await expect.poll(async () => (await usageRuns(page)).length).toBe(5);
+  const runs = await usageRuns(page);
+  expect(runs.map((r) => r.format)).toEqual(['draw-png', 'draw-png', 'draw-png', 'draw-svg', 'draw-png']);
+  for (const r of runs) {
+    expect(r.tool).toBe('signature-maker');
+    expect(JSON.stringify(r)).not.toMatch(/signature\.(png|svg)|M\d|"pts"/);
+  }
+  await page.locator('#sm-clear').click();
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'empty');
+  net.assertNothingLeft(['signature.png', 'signature.svg']);
+  expect(errors).toEqual([]);
+});
+
+test('Signature maker types a name in three script fonts, fetches the fonts only when Type opens, and warns about other alphabets', async ({ page }) => {
+  const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  const fonts: string[] = [];
+  page.on('request', (r) => {
+    if (/\/fonts\/(great-vibes|dancing-script)/.test(r.url())) fonts.push(r.url());
+  });
+  await page.waitForTimeout(500);
+  expect(fonts).toEqual([]);
+
+  await choose(page.locator('input[name="sm-mode"][value="type"]'));
+  await expect(page.locator('#sm-empty')).toHaveText('Type your name to see it here on a transparent background.');
+  await page.locator('#sm-text').fill('Ada Lovelace');
+  await choose(page.locator('input[name="sm-font"][value="dancing"]'));
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'ready');
+  await expect.poll(() => fonts.some((u) => u.includes('great-vibes')) && fonts.some((u) => u.includes('dancing-script'))).toBe(true);
+  await expect(page.locator('#sm-info')).toContainText('This is a typeface, not your own handwriting.');
+  await expect(page.locator('.sm-tile-preview').first()).toHaveText('Ada Lovelace');
+
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+  expect(png.suggestedFilename()).toBe('signature.png');
+  const st = await alphaStats(page, await bytesOf(png));
+  expect(st.width).toBe(1200);
+  expect(st.corner).toBe(0);
+  expect(st.visible).toBeGreaterThan(1000);
+  // Each font draws a different picture.
+  await choose(page.locator('input[name="sm-font"][value="great-vibes"]'));
+  const [gv] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+  const gvStats = await alphaStats(page, await bytesOf(gv));
+  expect(gvStats.height === st.height && gvStats.visible === st.visible).toBe(false);
+
+  await expect(page.locator('#sm-svg')).toBeDisabled();
+  await expect(page.locator('#sm-svg')).toHaveAttribute('title', 'SVG is available for drawn signatures.');
+  await page.locator('#sm-text').fill('Łukasz');
+  await expect(page.locator('#sm-info')).toContainText('Ł is not in these script fonts');
+  await page.locator('#sm-text').fill('José Muñoz');
+  await expect(page.locator('#sm-info')).not.toContainText('is not in these script fonts');
+
+  await expect.poll(async () => (await usageRuns(page)).length).toBe(2);
+  const runs = await usageRuns(page);
+  expect(runs.map((r) => r.format)).toEqual(['type-png', 'type-png']);
+  for (const r of runs) expect(JSON.stringify(r)).not.toMatch(/Ada|Lovelace|dancing|great|caveat/i);
+  net.assertNothingLeft(['Ada Lovelace', 'Ada']);
+  for (const r of await page.evaluate(() => (window as unknown as { __events: unknown[] }).__events)) {
+    expect(JSON.stringify(r)).not.toContain('Lovelace');
+  }
+  expect(errors).toEqual([]);
+});
+
+test('Signature maker photo mode takes the paper out of an unevenly lit photo and says when there is no ink or not an image', async ({ page }) => {
+  const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  await choose(page.locator('input[name="sm-mode"][value="photo"]'));
+  await expect(page.locator('#sm-photo-drop')).toContainText('Drop a photo of your signature here, or choose one');
+  await expect(page.locator('#sm-choose')).toHaveText('Choose a photo');
+  for (const id of makerButtons) await expect(page.locator(id)).toBeDisabled();
+
+  for (const name of ['signature-photo.png', 'signature-photo.jpg']) {
+    await page.locator('#sm-file').setInputFiles(staticFx(name));
+    await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'ready');
+    await expect(page.locator('#sm-info')).toContainText('Paper removed. Saved size:');
+    const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+    const bytes = await bytesOf(png);
+    const st = await alphaStats(page, bytes);
+    // Never wider than the trimmed photo (800 px at most), the corner is paper, the strokes are opaque and one colour,
+    // and the paper that was under the shadow and the fade is gone: the visible share is a thin line drawing.
+    expect(st.width).toBeLessThanOrEqual(800);
+    expect(st.corner).toBe(0);
+    expect(st.opaque).toBeGreaterThan(1500);
+    expect(st.visible / (st.width * st.height)).toBeLessThan(0.15);
+    expect(st.colours).toEqual(['17,17,17']);
+  }
+  // A lighter pen needs a higher strength: the slider changes the result.
+  await page.locator('#sm-strength').fill('100');
+  await page.locator('#sm-strength').dispatchEvent('change');
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'ready');
+
+  // A plain white picture holds no ink.
+  const white = await page.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = 300;
+    c.height = 120;
+    const ctx = c.getContext('2d')!;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, 300, 120);
+    const b: Blob = await new Promise((r) => c.toBlob((x) => r(x!), 'image/png'));
+    return [...new Uint8Array(await b.arrayBuffer())];
+  });
+  await page.locator('#sm-file').setInputFiles({ name: 'blank.png', mimeType: 'image/png', buffer: Buffer.from(white) });
+  await expect(page.locator('#sm-info')).toContainText('No ink found');
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'empty');
+  for (const id of makerButtons) await expect(page.locator(id)).toBeDisabled();
+
+  await page.locator('#sm-file').setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('not a picture') });
+  await expect(page.locator('#sm-info')).toContainText('This file is not an image this page can read.');
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'empty');
+
+  await expect.poll(async () => (await usageRuns(page)).length).toBe(2);
+  const runs = await usageRuns(page);
+  expect(runs.map((r) => r.format)).toEqual(['photo-png', 'photo-png']);
+  for (const r of runs) {
+    expect(r.files).toBeTruthy();
+    expect(JSON.stringify(r)).not.toContain('signature-photo');
+  }
+  net.assertNothingLeft(['signature-photo.png', 'signature-photo.jpg', 'blank.png', 'notes.txt']);
+  expect(errors.filter((e) => !/Failed to load resource/.test(e))).toEqual([]);
+});
+
+test('Signature maker carries the signature to Sign PDF in the same tab, where it is placed on the PDF', async ({ page }) => {
+  const errors = await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const net = watchNetwork(page);
+  await scribble(page);
+  await expect(page.locator('#sm-signpdf')).toBeEnabled();
+  await page.locator('#sm-signpdf').click();
+  await expect(page).toHaveURL(/\/tools\/sign-pdf$/);
+  // The note's text is in the HTML; it is shown only once the page's script has picked the signature up and wired the drop zone.
+  await expect(page.locator('#sig-carried')).toBeVisible();
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#sig-carried')).toHaveText('Your signature is ready. Drop the PDF to place it.');
+  await expect(page.locator('#sign-panel')).toBeHidden();
+
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#sign-panel')).toBeVisible();
+  await expect(page.locator('#sig-carried')).toBeHidden();
+  await expect(page.locator('input[name="sig-mode"][value="image"]')).toBeChecked();
+  await expect.poll(() => page.locator('#sig-image-preview').evaluate((i: HTMLImageElement) => i.naturalWidth)).toBeGreaterThan(0);
+  await page.locator('#add-signature').click();
+  await expect(page.locator('.stamp-signature')).toHaveCount(1);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect(download.suggestedFilename()).toBe('text-signed.pdf');
+  const doc = await PDFDocument.load(await bytesOf(download));
+  const xo = doc.getPage(0).node.Resources()?.lookup(PDFName.of('XObject'));
+  expect(xo ? (xo as unknown as { keys(): unknown[] }).keys().length : 0).toBe(1);
+
+  // The hand-off was recorded as one maker-to-Sign-PDF step, naming nothing.
+  const events = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events);
+  expect(events.filter((e) => e.n === 'tool_run').map((e) => `${e.d.tool}:${e.d.format ?? ''}`)).toContain('sign-pdf:');
+  net.assertNothingLeft(['signature.png', 'text.pdf']);
+  expect(errors).toEqual([]);
+
+  // Back to a fresh Sign PDF: nothing is carried any more.
+  await page.goto('/tools/sign-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#sig-carried')).toBeHidden();
+  await expect(page.locator('input[name="sig-mode"][value="draw"]')).toBeChecked();
+});
+
+test('Signature maker hand-off that cannot be saved stays on the page and says to download instead', async ({ page }) => {
+  await open(page, 'signature-maker');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.evaluate(() => {
+    IDBObjectStore.prototype.put = function () {
+      throw new DOMException('The quota has been exceeded.', 'QuotaExceededError');
+    };
+  });
+  await scribble(page);
+  await page.locator('#sm-signpdf').click();
+  await expect(page.locator('#sm-status')).toContainText('would not carry the signature over');
+  await expect(page).toHaveURL(/\/tools\/signature-maker$/);
+});
+
+test('Sign PDF Image mode takes a signature image from a file: a transparent PNG as it is, a photo with its paper removed', async ({ page }) => {
+  const errors = await open(page, 'sign-pdf');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([fx('text.pdf')]);
+  await expect(page.locator('#sign-panel')).toBeVisible();
+  await choose(page.locator('input[name="sig-mode"][value="image"]'));
+  await page.locator('#add-signature').click();
+  await expect(page.locator('#error')).toContainText('Choose a signature image first.');
+  await page.locator('#sig-image-file').setInputFiles(staticFx('signature-photo.jpg'));
+  await expect.poll(() => page.locator('#sig-image-preview').evaluate((i: HTMLImageElement) => i.naturalWidth)).toBeGreaterThan(0);
+  await page.locator('#add-signature').click();
+  await expect(page.locator('.stamp-signature')).toHaveCount(1);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#run').click()]);
+  expect((await PDFDocument.load(await bytesOf(download))).getPageCount()).toBe(3);
+  expect(errors.filter((e) => !e.includes('Choose a signature image first'))).toEqual([]);
+});
+
+for (const [slug, mode, font] of [
+  ['signature-generator', 'type', 'great-vibes'],
+  ['cursive-signature-generator', 'type', 'great-vibes'],
+  ['transparent-signature-png', 'photo', 'caveat'],
+] as const) {
+  test(`Signature maker preset /${slug} opens in ${mode} mode with structured data and an OG card`, async ({ page }) => {
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('input[name="sm-mode"]:checked')).toHaveValue(mode);
+    await expect(page.locator('input[name="sm-font"]:checked')).toHaveValue(font);
+    expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stayput.dev/${slug}`);
+    const og = await page.locator('meta[property="og:image"]').getAttribute('content');
+    expect((await page.request.get(new URL(og!).pathname)).status()).toBe(200);
+  });
+}
+
+test('Signature maker preset runs are recorded under the preset slug', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/signature-generator');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#sm-text').fill('Ada');
+  await expect(page.locator('#sm-frame')).toHaveAttribute('data-state', 'ready');
+  const [png] = await Promise.all([page.waitForEvent('download'), page.locator('#sm-png').click()]);
+  expect(png.suggestedFilename()).toBe('signature.png');
+  await expect.poll(async () => (await usageRuns(page)).map((r) => `${r.tool}:${r.format}`)).toEqual(['signature-generator:type-png']);
 });

@@ -1,12 +1,14 @@
 ---
 /** Signature maker and page stage for Sign PDF, shared by the tool page and its landing pages. */
 ---
+<p id="sig-carried" class="handoff-note" role="status" hidden>Your signature is ready. Drop the PDF to place it.</p>
 <div id="sign-panel" class="sign-panel" hidden>
   <div class="sign-maker">
     <div class="field-row" style="justify-content:space-between">
       <div class="segmented" role="radiogroup" aria-label="Signature style">
         <label><input type="radio" name="sig-mode" value="draw" checked /><span>Draw</span></label>
         <label><input type="radio" name="sig-mode" value="type" /><span>Type</span></label>
+        <label><input type="radio" name="sig-mode" value="image" /><span>Image</span></label>
       </div>
       <div class="field-row">
         <label class="small" for="sig-color">Ink</label>
@@ -34,6 +36,16 @@
         </select>
       </div>
       <div class="sig-preview" id="sig-preview" aria-hidden="true"></div>
+    </div>
+    <div id="image-box" hidden>
+      <div class="field-row">
+        <button class="btn" type="button" id="sig-image-choose">Choose a signature image</button>
+        <input type="file" id="sig-image-file" accept="image/png,image/jpeg,image/webp" hidden />
+        <span class="muted small" id="sig-image-note">A PNG, JPG or WebP of your signature. A picture on paper has the paper taken out first.</span>
+      </div>
+      <div class="sig-preview sig-image-preview" id="sig-image-wrap" hidden>
+        <img id="sig-image-preview" alt="Your signature image" />
+      </div>
     </div>
     <div class="field-row sign-actions">
       <button class="btn btn-primary" type="button" id="add-signature">Add signature to this page</button>

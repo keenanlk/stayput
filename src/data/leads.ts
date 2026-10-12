@@ -58,6 +58,7 @@ const does: Record<string, string> = {
   'qr-code-generator': 'Makes a QR code for a link, Wi-Fi network, contact card, email or phone number, and saves it as PNG or SVG.',
   'qr-code-scanner': 'Reads QR codes and barcodes from an image, a screenshot or your camera and shows what they hold, without opening anything for you.',
   'barcode-generator': 'Makes a Code 128, Code 39, UPC-A, EAN-13, ITF-14 or other barcode from the number or text you type, and saves it as PNG, SVG or PDF.',
+  'signature-maker': 'Makes a signature image you can draw, type in a script font or take from a photo of your handwriting, and saves it as a transparent PNG, or an SVG when you draw it.',
   'screen-recorder': 'Records your screen, a window or a browser tab, with sound and your microphone if you choose, and saves the video.',
   'voice-recorder': 'Records your voice with your microphone and saves it as MP3, WAV or M4A.',
   'volume-booster': 'Makes an MP3, voice memo or video louder or quieter, or normalizes a batch to the same loudness.',
@@ -175,6 +176,7 @@ const facts: Record<string, string> = {
   'qr-code-scanner': 'Your browser asks for camera permission only if you press the camera button, and after one visit the page works offline.',
   'qr-code-generator': 'The codes are static, so they never expire, and after one visit the page works offline.',
   'barcode-generator': 'The barcodes are drawn on this page, and after one visit the page works offline.',
+  'signature-maker': 'The signature is made on this page and never saved, and after one visit the page works offline.',
   'screen-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit the page works offline.',
   'voice-recorder': 'Recordings are built in your device’s memory, so how long you can record depends on the device. After one visit the page works offline.',
   'mic-test': 'Your browser asks for microphone permission, and after one visit the page works offline.',
@@ -193,6 +195,7 @@ const free: Record<string, string> = {
   'qr-code-scanner': freeLine('your images and the picture from your camera are'),
   'qr-code-generator': freeLine('what you type is'),
   'barcode-generator': freeLine('what you type is'),
+  'signature-maker': freeLine('what you draw, type or photograph is'),
   'screen-recorder': freeLine('your recordings are'),
   'voice-recorder': freeLine('your recordings are'),
 };

@@ -41,6 +41,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'audio-to-video': () => import('./audio-to-video'),
   'qr-code-generator': () => import('./qr-code-generator'),
   'barcode-generator': () => import('./barcode-generator'),
+  'signature-maker': () => import('./signature-maker'),
   'qr-code-scanner': () => import('./qr-code-scanner'),
   'screen-recorder': () => import('./screen-recorder'),
   'merge-audio': () => import('./merge-audio'),

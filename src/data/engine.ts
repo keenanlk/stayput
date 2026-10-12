@@ -175,6 +175,10 @@ export const engines: Record<string, Engine> = {
     how: 'JsBarcode (MIT), a small open-source library, turns your number or text into the pattern of bars in this page. The page first checks the number against the rules of the type you chose and works out the check digit itself. The PNG is painted on a canvas by your browser, the SVG is written as plain rectangles, and the PDF is made by pdf-lib (MIT) in the tab.',
     versus: 'Some online barcode makers draw the picture on their own server, so the number you type, which may be an unreleased product or an internal asset ID, travels to them first. Here the barcode is drawn on your device and the number never leaves it.',
   },
+  'signature-maker': {
+    how: 'Your strokes are kept as a list of points and painted on a canvas in this page, so they can be undone, recoloured and written out as an SVG. A typed name is set in an embedded script font and a photo is turned into a mask: the page estimates the paper around each pixel and keeps only what is darker. The PNG is written by your browser with a transparent background, trimmed to the signature.',
+    versus: 'A signature is the kind of image you do not want on someone else’s server. Here it is drawn, typed or cleaned up on your device, and the image is not uploaded.',
+  },
   'qr-code-scanner': {
     how: 'ZXing-C++ (Apache-2.0), a widely used open-source barcode reader compiled to WebAssembly, finds and reads the code on this page. The reader is a 0.9 MB file served from this site, so it is fetched on your first scan and then kept in your browser. Camera pictures are read frame by frame in memory and are never saved.',
     versus: 'A scanner that reads the picture on a server has to receive it first, and a Wi-Fi password or a ticket code travels with it. Here the picture is read on your device.',

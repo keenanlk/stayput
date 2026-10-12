@@ -1205,6 +1205,7 @@ export const presets: Preset[] = [
       { q: 'Does the other side need any software to see the signature?', a: 'No. The signature is drawn into the page itself, so it shows in every PDF viewer, including phones, browsers and printers.' },
       { q: 'How is this different from a digital signature?', a: 'This adds a visible signature, the on-screen version of signing a printout. A certificate-based digital signature proves the file was not changed afterwards and needs an identity certificate; if the sender requires one, their request will say so.' },
       { q: 'Is my signature saved anywhere?', a: 'No. It exists only in this tab while you work. Reload the page and it is gone; draw it again next time.' },
+      { q: 'Can I use a signature image I already have?', a: 'Yes. Choose Image next to Draw and Type, then pick a PNG, JPG or WebP file of your signature, or make one first in the [signature maker](/tools/signature-maker) and press Use in Sign PDF. A picture with a plain paper background has the paper taken out before it is placed.' },
     ],
   },
   {
@@ -5664,6 +5665,160 @@ export const presets: Preset[] = [
       { q: 'Why does the number have a leading zero, or one more digit than I expected?', a: 'A UPC-A number (12 digits) is read as an EAN-13 with a 0 in front, because the two are one system at two lengths. Both are the same product number.' },
       { q: 'Does it work with a handheld scanner?', a: 'A handheld scanner types the number into whatever is open and needs no web page. This page is for reading a barcode from a picture or with a camera.' },
       { q: 'Is the picture uploaded?', a: 'No. The barcode is read on your device and the picture is not uploaded.' },
+    ],
+  },
+  {
+    slug: 'signature-generator',
+    base: 'signature-maker',
+    name: 'Signature generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'Signature Generator: Type Your Name, Free | Stayput',
+    description: 'Type your name and get a signature in a handwriting style, saved as a transparent PNG. Free, no sign-up; what you type is not uploaded.',
+    heading: 'Generate a signature from your name',
+    tagline: 'Type your name, see it in three script styles at once, and save the one you like as a transparent PNG.',
+    keywords: ['signature generator', 'signature generator for my name', 'free signature generator', 'name signature generator', 'handwritten signature generator', 'signature generator png'],
+    dropLabel: 'Generate a signature',
+    action: 'Download',
+    defaults: { mode: 'type', font: 'great-vibes' },
+    intro: [
+      'A signature generator turns the name you type into a signature-style image. This one sets your name in three script styles, shows all three at once, and saves the one you pick as a PNG with a transparent background, ready for a document, a slide or a form.',
+      'The result is a typeface, not your own handwriting, which makes it the quick choice for everyday paperwork where an image of your name is enough. If you want it to look like you, switch to Draw and sign with a finger or a mouse, or add a photo of your real signature; all three modes are on this page.',
+      'The fonts come from this site and the image is made in your browser, so the name you type is not sent anywhere.',
+    ],
+    steps: [
+      'Type your name in the box. Use it as you would sign it: a first name, or a full name.',
+      'Compare the three styles and pick one. Change the ink colour if you want blue or brown instead of black.',
+      'Download the PNG, copy it to paste into a document, or press Use in Sign PDF.',
+    ],
+    sections: [
+      {
+        heading: 'The three styles',
+        bullets: [
+          'Handwriting: upright and casual, the closest to a quick pen signature.',
+          'Formal script: joined and sloping, with long swashes on the capitals. Suits a full name.',
+          'Flowing: lively, with a bouncing baseline. Suits a first name or a short name.',
+        ],
+      },
+      {
+        heading: 'Tips for a typed signature',
+        bullets: [
+          'Names up to 40 characters fit. Longer names are cut off by the box, not shrunk.',
+          'Accented letters such as é, ñ and ü work. Letters from other alphabets are drawn in a standard font, and the page tells you when that happens.',
+          'Use the same style every time you want people to recognise it.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is a typed signature the same as my handwriting?', a: 'No. It is a script typeface, so it looks like a signature without being yours. For something that looks like your own hand, use Draw or a photo on the [signature maker](/tools/signature-maker).' },
+      { q: 'Can I use letters with accents?', a: 'Yes for the Latin alphabet with accents, such as é, ñ, ü, ç and ã. Letters from Polish, Czech or Vietnamese and other alphabets are not in these fonts, and the page shows a note when your name has one.' },
+      { q: 'Can I choose a different colour?', a: 'Yes: black, blue or brown. The PNG has a transparent background, so the colour is the ink only.' },
+      { q: 'Will a form accept a typed signature?', a: 'That depends on the form. This page makes an image of your name in a script style; whether a form, employer or office accepts that is their rule, and some want a signature made in their own system or a certificate-based digital signature, which this page does not make.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'transparent-signature-png',
+    base: 'signature-maker',
+    name: 'Transparent signature PNG',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'Transparent Signature PNG: Remove the Paper, Free | Stayput',
+    description: 'Turn a photo of your signature into a transparent PNG by taking the paper out, in your browser. Free, no sign-up; the photo is not uploaded.',
+    heading: 'Make a signature transparent',
+    tagline: 'Add a photo or scan of your signature on paper and get a transparent PNG with only the ink left.',
+    keywords: ['transparent signature png', 'signature background remover', 'make signature transparent', 'signature from photo', 'transparent signature maker', 'remove background from signature'],
+    dropLabel: 'Make a transparent signature',
+    action: 'Download',
+    defaults: { mode: 'photo' },
+    intro: [
+      'A photo of a signature has a background: the paper, its colour and the shadows across it. Put that photo on a document and you get a grey or cream box around your name. This page removes the paper and keeps the ink, so the signature sits on the document directly.',
+      'It works by looking at how much darker each spot is than the paper right around it. That is why a shadow or an uneven light does not leave a patch of paper behind, and why the paper itself, however it is lit, goes transparent. The ink is then painted in black, blue or brown, whichever you pick.',
+      'The photo is opened and processed in this page. It is not uploaded and not kept.',
+    ],
+    steps: [
+      'Choose or drop a photo or scan of your signature on plain light paper.',
+      'Look at the preview on the checkerboard. If paper texture shows, lower Ink strength; if pale ink is missing, raise it.',
+      'Download the PNG, copy it, or press Use in Sign PDF.',
+    ],
+    sections: [
+      {
+        heading: 'How to photograph a signature',
+        bullets: [
+          'Use plain white or light paper and a dark pen. Pencil and very pale ink work with the strength raised, but the edge gets rough.',
+          'Lay the page flat in daylight or under a lamp, and shoot straight down. Shadows are handled, but a shadow that falls across the ink makes the strokes there lighter.',
+          'Crop to just the signature before you add it, with [Crop image](/tools/crop-image): printed lines and text are dark, so the page keeps them.',
+        ],
+      },
+      {
+        heading: 'What the Ink strength slider does',
+        bullets: [
+          'Higher keeps lighter strokes and fine hairlines, and starts to keep paper grain.',
+          'Lower removes more of the paper and thin strokes, and can break pale ink.',
+          'The middle setting is the one to start with.',
+        ],
+      },
+      {
+        heading: 'Where this falls short',
+        bullets: [
+          'A signature written over a printed line, a stamp or a coloured background is kept together with them.',
+          'A broad marker or a very thick stroke across a full-page photo can be partly removed.',
+          'The result is one ink colour. The colour of your pen in the photo is not kept.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Why is the paper still showing?', a: 'Lower Ink strength. If the paper is textured, coloured or lit unevenly the cut can leave faint grain; a plain light page and daylight give the cleanest result. You can also crop closer to the signature first.' },
+      { q: 'Why are parts of my signature missing?', a: 'The ink is too pale or too thin at that point for the current Ink strength. Raise it a little at a time. A darker pen on a second photo gives the best result.' },
+      { q: 'Does it work on a scan or a screenshot?', a: 'Yes. A flat scan on white is the easiest case. A screenshot of a signature on a coloured page works if the signature is clearly darker than its background.' },
+      { q: 'Why a PNG and not a JPG?', a: 'A JPG cannot be transparent, so it keeps a white box around the signature. A PNG keeps the see-through background, which is what lets the signature sit on a document, slide or PDF.' },
+      { q: 'Is my photo uploaded anywhere?', a: 'No. The photo is opened and processed by code running in this page, so it stays on your device and is not kept when you close the page. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
+    slug: 'cursive-signature-generator',
+    base: 'signature-maker',
+    name: 'Cursive signature generator',
+    sizeFact: 'No watermark, no sign-up',
+    title: 'Cursive Signature Generator, Free, No Upload | Stayput',
+    description: 'Write your name in a cursive script and save it as a transparent PNG signature. Free, no sign-up; what you type is not uploaded.',
+    heading: 'Make a cursive signature',
+    tagline: 'Type your name in a joined-up cursive script and save it as a transparent PNG.',
+    keywords: ['cursive signature generator', 'cursive signature maker', 'cursive name signature', 'cursive signature png', 'cursive signature online'],
+    dropLabel: 'Make a cursive signature',
+    action: 'Download',
+    defaults: { mode: 'type', font: 'great-vibes' },
+    intro: [
+      'Cursive writing joins the letters of a word in one flowing line. This page sets your name in three scripts that do that to different degrees, starts you on the most formal one, and saves the result as a PNG with a transparent background.',
+      'It makes a signature image, not a practice sheet: there are no tracing lines or worksheets here. To write your own cursive signature by hand, draw it on the pad in the same tool with Draw.',
+      'The name you type is not sent anywhere; the fonts come from this site and the image is made in your browser.',
+    ],
+    steps: [
+      'Type your name. Capitals matter in cursive, so type it as you would write it.',
+      'Pick a style: Formal script is the most joined and ornate, Flowing is lighter, and Handwriting is closer to a quick pen.',
+      'Download the PNG or copy it into your document.',
+    ],
+    sections: [
+      {
+        heading: 'How joined each style is',
+        bullets: [
+          'Formal script: every letter joins, with long entry and exit strokes. The most traditional look.',
+          'Flowing: joined, with a lively, uneven baseline. Reads as quick and personal.',
+          'Handwriting: partly joined, with some letters standing apart. The easiest to read at small sizes.',
+        ],
+      },
+      {
+        heading: 'Keeping a cursive signature readable',
+        bullets: [
+          'Use first name and surname rather than initials if the signature has to be identified later.',
+          'Avoid very long names at the Small size: the strokes get thin when the image is shrunk.',
+          'Keep one style and one ink colour for everything you sign.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Does this make handwriting practice sheets?', a: 'No. It makes a signature image from the name you type. For your own hand, use Draw on the [signature maker](/tools/signature-maker).' },
+      { q: 'Which style is the most cursive?', a: 'Formal script, which joins every letter and is the one this page starts with. Flowing is joined too and has a looser baseline. Handwriting keeps some letters apart.' },
+      { q: 'Can I save it with a transparent background?', a: 'Yes. The PNG has a transparent background, so it can sit on a document, certificate or slide without a white box.' },
+      { q: 'Is what I type uploaded anywhere?', a: 'No. The image is made by code running in this page, so your name stays on your device. After one visit you can turn off your internet connection and it still works.' },
     ],
   },
 ];
