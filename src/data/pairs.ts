@@ -71,7 +71,7 @@ export const pairs: Pair[] = [
     outputType: 'image/png',
     accept: '.heic,.heif,image/heic,image/heif',
     title: 'HEIC to PNG Converter, Free, No Upload | Stayput',
-    description: 'Convert iPhone HEIC photos to lossless PNG in your browser. No upload, batches welcome, works offline after one visit.',
+    description: 'Convert iPhone HEIC photos to lossless PNG in your browser. No upload, batches welcome, works offline after one visit and a short wait.',
     heading: 'Convert HEIC to PNG',
     tagline: 'A lossless PNG copy of every iPhone photo, made on your device.',
     keywords: ['heic to png', 'heic to png converter', 'convert heic to png free', 'iphone photo to png'],
@@ -82,7 +82,7 @@ export const pairs: Pair[] = [
     faq: [
       { q: 'Why is the PNG so much bigger than the HEIC?', a: 'HEIC uses lossy video-style compression; PNG is lossless. A 2 MB HEIC from a 12-megapixel camera typically becomes a 15 to 25 MB PNG. If size matters more than a lossless copy, use the HEIC to JPG tool instead.' },
       { q: 'Does the PNG keep the photo’s date and location?', a: 'No. PNG has no standard place for camera EXIF data, and browsers do not write it. If you need the metadata, convert to JPG and tick "Keep EXIF metadata".' },
-      { q: 'Are my photos uploaded?', a: 'No. There is no server in this process at all. After one visit you can switch your device to airplane mode and convert.' },
+      { q: 'Are my photos uploaded?', a: 'No. There is no server in this process at all. After one visit and a short wait you can switch your device to airplane mode and convert.' },
     ],
   },
   {
@@ -159,7 +159,7 @@ export const pairs: Pair[] = [
     outputType: 'image/png',
     accept: 'image/webp,.webp',
     title: 'WebP to PNG Converter, Free, No Upload | Stayput',
-    description: 'Convert WebP images to PNG in your browser, transparency preserved. No upload, batch conversion, works offline after one visit.',
+    description: 'Convert WebP images to PNG in your browser, transparency preserved. No upload, batch conversion, works offline after one visit and a short wait.',
     heading: 'Convert WebP to PNG',
     tagline: 'Open WebP images anywhere by saving them as PNG, on your device.',
     keywords: ['webp to png', 'convert webp to png', 'webp to png converter', 'save webp as png'],
@@ -254,7 +254,7 @@ export const pairs: Pair[] = [
     faq: [
       { q: 'What if my browser cannot decode AVIF?', a: 'AVIF decoding arrived in Chrome 85, Firefox 93 and Safari 16. In an older browser the page fetches a WebAssembly AVIF decoder (about 1 MB of program code, cached after the first use) and decodes the image in the tab instead. Either way the image itself is never sent anywhere.' },
       { q: 'Is quality lost?', a: 'AVIF and JPG are both lossy, so a small amount of detail is discarded in the re-encode. At quality 90 it is not visible. There is no way to convert AVIF to JPG without this step.' },
-      { q: 'Is the image uploaded anywhere?', a: 'No. The conversion runs entirely inside your browser tab. After one visit the page works with the network disconnected.' },
+      { q: 'Is the image uploaded anywhere?', a: 'No. The conversion runs entirely inside your browser tab. After one visit and a short wait the page works with the network disconnected.' },
     ],
   },
   {
@@ -348,7 +348,7 @@ export const pairs: Pair[] = [
     outputType: 'image/jpeg',
     accept: 'image/jpeg,image/pjpeg,.jfif,.jpe,.jpg,.jpeg',
     title: 'JFIF to JPG Converter, Free, No Upload | Stayput',
-    description: 'Turn .jfif images saved from the web into ordinary .jpg files in your browser. Batches welcome, nothing uploaded, works offline after one visit.',
+    description: 'Turn .jfif images saved from the web into ordinary .jpg files in your browser. Batches welcome, nothing uploaded, works offline after one visit and a short wait.',
     heading: 'Convert JFIF to JPG',
     tagline: 'Fix the pictures Windows saved as .jfif so every app and upload form accepts them.',
     keywords: ['jfif to jpg', 'convert jfif to jpg', 'jfif to jpg converter', 'change jfif to jpg', 'jfif to jpeg', 'what is a jfif file'],
@@ -360,7 +360,7 @@ export const pairs: Pair[] = [
       { q: 'Is JFIF the same as JPG?', a: 'Yes, in practice. JFIF is the standard container for JPEG data, and .jfif, .jpg, .jpeg and .jpe files are all the same kind of image. Only the name at the end differs, and some software checks the name.' },
       { q: 'Why do my downloaded images save as .jfif?', a: 'Windows maps the image/jpeg type to the .jfif extension in its registry on some machines, so browsers on those machines offer .jfif when you save a picture. Converting the files, or renaming them, fixes it for the files you already have.' },
       { q: 'Does converting lose quality?', a: 'The image is re-encoded as JPG at the quality you choose, 90 by default, which is visually identical for photos. If you want the original bytes untouched, rename the file instead of converting it. Tick "Keep EXIF metadata" to carry the camera data over.' },
-      { q: 'Are the images uploaded?', a: 'No. Your browser decodes and encodes each image inside this tab. There is no server in the process; you can go offline after one visit.' },
+      { q: 'Are the images uploaded?', a: 'No. Your browser decodes and encodes each image inside this tab. There is no server in the process; you can go offline after one visit and a short wait.' },
     ],
   },
   {
@@ -370,7 +370,7 @@ export const pairs: Pair[] = [
     outputType: 'image/png',
     accept: 'image/jpeg,image/pjpeg,.jfif,.jpe,.jpg,.jpeg',
     title: 'JFIF to PNG Converter, Free, No Upload | Stayput',
-    description: 'Convert .jfif images to lossless PNG in your browser. Batch conversion, no upload, works offline after one visit.',
+    description: 'Convert .jfif images to lossless PNG in your browser. Batch conversion, no upload, works offline after one visit and a short wait.',
     heading: 'Convert JFIF to PNG',
     tagline: 'A lossless PNG copy of every .jfif picture, made on your device.',
     keywords: ['jfif to png', 'convert jfif to png', 'jfif to png converter', 'change jfif to png'],
@@ -523,7 +523,7 @@ export const pairs: Pair[] = [
       { q: 'What about BMPs with transparency?', a: 'A 32-bit BMP with an alpha channel keeps its transparency in the PNG. Most BMPs are 24-bit and have no transparency to keep.' },
       { q: 'Can Windows open PNG files everywhere a BMP worked?', a: 'Almost always. Photos, Paint, Word, PowerPoint and every browser open PNG. The exceptions are the same old or embedded programs that still ask for BMP in the first place; keep the original bitmap for those.' },
       { q: 'Does the PNG keep the DPI of the scan?', a: 'The pixel count is identical, which is what decides print quality. The dots-per-inch tag from the bitmap header is not copied, so print dialogs may assume 72 or 96 dpi; set the print size you want there.' },
-      { q: 'Is anything uploaded?', a: 'No. The bitmap is decoded and the PNG is written by your browser, in this tab. After one visit the page keeps working with Wi-Fi turned off.' },
+      { q: 'Is anything uploaded?', a: 'No. The bitmap is decoded and the PNG is written by your browser, in this tab. After one visit and a short wait the page keeps working with Wi-Fi turned off.' },
     ],
   },
   {
@@ -597,7 +597,7 @@ export const pairs: Pair[] = [
       'TIFF is the format of scanners, print shops, museums and professional cameras. It is excellent for archiving and a nuisance for anything else: a single scanned page at 300 dpi is often 25 MB, Chrome and Firefox will not display it, and most upload forms and email previews refuse it. A JPG of the same scan is typically a twentieth of the size and opens everywhere.',
       'Only Safari can read TIFF on its own, so this page carries a TIFF decoder, UTIF.js, which is part of the site and runs in your tab. It handles the compression schemes real TIFFs use: none, LZW, Deflate (ZIP), PackBits, JPEG-in-TIFF, and CCITT Group 3 and 4 for black-and-white faxes and document scans. 16-bit files from scanners and raw converters are reduced to 8 bits per channel, which is what JPG stores.',
       'A multi-page TIFF, such as a fax or a scanned contract, becomes a JPG of its first page here. To keep every page, the [TIFF to PDF](/tiff-to-pdf) page turns each one into a PDF page instead. Layers and alpha channels from Photoshop-saved TIFFs are flattened onto the background colour in the options.',
-      'Your scans often hold exactly the documents you would least like copied to a stranger’s server: IDs, medical letters, signed agreements, family photos. Nothing here is uploaded; the decoding and the JPG encoding both happen on your device, and the page keeps working offline once loaded.',
+      'Your scans often hold exactly the documents you would least like copied to a stranger’s server: IDs, medical letters, signed agreements, family photos. Nothing here is uploaded; the decoding and the JPG encoding both happen on your device, and the page keeps working offline after one visit and a short wait.',
       'Camera TIFFs are a separate case from scans. Raw converters such as Lightroom, Capture One and darktable export 16-bit TIFFs of 70 MB and more for editing. Turning one of those into a JPG for sharing is fine, but keep the TIFF as your master copy, since every later edit on the JPG loses a little quality.',
       'Colour documents scanned for an office archive are the most common TIFF people need to share. A bank statement, a tax form or a school report scanned at 300 dpi comes out around 2500 by 3300 pixels. As a JPG at quality 85 that page is usually 400 to 900 KB, small enough to attach several to one email, and still sharp enough to print or read on a phone.',
     ],
@@ -635,7 +635,7 @@ export const pairs: Pair[] = [
       { q: 'Can I get one PNG per page from a multi-page TIFF?', a: 'Not on this page, which converts the first page. The TIFF to PDF page keeps every page; from the PDF, the PDF to PNG tool then saves each page as its own image.' },
       { q: 'Will CMYK TIFFs from a print shop look right?', a: 'They are converted to RGB for the PNG. Colours may shift slightly, as they do in any screen preview of a print file, because the conversion does not use the print profile.' },
       { q: 'How big will the PNG be?', a: 'Similar to an LZW-compressed TIFF, and far smaller than an uncompressed one. Flat graphics and scanned text compress extremely well; photographs much less.' },
-      { q: 'Is the file uploaded?', a: 'No. Everything happens in this tab; you can disconnect from the internet after the page loads and it still converts.' },
+      { q: 'Is the file uploaded?', a: 'No. Everything happens in this tab; after one visit and a short wait you can disconnect from the internet and it still converts.' },
     ],
   },
   {
@@ -704,7 +704,7 @@ export const pairs: Pair[] = [
       'Most people converting WebP to GIF have an animation: a sticker saved from WhatsApp or Telegram, a reaction clip from a website, a loop from Giphy or Tenor that downloaded as .webp instead of .gif. Many places still only play GIFs, including older chat apps, forum software, email signatures, slide decks and a lot of content management systems. Drop the WebP in one of those and you get a frozen first frame, or an upload error.',
       'A lot of converters make the same mistake, because browsers only expose the first frame of an animated WebP to a web page. This one reads the WebP file itself: it walks the animation frame by frame, decodes each frame with your browser’s WebP decoder, lays it onto the canvas using the blend and disposal rules stored in the file, and writes each finished frame into the GIF with its original delay. The loop setting carries over too, so a forever-looping sticker still loops forever.',
       'GIF is an old format with two limits worth knowing. Each frame holds at most 256 colours, so gradients and photographic clips can show some banding or speckle; flat stickers, emoji and cartoons look the same as the original. And GIF transparency is on or off per pixel, so soft, semi-transparent edges become hard ones. That is why a GIF is often two to five times larger than the WebP it came from.',
-      'Every step happens in this tab. Stickers and clips from private chats never leave your device, there is no queue, and the page keeps working with the network switched off once it has loaded.',
+      'Every step happens in this tab. Stickers and clips from private chats never leave your device, there is no queue, and the page keeps working with the network switched off after one visit and a short wait.',
     ],
     faq: [
       { q: 'Will my animated WebP stay animated?', a: 'Yes. Every frame is converted, with the same timing and loop count as the original. The result note shows how many frames went into the GIF.' },

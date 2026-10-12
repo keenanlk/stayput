@@ -33,7 +33,7 @@ export const engines: Record<string, Engine> = {
   },
   'merge-pdf': {
     how: 'pdf-lib, an open-source PDF library written in TypeScript, opens each document in your tab and copies its pages into a new PDF, preserving text, vector graphics, links and images as they are. The merged file is assembled in memory and handed to your browser’s download. Password-protected PDFs are unlocked first by qpdf, compiled to WebAssembly and loaded only when needed; the password is checked in your tab and the result is saved without encryption.',
-    versus: 'Upload-based mergers cap the number of files, the total size, or the number of merges per day. This one is bound only by your device’s memory, and your contracts, statements and scans are never copied to anyone’s server.',
+    versus: 'Upload-based mergers cap the number of files, the total size, or the number of merges per day. This one is bound by your device’s memory (phones hold less), and your contracts, statements and scans are never copied to anyone’s server.',
   },
   'split-pdf': {
     how: 'pdf.js, the PDF renderer inside Firefox, draws page thumbnails so you can see what you are extracting. pdf-lib then builds the new PDFs from the pages you chose, copying them exactly rather than rasterising them. All of it runs in a web worker inside your tab.',
@@ -109,11 +109,11 @@ export const engines: Record<string, Engine> = {
   },
   'resize-gif': {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. Each frame is drawn at the new width and height on a canvas, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
-    versus: 'Reaction GIFs and screen recordings are often personal. Here the GIF is resized in this tab: the file is not uploaded, there is no size cap beyond your device’s memory, no watermark is added, and you can resize several at once.',
+    versus: 'Reaction GIFs and screen recordings are often personal. Here the GIF is resized in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), no watermark is added, and you can resize several at once.',
   },
   'crop-gif': {
     how: 'Your browser draws the first frame of the GIF so you can place the box. gifuct-js (MIT) then reads the GIF byte by byte in your tab and every frame is composited the way browsers play it; the part inside the box is cut from each frame, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
-    versus: 'Here the GIF is cropped in this tab: the file is not uploaded, there is no size cap beyond your device’s memory, and no watermark is added.',
+    versus: 'Here the GIF is cropped in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), and no watermark is added.',
   },
   'compress-gif': {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. The frames are then written back with gifenc’s (MIT) colour quantizer and LZW coder: each frame after the first stores only the rectangle that changed, with unchanged pixels left transparent, and the stronger levels use fewer colours and ignore changes too small to see. The new GIF is assembled in memory.',
@@ -201,7 +201,7 @@ export const engines: Record<string, Engine> = {
   },
   'merge-audio': {
     how: 'Your browser’s own audio decoders read each file (MP3, AAC in M4A or MP4, Opus or Vorbis, FLAC, WAV) into plain samples at 44.1 kHz in your tab. The sounds are laid end to end, with equal-power crossfades if you chose them, and written once as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
-    versus: 'Online audio joiners upload every file, cap free use at a few files or a few minutes, and keep the uploads on their servers. Here the files never leave your device, and your device’s memory is the only limit on how many you join.',
+    versus: 'Online audio joiners upload every file, cap free use at a few files or a few minutes, and keep the uploads on their servers. Here the files never leave your device, and your device’s memory (phones hold less) is the limit on how many you join.',
   },
   'mic-test': {
     how: 'Your browser opens the microphone (getUserMedia) with its own clean-up turned off, and the Web Audio API measures the level of each moment of sound in your tab. The play-back check is recorded by the browser’s built-in recorder into memory and played straight back.',
@@ -217,7 +217,7 @@ export const engines: Record<string, Engine> = {
   },
   'compress-audio': {
     how: 'Your browser decodes the sound with its own audio decoders. When you set a size limit, the bitrate is worked out from the length of the sound so the file lands under it. The smaller file is then written in your tab, as MP3 by LAME compiled to WebAssembly or as OGG by the browser’s own Opus encoder (WebCodecs) with Mediabunny (MPL-2.0) writing the container.',
-    versus: 'Online audio compressors upload the recording before they shrink it, which for a large WAV is the slowest part, and cap free files at 50 to 100 MB. Here nothing is uploaded, so the only limit is your device’s memory and private recordings stay on your device.',
+    versus: 'Online audio compressors upload the recording before they shrink it, which for a large WAV is the slowest part, and cap free files at 50 to 100 MB. Here nothing is uploaded, so the limit is your device’s memory (phones hold less) and private recordings stay on your device.',
   },
   'add-text-to-image': {
     how: 'Your browser decodes each image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab at full size. Your text is wrapped to fit, then drawn with the canvas text functions at a size that is a share of the image, with an outline, shadow or backing box if chosen, and the result is encoded once in the format you picked. Fonts come from your device, apart from the site’s own Archivo and Caveat.',
@@ -245,7 +245,7 @@ export const engines: Record<string, Engine> = {
   },
   'metronome': {
     how: 'A Web Audio oscillator makes each click, shaped by a gain envelope a few milliseconds long. Every 25 ms the page schedules the clicks due in the next 120 ms at exact times on the audio clock, which is driven by your sound card rather than the page’s timers, and the beat lights are drawn from the same clock. Tap tempo takes the median gap between your last eight taps.',
-    versus: 'Metronome apps want an install and often a subscription for odd time signatures or subdivisions, and metronome websites run ads and trackers that can make the page stutter. This one has every setting free, no ads, and keeps working offline after one visit.',
+    versus: 'Metronome apps want an install and often a subscription for odd time signatures or subdivisions, and metronome websites run ads and trackers that can make the page stutter. This one has every setting free, no ads, and keeps working offline after one visit and a short wait.',
   },
   'fill-pdf-form': {
     how: 'pdf-lib reads the form’s fields (AcroForm) and where each one sits on the page, and pdf.js draws every page in your tab with the fields left off. The fields are laid over the pages as ordinary inputs. When you save, pdf-lib writes your answers into the same fields, draws their appearance with the standard Helvetica font, and, if you ask, flattens them into the page.',
@@ -257,7 +257,7 @@ export const engines: Record<string, Engine> = {
   },
   'remove-silence': {
     how: 'Your browser’s own audio decoders turn the file into plain samples in your tab. The level is measured in 10 ms windows, using the loudest channel, and every quiet stretch longer than your chosen length is cut down to the pause you chose, with a 5 ms fade at each join. The sound is then written again: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders.',
-    versus: 'Online silence removers upload the recording, cap free files by length or size, and some keep the uploads. Here nothing is uploaded and the only limit is your device’s memory, which matters for long lectures and for private interviews.',
+    versus: 'Online silence removers upload the recording, cap free files by length or size, and some keep the uploads. Here nothing is uploaded and the limit is your device’s memory (phones hold less), which matters for long lectures and for private interviews.',
   },
   'image-to-svg': {
     how: 'Your browser decodes the image in the tab. It is scaled so its longest side is between 400 and 1,000 pixels (800 for the Detailed style) and handed to imagetracerjs (public domain), running in a background worker. The colours are reduced to a palette (2, up to 8 or up to 32), the outline of every area of each colour is traced, and each outline is fitted with straight lines and quadratic curves. The shapes are scaled back to the image’s own width and height and written as SVG paths. Black and white first sets each pixel to black or white with a threshold chosen from the image’s own brightness (Otsu’s method).',
@@ -273,19 +273,19 @@ export const engines: Record<string, Engine> = {
   },
   'resize-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab. Each page gets the new paper size, turned to match the page as it is shown, and its existing content is wrapped in a single transform that scales it to fit inside the margin and centres it, with a clip at the old page edge. Nothing is redrawn or rasterised, so text, vector drawings and images are unchanged. Links, form fields and comments are moved and scaled by the same amount.',
-    versus: 'Online resizers upload the PDF, and many rasterise the pages or cap free use. Here the document stays on your device, the text stays real text, and the only limit is your device’s memory.',
+    versus: 'Online resizers upload the PDF, and many rasterise the pages or cap free use. Here the document stays on your device, the text stays real text, and the limit is your device’s memory (phones hold less).',
   },
   'transcribe': {
     how: 'Your browser’s own decoders read the sound, from an audio file or a video’s soundtrack, and it is resampled to 16 kHz mono in the tab. The recording is cut at pauses into pieces of up to 28 seconds, and each piece goes to OpenAI’s Whisper base model (MIT), 8-bit ONNX weights run by transformers.js (Apache-2.0) and onnxruntime-web (MIT) in a background worker. The model, 76 MB, is downloaded from this site on first use and cached. Its timed segments become paragraphs, SRT or WebVTT.',
-    versus: 'Online transcription services upload the recording to their servers, cap free minutes, and some keep your audio to train their models. Here the model runs on your device: nothing is uploaded, there is no minute limit beyond your device’s memory, and it works offline after the first run.',
+    versus: 'Online transcription services upload the recording to their servers, cap free minutes, and some keep your audio to train their models. Here the model runs on your device: nothing is uploaded, there is no minute limit beyond your device’s memory (phones hold less), and it works offline after the first run.',
   },
   'add-subtitles-to-video': {
     how: 'Without a subtitle file, the soundtrack is transcribed exactly as in Transcribe: decoded in your tab at 16 kHz, cut at pauses, and timed by OpenAI’s Whisper base model (MIT) running in a background worker through transformers.js (Apache-2.0) and onnxruntime-web (MIT). With an SRT or WebVTT file, its captions are read as they are. Each caption is wrapped to fit the width of the picture, two lines at most, and a long one becomes several in a row. Mediabunny (MPL-2.0) then decodes the video, every frame is drawn on a canvas with the caption that is due, and your browser’s own video encoder (WebCodecs) writes a new MP4, with the sound copied across.',
-    versus: 'Online captioning apps upload the whole video, cap free minutes, and many stamp their logo on the result or keep it for training. Here the video and its words stay on your device, with no watermark and no minute limit beyond your device’s memory.',
+    versus: 'Online captioning apps upload the whole video, cap free minutes, and many stamp their logo on the result or keep it for training. Here the video and its words stay on your device, with no watermark and no minute limit beyond your device’s memory (phones hold less).',
   },
   'vocal-remover': {
     how: 'Your browser’s own decoders read the song, from an audio file or a video’s soundtrack, at 44.1 kHz stereo. It is cut into pieces of about six seconds, and each piece becomes a spectrogram (a short-time Fourier transform with a 6144-point window, as the model was trained with). UVR-MDX-NET Inst HQ 3, an MDX-Net model from the Ultimate Vocal Remover project (MIT), predicts the spectrogram of the music without the voice; it runs through onnxruntime-web (MIT) on the graphics chip with WebGPU where the browser has it, or on the CPU with WebAssembly. The answer is turned back into sound, and the vocals are the song minus the music.',
-    versus: 'Online vocal removers upload the whole song, queue it, cap free minutes or songs per day, and ask for an account to download WAV. Here the song never leaves your device, the only limit is your device’s memory, and the model works offline after the first run.',
+    versus: 'Online vocal removers upload the whole song, queue it, cap free minutes or songs per day, and ask for an account to download WAV. Here the song never leaves your device, the limit is your device’s memory (phones hold less), and the model works offline after the first run.',
   },
   'video-background-remover': {
     how: 'Mediabunny (MPL-2.0) decodes the video in your tab. Each frame is scaled down and given to a Google MediaPipe selfie segmenter (Apache-2.0) running in WebAssembly: by default the multiclass one, a 16 MB model that rates every pixel as background, hair, skin or clothing, or, if you choose Fast, the binary one, 0.25 MB, that only separates person from background. The person’s outline is softened at the edge and averaged with the previous frame so it does not flicker, the background is blurred or replaced with your colour or picture, and your browser’s own encoder (WebCodecs) writes the new MP4, with the sound copied across.',
@@ -301,7 +301,7 @@ export const engines: Record<string, Engine> = {
   },
   'epub-to-pdf': {
     how: 'An EPUB is a zip file. fflate (MIT) unzips it in your tab and the browser’s own parser reads the package file for the reading order, title and author, then each chapter’s XHTML. Headings, paragraphs with their bold and italic runs, lists, quotations and pictures are turned into a document description, and pdfmake (MIT, built on PDFKit) sets it in the Roboto font (Apache-2.0), breaking lines and pages in a background worker. Each chapter starts on a new page, and the first heading of each goes into the contents page.',
-    versus: 'Online EPUB converters upload the whole book, many queue it on a server and some email you a download link. Here the book stays on your device, the only size limit is your device’s memory, and it works offline once the page has loaded.',
+    versus: 'Online EPUB converters upload the whole book, many queue it on a server and some email you a download link. Here the book stays on your device, the size limit is your device’s memory (phones hold less), and it works offline after one visit and a short wait.',
   },
   'pdf-to-epub': {
     how: 'pdf.js (Apache-2.0) reads the positioned text of every page in your tab. The same rebuilding as PDF to Word groups it into lines and paragraphs and spots headings by their size. Text that sits at the top or bottom of many pages and differs only in its numbers is treated as a running header or footer and dropped, bare page numbers too, and a paragraph that stops mid-sentence at a page break is joined to its continuation. The main headings start chapters. Each chapter is written as XHTML with a small stylesheet, with an EPUB 3 navigation file and an NCX contents list for older readers, and fflate (MIT) zips them with the uncompressed mimetype first, as the EPUB specification requires.',
@@ -309,7 +309,7 @@ export const engines: Record<string, Engine> = {
   },
   'archive-extractor': {
     how: 'libarchive (BSD-2-Clause), the archive library behind bsdtar, compiled to WebAssembly by libarchive.js (MIT), runs in a background worker in your tab. It detects the format from the file itself, opens password-protected ZIP files when you give the password, and hands back each file. The worker and its WebAssembly, about 1 MB, are served from this site the first time you extract something, then cached. Downloading everything packs the files into one plain ZIP with fflate (MIT), keeping the folders.',
-    versus: 'Online extractors upload the whole archive, including any password you type, to their servers, and many cap the size. Here nothing leaves your device, password-protected ZIPs stay private, and the only limit is your device’s memory.',
+    versus: 'Online extractors upload the whole archive, including any password you type, to their servers, and many cap the size. Here nothing leaves your device, password-protected ZIPs stay private, and the limit is your device’s memory (phones hold less).',
   },
   'file-checksum': {
     how: 'hash-wasm (MIT), a small hashing library compiled to WebAssembly, computes MD5, SHA-1 and SHA-256 together while the file is read from your disk in 8 MB pieces, so only one piece is in memory at a time and the file is never loaded whole. The three digests are written as lowercase hexadecimal. The compare box strips spaces and ignores capital letters before it checks the pasted value against each digest.',
@@ -317,11 +317,11 @@ export const engines: Record<string, Engine> = {
   },
   'json-to-csv': {
     how: 'A small parser written for this page, with no library, reads your text in a background worker in this tab. JSON is read with the browser’s own JSON parser, and one object per line is accepted too. CSV is read by a parser that follows RFC 4180: quoted values, a doubled quote for a quote, and line breaks inside quotes; the delimiter is detected from the first lines unless you choose one. The result is written in the tab, with quoting added only where a value needs it and, if you leave it ticked, a UTF-8 byte-order mark at the start so Excel reads the letters correctly.',
-    versus: 'Online converters make you paste or upload the data to their server, and customer lists and exports are often exactly the data you should not hand over. Here what you paste and any file you drop is converted on your device and never sent anywhere, and the only limit is your device’s memory.',
+    versus: 'Online converters make you paste or upload the data to their server, and customer lists and exports are often exactly the data you should not hand over. Here what you paste and any file you drop is converted on your device and never sent anywhere, and the limit is your device’s memory (phones hold less).',
   },
   'create-zip': {
     how: 'Your files are read into this tab and packed with fflate (MIT), which deflates text and documents and stores already-compressed photos, videos and archives as they are. Folders you drop or pick keep their structure inside the ZIP. With a password, each file gets its own random salt; PBKDF2 with SHA-1 (the browser’s Web Crypto) turns the password into an AES-256 key and an authentication key, the compressed file is encrypted with AES in counter mode (the AES code is @noble/ciphers, MIT, an audited JavaScript library), and an HMAC lets the opener check the password and spot tampering. This is the WinZip AE-2 format that 7-Zip and WinRAR write.',
-    versus: 'Online zippers upload every file, and a password-protect service sees both the files and the password, which defeats the point of locking them. Here nothing leaves your device and there is no size cap beyond your device’s memory.',
+    versus: 'Online zippers upload every file, and a password-protect service sees both the files and the password, which defeats the point of locking them. Here nothing leaves your device and there is no size cap beyond your device’s memory (phones hold less).',
   },
   'video-to-mp4': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
@@ -333,7 +333,7 @@ export const engines: Record<string, Engine> = {
   },
   'gif-to-mp4': {
     how: 'Stayput reads the GIF byte by byte in your tab with gifuct-js (MIT), decompresses each frame and composites it the way browsers play GIFs, honouring each frame’s delay and disposal rule. Every finished frame goes to your browser’s own video encoder through WebCodecs: H.264 where the browser has one (Chrome, Edge, Safari), VP9 or AV1 where it does not. The encoded frames are written into an MP4 container by mp4-muxer (MIT), all in memory.',
-    versus: 'GIF to MP4 sites upload the file to convert it on a server, cap the size, and some add a watermark or keep the file for hours. Here the conversion runs on your device, so a reaction GIF, a screen recording of your product or a clip of your kids never leaves it, and the page keeps working offline after one visit.',
+    versus: 'GIF to MP4 sites upload the file to convert it on a server, cap the size, and some add a watermark or keep the file for hours. Here the conversion runs on your device, so a reaction GIF, a screen recording of your product or a clip of your kids never leaves it, and the page keeps working offline after one visit and a short wait.',
   },
   'image-to-text': {
     how: 'Your browser decodes the image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL), enlarges small screenshots so letters are big enough to read, and hands the pixels to Tesseract, the open-source OCR engine first built at HP and later developed by Google, compiled to WebAssembly by tesseract.js (Apache-2.0). Its neural network model for English is served by this site and loaded the first time you run it. The text is recognised line by line inside a worker in your tab.',
@@ -349,7 +349,7 @@ export const engines: Record<string, Engine> = {
   },
   'watermark-image': {
     how: 'Your browser decodes each photo (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab at full size. The text is drawn on top with your device’s own fonts at the chosen opacity, sized to the photo’s shorter side so the same setting looks alike on every photo, and the canvas is saved as JPG, PNG or WebP by the browser’s own encoder.',
-    versus: 'Watermark sites and apps upload the photos you most want to protect, the unpublished ones, and several add their own branding on the free tier. Here the photos never leave your device, and the only limit on how many you do at once is your device’s memory.',
+    versus: 'Watermark sites and apps upload the photos you most want to protect, the unpublished ones, and several add their own branding on the free tier. Here the photos never leave your device, and the limit on how many you do at once is your device’s memory (phones hold less).',
   },
   'watermark-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab. For each page size, the watermark is drawn once on a transparent canvas at about 216 dpi and embedded as a PNG, then placed over every page of that size, following each page’s crop box and rotation. The original page content is not rewritten, so text, links and forms are untouched.',
@@ -373,7 +373,7 @@ export const engines: Record<string, Engine> = {
   },
   'black-and-white-image': {
     how: 'Your browser decodes each image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab. Each pixel’s brightness is computed with the Rec. 709 weights, the way the eye weighs red, green and blue. High contrast stretches the tones to the full range; pure black and white picks the split point with Otsu’s method, which finds the threshold that best separates ink from paper. The browser then saves the canvas as JPG, PNG or WebP.',
-    versus: 'Photo filter sites upload your pictures to apply a filter a phone could do offline, and many add a watermark or keep the images. Here the photos stay on your device, the only limit on how many you convert at once is your device’s memory, and the result is not recompressed more than once.',
+    versus: 'Photo filter sites upload your pictures to apply a filter a phone could do offline, and many add a watermark or keep the images. Here the photos stay on your device, the limit on how many you convert at once is your device’s memory (phones hold less), and the result is not recompressed more than once.',
   },
   'grayscale-pdf': {
     how: 'pdf-lib (MIT) opens the PDF in your tab and draws one neutral grey rectangle over each page with the PDF Saturation blend mode. Blending keeps the brightness of whatever is underneath and takes the grey’s zero saturation, so every colour, in text, drawings and photos alike, turns into its own shade of grey. Nothing on the page is rewritten or re-rendered, so text stays text. For the same reason the original colour data is still in the file: the page looks and prints grey, but a check that inspects colour spaces may still detect colour.',
