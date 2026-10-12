@@ -4467,6 +4467,61 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'json-to-csv',
+    name: 'JSON ↔ CSV',
+    title: 'JSON to CSV and CSV to JSON Converter, No Upload | Stayput',
+    description:
+      'Convert JSON to CSV or CSV to JSON in your browser. Paste text or drop a file, flatten nested data, pick the delimiter. What you paste is not uploaded.',
+    heading: 'Convert JSON to CSV, or CSV to JSON',
+    tagline: 'Paste or drop your data, choose a direction and get a table or an array back. What you paste stays on this device.',
+    sections: [
+      {
+        heading: 'Related tools',
+        paragraphs: [
+          'Data exports often arrive zipped and need checking. The [archive opener](/tools/archive-extractor) opens the ZIP an export comes in, [File Checksum](/tools/file-checksum) confirms a download is intact, and [Create ZIP](/tools/create-zip) packs the converted files together.',
+        ],
+      },
+    ],
+    category: 'pdf',
+    accept: '.json,.csv,.tsv,.txt,application/json,text/csv',
+    multiple: false,
+    dropLabel: 'Drop a JSON or CSV file',
+    action: 'Convert',
+    sizeFact: 'No account, no watermark. The limit is your device’s memory.',
+    keywords: ['json to csv', 'csv to json', 'json to csv converter', 'convert json to csv', 'csv to json format', 'json to csv online'],
+    steps: [
+      'Paste JSON or CSV into the box, or drop a .json or .csv file. The direction is picked from what you gave it, and you can change it.',
+      'Set the options: the delimiter, whether the first row is headers, and how nested data is handled.',
+      'Convert, check the preview, then copy the result or download it.',
+    ],
+    faq: [
+      {
+        q: 'How do I convert JSON to CSV?',
+        a: 'Paste the JSON or drop the file, check that the direction says JSON to CSV, and press Convert. An array of objects becomes a table: each object is a row and each key a column, with the columns taken from every key that appears. Copy it, or download the .csv file.',
+      },
+      {
+        q: 'What happens to nested objects and arrays?',
+        a: 'Nested objects are flattened into columns named with a dot, so `{"user":{"name":"Ada"}}` gives a `user.name` column. Arrays go into one cell as JSON text, or joined with a semicolon if you tick that option. Untick Flatten nested objects if you want the whole nested value kept as text in one cell.',
+      },
+      {
+        q: 'Why does my CSV look wrong in Excel?',
+        a: 'Excel in many countries expects a semicolon, not a comma, and reads non-English letters wrongly unless the file starts with a byte-order mark. Keep UTF-8 with BOM ticked and choose Semicolon if your columns land in one cell.',
+      },
+      {
+        q: 'How are numbers, true/false and empty values handled going from CSV to JSON?',
+        a: 'By default every value stays text, exactly as it is in the CSV, so an id such as 00123 is not changed. Tick Detect types to turn numbers, true and false and null into real JSON values; long digit strings and values with leading zeros stay as text even then.',
+      },
+      {
+        q: 'Is my data uploaded?',
+        a: 'No. What you paste, and any file you drop, is converted by code running in this page and is not uploaded; the only thing the site counts is the anonymous usage listed on the privacy page. The only limit is your device’s memory, and the page keeps working offline after one visit.',
+      },
+      {
+        q: 'Can it handle a big file?',
+        a: 'The conversion runs in the background so the page stays usable. It is bounded by your device’s memory: a phone may run out of memory on a very large file, and then the page says so instead of giving a half result. Split the file and convert the pieces if that happens.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
