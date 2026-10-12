@@ -2718,7 +2718,7 @@ export const tools: Tool[] = [
       {
         heading: 'How to read the result',
         bullets: [
-          '**BPM** is beats per minute, the steady pulse you would tap your foot to. The page also shows the half and double of it, because a detector cannot always tell a slow song with busy drums from a fast one: 70 and 140 are the same song.',
+          '**BPM** is beats per minute, the steady pulse you would tap your foot to. The page folds the answer into 70 to 180, and for tempos from about 80 to 120 it also shows the half and the double, because a detector cannot always tell a slow song with busy drums from a fast one.',
           '**Key** is the home note and the scale, such as A minor. Many songs sit between a major key and its relative minor (C major and A minor use the same notes), so the page names the relative key as well.',
           '**Camelot code** is the key written as a number from 1 to 12 and a letter: A for minor, B for major. Two songs whose codes are the same, or one number apart, or the same number with the other letter, usually blend well. The [Camelot wheel](/camelot-wheel) page lists all 24.',
           '**Unsure** means the notes in the song did not point clearly to one key. It happens with drones, drum-only tracks, heavy bass and songs that change key.',
@@ -2743,15 +2743,15 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'How do I find the BPM of a song?',
-        a: 'Drop the audio file here and press Find BPM and key. The page decodes the file in your browser, finds the beat and shows the tempo in beats per minute, along with the half and double readings. If you only have the song playing and no file, use the [Tap tempo](/tap-tempo) page and tap along.',
+        a: 'Drop the audio file here and press Find BPM and key. The page decodes the file in your browser, finds the beat and shows the tempo in beats per minute, with its tempo name, and the half and double readings when they are in a plausible range. If you only have the song playing and no file, use the [Tap tempo](/tap-tempo) page and tap along.',
       },
       {
-        q: 'Why does it say 70 when the song feels like 140?',
-        a: 'Both are right in the sense that they are the same pulse counted twice. A slow song with a busy hi-hat can be written either way, and detectors cannot always tell which one you mean. That is why the page always shows the half and the double next to the answer. Pick the one that matches how the song feels, or that your DJ software or session expects.',
+        q: 'Why does the BPM look double or half of what I expected?',
+        a: 'Both are the same pulse counted twice. A slow song with a busy hi-hat can be written either way, and detectors cannot always tell which one you mean. The page folds its answer into 70 to 180 BPM and, for tempos from about 80 to 120, shows the half and the double next to it. Pick the one that matches how the song feels, or that your DJ software or session expects.',
       },
       {
         q: 'How accurate is it?',
-        a: 'In our own test on 19 recordings (15 with a known tempo and 15 with a known key; some of them synthesised by us), the tempo came out within 2% of the label on 10 of 15, and at exactly half or double on 4 or 5 of the rest. The key was exactly right on 7 of 15 and the relative major or minor on 3 more; the others were a fifth away, in the other mode, or wrong. That is a small test, so use the result as a good first guess and check it by ear.',
+        a: 'It is an estimate made from the sound, not a lookup, so check it. Play the song next to a click on the [online metronome](/tools/metronome), and treat a key marked Unsure as a guess to confirm by ear or on an instrument.',
       },
       {
         q: 'What is the Camelot code?',

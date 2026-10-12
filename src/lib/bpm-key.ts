@@ -12,8 +12,8 @@
  * real; labels not independently verified), headline tempo folded to 70-180:
  * within 2% on 13, half or double on 1 or 2, wrong on 0 or 1. Key: exact on 7,
  * relative major or minor on 3, a fifth away on 2, other mode on 1, wrong on
- * 2. The page copy quotes the raw-tempo and key figures; re-measure and edit
- * the copy together if the detector changes.
+ * 2. The song-key and Camelot pages quote the key figures; re-measure and edit
+ * that copy together if the key code changes.
  */
 import MusicTempo from 'music-tempo';
 import { fft } from './fft';
