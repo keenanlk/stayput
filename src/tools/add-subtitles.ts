@@ -137,7 +137,8 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       if (e instanceof EncoderStall) throw new CaptionsUnavailable();
       // Any other failure while redrawing: the captions written from speech already exist, so hand them over with the message.
       // Out of memory, or an unnamed failure on a phone with a video this big (Safari's EncodingError "Unknown error"), says so.
-      const memory = looksLikeMemory(e) || overPhoneLimit(file.size);
+      // A RangeError whose message names no memory (a bad buffer length) is not blamed on the phone's size.
+      const memory = looksLikeMemory(e) || (overPhoneLimit(file.size) && !(e instanceof RangeError));
       const err = (memory ? asMemory(encodeMemoryError(e)) : given ? unknownCaptionError(e) : encodeFailedError(e)) as Error & { salvage?: OutputFile[] };
       if (!given) err.salvage = [srtOutput(file, segments)];
       throw err;

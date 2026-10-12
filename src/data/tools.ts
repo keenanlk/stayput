@@ -66,7 +66,7 @@ export const tools: Tool[] = [
     action: 'Convert',
     sizeFact: 'No sign-up, no watermark',
     lead:
-      'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and can give you a batch as one zip. Location and camera details are left out unless you choose JPG and tick Keep EXIF metadata. It is free, needs no account and adds no watermark, and your photos are not uploaded: a HEIC decoder runs in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and can give you a batch as one zip. Location and camera details are left out unless you choose JPG and tick Keep EXIF metadata. It is free, needs no account and adds no watermark, and your photos are not uploaded: a HEIC decoder runs in your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     sections: [
       {
         heading: 'How to open or convert HEIC on Windows, Mac and iPhone',
@@ -140,7 +140,7 @@ export const tools: Tool[] = [
     name: 'Image Converter',
     title: 'Image Converter: JPG, PNG, WebP, PDF, ICO, No Upload | Stayput',
     description:
-      'Drop any image and Stayput detects its real format. Convert to JPG, PNG, WebP, PDF, ICO, GIF, BMP or TIFF without uploading. Free, batches, works offline after one visit.',
+      'Drop any image and Stayput detects its real format. Convert to JPG, PNG, WebP, PDF, ICO, GIF, BMP or TIFF without uploading. Free, batches, works offline after one visit and a short wait.',
     heading: 'Convert images between formats',
     tagline: 'Drop any image, see what it really is, pick what you need. Converted on your device.',
     category: 'images',
@@ -177,7 +177,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is anything uploaded?',
-        a: 'No. Decoding and encoding happen in this browser tab. After one visit this page works with your network switched off.',
+        a: 'No. Decoding and encoding happen in this browser tab. After one visit and a short wait this page works with your network switched off.',
       },
     ],
   },
@@ -245,7 +245,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is decoded and written again by code running in this page. There is no server in the process, no daily limit, and the only size limit is your device’s memory. The page keeps working offline after one visit.',
+        a: 'No. The GIF is decoded and written again by code running in this page. There is no server in the process, no daily limit, and the size limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
       {
         q: 'How does it make GIFs smaller?',
@@ -287,7 +287,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my PNG uploaded?',
-        a: 'No. The PNG is decoded and written again by code running in this page. There is no server in the process, no daily limit, and the only size limit is your device’s memory. The page keeps working offline after one visit.',
+        a: 'No. The PNG is decoded and written again by code running in this page. There is no server in the process, no daily limit, and the size limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
       {
         q: 'How does it make PNGs so much smaller?',
@@ -394,9 +394,9 @@ export const tools: Tool[] = [
     description:
       'Combine PDFs into one file in your browser: set the order with the arrows, then download merged.pdf. Nothing is uploaded, no watermark, no account.',
     heading: 'Merge PDF files',
-    tagline: 'Combine PDFs into one document and set the order with the arrows. No watermark, nothing uploaded, and the only size limit is your device’s memory.',
+    tagline: 'Combine PDFs into one document and set the order with the arrows. No watermark, nothing uploaded, and the size limit is your device’s memory (phones hold less).',
     lead:
-      'Combines two or more PDF files into one PDF, in the top-to-bottom order you set with the arrows, and saves it as merged.pdf. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: the pages are copied together in your browser, so text stays selectable and images are not recompressed. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Combines two or more PDF files into one PDF, in the top-to-bottom order you set with the arrows, and saves it as merged.pdf. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: the pages are copied together in your browser, so text stays selectable and images are not recompressed. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     sections: [
       {
         heading: 'A worked example: a cover letter, a CV and a certificate in one file',
@@ -420,7 +420,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is there a limit on the number or size of files?',
-        a: 'No. Other free tools cap you at two or three tasks an hour or a set file size because they pay for servers. This tool does the work on your device, so the only limit is your device’s memory. Merging fifty PDFs or a few hundred megabytes is fine on a normal laptop.',
+        a: 'No. Other free tools cap you at two or three tasks an hour or a set file size because they pay for servers. This tool does the work on your device, so the limit is your device’s memory (phones hold less). Merging fifty PDFs or a few hundred megabytes is fine on a normal laptop.',
       },
       {
         q: 'Can I merge PDFs without uploading them?',
@@ -489,7 +489,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop PDF files here',
     action: 'Compress PDF',
     lead:
-      'Makes a PDF smaller in four ways: a lossless cleanup, image recompression that keeps text selectable, flattening pages to pictures, or fitting it under a size you type, such as 1 MB or 200 KB. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: everything runs in your browser on your device. The only size limit is your device’s memory, and after one visit the page works offline; a password-protected PDF needs its unlock engine downloaded once first.',
+      'Makes a PDF smaller in four ways: a lossless cleanup, image recompression that keeps text selectable, flattening pages to pictures, or fitting it under a size you type, such as 1 MB or 200 KB. It is free, needs no account and adds no watermark, and your PDFs are not uploaded: everything runs in your browser on your device. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline; a password-protected PDF needs its unlock engine downloaded once first.',
     sections: [
       {
         heading: 'Compress to a set size: 100 KB, 200 KB, 500 KB, 1 MB, 2 MB',
@@ -588,7 +588,7 @@ export const tools: Tool[] = [
   {
     slug: 'unlock-pdf',
     lead:
-      'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The only size limit is your device’s memory, and after your first run on a protected PDF the page works offline.',
+      'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The size limit is your device’s memory (phones hold less), and after your first run on a protected PDF the page works offline.',
     name: 'Unlock PDF',
     title: 'Unlock PDF: Remove a PDF Password, Free and Private | Stayput',
     description:
@@ -757,7 +757,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is the PDF uploaded?',
-        a: 'No. Thumbnails are rendered with pdf.js and the new file is written with pdf-lib, both running in your browser. Switch off your network after the page loads and it still works.',
+        a: 'No. Thumbnails are rendered with pdf.js and the new file is written with pdf-lib, both running in your browser. After one visit and a short wait, switch off your network and it still works.',
       },
     ],
   },
@@ -799,7 +799,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I sign on a phone?',
-        a: 'Yes. Draw with your finger in the signature box. It works in Safari on iPhone and in Chrome on Android, and works offline after one visit.',
+        a: 'Yes. Draw with your finger in the signature box. It works in Safari on iPhone and in Chrome on Android, and works offline after one visit and a short wait.',
       },
       {
         q: 'What if the PDF is a form or is password protected?',
@@ -812,7 +812,7 @@ export const tools: Tool[] = [
     name: 'Add Page Numbers',
     title: 'Add Page Numbers to a PDF Online, Free and Private | Stayput',
     description:
-      'Stamp page numbers on every page of a PDF. Choose the position, format such as "Page 1 of 10", font and starting number. No upload, works offline after one visit.',
+      'Stamp page numbers on every page of a PDF. Choose the position, format such as "Page 1 of 10", font and starting number. No upload, works offline after one visit and a short wait.',
     heading: 'Add page numbers to a PDF',
     tagline: 'Number every page in the corner or the centre, in the format you want, without sending the document anywhere.',
     category: 'pdf',
@@ -887,7 +887,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is the PDF uploaded?',
-        a: 'No. pdf.js reads the text inside your browser and the Word file is assembled in memory in your tab. After one visit you can convert with the network switched off.',
+        a: 'No. pdf.js reads the text inside your browser and the Word file is assembled in memory in your tab. After one visit and a short wait you can convert with the network switched off.',
       },
     ],
   },
@@ -933,7 +933,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is the photo uploaded?',
-        a: 'No. The image is decoded and cropped on a canvas inside your browser tab. After one visit you can switch off Wi-Fi and crop as many photos as you like.',
+        a: 'No. The image is decoded and cropped on a canvas inside your browser tab. After one visit and a short wait you can switch off Wi-Fi and crop as many photos as you like.',
       },
     ],
   },
@@ -1118,7 +1118,7 @@ export const tools: Tool[] = [
     heading: 'Convert video or audio to MP3',
     tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
     taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3).',
-    sizeFact: 'No sign-up, no watermark',
+    sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
     category: 'media',
     accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
     multiple: true,
@@ -1170,6 +1170,7 @@ export const tools: Tool[] = [
     multiple: false,
     dropLabel: 'Drop a video to turn into a GIF',
     action: 'Make GIF',
+    sizeFact: 'No watermark. Up to 600 frames; the limit is your device’s memory (phones hold less).',
     keywords: ['video to gif', 'mp4 to gif', 'mov to gif', 'webm to gif', 'convert video to gif', 'gif maker', 'make a gif from a video'],
     steps: [
       'Drop a video (MP4, MOV, WebM or MKV), or tap to pick one. It opens in a player on the page.',
@@ -1195,14 +1196,14 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is there a watermark or a file size limit?',
-        a: 'No watermark and no upload limit. The only limit is your device’s memory: a long 4K video works, because only the frames you pick are decoded, but the GIF itself is capped at 600 frames.',
+        a: 'No watermark and no upload limit. The video itself is limited by your device’s memory (phones hold less): a long 4K video works, because only the frames you pick are decoded, but the GIF itself is capped at 600 frames.',
       },
     ],
   },
   {
     slug: 'gif-to-mp4',
     lead:
-      'Converts animated GIFs to MP4 video (H.264 in Chrome, Edge and Safari, with no sound track since GIFs have none), often five to twenty times smaller, with each frame keeping its timing. It is free, and your GIFs are not uploaded: each frame is encoded by your browser’s own video encoder. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Converts animated GIFs to MP4 video (H.264 in Chrome, Edge and Safari, with no sound track since GIFs have none), often five to twenty times smaller, with each frame keeping its timing. It is free, and your GIFs are not uploaded: each frame is encoded by your browser’s own video encoder. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     name: 'GIF to MP4',
     title: 'GIF to MP4 Converter, Free, No Upload | Stayput',
     description:
@@ -1223,7 +1224,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is decoded by code in this page and each frame is encoded by your browser’s own video encoder. There is no server in the process, so there is nothing to wait for, and after one visit the page works with Wi-Fi off.',
+        a: 'No. The GIF is decoded by code in this page and each frame is encoded by your browser’s own video encoder. There is no server in the process, so there is nothing to wait for, and after one visit and a short wait the page works with Wi-Fi off.',
       },
       {
         q: 'Why is the MP4 so much smaller than the GIF?',
@@ -1257,7 +1258,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop videos to compress',
     action: 'Compress',
     lead:
-      'Makes MP4, MOV, WebM and MKV videos smaller and saves an MP4, either at a quality level or fitted under a size you pick: 8, 10, 16, 25, 50 or 100 MB. It is free, needs no account and adds no watermark, and your videos are not uploaded: your browser’s own video encoder re-encodes them on your device. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Makes MP4, MOV, WebM and MKV videos smaller and saves an MP4, either at a quality level or fitted under a size you pick: 8, 10, 16, 25, 50 or 100 MB. It is free, needs no account and adds no watermark, and your videos are not uploaded: your browser’s own video encoder re-encodes them on your device. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     sections: [
       {
         heading: 'A worked example: a clip for Discord',
@@ -1275,7 +1276,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Can I compress a video without uploading it?',
-        a: 'Yes. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for and no copy left on someone else’s computer. After one visit you can switch off Wi-Fi and it still works.',
+        a: 'Yes. The video is read and re-encoded by your browser’s own video encoder inside this page. There is no server in the process, so there is no upload to wait for and no copy left on someone else’s computer. After one visit and a short wait you can switch off Wi-Fi and it still works.',
       },
       {
         q: 'How much smaller will it get?',
@@ -1322,7 +1323,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process, so there is no upload and no copy left anywhere. After one visit the page works with Wi-Fi off.',
+        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process, so there is no upload and no copy left anywhere. After one visit and a short wait the page works with Wi-Fi off.',
       },
       {
         q: 'Why was my file converted so fast?',
@@ -1360,7 +1361,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. Your browser plays the video from the file on your device, and the clip is cut by code in this page. There is no server and no watermark, and the page works offline after one visit.',
+        a: 'No. Your browser plays the video from the file on your device, and the clip is cut by code in this page. There is no server and no watermark, and the page works offline after one visit and a short wait.',
       },
       {
         q: 'Why does my clip start a moment early?',
@@ -1379,7 +1380,7 @@ export const tools: Tool[] = [
   {
     slug: 'mute-video',
     lead:
-      'Removes the sound track from a video (MP4, MOV, WebM or MKV) and saves it in the same format, copying the picture untouched so it takes seconds with no quality loss. It is free, and your video is not uploaded: it is rewritten in your browser. The only size limit is your device’s memory, and after one visit the page works offline.',
+      'Removes the sound track from a video (MP4, MOV, WebM or MKV) and saves it in the same format, copying the picture untouched so it takes seconds with no quality loss. It is free, and your video is not uploaded: it is rewritten in your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     name: 'Mute video',
     title: 'Remove Audio from Video: Mute MP4, MOV, No Upload | Stayput',
     description:
@@ -1400,7 +1401,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The file is read and rewritten by code in this page. There is no server in the process, so there is no upload and no copy left anywhere. After one visit the page works with Wi-Fi off.',
+        a: 'No. The file is read and rewritten by code in this page. There is no server in the process, so there is no upload and no copy left anywhere. After one visit and a short wait the page works with Wi-Fi off.',
       },
       {
         q: 'Does removing the sound lower the quality?',
@@ -1769,7 +1770,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound with its own decoders, and the new file is written inside the page: MP3 by LAME compiled to WebAssembly, WAV and FLAC by small encoders in this site’s code, M4A and OGG by the browser’s built-in AAC and Opus encoders. Your files are not uploaded, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
+        a: 'No. Your browser decodes the sound with its own decoders, and the new file is written inside the page: MP3 by LAME compiled to WebAssembly, WAV and FLAC by small encoders in this site’s code, M4A and OGG by the browser’s built-in AAC and Opus encoders. Your files are not uploaded, so the size limit is your device’s memory (phones hold less), and the page works offline after one visit and a short wait (MP3 output needs one MP3 run first).',
       },
       {
         q: 'Which format should I choose?',
@@ -1971,7 +1972,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my signature uploaded or saved?',
-        a: 'No. It is made by code running in this page, so what you draw, type or photograph stays on your device. Nothing is kept when you close or reload the page, so download it if you want it. If you press Use in Sign PDF, one temporary copy is kept in this browser’s storage on your device until Sign PDF picks it up. After one visit you can turn off your internet connection and the page still works.',
+        a: 'No. It is made by code running in this page, so what you draw, type or photograph stays on your device. Nothing is kept when you close or reload the page, so download it if you want it. If you press Use in Sign PDF, one temporary copy is kept in this browser’s storage on your device until Sign PDF picks it up. After one visit and a short wait you can turn off your internet connection and the page still works.',
       },
       {
         q: 'How should I photograph my signature?',
@@ -2477,7 +2478,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my files uploaded?',
-        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Your files are not uploaded, so the only size limit is your device’s memory, and the page works offline after one visit (MP3 output needs one MP3 run first).',
+        a: 'No. Your browser decodes the sound and the smaller file is written inside the page: MP3 by LAME compiled to WebAssembly, OGG by the browser’s own Opus encoder. Your files are not uploaded, so the size limit is your device’s memory (phones hold less), and the page works offline after one visit and a short wait (MP3 output needs one MP3 run first).',
       },
       {
         q: 'How much smaller will it get?',
@@ -2515,7 +2516,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my photo uploaded?',
-        a: 'No. Your browser decodes the image, draws your text onto it on a canvas in the page, and saves the result. Your files are not uploaded, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the image, draws your text onto it on a canvas in the page, and saves the result. Your files are not uploaded, and it works offline after one visit and a short wait.',
       },
       {
         q: 'Does the text stay sharp on a big photo?',
@@ -2557,7 +2558,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my picture uploaded?',
-        a: 'No. Your browser decodes the image and cuts the tiles on a canvas in the page. Your files are not uploaded, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the image and cuts the tiles on a canvas in the page. Your files are not uploaded, and it works offline after one visit and a short wait.',
       },
       {
         q: 'Which grid for an Instagram profile?',
@@ -2595,7 +2596,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Your browser decodes the pictures and draws the collage on a canvas in the page. Your files are not uploaded, and it works offline once the page has loaded.',
+        a: 'No. Your browser decodes the pictures and draws the collage on a canvas in the page. Your files are not uploaded, and it works offline after one visit and a short wait.',
       },
       {
         q: 'Are the pictures cropped?',
@@ -2607,7 +2608,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is there a watermark or a limit?',
-        a: 'No watermark, and no limit on the number of pictures beyond your device’s memory.',
+        a: 'No watermark, and no set limit on the number of pictures beyond your device’s memory (phones hold less).',
       },
     ],
   },
@@ -2649,7 +2650,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my PDF uploaded?',
-        a: 'No. The file is read by pdf.js running in this tab and the pictures are saved from memory. Your files are not uploaded, and the page keeps working with the network off once it has loaded.',
+        a: 'No. The file is read by pdf.js running in this tab and the pictures are saved from memory. Your files are not uploaded, and the page keeps working with the network off after one visit and a short wait.',
       },
     ],
   },
@@ -2742,7 +2743,7 @@ export const tools: Tool[] = [
     name: 'Metronome',
     title: 'Online Metronome with Tap Tempo, Free, No Ads | Stayput',
     description:
-      'A steady online metronome: 20 to 300 BPM, any time signature, accented downbeat, eighths, triplets and sixteenths, and tap tempo. Works offline after one visit.',
+      'A steady online metronome: 20 to 300 BPM, any time signature, accented downbeat, eighths, triplets and sixteenths, and tap tempo. Works offline after one visit and a short wait.',
     heading: 'Online metronome',
     tagline: 'A steady click at any tempo, with the bar, the subdivisions and tap tempo, running on your device.',
     category: 'media',
@@ -2771,7 +2772,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Does it work offline?',
-        a: 'Yes. After one visit the page is stored by your browser, so the metronome opens and runs with no connection, in a practice room or on a plane.',
+        a: 'Yes. After one visit and a short wait the page is stored by your browser, so the metronome opens and runs with no connection, in a practice room or on a plane.',
       },
       {
         q: 'Is anything recorded?',
@@ -2952,7 +2953,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop GIFs to resize',
     action: 'Resize',
-    sizeFact: 'No watermark. The limit is your device’s memory: a long or very large GIF may need a computer.',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or very large GIF may need a computer.',
     keywords: ['resize gif', 'gif resizer', 'resize gif online', 'change gif dimensions', 'resize animated gif', 'make gif bigger'],
     steps: [
       'Drop one or more GIFs, or tap to pick them.',
@@ -2982,7 +2983,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is read and rewritten by code running in this page, with no server in the process, and the only limit is your device’s memory. The page keeps working offline after one visit.',
+        a: 'No. The GIF is read and rewritten by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
     ],
   },
@@ -2999,7 +3000,7 @@ export const tools: Tool[] = [
     multiple: false,
     dropLabel: 'Drop a GIF to crop',
     action: 'Crop',
-    sizeFact: 'No watermark. The limit is your device’s memory: a long or very large GIF may need a computer.',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or very large GIF may need a computer.',
     keywords: ['crop gif', 'gif cropper', 'crop gif online', 'crop gif to square', 'crop animated gif', 'cut part of a gif'],
     steps: [
       'Drop a GIF, or tap to pick one. The first frame appears with a crop box.',
@@ -3029,7 +3030,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is decoded and cropped by code running in this page, with no server in the process, and the only limit is your device’s memory. The page keeps working offline after one visit.',
+        a: 'No. The GIF is decoded and cropped by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
     ],
   },
@@ -3046,6 +3047,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop the pictures for your GIF',
     action: 'Make GIF',
+    sizeFact: 'No watermark. Up to 300 pictures; the limit is your device’s memory (phones hold less).',
     keywords: ['gif maker', 'make a gif', 'animated gif maker', 'create gif from images', 'photo to gif', 'gif creator', 'make gif from pictures'],
     steps: [
       'Drop two or more pictures. Put them in order with the arrows in the list.',
@@ -3164,12 +3166,12 @@ export const tools: Tool[] = [
     steps: [
       'Drop one or more recordings or videos.',
       'Pick the spoken language (or let it detect it), and whether you want text, SRT subtitles or WebVTT captions.',
-      'Press Transcribe. The first run downloads the speech model once; the transcript appears with a Copy button and downloads as a file.',
+      'Press Transcribe. The first run downloads the speech model and its engine once; the transcript appears with a Copy button and downloads as a file.',
     ],
     faq: [
       {
         q: 'Is my recording uploaded?',
-        a: 'No. The sound is decoded in this tab and the Whisper speech model runs in your browser, so interviews, medical dictation, meetings and voice notes stay on your device. The only downloads are the speech model and the engine that runs it, both from this site, the first time.',
+        a: 'No. The sound is decoded in this tab and the Whisper speech model runs in your browser, so interviews, medical dictation, meetings and voice notes stay on your device. What gets downloaded is the speech model and the engine that runs it, both from this site, the first time.',
       },
       {
         q: 'How accurate is it?',
@@ -3206,6 +3208,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop a video, and an SRT or VTT file if you have one',
     action: 'Add subtitles',
+    sizeFact: 'No watermark. On a phone, a video over about 200 MB (2 minutes of iPhone video) may run out of memory',
     keywords: ['add subtitles to video', 'auto caption video', 'burn subtitles into video', 'hardcode subtitles', 'add captions to video', 'srt to video', 'open captions', 'subtitles without upload'],
     steps: [
       'Drop a video. To use subtitles you already have, drop the SRT or VTT file with it.',
@@ -3215,7 +3218,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The soundtrack is transcribed by a speech model running in this tab, and the frames are redrawn and encoded by your browser’s own video encoder. The only downloads are the speech model and the engine that runs it, both from this site, the first time.',
+        a: 'No. The soundtrack is transcribed by a speech model running in this tab, and the frames are redrawn and encoded by your browser’s own video encoder. What gets downloaded is the speech model and the engine that runs it, both from this site, the first time.',
       },
       {
         q: 'What is the difference between burned-in and separate subtitles?',
@@ -3231,7 +3234,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is there a watermark or a length limit?',
-        a: 'No watermark. The only limit is your device’s memory, since the new video is built in the tab.',
+        a: 'No watermark. The limit is your device’s memory, since the new video is built in the tab; on a phone, a video over about 200 MB (2 minutes of iPhone video) may run out of memory.',
       },
     ],
   },
@@ -3252,12 +3255,12 @@ export const tools: Tool[] = [
     steps: [
       'Drop one or more songs, or videos with music.',
       'Choose what to keep: the music without the vocals, the vocals alone, or both as two files, and MP3 or WAV.',
-      'Press Separate. The first run downloads the model once; each song is split in pieces and the files download when it is done.',
+      'Press Separate. The first run downloads the model and its engine once; each song is split in pieces and the files download when it is done.',
     ],
     faq: [
       {
         q: 'Is my song uploaded?',
-        a: 'No. The song is decoded in this tab and the separation model runs on your device, so unreleased demos, stems for a client and your own recordings stay with you. The only downloads are the separation model and the engine that runs it, both from this site, the first time.',
+        a: 'No. The song is decoded in this tab and the separation model runs on your device, so unreleased demos, stems for a client and your own recordings stay with you. What gets downloaded is the separation model and the engine that runs it, both from this site, the first time.',
       },
       {
         q: 'How good is the separation?',
@@ -3294,7 +3297,7 @@ export const tools: Tool[] = [
     steps: [
       'Drop a video of a person. For a picture behind them, drop the JPG or PNG with it.',
       'Choose Blur, a Colour (green is ready for keying in an editor) or Picture.',
-      'Press Replace background. The first run downloads the person finder once; each frame is then redrawn and the new video downloads.',
+      'Press Replace background. The first run downloads the person finder and its engine once; each frame is then redrawn and the new video downloads.',
     ],
     faq: [
       {
@@ -3526,6 +3529,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop files or folders to zip',
     action: 'Create ZIP',
+    sizeFact: 'No watermark. A ZIP can be up to 4 GB, and phones hold less.',
     keywords: ['create zip file', 'zip files online', 'password protect zip file', 'zip folder', 'compress files to zip', 'encrypted zip'],
     steps: [
       'Drop files or a folder, or press Add a folder.',
@@ -3589,7 +3593,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my logo uploaded?',
-        a: 'No. The image is decoded and resized on a canvas in your browser tab, and the ICO file is written by a small encoder in the page. Logos for a rebrand or an unannounced product never leave your device. After one visit you can go offline and generate icons as often as you like.',
+        a: 'No. The image is decoded and resized on a canvas in your browser tab, and the ICO file is written by a small encoder in the page. Logos for a rebrand or an unannounced product never leave your device. After one visit and a short wait you can go offline and generate icons as often as you like.',
       },
     ],
   },
@@ -3612,20 +3616,20 @@ export const tools: Tool[] = [
       {
         heading: 'A worked example: a product photo on a white background',
         paragraphs: [
-          'Say you have a 12-megapixel JPG of a mug on a kitchen table for a marketplace listing. Drop it, choose White, set Save as to JPG and press Remove background. The first photo downloads the model once; after that each photo takes a few seconds. You get mug-no-bg.jpg at the same 4000 × 3000 size, and the result line shows that size. If part of the mug goes missing, set Keep around the edges to More and run it again.',
+          'Say you have a 12-megapixel JPG of a mug on a kitchen table for a marketplace listing. Drop it, choose White, set Save as to JPG and press Remove background. The first photo downloads the model and its engine once; after that each photo takes a few seconds. You get mug-no-bg.jpg at the same 4000 × 3000 size, and the result line shows that size. If part of the mug goes missing, set Keep around the edges to More and run it again.',
         ],
       },
     ],
     keywords: ['remove background', 'background remover', 'remove background from image', 'transparent background', 'make background transparent', 'remove bg', 'remove.bg alternative', 'cut out image', 'white background'],
     steps: [
       'Drop one or more photos (JPG, PNG, WebP, HEIC, AVIF or JPEG XL), or tap to pick them.',
-      'Choose a transparent, white or coloured background, or keep the scene and blur it, and the file type. The first photo downloads the cut-out model once; after that it is cached.',
+      'Choose a transparent, white or coloured background, or keep the scene and blur it, and the file type. The first photo downloads the cut-out model and its WebAssembly runtime once; after that it is cached.',
       'Download the cut-out at the photo’s full size, or all of them in one zip.',
     ],
     faq: [
       {
         q: 'Can I remove a background without uploading the photo?',
-        a: 'Yes. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. The only downloads are the model and the WebAssembly runtime that runs it, both fetched from this site the first time. After your first run you can turn off Wi-Fi and it keeps working.',
+        a: 'Yes. A segmentation model runs inside your browser tab and works out which pixels are the subject; the new image is written there too. What gets downloaded is the model and the WebAssembly runtime that runs it, both fetched from this site the first time. After your first run you can turn off Wi-Fi and it keeps working.',
       },
       {
         q: 'Why is the first photo slow?',
@@ -3682,7 +3686,7 @@ export const tools: Tool[] = [
     keywords: ['passport photo', 'passport photo maker', 'passport photo online', 'id photo', 'visa photo', '2x2 photo', '35x45 photo', 'passport size photo', 'passport photo app'],
     steps: [
       'Drop a photo taken straight on: face the camera, neutral expression, eyes open, in even light, with some space above your head.',
-      'Pick the size, and keep the background or replace it with white or light grey. The first photo downloads the face finder and cut-out model once.',
+      'Pick the size, and keep the background or replace it with white or light grey. The first photo downloads the face finder, the cut-out model and their WebAssembly runtime once.',
       'Download the single photo for online applications, and the 4 × 6 sheet to print at a photo counter or at home, then cut along the grey lines.',
     ],
     sections: [
@@ -3698,7 +3702,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Can I make a passport photo without uploading my photo?',
-        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
+        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
       },
       {
         q: 'How is the head sized?',
@@ -3725,7 +3729,7 @@ export const tools: Tool[] = [
   {
     slug: 'watermark-image',
     name: 'Watermark image',
-    sizeFact: 'The only limit is your device’s memory',
+    sizeFact: 'The limit is your device’s memory (phones hold less)',
     title: 'Add Watermark to Photo, Free, No Upload | Stayput',
     description:
       'Add a text watermark to photos in your browser: your name, a copyright line or a website, in a corner, across the middle or repeated. No upload, no sign-up.',
@@ -3745,7 +3749,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Each photo is decoded, drawn with the watermark and saved inside your browser tab. Your files are not uploaded, so unpublished work, client photos and pictures of your home stay on your device. The page works with Wi-Fi off once it has loaded.',
+        a: 'No. Each photo is decoded, drawn with the watermark and saved inside your browser tab. Your files are not uploaded, so unpublished work, client photos and pictures of your home stay on your device. The page works with Wi-Fi off after one visit and a short wait.',
       },
       {
         q: 'Which placement should I use?',
@@ -3772,7 +3776,7 @@ export const tools: Tool[] = [
   {
     slug: 'watermark-pdf',
     name: 'Watermark PDF',
-    sizeFact: 'The only limit is your device’s memory',
+    sizeFact: 'The limit is your device’s memory (phones hold less)',
     title: 'Add Watermark to PDF, Free, No Upload | Stayput',
     description:
       'Stamp CONFIDENTIAL, DRAFT or any text on every page of a PDF, diagonally, repeated or in a corner. Runs in your browser; the document is never uploaded.',
@@ -3842,7 +3846,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my PDF uploaded?',
-        a: 'No. The file is read and rewritten by code running in your browser tab, so a CV, contract, legal filing or anonymous tip never leaves your device. The page works with Wi-Fi off once it has loaded.',
+        a: 'No. The file is read and rewritten by code running in your browser tab, so a CV, contract, legal filing or anonymous tip never leaves your device. The page works with Wi-Fi off after one visit and a short wait.',
       },
       {
         q: 'Does it change the document itself?',
@@ -3884,7 +3888,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my photo uploaded?',
-        a: 'No. The cut-out model runs inside your browser tab, and the border and file are made there too. Photos of your friends, kids and pets stay on your device. The only downloads are the model and the WebAssembly runtime that runs it, fetched from this site once and then cached.',
+        a: 'No. The cut-out model runs inside your browser tab, and the border and file are made there too. Photos of your friends, kids and pets stay on your device. What gets downloaded is the model and the WebAssembly runtime that runs it, fetched from this site once and then cached.',
       },
       {
         q: 'How do I use it in WhatsApp?',
@@ -3971,6 +3975,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop pictures to upscale',
     action: 'Upscale',
+    sizeFact: 'No watermark. The enlarged picture can be up to about 16.7 megapixels (4096 × 4096 px).',
     keywords: ['ai image upscaler', 'upscale image', 'image upscaler', 'increase image resolution', 'enlarge image without losing quality', 'photo enhancer', 'upscale photo', 'make image bigger'],
     steps: [
       'Drop one or more pictures (JPG, PNG, WebP, HEIC, AVIF or JPEG XL).',
@@ -3980,7 +3985,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my pictures uploaded?',
-        a: 'No. The upscaler is a neural network that runs as WebAssembly inside this page, in a background thread. Your pictures are decoded, enlarged and saved in your tab. The model file is the only thing downloaded, once, from this site.',
+        a: 'No. The upscaler is a neural network that runs as WebAssembly inside this page, in a background thread. Your pictures are decoded, enlarged and saved in your tab. The model and the WebAssembly runtime that runs it are downloaded once, from this site.',
       },
       {
         q: 'How is this different from resizing?',
@@ -4022,7 +4027,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my photo uploaded?',
-        a: 'No. The eraser is MI-GAN, a small open-source inpainting network, running as WebAssembly in a background thread of this page. Your photo is decoded, filled in and saved in your tab. The 28 MB model is the only thing downloaded, once, from this site.',
+        a: 'No. The eraser is MI-GAN, a small open-source inpainting network, running as WebAssembly in a background thread of this page. Your photo is decoded, filled in and saved in your tab. The 28 MB model and the WebAssembly runtime that runs it are downloaded once, from this site.',
       },
       {
         q: 'What does it do well, and what not?',
@@ -4064,7 +4069,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Each photo is decoded and adjusted pixel by pixel on a canvas in your tab, and saved by your browser. Your files are not uploaded, so it works offline once the page has loaded.',
+        a: 'No. Each photo is decoded and adjusted pixel by pixel on a canvas in your tab, and saved by your browser. Your files are not uploaded, so it works offline after one visit and a short wait.',
       },
       {
         q: 'Why does brightness not wash out the whites?',
@@ -4122,7 +4127,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my artwork uploaded?',
-        a: 'No. The image is decoded, trimmed, resized and saved as PNG on a canvas in your tab. Commissioned emotes and unreleased sub badges stay on your device, and the page works offline once loaded.',
+        a: 'No. The image is decoded, trimmed, resized and saved as PNG on a canvas in your tab. Commissioned emotes and unreleased sub badges stay on your device, and the page works offline after one visit and a short wait.',
       },
     ],
   },
@@ -4164,7 +4169,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my picture uploaded?',
-        a: 'No. The picture is shrunk, recoloured and enlarged on a canvas in your browser tab, and the PNG is saved from there. Your files are not uploaded, and it works offline once the page has loaded.',
+        a: 'No. The picture is shrunk, recoloured and enlarged on a canvas in your browser tab, and the PNG is saved from there. Your files are not uploaded, and it works offline after one visit and a short wait.',
       },
     ],
   },
@@ -4274,7 +4279,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Are my photos uploaded?',
-        a: 'No. Each photo is decoded, converted and saved by code running in your browser tab. Your files are not uploaded, and the page works offline once it has loaded.',
+        a: 'No. Each photo is decoded, converted and saved by code running in your browser tab. Your files are not uploaded, and the page works offline after one visit and a short wait.',
       },
       {
         q: 'What is the difference between the looks?',
@@ -4316,7 +4321,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my PDF uploaded?',
-        a: 'No. The conversion runs in your browser tab, so the document stays on your device, and the page works offline once it has loaded.',
+        a: 'No. The conversion runs in your browser tab, so the document stays on your device, and the page works offline after one visit and a short wait.',
       },
       {
         q: 'Will the text still be selectable?',
@@ -4362,7 +4367,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my PDF uploaded?',
-        a: 'No. The pages are drawn and the crop is written by code running in your browser tab, so the document never leaves your device, and the page works offline once it has loaded.',
+        a: 'No. The pages are drawn and the crop is written by code running in your browser tab, so the document never leaves your device, and the page works offline after one visit and a short wait.',
       },
       {
         q: 'Does cropping lower the quality?',
@@ -4412,7 +4417,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my PDF uploaded?',
-        a: 'No. The pages are drawn, searched and rewritten by code running in your browser tab, so a bank statement, medical record, court filing or HR document never leaves your device. The page works with Wi-Fi off once it has loaded.',
+        a: 'No. The pages are drawn, searched and rewritten by code running in your browser tab, so a bank statement, medical record, court filing or HR document never leaves your device. The page works with Wi-Fi off after one visit and a short wait.',
       },
       {
         q: 'Why can I no longer select text on the redacted pages?',
@@ -4500,7 +4505,7 @@ export const tools: Tool[] = [
     multiple: false,
     dropLabel: 'Drop a JSON or CSV file',
     action: 'Convert',
-    sizeFact: 'No account, no watermark. The limit is your device’s memory.',
+    sizeFact: 'No account, no watermark. A file can be up to 200 MB, and phones hold less.',
     keywords: ['json to csv', 'csv to json', 'json to csv converter', 'convert json to csv', 'csv to json format', 'json to csv online'],
     steps: [
       'Paste JSON or CSV into the box, or drop a .json or .csv file. The direction is picked from what you gave it, and you can change it.',
@@ -4526,11 +4531,11 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my data uploaded?',
-        a: 'No. What you paste, and any file you drop, is converted by code running in this page and is not uploaded; the only thing the site counts is the anonymous usage listed on the privacy page. The only limit is your device’s memory, and the page keeps working offline after one visit.',
+        a: 'No. What you paste, and any file you drop, is converted by code running in this page and is not uploaded; the only thing the site counts is the anonymous usage listed on the privacy page. A file can be up to 200 MB, and the page keeps working offline after one visit and a short wait.',
       },
       {
         q: 'Can it handle a big file?',
-        a: 'The conversion runs in the background so the page stays usable. It is bounded by your device’s memory: a phone may run out of memory on a very large file, and then the page says so instead of giving a half result. Split the file and convert the pieces if that happens.',
+        a: 'The conversion runs in the background so the page stays usable. A file over 200 MB is refused as too large for a browser tab, and a phone may run out of memory on a smaller one, in which case the page says so instead of giving a half result. Split the file and convert the pieces if that happens.',
       },
     ],
   },
