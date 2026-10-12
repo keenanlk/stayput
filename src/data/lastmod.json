@@ -713,11 +713,11 @@
  },
  "/guides/remove-exif-data-from-photos-on-mac": {
   "date": "2026-10-12",
-  "hash": "930f6e9c2d24c722"
+  "hash": "f6c8874d5c51b7ec"
  },
  "/guides/remove-exif-data-from-photos-on-windows": {
   "date": "2026-10-12",
-  "hash": "76eff1036633dbbb"
+  "hash": "3c607c02a5f67488"
  },
  "/guides/remove-location-data-from-photos": {
   "date": "2026-10-12",
@@ -733,7 +733,7 @@
  },
  "/guides/strip-exif-without-re-encoding": {
   "date": "2026-10-12",
-  "hash": "ac711cd1635aacfd"
+  "hash": "a09c7835856e47de"
  },
  "/guides/turn-off-location-tags-on-photos": {
   "date": "2026-10-12",

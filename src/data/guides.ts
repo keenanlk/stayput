@@ -661,7 +661,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "strip-exif-without-re-encoding",
-    title: "Stripping EXIF Without Re-encoding the Image: How a Lossless Remover Works",
+    title: "Stripping EXIF Without Re-encoding the Image: How It Works, and the One Exception",
     description: "Remove EXIF, GPS and other metadata from JPEG, PNG and WebP by editing the file structure instead of re-saving the pixels: the segments, chunks, gotchas and code.",
     heading: "Stripping EXIF without re-encoding the JPEG",
     dek: "How Stayput removes location and camera data from photos in the browser by editing the file structure, in about 600 lines of TypeScript and no library, and the one case that still has to re-encode.",
@@ -4102,7 +4102,7 @@ export const guides: Guide[] = [
   {
     slug: "remove-exif-data-from-photos-on-windows",
     title: "How to Remove Metadata (EXIF) From a Photo on Windows",
-    description: "Remove metadata, EXIF and GPS data from photos on Windows: the File Explorer option, what it leaves alone, and a way to clean a whole folder in your browser without re-compressing the pictures.",
+    description: "Remove metadata, EXIF and GPS data from photos on Windows: the File Explorer option, what it leaves alone, and a way to clean a whole folder in your browser, copying the image data unchanged apart from sideways JPGs when Apply orientation is on.",
     heading: "How to remove metadata from a photo on Windows",
     dek: "File Explorer can strip some metadata from a photo. Here is how, what it does not promise, and how to clean a whole folder without re-saving the pictures.",
     keywords: ["remove metadata from photo windows","remove exif data windows", "remove exif data windows 11", "remove metadata from photo windows 10", "strip exif windows", "delete exif data from image windows"],
@@ -4137,7 +4137,7 @@ export const guides: Guide[] = [
   {
     slug: "remove-exif-data-from-photos-on-mac",
     title: "How to Remove Metadata and EXIF Data From Photos on a Mac",
-    description: "What Photos, Preview and the Terminal can do about photo metadata on a Mac, and a way to strip EXIF and GPS from JPG, PNG and WebP in your browser without re-compressing the picture.",
+    description: "What Photos, Preview and the Terminal can do about photo metadata on a Mac, and a way to strip EXIF and GPS from JPG, PNG and WebP in your browser, copying the image data unchanged apart from sideways JPGs when Apply orientation is on.",
     heading: "How to remove metadata from photos on a Mac",
     dek: "Photos can hide a location, Preview can show or remove one, and neither touches the rest of the metadata. Here is what each does and how to strip a photo for sure.",
     keywords: ["remove metadata from photo mac", "remove exif data mac", "strip exif macos", "mac remove gps from photo", "remove exif data mac terminal"],
