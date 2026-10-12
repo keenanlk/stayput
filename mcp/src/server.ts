@@ -105,7 +105,7 @@ export function createServer(): McpServer {
     'pdf_info',
     {
       title: 'PDF info',
-      description: 'Read a PDF on this machine and report its page count, page sizes, title and whether it was encrypted. Use before splitting, extracting or rotating to learn how many pages there are.',
+      description: 'Read a PDF on this machine and report its page count, page sizes, title and whether it was encrypted. Read-only: nothing is written. Use before split_pdf, extract_pdf_pages or rotate_pdf to learn the page count. Fails with a readable error if the file is not a PDF or needs a password.',
       inputSchema: { path: z.string().describe('Path to the PDF.'), password },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
@@ -129,7 +129,7 @@ export function createServer(): McpServer {
     'merge_pdfs',
     {
       title: 'Merge PDFs',
-      description: 'Combine several PDFs on this machine into one, in the order given. The same file may appear more than once. Writes a new PDF and returns its path.',
+      description: 'Combine several PDFs on this machine into one, in the order given. The same file may appear more than once. Writes a new PDF and returns its path; the inputs are never modified and an existing file is never overwritten. To combine only some pages, run extract_pdf_pages first. Needs the optional password if an input is encrypted.',
       inputSchema: { inputs: z.array(z.string()).min(1).describe('PDF paths, in the order their pages should appear.'), output, password },
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
@@ -148,7 +148,7 @@ export function createServer(): McpServer {
     'extract_pdf_pages',
     {
       title: 'Extract, reorder or delete PDF pages',
-      description: 'Write a new PDF containing only the listed pages, in the listed order. Use it to pull out a range, reorder pages ("3,1,2") or drop pages (list the ones to keep). Pages are 1-based; ranges like "1-3, 7" and reversed ranges like "5-1" work.',
+      description: 'Write a new PDF containing only the listed pages, in the listed order. Use it to pull out a range, reorder pages ("3,1,2") or drop pages (list the ones to keep). Pages are 1-based; ranges like "1-3, 7" and reversed ranges like "5-1" work. Writes a new PDF and returns its path; the input is not modified and an existing file is never overwritten. To cut a PDF into equal parts use split_pdf instead.',
       inputSchema: { input: z.string().describe('Path to the PDF.'), pages: z.string().describe('Pages to keep, for example "1-3, 7" or "3,1,2".'), output, password },
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
@@ -167,7 +167,7 @@ export function createServer(): McpServer {
     'split_pdf',
     {
       title: 'Split PDF',
-      description: 'Split a PDF into several files of N pages each (1 = one file per page), written into a folder. Returns the list of files.',
+      description: 'Split a PDF into several files of N pages each (1 = one file per page), written into a folder. Returns the list of files. The input is not modified and existing files are never overwritten. To keep a custom page range as one file use extract_pdf_pages instead.',
       inputSchema: {
         input: z.string().describe('Path to the PDF.'),
         pages_per_file: z.number().int().min(1).default(1).describe('Pages in each output file. Default 1.'),
@@ -197,7 +197,7 @@ export function createServer(): McpServer {
     'rotate_pdf',
     {
       title: 'Rotate PDF pages',
-      description: 'Rotate all pages, or only the listed ones, clockwise by 90, 180 or 270 degrees, and save the rotation permanently in a new PDF.',
+      description: 'Rotate all pages, or only the listed ones, clockwise by 90, 180 or 270 degrees, and save the rotation permanently in a new PDF. The input is not modified and an existing file is never overwritten; returns the new path.',
       inputSchema: {
         input: z.string().describe('Path to the PDF.'),
         degrees: z.union([z.literal(90), z.literal(180), z.literal(270)]).describe('Clockwise rotation to add.'),
@@ -225,7 +225,7 @@ export function createServer(): McpServer {
     'number_pdf_pages',
     {
       title: 'Add page numbers',
-      description: 'Stamp page numbers on a PDF. The template may use {n} for the page number and {total} for the last number, e.g. "Page {n} of {total}".',
+      description: 'Stamp page numbers on a PDF. The template may use {n} for the page number and {total} for the last number, e.g. "Page {n} of {total}". Writes a new PDF and returns its path; the input is not modified and an existing file is never overwritten. Text only, in Helvetica.',
       inputSchema: {
         input: z.string().describe('Path to the PDF.'),
         template: z.string().default('{n}').describe('Text to print. Default "{n}".'),
@@ -252,7 +252,7 @@ export function createServer(): McpServer {
     'images_to_pdf',
     {
       title: 'Images to PDF',
-      description: 'Put JPG and PNG images into one PDF, one image per page, in the order given. Images are embedded as they are, without re-compression.',
+      description: 'Put JPG and PNG images into one PDF, one image per page, in the order given. Images are embedded as they are, without re-compression. HEIC and WebP are rejected with an error that says how to convert them. Writes a new PDF and returns its path; an existing file is never overwritten.',
       inputSchema: {
         inputs: z.array(z.string()).min(1).describe('JPG or PNG paths, in page order.'),
         page_size: z.enum(['fit', 'a4', 'letter']).default('fit').describe('"fit" makes each page the size of its image; "a4" and "letter" centre the image on a standard page.'),
@@ -291,7 +291,7 @@ export function createServer(): McpServer {
     'inspect_image_metadata',
     {
       title: 'Inspect photo metadata',
-      description: 'Report the metadata hidden in a JPG, PNG or WebP photo: GPS location, camera make and model, capture time, editing software, and which blocks (EXIF, XMP, IPTC, comments) are present. HEIC files report EXIF only.',
+      description: 'Report the metadata hidden in a JPG, PNG or WebP photo: GPS location, camera make and model, capture time, editing software, and which blocks (EXIF, XMP, IPTC, comments) are present. HEIC files report EXIF only. Read-only: nothing is written. Use before strip_image_metadata to see what would be removed.',
       inputSchema: { path: z.string().describe('Path to the image.') },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
@@ -308,7 +308,7 @@ export function createServer(): McpServer {
     'strip_image_metadata',
     {
       title: 'Remove photo metadata',
-      description: 'Write a copy of a JPG, PNG or WebP photo with EXIF (including GPS location), XMP, IPTC and comments removed. Lossless: the image data is not re-encoded. The original file is left untouched.',
+      description: 'Write a copy of a JPG, PNG or WebP photo with EXIF (including GPS location), XMP, IPTC and comments removed. Lossless: the image data is not re-encoded. The original file is left untouched and an existing file is never overwritten; returns the new path and what was removed. HEIC is rejected with an error. Use inspect_image_metadata first to see what is there.',
       inputSchema: {
         input: z.string().describe('Path to the image.'),
         keep_color_profile: z.boolean().default(true).describe('Keep the ICC colour profile so colours look the same. Default true.'),
