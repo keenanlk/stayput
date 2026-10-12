@@ -1902,6 +1902,41 @@
    "copyright": "Copyright 2011 The Roboto Project Authors"
   },
   {
+   "id": "zxing-wasm",
+   "name": "zxing-wasm",
+   "version": "3.1.5",
+   "npm": "zxing-wasm",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "/vendor/zxing-wasm@3.1.5/LICENSE"
+    }
+   ],
+   "project": "https://github.com/Sec-ant/zxing-wasm",
+   "source": "https://github.com/Sec-ant/zxing-wasm/tree/v3.1.5",
+   "shipped": "Reader wrapper bundled into the site JavaScript; WebAssembly served as /vendor/zxing-wasm@3.1.5/zxing_reader.wasm (QR code scanner)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2023 Ze-Zheng Wu"
+  },
+  {
+   "id": "zxing-cpp",
+   "name": "ZXing-C++",
+   "version": "2ecec3f5be0ee803f6e14a5a2c7028c0cfe525b4",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "/vendor/zxing-wasm@3.1.5/LICENSE-zxing-cpp.txt"
+    }
+   ],
+   "project": "https://github.com/zxing-cpp/zxing-cpp",
+   "source": "https://github.com/zxing-cpp/zxing-cpp/tree/2ecec3f5be0ee803f6e14a5a2c7028c0cfe525b4",
+   "shipped": "Compiled to WebAssembly as /vendor/zxing-wasm@3.1.5/zxing_reader.wasm",
+   "kind": "wasm",
+   "via": "zxing-wasm",
+   "copyright": "Copyright 2016 Nu-book Inc., Copyright 2016 ZXing authors and other contributors (the notices are in the source files)"
+  },
+  {
    "id": "umami",
    "name": "Umami tracker script",
    "version": "3.4.0",

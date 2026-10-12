@@ -175,6 +175,10 @@ export const engines: Record<string, Engine> = {
     how: 'JsBarcode (MIT), a small open-source library, turns your number or text into the pattern of bars in this page. The page first checks the number against the rules of the type you chose and works out the check digit itself. The PNG is painted on a canvas by your browser, the SVG is written as plain rectangles, and the PDF is made by pdf-lib (MIT) in the tab.',
     versus: 'Some online barcode makers draw the picture on their own server, so the number you type, which may be an unreleased product or an internal asset ID, travels to them first. Here the barcode is drawn on your device and the number never leaves it.',
   },
+  'qr-code-scanner': {
+    how: 'ZXing-C++ (Apache-2.0), a widely used open-source barcode reader compiled to WebAssembly, finds and reads the code on this page. The reader is a 0.9 MB file served from this site, so it is fetched on your first scan and then kept in your browser. Camera pictures are read frame by frame in memory and are never saved.',
+    versus: 'A scanner that reads the picture on a server has to receive it first, and a Wi-Fi password or a ticket code travels with it. Here the picture is read on your device.',
+  },
   'screen-recorder': {
     how: 'Your browser’s own screen picker (getDisplayMedia) lets you choose what to share, and its built-in recorder (MediaRecorder) writes the video in your tab, as MP4 in Chrome, Edge and Safari or WebM in Firefox. When you stop, Mediabunny (MPL-2.0) copies the video into a fresh file without re-encoding so its length is written and players can seek it.',
     versus: 'Online screen recorders make you install an extension or desktop app, sign up, stamp a watermark on free recordings, cap them at a few minutes, and upload the video to their servers to share it. Screens show emails, chats, dashboards and customer data. Here the recording never leaves your device.',

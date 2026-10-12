@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Download, type Locator } from '@playwright/test';
+import { test, expect, type Page, type Download, type Locator, type BrowserContext } from '@playwright/test';
 import { readFileSync, existsSync, writeFileSync, mkdtempSync, copyFileSync, mkdirSync, truncateSync } from 'node:fs';
 import { execSync, execFileSync } from 'node:child_process';
 import { deflateSync } from 'node:zlib';
@@ -158,7 +158,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(98);
+  expect(await page.locator('.index .tool-card').count()).toBe(99);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -569,7 +569,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -4779,6 +4779,247 @@ test('the ISBN page converts an ISBN-10, names the digit it worked out and keeps
   expect(run!.tool).toBe('isbn-barcode-generator');
   net.assertNothingLeft(['0-306-40615-2', '0306406152', '9780306406157']);
 });
+
+// ---- QR code scanner (image, paste and drop; the camera is in qr-scan-camera.spec.ts) ----
+
+const qrFx = (name: string) => fileURLToPath(new URL(`./fixtures/qr/${name}`, import.meta.url));
+const qrTexts = JSON.parse(readFileSync(qrFx('texts.json'), 'utf8')) as Record<string, string>;
+const WASM = '/vendor/zxing-wasm@3.1.5/zxing_reader.wasm';
+
+/** A PNG of a QR code for `text`, drawn by the site's own encoder and rasterised in a throwaway tab. */
+async function qrPng(context: BrowserContext, text: string) {
+  const { encodeQr, qrSvg } = await import('../src/lib/qr');
+  const svg = qrSvg(encodeQr(text, 'M'), { margin: 4, dark: '#000000', light: '#ffffff' });
+  const helper = await context.newPage();
+  const b64 = await helper.evaluate(async (markup) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(new Blob([markup], { type: 'image/svg+xml' }));
+    await img.decode();
+    const c = document.createElement('canvas');
+    c.width = c.height = 600;
+    const g = c.getContext('2d')!;
+    g.fillStyle = '#fff';
+    g.fillRect(0, 0, 600, 600);
+    g.drawImage(img, 0, 0, 600, 600);
+    return c.toDataURL('image/png').split(',')[1]!;
+  }, svg);
+  await helper.close();
+  return { name: 'code.png', mimeType: 'image/png', buffer: Buffer.from(b64, 'base64') };
+}
+
+/** Pick a file and wait for the reader to finish (the page starts reading by itself). */
+async function scanFile(page: Page, file: string | { name: string; mimeType: string; buffer: Buffer }) {
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(typeof file === 'string' ? qrFx(file) : file);
+}
+
+test('QR scanner reads a link from an image and shows it without opening it', async ({ page, context }) => {
+  const errors = await open(page, 'qr-code-scanner');
+  const net = watchNetwork(page);
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
+  const popups: string[] = [];
+  context.on('page', (p) => popups.push(p.url()));
+  const before = page.url();
+  await expect(page.locator('#drop')).toBeVisible();
+  await expect(page.locator('#qs-results')).toBeEmpty();
+  await scanFile(page, 'qr_url.png');
+  const card = page.locator('#qs-results .qs-card');
+  await expect(card).toHaveCount(1);
+  await expect(card.locator('.qs-kind')).toHaveText('Link');
+  await expect(card.locator('.qs-domain')).toHaveText('stayput.dev');
+  await expect(card.locator('.qs-address')).toHaveText(qrTexts.url!);
+  await expect(card.locator('.qs-warnings')).toHaveCount(0);
+  await expect(card).toContainText('This page has not opened the link.');
+  const open_ = card.getByRole('link', { name: 'Open link' });
+  await expect(open_).toHaveAttribute('href', qrTexts.url!);
+  await expect(open_).toHaveAttribute('target', '_blank');
+  await expect(open_).toHaveAttribute('rel', /noopener/);
+  await page.waitForTimeout(2000);
+  expect(page.url()).toBe(before);
+  expect(popups).toEqual([]);
+  // The reader came from this site, and nothing else left the page.
+  expect(urls.some((u) => u.endsWith(WASM))).toBe(true);
+  expect(urls.some((u) => /jsdelivr|unpkg|cdnjs/.test(u))).toBe(false);
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  net.assertNothingLeft(['qr_url', 'stayput.dev']);
+  expect(errors).toEqual([]);
+});
+
+test('QR scanner reads photos: an angled phone photo and a low-light one', async ({ page }) => {
+  await open(page, 'qr-code-scanner');
+  await scanFile(page, '03_photo_angle35.jpg');
+  await expect(page.locator('#qs-results .qs-address')).toHaveText(qrTexts.url!);
+  await scanFile(page, '05_low_light.jpg');
+  await expect(page.locator('#qs-results .qs-kind')).toHaveText('Wi-Fi network');
+  await expect(page.locator('#qs-results .qs-card')).toHaveCount(1);
+  await scanFile(page, '41_mirrored.png');
+  await expect(page.locator('#qs-results .qs-card')).toHaveCount(1);
+  await scanFile(page, '08_inverted.png');
+  await expect(page.locator('#qs-results .qs-card')).toHaveCount(1);
+});
+
+test('QR scanner lists several codes in reading order', async ({ page }) => {
+  await open(page, 'qr-code-scanner');
+  await scanFile(page, '09_three_codes.png');
+  const cards = page.locator('#qs-results .qs-card');
+  await expect(cards).toHaveCount(3);
+  await expect(page.locator('#qs-results .qs-summary')).toHaveText('Found 3 codes in this image.');
+  await expect(cards.nth(0).locator('h3')).toHaveText('Code 1 of 3');
+  await expect(cards.nth(2).locator('h3')).toHaveText('Code 3 of 3');
+  await expect(cards.nth(0).locator('.qs-kind')).toHaveText('Link');
+  await expect(cards.nth(1).locator('.qs-kind')).toHaveText('Wi-Fi network');
+  await expect(cards.nth(2).locator('.qs-kind')).toHaveText('Email');
+  // The shell's own copy and download of the text are there too, one line per code.
+  await expect(page.locator('#results-list .result-text')).toHaveCount(1);
+});
+
+test('QR scanner shows Wi-Fi, contact, email and phone cards, with the password hidden until Show', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await open(page, 'qr-code-scanner');
+  await scanFile(page, 'qr_wifi.png');
+  const wifi = page.locator('#qs-results .qs-card');
+  await expect(wifi.locator('.qs-kind')).toHaveText('Wi-Fi network');
+  await expect(wifi).toContainText('Cafe Guest');
+  await expect(wifi).toContainText('WPA/WPA2/WPA3');
+  await expect(wifi).not.toContainText('correct-horse-battery');
+  await expect(wifi).toContainText('••••••••');
+  await wifi.getByRole('button', { name: 'Show' }).click();
+  await expect(wifi).toContainText('correct-horse-battery');
+  await wifi.getByRole('button', { name: 'Copy password' }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('correct-horse-battery');
+  await expect(wifi.getByRole('link')).toHaveCount(0);
+
+  await scanFile(page, 'qr_vcard.png');
+  const contact = page.locator('#qs-results .qs-card');
+  await expect(contact.locator('.qs-kind')).toHaveText('Contact');
+  await expect(contact).toContainText('Jane Doe');
+  const [vcf] = await Promise.all([page.waitForEvent('download'), contact.getByRole('button', { name: 'Save contact (.vcf)' }).click()]);
+  expect(vcf.suggestedFilename()).toBe('contact.vcf');
+  expect(readFileSync((await vcf.path())!, 'utf8')).toMatch(/^BEGIN:VCARD/);
+
+  await scanFile(page, 'qr_mail.png');
+  await expect(page.locator('#qs-results .qs-kind')).toHaveText('Email');
+  await expect(page.locator('#qs-results')).toContainText('hello@example.com');
+  await expect(page.getByRole('link', { name: 'Open in email app' })).toHaveAttribute('href', 'mailto:hello@example.com?subject=Hi');
+  await scanFile(page, 'qr_tel.png');
+  await expect(page.locator('#qs-results .qs-kind')).toHaveText('Phone number');
+  await expect(page.getByRole('link', { name: 'Call' })).toHaveAttribute('href', 'tel:+15551234567');
+});
+
+test('QR scanner labels a product barcode and offers no link', async ({ page }) => {
+  await open(page, 'qr-code-scanner');
+  await scanFile(page, 'b_ean13.png');
+  const card = page.locator('#qs-results .qs-card');
+  await expect(card.locator('.qs-kind')).toHaveText('Barcode (EAN-13)');
+  await expect(card).toContainText('5901234123457');
+  await expect(card).toContainText('It holds no link, and this page does not look the number up.');
+  await expect(card.getByRole('link')).toHaveCount(0);
+  await scanFile(page, 'b_code128.png');
+  await expect(page.locator('#qs-results .qs-kind')).toHaveText('Barcode (Code 128)');
+});
+
+test('QR scanner says plainly when nothing is found, or the file is not an image', async ({ page }) => {
+  await open(page, 'qr-code-scanner');
+  await scanFile(page, '30_no_code_photo.jpg');
+  await expect(page.locator('#error')).toContainText('No QR code or barcode was found in this image.');
+  await expect(page.locator('#qs-results')).toContainText('Some apps use their own round or dotted codes.');
+  await expect.poll(async () => (await usageRuns(page)).map((r) => [r.outcome, r.error_class])).toEqual([['error', 'NoCodeFound']]);
+  // A glare-covered corner is found but not readable: never shown as a code.
+  await scanFile(page, '15_glare_over_corner.jpg');
+  await expect(page.locator('#error')).toContainText('A code was found, but it could not be read cleanly.');
+  await expect(page.locator('#qs-results .qs-card')).toHaveCount(0);
+  await scanFile(page, { name: 'x.png', mimeType: 'image/png', buffer: Buffer.from('this is plain text, not a picture') });
+  await expect(page.locator('#error')).toContainText('This file could not be opened as an image.');
+  await scanFile(page, { name: 'scan.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n%%EOF') });
+  await expect(page.locator('#error')).toContainText('This is a PDF, not an image.');
+  await expect(page.locator('#qs-results .qs-card')).toHaveCount(0);
+});
+
+test('QR scanner reads a pasted screenshot and a file dropped anywhere on the page', async ({ page }) => {
+  await open(page, 'qr-code-scanner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  const b64 = readFileSync(qrFx('qr_url.png')).toString('base64');
+  await page.evaluate((data) => {
+    const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+    const dt = new DataTransfer();
+    dt.items.add(new File([bytes], 'image.png', { type: 'image/png' }));
+    document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true }));
+  }, b64);
+  await expect(page.locator('#qs-results .qs-address')).toHaveText(qrTexts.url!);
+  await page.locator('#clear').click();
+  await expect(page.locator('#qs-results .qs-card')).toHaveCount(0);
+  const wifi = readFileSync(qrFx('qr_wifi.png')).toString('base64');
+  await page.evaluate((data) => {
+    const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+    const dt = new DataTransfer();
+    dt.items.add(new File([bytes], 'wifi.png', { type: 'image/png' }));
+    document.body.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
+  }, wifi);
+  await expect(page.locator('#qs-results .qs-kind')).toHaveText('Wi-Fi network');
+});
+
+test('QR scanner never turns hostile text into markup or navigation', async ({ page, context }) => {
+  await open(page, 'qr-code-scanner');
+  const evil = '<img src=x onerror="window.__pwned=1"><script>window.__pwned=2</script>';
+  await scanFile(page, await qrPng(context, evil));
+  const card = page.locator('#qs-results .qs-card');
+  await expect(card).toHaveCount(1);
+  await expect(card).toContainText('<img src=x onerror=');
+  await expect(page.locator('#qs-results img, #qs-results script')).toHaveCount(0);
+  expect(await page.evaluate(() => (window as unknown as { __pwned?: number }).__pwned)).toBeUndefined();
+});
+
+test('QR scanner does not open or follow a javascript link and warns about look-alike links', async ({ page, context }) => {
+  await open(page, 'qr-code-scanner');
+  await scanFile(page, await qrPng(context, 'javascript:alert(document.domain)'));
+  const app = page.locator('#qs-results .qs-card');
+  await expect(app.locator('.qs-kind')).toHaveText('Link for another app');
+  await expect(app).toContainText('this page will not open it');
+  await expect(app.getByRole('link')).toHaveCount(0);
+  await scanFile(page, await qrPng(context, 'http://paypal.com@192.168.0.1:8080/login'));
+  const link = page.locator('#qs-results .qs-card');
+  await expect(link.locator('.qs-kind')).toHaveText('Link');
+  await expect(link.locator('.qs-warnings li')).toHaveCount(4);
+  await expect(link.locator('.qs-warnings')).toContainText('The address is a number, not a name');
+});
+
+test('QR scanner sends only files_added and tool_run, with no decoded text, file name or new field', async ({ page }) => {
+  await open(page, 'qr-code-scanner');
+  const net = watchNetwork(page);
+  await scanFile(page, 'qr_wifi.png');
+  await expect(page.locator('#qs-results .qs-card')).toHaveCount(1);
+  await expect.poll(async () => (await usageRuns(page)).length).toBe(1);
+  const events = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events);
+  const mine = events.filter((e) => e.n === 'files_added' || e.n === 'tool_run');
+  expect(mine.map((e) => e.n)).toEqual(['files_added', 'tool_run']);
+  const run = mine[1]!.d;
+  expect(run).toMatchObject({ tool: 'qr-code-scanner', outcome: 'ok', format: 'image', attempt: 'first-ok' });
+  const allowed = new Set(['tool', 'outcome', 'files', 'input', 'output', 'duration', 'format', 'attempt', 'error_class', 'landing', 'ref', 'from', 'visit', 'via', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns']);
+  for (const e of mine) for (const k of Object.keys(e.d)) expect(allowed.has(k), `unexpected field ${k}`).toBe(true);
+  const sent = JSON.stringify(events);
+  for (const secret of ['correct-horse-battery', 'Cafe Guest', 'WIFI:', 'qr_wifi', '.png']) expect(sent, secret).not.toContain(secret);
+  net.assertNothingLeft(['qr_wifi', 'correct-horse-battery', 'Cafe']);
+});
+
+for (const [slug, tip] of [
+  ['scan-qr-code-from-image', 'Drop an image or screenshot with a QR code'],
+  ['qr-code-scanner-for-pc', 'Drop an image or paste a screenshot'],
+] as const) {
+  test(`${slug} runs the same scanner`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await stubAnalytics(page);
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('#drop')).toContainText(tip);
+    await expect(page.locator('#qs-start')).toBeVisible();
+    await page.locator('#file-input').setInputFiles(qrFx('qr_url.png'));
+    await expect(page.locator('#qs-results .qs-address')).toHaveText(qrTexts.url!);
+    expect(errors).toEqual([]);
+    await expect.poll(async () => (await usageRuns(page)).map((r) => r.tool)).toEqual([slug]);
+  });
+}
 
 /**
  * Stand in for the browser's screen picker: a moving canvas, and optionally a

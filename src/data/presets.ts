@@ -5525,6 +5525,147 @@ export const presets: Preset[] = [
       { q: 'Is my email address stored anywhere?', a: 'No. The address, subject and message are turned into the code in this tab and nothing is uploaded.' },
     ],
   },
+  {
+    slug: 'scan-qr-code-from-image',
+    base: 'qr-code-scanner',
+    name: 'Scan a QR code from an image',
+    title: 'Scan a QR Code From an Image or Screenshot | Stayput',
+    description: 'Drop or paste a photo or screenshot and read the QR code in it. Free, no sign-up; the image is not uploaded and links are not opened for you.',
+    heading: 'Scan a QR code from an image',
+    tagline: 'For a code in a screenshot, a photo, an email or a chat: drop it here, or paste it, and read what it holds.',
+    keywords: ['scan qr code from image', 'qr code scanner from image', 'scan qr code from screenshot', 'scan qr code from picture', 'read qr code from image online', 'scan qr code from photo'],
+    dropLabel: 'Drop an image or screenshot with a QR code',
+    action: 'Read the code',
+    defaults: { focus: 'image' },
+    sizeFact: 'No watermark, no sign-up',
+    intro: [
+      'You often cannot point a phone at a QR code: it is in an email, a chat, a PDF, a web page or a photo you were sent. This page reads the code from the picture instead. Drop the image, or paste it straight from the clipboard, and the page shows what the code holds.',
+      'The picture is read on your device and is not uploaded. A link in the code is shown in full and is never opened for you.',
+    ],
+    steps: [
+      'Get the code into an image. On a computer, take a screenshot (Windows: Win+Shift+S; Mac: Cmd+Shift+4, holding Ctrl as well to copy it to the clipboard), or save the picture from the page or message.',
+      'Drop the image on the box, press Ctrl+V or Cmd+V to paste it, or choose it from your files. On a phone, tap the box and choose a photo or screenshot.',
+      'Read the card. Copy the text, or for a link read the domain and press Open link only if you trust it.',
+    ],
+    sections: [
+      {
+        heading: 'Which pictures work',
+        bullets: [
+          'JPG, PNG, WebP, GIF, BMP and AVIF, and iPhone HEIC photos.',
+          'The whole code in the picture, with a blank border (the quiet zone) of a few squares around it.',
+          'Screenshots work best. A photo of a screen can show stripes (moiré) that hide the code.',
+        ],
+      },
+      {
+        heading: 'If nothing is found',
+        bullets: [
+          'Crop closer, so the code fills most of the picture.',
+          'Use a sharper, brighter picture.',
+          'A PDF is not an image: take a screenshot of the page with the code.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I scan a QR code from a screenshot?', a: 'Take the screenshot, then paste it here with Ctrl+V or Cmd+V, or drop the file on the box. The page reads the code in it and shows the result. On an iPhone, tap the box and choose the screenshot from Photos.' },
+      { q: 'Can it read a QR code in a photo from my camera roll?', a: 'Yes. Choose the photo, including HEIC photos from an iPhone. The code should be sharp and fill a fair part of the picture; a photo taken at a steep angle or in dim light may still work, but a straight-on picture is best.' },
+      { q: 'Is my image uploaded to read the code?', a: 'No. The image is read on your device by code running in this page. It is not sent anywhere.' },
+      { q: 'Can it read a QR code in a PDF?', a: 'Not directly. Take a screenshot of the PDF page, or turn the page into an image with the [PDF to image](/tools/pdf-to-image) tool, and drop that here.' },
+      { q: 'What if the code has a logo in the middle?', a: 'It usually reads fine. QR codes carry extra data so that a logo or a small scratch does not stop them, as long as the code is sharp.' },
+    ],
+  },
+  {
+    slug: 'qr-code-scanner-for-pc',
+    base: 'qr-code-scanner',
+    name: 'QR code scanner for PC',
+    title: 'QR Code Scanner for PC, Mac and Laptop | Stayput',
+    description: 'Scan a QR code on a computer with your webcam, or from a screenshot you paste. Free, no install or app; nothing is uploaded.',
+    heading: 'Scan a QR code on your computer',
+    tagline: 'Use your webcam, or paste a screenshot. There is nothing to install.',
+    keywords: ['qr code scanner for pc', 'qr code scanner for laptop', 'qr code reader for pc', 'qr code scanner windows', 'qr code scanner mac', 'qr code scanner webcam'],
+    dropLabel: 'Drop an image or paste a screenshot',
+    action: 'Read the code',
+    defaults: { focus: 'any' },
+    sizeFact: 'No watermark, no sign-up',
+    intro: [
+      'A computer has no camera app that reads QR codes the way a phone does. This page does it in the browser: with your webcam, or from a screenshot of a code that is already on your screen. There is no program or extension to install.',
+      'Neither the webcam picture nor the screenshot is uploaded. A link in a code is shown in full, and opened only when you press the button.',
+    ],
+    steps: [
+      'For a code on your screen, take a screenshot: Windows, Win+Shift+S; Mac, Cmd+Ctrl+Shift+4; Chromebook, Ctrl+Shift+Show windows. Then paste it here with Ctrl+V or Cmd+V.',
+      'For a code on paper or on a phone, press Scan with camera, allow the camera when your browser asks, and hold the code in front of the webcam, about 15 to 30 cm away.',
+      'Read the card, copy the text, and press Open link only for a link you trust.',
+    ],
+    sections: [
+      {
+        heading: 'Two ways on a computer',
+        bullets: [
+          'A screenshot or saved image: the code is read at once, with no camera permission.',
+          'The webcam: a code printed on paper or shown on a phone screen. Use good light and keep the code flat.',
+        ],
+      },
+      {
+        heading: 'If the camera does not start',
+        bullets: [
+          'Another app may be using it: video-call apps are the usual cause.',
+          'Check the camera permission in your browser’s address bar.',
+          'Some laptops have a privacy shutter or a keyboard key that turns the camera off.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I scan a QR code on my laptop?', a: 'Press Scan with camera and hold the code in front of the webcam. Or, if the code is on your screen, take a screenshot and paste it here. The page shows what the code holds.' },
+      { q: 'Does it work on Windows, Mac and Chromebook?', a: 'Yes, in a recent Chrome, Edge, Firefox or Safari. It needs no app, no extension and no account.' },
+      { q: 'Why does my webcam read the code slowly or not at all?', a: 'Webcams are lower quality than phone cameras and focus closer. Hold the code flat, 15 to 30 cm away, with light on it and no glare. If it still fails, show the code on a bigger screen or paste a screenshot.' },
+      { q: 'Is the webcam picture saved or uploaded?', a: 'No. Frames are read in memory on your device and discarded. The camera turns off as soon as a code is read, when you press Stop, or when you leave the tab.' },
+    ],
+  },
+  {
+    slug: 'barcode-scanner-online',
+    base: 'qr-code-scanner',
+    name: 'Barcode scanner online',
+    title: 'Free Online Barcode Scanner: From Image or Camera | Stayput',
+    description: 'Read EAN, UPC, Code 128 and other barcodes from a photo or your camera. Free; the image is not uploaded, and no product lookup is made.',
+    heading: 'Scan a barcode',
+    tagline: 'Read the number in a product or parcel barcode from a photo or your camera. Nothing is looked up or sent.',
+    keywords: ['barcode scanner online', 'online barcode reader', 'scan barcode from image', 'barcode scanner free', 'read barcode from photo'],
+    dropLabel: 'Drop an image with a barcode',
+    action: 'Read the barcode',
+    defaults: { focus: 'any' },
+    sizeFact: 'No watermark, no sign-up',
+    intro: [
+      'A barcode on a product or a parcel holds a number: the product number (EAN or UPC), or a code your own system gave it (Code 128, Code 39). This page reads the number from a photo or your camera and shows it to you, so you can copy it.',
+      'It does not look the number up. It will not tell you a price or what the product is, because that would mean sending the number to a service; this page keeps everything on your device.',
+    ],
+    steps: [
+      'Drop a photo of the barcode on the box, paste a screenshot, or press Scan with camera.',
+      'Keep the whole barcode in the picture, flat and in focus, with blank space at both ends.',
+      'Copy the number from the card. To make a barcode, use the [barcode generator](/tools/barcode-generator).',
+    ],
+    sections: [
+      {
+        heading: 'Barcodes it reads',
+        bullets: [
+          'Products: EAN-13, EAN-8, UPC-A, UPC-E, and ISBN on books.',
+          'Labels and parcels: Code 128, Code 39, Code 93, ITF and ITF-14, Codabar.',
+          'Two-dimensional: QR code, Data Matrix, Aztec, PDF417.',
+        ],
+      },
+      {
+        heading: 'What a barcode number is for',
+        bullets: [
+          'EAN and UPC numbers identify a product (a GTIN). A shop’s system or a product database turns the number into a name and a price; this page does not.',
+          'Code 128 and Code 39 hold whatever the label-maker put there: an item code, a tracking number, an asset tag.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Can it tell me the price or the product from a barcode?', a: 'No. It reads the number in the barcode. Looking a number up would mean sending it to a service, which this page does not do. Copy the number and search for it where you shop.' },
+      { q: 'Which barcodes can it read?', a: 'EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, Code 93, ITF, Codabar, and the two-dimensional QR code, Data Matrix, Aztec and PDF417.' },
+      { q: 'Why does the number have a leading zero, or one more digit than I expected?', a: 'A UPC-A number (12 digits) is read as an EAN-13 with a 0 in front, because the two are one system at two lengths. Both are the same product number.' },
+      { q: 'Does it work with a handheld scanner?', a: 'A handheld scanner types the number into whatever is open and needs no web page. This page is for reading a barcode from a picture or with a camera.' },
+      { q: 'Is the picture uploaded?', a: 'No. The barcode is read on your device and nothing is sent anywhere.' },
+    ],
+  },
 ];
 
 export const presetBySlug = (slug: string): Preset | undefined => presets.find((p) => p.slug === slug);

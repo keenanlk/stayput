@@ -108,5 +108,12 @@
     "version": "4.12.0",
     "entry": "index.esm.min.js",
     "files": { "index.esm.min.js": "dist/index.esm.min.js", "LICENSE": "LICENSE" }
+  },
+  "zxing": {
+    "package": "zxing-wasm",
+    "version": "3.1.5",
+    "entry": "zxing_reader.wasm",
+    "files": { "zxing_reader.wasm": "dist/reader/zxing_reader.wasm", "LICENSE": "LICENSE" },
+    "licences": { "LICENSE-zxing-cpp.txt": "vendor-licenses/zxing-wasm/LICENSE-zxing-cpp.txt" }
   }
 }
