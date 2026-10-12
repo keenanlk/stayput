@@ -5626,7 +5626,7 @@ export const presets: Preset[] = [
     title: 'Free Online Barcode Scanner: From Image or Camera | Stayput',
     description: 'Read EAN, UPC, Code 128 and other barcodes from a photo or your camera. Free; the image is not uploaded, and no product lookup is made.',
     heading: 'Scan a barcode',
-    tagline: 'Read the number in a product or parcel barcode from a photo or your camera. Nothing is looked up or sent.',
+    tagline: 'Read the number in a product or parcel barcode from a photo or your camera. Nothing is looked up, and the picture is not uploaded.',
     keywords: ['barcode scanner online', 'online barcode reader', 'scan barcode from image', 'barcode scanner free', 'read barcode from photo'],
     dropLabel: 'Drop an image with a barcode',
     action: 'Read the barcode',
@@ -5663,7 +5663,7 @@ export const presets: Preset[] = [
       { q: 'Which barcodes can it read?', a: 'EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, Code 93, ITF, Codabar, and the two-dimensional QR code, Data Matrix, Aztec and PDF417.' },
       { q: 'Why does the number have a leading zero, or one more digit than I expected?', a: 'A UPC-A number (12 digits) is read as an EAN-13 with a 0 in front, because the two are one system at two lengths. Both are the same product number.' },
       { q: 'Does it work with a handheld scanner?', a: 'A handheld scanner types the number into whatever is open and needs no web page. This page is for reading a barcode from a picture or with a camera.' },
-      { q: 'Is the picture uploaded?', a: 'No. The barcode is read on your device and nothing is sent anywhere.' },
+      { q: 'Is the picture uploaded?', a: 'No. The barcode is read on your device and the picture is not uploaded.' },
     ],
   },
 ];

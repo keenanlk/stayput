@@ -17,7 +17,8 @@ function makeY4m(path: string, qrPng?: string) {
   const H = 480;
   const rgb = new Uint8Array(W * H * 3).fill(255);
   if (qrPng) {
-    const png = UPNG.decode(readFileSync(qrPng));
+    const file = readFileSync(qrPng);
+    const png = UPNG.decode(file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength) as ArrayBuffer);
     const src = new Uint8Array(UPNG.toRGBA8(png)[0]!);
     const size = 360;
     const x0 = (W - size) / 2;
@@ -70,7 +71,7 @@ export type Ev = { n: string; d: Record<string, string> };
 export const events = (page: Page) => page.evaluate(() => (window as unknown as { __events: Ev[] }).__events);
 
 /** The self-hosted analytics script replaced by one that records events; every request noted. */
-export async function prepare<T = undefined>(page: Page, init?: (arg: T) => void, arg?: T) {
+export async function prepare(page: Page, init?: (arg: string) => void, arg?: string) {
   await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
   await page.route('https://stats.keenankaufman.com/**', (route) =>
     route.fulfill({ contentType: 'text/javascript', body: 'window.__events=[];window.umami={track:(n,d)=>window.__events.push({n,d})};' }),
@@ -90,7 +91,7 @@ export async function prepare<T = undefined>(page: Page, init?: (arg: T) => void
       return s;
     };
   });
-  if (init) await page.addInitScript(init as (a: T) => void, arg as T);
+  if (init) await page.addInitScript(init, arg);
   const seen: { url: string; method: string; body: string | null }[] = [];
   page.on('request', (r) => seen.push({ url: r.url(), method: r.method(), body: r.postData() }));
   const errors: string[] = [];

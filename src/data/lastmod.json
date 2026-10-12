@@ -61,7 +61,7 @@
  },
  "/barcode-scanner-online": {
   "date": "2026-10-12",
-  "hash": "dc5860747d3c6df6"
+  "hash": "50a76466ec4b566e"
  },
  "/black-and-white-pdf": {
   "date": "2026-10-06",
@@ -1493,7 +1493,7 @@
  },
  "/tools/qr-code-scanner": {
   "date": "2026-10-12",
-  "hash": "76dd935285eacbc8"
+  "hash": "ccc4ec28b7035e04"
  },
  "/tools/redact-pdf": {
   "date": "2026-10-06",

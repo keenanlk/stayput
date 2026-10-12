@@ -1948,7 +1948,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is the picture or the camera feed uploaded?',
-        a: 'No. The code is read by a program running in this page, on your device. Your picture and your camera feed are not sent anywhere. The first scan loads a reader of about 1 MB from this site and keeps it in your browser, so after your first scan the page works offline.',
+        a: 'No. The code is read by a program running in this page, on your device. Your picture and your camera feed are not sent anywhere. The first scan loads a reader of about 1 MB from this site and keeps it in your browser, so after your first run the page works offline.',
       },
       {
         q: 'Does it open the link in the code?',
