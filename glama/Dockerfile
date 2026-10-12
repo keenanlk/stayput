@@ -26,6 +26,7 @@ RUN cd mcp && npm ci --ignore-scripts
 COPY src/lib ./src/lib
 COPY src/data/vendor.json ./src/data/vendor.json
 COPY mcp/build.mjs ./mcp/build.mjs
+COPY mcp/tsconfig.json ./mcp/tsconfig.json
 COPY mcp/src ./mcp/src
 RUN cd mcp && npm run build
 
