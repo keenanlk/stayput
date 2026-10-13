@@ -46,12 +46,36 @@ test('the WebGPU speech worker is left running when the captions are written', a
   });
   await run(page, speech(info.project.name));
   await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.');
+  // A second job on the same page goes to the same, still running worker.
+  const second = page.waitForEvent('download');
+  await page.locator('#run').click();
+  expect((await second).suggestedFilename()).toMatch(/\.mp4$/);
+  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.');
   const seen = await page.evaluate(() => ({ started: (window as never as { __gpuWorkers: number }).__gpuWorkers, stopped: (window as never as { __gpuTerminated: number }).__gpuTerminated }));
   expect(seen).toEqual({ started: 1, stopped: 0 });
 });
 
-test('with a real WebGPU adapter, the captions are written and burned in without the page crashing', async ({ page }, info) => {
-  test.setTimeout(240_000);
+test('with a real WebGPU adapter, three runs in a row on one page load finish without the page crashing', async ({ page }, info) => {
+  test.setTimeout(420_000);
+  await page.addInitScript(() => {
+    // Counts the WebGPU workers started and stopped; the real worker still runs.
+    const w = window as unknown as { __gpuWorkers: number; __gpuTerminated: number };
+    w.__gpuWorkers = 0;
+    w.__gpuTerminated = 0;
+    const Real = window.Worker;
+    window.Worker = class extends Real {
+      constructor(url: string | URL, options?: WorkerOptions) {
+        super(url, options);
+        if (!/transcribe-gpu\.worker/.test(String(url))) return;
+        w.__gpuWorkers++;
+        const stop = this.terminate.bind(this);
+        this.terminate = () => {
+          w.__gpuTerminated++;
+          stop();
+        };
+      }
+    };
+  });
   await page.goto('/');
   const real = await page.evaluate(async () => {
     try {
@@ -64,9 +88,20 @@ test('with a real WebGPU adapter, the captions are written and burned in without
   test.skip(!real, 'this browser has no WebGPU adapter with 16-bit shaders');
   let crashed = false;
   page.on('crash', () => (crashed = true));
-  const download = page.waitForEvent('download').catch(() => undefined);
-  await run(page, speech(info.project.name));
-  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.');
-  expect(crashed).toBe(false);
-  expect(download).toBeTruthy();
+  await page.goto('/auto-caption-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(speech(info.project.name));
+  for (let n = 1; n <= 3; n++) {
+    const download = page.waitForEvent('download', { timeout: 200_000 });
+    await page.locator('#run').click();
+    expect((await download).suggestedFilename(), `run ${n}`).toMatch(/\.mp4$/);
+    await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.', { timeout: 60_000 });
+    await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+    // The page still answers a while after the run.
+    await page.waitForTimeout(5000);
+    expect(await page.evaluate(() => 1 + 1), `page alive after run ${n}`).toBe(2);
+    expect(crashed, `no crash after run ${n}`).toBe(false);
+  }
+  const seen = await page.evaluate(() => ({ started: (window as never as { __gpuWorkers: number }).__gpuWorkers, stopped: (window as never as { __gpuTerminated: number }).__gpuTerminated }));
+  expect(seen).toEqual({ started: 1, stopped: 0 });
 });
