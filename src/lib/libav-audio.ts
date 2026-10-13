@@ -1,7 +1,14 @@
 /**
- * Sound frames from the libav.js decoders as plain float channels, mixed down to at most two.
- * Shared by the decoder workers that read old formats browsers cannot open.
+ * Decoded-sound helpers shared by the libav.js workers (AVI and FLV): a libav audio frame in any of its
+ * sample layouts becomes planar float32, mixed down to at most two channels.
  */
+
+export interface LibavAudioFrame {
+  data: Uint8Array | Int16Array | Int32Array | Float32Array | Float64Array | (Int16Array | Int32Array | Float32Array | Float64Array | Uint8Array)[];
+  format: number;
+  channels?: number;
+  nb_samples?: number;
+}
 
 /** libav's sample format numbers. */
 const enum Sample {
@@ -17,21 +24,14 @@ const enum Sample {
   DBLP = 9,
 }
 
-export interface LibavSoundFrame {
-  data: ArrayLike<number> | ArrayLike<number>[];
-  format: number;
-  sample_rate?: number;
-  channels?: number;
-  nb_samples?: number;
-}
-
 /** Planar float32 channels from a decoded audio frame, mixed down to at most two. */
-export function toFloatPlanes(f: LibavSoundFrame): Float32Array[] {
+export function toFloatPlanes(f: LibavAudioFrame): Float32Array[] {
   const planar = Array.isArray(f.data);
   const channels = f.channels ?? (planar ? (f.data as unknown[]).length : 1);
   const n = f.nb_samples ?? (planar ? (f.data as ArrayLike<number>[])[0]!.length : (f.data as ArrayLike<number>).length / channels);
-  const k = f.format === Sample.S16 || f.format === Sample.S16P ? 1 / 32768 : f.format === Sample.S32 || f.format === Sample.S32P ? 1 / 2147483648 : 1;
+  const scale = (fmt: number) => (fmt === Sample.S16 || fmt === Sample.S16P ? 1 / 32768 : fmt === Sample.S32 || fmt === Sample.S32P ? 1 / 2147483648 : 1);
   const unsigned8 = f.format === Sample.U8 || f.format === Sample.U8P;
+  const k = scale(f.format);
   const read = (src: ArrayLike<number>, at: number) => (unsigned8 ? (src[at]! - 128) / 128 : src[at]! * k);
   const planes: Float32Array[] = [];
   for (let c = 0; c < channels; c++) {
@@ -49,16 +49,15 @@ export function toFloatPlanes(f: LibavSoundFrame): Float32Array[] {
 }
 
 /** One or two channels pass through; surround is folded down with the usual -3 dB centre and surround weights. */
-export function mixToStereo(planes: Float32Array[]): Float32Array[] {
+function mixToStereo(planes: Float32Array[]): Float32Array[] {
   if (planes.length <= 2) return planes;
   const n = planes[0]!.length;
   const left = new Float32Array(n);
   const right = new Float32Array(n);
   // FFmpeg's order for 5.1: front left, front right, centre, LFE, back left, back right.
-  const six = planes.length >= 6;
-  const w = six ? [1, 0, 0.707, 0, 0.707, 0] : [1, 0, 0, 0, 0, 0];
-  const wr = six ? [0, 1, 0.707, 0, 0, 0.707] : [0, 1, 0, 0, 0, 0];
-  const norm = six ? 1 / 2.414 : 1;
+  const w = planes.length >= 6 ? [1, 0, 0.707, 0, 0.707, 0] : [1, 0, 0, 0, 0, 0];
+  const wr = planes.length >= 6 ? [0, 1, 0.707, 0, 0, 0.707] : [0, 1, 0, 0, 0, 0];
+  const norm = planes.length >= 6 ? 1 / 2.414 : 1;
   for (let i = 0; i < n; i++) {
     let l = 0;
     let r = 0;

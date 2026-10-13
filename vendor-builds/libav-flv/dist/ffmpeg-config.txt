@@ -1,0 +1,4 @@
+--enable-protocol=data --enable-protocol=file
+--enable-demuxer=flv
+--enable-parser=mpegaudio
+--enable-decoder=mp3

@@ -6,7 +6,7 @@
  * in slices from disk and never leaves the tab.
  */
 import { Resampler } from './audio-resample';
-import { toFloatPlanes, type LibavSoundFrame } from './libav-audio';
+import { toFloatPlanes, type LibavAudioFrame } from './libav-audio';
 import { UnsupportedWmaCodec, WmaDecoderLoadError } from './wma-errors';
 import { workerFailure } from './worker-error';
 
@@ -114,7 +114,7 @@ async function decode(job: WmaJob): Promise<void> {
   const chunks: Float32Array[][] = [];
   let resampler: Resampler | undefined;
   let total = 0;
-  const push = (frames: LibavSoundFrame[]) => {
+  const push = (frames: LibavAudioFrame[]) => {
     for (const f of frames) {
       let planes = toFloatPlanes(f);
       if (srcRate !== job.rate) {
