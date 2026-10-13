@@ -113,6 +113,7 @@ const does: Record<string, string> = {
   'crop-pdf': 'Crops PDF pages to an area you draw, or trims white margins from every page in one click.',
   'redact-pdf': 'Blacks out names, numbers and addresses in a PDF so the text underneath is removed, not just covered.',
   'file-checksum': 'Computes the MD5, SHA-1 or SHA-256 checksum of a file so you can compare it with the one the publisher lists.',
+  'audio-splitter': 'Splits one audio file into separate MP3 or WAV parts at the times you set or at equal lengths.',
   'json-to-csv': 'Converts JSON to CSV or CSV to JSON, flattening nested objects, with the delimiter, headers and Excel-friendly encoding you choose.',
 };
 
@@ -157,7 +158,7 @@ const downloads: Record<string, Download> = {
  * on the first visit (pages, scripts and the image decoders).
  */
 const firstUseEngines = [
-  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-converter', 'compress-audio', 'volume-booster',
+  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-splitter', 'audio-converter', 'compress-audio', 'volume-booster',
   'pitch-changer', 'remove-silence', 'voice-recorder', 'remove-noise', 'file-checksum',
   'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image', 'qr-code-scanner',
 ];

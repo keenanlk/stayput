@@ -1,7 +1,7 @@
 {
  "/": {
-  "date": "2026-10-12",
-  "hash": "7a8f666e22794f6b"
+  "date": "2026-10-13",
+  "hash": "a49886e022cb505c"
  },
  "/2x2-photo": {
   "date": "2026-10-12",
@@ -1326,6 +1326,10 @@
  "/tools/audio-converter": {
   "date": "2026-10-12",
   "hash": "9a2745f0e06215ec"
+ },
+ "/tools/audio-splitter": {
+  "date": "2026-10-13",
+  "hash": "0f50b4f7f5ebac6a"
  },
  "/tools/audio-to-video": {
   "date": "2026-10-12",
