@@ -23,6 +23,7 @@ export const instruments: Instrument[] = [
   { id: 'ukulele', label: 'Ukulele, standard (G C E A)', strings: [67, 60, 64, 69] },
   { id: 'ukulele-low-g', label: 'Ukulele, low G (G C E A)', strings: [55, 60, 64, 69] },
   { id: 'violin', label: 'Violin (G D A E)', strings: [55, 62, 69, 76] },
+  { id: 'viola', label: 'Viola (C G D A)', strings: [48, 55, 62, 69] },
   { id: 'cello', label: 'Cello (C G D A)', strings: [36, 43, 50, 57] },
   { id: 'banjo', label: 'Banjo, 5-string open G (g D G B D)', strings: [67, 50, 55, 59, 62] },
   { id: 'mandolin', label: 'Mandolin (G D A E)', strings: [55, 62, 69, 76] },
