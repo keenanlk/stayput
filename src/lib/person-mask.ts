@@ -182,6 +182,19 @@ export class Matte {
   /** Frames in which some of the picture was a person. */
   framesWithPerson = 0;
   frames = 0;
+  /** Milliseconds the finder took for each frame, on the graphics chip and on the CPU. Page-local, never sent. */
+  private chipMs: number[] = [];
+  private cpuFrames = 0;
+
+  /** A plain sentence on which path found the people in this video, for the result line. */
+  pathNote(): string {
+    if (this.finder === 'fast') return 'Found the person with the processor (Fast always uses it).';
+    if (this.chipMs.length === 0) return 'Found the person with the processor (the graphics chip was slow or unavailable).';
+    const sorted = [...this.chipMs].sort((a, b) => a - b);
+    const ms = Math.max(1, Math.round(sorted[sorted.length >> 1]!));
+    const chip = `the graphics chip (about ${ms} ms a frame)`;
+    return this.cpuFrames === 0 ? `Found the person with ${chip}.` : `Found the person with ${chip}, then with the processor after the chip stopped or was slow.`;
+  }
 
   async apply(ctx: CanvasRenderingContext2D, background: (ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement) => void) {
     const { width, height } = ctx.canvas;
@@ -225,6 +238,8 @@ export class Matte {
     if (!found) throw new Error('The person finder returned no mask.');
     const conf = found.getAsFloat32Array();
     const frameMs = performance.now() - began;
+    if (segmenter?.gpu) this.chipMs.push(frameMs);
+    else this.cpuFrames++;
     const mw = found.width;
     const mh = found.height;
     const cur = new Float32Array(mw * mh);

@@ -54,3 +54,42 @@ test('time left does go up when the work genuinely slows right down', () => {
   const first = nums[0]!;
   expect(Math.max(...nums), 'it raises its estimate for a real slowdown').toBeGreaterThan(first);
 });
+
+// The video background tools opt in to a quiet start: no figure until 8% is done and 10 s have been measured.
+function runQuiet(speed: (t: number) => number) {
+  let now = 100;
+  const tl = new TimeLeft(() => now, { minFraction: 0.08, minSeconds: 10 });
+  const shown: { t: number; f: number; text: string | undefined }[] = [];
+  let f = 0;
+  tl.update(f);
+  for (let t = 0; f < 1 && t < 600; t += 0.25) {
+    now += 0.25;
+    f = Math.min(1, f + speed(t) * 0.25);
+    shown.push({ t: t + 0.25, f, text: tl.update(f) });
+  }
+  return shown;
+}
+
+test('opted-in time left waits for both 8% and 10 s, then shows a figure', () => {
+  // A 100 s job: 8% is at 8 s, 10 s comes later, so the 10 s rule decides.
+  const slow = runQuiet(() => 1 / 100);
+  const firstSlow = slow.find((x) => x.text)!;
+  expect(firstSlow.t).toBeGreaterThanOrEqual(10);
+  expect(slow.filter((x) => x.t < 10).every((x) => x.text === undefined)).toBe(true);
+  // A 400 s job: 10 s is only 2.5%, so the 8% rule (at 32 s) decides.
+  const long = runQuiet(() => 1 / 400);
+  const firstLong = long.find((x) => x.text)!;
+  expect(firstLong.f).toBeGreaterThanOrEqual(0.08);
+  expect(firstLong.t).toBeGreaterThanOrEqual(31);
+  // The first figure is a real estimate, not a stale early one.
+  expect(seconds(firstLong.text!)).toBeGreaterThan(300);
+  expect(seconds(firstLong.text!)).toBeLessThanOrEqual(400);
+  // After that the count-down rules hold.
+  const nums = secondsOf(long);
+  for (let i = 1; i < nums.length; i++) expect(nums[i]!).toBeLessThanOrEqual(nums[i - 1]!);
+});
+
+test('without the opt-in the time left starts after the short warm-up, as before', () => {
+  const first = run(() => 1 / 400).find((x) => x.text)!;
+  expect(first.t).toBeLessThan(4);
+});
