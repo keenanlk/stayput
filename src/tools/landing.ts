@@ -87,6 +87,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'create-zip': () => import('./create-zip'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
+  'json-to-csv': () => import('./json-to-csv'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';
