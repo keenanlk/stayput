@@ -6,6 +6,7 @@ import { presets, presetAsTool } from '../src/data/presets';
 import { guides } from '../src/data/guides';
 import { ogSite, ogPills } from '../src/data/og';
 import { offlineBadge, needsFirstUse, defaultSizeBadge } from '../src/data/leads';
+import { SPEECH_MODEL_MB } from '../src/data/speech-size';
 
 // Reads the built HTML of every tool, pair, preset and guide page: visible text, meta
 // descriptions, badges and structured data. Run after `npm run build`.
@@ -195,6 +196,23 @@ test('the link-preview card text makes no banned claim', () => {
   const script = readFileSync(new URL('../scripts/make-og.mjs', import.meta.url), 'utf8');
   expect([...claimsIn(`<p>${script.replace(/\n/g, '</p><p>')}</p>`), ...(bannedPhrases.exec(script) ? ['banned phrase in make-og.mjs'] : [])]).toEqual([]);
   expect(claimsIn('<p>Nothing is uploaded, nothing is capped, it works offline.</p>')).not.toEqual([]);
+});
+
+test('every speech model download size on a page or in llms.txt names both paths, with the measured figures', () => {
+  const files = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') || f === 'llms.txt');
+  const both = `${SPEECH_MODEL_MB.q8} MB, or ${SPEECH_MODEL_MB.webgpu} MB on computers with WebGPU`;
+  const alt = `${SPEECH_MODEL_MB.q8} MB (${SPEECH_MODEL_MB.webgpu} MB on computers with WebGPU)`;
+  let seen = 0;
+  const bad: string[] = [];
+  for (const f of files) {
+    const text = scannable(readFileSync(new URL(f, dist), 'utf8'));
+    for (const m of text.matchAll(/speech model[^.<]{0,45}?\b\d+(\.\d)? MB[^.<]{0,60}/gi)) {
+      seen++;
+      if (!m[0].includes(both) && !m[0].includes(alt) && !/ \(\d+ MB\) could not/.test(m[0])) bad.push(`${f}: ${m[0]}`);
+    }
+  }
+  expect(seen).toBeGreaterThan(5);
+  expect(bad).toEqual([]);
 });
 
 // The image background remover family downloads the cut-out model and its onnxruntime WebAssembly runtime:

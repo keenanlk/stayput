@@ -57,14 +57,14 @@ test('every lead is two or three sentences that say it is free and the files are
 test('hand-written leads on the six most-visited pages say what the code does', () => {
   const lead = (path: string) => pages.find((p) => p.path === path)!.lead;
   // Model download sizes match the progress text in src/lib and src/tools.
-  for (const path of ['/auto-caption-video', '/video-to-subtitles', '/burn-subtitles-into-video']) expect(lead(path), path).toContain('speech model (76 MB)');
+  for (const path of ['/auto-caption-video', '/video-to-subtitles', '/burn-subtitles-into-video']) expect(lead(path), path).toContain('speech model (77 MB, or 95 MB on computers with WebGPU)');
   expect(lead('/tools/unlock-pdf')).toMatch(/cannot crack passwords/);
   expect(lead('/tools/mute-video')).toMatch(/same format/);
   expect(lead('/tools/gif-to-mp4')).toMatch(/no sound track/);
   // Model tools carry their download size and the offline note.
   expect(lead('/tools/remove-background')).toMatch(/about 42 MB in all.*offline/);
   expect(lead('/tools/vocal-remover')).toMatch(/about 67 MB.*offline/);
-  expect(lead('/tools/transcribe')).toMatch(/about 76 MB.*offline/);
+  expect(lead('/tools/transcribe')).toMatch(/about 77 MB, or 95 MB on computers with WebGPU.*offline/);
   // A base tool's hand-written lead must not leak onto its presets.
   expect(lead('/remove-audio-from-video')).not.toBe(lead('/tools/mute-video'));
 });

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { allowServiceWorker } from './allow-sw';
 
 /**
- * The Whisper model (76 MB) must be fetched once and kept in exactly one place, the cache
+ * The Whisper model (77 MB) must be fetched once and kept in exactly one place, the cache
  * transformers.js writes, with the service worker active. Two writers storing the same file at
  * once made Chromium fail the download with net::ERR_CACHE_WRITE_FAILURE. Requests are counted
  * from context-level events, the only place a service worker's own requests show up.

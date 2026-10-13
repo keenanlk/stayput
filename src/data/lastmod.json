@@ -44,12 +44,12 @@
   "hash": "aebf9668a858a2e4"
  },
  "/audio-to-text": {
-  "date": "2026-10-12",
-  "hash": "7788e29c29c96b99"
+  "date": "2026-10-13",
+  "hash": "f0970a966f3001b8"
  },
  "/auto-caption-video": {
-  "date": "2026-10-12",
-  "hash": "449cf768bcfcd004"
+  "date": "2026-10-13",
+  "hash": "0cd19554e9b21e6a"
  },
  "/avif-to-jpg": {
   "date": "2026-10-12",
@@ -108,8 +108,8 @@
   "hash": "3f2570287bc5b8e1"
  },
  "/burn-subtitles-into-video": {
-  "date": "2026-10-12",
-  "hash": "cde0fe96dafd241a"
+  "date": "2026-10-13",
+  "hash": "9ffcf949ce6931d1"
  },
  "/camelot-wheel": {
   "date": "2026-10-12",
@@ -996,8 +996,8 @@
   "hash": "e854f961bb7de5ee"
  },
  "/mp3-to-text": {
-  "date": "2026-10-12",
-  "hash": "09a4eb69aca351bf"
+  "date": "2026-10-13",
+  "hash": "74fd1492d32558d5"
  },
  "/mp3-to-wav": {
   "date": "2026-10-12",
@@ -1324,8 +1324,8 @@
   "hash": "b3bda92759cfd3b6"
  },
  "/tools/add-subtitles-to-video": {
-  "date": "2026-10-12",
-  "hash": "7c98ce937d1a76e2"
+  "date": "2026-10-13",
+  "hash": "3f31642cbc767583"
  },
  "/tools/add-text-to-gif": {
   "date": "2026-10-13",
@@ -1664,8 +1664,8 @@
   "hash": "69b0d095adebeb6f"
  },
  "/tools/transcribe": {
-  "date": "2026-10-12",
-  "hash": "9fa71a5404a1b5b5"
+  "date": "2026-10-13",
+  "hash": "a162e4dfa775c875"
  },
  "/tools/trim-audio": {
   "date": "2026-10-12",
@@ -1776,12 +1776,12 @@
   "hash": "ff96c04fa22ba00e"
  },
  "/video-to-subtitles": {
-  "date": "2026-10-12",
-  "hash": "8d2ffa79a717600c"
+  "date": "2026-10-13",
+  "hash": "845e0ad1838bd9c0"
  },
  "/video-to-text": {
-  "date": "2026-10-12",
-  "hash": "0ddbf8c65f6cb640"
+  "date": "2026-10-13",
+  "hash": "3b96c2158e0e5d52"
  },
  "/violin-tuner": {
   "date": "2026-10-13",
