@@ -36,4 +36,6 @@ grep -q '^License: LGPL version 2.1 or later' "$out/configure-summary.txt" || { 
 test -f src/dist/libav-$FULL-avi.wasm.wasm
 cp src/dist/libav-$FULL-avi.mjs src/dist/libav-$FULL-avi.wasm.mjs src/dist/libav-$FULL-avi.wasm.wasm "$out/"
 cp src/configs/configs/avi/ffmpeg-config.txt "$out/ffmpeg-config.txt"
+# Fail the build if a banned component is in the config or the built module.
+node "$here/check-codecs.mjs" "$out" > "$out/check-codecs-output.txt"
 echo "built into $out"

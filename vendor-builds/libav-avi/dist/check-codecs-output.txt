@@ -41,6 +41,8 @@ ok   decoder nellymoser     absent
 ok   decoder opus           absent 
 ok   decoder vorbis         absent 
 ok   decoder flac           absent 
+ok   decoder flv1           absent 
+ok   decoder asf            absent 
 ok   demuxer avi            present
 ok   demuxer asf            absent 
 ok   demuxer flv            absent 
