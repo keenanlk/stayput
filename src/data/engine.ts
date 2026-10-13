@@ -344,7 +344,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Online converters make you paste or upload the data to their server, and customer lists and exports are often exactly the data you should not hand over. Here what you paste and any file you drop is converted on your device and never sent anywhere, and the limit is your device’s memory (phones hold less).',
   },
   'subtitle-converter': {
-    how: 'The page reads the text of your file with the browser’s file reader and finds each caption: the line with the two times, and the words under it. Numbers, the WEBVTT header, notes, style blocks, cue names, position settings and tags inside the words are dropped. The captions are then written out again in time order, as SRT with a comma before the milliseconds and numbers from 1, or as WebVTT with a full stop and a WEBVTT line, or as plain text. No library is used and nothing is sent anywhere.',
+    how: 'The page reads the text of your file with the browser’s file reader and finds each caption: the line with the two times, and the words under it. Numbers, the WEBVTT header, notes, style blocks, cue names, position settings and tags inside the words are dropped. The captions are then written out again in time order, as SRT with a comma before the milliseconds and numbers from 1, or as WebVTT with a full stop and a WEBVTT line, or as plain text. No library is used, and the file is never uploaded.',
     versus: 'Online converters ask you to upload the subtitle file, which can be the transcript of a private meeting. Here the file is read and rewritten by code in this tab, and the new file is made in your device’s memory.',
   },
   'create-zip': {

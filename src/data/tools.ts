@@ -4936,7 +4936,7 @@ export const tools: Tool[] = [
     action: 'Convert',
     keywords: ['srt to vtt', 'vtt to srt', 'srt to vtt converter', 'convert srt to vtt', 'convert vtt to srt', 'subtitle converter', 'webvtt to srt'],
     sizeFact: 'No watermark, no sign-up. Subtitle files are plain text and convert in an instant',
-    lead: 'Converts a subtitle file from SRT to WebVTT, or from WebVTT to SRT, and keeps every caption’s words and timing. There is no charge, no sign-up and no watermark, and your file is not uploaded: it is a plain text file, read and rewritten by code in this tab. It changes the format only. It does not translate the captions.',
+    lead: 'Converts a subtitle file from SRT to WebVTT, or from WebVTT to SRT, and keeps every caption’s words and timing. It is free, needs no sign-up and adds no watermark, and your file is not uploaded: it is a plain text file, read and rewritten by code in this tab. It changes the format only. It does not translate the captions.',
     steps: [
       'Drop one or more .srt or .vtt files, or tap to pick them.',
       'Press Convert. An .srt file becomes a .vtt file, and a .vtt file becomes an .srt file.',
