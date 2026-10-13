@@ -1,0 +1,7 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('gif-to-animated-png')!;
+---
+<ToolLayout tool={tool} />
+<script src="../../tools/gif-to-apng.ts"></script>

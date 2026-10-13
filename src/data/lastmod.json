@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "cafdec05b6580e2d"
+  "hash": "13be5097ffca3893"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -342,6 +342,10 @@
  "/gif-compressor": {
   "date": "2026-10-12",
   "hash": "43e5b9991e210c4b"
+ },
+ "/gif-to-apng": {
+  "date": "2026-10-13",
+  "hash": "11a62f905d4d3e1e"
  },
  "/gif-to-jpg": {
   "date": "2026-10-12",
@@ -1514,6 +1518,10 @@
  "/tools/gif-speed": {
   "date": "2026-10-13",
   "hash": "4ecdd26ebeb2d40b"
+ },
+ "/tools/gif-to-animated-png": {
+  "date": "2026-10-13",
+  "hash": "5e25926aff54452e"
  },
  "/tools/gif-to-mp4": {
   "date": "2026-10-12",
