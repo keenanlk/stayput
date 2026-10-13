@@ -45,6 +45,16 @@ export interface GifCompressOptions {
   append?: ArrayBuffer[];
   /** A CSS colour painted over the whole frame before each GIF's frame is drawn, so bars and see-through areas are solid. Left out, bars are transparent. */
   fill?: string;
+  /**
+   * Play the frames last to first. Each frame keeps its own delay, and the frames are composited
+   * before they are reordered, so partial frames and disposal rules still draw correctly.
+   */
+  reverse?: boolean;
+  /**
+   * Play this many times faster (2 halves every delay, 0.5 doubles it). Delays are rounded to whole
+   * centiseconds and held to at least 2 cs, because browsers show anything shorter as about 100 ms.
+   */
+  speed?: number;
   /** Always return the rewritten GIF, even if it is not smaller than the input. */
   force?: boolean;
   /**
@@ -199,6 +209,13 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
       opts.onProgress?.((0.4 * i) / framesIn);
       if (i % 20 === 19) await new Promise((r) => setTimeout(r, 0));
     }
+  }
+
+  if (opts.reverse) full.reverse();
+  const speed = opts.speed ?? 1;
+  if (speed !== 1) {
+    if (!(speed > 0)) throw new Error('The speed must be above zero.');
+    for (const f of full) f.delay = Math.max(20, Math.round(f.delay / speed / 10) * 10);
   }
 
   // Pass 2: choose what each frame stores.
