@@ -16,6 +16,7 @@ const does: Record<string, string> = {
   'convert-image': 'Converts images between JPG, PNG, WebP, GIF, BMP, TIFF, ICO and PDF, and reads HEIC, AVIF, JXL and SVG as input.',
   'compress-image': 'Makes JPG, PNG and WebP images smaller: pick a quality, fit a file size such as 100 KB, or resize to exact pixels, for a single file or a batch.',
   'resize-gif': 'Changes the width and height of animated GIFs by percent or in exact pixels, keeping the animation, frame timing and loop.',
+  'add-text-to-gif': 'Puts text on every frame of an animated GIF, with the font, colour and outline you choose, and saves a new GIF with the same timing.',
   'crop-gif': 'Crops an animated GIF to a box you draw, a square, 16:9 or 9:16, keeping every frame, its timing and the loop.',
   'compress-gif': 'Shrinks animated GIFs by dropping unchanged pixels, reducing colours, resizing or removing frames, and saves a smaller GIF.',
   'compress-png': 'Compresses PNG files with a smart colour palette or losslessly, keeps transparency, and saves smaller PNGs.',
