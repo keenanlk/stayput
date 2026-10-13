@@ -25,9 +25,12 @@ through onnxruntime-web, served from /vendor/.
 `whisper-base/` is OpenAI's Whisper base speech-recognition model
 (https://github.com/openai/whisper), released under the MIT License, as the
 ONNX export published by onnx-community on Hugging Face
-(https://huggingface.co/onnx-community/whisper-base). Only the 8-bit quantised
-encoder and merged decoder are kept, with the tokenizer and config files, 76 MB
-in all. The transcribe tool loads it on the first file and runs it in a web
+(https://huggingface.co/onnx-community/whisper-base). The 8-bit quantised
+encoder and merged decoder are kept, with the tokenizer and config files, 77 MB
+in all, and the 16-bit encoder (`encoder_model_fp16.onnx`, 41 MB, SHA-256
+ffba51b20185377c1b89362b1128148d0132de936a32b200af973da2a11a5369) that
+computers with WebGPU run on the graphics chip instead of the 8-bit one,
+combined with the same 8-bit decoder. The transcribe tool loads it on the first file and runs it in a web
 worker through Transformers.js (Apache-2.0) and onnxruntime-web, served from
 /vendor/.
 

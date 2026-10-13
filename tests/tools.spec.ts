@@ -6965,10 +6965,10 @@ test('Video to subtitles shows the download line before any run and the phone si
   await p.goto('/video-to-subtitles');
   await expect(p.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await expect(p.locator('#run-hint')).toBeVisible();
-  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once. Keep the screen on while it works.');
+  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once. Keep the screen on while it works.');
   await p.locator('#file-input').setInputFiles(big);
   await expect(p.locator('#run-hint')).toContainText('about 200 MB');
-  await expect(p.locator('#run-hint')).toContainText('about 76 MB');
+  await expect(p.locator('#run-hint')).toContainText('about 77 MB (95 MB on computers with WebGPU)');
   await expect(p.locator('#run-hint').getByRole('link', { name: 'Trim it first' })).toHaveAttribute('href', '/tools/trim-video');
   await phone.close();
 });
@@ -6991,7 +6991,7 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   await p.locator('#clear').click();
   await p.locator('#file-input').setInputFiles(small);
   // No size warning for a video that is small enough: the download line and the keep-the-screen-on line are left.
-  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once. Keep the screen on while it works.');
+  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once. Keep the screen on while it works.');
   await phone.close();
   const desktop = await browser.newContext();
   const d = await desktop.newPage();
@@ -7000,7 +7000,7 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   await d.locator('#file-input').setInputFiles(big);
   await expect(d.locator('#run')).toBeVisible();
   // No size warning and no keep-awake line on a computer; only what the first run downloads.
-  await expect(d.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once.');
+  await expect(d.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once.');
   await desktop.close();
 });
 
@@ -7444,6 +7444,27 @@ test('Resize PNG page keeps a PNG and its transparent pixels when the picture is
   expect([out.width, out.height]).toEqual([100, 100]);
   expect(out.px[0]![3]).toBe(0);
   expect(out.px[1]![3]).toBe(255);
+});
+
+test('Nightcore maker opens with speed 1.25×, the pitch following the speed and MP3 chosen; Key changer and Speed up audio open with the pitch kept', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/nightcore-maker');
+  await expect(page.locator('#speed')).toHaveValue('1.25');
+  await expect(page.locator('#tape')).toBeChecked();
+  await expect(page.locator('#format')).toHaveValue('mp3');
+  await page.goto('/key-changer');
+  await expect(page.locator('#semitones')).toHaveValue('0');
+  await expect(page.locator('#speed')).toHaveValue('1');
+  await expect(page.locator('#tape')).not.toBeChecked();
+  await page.goto('/speed-up-audio');
+  await expect(page.locator('#tape')).not.toBeChecked();
+});
+
+test('Extract audio from video opens on the video converter with MP3 at 192 kbps', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/extract-audio-from-video');
+  await expect(page.locator('#file-input')).toHaveAttribute('accept', /\.mkv/);
+  await expect(page.locator('#format')).toHaveValue('mp3');
 });
 
 test('Compress PDF fits a file size with the gentlest step, and says when a limit cannot be met', async ({ page }) => {

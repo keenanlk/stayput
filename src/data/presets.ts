@@ -1615,6 +1615,70 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'extract-audio-from-video',
+    base: 'video-to-mp3',
+    name: 'Extract audio from video',
+    title: 'Extract Audio from Video, MP3 or WAV, No Upload | Stayput',
+    description: 'Pull the sound out of an MP4, MOV, WebM or MKV video and keep it as an MP3 or a WAV. Free, no sign-up, and the video is not uploaded.',
+    heading: 'Extract the audio from a video',
+    tagline: 'Keep the sound of a video as an MP3 or a WAV. The picture is left behind, and the video stays on this device.',
+    keywords: ['extract audio from video', 'extract audio from video free', 'extract audio from video online', 'get audio from video', 'save audio from video', 'video to audio'],
+    dropLabel: 'Drop videos to take the audio from',
+    action: 'Extract audio',
+    sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
+    lead:
+      'Takes the sound out of a video and saves it as an MP3 or a WAV, from MP4, MOV, WebM, MKV and other video files whose sound your browser can play. It is free, and your video is not uploaded: your browser reads the sound track and writes the new file on your device. The MP3 encoder is fetched the first time you use it, so after your first run the page works offline.',
+    intro: [
+      'A video file holds a picture and a sound track in one container. To keep only the sound, the page reads the sound track, decodes it, and writes it again as a file of its own. The picture is not used, which is why the audio file is a small fraction of the video’s size.',
+      'The first choice is the format, on the [Video to MP3](/tools/video-to-mp3) tool and on this page alike. MP3 is the small one that plays on nearly everything; at 192 kbps it takes about 1.4 MB a minute. WAV is uncompressed, which is what audio editors and some upload forms ask for, and it takes about 10.6 MB a minute in stereo. For a 10-minute video that is about 14 MB as an MP3 and about 106 MB as a WAV.',
+      'The second choice is how much to keep. Voice recordings such as lectures, calls and interviews are fine at 96 or 128 kbps in mono, and come out around 7 MB for those 10 minutes at 96 kbps. Music is better at 192 kbps or higher. Neither format can bring back detail that the video’s own sound track did not have, and a WAV is not a better copy of the sound; it is the same sound without a second round of compression.',
+      'Drop several videos at once and they are converted one after another. One file downloads straight away, and several come as a zip. If you only want the words, drop the video on [Video to text](/video-to-text) instead; it reads the sound track itself.',
+    ],
+    steps: [
+      'Drop one or more video files, or tap to pick them from your files or camera roll.',
+      'Choose MP3 or WAV. For MP3 pick a quality: 192 kbps for music, 96 to 128 kbps for speech. Choose mono to halve the size of a voice recording.',
+      'Extract. The audio file downloads when it is ready, named like the video; several files come as a zip.',
+    ],
+    sections: [
+      {
+        heading: 'Which videos work',
+        bullets: [
+          'MP4, M4V and MOV files from phones, cameras and screen recorders, and WebM and MKV files.',
+          'What counts is the sound track, not the picture: the page only reads the sound, and needs your browser to be able to play it.',
+          'If a file will not open, try the page in another browser. Safari reads some Apple files that other browsers do not.',
+          'A video with no sound track, such as a screen recording made without a microphone, gives an error saying no audio could be read.',
+        ],
+      },
+      {
+        heading: 'What you get',
+        bullets: [
+          'An MP3 at 96 to 320 kbps, in stereo or mono, or a 16-bit WAV at 44.1 kHz, with the same name as the video.',
+          'Surround sound is mixed down to stereo, and the centre channel, where film dialogue sits, is kept.',
+          'The whole video is read into your device’s memory first, so a very long film may be too much for an older phone.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It takes files from your device, not links. A YouTube or other web address cannot be pasted here, because the page never fetches anything for you.',
+          'It converts the whole video. To keep only part of it, cut the audio afterwards with [Trim audio](/tools/trim-audio).',
+          'It does not copy the sound track unchanged: the sound is decoded and written again as MP3 or WAV.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I extract the audio from a video?', a: 'Drop the video on this page, choose MP3 or WAV, and press Extract audio. Your browser decodes the sound track and the page writes it as a file of its own, with the picture left out. For a step-by-step guide that covers phones, QuickTime and Windows, see [how to convert a video to MP3](/guides/how-to-convert-a-video-to-mp3).' },
+      { q: 'Should I choose MP3 or WAV?', a: 'MP3 for listening, sharing and uploads: it is small and plays everywhere. WAV if you will edit the sound further or a program asks for it, because nothing is compressed a second time. At the default 192 kbps, a WAV is about seven times the size of the MP3.' },
+      { q: 'Does extracting the audio lose quality?', a: 'WAV keeps what the decoder produced, so nothing more is lost. MP3 compresses the sound again, which at 192 kbps or higher is not noticeable for most music and speech. In both cases the sound cannot be better than the sound track in the video.' },
+      { q: 'Which video formats can I use?', a: 'MP4, M4V, MOV, WebM and MKV are what this page is built for, and it works with any video whose sound track your browser can decode. There is no list of codecs to check: if a file will not open, you get a message, and another browser may read it.' },
+      { q: 'Can I paste a link to a video?', a: 'No. The page works on files on your device and does not fetch anything from other sites. Use a video file you already have.' },
+      { q: 'Can I extract the audio from a video on my iPhone or Android phone?', a: 'Yes. Open this page in your phone’s browser, tap the drop area and pick the video from your photo library or files. The audio file is written on the phone and saved to your downloads.' },
+      { q: 'Is there a length or size limit?', a: 'There is no file size cap from us. The whole video is read into your device’s memory, so a long film works on a laptop but may be too much for an older phone.' },
+      { q: 'What if I only need part of the audio?', a: 'Extract the whole sound track first, then cut the part you want with [Trim audio](/tools/trim-audio). Both steps run on your device.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'extract-text-from-image',
     base: 'image-to-text',
     name: 'Extract text from image',
@@ -4541,7 +4605,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'What speed is best for podcasts and lectures?', a: 'Most people follow speech easily at 1.25× to 1.5×. Above 1.75× only very clear speakers stay comfortable, and background music starts to sound choppy before the voice does.' },
-      { q: 'Can I make a sped-up song for TikTok or Reels?', a: 'Yes. Tick “Let the pitch follow the speed” for the higher, brighter sped-up sound those edits use, or leave it off to keep the key. 1.2× to 1.3× is the usual range for sped-up versions of songs.' },
+      { q: 'Can I make a sped-up song for TikTok or Reels?', a: 'Yes. Tick “Let the pitch follow the speed” for the higher, brighter sped-up sound those edits use, or leave it off to keep the key. The [Nightcore maker](/nightcore-maker) opens with the pitch following the speed already.' },
       { q: 'Why is my file shorter but the same size in MB?', a: 'A lossy file is written again at about the bitrate of the original, and size follows bitrate times length. A file that plays 25% faster is 20% shorter, so it should be about 20% smaller. If the size did not drop, the original was probably a low-bitrate file saved at a higher rate; pick MP3 and it is written at a sensible bitrate.' },
       { q: 'Does speeding up remove pauses?', a: 'No. Everything plays faster by the same amount, pauses included. To cut silences out of a recording, trim them with Trim audio first, then speed up what is left.' },
       noUpload,
@@ -4575,6 +4639,123 @@ export const presets: Preset[] = [
       { q: 'How slow can it go?', a: 'Down to 0.5×. Below about 0.7×, drums and sharp attacks start to sound soft or doubled, which is normal for any time stretch. Sustained notes, voices and guitar lines hold up much better than percussion.' },
       { q: 'How do I make a slowed and reverb version?', a: 'Tick “Let the pitch follow the speed” and choose 0.8× to 0.9×: the song drops in key as it slows, like a record played at the wrong speed. This page adds no reverb, so put the slowed copy into an editor or app for that last step.' },
       { q: 'Can I slow down a YouTube video I am learning from?', a: 'YouTube’s own speed setting already slows playback while keeping the pitch. Use this page for files you have on your device, such as a lesson recording, a voice memo of a teacher, or a practice track, when you want a slower copy to keep.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'key-changer',
+    base: 'pitch-changer',
+    name: 'Key changer',
+    title: 'Key Changer: Change a Song’s Key Online, No Upload | Stayput',
+    description: 'Change the key of an MP3 or other song file up or down by semitones, up to an octave, and keep the speed. Free, no sign-up, and the file is not uploaded.',
+    heading: 'Change the key of a song',
+    tagline: 'Move a song up or down by semitones to suit your voice or your instrument. The speed stays the same.',
+    keywords: ['key changer', 'key changer online', 'key changer for songs', 'key changer mp3', 'change key of a song', 'song key changer'],
+    dropLabel: 'Drop songs to change the key of',
+    action: 'Change key',
+    lead:
+      'Changes the key of a song file up or down by whole semitones, up to an octave either way, and keeps its speed the same. It is free, and your music is not uploaded: the key is shifted in your browser tab. The page works on files, not links, and after your first run it works offline.',
+    intro: [
+      'A key changer moves every note of a song up or down by the same amount, so the song fits your voice or your instrument without being played faster or slower. A singer who cannot reach the high notes moves the key down; a guitarist who finds the chords awkward moves it to a key with friendlier ones.',
+      'The amount is counted in semitones, the steps on a piano from one key to the next. Going from C up to D is +2, from E down to C is −4, and 12 semitones is one octave. Minor keys move the same way: a song in A minor moved down 3 semitones is in F♯ minor.',
+      'A worked example: a ballad in G is too high for your voice. Move the slider to −2 and the song plays in F, one whole step lower, at the same speed and in the same length. If that is still too high, try −3 or −4 and listen again. The slider moves in whole semitones from −12 to +12, and the page does not tell you which key the song is in, so you need to know it, or find it by ear, to count the steps.',
+      'The new file is written in the format you dropped unless you pick another. A small shift of a few semitones sounds natural; a very large one, such as a whole octave, adds some smearing, as every pitch shifter does.',
+    ],
+    steps: [
+      'Drop one or more songs (MP3, WAV, M4A, FLAC or OGG), or tap to pick them.',
+      'Move the pitch slider by the number of semitones you want, up or down. At 0 nothing changes, and the page says so.',
+      'Press Change key. Each file downloads when it is ready, with the shift in its name, such as song-down2.mp3.',
+    ],
+    sections: [
+      {
+        heading: 'Counting semitones',
+        bullets: [
+          'One semitone is the step from one piano key to the next, white or black.',
+          'Up 2 is a whole step: C to D, G to A. Down 2: G to F.',
+          'Up 7 is a fifth, and 12 is a whole octave. The slider stops at 12 each way.',
+          'To move a song from one key to another, count the semitones between the two key names, and use a minus sign to go down.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It does not find the key of a song. You tell it how far to move.',
+          'It takes sound files, not links. A YouTube or streaming address cannot be pasted here, because the page never fetches anything for you.',
+          'It moves in whole semitones only. A shift smaller than one semitone is not available.',
+          'It shifts the whole mix. It does not move the voice and the band separately.',
+          'It takes sound files only, not video. For a video, save the sound first with [Extract audio from video](/extract-audio-from-video), then bring it here.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I change the key of a song?', a: 'Drop the song file here, move the pitch slider by the number of semitones between the key it is in and the key you want, and press Change key. From C to D is +2; from E to C is −4. The speed and the length stay the same.' },
+      { q: 'How many semitones is an octave?', a: '12. The slider goes from −12 to +12, so you can move a song up or down by a whole octave. Shifts of a few semitones sound the most natural.' },
+      { q: 'Will the song get faster or slower?', a: 'No. With the speed left at 1×, only the key changes and the song keeps its length. If you also want it faster or slower, use the Speed list on the same page.' },
+      { q: 'Can I change the key of a YouTube or Spotify song?', a: 'Not from a link. This page works on a sound file on your device and does not fetch anything from other sites. Use a file you already have, such as a recording of your own band, a backing track or a voice memo.' },
+      { q: 'How do I find the key of the song first?', a: 'Play the song along with a piano or guitar and find the note that sounds like “home” at the end; the [tuner](/tools/tuner) shows the name of a single note you play. This page does not detect the key for you.' },
+      { q: 'How good is the quality?', a: 'Small changes, a few semitones, sound natural. A very large one, a whole octave, adds some smearing, as every pitch shifter does. Save as WAV or FLAC if you will edit the result further.' },
+      { q: 'Does it change only the voice?', a: 'No. It moves everything in the file by the same amount: voices, guitars, drums and all.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'nightcore-maker',
+    base: 'pitch-changer',
+    name: 'Nightcore maker',
+    title: 'Nightcore Maker: Speed Up and Pitch Up a Song | Stayput',
+    description: 'Make a nightcore version of a song: faster, with the pitch rising with the speed, saved as an MP3. Free, no sign-up, and the song is not uploaded.',
+    heading: 'Make a nightcore version of a song',
+    tagline: 'Speed a song up and let the pitch rise with it, then save it as an MP3.',
+    keywords: ['nightcore maker', 'nightcore maker online', 'make nightcore', 'nightcore mp3', 'nightcore converter', 'speed up and pitch up a song'],
+    dropLabel: 'Drop songs to make nightcore',
+    action: 'Make nightcore',
+    defaults: { speed: '1.25', tape: 'true', format: 'mp3' },
+    lead:
+      'Speeds a song up and raises its pitch with the speed, the sound known as nightcore, and saves it as an MP3. It is free, and your music is not uploaded: the song is changed in your browser tab. It makes that one change and adds no effects, and after your first run the page works offline.',
+    intro: [
+      'Nightcore is a song played faster, so that it also sounds higher, like a record spun too fast. This page does exactly that and nothing more: it plays the song faster and lets the pitch follow the speed, then saves the result as an MP3. It adds no effect, no echo and no picture.',
+      'It starts at 1.25× speed. At that speed the pitch rises by almost four semitones, and a 3-minute-30-second song comes out at 2 minutes 48. Pick a different speed from 1.05× to 2× in the list: the higher the speed, the higher the pitch, and 2× is a whole octave up.',
+      'A worked example: you drop song.mp3 and leave the speed at 1.25×. The page writes song-faster.mp3, which plays in 80% of the time and about 3.9 semitones higher. The note on the result says “1.25× speed, pitch following”.',
+      'The pitch slider is still there. While the box is ticked, a shift in semitones is added on top of the rise from the speed, so 1.25× with the slider at +2 is about 5.9 semitones up. Untick “Let the pitch follow the speed” to speed up without raising the pitch.',
+    ],
+    steps: [
+      'Drop one or more songs (MP3, WAV, M4A, FLAC or OGG), or tap to pick them.',
+      'Leave the speed at 1.25× or pick another. The tick-box keeps the pitch rising with the speed; the pitch slider adds a further shift if you want one.',
+      'Press Make nightcore. Each file downloads when it is ready, as an MP3; several come as a zip.',
+    ],
+    sections: [
+      {
+        heading: 'How much higher does it go?',
+        paragraphs: [
+          'With the pitch following the speed, the rise is set by the speed alone: each doubling of the speed is one octave, 12 semitones.',
+        ],
+        bullets: [
+          '1.1×: about 1.7 semitones higher.',
+          '1.2×: about 3.2 semitones.',
+          '1.25×: about 3.9 semitones (the starting speed).',
+          '1.3×: about 4.5 semitones.',
+          '1.5×: about 7.0 semitones.',
+          '2×: 12 semitones, one octave.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It adds no effects. There is no reverb, echo, bass boost or picture; only the speed and the pitch change.',
+          'It takes sound files, not links and not video. For a video, save the sound first with [Extract audio from video](/extract-audio-from-video), then bring it here.',
+          'It does not keep the key. To speed a song up and keep its key, tick the box off, or use [Speed up audio](/speed-up-audio).',
+          'It works on a whole file. To make nightcore of one part, cut it first with [Trim audio](/tools/trim-audio).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is nightcore?', a: 'A version of a song that is played faster, so that it also sounds higher, like a record played at too high a speed. This page makes that change and nothing else.' },
+      { q: 'How do I make a nightcore version of a song?', a: 'Drop the song file here and press Make nightcore. The page speeds it up to 1.25×, lets the pitch rise with the speed, and saves an MP3. Pick another speed in the list if you want it faster or slower.' },
+      { q: 'What speed should I use?', a: 'The page starts at 1.25×. Raise it for a faster, higher result and lower it for a gentler one. At 1.5× the pitch is about seven semitones higher, which is a big change; listen before you share it.' },
+      { q: 'Can I speed a song up without raising the pitch?', a: 'Yes. Untick “Let the pitch follow the speed” and the speed changes alone, so the song keeps its key. The [Speed up audio](/speed-up-audio) page opens that way.' },
+      { q: 'Can I make nightcore from a YouTube link?', a: 'No. The page works on files on your device and does not fetch anything from other sites. Use a song file you already have.' },
+      { q: 'Does it add reverb, bass or any other effect?', a: 'No. The page changes the speed and the pitch of the sound and nothing else.' },
+      { q: 'Is it OK to share the result?', a: 'That depends on who owns the song. Changing its speed does not change who owns it, so a nightcore copy of someone else’s song needs their permission to publish.' },
       noUpload,
     ],
   },
@@ -5338,7 +5519,7 @@ export const presets: Preset[] = [
   {
     slug: 'video-to-subtitles',
     lead:
-      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, needs no account and adds no watermark, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (76 MB) and the engine that runs it, and after that it works offline.',
+      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, needs no account and adds no watermark, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it, and after that it works offline.',
     base: 'transcribe',
     name: 'Video to subtitles',
     title: 'Subtitle Generator: Auto SRT Subtitles from Video, Free, No Upload | Stayput',
@@ -5417,7 +5598,7 @@ export const presets: Preset[] = [
     intro: [
       'Audio recorders, meeting apps and phones all save sound in different formats: WAV from a handheld recorder, OGG or Opus from a chat app, FLAC from a lossless capture, M4A from a phone. This page reads all of them and writes out what is said as paragraphs of plain text you can search, quote and paste into your notes. For a single MP3 or a voice memo, [MP3 to text](/mp3-to-text) is the same tool with that case in mind.',
       'A worked example: a one-hour team meeting saved as a WAV by a recorder on the table. Drop it here with the language left on Detect. The sound is decoded in the tab, cut at pauses into pieces, and each piece is transcribed by Whisper on your device. A paragraph break falls wherever there was a pause of two seconds or more, which usually lands where someone else starts talking. It does not label who is speaking, so add names when you read it through.',
-      'The first run downloads the speech model (76 MB) and the engine that runs it from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer and need memory, since the whole recording is decoded first.',
+      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer and need memory, since the whole recording is decoded first.',
       'If the recording is a video, such as a recorded lecture or a Zoom MP4, use [Video to text](/video-to-text). For timed captions instead of plain text, choose Subtitles (.srt) on the general [transcribe](/tools/transcribe) tool.',
     ],
     steps: [
@@ -5428,7 +5609,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Which audio formats does it read?', a: 'MP3, WAV, M4A, AAC, OGG, Opus and FLAC, plus WebM audio. A video file works too, on [Video to text](/video-to-text).' },
       { q: 'Is there a length limit?', a: 'No fixed limit. Long recordings take proportionally longer, and very long ones (several hours) need a device with plenty of memory, since the whole recording is decoded first.' },
-      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (76 MB) are stored by your browser, so you can transcribe without a connection.' },
+      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (77 MB, or 95 MB on computers with WebGPU) are stored by your browser, so you can transcribe without a connection.' },
       { q: 'Can it translate the recording?', a: 'Into English only. Choose Translate to English for a foreign-language recording; for text in the spoken language, leave it off. It does not translate into other languages.' },
       { q: 'Does it say who is speaking?', a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph, which usually falls where the speaker changes.' },
       noUpload,
@@ -5450,7 +5631,7 @@ export const presets: Preset[] = [
     intro: [
       'A recorded lecture, a Zoom call, a screen recording of a demo: the words are in the video, but finding the one you need means watching it all. This page reads the soundtrack of the video and writes what is said as paragraphs of plain text you can search, quote and paste into your notes.',
       'A worked example: a 50-minute lecture saved from Zoom as an MP4. Drop it here with the language left on Detect. Only the soundtrack is decoded, in the tab; the picture is never touched. The speech is cut at pauses into pieces and transcribed by Whisper on your device, and a new paragraph starts wherever there was a pause of two seconds or more. Copy it, or download it as a .txt file.',
-      'The first run downloads the speech model (76 MB) and the engine that runs it from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer and need memory, since the whole soundtrack is decoded first. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
+      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer and need memory, since the whole soundtrack is decoded first. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
     ],
     steps: [
       'Drop the video: MP4, MOV, M4V, WebM or MKV.',
@@ -5460,7 +5641,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Which video files does it read?', a: 'MP4, MOV, M4V, WebM and MKV, as long as your browser can play the sound track. For audio-only files use [Audio to text](/audio-to-text).' },
       { q: 'Is there a length limit?', a: 'No fixed limit. Long videos take proportionally longer, and very long ones (several hours) need a device with plenty of memory, since the whole soundtrack is decoded first.' },
-      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (76 MB) are stored by your browser, so you can transcribe without a connection.' },
+      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (77 MB, or 95 MB on computers with WebGPU) are stored by your browser, so you can transcribe without a connection.' },
       { q: 'Can I get subtitles instead of plain text?', a: 'Yes. Use [Video to subtitles](/video-to-subtitles) for an SRT or WebVTT file timed to the speech.' },
       { q: 'Does it say who is speaking?', a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph, which usually falls where the speaker changes.' },
       noUpload,
@@ -5469,7 +5650,7 @@ export const presets: Preset[] = [
   {
     slug: 'auto-caption-video',
     lead:
-      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB) and the engine that runs it, and after that it works offline; the longest video you can caption depends on your device’s memory.',
+      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it, and after that it works offline; the longest video you can caption depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     sizeFact: 'No watermark. On a phone, a video over about 200 MB (2 minutes of iPhone video) may run out of memory',
     name: 'Auto caption video',
@@ -5484,7 +5665,7 @@ export const presets: Preset[] = [
     defaults: { size: 'large' },
     intro: [
       'Most short videos are watched on mute, in a feed, on a phone. A talking-head clip without captions loses those viewers in the first second, and apps that ignore subtitle files, such as Instagram Stories and WhatsApp, only show captions that are part of the picture. This page writes the captions from the speech and draws them into every frame, so they travel with the video wherever it goes.',
-      'A worked example: a 45-second vertical clip from your phone, 1080×1920, of you explaining a recipe. Drop it here; Large is already chosen, which on a 1080-pixel-wide vertical video sets the text at about 90 pixels, readable on a small screen. The speech model writes the captions (it downloads once, 76 MB), each is wrapped to at most two lines across the width of the frame, and the clip is re-encoded with the words in the lower part of the picture. You get recipe-subtitled.mp4, ready to post. If the app puts its buttons over the bottom of the video, choose Top instead.',
+      'A worked example: a 45-second vertical clip from your phone, 1080×1920, of you explaining a recipe. Drop it here; Large is already chosen, which on a 1080-pixel-wide vertical video sets the text at about 90 pixels, readable on a small screen. The speech model writes the captions (it downloads once, 77 MB, or 95 MB on computers with WebGPU), each is wrapped to at most two lines across the width of the frame, and the clip is re-encoded with the words in the lower part of the picture. You get recipe-subtitled.mp4, ready to post. If the app puts its buttons over the bottom of the video, choose Top instead.',
       'Speech models slip on names, brand words and mumbled phrases, and a burned-in mistake cannot be edited later. For anything important, tick Also save the subtitles as an SRT file, fix the words in a text editor, and run the clip again with the corrected SRT dropped next to it.',
     ],
     steps: [
@@ -5498,14 +5679,14 @@ export const presets: Preset[] = [
       { q: 'Can it caption a video in another language?', a: 'Yes, with limits. The language is detected from the first seconds, or you can choose it. The speech model is small, so it is most accurate in English and makes more mistakes in other languages, especially on short or noisy clips; if the words come out wrong, choose the language yourself. Tick Translate the speech to English for rough English captions on a video in another language, and check them before you post.' },
       { q: 'Can I get a separate subtitle file instead?', a: 'Yes. [Video to subtitles](/video-to-subtitles) is a subtitle generator that makes an SRT or WebVTT file from the speech, without touching the video.' },
       { q: 'Can I add captions to a video without uploading it?', a: 'Yes. The speech is transcribed and the frames are redrawn in this tab. Unposted clips, family videos and client footage stay on your device.' },
-      { q: 'How long a video can I caption?', a: 'The limit is your device’s memory, not a set length. On a phone, a video over about 200 MB (around 2 minutes of iPhone video) may run out of memory, and the page warns you before it starts. A laptop handles longer clips. The first run also downloads the speech model (76 MB).' },
+      { q: 'How long a video can I caption?', a: 'The limit is your device’s memory, not a set length. On a phone, a video over about 200 MB (around 2 minutes of iPhone video) may run out of memory, and the page warns you before it starts. A laptop handles longer clips. The first run also downloads the speech model (77 MB, or 95 MB on computers with WebGPU).' },
       noAccount,
     ],
   },
   {
     slug: 'burn-subtitles-into-video',
     lead:
-      'Burns an SRT or VTT subtitle file permanently into an MP4, MOV or WebM video, in the look, size and place you pick, and saves a new MP4. It is free, needs no account and adds no watermark, and your files are not uploaded: the video is re-encoded in your browser, and your own subtitle file needs no model. If you drop only the video, a speech model (76 MB) downloads once to write the subtitles, and the longest video you can burn depends on your device’s memory.',
+      'Burns an SRT or VTT subtitle file permanently into an MP4, MOV or WebM video, in the look, size and place you pick, and saves a new MP4. It is free, needs no account and adds no watermark, and your files are not uploaded: the video is re-encoded in your browser, and your own subtitle file needs no model. If you drop only the video, a speech model (77 MB, or 95 MB on computers with WebGPU) downloads once to write the subtitles, and the longest video you can burn depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     name: 'Burn subtitles into video',
     title: 'Burn SRT Subtitles into Video (Hardcode), Free, No Upload | Stayput',

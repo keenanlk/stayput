@@ -9,6 +9,7 @@
  * or competitors.
  */
 import type { Tool } from './tools';
+import { SPEECH_MODEL_SIZE } from './speech-size.ts';
 
 /** What each tool does, with its input and output formats. First sentence of the lead. */
 const does: Record<string, string> = {
@@ -138,7 +139,7 @@ const downloads: Record<string, Download> = {
   'remove-object': { what: 'object removal model', size: '28 MB' },
   'image-to-text': { what: 'text reader', size: '6 MB' },
   'ocr-pdf': { what: 'text reader', size: '6 MB' },
-  'transcribe': { what: 'speech model', size: '76 MB' },
+  'transcribe': { what: 'speech model', size: SPEECH_MODEL_SIZE },
   'vocal-remover': { what: 'separation model', size: '67 MB' },
   'video-background-remover': {
     what: 'person finder',
@@ -148,8 +149,8 @@ const downloads: Record<string, Download> = {
   'blur-face-video': { what: 'face detector', size: '4 MB' },
   'add-subtitles-to-video': {
     what: 'speech model',
-    size: '76 MB',
-    text: 'Writing captions from speech downloads the speech model (76 MB) and the engine that runs it on first use and then works offline; burning in your own SRT or VTT file needs no model.',
+    size: SPEECH_MODEL_SIZE,
+    text: `Writing captions from speech downloads the speech model (${SPEECH_MODEL_SIZE}) and the engine that runs it on first use and then works offline; burning in your own SRT or VTT file needs no model.`,
   },
 };
 
