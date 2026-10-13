@@ -9,7 +9,7 @@
  * or competitors.
  */
 import type { Tool } from './tools';
-import { SPEECH_MODEL_SIZE } from './speech-size';
+import { SPEECH_MODEL_SIZE } from './speech-size.ts';
 
 /** What each tool does, with its input and output formats. First sentence of the lead. */
 const does: Record<string, string> = {
