@@ -108,16 +108,63 @@ test('below the 30 Hz floor reads nothing, and a note just above it is read', ()
   expect(Math.abs(1200 * Math.log2(b0!.freq / 30.87))).toBeLessThan(5);
 });
 
-test('an octave jump while the sound is dying away is held; a louder one is a new note', () => {
-  // Banjo G4 tail: the fundamental has faded and the second harmonic reads an octave up.
-  const tail = detectPitch(tone([[392, 0.004], [784, 0.02]]), RATE);
-  expect(tail).toBeDefined();
-  expect(tail!.freq).toBeGreaterThan(780);
-  expect(isDecayOctaveJump(tail!.freq, 392, 0.014, 0.016)).toBe(true);
-  // The same reading on a louder window is a new pluck.
-  expect(isDecayOctaveJump(tail!.freq, 392, 0.2, 0.016)).toBe(false);
-  // Other jumps, and the same note, are not octave jumps.
-  expect(isDecayOctaveJump(392, 392, 0.014, 0.016)).toBe(false);
-  expect(isDecayOctaveJump(588, 392, 0.014, 0.016)).toBe(false);
-  expect(isDecayOctaveJump(196, 392, 0.014, 0.016)).toBe(false);
+/** The tuner's per-window smoothing and octave-tail guard (src/tools/tuner.ts listen()), one reading per 50 ms. */
+function shownFor(windows: { freq: number; rms: number }[]) {
+  let recent: number[] = [];
+  let lastRms = 0;
+  let skipped = 0;
+  const shown: number[] = [];
+  for (const { freq, rms } of windows) {
+    const before = lastRms;
+    lastRms = rms;
+    if (recent.length && isDecayOctaveJump(freq, recent[recent.length - 1]!, rms, before, recent.length, skipped)) {
+      skipped++;
+    } else {
+      skipped = 0;
+      if (recent.length && Math.abs(1200 * Math.log2(freq / recent[recent.length - 1]!)) > 100) recent = [];
+      recent.push(freq);
+      if (recent.length > 5) recent.shift();
+    }
+    shown.push([...recent].sort((a, b) => a - b)[Math.floor(recent.length / 2)]!);
+  }
+  return shown;
+}
+const held = (n: number, freq: number, rms: number) => Array.from({ length: n }, () => ({ freq, rms }));
+
+test('the tail of a note that reads an octave up is held on the played note', () => {
+  // Banjo G4: 14 windows on 392 Hz, then the fundamental has faded and the second harmonic reads 784 Hz, still getting quieter.
+  const tail = Array.from({ length: 7 }, (_, i) => ({ freq: 784, rms: 0.05 - i * 0.004 }));
+  const shown = shownFor([...held(14, 392, 0.1).map((w, i) => ({ ...w, rms: 0.1 - i * 0.003 })), ...tail]);
+  expect(shown.at(-1)).toBe(392);
+  expect(shown.every((f) => f === 392)).toBe(true);
+  // The detector really does read the harmonic there.
+  const raw = detectPitch(tone([[392, 0.004], [784, 0.02]]), RATE);
+  expect(raw!.freq).toBeGreaterThan(780);
+});
+
+test('a new, louder pluck an octave up is accepted at once', () => {
+  const shown = shownFor([...held(8, 392, 0.05).map((w, i) => ({ ...w, rms: 0.05 - i * 0.002 })), { freq: 784, rms: 0.2 }]);
+  expect(shown.at(-1)).toBe(784);
+});
+
+test('a sustained note that moves up an octave is accepted within 300 ms', () => {
+  // Steady voice or bowed note, loudness wobbling a little: 6 windows is 300 ms.
+  const wobble = [0.1, 0.099, 0.102, 0.098, 0.1, 0.101, 0.099, 0.1];
+  const windows = [...held(8, 392, 0.1), ...wobble.map((rms) => ({ freq: 784, rms }))];
+  const shown = shownFor(windows).slice(8);
+  const first = shown.findIndex((f) => f === 784);
+  expect(first).toBeGreaterThanOrEqual(0);
+  expect(first).toBeLessThan(6);
+  // Even a perfectly steadily falling level is let through after the cap, 400 ms.
+  const falling = Array.from({ length: 12 }, (_, i) => ({ freq: 784, rms: 0.1 - i * 0.002 }));
+  expect(shownFor([...held(8, 392, 0.1), ...falling]).at(-1)).toBe(784);
+});
+
+test('an octave read at the start of a note is never held back', () => {
+  // A guitar's attack can read an octave low; the true pitch must replace it even though the sound is falling.
+  const shown = shownFor([{ freq: 45.4, rms: 0.2 }, { freq: 90.8, rms: 0.18 }, { freq: 90.8, rms: 0.17 }]);
+  expect(shown.at(-1)).toBe(90.8);
+  expect(isDecayOctaveJump(392, 392, 0.014, 0.016, 5, 0)).toBe(false);
+  expect(isDecayOctaveJump(588, 392, 0.014, 0.016, 5, 0)).toBe(false);
+  expect(isDecayOctaveJump(196, 392, 0.014, 0.016, 5, 0)).toBe(false);
 });

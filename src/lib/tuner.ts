@@ -61,18 +61,22 @@ export function nearestString(freq: number, strings: number[], a4 = 440): { inde
   return best;
 }
 
+/** Readings of the held note needed, and windows (50 ms each) an octave tail may be held for. */
+export const OCTAVE_HOLD = { minHeld: 3, maxSkipped: 8 };
+
 /**
- * True for a reading about an octave above the note being held, taken while the
- * sound is getting quieter. As a short or heavy string dies away its
- * fundamental fades before its second harmonic does, and the detector then
- * correctly reports the harmonic; the tuner should keep showing the note the
- * player plucked. A fresh pluck an octave up is louder than the tail, so it
- * passes, and so does a steady note that really moves up an octave, within a
- * window or two.
+ * True for a reading about an octave above a note that has been held for a few
+ * readings, taken while the sound is getting quieter. As a short or heavy string
+ * dies away its fundamental fades before its second harmonic does, and the
+ * detector then correctly reports the harmonic; the tuner should keep showing
+ * the note the player plucked. A fresh pluck an octave up is louder than the
+ * tail, so it passes; so does a steady note that really moves up an octave,
+ * within a window or two. A note just started (the attack can read an octave
+ * low) is never held, and no tail is held for more than `maxSkipped` windows.
  */
-export function isDecayOctaveJump(freq: number, held: number, rms: number, lastRms: number): boolean {
+export function isDecayOctaveJump(freq: number, held: number, rms: number, lastRms: number, heldCount: number, skipped: number): boolean {
   const cents = 1200 * Math.log2(freq / held);
-  return cents > 1100 && cents < 1300 && rms < lastRms;
+  return cents > 1100 && cents < 1300 && rms < lastRms && heldCount >= OCTAVE_HOLD.minHeld && skipped < OCTAVE_HOLD.maxSkipped;
 }
 
 export interface Pitch {
