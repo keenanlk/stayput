@@ -1209,6 +1209,66 @@
    "note": "Licensed under the GNU Library General Public License version 2 or, at your option, any later version. The upstream release 3.100 is also at https://sourceforge.net/projects/lame/files/lame/3.100/ ; the linked commit is the exact (slightly modified) tree that was compiled."
   },
   {
+   "id": "libavjs",
+   "name": "libav.js (custom build for AVI)",
+   "version": "6.10.9.0",
+   "npm": "libav.js",
+   "licences": [
+    {
+     "name": "LGPL-2.1-or-later",
+     "url": "/licenses/LGPL-2.1.txt"
+    }
+   ],
+   "project": "https://github.com/Yahweasel/libav.js",
+   "source": "https://github.com/Yahweasel/libav.js/tree/v6.10.9.0",
+   "shipped": "Served as three separate files in /vendor/libav.js@6.10.9.0/ (libav-6.10.9.0-avi.mjs, libav-6.10.9.0-avi.wasm.mjs and libav-6.10.9.0-avi.wasm.wasm), fetched only when you convert an AVI file. The build uses libav.js's own configuration tool; the exact component list, build script and instructions are in the repository under vendor-builds/libav-avi/, next to a copy of the built files.",
+   "kind": "wasm",
+   "copyleft": "lgpl",
+   "copyright": "Copyright (C) 2019-2025 Yahweasel and contributors",
+   "replace": "/vendor/libav.js@6.10.9.0/libav-6.10.9.0-avi.wasm.wasm",
+   "note": "To rebuild: run vendor-builds/libav-avi/build.sh (needs Docker; it uses the emscripten/emsdk:6.0.5 image and the libav.js 6.10.9 npm package, which carries the FFmpeg sources). Source tarballs: the FFmpeg 9.0 release (https://ffmpeg.org/releases/ffmpeg-9.0.tar.xz) and the libav.js 6.10.9 npm package, which contains both it and the libav.js source (https://registry.npmjs.org/libav.js/-/libav.js-6.10.9.tgz, in sources/)."
+  },
+  {
+   "id": "ffmpeg-libs",
+   "name": "FFmpeg libraries (libavformat, libavcodec, libswscale, libswresample)",
+   "version": "9.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "LGPL-2.1-or-later",
+     "url": "/licenses/LGPL-2.1.txt"
+    }
+   ],
+   "project": "https://ffmpeg.org",
+   "source": "https://github.com/FFmpeg/FFmpeg/tree/refs/tags/n9.0",
+   "shipped": "Compiled to WebAssembly inside /vendor/libav.js@6.10.9.0/libav-6.10.9.0-avi.wasm.wasm. Only the AVI demuxer and the decoders for MPEG-4 Part 2 video (Xvid, DivX 4 and later), Motion JPEG, MP3, MP2, AC-3 and PCM are included; no GPL or non-free parts, no H.264, AAC, Windows Media, VC-1, VP6 or FLV code.",
+   "kind": "wasm",
+   "via": "libavjs",
+   "copyleft": "lgpl",
+   "copyright": "Copyright (c) 2000-2024 Fabrice Bellard, et al.",
+   "replace": "/vendor/libav.js@6.10.9.0/libav-6.10.9.0-avi.wasm.wasm",
+   "note": "Configured with --disable-everything and the flags in vendor-builds/libav-avi/dist/ffmpeg-config.txt, so no other component is present. Source tarballs: the FFmpeg 9.0 release (https://ffmpeg.org/releases/ffmpeg-9.0.tar.xz) and the libav.js 6.10.9 npm package, which contains both it and the libav.js source (https://registry.npmjs.org/libav.js/-/libav.js-6.10.9.tgz, in sources/)."
+  },
+  {
+   "id": "ijg-jrevdct",
+   "name": "jrevdct (Independent JPEG Group)",
+   "version": "inside FFmpeg 9.0",
+   "npm": null,
+   "licences": [
+    {
+     "name": "IJG",
+     "url": "https://github.com/FFmpeg/FFmpeg/blob/n9.0/libavcodec/jrevdct.c"
+    }
+   ],
+   "project": "https://www.ijg.org",
+   "source": "https://github.com/FFmpeg/FFmpeg/tree/refs/tags/n9.0",
+   "shipped": "Compiled into the FFmpeg decoder build above (Motion JPEG decoding).",
+   "kind": "wasm",
+   "via": "ffmpeg-libs",
+   "copyright": "Copyright (C) 1991, 1992, Thomas G. Lane",
+   "attribution": "This software is based in part on the work of the Independent JPEG Group."
+  },
+  {
    "id": "libavif",
    "name": "libavif",
    "version": "1.0.1",

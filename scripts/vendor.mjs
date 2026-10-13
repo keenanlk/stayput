@@ -1,5 +1,5 @@
 // Copies the WebAssembly decoders listed in src/data/vendor.json from node_modules
-// into public/vendor/<name>@<version>/, so the site serves them itself instead of
+// (or, for "local" entries, a build committed in this repository) into public/vendor/<name>@<version>/, so the site serves them itself instead of
 // loading them from a CDN. Runs from an integration in astro.config.mjs, so every
 // `astro build` and `astro dev` gets it. The version is
 // part of the path, so the files can be cached forever and an upgrade gets new URLs.
@@ -11,10 +11,13 @@ const vendor = JSON.parse(await readFile(new URL('src/data/vendor.json', root), 
 const out = new URL('public/vendor/', root);
 await rm(out, { recursive: true, force: true });
 for (const lib of Object.values(vendor)) {
-  const pkgDir = new URL(`node_modules/${lib.package}/`, root);
-  const installed = JSON.parse(await readFile(new URL('package.json', pkgDir), 'utf8')).version;
-  if (installed !== lib.version) {
-    throw new Error(`${lib.package} is ${installed} in node_modules but src/data/vendor.json says ${lib.version}; update one to match.`);
+  // A decoder built from source in this repository ("local") is read from that folder, not from node_modules.
+  const pkgDir = new URL(lib.local ?? `node_modules/${lib.package}/`, root);
+  if (!lib.local) {
+    const installed = JSON.parse(await readFile(new URL('package.json', pkgDir), 'utf8')).version;
+    if (installed !== lib.version) {
+      throw new Error(`${lib.package} is ${installed} in node_modules but src/data/vendor.json says ${lib.version}; update one to match.`);
+    }
   }
   for (const [dest, src] of Object.entries(lib.files)) {
     const target = new URL(`${vendorDir(lib)}${dest}`, out);

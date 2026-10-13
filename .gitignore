@@ -1,5 +1,7 @@
 node_modules/
 dist/
+# the committed AVI decoder build (see vendor-builds/libav-avi/README.md)
+!vendor-builds/libav-avi/dist/
 .astro/
 .vercel/
 test-results/

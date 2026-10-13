@@ -53,7 +53,11 @@ const PLAYS_EVERYWHERE_AUDIO: AudioCodec[] = ['aac', 'mp3'];
 
 export type ConvertFormat = 'mp4' | 'mov';
 
-export const convertToMp4 = (file: File, opts: ConvertOptions) => convertVideo(file, opts, 'mp4');
+export async function convertToMp4(file: File, opts: ConvertOptions): Promise<ConvertResult> {
+  // AVI has no browser reader or decoder: it goes to the worker with the separately loaded decoder module.
+  const { isAvi, convertAvi } = await import('./avi-convert');
+  return (await isAvi(file)) ? convertAvi(file, opts) : convertVideo(file, opts, 'mp4');
+}
 export const convertToMov = (file: File, opts: ConvertOptions) => convertVideo(file, opts, 'mov');
 
 async function convertVideo(file: File, opts: ConvertOptions, container: ConvertFormat): Promise<ConvertResult> {

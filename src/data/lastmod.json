@@ -20,8 +20,8 @@
   "hash": "9994c502bbb85e81"
  },
  "/about": {
-  "date": "2026-10-12",
-  "hash": "5fe8d610d79f5e9a"
+  "date": "2026-10-13",
+  "hash": "6a83b0252d64b775"
  },
  "/acapella-extractor": {
   "date": "2026-10-12",
@@ -50,6 +50,10 @@
  "/auto-caption-video": {
   "date": "2026-10-13",
   "hash": "0cd19554e9b21e6a"
+ },
+ "/avi-to-mp4": {
+  "date": "2026-10-13",
+  "hash": "846ff20aec26c0ca"
  },
  "/avif-to-jpg": {
   "date": "2026-10-12",
@@ -904,8 +908,8 @@
   "hash": "f2e0a7fc9e46d25e"
  },
  "/licenses": {
-  "date": "2026-10-12",
-  "hash": "b0cd1ad7a7c29314"
+  "date": "2026-10-13",
+  "hash": "10abd7ba65548da5"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-13",
@@ -920,8 +924,8 @@
   "hash": "94a54bc1dc656e19"
  },
  "/m4v-to-mp4": {
-  "date": "2026-10-12",
-  "hash": "ae2a515c91220d84"
+  "date": "2026-10-13",
+  "hash": "3907e2f8e3b5d0e2"
  },
  "/magic-eraser": {
   "date": "2026-10-12",
@@ -956,8 +960,8 @@
   "hash": "1b442b6f23188808"
  },
  "/mkv-to-mp4": {
-  "date": "2026-10-12",
-  "hash": "aecd43d15519bcaf"
+  "date": "2026-10-13",
+  "hash": "02a03e6a3bb3e8dc"
  },
  "/mov-to-gif": {
   "date": "2026-10-12",
@@ -969,7 +973,7 @@
  },
  "/mov-to-mp4": {
   "date": "2026-10-13",
-  "hash": "3ea44c4363fb0c8e"
+  "hash": "03bd4b779760997b"
  },
  "/mov-to-wav": {
   "date": "2026-10-12",
@@ -1136,8 +1140,8 @@
   "hash": "6ee9894ea40c6088"
  },
  "/privacy": {
-  "date": "2026-10-12",
-  "hash": "777f385be78c5d06"
+  "date": "2026-10-13",
+  "hash": "79dadb0a482e127b"
  },
  "/psd-to-jpg": {
   "date": "2026-10-12",
@@ -1712,8 +1716,8 @@
   "hash": "99b799798f7951c5"
  },
  "/tools/video-to-mp4": {
-  "date": "2026-10-12",
-  "hash": "6e212c6a234c4668"
+  "date": "2026-10-13",
+  "hash": "45e35243f7feb131"
  },
  "/tools/vocal-remover": {
   "date": "2026-10-12",
@@ -1812,8 +1816,8 @@
   "hash": "2bbd3044cd0060ef"
  },
  "/webm-to-mp4": {
-  "date": "2026-10-12",
-  "hash": "006f2cdb9e05b304"
+  "date": "2026-10-13",
+  "hash": "ed94e50e5b01641c"
  },
  "/webp-to-gif": {
   "date": "2026-10-12",

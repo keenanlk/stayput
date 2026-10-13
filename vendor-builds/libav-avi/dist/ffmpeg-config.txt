@@ -1,0 +1,16 @@
+--enable-protocol=data --enable-protocol=file
+--enable-swscale --enable-filter=scale
+--enable-swresample --enable-filter=aresample
+--enable-demuxer=avi
+--enable-parser=mpeg4video
+--enable-parser=mpegaudio
+--enable-parser=ac3
+--enable-decoder=mpeg4
+--enable-decoder=mjpeg
+--enable-decoder=mp3
+--enable-decoder=mp2
+--enable-decoder=ac3
+--enable-decoder=pcm_s16le
+--enable-decoder=pcm_u8
+--enable-decoder=pcm_alaw
+--enable-decoder=pcm_mulaw
