@@ -119,6 +119,10 @@ export const engines: Record<string, Engine> = {
     how: 'gifuct-js (MIT) reads each GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. The frames of all the GIFs are drawn in order on one canvas the size of the first GIF, and gifenc’s (MIT) colour quantizer and LZW coder write them back as one GIF with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Reaction GIFs and screen recordings are often personal. Here the GIFs are joined in this tab: the files are not uploaded, the limit is your device’s memory (phones hold less), and no watermark is added.',
   },
+  'gif-speed': {
+    how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, so partial frames and disposal rules are resolved into whole pictures. The frames are put in the new order, each frame’s delay is multiplied by the speed and rounded to whole hundredths of a second, and gifenc’s (MIT) colour quantizer and LZW coder write them back with the loop setting. The new GIF is assembled in memory.',
+    versus: 'Here the GIF is re-timed in this tab: the file is not uploaded, the limit is your device’s memory (phones hold less), and no watermark is added.',
+  },
   'crop-gif': {
     how: 'Your browser draws the first frame of the GIF so you can place the box. gifuct-js (MIT) then reads the GIF byte by byte in your tab and every frame is composited the way browsers play it; the part inside the box is cut from each frame, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Here the GIF is cropped in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), and no watermark is added.',
