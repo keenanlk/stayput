@@ -63,6 +63,13 @@
     "entry": "worker-bundle.js",
     "files": { "worker-bundle.js": "dist/worker-bundle.js", "libarchive.wasm": "dist/libarchive.wasm", "LICENSE": "LICENSE" }
   },
+  "sevenzip": {
+    "package": "7z-wasm",
+    "version": "1.2.0",
+    "entry": "7zz.es6.js",
+    "files": { "7zz.es6.js": "7zz.es6.js", "7zz.wasm": "7zz.wasm" },
+    "licences": { "LICENSE-7zip.txt": "vendor-licenses/7z-wasm/License.txt", "unRarLicense.txt": "vendor-licenses/7z-wasm/unRarLicense.txt" }
+  },
   "tesseract": {
     "package": "tesseract.js",
     "version": "7.0.0",
