@@ -11,7 +11,7 @@ export const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G�
 export interface Instrument {
   id: string;
   label: string;
-  /** Open strings, low to high, as MIDI note numbers. */
+  /** Open strings as MIDI note numbers, in the order players name them (low to high, except re-entrant tunings). */
   strings: number[];
 }
 
@@ -23,6 +23,9 @@ export const instruments: Instrument[] = [
   { id: 'ukulele', label: 'Ukulele, standard (G C E A)', strings: [67, 60, 64, 69] },
   { id: 'ukulele-low-g', label: 'Ukulele, low G (G C E A)', strings: [55, 60, 64, 69] },
   { id: 'violin', label: 'Violin (G D A E)', strings: [55, 62, 69, 76] },
+  { id: 'cello', label: 'Cello (C G D A)', strings: [36, 43, 50, 57] },
+  { id: 'banjo', label: 'Banjo, 5-string open G (g D G B D)', strings: [67, 50, 55, 59, 62] },
+  { id: 'mandolin', label: 'Mandolin (G D A E)', strings: [55, 62, 69, 76] },
 ];
 
 export const instrumentById = (id: string) => instruments.find((i) => i.id === id) ?? instruments[0]!;
@@ -56,6 +59,24 @@ export function nearestString(freq: number, strings: number[], a4 = 440): { inde
     if (!best || Math.abs(cents) < Math.abs(best.cents)) best = { index, cents };
   });
   return best;
+}
+
+/** Readings of the held note needed, and windows (50 ms each) an octave tail may be held for. */
+export const OCTAVE_HOLD = { minHeld: 3, maxSkipped: 8 };
+
+/**
+ * True for a reading about an octave above a note that has been held for a few
+ * readings, taken while the sound is getting quieter. As a short or heavy string
+ * dies away its fundamental fades before its second harmonic does, and the
+ * detector then correctly reports the harmonic; the tuner should keep showing
+ * the note the player plucked. A fresh pluck an octave up is louder than the
+ * tail, so it passes; so does a steady note that really moves up an octave,
+ * within a window or two. A note just started (the attack can read an octave
+ * low) is never held, and no tail is held for more than `maxSkipped` windows.
+ */
+export function isDecayOctaveJump(freq: number, held: number, rms: number, lastRms: number, heldCount: number, skipped: number): boolean {
+  const cents = 1200 * Math.log2(freq / held);
+  return cents > 1100 && cents < 1300 && rms < lastRms && heldCount >= OCTAVE_HOLD.minHeld && skipped < OCTAVE_HOLD.maxSkipped;
 }
 
 export interface Pitch {

@@ -27,7 +27,7 @@ function leadOf(path: string) {
 const chatgpt = ['/auto-caption-video', '/burn-subtitles-into-video', '/tools/unlock-pdf', '/tools/mute-video', '/video-to-subtitles', '/tools/gif-to-mp4'];
 
 test('every tool and landing page has its lead in the HTML, between the heading and the tool controls', () => {
-  expect(tools).toHaveLength(102);
+  expect(tools).toHaveLength(104);
   expect(pages.length).toBe(tools.length + pairs.length + presets.length);
   for (const { path, lead } of pages) {
     const { text, at, page } = leadOf(path);
@@ -62,7 +62,7 @@ test('hand-written leads on the six most-visited pages say what the code does', 
   expect(lead('/tools/mute-video')).toMatch(/same format/);
   expect(lead('/tools/gif-to-mp4')).toMatch(/no sound track/);
   // Model tools carry their download size and the offline note.
-  expect(lead('/tools/remove-background')).toMatch(/about 46 MB.*offline/);
+  expect(lead('/tools/remove-background')).toMatch(/about 42 MB in all.*offline/);
   expect(lead('/tools/vocal-remover')).toMatch(/about 67 MB.*offline/);
   expect(lead('/tools/transcribe')).toMatch(/about 77 MB, or 95 MB on computers with WebGPU.*offline/);
   // A base tool's hand-written lead must not leak onto its presets.

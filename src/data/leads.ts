@@ -17,6 +17,7 @@ const does: Record<string, string> = {
   'convert-image': 'Converts images between JPG, PNG, WebP, GIF, BMP, TIFF, ICO and PDF, and reads HEIC, AVIF, JXL and SVG as input.',
   'compress-image': 'Makes JPG, PNG and WebP images smaller: pick a quality, fit a file size such as 100 KB, or resize to exact pixels, for a single file or a batch.',
   'resize-gif': 'Changes the width and height of animated GIFs by percent or in exact pixels, keeping the animation, frame timing and loop.',
+  'add-text-to-gif': 'Puts text on every frame of an animated GIF, with the font, colour and outline you choose, and saves a new GIF with the same timing.',
   'crop-gif': 'Crops an animated GIF to a box you draw, a square, 16:9 or 9:16, keeping every frame, its timing and the loop.',
   'compress-gif': 'Shrinks animated GIFs by dropping unchanged pixels, reducing colours, resizing or removing frames, and saves a smaller GIF.',
   'compress-png': 'Compresses PNG files with a smart colour palette or losslessly, keeps transparency, and saves smaller PNGs.',
@@ -114,6 +115,7 @@ const does: Record<string, string> = {
   'crop-pdf': 'Crops PDF pages to an area you draw, or trims white margins from every page in one click.',
   'redact-pdf': 'Blacks out names, numbers and addresses in a PDF so the text underneath is removed, not just covered.',
   'file-checksum': 'Computes the MD5, SHA-1 or SHA-256 checksum of a file so you can compare it with the one the publisher lists.',
+  'audio-splitter': 'Splits one audio file into separate MP3 or WAV parts at the times you set or at equal lengths.',
   'json-to-csv': 'Converts JSON to CSV or CSV to JSON, flattening nested objects, with the delimiter, headers and Excel-friendly encoding you choose.',
 };
 
@@ -127,10 +129,10 @@ interface Download {
 
 /** Tools that download a model or engine on first use, by base tool slug. */
 const downloads: Record<string, Download> = {
-  'remove-background': { what: 'cut-out model', size: '46 MB' },
-  'sticker-maker': { what: 'cut-out model', size: '46 MB' },
-  'passport-photo': { what: 'face finder and cut-out model', size: '50 MB' },
-  'profile-picture-maker': { what: 'face finder and cut-out model', size: '50 MB' },
+  'remove-background': { what: 'cut-out model', size: '42 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 42 MB in all) to your browser, and after that the tool works offline.' },
+  'sticker-maker': { what: 'cut-out model', size: '42 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 42 MB in all) to your browser, and after that the tool works offline.' },
+  'passport-photo': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
+  'profile-picture-maker': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
   'upscale-image': { what: 'upscaling model', size: '4.9 MB' },
   'remove-object': { what: 'object removal model', size: '28 MB' },
   'image-to-text': { what: 'text reader', size: '6 MB' },
@@ -158,7 +160,7 @@ const downloads: Record<string, Download> = {
  * on the first visit (pages, scripts and the image decoders).
  */
 const firstUseEngines = [
-  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-converter', 'compress-audio', 'volume-booster',
+  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-splitter', 'audio-converter', 'compress-audio', 'volume-booster',
   'pitch-changer', 'remove-silence', 'voice-recorder', 'remove-noise', 'file-checksum',
   'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image', 'qr-code-scanner',
 ];

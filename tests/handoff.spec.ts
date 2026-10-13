@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { allowServiceWorker } from './allow-sw';
 import { handoffs } from '../src/data/handoff.ts';
 import { nextSteps } from '../src/data/next-steps.ts';
 import { tools } from '../src/data/tools.ts';
@@ -16,6 +17,7 @@ const clip = fx('static/clip.webm');
 
 // Service-worker requests are not routed through the page, so let the worker run and watch the whole context.
 test.use({ serviceWorkers: 'allow' });
+test.beforeEach(async ({ context }) => allowServiceWorker(context));
 
 /** Pin the experiment arm so the next-step links show (they appear for half of visits). */
 async function arm(page: Page) {

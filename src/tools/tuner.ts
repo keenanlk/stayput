@@ -1,6 +1,6 @@
 import { createShell } from '../lib/shell';
 import { trackToolRun } from '../lib/analytics';
-import { detectPitch, instrumentById, midiToFreq, nearestString, noteFor, noteLabel } from '../lib/tuner';
+import { detectPitch, instrumentById, isDecayOctaveJump, midiToFreq, nearestString, noteFor, noteLabel } from '../lib/tuner';
 
 /**
  * Tuner. The live microphone input is read in the page (Web Audio) and its
@@ -37,6 +37,8 @@ let analyser: AnalyserNode | undefined;
 let timer = 0;
 let recent: number[] = [];
 let lastHeard = 0;
+let lastRms = 0;
+let skipped = 0;
 let tunedSince = 0;
 let tracked = false;
 let toneCtx: AudioContext | undefined;
@@ -99,6 +101,11 @@ function listen() {
   analyser.getFloatTimeDomainData(buf);
   const pitch = detectPitch(buf, ctx.sampleRate);
   const now = performance.now();
+  let energy = 0;
+  for (const v of buf) energy += v * v;
+  const rms = Math.sqrt(energy / buf.length);
+  const before = lastRms;
+  lastRms = rms;
   if (!pitch) {
     if (now - lastHeard > HOLD_MS && panel.dataset.signal !== 'none') {
       recent = [];
@@ -106,6 +113,13 @@ function listen() {
     }
     return;
   }
+  // The tail of a note can read an octave up as the fundamental fades first: keep the held note.
+  if (recent.length && isDecayOctaveJump(pitch.freq, recent[recent.length - 1]!, rms, before, recent.length, skipped)) {
+    skipped++;
+    lastHeard = now;
+    return;
+  }
+  skipped = 0;
   // A jump of more than a semitone starts a new note; otherwise smooth with the median of the last readings.
   if (recent.length && Math.abs(1200 * Math.log2(pitch.freq / recent[recent.length - 1]!)) > 100) recent = [];
   recent.push(pitch.freq);
@@ -194,6 +208,8 @@ async function start() {
   ctx.createMediaStreamSource(stream).connect(analyser);
   recent = [];
   lastHeard = 0;
+  lastRms = 0;
+  skipped = 0;
   tunedSince = 0;
   nameEl.textContent = '–';
   octaveEl.textContent = '';

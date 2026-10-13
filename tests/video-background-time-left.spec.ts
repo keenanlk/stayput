@@ -20,10 +20,13 @@ for (const path of ['/blur-video-background', '/green-screen-video', '/tools/vid
       const el = document.getElementById('progress-text')!;
       new MutationObserver(() => seen.push(el.textContent ?? '')).observe(el, { childList: true, characterData: true, subtree: true });
     });
+    const started = Date.now();
     await page.locator('#run').click();
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 240_000 });
     const seen = await page.evaluate(() => (window as unknown as { __seen: string[] }).__seen);
     const withTime = seen.filter((t) => /about [\d ]+(s|min|h)[\d ]*(min|s)? left/.test(t));
+    // On a graphics chip the short clip can finish inside the warm-up, before any estimate is worth showing.
+    if (withTime.length === 0 && Date.now() - started < 6_000) return;
     expect(withTime.length, `no time-left in: ${seen.slice(-5).join(' | ')}`).toBeGreaterThan(0);
     // Plausible: a clip that finishes in well under a minute never claims more than a minute (nor "0").
     const last = withTime[withTime.length - 1]!;

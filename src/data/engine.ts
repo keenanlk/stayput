@@ -111,6 +111,10 @@ export const engines: Record<string, Engine> = {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. Each frame is drawn at the new width and height on a canvas, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Reaction GIFs and screen recordings are often personal. Here the GIF is resized in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), no watermark is added, and you can resize several at once.',
   },
+  'add-text-to-gif': {
+    how: 'The GIF is decoded frame by frame with gifuct-js (MIT) and each frame is composited the way browsers play it. Your text is drawn on every frame on a canvas by your browser, and the frames are written back as a GIF with gifenc’s (MIT) colour quantizer and LZW coder. Everything runs in your tab.',
+    versus: 'The GIF is read and rewritten on your device, so the limit is how much memory your device has: a long or very large GIF may need a computer.',
+  },
   'crop-gif': {
     how: 'Your browser draws the first frame of the GIF so you can place the box. gifuct-js (MIT) then reads the GIF byte by byte in your tab and every frame is composited the way browsers play it; the part inside the box is cut from each frame, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Here the GIF is cropped in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), and no watermark is added.',
@@ -162,6 +166,10 @@ export const engines: Record<string, Engine> = {
   'trim-audio': {
     how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. The part you chose is copied, faded if asked, and written as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
     versus: 'Online audio cutters upload your file to a server, surround the download with ads, and some keep the file. Voice memos, interviews and unreleased tracks are private. Here the sound never leaves your device.',
+  },
+  'audio-splitter': {
+    how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. Each part is copied out between the points you chose, with no fades, so every part starts at the sample where the one before it ended, and is written as MP3 by LAME compiled to WebAssembly or as a 16-bit WAV. The parts are packed into a zip by code in the page.',
+    versus: 'The recording is decoded and cut on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
   },
   'audio-converter': {
     how: 'Your browser decodes the sound with the decoders it uses to play media on any website. The new file is written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, FLAC by a small lossless encoder in this site’s code (fixed predictors and Rice coding, as the FLAC format describes), and M4A or OGG by the browser’s own AAC and Opus encoders (WebCodecs), packed by Mediabunny (MPL-2.0). WAV and FLAC keep the original sample rate.',
