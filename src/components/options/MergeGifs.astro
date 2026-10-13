@@ -1,0 +1,21 @@
+---
+/** Option controls for merging GIFs: how a GIF of another shape is fitted, and the colour of the bars. */
+---
+<div class="field">
+  <label for="fit">If a GIF is a different shape</label>
+  <select id="fit">
+    <option value="contain" selected>Fit inside (bars)</option>
+    <option value="cover">Fill and crop</option>
+  </select>
+</div>
+<div class="field">
+  <label for="bars">Bar colour</label>
+  <div class="bars-row">
+    <input type="color" id="bars" value="#ffffff" aria-label="Bar colour" />
+    <label class="check"><input type="checkbox" id="transparent" /> Transparent bars</label>
+  </div>
+</div>
+<style>
+  .bars-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  #bars { width: 44px; height: 36px; padding: 2px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); }
+</style>

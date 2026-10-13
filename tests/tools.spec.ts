@@ -159,7 +159,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(105);
+  expect(await page.locator('.index .tool-card').count()).toBe(106);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -570,7 +570,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'audio-splitter', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'signature-maker', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'add-text-to-gif', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'bpm-key-finder', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image', 'json-to-csv'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'merge-gifs', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'audio-splitter', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'signature-maker', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'add-text-to-gif', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'bpm-key-finder', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image', 'json-to-csv'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -3117,7 +3117,7 @@ test('Trim video copies the part between start and end, keeps the format, and no
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(clip);
   // The recording has no length in its header; the page finds it anyway.
-  await expect(page.locator('#vg-panel')).toBeVisible();
+  await expect(page.locator('#vg-panel[data-duration]')).toBeVisible();
   const length = Number(await page.locator('#vg-panel').getAttribute('data-duration'));
   expect(length).toBeGreaterThan(2.5);
   await expect(page.locator('#vg-end')).toHaveValue(String(length));
@@ -3146,7 +3146,7 @@ test('Trim video cuts exactly on request, and an end before the start is refused
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const clip = await recordClip(page);
   await page.locator('#file-input').setInputFiles(clip);
-  await expect(page.locator('#vg-panel')).toBeVisible();
+  await expect(page.locator('#vg-panel[data-duration]')).toBeVisible();
   await page.locator('#vg-start').fill('2');
   await page.locator('#vg-end').fill('1');
   await expect(page.locator('#vg-estimate')).toHaveText('The end must come after the start.');
@@ -4269,9 +4269,16 @@ test('Watermark image draws the text over the whole photo at full size, and no b
 test('Watermark PDF stamps every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'watermark-pdf');
   const net = watchNetwork(page);
-  const source = readFileSync(fx('rotated.pdf'));
+  // Built here, in its own folder, so this test never depends on another test (or its parallel worker) having written it.
+  const rotated = await PDFDocument.create();
+  const rotatedPage = rotated.addPage([612, 792]);
+  rotatedPage.setRotation(degrees(90));
+  rotatedPage.drawText('Keep this text', { x: 60, y: 700, size: 20, font: await rotated.embedFont(StandardFonts.Helvetica) });
+  const rotatedPath = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'rotated.pdf');
+  writeFileSync(rotatedPath, await rotated.save());
+  const source = readFileSync(rotatedPath);
   const before = await PDFDocument.load(source);
-  const { downloads } = await run(page, ['rotated.pdf'], async () => {
+  const { downloads } = await run(page, [rotatedPath], async () => {
     await expect(page.locator('#wm-panel')).toBeVisible();
     await expect(page.locator('#wm-hint')).toContainText(`all ${before.getPageCount()} page`);
     await page.locator('#wm-text').fill('DRAFT');
@@ -4290,6 +4297,7 @@ test('Watermark PDF stamps every page, keeps the text, and no bytes leave the ta
   // The original text is still there to select and search.
   const was = (await textItems(new Uint8Array(source), 1)).map((t) => t.str).join('');
   const now = (await textItems(out, 1)).map((t) => t.str).join('');
+  expect(was).toContain('Keep this text');
   expect(now).toBe(was);
   net.assertNothingLeft(['rotated.pdf']);
   expect(errors).toEqual([]);
@@ -6875,9 +6883,16 @@ async function yellowBands(page: Page, bytes: Uint8Array, t: number) {
   return page.evaluate(async ({ data, t }) => {
     const v = document.createElement('video');
     v.muted = true;
+    v.preload = 'auto';
     v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
     await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
-    await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); v.currentTime = t; });
+    // `seeked` fires once for every seek and says the frame at `t` is current. (A frame callback on a detached,
+    // paused video is not guaranteed to fire, which left this wait hanging for the whole test timeout.)
+    await new Promise<void>((ok, bad) => {
+      v.onseeked = () => ok();
+      v.onerror = () => bad(new Error('video will not seek'));
+      v.currentTime = t;
+    });
     const c = document.createElement('canvas');
     c.width = v.videoWidth;
     c.height = v.videoHeight;

@@ -115,6 +115,10 @@ export const engines: Record<string, Engine> = {
     how: 'The GIF is decoded frame by frame with gifuct-js (MIT) and each frame is composited the way browsers play it. Your text is drawn on every frame on a canvas by your browser, and the frames are written back as a GIF with gifenc’s (MIT) colour quantizer and LZW coder. Everything runs in your tab.',
     versus: 'The GIF is read and rewritten on your device, so the limit is how much memory your device has: a long or very large GIF may need a computer.',
   },
+  'merge-gifs': {
+    how: 'gifuct-js (MIT) reads each GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. The frames of all the GIFs are drawn in order on one canvas the size of the first GIF, and gifenc’s (MIT) colour quantizer and LZW coder write them back as one GIF with their delays and the loop setting. The new GIF is assembled in memory.',
+    versus: 'Reaction GIFs and screen recordings are often personal. Here the GIFs are joined in this tab: the files are not uploaded, the limit is your device’s memory (phones hold less), and no watermark is added.',
+  },
   'crop-gif': {
     how: 'Your browser draws the first frame of the GIF so you can place the box. gifuct-js (MIT) then reads the GIF byte by byte in your tab and every frame is composited the way browsers play it; the part inside the box is cut from each frame, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Here the GIF is cropped in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), and no watermark is added.',

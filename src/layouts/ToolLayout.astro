@@ -25,6 +25,8 @@ interface Props {
 }
 const { tool, intro = [], engineSlug, base } = Astro.props;
 const path = toolPath(tool);
+// Video tools where iOS's own Photos picker prepares (transcodes or downloads) the clip before the page sees it.
+const iosPickerNote = ['add-subtitles-to-video', 'video-background-remover', 'compress-video', 'trim-video', 'video-to-mp3'].includes(base ?? tool.slug);
 const url = new URL(path, Astro.site).toString();
 const lead = leadFor(tool, base ?? tool.slug, base ? 'landing' : 'tool');
 const engine = engineFor(engineSlug ?? tool.slug);
@@ -138,6 +140,7 @@ const jsonLd = [
         <span id="drop-hint">or click to choose {tool.multiple ? 'files' : 'a file'}. {tool.multiple ? 'Batches welcome.' : ''}</span>
       </div>
       <input class="visually-hidden" id="file-input" type="file" accept={tool.accept} multiple={tool.multiple} tabindex="-1" aria-hidden="true" />
+      {iosPickerNote && <p class="hint" id="ios-picker-note" hidden>Your iPhone may take a few seconds to prepare the video first, longer if it's stored in iCloud.</p>}
       <ul class="file-list" id="file-list" aria-live="polite" aria-label="Selected files"></ul>
       <slot name="panel" />
       <div class="options" id="options">

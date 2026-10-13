@@ -226,9 +226,9 @@ export const tools: Tool[] = [
   {
     slug: 'compress-gif',
     name: 'Compress GIF',
-    title: 'GIF Compressor: Reduce GIF File Size Online, No Upload | Stayput',
+    title: 'GIF Compressor for Discord and Slack: Make a GIF Smaller | Stayput',
     description:
-      'Compress animated GIFs in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. Often 50 to 80% smaller. No upload.',
+      'Compress animated GIFs for Discord, Slack or email in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. No upload.',
     heading: 'Compress a GIF',
     tagline: 'Make an animated GIF small enough for Discord, Slack, email or a web page. It is compressed on this device and never uploaded.',
     category: 'images',
@@ -252,7 +252,7 @@ export const tools: Tool[] = [
         a: 'Most GIFs store every frame whole, even when only a small part of the picture moves. Each frame is rewritten to hold just the area that changed, with the unchanged pixels left see-through so the frame before shows through. Medium and Strong also ignore changes too small to notice and use fewer colours, which is where GIF compressors such as gifsicle and ezgif get most of their savings.',
       },
       {
-        q: 'How do I get a GIF under a size limit?',
+        q: 'How do I compress a GIF for Discord or get it under a size limit?',
         a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels (to set exact pixel dimensions instead, use [Resize GIF](/tools/resize-gif)). Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB.',
       },
       {
@@ -3224,6 +3224,64 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'merge-gifs',
+    name: 'Merge GIFs',
+    title: 'Merge GIFs: Join Several GIFs into One, No Upload | Stayput',
+    description: 'Join two or more animated GIFs into one GIF, in the order you set. Different sizes are fitted for you. Free, no account, and your GIFs are not uploaded.',
+    heading: 'Merge GIFs into one',
+    tagline: 'Join several animated GIFs end to end, in the order you choose. They are put together on this device, and the GIFs are not uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop the GIFs to merge',
+    action: 'Merge GIFs',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): long or large GIFs may need a computer.',
+    keywords: ['merge gifs', 'combine gifs', 'join gifs', 'merge gif online', 'combine gifs into one', 'put gifs together', 'concatenate gifs'],
+    lead: 'Joins two or more animated GIFs into one GIF that plays them one after another, in the order you set, and saves it as a new GIF. Every frame keeps its own timing, and a GIF of another size is fitted to the size of the first one. It is free, needs no account and adds no watermark, and your GIFs are not uploaded: they are read and rewritten by code in this tab. The limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline.',
+    steps: [
+      'Drop two or more GIFs, or tap to pick them. Put them in order with the arrows in the list. The first one sets the size.',
+      'If a GIF is a different shape, choose Fit inside to show all of it with bars of a colour you pick, or Fill and crop to cover the frame and trim the edges.',
+      'Press Merge GIFs. The frames are joined in that order, and the new GIF downloads from your browser.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have intro.gif, 480 by 270 pixels with 30 frames at 0.1 seconds each, and loop.gif, 400 by 400 pixels with 20 frames at 0.05 seconds each. Drop intro.gif first and loop.gif second. The first GIF sets the size, so the result is 480 by 270.',
+          'loop.gif is square, so Fit inside shrinks it to 270 by 270 and puts it in the middle, with a white bar 105 pixels wide on each side. Press Merge GIFs and you download merged.gif: 480 by 270 pixels, 3 seconds of intro followed by 1 second of loop, 4 seconds in all.',
+        ],
+      },
+      {
+        heading: 'What you can set',
+        bullets: [
+          'The order, with the arrows in the file list. The first GIF sets the size of the result.',
+          'Fit inside, which shows all of each GIF, or Fill and crop, which covers the frame and trims what overflows from the centre.',
+          'The colour of the bars that Fit inside leaves, white to start with, or transparent.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'The GIFs play straight after one another. There is no transition between them and no pause, and it does not change how fast any of them plays.',
+          'The result is one GIF, so each frame holds at most 256 colours. To make the file lighter afterwards, use [Compress GIF](/tools/compress-gif).',
+          'It joins GIFs only. For a video clip, use [Video to GIF](/tools/video-to-gif) first, and for still pictures, use the [GIF maker](/tools/gif-maker).',
+          'Every frame is held in memory while the new GIF is written, so a long or large result may need a computer, and a phone may run out of memory sooner.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I merge GIFs into one?', a: 'Drop two or more GIFs, put them in the order you want with the arrows in the list, and press Merge GIFs. The frames of the second GIF follow the last frame of the first, and so on, and the new GIF downloads with each frame’s own timing.' },
+      { q: 'What happens when the GIFs are different sizes?', a: 'The first GIF in the list sets the size of the result, so put the one whose shape you want first. Every other GIF is fitted inside that size without being stretched, and the space left over becomes bars in a colour you choose, white to start with. A smaller GIF is enlarged to fit, which can make it look soft. Choose Fill and crop to cover the frame instead, which trims the edges from the centre. For a size you pick yourself, merge first and then use [Resize GIF](/tools/resize-gif).' },
+      { q: 'Does the merged GIF keep each GIF’s speed?', a: 'Yes. Every frame keeps its own delay, so each part plays as fast as it did before and the merged GIF lasts as long as the originals added together. Frames with a delay of 10 milliseconds or less are written as 100 milliseconds, which is how browsers already play them. Two frames that look the same side by side may be written as one frame shown for longer, so the frame count can be lower while the length stays the same.' },
+      { q: 'What happens to a GIF with a transparent background?', a: 'With a bar colour chosen, transparent areas are filled with that colour, so the result is a solid picture and a smaller file. To keep transparency, set the bars to transparent. GIF transparency is on or off, so soft edges can look rough over a coloured page.' },
+      { q: 'Will the merged GIF loop?', a: 'It follows the loop setting of the first GIF in the list: if that GIF repeats forever, so does the merged one, and it repeats as a whole, from the first GIF to the last. If the first GIF plays once, the merged GIF plays once.' },
+      { q: 'Will the colours or the file size change?', a: 'They can. A GIF holds at most 256 colours per frame, and the frames are written again, so smooth gradients can look a little different. The file is usually about as large as the originals together, and a GIF fitted to a larger size comes out bigger. [Compress GIF](/tools/compress-gif) makes a GIF lighter afterwards.' },
+      { q: 'How many GIFs, or how long, can I merge?', a: 'The limit is your device’s memory, and phones hold less. Every frame of the merged GIF is held in memory while the file is written, so many GIFs, a long result or a large first GIF may need a computer. If the page says it is too large, merge fewer GIFs at a time, or make them smaller first with [Resize GIF](/tools/resize-gif).' },
+      { q: 'Can I merge GIFs without uploading them?', a: 'Yes. Your browser reads each GIF, joins the frames and writes the new GIF with code running in this tab. Open the network tab, run it, and your GIFs are not among the requests. After one visit and a short wait the page works offline.' },
+      { q: 'Can I merge a GIF with a video or a photo?', a: 'Not on this page, which takes GIFs only. To turn a video clip into a GIF first, use [Video to GIF](/tools/video-to-gif). To make a GIF from still pictures, use the [GIF maker](/tools/gif-maker), then merge the result here.' },
+    ],
+  },
+  {
     slug: 'gif-maker',
     name: 'GIF maker',
     title: 'GIF Maker: Make an Animated GIF from Images, No Upload | Stayput',
@@ -3700,6 +3758,10 @@ export const tools: Tool[] = [
         a: 'Password-protected ZIP files open after you enter the password: type it before pressing Extract. Encrypted 7z and RAR archives are not supported yet (in our tests they did not open even with the correct password). It cannot guess or remove a password you do not have.',
       },
       {
+        q: 'How do I remove the password from a ZIP file?',
+        a: 'Open the ZIP here, type its password before pressing Extract, then press Download all as zip. The new ZIP has the same files and no password. You need the password: this page cannot recover a forgotten one, and encrypted 7z and RAR archives are not supported yet.',
+      },
+      {
         q: 'Is the archive uploaded?',
         a: 'No. libarchive, the same open-source code behind the tar command on macOS and FreeBSD, runs in this tab as WebAssembly, so the archive and everything in it stay on your device.',
       },
@@ -3855,7 +3917,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this an alternative to remove.bg?',
-        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 42 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
+        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 12 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 42 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
       },
     ],
   },

@@ -87,6 +87,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Merge audio](https://stayput.dev/tools/merge-audio) (join MP3, WAV, M4A with silence or crossfades) | |
 | [Metronome](https://stayput.dev/tools/metronome) (any time signature, subdivisions, tap tempo) | |
 | [GIF maker](https://stayput.dev/tools/gif-maker) (animated GIF from photos or screenshots; timing, size, loop, there-and-back) | |
+| [Merge GIFs](https://stayput.dev/tools/merge-gifs) (join animated GIFs end to end, fitted to the first one's size) | |
 | [Image to SVG](https://stayput.dev/tools/image-to-svg) (trace PNG or JPG into vector shapes; black and white, logo or detailed) | |
 | [Transcribe audio to text](https://stayput.dev/tools/transcribe) (Whisper on your device; text, SRT or WebVTT; 16+ languages) | |
 | [Add subtitles to video](https://stayput.dev/tools/add-subtitles-to-video) (captions from the speech or your SRT, burned into the picture) | |

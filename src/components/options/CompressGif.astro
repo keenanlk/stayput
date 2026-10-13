@@ -21,13 +21,13 @@ const keeps = [
   ['2', 'Drop every second frame'],
   ['3', 'Keep one frame in three'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="level">Compression</label>
   <select id="level">
     {levels.map(([v, l]) => <option value={v} selected={v === level}>{l}</option>)}
   </select>
-  <p class="muted small">Each frame keeps only what changed from the one before. Stronger levels use fewer colours and ignore tiny changes.</p>
 </div>
 <div class="field">
   <label for="scale">Size</label>
@@ -40,5 +40,8 @@ const keeps = [
   <select id="frames">
     {keeps.map(([v, l]) => <option value={v} selected={v === frames}>{l}</option>)}
   </select>
-  <p class="muted small">Dropped frames give their time to the frame before, so the GIF plays at the same speed, a little less smoothly.</p>
 </div>
+<OptionDetails>
+  <p>Each frame keeps only what changed from the one before. Stronger levels use fewer colours and ignore tiny changes.</p>
+  <p>Dropped frames give their time to the frame before, so the GIF plays at the same speed, a little less smoothly.</p>
+</OptionDetails>

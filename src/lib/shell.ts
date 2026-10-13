@@ -14,7 +14,7 @@ import { droppedFiles } from './folder-drop';
 import { takeHandoff } from './handoff';
 import { releaseOutput } from './opfs-output';
 import { guardRun, interruptedError, KEEP_SCREEN_ON_HINT } from './wake-lock';
-import { isPhoneBrowser } from './phone-limit';
+import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 
 export interface ShellFile {
   id: number;
@@ -91,6 +91,17 @@ export function bindRange(id: string, outId: string, format: (v: number) => stri
 }
 
 /** Prefix an error with the file it came from, once. */
+/** A long file name cut in the middle, keeping its start and its extension: "IMG_20241012_1830…4821.mov". */
+export function shortName(name: string, max = 26): string {
+  if (name.length <= max) return name;
+  const dot = name.lastIndexOf('.');
+  const ext = dot > 0 && name.length - dot <= 6 ? name.slice(dot) : '';
+  const base = ext ? name.slice(0, dot) : name;
+  const room = Math.max(8, max - ext.length - 1);
+  const tail = Math.min(4, Math.floor(room / 3));
+  return `${base.slice(0, room - tail)}…${base.slice(base.length - tail)}${ext}`;
+}
+
 export function describeError(file: File, e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e);
   return msg.startsWith(file.name) ? msg : `${file.name}: ${msg}`;
@@ -145,6 +156,8 @@ export function createShell(opts: ShellOptions) {
   const multiple = root.dataset.multiple === 'true';
   const reorder = opts.reorder ?? multiple;
   const drop = $('drop');
+  const iosNote = document.getElementById('ios-picker-note');
+  if (iosNote && isIosBrowser()) iosNote.hidden = false;
   const input = $<HTMLInputElement>('file-input');
   const list = $('file-list');
   const run = $<HTMLButtonElement>('run');
@@ -335,7 +348,14 @@ export function createShell(opts: ShellOptions) {
 
   const progressApi: Progress = {
     set(text, fraction) {
-      progressText.textContent = text;
+      // Tool scripts put the file's own name in the message; a long one would fill the line, so show a short form
+      // (the full line stays in the title, which only ever shows on this device).
+      let short = text;
+      for (const { file } of [...files].sort((a, b) => b.file.name.length - a.file.name.length)) {
+        if (file.name.length > 26) short = short.split(file.name).join(shortName(file.name));
+      }
+      progressText.textContent = short;
+      progressText.title = short === text ? '' : text;
       progressBar.style.width = fraction === undefined ? '0%' : `${Math.round(Math.min(1, Math.max(0, fraction)) * 100)}%`;
     },
   };

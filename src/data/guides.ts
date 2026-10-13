@@ -2216,12 +2216,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-merge-multiple-videos-into-one',
-    title: 'How to Merge Multiple Videos Into One',
+    title: 'How to Combine or Merge Videos Into One on Any Device',
     description: 'Joining several video clips end to end into a single file is not something most phone camera rolls or built-in video apps do without a full editor. Here is what actually works, including a browser tool.',
-    heading: 'How to merge multiple videos into one',
+    heading: 'How to combine or merge videos into one on any device',
     dek: 'Most camera rolls can play clips one after another, not merge them into a single file. Here is what actually joins them.',
     keywords: ['how to merge videos', 'combine video clips into one', 'join videos together', 'merge mp4 files free', 'stitch videos into one file'],
-    updated: '2026-09-29',
+    updated: '2026-10-13',
     tools: ['merge-videos'],
     sections: [
       {
@@ -2251,7 +2251,7 @@ export const guides: Guide[] = [
       {
         h: 'A tool built just for joining clips',
         p: [
-          'Stayput\'s [merge videos](/tools/merge-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
+          'Stayput\'s [combine videos](/combine-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
         ],
       },
     ],
@@ -2846,7 +2846,7 @@ export const guides: Guide[] = [
     title: 'remove.bg Alternative: It Closes 1 Dec 2026 (Free, No Upload)',
     description: 'remove.bg says its website closes on 1 December 2026. Stayput removes backgrounds free, with no account, and your photos are not uploaded.',
     heading: 'remove.bg is closing: a free alternative that does not upload your photos',
-    dek: 'remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). Stayput\'s background remover is free, needs no account, and your photos are not uploaded.',
+    dek: 'remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 12 October 2026). Stayput\'s background remover is free, needs no account, and your photos are not uploaded.',
     keywords: ['remove.bg alternative', 'remove.bg shutting down', 'remove.bg closing', 'remove.bg canva', 'remove.bg replacement', 'free remove.bg alternative', 'background remover no upload', 'remove.bg alternative full resolution'],
     updated: '2026-10-13',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
@@ -2854,15 +2854,15 @@ export const guides: Guide[] = [
       {
         h: 'remove.bg is closing on 1 December 2026',
         p: [
-          'remove.bg\'s site shows this notice (checked 8 October 2026): "remove.bg\'s background removal is moving to Canva. The standalone website will no longer be available from 1 December 2026 at 9:00am CET."',
-          'Its API page (checked 8 October 2026) says: "Starting December 1, 2026, background removal moves to Leonardo.Ai, also part of Canva." Its terms and conditions (checked 8 October 2026) say: "All credits (including pay-as-you-go (PAYG) credits, monthly rollover credits and any other type of credits) may be used until December 1 2026 only. Any unused credits will expire on that date and are non-refundable."',
+          'remove.bg\'s site shows this notice (checked 12 October 2026): "remove.bg\'s background removal is moving to Canva. The standalone website will no longer be available from 1 December 2026 at 9:00am CET."',
+          'Its API page (checked 12 October 2026) says: "Starting December 1, 2026, background removal moves to Leonardo.Ai, also part of Canva." Its terms and conditions (checked 12 October 2026) say: "All credits (including pay-as-you-go (PAYG) credits, monthly rollover credits and any other type of credits) may be used until December 1 2026 only. Any unused credits will expire on that date and are non-refundable."',
           'For what happens to subscriptions, refunds and accounts, read the notice on remove.bg itself (remove.bg/faq); we have not summarised it here.',
         ],
       },
       {
         h: 'Why people look for an alternative',
         p: [
-          'On remove.bg\'s website, per its own site text (checked 8 October 2026), images up to 0.25 megapixels (for example 625 by 400 pixels) are always free; higher-resolution downloads up to 25 megapixels cost 1 credit per image.',
+          'remove.bg\'s pricing page (checked 12 October 2026) says its preview images "are always free". Its site text labels the free preview "up to 0.25 megapixels" and the Download HD option "up to 50 megapixels".',
           'remove.bg is also a web service that processes photos on its servers. Its stated retention practices are covered in [Is remove.bg safe?](/guides/is-remove-bg-safe).',
         ],
       },
@@ -2876,7 +2876,7 @@ export const guides: Guide[] = [
       {
         h: 'Where remove.bg and Stayput differ',
         p: [
-          'Stayput has no API, no desktop app and no Photoshop plug-in. If you used remove.bg through its API, that moves to Leonardo.Ai per remove.bg\'s API page (checked 8 October 2026).',
+          'Stayput has no API, no desktop app and no Photoshop plug-in. If you used remove.bg through its API, that moves to Leonardo.Ai per remove.bg\'s API page (checked 12 October 2026).',
           'We use one general-purpose model (ISNet, 8-bit weights). We have not run a side-by-side comparison with remove.bg, so we cannot say which cuts fine hair or low-contrast subjects better. Fine hair and fur are kept as soft edges; if part of the subject goes missing or background stays, try the "Keep around the edges" setting.',
           'Each photo takes a few seconds depending on your device, and the first run waits for the one-time download of about 42 MB.',
           'You can drop several photos and download them in one zip.',
@@ -2885,19 +2885,19 @@ export const guides: Guide[] = [
       {
         h: 'Before 1 December',
         p: [
-          'Per remove.bg\'s terms (checked 8 October 2026), unused credits expire on 1 December 2026 and are non-refundable, so use them or finish your cut-outs before then.',
+          'Per remove.bg\'s terms (checked 12 October 2026), unused credits expire on 1 December 2026 and are non-refundable, so use them or finish your cut-outs before then.',
         ],
       },
     ],
     faq: [
-      { q: 'Is remove.bg shutting down?', a: 'Its own site says so. A notice on remove.bg (checked 8 October 2026) states: "The standalone website will no longer be available from 1 December 2026 at 9:00am CET." It says background removal is moving to Canva.' },
-      { q: 'What happens to my remove.bg credits?', a: 'Its terms and conditions (checked 8 October 2026) say unused credits expire on 1 December 2026 and are non-refundable.' },
-      { q: 'What happens to the remove.bg API?', a: 'Its API page (checked 8 October 2026) says that from 1 December 2026 background removal moves to Leonardo.Ai, also part of Canva. Stayput has no API.' },
+      { q: 'Is remove.bg shutting down?', a: 'Its own site says so. A notice on remove.bg (checked 12 October 2026) states: "The standalone website will no longer be available from 1 December 2026 at 9:00am CET." It says background removal is moving to Canva.' },
+      { q: 'What happens to my remove.bg credits?', a: 'Its terms and conditions (checked 12 October 2026) say unused credits expire on 1 December 2026 and are non-refundable.' },
+      { q: 'What happens to the remove.bg API?', a: 'Its API page (checked 12 October 2026) says that from 1 December 2026 background removal moves to Leonardo.Ai, also part of Canva. Stayput has no API.' },
       { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model and the WebAssembly runtime that runs it (about 42 MB in all), so it needs a connection then.' },
       { q: 'Does it work as well as remove.bg?', a: 'We have not compared them side by side. Stayput uses one general-purpose model, and fine hair and low-contrast subjects may need a second try with the edge setting. There is no API, desktop app or plug-in.' },
       { q: 'Is the result full resolution?', a: 'It is the same size as your photo: a 12 megapixel photo gives a 12 megapixel cut-out, limited by what your device can hold in memory. There is no low-resolution preview and no watermark.' },
       { q: 'Can I do many photos at once?', a: 'Yes. Drop several photos and download them all in one zip.' },
-      { q: 'Why is remove.bg\'s free result small?', a: 'Per its site text (checked 8 October 2026), images up to 0.25 megapixels are free and higher-resolution downloads cost a credit.' },
+      { q: 'Why is remove.bg\'s free result small?', a: 'Its pricing page (checked 12 October 2026) says preview images are always free, and its site text labels the preview "up to 0.25 megapixels" and Download HD "up to 50 megapixels".' },
     ],
   },
   {
@@ -4064,8 +4064,8 @@ export const guides: Guide[] = [
     heading: 'How to convert a photo to black and white',
     dek: 'Just desaturating a colour photo often looks flat in black and white, because colours that looked different can turn into the same shade of grey. Here is why, and a free tool that fixes it.',
     keywords: ['how to convert photo to black and white', 'black and white photo converter free', 'convert image to grayscale online', 'make photo black and white free', 'photo to grayscale converter'],
-    updated: '2026-10-12',
-    tools: ['black-and-white-image'],
+    updated: '2026-10-13',
+    tools: ['black-and-white-image', 'grayscale-image', 'sepia-filter'],
     sections: [
       {
         h: 'Why plain desaturation can look flat',
@@ -4612,7 +4612,7 @@ export const guides: Guide[] = [
     heading: "How to open a RAR or 7z file",
     dek: "RAR and 7z are archive formats like ZIP, but not every device opens them. Here is what works on Windows, Mac and phones, and a way that needs no install.",
     keywords: ["how to open a rar file", "how to open rar file on mac", "how to open 7z file", "open rar files online", "extract rar without winrar"],
-    updated: "2026-10-04",
+    updated: "2026-10-13",
     tools: ["archive-extractor", "create-zip"],
     sections: [
       {
@@ -4633,7 +4633,7 @@ export const guides: Guide[] = [
       },
       {
         h: "In the browser, without uploading",
-        p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP."],
+        p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP.", "If all you have is a RAR, the [RAR extractor](/rar-extractor) page is set up for it; for a .7z, use the [7z opener](/open-7z-file)."],
         list: [
           "**Folders:** the paths inside the archive are kept, so files from a folder show as folder/name.",
           "**Passwords, as of October 2026:** a password-protected ZIP opens after you enter the password, so type it before pressing Extract; a wrong one shows an error. Encrypted 7z and RAR archives are not supported yet: in our tests they did not open even with the correct password. Use 7-Zip for an encrypted 7z, and WinRAR or The Unarchiver for an encrypted RAR.",

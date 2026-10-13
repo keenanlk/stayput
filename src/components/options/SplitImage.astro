@@ -28,6 +28,7 @@ const formats = [
   ['image/png', 'PNG (lossless)'],
   ['image/webp', 'WebP'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="layout">Grid</label>
@@ -57,7 +58,6 @@ const formats = [
     <label><input type="radio" name="order" value="reading" checked={order === 'reading'} /><span>Left to right</span></label>
     <label><input type="radio" name="order" value="post" checked={order === 'post'} /><span>In posting order</span></label>
   </div>
-  <p class="muted small">Posting order numbers the bottom-right tile 1, so posting 1, 2, 3… builds the grid on an Instagram profile.</p>
 </div>
 <div class="field">
   <label for="format">Output format</label>
@@ -74,3 +74,6 @@ const formats = [
   .split-custom .field { flex: 1 1 100px; }
   .split-custom input { width: 100%; }
 </style>
+<OptionDetails>
+  <p>Posting order numbers the bottom-right tile 1, so posting 1, 2, 3… builds the grid on an Instagram profile.</p>
+</OptionDetails>
