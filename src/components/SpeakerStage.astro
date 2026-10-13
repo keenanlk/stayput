@@ -1,0 +1,75 @@
+---
+/**
+ * The speaker test: a channel choice (left, right or both), a tone, a sweep
+ * and pink noise, with a low starting level and a warning before louder. It
+ * replaces the drop zone. Driven by src/tools/speaker-test.ts.
+ */
+import { FREQUENCIES, DEFAULT_FREQUENCY, DEFAULT_LEVEL, MAX_LEVEL } from '../lib/speaker-test';
+---
+<div id="spk-panel" class="spk-panel" data-state="stopped">
+  <div class="spk-deck">
+    <p class="spk-now" id="spk-now" aria-live="polite">Nothing is playing.</p>
+    <p class="muted small spk-sub" id="spk-sub">Starting quiet. Your device volume is separate: lower it first.</p>
+  </div>
+  <p class="spk-warn" id="spk-warn">Loud tones can hurt. Keep your device volume low, especially with headphones and at high pitches, which can be loud and tiring even when they seem faint. Stop if it hurts.</p>
+  <fieldset class="spk-channels">
+    <legend>Channel</legend>
+    <label class="spk-choice"><input type="radio" name="spk-channel" value="left" /><span>Left</span></label>
+    <label class="spk-choice"><input type="radio" name="spk-channel" value="right" /><span>Right</span></label>
+    <label class="spk-choice"><input type="radio" name="spk-channel" value="both" checked /><span>Both</span></label>
+  </fieldset>
+  <div class="spk-controls">
+    <button type="button" class="btn btn-primary btn-lg" id="spk-tone">Play tone</button>
+    <button type="button" class="btn btn-lg" id="spk-sweep">Sweep</button>
+    <button type="button" class="btn btn-lg" id="spk-noise">Pink noise</button>
+    <button type="button" class="btn btn-lg btn-ghost" id="spk-stop" disabled>Stop</button>
+  </div>
+  <div class="spk-options">
+    <div class="field">
+      <label for="spk-freq">Tone pitch</label>
+      <select id="spk-freq">
+        {FREQUENCIES.map((f) => <option value={String(f.hz)} selected={f.hz === DEFAULT_FREQUENCY}>{f.label}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="spk-level">Level in this page: <output id="spk-level-text" for="spk-level">{DEFAULT_LEVEL}%</output></label>
+      <input id="spk-level" type="range" min="0" max={MAX_LEVEL} step="1" value={DEFAULT_LEVEL} />
+    </div>
+    <p class="hint">A tone, the sweep and the noise stop by themselves after a minute, and when you leave this tab.</p>
+  </div>
+  <div class="spk-confirm" id="spk-confirm" hidden role="alert">
+    <p>This is louder than the starting level. Lower your device volume first, and stop if it hurts.</p>
+    <div class="spk-confirm-buttons">
+      <button type="button" class="btn btn-primary" id="spk-allow">Allow louder</button>
+      <button type="button" class="btn btn-ghost" id="spk-keep">Keep it quiet</button>
+    </div>
+  </div>
+  <p class="muted small spk-note" id="spk-note" aria-live="polite"></p>
+</div>
+<style is:global>
+  .tool-panel:has(#spk-panel) #drop,
+  .tool-panel:has(#spk-panel) #file-list,
+  .tool-panel:has(#spk-panel) .run-dock { display: none; }
+  .spk-panel { display: grid; gap: 16px; }
+  .spk-deck { min-height: 120px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius); display: grid; place-content: center; justify-items: center; gap: 6px; padding: 20px; text-align: center; }
+  .spk-now { margin: 0; font-size: 1.4rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .spk-sub { margin: 0; }
+  .spk-warn { margin: 0; padding: 10px 14px; border: 1px solid var(--warn); border-radius: var(--radius); color: var(--ink); font-size: 14px; }
+  .spk-channels { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .spk-channels legend { padding: 0; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+  .spk-choice { flex: 1 1 90px; position: relative; }
+  .spk-choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .spk-choice span { display: block; text-align: center; padding: 12px 10px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-weight: 600; }
+  .spk-choice input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .spk-choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .spk-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+  .spk-controls .btn { flex: 1 1 140px; }
+  .spk-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px 28px; align-items: end; }
+  .spk-options p { grid-column: 1 / -1; margin: 0; }
+  .spk-options input[type='range'] { width: 100%; accent-color: var(--accent); }
+  .spk-confirm { padding: 12px 14px; border: 1px solid var(--warn); border-radius: var(--radius); background: var(--surface-2); display: grid; gap: 10px; }
+  .spk-confirm p { margin: 0; font-weight: 600; }
+  .spk-confirm-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+  .spk-note { margin: 0; }
+  .spk-note.is-warn { color: var(--warn); font-weight: 600; }
+</style>

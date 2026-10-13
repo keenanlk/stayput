@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import SpeakerStage from '../../components/SpeakerStage.astro';
+const tool = toolBySlug('speaker-test')!;
+---
+<ToolLayout tool={tool}>
+  <SpeakerStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/speaker-test.ts"></script>
