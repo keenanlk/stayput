@@ -1281,7 +1281,7 @@
  },
  "/tools/add-subtitles-to-video": {
   "date": "2026-10-13",
-  "hash": "dbcf68dfd6e4a9ae"
+  "hash": "3f31642cbc767583"
  },
  "/tools/add-text-to-image": {
   "date": "2026-10-12",
@@ -1609,7 +1609,7 @@
  },
  "/tools/transcribe": {
   "date": "2026-10-13",
-  "hash": "a401fd28c60d7130"
+  "hash": "a162e4dfa775c875"
  },
  "/tools/trim-audio": {
   "date": "2026-10-12",

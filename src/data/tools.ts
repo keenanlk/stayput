@@ -3263,7 +3263,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'It depends on your device. On a recent laptop, ten minutes of sound takes about two to three minutes, plus a few seconds to load the model; on a phone it is several times slower. Keep the tab open while it works.',
+        a: 'It depends on your device. On a recent laptop, ten minutes of sound takes about two to three minutes, or about one minute on a computer with WebGPU, plus a few seconds to load the model; on a phone it is several times slower. Keep the tab open while it works.',
       },
       {
         q: 'Can it make subtitles for a video?',
@@ -3314,7 +3314,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'Writing the captions takes about two to three minutes for every ten minutes of speech on a laptop. Redrawing and encoding the video then depends on its length and resolution and on your device’s video encoder. Keep the tab open while it works.',
+        a: 'Writing the captions takes about two to three minutes for every ten minutes of speech on a laptop, or about one minute on a computer with WebGPU. Redrawing and encoding the video then depends on its length and resolution and on your device’s video encoder. Keep the tab open while it works.',
       },
       {
         q: 'Is there a watermark or a length limit?',
