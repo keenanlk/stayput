@@ -29,7 +29,10 @@ export function loadRnnoise(): Promise<Rnnoise> {
     .then((m) => m.Rnnoise.load())
     .catch((err) => {
       loading = undefined;
-      throw new Error(`The noise remover could not load (${err instanceof Error ? err.message : err}). Check your connection and try again.`);
+      const out = new Error('The noise remover could not load. Check your connection and try again.');
+      out.name = 'NoiseModelLoadError';
+      out.cause = err;
+      throw out;
     });
   return loading;
 }
@@ -107,4 +110,28 @@ export async function resample(chans: Float32Array[], from: number, to: number):
   src.start();
   const rendered = await ctx.startRendering();
   return Array.from({ length: chans.length }, (_, i) => rendered.getChannelData(i));
+}
+
+/**
+ * Give an error from one step of cleaning a file a name that says which step
+ * (the name is all a failed run records). Errors that already have a name of
+ * their own pass through; a bare Error takes the step's name, and an error
+ * that reads as running out of memory says so.
+ */
+export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseWriteError', e: unknown): Error {
+  if (e instanceof Error && e.name !== 'Error') return e;
+  const text = e instanceof Error ? e.message : String(e);
+  const memory = /memory|allocation|bad_alloc/i.test(text) || (e instanceof RangeError && /array|buffer|length/i.test(text));
+  const out = new Error(
+    memory
+      ? 'This device ran out of memory cleaning this video. Trim the video to a shorter length first, or use a computer.'
+      : stage === 'NoiseDecodeError'
+        ? 'The sound of this file could not be read. Try a shorter clip or another file.'
+        : stage === 'NoiseRemoveError'
+          ? 'The noise could not be removed from this sound. Reload the page and try again, or try a shorter clip.'
+          : 'The cleaned video could not be written. Reload the page and try again, or try a shorter clip.',
+  );
+  out.name = memory ? 'OutOfMemoryError' : stage;
+  out.cause = e;
+  return out;
 }
