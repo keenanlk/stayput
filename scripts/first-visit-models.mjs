@@ -6,10 +6,13 @@
 //   STAYPUT_PROD_CACHE=1 node scripts/serve.mjs 4321 &
 //   node scripts/first-visit-models.mjs --browser chromium --runs 10
 //   node scripts/first-visit-models.mjs --browser chrome --tool auto-caption-video
+//   node scripts/first-visit-models.mjs --with-sw --warm     # full visit, service worker included
 //
 // Options: --base URL (default http://localhost:4321), --browser chromium|chrome,
 // --tool auto-caption-video|video-to-subtitles|all, --runs N, --seconds N (clip length, 60),
-// --sw on|off (block the service worker), --warm (open the home page first and wait for the
+// --with-sw (let the site's service worker run; by default it is blocked, so a run against a
+// deployed site doesn't also precache every page, which costs hundreds of requests per fresh
+// profile; pass it when measuring the full first visit on purpose), --warm (open the home page first and wait for the
 // service worker to take control, as a visitor who browsed before using the tool), --profile (use a fresh on-disk profile, which has a real HTTP disk cache, instead of an in-memory context), --cache-dir PATH (macOS: point the browser's HTTP disk cache there and deny it every write under sandbox-exec, as a locked-down profile or full disk would), --headed.
 // Requests are counted from context-level events, the only place a service worker's show up.
 import { chromium } from '@playwright/test';
@@ -28,7 +31,7 @@ const browserName = arg('browser', 'chromium');
 const toolArg = arg('tool', 'all');
 const runs = Number(arg('runs', 10));
 const seconds = Number(arg('seconds', 60));
-const swBlocked = arg('sw', 'on') === 'off';
+const swBlocked = arg('with-sw', false) !== true;
 const warm = arg('warm', false) === true;
 const onDisk = arg('profile', false) === true;
 const cacheDir = arg('cache-dir', null);

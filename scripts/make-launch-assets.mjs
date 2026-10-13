@@ -33,7 +33,8 @@ const ctx = await browser.newContext({
   deviceScaleFactor: 1,
   colorScheme: 'light',
   // Routes do not see service worker fetches, so keep the worker out when faking the host.
-  serviceWorkers: showHost ? 'block' : 'allow',
+  // Only a local server may run it: against a deployed site it precaches hundreds of pages.
+  serviceWorkers: !showHost && /^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(local) ? 'allow' : 'block',
 });
 if (showHost) {
   await ctx.route(`${base}/**`, async (r) => r.fulfill({ response: await r.fetch({ url: r.request().url().replace(base, local) }) }));
