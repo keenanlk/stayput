@@ -67,6 +67,8 @@ for (const tool of tools) {
     const contextOptions = { serviceWorkers: swBlocked ? 'block' : 'allow', reducedMotion: 'reduce', baseURL: base };
     const browser = onDisk ? null : await chromium.launch(launch);
     const context = onDisk ? await chromium.launchPersistentContext(profile, { ...launch, ...contextOptions }) : await browser.newContext(contextOptions);
+    // register-sw.js skips automated browsers; a run that keeps the worker opts in.
+    if (!swBlocked) await context.addInitScript(() => { window.__stayputAllowSW = true; });
     const requested = {};
     const failures = [];
     context.on('request', (r) => MODEL.test(r.url()) && (process.env.DEBUG_REQ && console.log('  req', r.method(), r.headers().range ?? '-', r.serviceWorker() ? 'from-sw' : r.frame() ? 'frame' : 'worker', r.url().split('/').pop()), 1) && (requested[new URL(r.url()).pathname.split('/').pop()] = (requested[new URL(r.url()).pathname.split('/').pop()] ?? 0) + 1));

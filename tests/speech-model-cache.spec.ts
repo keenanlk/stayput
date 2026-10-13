@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
+import { allowServiceWorker } from './allow-sw';
 
 /**
  * The Whisper model (76 MB) must be fetched once and kept in exactly one place, the cache
@@ -9,6 +10,7 @@ import { fileURLToPath } from 'node:url';
  * (scripts/first-visit-models.mjs repeats this in fresh profiles, in Chromium and Chrome.)
  */
 test.use({ serviceWorkers: 'allow' });
+test.beforeEach(async ({ context }) => allowServiceWorker(context));
 
 const SPOKEN = fileURLToPath(new URL('./fixtures/static/jfk.wav', import.meta.url));
 const MODEL = /\/models\/whisper-base\/onnx\/.+\.onnx/;
