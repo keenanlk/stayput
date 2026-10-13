@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "a0a5ca55aeca3b42"
+  "hash": "cafdec05b6580e2d"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -1235,6 +1235,10 @@
   "date": "2026-10-13",
   "hash": "efcba3008df486df"
  },
+ "/reverse-gif": {
+  "date": "2026-10-13",
+  "hash": "d439ade1605395c7"
+ },
  "/rounded-corners-image": {
   "date": "2026-10-12",
   "hash": "3a0174132e709e09"
@@ -1283,6 +1287,10 @@
   "date": "2026-10-12",
   "hash": "d4b28d01558af196"
  },
+ "/slow-down-gif": {
+  "date": "2026-10-13",
+  "hash": "4869c24aad90885a"
+ },
  "/slow-down-video": {
   "date": "2026-10-12",
   "hash": "8b3bbaf344b8da26"
@@ -1294,6 +1302,10 @@
  "/speed-up-audio": {
   "date": "2026-10-13",
   "hash": "cb83e054e74a8a64"
+ },
+ "/speed-up-gif": {
+  "date": "2026-10-13",
+  "hash": "53eb8688a173b354"
  },
  "/speed-up-video": {
   "date": "2026-10-12",
@@ -1490,6 +1502,10 @@
  "/tools/gif-maker": {
   "date": "2026-10-12",
   "hash": "14341f58d4b41088"
+ },
+ "/tools/gif-speed": {
+  "date": "2026-10-13",
+  "hash": "4ecdd26ebeb2d40b"
  },
  "/tools/gif-to-mp4": {
   "date": "2026-10-12",
