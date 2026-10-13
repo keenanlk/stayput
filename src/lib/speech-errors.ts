@@ -9,8 +9,11 @@ export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelLoadError', 'OutOfMemo
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
 
 export class SpeechError extends Error {
+  /** What went wrong, as the page decides what to say; `name` may later be set to the underlying class so a failed run records the cause. */
+  readonly kind: SpeechErrorName;
   constructor(name: SpeechErrorName, message: string) {
     super(message);
+    this.kind = name;
     // Set by hand: a minified class name would not survive into the name.
     this.name = name;
   }
@@ -24,7 +27,23 @@ export const modelLoadError = () =>
   make('ModelLoadError', 'The speech model downloaded but could not be started in this browser. Reload the page and try again, or use an up-to-date Chrome, Edge or Firefox on a computer.');
 export const outOfMemoryError = () =>
   make('OutOfMemoryError', "This device ran out of memory while writing captions. Close other tabs and apps and try again, use a shorter recording, or use a desktop browser.");
-export const audioDecodeError = (message = 'No audio could be read from this file. It may have no sound track, or use an audio format this browser cannot decode.') => make('AudioDecodeError', message);
+/** Errors that only say a decoder or the container reader would not take the sound: what AudioDecodeError already means. */
+const REFUSALS = ['Error', 'EncodingError', 'NotSupportedError', 'DataError', 'UnsupportedInputFormatError'];
+
+/**
+ * No sound could be read. `cause` is whatever failed underneath: when it has a class name of its own (a
+ * RangeError, a NotReadableError) the run records that name, so the causes split in the stats; the message
+ * is never shown or recorded. A decoder that simply refuses the sound (EncodingError, NotSupportedError) is
+ * what AudioDecodeError already means, so it keeps that name.
+ */
+export const audioDecodeError = (message = 'No audio could be read from this file. It may have no sound track, or use an audio format this browser cannot decode.', cause?: unknown) => {
+  const err = make('AudioDecodeError', message);
+  if (cause === undefined) return err;
+  err.cause = cause;
+  const named = classNameOf(cause);
+  if (!REFUSALS.includes(named)) err.name = named as SpeechErrorName;
+  return err;
+};
 export const workerCrashError = () =>
   make('WorkerCrashError', 'The speech model stopped unexpectedly, which usually means the browser ran short of memory. Close other tabs and try again, or use a shorter recording.');
 /** The re-encode ran out of memory after the captions were written. The tool attaches the caption file it already made. */
