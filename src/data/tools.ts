@@ -1717,9 +1717,9 @@ export const tools: Tool[] = [
   {
     slug: 'trim-audio',
     name: 'Trim audio',
-    title: 'Trim Audio Online: Cut MP3, WAV, M4A or Audio from an MP4 | Stayput',
+    title: 'Trim Audio Online: Cut MP3, WAV or M4A, No Upload | Stayput',
     description:
-      'Cut the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from an MP4’s sound, in your browser. See the waveform, add fades, save MP3 or WAV. No upload.',
+      'Cut the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, in your browser. See the waveform, add fades, save as MP3 or WAV. No upload.',
     heading: 'Trim audio',
     tagline: 'Cut a song, a voice memo or a podcast down to the part you want, with fades if you like. Done on this device, never uploaded.',
     category: 'media',
