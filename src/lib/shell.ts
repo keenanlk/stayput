@@ -90,7 +90,6 @@ export function bindRange(id: string, outId: string, format: (v: number) => stri
   update();
 }
 
-/** Prefix an error with the file it came from, once. */
 /** A long file name cut in the middle, keeping its start and its extension: "IMG_20241012_1830…4821.mov". */
 export function shortName(name: string, max = 26): string {
   if (name.length <= max) return name;
@@ -102,6 +101,7 @@ export function shortName(name: string, max = 26): string {
   return `${base.slice(0, room - tail)}…${base.slice(base.length - tail)}${ext}`;
 }
 
+/** Prefix an error with the file it came from, once. */
 export function describeError(file: File, e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e);
   return msg.startsWith(file.name) ? msg : `${file.name}: ${msg}`;

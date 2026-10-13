@@ -23,6 +23,7 @@ const formats = [
   ['image/webp', 'WebP (smaller)'],
   ['image/jpeg', 'JPG (not for transparent)'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field wide">
   <label>New background</label>
@@ -50,14 +51,6 @@ const formats = [
     {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
   </select>
 </div>
-<p class="field wide model-note" id="model-note">
-  The first photo downloads the cut-out model and its WebAssembly runtime (about 42 MB in all, once). After that first download it is cached and works offline. If part of the subject goes missing, try Keep more; if bits of background stay, try Keep less.
-</p>
-
-<style>
-  .model-note {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-2);
-  }
-</style>
+<OptionDetails>
+  <p>The first photo downloads the cut-out model and its WebAssembly runtime (about 42 MB in all, once). After that first download it is cached and works offline. If part of the subject goes missing, try Keep more; if bits of background stay, try Keep less.</p>
+</OptionDetails>

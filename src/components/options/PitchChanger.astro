@@ -18,8 +18,8 @@ const formats = [
 <div class="field">
   <label for="semitones">Pitch <output id="semitones-out">{Number(semitones) > 0 ? `+${semitones}` : semitones} semitones</output></label>
   <input type="range" id="semitones" min="-12" max="12" step="1" value={semitones} />
-  <p class="muted small">12 semitones is one octave. The length stays the same.</p>
 </div>
+<p class="hint">12 semitones is one octave. The length stays the same.</p>
 <div class="field">
   <label for="speed">Speed</label>
   <select id="speed">

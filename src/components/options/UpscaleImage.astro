@@ -17,8 +17,8 @@ const formats = [
   <div class="segmented" role="radiogroup" aria-label="Enlarge">
     {['2', '3', '4'].map((v) => <label><input type="radio" name="scale" value={v} checked={v === scale} /><span>{v}×</span></label>)}
   </div>
-  <p class="muted small">Pictures are held under 16 megapixels, the most every browser can save.</p>
 </div>
+<p class="hint">Pictures are held under 16 megapixels, the most every browser can save.</p>
 <div class="field">
   <label for="format">Output format</label>
   <select id="format">

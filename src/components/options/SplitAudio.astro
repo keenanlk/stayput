@@ -1,5 +1,6 @@
 ---
 /** Option controls for Audio splitter: how to split, where, and the format. */
+import OptionDetails from '../OptionDetails.astro';
 ---
 <fieldset class="field sp-mode">
   <legend>Split</legend>
@@ -9,7 +10,6 @@
 <div class="field" id="sp-times-field">
   <label for="sp-times">Times where each new part starts</label>
   <input type="text" id="sp-times" placeholder="12:30, 31:05" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" />
-  <p class="muted small">Minutes and seconds (12:30), hours too (1:02:45), or plain seconds (750), separated by commas.</p>
 </div>
 <div class="field" id="sp-every-field" hidden>
   <label for="sp-every">Length of each part</label>
@@ -30,6 +30,9 @@
 </div>
 <p class="muted small sp-info" id="sp-info" aria-live="polite"></p>
 <ol class="sp-parts small" id="sp-parts" hidden></ol>
+<OptionDetails>
+  <p>Minutes and seconds (12:30), hours too (1:02:45), or plain seconds (750), separated by commas.</p>
+</OptionDetails>
 <style is:global>
   .sp-mode { border: 0; padding: 0; margin: 0; }
   .sp-mode legend { padding: 0; font-weight: 600; }

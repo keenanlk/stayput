@@ -1,6 +1,7 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import { toolBySlug } from '../../data/tools';
+import OptionDetails from '../../components/OptionDetails.astro';
 const tool = toolBySlug('protect-pdf')!;
 ---
 <ToolLayout tool={tool}>
@@ -15,8 +16,10 @@ const tool = toolBySlug('protect-pdf')!;
     </div>
     <div class="field wide">
       <label class="check"><input type="checkbox" id="show-password" /> Show password</label>
-      <p class="small muted">There is no way to recover a forgotten password. Keep the original, or save the password in a password manager.</p>
     </div>
+    <OptionDetails>
+      <p>There is no way to recover a forgotten password. Keep the original, or save the password in a password manager.</p>
+    </OptionDetails>
   </Fragment>
 </ToolLayout>
 <script src="../../tools/protect-pdf.ts"></script>

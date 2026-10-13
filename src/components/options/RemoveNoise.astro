@@ -27,8 +27,8 @@ import OptionDetails from '../OptionDetails.astro';
   <select id="format">
     {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
   </select>
-  <p class="muted small">Videos keep their picture untouched and get the cleaned sound.</p>
 </div>
+<p class="hint">Videos keep their picture untouched and get the cleaned sound.</p>
 <OptionDetails>
   <p>Strong keeps only the voice. Medium and Light leave a little of the room in, which sounds more natural.</p>
 </OptionDetails>

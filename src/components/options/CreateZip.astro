@@ -3,11 +3,11 @@
 interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
 const lock = defaults.lock === 'true';
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field wide">
   <button type="button" class="btn btn-sm" id="add-folder" style="justify-self: start">Add a folder</button>
   <input type="file" id="folder-input" webkitdirectory multiple hidden />
-  <p class="muted small">Or drop a folder on the page. Its subfolders are kept inside the ZIP.</p>
 </div>
 <div class="field">
   <label for="zip-name">ZIP name</label>
@@ -22,6 +22,9 @@ const lock = defaults.lock === 'true';
   <label class="check small"><input type="checkbox" id="show-password" /> Show password</label>
 </div>
 <p class="muted small" id="lock-note" hidden={!lock}>7-Zip, WinRAR, The Unarchiver, Keka and this site's archive opener open AES-locked ZIPs. The zip openers built into Windows and macOS may not, so tell the person you send it to.</p>
+<OptionDetails>
+  <p>Or drop a folder on the page. Its subfolders are kept inside the ZIP.</p>
+</OptionDetails>
 <script>
   const lock = document.getElementById('lock') as HTMLInputElement;
   const field = document.getElementById('password-field')!;

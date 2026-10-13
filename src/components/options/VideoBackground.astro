@@ -6,6 +6,7 @@ const bg = defaults.bg ?? 'blur';
 const strength = defaults.strength ?? '6';
 const color = defaults.color ?? '#00b140';
 const finder = defaults.finder ?? 'edges';
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label>New background</label>
@@ -32,4 +33,6 @@ const finder = defaults.finder ?? 'edges';
 </div>
 <p class="hint" id="image-hint" hidden={bg !== 'image'}>Drop a JPG or PNG with the video to fill the frame behind the person.</p>
 <p class="hint">Made for people. Fast is rougher around hair and in dim light.</p>
-<p class="hint" id="time-note">Can run slower than the video plays; the time left shows as it runs.</p>
+<OptionDetails>
+  <p id="time-note">Can run slower than the video plays; the time left shows as it runs.</p>
+</OptionDetails>

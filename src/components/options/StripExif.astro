@@ -1,11 +1,14 @@
 ---
 /** Option controls for the metadata remover, shared by the tool page and its landing pages. */
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label class="check"><input type="checkbox" id="keep-icc" checked /> Keep color profile (ICC)</label>
-  <span class="small muted">Recommended. Removing it can shift colors.</span>
 </div>
+<p class="hint">Recommended. Removing it can shift colors.</p>
 <div class="field">
   <label class="check"><input type="checkbox" id="apply-orientation" checked /> Apply orientation to sideways photos</label>
-  <span class="small muted">A sideways JPG is re-encoded at quality 95 (without its color profile) so it still displays upright. Untick to copy every file unchanged; a sideways photo may then show sideways.</span>
 </div>
+<OptionDetails>
+  <p>A sideways JPG is re-encoded at quality 95 (without its color profile) so it still displays upright. Untick to copy every file unchanged; a sideways photo may then show sideways.</p>
+</OptionDetails>

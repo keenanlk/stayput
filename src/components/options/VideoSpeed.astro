@@ -14,14 +14,17 @@ const speeds = [
   ['4', '4×'],
   ['8', '8× (timelapse)'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="speed">Speed</label>
   <select id="speed">
     {speeds.map(([v, l]) => <option value={v} selected={v === speed}>{l}</option>)}
   </select>
-  <p class="muted small">The sound keeps its pitch, so voices do not turn into chipmunks or growls.</p>
 </div>
 <div class="field">
   <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
 </div>
+<OptionDetails>
+  <p>The sound keeps its pitch, so voices do not turn into chipmunks or growls.</p>
+</OptionDetails>

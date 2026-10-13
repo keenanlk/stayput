@@ -18,6 +18,7 @@ const fits = [
   ['16', '16 MB (WhatsApp)'],
   ['25', '25 MB (Gmail and Outlook)'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="quality">Compression</label>
@@ -30,7 +31,6 @@ const fits = [
   <select id="fit">
     {fits.map(([v, l]) => <option value={v} selected={v === fit}>{l}</option>)}
   </select>
-  <p class="muted small">Long files are compressed harder, when needed, to come in under the limit.</p>
 </div>
 <div class="field">
   <label for="format">Save as</label>
@@ -42,3 +42,6 @@ const fits = [
 <div class="field">
   <label class="check"><input type="checkbox" id="mono" checked={mono} /> Mono (clearer speech at low sizes)</label>
 </div>
+<OptionDetails>
+  <p>Long files are compressed harder, when needed, to come in under the limit.</p>
+</OptionDetails>
