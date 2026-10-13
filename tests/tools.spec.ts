@@ -10,6 +10,7 @@ import { PDFDocument, PDFHexString, PDFName, PDFArray, PDFRawStream, decodePDFRa
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { inspect, sniffFormat } from '../src/lib/exif';
+import { allowServiceWorker } from './allow-sw';
 
 const fixtures = fileURLToPath(new URL('./fixtures/generated/', import.meta.url));
 const fx = (name: string) => fixtures + name;
@@ -723,6 +724,7 @@ async function decoderCache(page: Page, expected: 'cached' | 'none') {
 
 test.describe('decoder caching', () => {
   test.use({ serviceWorkers: 'allow' });
+  test.beforeEach(async ({ context }) => allowServiceWorker(context));
   test('Decoders are cached only by pages that can need them, from this site, and only when the browser lacks one', async ({ page }) => {
     await stubAnalytics(page);
     // A PDF tool never needs an image decoder, so a visit costs none of those bytes.
@@ -1618,6 +1620,7 @@ test('A file that cannot be opened shows an error as soon as it is added', async
 
 test.describe('offline', () => {
   test.use({ serviceWorkers: 'allow' });
+  test.beforeEach(async ({ context }) => allowServiceWorker(context));
   test('Returning visitors get pages from the browser\'s own request, and missing pages still 404', async ({ page }) => {
     // The worker used to re-fetch every page itself, and Chrome showed ERR_FAILED on
     // the first open of each page for returning visitors. Navigation preload hands the
