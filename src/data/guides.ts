@@ -2216,12 +2216,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-merge-multiple-videos-into-one',
-    title: 'How to Merge Multiple Videos Into One',
+    title: 'How to Combine or Merge Videos Into One on Any Device',
     description: 'Joining several video clips end to end into a single file is not something most phone camera rolls or built-in video apps do without a full editor. Here is what actually works, including a browser tool.',
-    heading: 'How to merge multiple videos into one',
+    heading: 'How to combine or merge videos into one on any device',
     dek: 'Most camera rolls can play clips one after another, not merge them into a single file. Here is what actually joins them.',
     keywords: ['how to merge videos', 'combine video clips into one', 'join videos together', 'merge mp4 files free', 'stitch videos into one file'],
-    updated: '2026-09-29',
+    updated: '2026-10-13',
     tools: ['merge-videos'],
     sections: [
       {
@@ -2251,7 +2251,7 @@ export const guides: Guide[] = [
       {
         h: 'A tool built just for joining clips',
         p: [
-          'Stayput\'s [merge videos](/tools/merge-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
+          'Stayput\'s [combine videos](/combine-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
         ],
       },
     ],
@@ -4064,8 +4064,8 @@ export const guides: Guide[] = [
     heading: 'How to convert a photo to black and white',
     dek: 'Just desaturating a colour photo often looks flat in black and white, because colours that looked different can turn into the same shade of grey. Here is why, and a free tool that fixes it.',
     keywords: ['how to convert photo to black and white', 'black and white photo converter free', 'convert image to grayscale online', 'make photo black and white free', 'photo to grayscale converter'],
-    updated: '2026-10-12',
-    tools: ['black-and-white-image'],
+    updated: '2026-10-13',
+    tools: ['black-and-white-image', 'grayscale-image', 'sepia-filter'],
     sections: [
       {
         h: 'Why plain desaturation can look flat',
@@ -4612,7 +4612,7 @@ export const guides: Guide[] = [
     heading: "How to open a RAR or 7z file",
     dek: "RAR and 7z are archive formats like ZIP, but not every device opens them. Here is what works on Windows, Mac and phones, and a way that needs no install.",
     keywords: ["how to open a rar file", "how to open rar file on mac", "how to open 7z file", "open rar files online", "extract rar without winrar"],
-    updated: "2026-10-04",
+    updated: "2026-10-13",
     tools: ["archive-extractor", "create-zip"],
     sections: [
       {
@@ -4633,7 +4633,7 @@ export const guides: Guide[] = [
       },
       {
         h: "In the browser, without uploading",
-        p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP."],
+        p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP.", "If all you have is a RAR, the [RAR extractor](/rar-extractor) page is set up for it; for a .7z, use the [7z opener](/open-7z-file)."],
         list: [
           "**Folders:** the paths inside the archive are kept, so files from a folder show as folder/name.",
           "**Passwords, as of October 2026:** a password-protected ZIP opens after you enter the password, so type it before pressing Extract; a wrong one shows an error. Encrypted 7z and RAR archives are not supported yet: in our tests they did not open even with the correct password. Use 7-Zip for an encrypted 7z, and WinRAR or The Unarchiver for an encrypted RAR.",
