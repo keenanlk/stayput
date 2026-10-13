@@ -31,6 +31,7 @@ import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
+import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { InputError } from './input-error';
 
 export interface MergeOptions {
@@ -127,7 +128,9 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
         }
       }
     }
-    const audioCodec = sound ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH }) : null;
+    // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
+    const audioCodec = sound ? await firstEncodableSound(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH }) : null;
+    if (sound && !audioCodec) throw noAudioEncoder(true);
 
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
     const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH });

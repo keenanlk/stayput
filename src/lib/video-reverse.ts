@@ -22,7 +22,6 @@ import {
   VideoSampleSink,
   VideoSampleSource,
   WEBM,
-  getFirstEncodableAudioCodec,
   type VideoSamplePixelFormat,
 } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
@@ -109,9 +108,13 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
         });
       }
     }
+    // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
+    // Loaded here: tests import this file in Node, which cannot read the encoder's vendor.json import.
+    const { firstEncodableSound, noAudioEncoder } = await import('./mp3-fallback');
     const audioCodec = sound
-      ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: sound.length, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH })
+      ? await firstEncodableSound(['aac', 'opus'], { numberOfChannels: sound.length, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH })
       : null;
+    if (sound && !audioCodec) throw noAudioEncoder(true);
 
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
     const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain' });

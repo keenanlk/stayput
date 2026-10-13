@@ -20,13 +20,13 @@ import {
   VideoSampleSink,
   VideoSampleSource,
   WEBM,
-  getFirstEncodableAudioCodec,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { timeStretch } from './stretch';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
+import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { InputError } from './input-error';
 
 export interface SpeedOptions {
@@ -68,9 +68,11 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
       const decoded = await decodePcm(file);
       if (decoded) sound = timeStretch(decoded, speed);
     }
+    // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
     const audioCodec = sound
-      ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: sound.length, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH })
+      ? await firstEncodableSound(['aac', 'opus'], { numberOfChannels: sound.length, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH })
       : null;
+    if (sound && !audioCodec) throw noAudioEncoder(true);
 
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
     const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain' });

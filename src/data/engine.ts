@@ -223,6 +223,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser opens the camera (getUserMedia) and shows it in a video element on this page. The resolution comes from the picture itself, the frame rate is counted from the frames that actually arrive, and a snapshot is drawn to a canvas and saved as JPG by your browser.',
     versus: 'Many online webcam tests send your picture to their servers to take a photo or record a clip, and run ads and trackers around the test. Here the picture goes from your camera to this tab and nowhere else.',
   },
+  'speaker-test': {
+    how: 'Your browser’s Web Audio API makes each sound in this tab: an oscillator at the pitch you chose, or a loop of pink noise, sent to the left channel, the right or both, through a volume control. The sweep moves the oscillator’s pitch smoothly from low to high.',
+    versus: 'Nothing here needs a file, an account or a download: the sounds are made in your tab and go straight to your speakers.',
+  },
   'audio-to-video': {
     how: 'Your browser decodes the sound into plain samples, draws the picture once onto a canvas (fitted whole over a blurred copy, or the title on a plain colour), and its own WebCodecs encoders write that still frame once a second with the sound as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
     versus: 'Online MP3-to-video converters upload your music and cover art, add their logo to free videos, and cap the length. Unreleased tracks and private recordings stay private here: nothing leaves your device.',
@@ -340,7 +344,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Online zippers upload every file, and a password-protect service sees both the files and the password, which defeats the point of locking them. Here nothing leaves your device and there is no size cap beyond your device’s memory (phones hold less).',
   },
   'video-to-mp4': {
-    how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
+    how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. An AVI, which no browser opens, is decoded in a background worker by a separate decoder module and re-encoded the same way. An FLV is opened by a small separate reader module, and its H.264 picture is copied into the MP4 as it is. Most video runs on your browser\'s WebCodecs through Mediabunny. For old formats the browser cannot read, the page loads a decoder built from FFmpeg\'s libraries (LGPL) only when you convert such a file. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',
   },
   'video-to-mov': {

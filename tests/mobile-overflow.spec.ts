@@ -25,12 +25,15 @@ const pages = [
   '/qr-code-scanner-for-pc',
   '/itf-14-barcode-generator',
   '/tools/audio-splitter',
+  '/tools/speaker-test',
   '/tools/bpm-key-finder',
   '/camelot-wheel',
   '/bpm-finder',
   '/csv-to-json',
   '/press',
   '/licenses',
+  '/avi-to-mp4',
+  '/flv-to-mp4',
 ];
 
 for (const path of pages) {

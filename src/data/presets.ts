@@ -2590,6 +2590,107 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'avi-to-mp4',
+    base: 'video-to-mp4',
+    name: 'AVI to MP4',
+    title: 'AVI to MP4 Converter, Free, No Upload | Stayput',
+    description: 'Convert AVI to MP4 in your browser: Xvid, DivX and Motion JPEG files from old cameras and PC downloads become MP4s that play on phones and TVs. Nothing is uploaded.',
+    lead:
+      'Converts AVI videos (Xvid, DivX 4 and later, and Motion JPEG, with MP3, AC-3 or PCM sound) to MP4 with H.264 video and AAC sound. It is free and needs no account, and your videos are not uploaded: everything runs in your browser on your device, and after one visit and a short wait the page works offline.',
+    heading: 'Convert AVI to MP4',
+    tagline: 'Turn old AVI files into MP4s that iPhones, Android phones, TVs and editors play, without uploading them.',
+    keywords: ['avi to mp4', 'convert avi to mp4', 'avi to mp4 converter', 'avi to mp4 online', 'avi to mp4 free', 'change avi to mp4', 'avi to mp4 no upload'],
+    dropLabel: 'Drop AVI files to convert to MP4',
+    accept: 'video/x-msvideo,video/avi,.avi,video/*',
+    intro: [
+      'AVI is Microsoft’s container from the 1990s, and it is still what many old digital cameras, camcorders, downloaded clips and family DVD rips are saved as. Phones, smart TVs, PowerPoint and most upload forms no longer open it, and browsers cannot play it at all.',
+      'This page reads the AVI in your browser, decodes the picture and sound, and writes a new MP4 with H.264 video and AAC sound, the combination that plays everywhere. Unlike a simple rewrap, an AVI always has to be re-encoded, because the video inside (Xvid, DivX, Motion JPEG) is not a format an MP4 player expects. A clip converts at several times its running time or faster on a laptop, and slower on a phone.',
+      'The file never leaves your device. Home videos and camera footage are exactly what you should not hand to a stranger’s server just to change the wrapper, and here there is no upload to wait for and no copy kept anywhere.',
+      'The picture is re-encoded at a high quality setting, so the MP4 can come out larger than the AVI when the original was heavily compressed. If it is bigger than you want for email or chat, run it through Compress video afterwards.',
+    ],
+    sections: [
+      {
+        heading: 'Which AVI files this converts',
+        bullets: [
+          'Picture: MPEG-4 video (Xvid, DivX 4 and later, and the MP4V and FMP4 variants) and Motion JPEG, which is what many digital cameras and screen recorders write.',
+          'Sound: MP3, MP2, AC-3 and uncompressed PCM. Surround sound is mixed down to stereo, and low-quality sound is brought up to 48 kHz so every player accepts it.',
+          'Not converted: AVIs whose picture is H.264, DivX 3, Windows Media, VP6 or another codec this page does not carry. The page names the codec it found, so you know what you have.',
+        ],
+      },
+      {
+        heading: 'What this page loads',
+        paragraphs: [
+          "Most video runs on your browser's WebCodecs through Mediabunny. For old formats the browser cannot read, the page loads a decoder built from FFmpeg's libraries (LGPL) only when you convert such a file.",
+          'That decoder is a file of about 2 MB (under 1 MB compressed) from stayput.dev, not from anyone else’s server, and the licenses page links its exact source and how it was built.',
+        ],
+      },
+    ],
+    steps: [
+      'Drop one or more AVI files, or tap to pick them.',
+      'Tick Remove the sound if you only need the picture.',
+      'Convert, then open or share the MP4. Several files download together as a zip.',
+    ],
+    faq: [
+      { q: 'Why does an AVI take longer to convert than an MKV or MOV?', a: 'MOV and MKV files often hold H.264 video that can be copied into an MP4 unchanged. AVI never does, so every frame is decoded and encoded again. Expect roughly five to ten times the clip’s length on a recent laptop for ordinary 480p or 720p video, and keep the tab open until it finishes.' },
+      { q: 'Why does it say the picture is not supported?', a: 'AVI is only a wrapper, and many different video codecs live inside it. This page opens Xvid, DivX 4 and later, and Motion JPEG files. An AVI that holds H.264, DivX 3, Windows Media Video or another codec shows a message naming it, and nothing is converted.' },
+      { q: 'Why does the message mention the sound?', a: 'The sound inside the AVI is in a format this page cannot decode, such as AAC or Windows Media Audio. Tick Remove the sound to convert the picture alone.' },
+      { q: 'Will the MP4 play on my iPhone and TV?', a: 'Yes, when your browser writes H.264, which Chrome, Edge and Safari do; the line under the result names the codec. The MP4 plays in the iPhone Photos app, on Android, on Windows and macOS, and on current smart TVs.' },
+      { q: 'Is the AVI uploaded anywhere?', a: 'No. The file is read from your disk in slices by code running in a background worker in your tab, and the MP4 is written in memory. The decoder module downloads from stayput.dev when you first convert, and it carries none of your data.' },
+      { q: 'Can I convert a whole folder of AVI files?', a: 'Select them all at once and they are converted one after another; several download together as a zip. Each MP4 keeps the name of its AVI with the new extension.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'flv-to-mp4',
+    base: 'video-to-mp4',
+    name: 'FLV to MP4',
+    title: 'FLV to MP4 Converter, Free, No Upload | Stayput',
+    description: 'Convert FLV to MP4 in your browser: Flash-era videos with H.264 picture become MP4s that play on phones and TVs, without re-encoding. Nothing is uploaded.',
+    lead:
+      'Converts FLV videos that hold H.264 picture, with AAC or MP3 sound, to MP4. The picture is copied into the MP4 without re-encoding, so it is fast and loses no quality. It is free and needs no account, and your videos are not uploaded: everything runs in your browser on your device, and after one visit and a short wait the page works offline.',
+    heading: 'Convert FLV to MP4',
+    tagline: 'Turn Flash-era FLV files into MP4s that iPhones, Android phones, TVs and editors play, without uploading them.',
+    keywords: ['flv to mp4', 'convert flv to mp4', 'flv to mp4 converter', 'flv to mp4 online', 'flv to mp4 free', 'change flv to mp4', 'flv to mp4 no upload'],
+    dropLabel: 'Drop FLV files to convert to MP4',
+    accept: 'video/x-flv,.flv,video/*',
+    intro: [
+      'FLV is the Flash Video container. Sites that streamed video in the Flash era saved clips as FLV, screen and stream recorders still write it, and a lot of old downloads are sitting in folders as .flv files that nothing on a phone or a modern computer will open.',
+      'Most FLV files from 2008 onward hold H.264 video, the same picture format an MP4 uses. This page reads the FLV in your browser and copies that picture into a new MP4 as it is, with the sound alongside it. Nothing in the picture is re-encoded, so a long recording converts in seconds and looks exactly like the original.',
+      'The file never leaves your device. Recordings and downloads are exactly what you should not hand to a stranger’s server just to change the wrapper, and here there is no upload to wait for and no copy kept anywhere.',
+    ],
+    sections: [
+      {
+        heading: 'Which FLV files this converts',
+        bullets: [
+          'Picture: H.264, which is what Flash Player 9 and later, YouTube’s old FLV files, OBS and most stream recorders write.',
+          'Sound: AAC is copied as it is. MP3 is converted to AAC, and low-quality MP3 is brought up to 48 kHz so every player accepts it.',
+          'Not converted: older FLV files whose picture is Sorenson Spark or VP6 (the codecs of Flash Player 6 to 8), or whose sound is Nellymoser or Speex. The page names the codec it found, so you know what you have.',
+        ],
+      },
+      {
+        heading: 'What this page loads',
+        paragraphs: [
+          "Most video runs on your browser's WebCodecs through Mediabunny. For old formats the browser cannot read, the page loads a decoder built from FFmpeg's libraries (LGPL) only when you convert such a file.",
+          'For FLV that module is small, well under 1 MB, and comes from stayput.dev, not from anyone else’s server. It only reads the container: the picture is not decoded, and the licenses page links its exact source and how it was built.',
+        ],
+      },
+    ],
+    steps: [
+      'Drop one or more FLV files, or tap to pick them.',
+      'Tick Remove the sound if you only need the picture.',
+      'Convert, then open or share the MP4. Several files download together as a zip.',
+    ],
+    faq: [
+      { q: 'Does converting FLV to MP4 lose quality?', a: 'Not for the picture. The H.264 video in the FLV is copied into the MP4 as it is, so nothing is re-encoded. AAC sound is copied too. MP3 sound is converted to AAC, which is the one step that touches the audio.' },
+      { q: 'Why does it say the video uses VP6 or Sorenson Spark?', a: 'FLV is only a wrapper. Files from the early Flash years hold Sorenson Spark or On2 VP6 picture, which this page does not open, and it tells you which one it found instead of failing without a reason. Files made since about 2008 are nearly always H.264.' },
+      { q: 'Why does the message mention the sound?', a: 'The sound inside the FLV is in a format this page does not read, such as Nellymoser or Speex. Tick Remove the sound to convert the picture alone.' },
+      { q: 'Will the MP4 play on my iPhone and TV?', a: 'Yes. It holds H.264 picture and AAC sound, which iPhones, Android phones, Windows, macOS and current smart TVs play. The line under the result says the picture was copied.' },
+      { q: 'Is the FLV uploaded anywhere?', a: 'No. The file is read from your disk in slices by code running in a background worker in your tab, and the MP4 is written in memory. The reader module downloads from stayput.dev when you first convert, and it carries none of your data.' },
+      { q: 'Can I convert a whole folder of FLV files?', a: 'Select them all at once and they are converted one after another; several download together as a zip. Each MP4 keeps the name of its FLV with the new extension.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'webm-to-mp4',
     base: 'video-to-mp4',
     name: 'WebM to MP4',

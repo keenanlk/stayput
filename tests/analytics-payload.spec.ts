@@ -145,6 +145,26 @@ test('a failed run sends the original error class as the kind, with no message a
   for (const secret of ['secret-message', 'anim']) expect(raw).not.toContain(secret);
 });
 
+/** The background remover prints which path ran and a per-frame time split on the page; none of it may be sent. */
+test('video background remover: the path and per-frame timing line stay on the page, not in analytics', async ({ page, baseURL }) => {
+  test.setTimeout(240_000);
+  const sent = await captureAnalytics(page, baseURL!);
+  await page.goto(`${SITE}/tools/video-background-remover`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fileURLToPath(new URL('./fixtures/static/speech.mov', import.meta.url)));
+  await page.locator('input[name="finder"][value="fast"]').evaluate((el) => (el as HTMLInputElement).click());
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+  await expect(page.locator('#results-list')).toContainText('Each frame took about');
+  await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
+  const run = sent.find((s) => s.payload.name === 'tool_run')!;
+  for (const s of sent) expect(violations(s), JSON.stringify(s)).toEqual([]);
+  const keys = Object.keys(run.payload.data as Record<string, string>);
+  expect(keys.filter((k) => !EVENTS.tool_run!.keys.includes(k))).toEqual([]);
+  const raw = JSON.stringify(sent);
+  for (const word of ['Each frame', 'ms a frame', 'graphics chip', 'processor', 'waiting for', 'speech']) expect(raw).not.toContain(word);
+});
+
 const SPEECH_TOOLS = ['transcribe', 'add-subtitles-to-video'] as const;
 const SPOKEN = fileURLToPath(new URL('./fixtures/static/jfk.wav', import.meta.url));
 

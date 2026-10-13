@@ -2453,6 +2453,95 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'speaker-test',
+    name: 'Speaker test',
+    title: 'Speaker Test: Left and Right Channel Check Online | Stayput',
+    description:
+      'Test your speakers or headphones online: a tone in the left, the right or both channels, a frequency sweep and pink noise. It starts quiet, and nothing is uploaded.',
+    heading: 'Test your speakers',
+    tagline: 'Check that both sides of your speakers or headphones play: send a tone to the left, the right or both, sweep up through the pitches, or play pink noise. It starts quiet, and nothing is uploaded.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your speakers',
+    action: 'Test',
+    lead:
+      'Plays a test tone through the left speaker, the right speaker or both, sweeps up through the pitches, or plays pink noise, so you can hear whether each side of your speakers or headphones is working. It is free, and your choices are not uploaded: the sounds are made by code in your browser, and the page uses no file and no microphone. After one visit and a short wait the page works offline.',
+    sections: [
+      {
+        heading: 'What this test does',
+        bullets: [
+          'Plays one sound at a time through the left channel, the right channel or both, so you can hear which side it comes from.',
+          'Lets you pick the pitch of the tone, from a low note to a high one.',
+          'Sweeps a tone smoothly from low to high, with the pitch shown as it rises.',
+          'Plays pink noise, a steady hiss that is easier than a single tone to place in the room and to hear rattles in.',
+          'Starts at a low volume and asks you to confirm before it goes louder.',
+        ],
+      },
+      {
+        heading: 'What this test cannot tell you',
+        bullets: [
+          'The page plays sound and you listen. It cannot hear your speakers, so it does not measure their quality, loudness or frequency response.',
+          'It cannot say that a speaker is broken. A missing tone is a reason to check the cable, the settings and the volume below, not a diagnosis.',
+          'Small speakers play very low and very high tones weakly or not at all. What you hear depends on your speakers and your hearing.',
+        ],
+      },
+      {
+        heading: 'Sound missing on one side? Check these first',
+        bullets: [
+          'Check the balance setting in your system’s sound settings; it can be set all the way to one side.',
+          'Check that the right output is chosen: speakers, headphones and Bluetooth devices each show up as a separate output.',
+          'Check for a mono-audio setting in your system’s accessibility options, which sends both sides to every speaker.',
+          'Check the cable or the Bluetooth connection, and try another pair of headphones or another device.',
+        ],
+      },
+    ],
+    keywords: ['speaker test', 'online speaker test', 'left right speaker test', 'test my speakers', 'headphone test', 'stereo test', 'speaker tester', 'sound test'],
+    steps: [
+      'Turn your device volume down, choose Left, Right or Both, and press Play tone.',
+      'Listen for the tone. It should come from the side you chose; if it comes from the other side or from both, check the settings listed below the test.',
+      'Press Sweep to hear the pitch rise from low to high, or Pink noise for a steady hiss, and press Stop when you are done.',
+    ],
+    faq: [
+      {
+        q: 'Is anything recorded or uploaded?',
+        a: 'No. The sounds are made by code in this page and played through your speakers. The page does not use your microphone and does not ask for any permission, and nothing about what you play is sent anywhere.',
+      },
+      {
+        q: 'How do I test the left and right speakers?',
+        a: 'Press Left and listen: the tone should come only from the left speaker, or the left side of your headphones. Press Right to check the other side, then Both to hear them together. If a side is silent, check the balance setting and the connection first.',
+      },
+      {
+        q: 'Why does the tone come from both speakers, or from one only?',
+        a: 'If the sound comes from both sides when you chose one, check for a mono-audio setting in your system’s accessibility options. If your device has a single speaker, as many phones do, left and right play from that one speaker.',
+      },
+      {
+        q: 'Does this measure how good my speakers are?',
+        a: 'No. The page plays sounds and you listen to them. It cannot hear what comes out, so it cannot measure quality, volume or frequency response. Use it to check that each side plays and to hear whether a speaker rattles or goes quiet at some pitch.',
+      },
+      {
+        q: 'Why does it start at a low volume?',
+        a: 'A steady tone is harsher than music at the same setting, and a speaker you have not tested before may be turned up from last time. The test starts quiet, and asks you to confirm before it goes louder. Raise the volume a little at a time, on the page or on your device, and stop if it hurts.',
+      },
+      {
+        q: 'Can I test headphones with it?',
+        a: 'Yes. Left and Right then play in the matching ear. Keep the volume low before you put them on, because the tone sits close to your ear.',
+      },
+      {
+        q: 'What is pink noise for?',
+        a: 'Pink noise is a steady hiss with equal energy in each octave, so it sounds fuller and less shrill than white noise. Play it through one side or both to hear whether the sound fills the room evenly, or to listen for a rattle or a buzz that a single tone can miss. It is for listening only: this page does not measure what comes out.',
+      },
+      {
+        q: 'Why can I not hear the lowest or the highest part of the sweep?',
+        a: 'Small speakers, such as those in a phone or laptop, play very low notes weakly or not at all, and people differ in how high a sound they hear. Missing the ends of the sweep is common and does not by itself mean a fault.',
+      },
+      {
+        q: 'Does the speaker test work on a phone?',
+        a: 'Try it. Open this page in your phone’s browser and press Play tone. If you hear nothing, check the volume and any silent or mute switch on the phone.',
+      },
+    ],
+  },
+  {
     slug: 'audio-to-video',
     name: 'Audio to video',
     title: 'Audio to Video: Turn MP3 into MP4 with a Picture | Stayput',
@@ -3755,7 +3844,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can it open password-protected archives?',
-        a: 'Yes, when you have the password: type it before pressing Extract. That works for password-protected ZIP files, for 7z archives (whether only the contents are encrypted or the file names are too) and for RAR archives (old RAR and RAR5, with or without encrypted file names). A wrong password shows an error and nothing is extracted. For 7z and RAR the page loads 7-Zip, about 0.7 MB more, only when you type a password for one of them. It cannot guess or remove a password you do not have, and archives split into parts are not supported.',
+        a: 'Yes, when you have the password: type it before pressing Extract. That works for password-protected ZIP files, for 7z archives (whether only the contents are encrypted or the file names are too) and for RAR archives (old RAR and RAR5, with or without encrypted file names). A wrong password shows an error and nothing is extracted. For 7z and RAR the page downloads 7-Zip, about 0.7 MB more, only when an archive needs it: when it has a password, or when its list of files is itself encrypted so the page cannot read it without 7-Zip. Everything still runs in your browser and nothing is uploaded. It cannot guess or remove a password you do not have, and archives split into parts are not supported.',
       },
       {
         q: 'How do I remove the password from a ZIP file?',
