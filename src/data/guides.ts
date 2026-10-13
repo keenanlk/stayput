@@ -3441,7 +3441,7 @@ export const guides: Guide[] = [
     heading: 'How to resize an image to exact pixels',
     dek: 'Getting a photo to an exact width and height, not just smaller, needs a different setting than a normal resize. Here is how, with no software to install.',
     keywords: ['how to resize an image to exact pixels', 'resize image to exact pixels online', 'resize photo to exact dimensions', 'resize image to 1920x1080', 'resize image to 512x512'],
-    updated: '2026-09-30',
+    updated: '2026-10-12',
     tools: ['resize-image', 'resize-image-to-1920x1080', 'resize-image-to-1024x1024'],
     sections: [
       {
@@ -3478,7 +3478,7 @@ export const guides: Guide[] = [
       { q: 'What is the difference between resizing and cropping to an exact size?', a: 'Resizing to a maximum keeps the photo\'s original shape and only makes it smaller; forcing an exact size (like 1920x1080) usually needs cropping, padding or stretching, since the source photo is rarely already that exact shape.' },
       { q: 'Will resizing to an exact size distort my photo?', a: 'Only if you choose Stretch. Crop to fill and Fit with padding both keep the photo\'s proportions intact; they just handle the leftover space differently, by cutting it off or by adding a border.' },
       { q: 'Can I resize many photos to the same exact size at once?', a: 'Yes, with a browser tool like Stayput\'s resize image, which applies the same exact-size setting to every photo you drop.' },
-      { q: 'Can this make a small image bigger to hit the exact size?', a: 'A plain resize does not enlarge, since upscaling invents pixels and looks soft; for a photo smaller than the target size, run it through an AI image upscaler first, then resize to the exact dimensions.' },
+      { q: 'Can this make a small image bigger to hit the exact size?', a: 'Yes. Exact size can enlarge: type a width and height larger than the photo and it is stretched to that size, but no detail is added, so it looks soft. For a sharper result, run the photo through an AI image upscaler first, then resize to the exact dimensions. Limit dimensions and Percentage only scale down.' },
     ],
   },
   {

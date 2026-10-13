@@ -7358,6 +7358,23 @@ test('Compress image to 20 KB gets a PNG under the limit as a JPG', async ({ pag
   expect((await bytesOf(downloads[0]!)).length).toBeLessThanOrEqual(20_000);
 });
 
+test('Resize PNG page keeps a PNG and its transparent pixels when the picture is made smaller', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/resize-png');
+  await expect(page.locator('#max-width')).toHaveValue('1920');
+  await expect(page.locator('#file-input')).toHaveAttribute('accept', /png/);
+  // logoPng is 200x200: an opaque disc and bar on a fully transparent background.
+  const { downloads } = await run(page, [logoPng()], async () => {
+    await page.locator('#max-width').fill('100');
+    await page.locator('#max-height').fill('100');
+  });
+  expect(downloads[0]!.suggestedFilename()).toBe('logo.png');
+  const out = await pixelsOf(page, await bytesOf(downloads[0]!), [[2, 2], [50, 40]]);
+  expect([out.width, out.height]).toEqual([100, 100]);
+  expect(out.px[0]![3]).toBe(0);
+  expect(out.px[1]![3]).toBe(255);
+});
+
 test('Compress PDF fits a file size with the gentlest step, and says when a limit cannot be met', async ({ page }) => {
   test.setTimeout(120_000);
   await stubAnalytics(page);

@@ -576,8 +576,8 @@
   "hash": "1d3d58cffab7498b"
  },
  "/guides/how-to-resize-an-image-to-exact-pixels": {
-  "date": "2026-09-30",
-  "hash": "0c2f8df619cc9011"
+  "date": "2026-10-12",
+  "hash": "50b043b0f8bb41ad"
  },
  "/guides/how-to-reverse-a-video": {
   "date": "2026-10-03",
@@ -1149,7 +1149,7 @@
  },
  "/resize-image": {
   "date": "2026-10-12",
-  "hash": "ce641174d745fd1e"
+  "hash": "58adedd44a21b239"
  },
  "/resize-image-for-instagram": {
   "date": "2026-10-12",
@@ -1170,6 +1170,10 @@
  "/resize-image-to-512x512": {
   "date": "2026-10-12",
   "hash": "0b92a4d5faec2b7e"
+ },
+ "/resize-png": {
+  "date": "2026-10-12",
+  "hash": "1f620990920abf0e"
  },
  "/rounded-corners-image": {
   "date": "2026-10-12",
