@@ -2968,7 +2968,7 @@ export const presets: Preset[] = [
       'For a logo on a plain white or coloured backdrop, the same model separates the mark from the page. Check the preview at the edges of thin strokes and small text: very fine detail on a busy background is the hardest case. If you need the file smaller for the web, choose WebP, which keeps the transparency at a fraction of the PNG size.',
     ],
     steps: [
-      'Drop the photos or logos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 46 MB).',
+      'Drop the photos or logos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 42 MB).',
       'Keep Transparent and PNG, or choose WebP for a smaller file with the same transparency.',
       'Download the transparent images at their original size, or all of them in one zip.',
     ],
@@ -2998,7 +2998,7 @@ export const presets: Preset[] = [
       'The same fill works for profile pictures and staff photos where a busy room would distract. Pick Colour instead of White for a brand shade or a light grey. For photos that must meet an official passport or visa rule, check that service’s requirements too: they also set head size, lighting and shadow rules that a new background alone does not satisfy.',
     ],
     steps: [
-      'Drop the product photos or portraits, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 46 MB).',
+      'Drop the product photos or portraits, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 42 MB).',
       'Keep White, or choose Colour for another shade, and pick JPG or PNG.',
       'Download the photos on white at full size, or all of them in one zip.',
     ],
@@ -3054,7 +3054,7 @@ export const presets: Preset[] = [
       'It is useful for profile pictures and staff photos taken in the office, product shots on a busy desk, and for hiding what is behind you, such as house numbers, whiteboards or other people, while keeping a natural photo instead of a flat colour. For hiding a face or a number plate itself, use the blur image tool instead, which blurs the areas you mark.',
     ],
     steps: [
-      'Drop the photos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 46 MB).',
+      'Drop the photos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 42 MB).',
       'Keep Blur, set the strength, and pick JPG, PNG or WebP.',
       'Download the photos with the blurred background at full size, or all of them in one zip.',
     ],

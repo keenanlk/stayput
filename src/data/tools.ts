@@ -3611,7 +3611,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop photos to remove the background',
     action: 'Remove background',
     lead:
-      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model (about 46 MB) to your browser, and after that the tool works offline.',
+      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model and its runtime (about 42 MB) to your browser, and after that the tool works offline.',
     sections: [
       {
         heading: 'A worked example: a product photo on a white background',
@@ -3633,7 +3633,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is the first photo slow?',
-        a: 'The first time, the page downloads the model (about 46 MB) and the WebAssembly runtime that runs it, and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
+        a: 'The first time, the page downloads the model and the WebAssembly runtime that runs it (about 42 MB together, once), and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
       },
       {
         q: 'What resolution is the result?',
@@ -3666,7 +3666,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this an alternative to remove.bg?',
-        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model of about 46 MB. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
+        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads the model and its runtime, about 42 MB once. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
       },
     ],
   },
@@ -3698,11 +3698,11 @@ export const tools: Tool[] = [
       },
     ],
     lead:
-      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models (about 50 MB) to your browser, and after that the tool works offline.',
+      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models and their runtime (about 46 MB) to your browser, and after that the tool works offline.',
     faq: [
       {
         q: 'Can I make a passport photo without uploading my photo?',
-        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
+        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model and the WebAssembly runtime that runs it (about 42 MB together), all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
       },
       {
         q: 'How is the head sized?',

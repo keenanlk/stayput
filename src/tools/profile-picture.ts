@@ -29,7 +29,7 @@ createShell({
           if (stage === 'loading') progress.set('Loading the face finder (one time, about 4 MB)…', share(0.05));
         });
         const mask = await findSubject(bitmap, (f) =>
-          progress.set(`Downloading the cut-out model (one time, about 46 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),
+          progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),
         );
         if (coverage(mask) < 0.005) throw new Error('No person, pet or object was found in this photo. Try one with a clear subject.');
         const face = faces[0];

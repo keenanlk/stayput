@@ -2869,7 +2869,7 @@ export const guides: Guide[] = [
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, and it is free, with no account; your photos are not uploaded. The result is the same size as your photo (a 12 megapixel photo gives a 12 megapixel cut-out), limited by what your device can hold in memory, with no watermark and no credits. The first photo downloads the cut-out model (about 46 MB) and the WebAssembly runtime that runs it; the first run needs a connection, and after that the model is cached. After your first run you can turn off Wi-Fi and it keeps working.',
+          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, and it is free, with no account; your photos are not uploaded. The result is the same size as your photo (a 12 megapixel photo gives a 12 megapixel cut-out), limited by what your device can hold in memory, with no watermark and no credits. The first photo downloads the cut-out model and the WebAssembly runtime that runs it (about 42 MB together, once); the first run needs a connection, and after that the model is cached. After your first run you can turn off Wi-Fi and it keeps working.',
           '[Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it. For a step-by-step walkthrough, see [how to remove the background from a photo](/guides/remove-background-from-a-photo).',
         ],
       },
@@ -2878,7 +2878,7 @@ export const guides: Guide[] = [
         p: [
           'Stayput has no API, no desktop app and no Photoshop plug-in. If you used remove.bg through its API, that moves to Leonardo.Ai per remove.bg\'s API page (checked 8 October 2026).',
           'We use one general-purpose model (ISNet, 8-bit weights). We have not run a side-by-side comparison with remove.bg, so we cannot say which cuts fine hair or low-contrast subjects better. Fine hair and fur are kept as soft edges; if part of the subject goes missing or background stays, try the "Keep around the edges" setting.',
-          'Each photo takes a few seconds depending on your device, and the first run waits for the 46 MB download.',
+          'Each photo takes a few seconds depending on your device, and the first run waits for the one-time download of about 42 MB.',
           'You can drop several photos and download them in one zip.',
         ],
       },
@@ -2893,7 +2893,7 @@ export const guides: Guide[] = [
       { q: 'Is remove.bg shutting down?', a: 'Its own site says so. A notice on remove.bg (checked 8 October 2026) states: "The standalone website will no longer be available from 1 December 2026 at 9:00am CET." It says background removal is moving to Canva.' },
       { q: 'What happens to my remove.bg credits?', a: 'Its terms and conditions (checked 8 October 2026) say unused credits expire on 1 December 2026 and are non-refundable.' },
       { q: 'What happens to the remove.bg API?', a: 'Its API page (checked 8 October 2026) says that from 1 December 2026 background removal moves to Leonardo.Ai, also part of Canva. Stayput has no API.' },
-      { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model (about 46 MB) and the WebAssembly runtime that runs it, so it needs a connection then.' },
+      { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model and the WebAssembly runtime that runs it (about 42 MB together, once), so it needs a connection then.' },
       { q: 'Does it work as well as remove.bg?', a: 'We have not compared them side by side. Stayput uses one general-purpose model, and fine hair and low-contrast subjects may need a second try with the edge setting. There is no API, desktop app or plug-in.' },
       { q: 'Is the result full resolution?', a: 'It is the same size as your photo: a 12 megapixel photo gives a 12 megapixel cut-out, limited by what your device can hold in memory. There is no low-resolution preview and no watermark.' },
       { q: 'Can I do many photos at once?', a: 'Yes. Drop several photos and download them all in one zip.' },
