@@ -22,3 +22,15 @@ export class UnreadableFile extends Error {
     this.name = 'UnreadableFile';
   }
 }
+
+/**
+ * A step of a tool failed after the file was read: `stage` is the name a failed run records
+ * (letters and digits only, see classifyError), so these split by cause and not as a plain "Error".
+ * The original error's message is kept for the visitor.
+ */
+export class StageError extends Error {
+  constructor(stage: string, e: unknown) {
+    super(e instanceof Error && e.message ? e.message : 'Something went wrong.');
+    this.name = stage;
+  }
+}
