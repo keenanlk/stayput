@@ -4265,9 +4265,16 @@ test('Watermark image draws the text over the whole photo at full size, and no b
 test('Watermark PDF stamps every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'watermark-pdf');
   const net = watchNetwork(page);
-  const source = readFileSync(fx('rotated.pdf'));
+  // Built here, in its own folder, so this test never depends on another test (or its parallel worker) having written it.
+  const rotated = await PDFDocument.create();
+  const rotatedPage = rotated.addPage([612, 792]);
+  rotatedPage.setRotation(degrees(90));
+  rotatedPage.drawText('Keep this text', { x: 60, y: 700, size: 20, font: await rotated.embedFont(StandardFonts.Helvetica) });
+  const rotatedPath = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'rotated.pdf');
+  writeFileSync(rotatedPath, await rotated.save());
+  const source = readFileSync(rotatedPath);
   const before = await PDFDocument.load(source);
-  const { downloads } = await run(page, ['rotated.pdf'], async () => {
+  const { downloads } = await run(page, [rotatedPath], async () => {
     await expect(page.locator('#wm-panel')).toBeVisible();
     await expect(page.locator('#wm-hint')).toContainText(`all ${before.getPageCount()} page`);
     await page.locator('#wm-text').fill('DRAFT');
@@ -4286,6 +4293,7 @@ test('Watermark PDF stamps every page, keeps the text, and no bytes leave the ta
   // The original text is still there to select and search.
   const was = (await textItems(new Uint8Array(source), 1)).map((t) => t.str).join('');
   const now = (await textItems(out, 1)).map((t) => t.str).join('');
+  expect(was).toContain('Keep this text');
   expect(now).toBe(was);
   net.assertNothingLeft(['rotated.pdf']);
   expect(errors).toEqual([]);
@@ -6871,9 +6879,16 @@ async function yellowBands(page: Page, bytes: Uint8Array, t: number) {
   return page.evaluate(async ({ data, t }) => {
     const v = document.createElement('video');
     v.muted = true;
+    v.preload = 'auto';
     v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
     await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
-    await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); v.currentTime = t; });
+    // `seeked` fires once for every seek and says the frame at `t` is current. (A frame callback on a detached,
+    // paused video is not guaranteed to fire, which left this wait hanging for the whole test timeout.)
+    await new Promise<void>((ok, bad) => {
+      v.onseeked = () => ok();
+      v.onerror = () => bad(new Error('video will not seek'));
+      v.currentTime = t;
+    });
     const c = document.createElement('canvas');
     c.width = v.videoWidth;
     c.height = v.videoHeight;
