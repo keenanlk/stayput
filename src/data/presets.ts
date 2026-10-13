@@ -35,6 +35,12 @@ export interface Preset {
 
 const noUpload = { q: 'Is the file uploaded anywhere?', a: 'No. There is no server in this process. The page is a static file and the work is done by code running inside your browser tab. Give the page a short while after one visit to save itself for offline use; then you can turn off Wi-Fi and it still works.' };
 
+/** Microphone FAQ for the tuner landing pages that carry no offline claim; the mic is on only until Stop. */
+const micPrivacy = {
+  q: 'Is the sound from my microphone recorded or uploaded?',
+  a: 'No. The pitch is measured by code running in this tab, about twenty times a second, and no sound is recorded or stored: only the last few pitch readings are held in memory while the tuner listens. Press Stop using the microphone to turn it off. Like any website, the host sees your connection’s IP address when the page loads, and the site counts visits with anonymous usage events that never include sound; the [privacy page](/privacy) lists them field by field.',
+};
+
 /** FAQ entry on the pages whose lead says no account and no watermark; no tool behind them draws a mark on its output. */
 const noAccount = { q: 'Do I need an account, and is there a watermark?', a: 'No account and no sign-up: open the page and drop a file. Nothing is added to your file, so there is no watermark or logo. It is free, and your files are not uploaded.' };
 
@@ -4593,6 +4599,311 @@ export const presets: Preset[] = [
       { q: 'Does it work with low G tuning?', a: 'Yes. Choose Ukulele, low G from the list: the G button then plays and aims for G3, an octave below the usual G4, and the other three strings stay the same.' },
       { q: 'Can I tune it to a different key, like D6 (A D F♯ B)?', a: 'Choose Chromatic and bring each string up a whole step: G to A, C to D, E to F♯ and A to B. The big letter shows each note as you go.' },
       noUpload,
+    ],
+  },
+  {
+    slug: 'violin-tuner',
+    base: 'tuner',
+    name: 'Violin tuner',
+    title: 'Violin Tuner Online with Microphone, Free, Private | Stayput',
+    description: 'Tune your violin online to G, D, A and E with the microphone, or by ear with reference notes. The sound is measured in your browser and not uploaded.',
+    heading: 'Violin tuner',
+    tagline: 'G, D, A and E, one open string at a time, with the sound kept on your device.',
+    keywords: ['violin tuner', 'online violin tuner', 'violin tuner online free', 'violin tuner with microphone', 'tune violin', 'violin string notes GDAE'],
+    defaults: { instrument: 'violin' },
+    sizeFact: 'Free, no account. The microphone is on only until you press Stop',
+    lead: 'Tune your violin to G, D, A and E with your microphone, or press a string button to hear its note and tune by ear. The tuner names the string you played and shows with a needle whether it is sharp or flat. It is free, and the sound from your microphone is not uploaded: everything runs in your browser on your device.',
+    intro: [
+      'A violin’s four strings are a fifth apart: G3, D4, A4 and E5, from the thickest to the thinnest. Players call the E the first string and the G the fourth. Press Start the tuner, play one open string, and the tuner lights the string it is closest to and shows how far off it is.',
+      'A worked example: you bow the open A and the tuner shows A with the needle to the left and “14 cents flat: tune up”. Turn the A peg a small amount, or the fine tuner if your violin has one, bow again, and stop when the needle sits in the shaded middle and the A button fills in. Tune the A first: the D, G and E are then set from it in fifths.',
+      'Bow a long, steady note on one string at a time, and let it sound for a moment before you adjust. The page takes the middle of its last five readings, so one scratchy stroke does not throw the needle, but a held note gives it the most to work with. Plucking the string works as well.',
+    ],
+    sections: [
+      {
+        heading: 'The four open strings',
+        paragraphs: ['The frequencies use the usual reference, A4 = 440 Hz, in equal temperament. They are the same numbers the page shows as a tooltip on each string button.'],
+        bullets: [
+          '**4th string, G:** G3, 196.00 Hz',
+          '**3rd string, D:** D4, 293.66 Hz',
+          '**2nd string, A:** A4, 440.00 Hz',
+          '**1st string, E:** E5, 659.26 Hz',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It hears one note at a time. Double stops, or two strings sounding together, will confuse it, so bow one string and let the others rest.',
+          'With Violin chosen, the needle measures the distance to the nearest open string. A fingered note such as B or C♯ therefore shows as a large error from some open string. To read the name of a fingered note, choose Chromatic.',
+          'It does not check your intonation up the fingerboard or say where a finger should go.',
+          'It is not set up for a viola. The viola’s A, D and G are the same notes as here, but its lowest string, C3, is a fifth below the violin’s G and would read as a G a long way flat. Use the A, D and G buttons here and choose Chromatic for the C.',
+          'It listens through the microphone, so in a room of players it hears all of them. Tune somewhere quiet or away from the group.',
+        ],
+      },
+    ],
+    steps: [
+      'Press Start the tuner and allow the microphone. Violin is already chosen.',
+      'Bow one open string, a long note, and let it sound. The nearest of G, D, A and E lights up and the needle shows sharp or flat.',
+      'Turn the peg or fine tuner until it says In tune, then tune the next string: A, D, G, E.',
+    ],
+    faq: [
+      { q: 'Should I use the pegs or the fine tuners?', a: 'Pegs make the big moves and fine tuners the last small ones. A fine tuner has only a short travel, so do not try to bring a string up a long way with it. When you turn a peg, press it gently into the peg box as you turn so that it grips, and make the last part of the move upward, from just below the note.' },
+      { q: 'Which string do I tune first?', a: 'The A, then D, G and E. Each string is a fifth from its neighbour, so once the A is right the others can be checked against it by ear: bow two neighbouring strings together, and a fifth with no slow wobble in it is in tune. Then let the tuner confirm each one.' },
+      { q: 'Can I tune to A 442 or to Baroque pitch?', a: 'Yes. Change the Reference pitch field; it takes values from 415 to 466. Many orchestras tune to 442, and 415 is a common pitch for Baroque music, a semitone below 440. The string buttons and the needle both move to the new pitch. A number outside 415 to 466 is ignored and 440 is used.' },
+      { q: 'How do I tune without the microphone?', a: 'Press the A button to hear the note for two seconds, and tune your A string until the two sound as one and the slow wobble between them stops. Then tune D to A, G to D and E to A by bowing the pair together.' },
+      micPrivacy,
+    ],
+  },
+  {
+    slug: 'bass-tuner',
+    base: 'tuner',
+    name: 'Bass tuner',
+    title: 'Bass Tuner Online, 4-String, with Microphone, Free | Stayput',
+    description: 'Tune a four-string bass online to E, A, D and G with the microphone, or by ear with reference notes. The sound is measured in your browser and not uploaded.',
+    heading: 'Bass tuner',
+    tagline: 'E, A, D and G on a four-string bass, with the sound kept on your device.',
+    keywords: ['bass tuner', 'online bass tuner', 'bass tuner online free', 'bass tuner with microphone', 'bass guitar tuner', 'tune bass guitar', 'bass tuning EADG'],
+    defaults: { instrument: 'bass' },
+    sizeFact: 'Free, no account. The microphone is on only until you press Stop',
+    lead: 'Tune a four-string bass to E, A, D and G with your microphone, or press a string button to hear each note and tune by ear. The tuner shows the string it hears and a needle for sharp or flat. It is free, and the sound from your microphone is not uploaded: everything runs in your browser on your device.',
+    intro: [
+      'A four-string bass is tuned E1, A1, D2 and G2, from the thickest string to the thinnest. Those are the note names of the guitar’s lowest four strings, one octave down, so the bass’s low E vibrates at 41.20 Hz against the guitar’s 82.41 Hz. Press Start the tuner, play one open string, and the tuner lights the string it is closest to and shows how far off it is.',
+      'A worked example: you play the open D, the second string, and the tuner shows D with the needle to the right and “9 cents sharp: tune down”. Ease the peg down until the needle sits in the shaded middle and the D button fills in. Low notes take longer to settle on screen than a guitar’s: pluck once, let the string ring, and give the needle a second.',
+      'Once the E is right you can check the others against it with the fifth fret: the fifth fret of the E string sounds the open A, the fifth fret of the A sounds the D, and the fifth fret of the D sounds the G. The method is the one in [how to tune a guitar](/guides/how-to-tune-a-guitar), an octave lower.',
+    ],
+    sections: [
+      {
+        heading: 'The four open strings',
+        paragraphs: ['The frequencies use the usual reference, A4 = 440 Hz, in equal temperament. They are the same numbers the page shows as a tooltip on each string button.'],
+        bullets: [
+          '**4th string, E:** E1, 41.20 Hz',
+          '**3rd string, A:** A1, 55.00 Hz',
+          '**2nd string, D:** D2, 73.42 Hz',
+          '**1st string, G:** G2, 98.00 Hz',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'There is no B string. The list is for four-string basses; the low B of a five-string (B0, 30.87 Hz) is not in it.',
+          'There is no input selector or cable input. The page uses the microphone your browser picks, so an unplugged electric bass, which is quiet, needs an amp with the device held near it, or the device held close to the strings.',
+          'It names the open string nearest in pitch. A string more than about two and a half semitones flat can be taken for its lower neighbour, so bring a very slack string close by ear before you read the needle.',
+          'It does not set intonation or string height. If the open strings are in tune but notes up the neck are not, that is a set-up job.',
+        ],
+      },
+    ],
+    steps: [
+      'Press Start the tuner and allow the microphone. Bass, 4 strings is already chosen.',
+      'Play one open string and let it ring for a moment. The nearest of E, A, D and G lights up and the needle shows sharp or flat.',
+      'Turn the peg until it says In tune, then tune the next string, E up to G.',
+    ],
+    faq: [
+      { q: 'Can I tune a five-string bass?', a: 'The E, A, D and G of a five-string bass are the same notes and tune here. The low B is B0 at 30.87 Hz, which is not in the list and sits just above the lowest pitch this tuner listens for, about 30 Hz. In our tests with recorded bass notes it read a note at that pitch, but a phone or laptop microphone picks up very little that low, so it may not settle on yours. Choose Chromatic, play the B and read the note name, or tune the B so that its fifth fret matches the open E.' },
+      { q: 'Why does the guitar setting not work for my bass?', a: 'The guitar list starts at E2, 82.41 Hz, an octave above the bass’s low E. Played against that list, your low E reads as a very long way flat, with the needle pinned at the left edge. Choose Bass, 4 strings and each string is aimed at its own note.' },
+      { q: 'How do I tune to drop D?', a: 'Choose Chromatic, play the low string and lower it a whole step, through D♯, until the big letter says D: that is D1 at 36.71 Hz. The other three strings stay as they are. The Chromatic setting has no string buttons, so there is no reference tone for the D.' },
+      { q: 'The E button is hard to hear on my phone or laptop. Is it working?', a: 'Probably. The E is 41.20 Hz and small speakers play very little that low; what you hear is mostly the overtones of the tone. Headphones or a larger speaker show the note much better, and the overtones are still enough to tune against by ear.' },
+      micPrivacy,
+    ],
+  },
+  {
+    slug: 'cello-tuner',
+    base: 'tuner',
+    name: 'Cello tuner',
+    title: 'Cello Tuner Online, C G D A, with Microphone, Free | Stayput',
+    description: 'Tune your cello online to C, G, D and A with the microphone, or by ear with reference notes. The sound is measured in your browser and not uploaded.',
+    heading: 'Cello tuner',
+    tagline: 'C, G, D and A, one open string at a time, with the sound kept on your device.',
+    keywords: ['cello tuner', 'online cello tuner', 'cello tuner online free', 'cello tuner with microphone', 'tune cello', 'cello string notes CGDA'],
+    defaults: { instrument: 'cello' },
+    sizeFact: 'Free, no account. The microphone is on only until you press Stop',
+    lead: 'Tune your cello to C, G, D and A with your microphone, or press a string button to hear each note and match it by ear. The tuner shows which string it heard and whether it is sharp or flat. It is free, and the sound from your microphone is not uploaded: everything runs in your browser on your device.',
+    intro: [
+      'A cello’s four strings are a fifth apart: C2, G2, D3 and A3, from the thickest to the thinnest. The A is the first string and the C the fourth. It is the viola’s tuning an octave lower, so the open C vibrates at 65.41 Hz. Press Start the tuner, bow one open string, and the tuner lights the string it is closest to and shows how far off it is.',
+      'A worked example: you bow the open D and the tuner shows D with the needle to the left and “17 cents flat: tune up”. Take the peg up a little, bow a long stroke again, and stop when the needle sits in the shaded middle and the D button fills in. Tune the A first, then D, G and C, each a fifth below the last.',
+      'Cello strings are long and heavy and take a moment to speak, so use a long, slow bow and give the needle a second. The C is the lowest string and the slowest to settle. If the needle will not hold on it, press the C button and tune until the string and the tone sound as one, with no slow wobble between them.',
+    ],
+    sections: [
+      {
+        heading: 'The four open strings',
+        paragraphs: ['The frequencies use the usual reference, A4 = 440 Hz, in equal temperament. They are the same numbers the page shows as a tooltip on each string button.'],
+        bullets: [
+          '**4th string, C:** C2, 65.41 Hz',
+          '**3rd string, G:** G2, 98.00 Hz',
+          '**2nd string, D:** D3, 146.83 Hz',
+          '**1st string, A:** A3, 220.00 Hz',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It is for standard C G D A tuning. A string tuned to something else, such as the A lowered to G, needs Chromatic, which shows the note name but has no string buttons.',
+          'It hears one note at a time, so bow a single string and let the others rest.',
+          'A fingered note is shown as a distance from the nearest open string, not under its own name. To read the name of a fingered note, choose Chromatic.',
+          'Microphones pick up a low C quietly. Hold the device near the instrument and away from fans or other players.',
+        ],
+      },
+    ],
+    steps: [
+      'Press Start the tuner and allow the microphone. Cello is already chosen.',
+      'Bow one open string with a long, slow stroke. The nearest of C, G, D and A lights up and the needle shows sharp or flat.',
+      'Turn the peg until it says In tune, then tune the next string: A, D, G, C.',
+    ],
+    faq: [
+      { q: 'Is a cello tuned the same as a viola?', a: 'The same note names, C G D A, but an octave lower: the viola’s C3 is 130.81 Hz and the cello’s C2 is 65.41 Hz, exactly half. A viola played against the cello list would read an octave sharp, so violists should choose Chromatic or use the [violin tuner](/violin-tuner) for the A, D and G.' },
+      { q: 'How do I tune the lowest string, the C?', a: 'The C is C2, 65.41 Hz. Bow it with a long, slow stroke and wait for the reading; the page keeps the last note on screen for a moment after the sound stops. If the needle will not hold, press the C button and tune until the string and the tone sound as one. You can also bow the C and G together: a fifth with no slow wobble in it is in tune.' },
+      { q: 'Can I tune the A string down to G for Bach’s fifth suite?', a: 'Yes. Choose Chromatic, bow the A string and lower the peg until the big letter says G with the needle centred: that is G3, 196.00 Hz. After the piece, bring it back to A3, 220.00 Hz. Chromatic has no string buttons, so there is no reference tone for it.' },
+      micPrivacy,
+    ],
+  },
+  {
+    slug: 'chromatic-tuner',
+    base: 'tuner',
+    name: 'Chromatic tuner',
+    title: 'Chromatic Tuner Online, Any Note, Free, Private | Stayput',
+    description: 'A chromatic tuner for any instrument or voice: play or sing a note and see its name and how sharp or flat it is. The sound is not uploaded. Free.',
+    heading: 'Chromatic tuner',
+    tagline: 'Any note, any instrument or voice, with the sound kept on your device.',
+    keywords: ['chromatic tuner', 'online chromatic tuner', 'chromatic tuner online free', 'free chromatic tuner', 'chromatic tuner with microphone', 'note detector', 'what note am I playing'],
+    defaults: { instrument: 'chromatic' },
+    sizeFact: 'Free, no account. The microphone is on only until you press Stop',
+    lead: 'Play or sing a note and see which of the twelve notes it is closest to and how sharp or flat it is, for any instrument or voice. There is no instrument to choose and no string to aim at. It is free, and the sound from your microphone is not uploaded: everything runs in your browser on your device.',
+    intro: [
+      'A chromatic tuner does not aim at a set of strings. It takes the single note you play or sing, names the nearest of the twelve notes in the scale, and shows with a needle how far sharp or flat you are. That suits a trumpet, a flute, a recorder, a voice, or an instrument with an unusual tuning. Press Start the tuner and play one note.',
+      'The big letter is the note, with its octave beside it, and the pitch in Hz sits under the needle, for example 261.6 Hz. Sharps are written with a ♯, so a B♭ appears as A♯. There are no string buttons here, because no instrument is chosen, so there are no reference tones to play.',
+      'A worked example: you play a note on a B♭ trumpet that you read as a C. The page shows A♯, because it names the sound that comes out, not the written note. If the needle sits left of centre with “12 cents flat: tune up”, push the main tuning slide in a little to raise the pitch, and play again.',
+    ],
+    sections: [
+      {
+        heading: 'The twelve notes in one octave',
+        paragraphs: ['Octave 4, from middle C, at A4 = 440 Hz in equal temperament. Each octave up doubles the frequency, so C5 is 523.25 Hz.'],
+        bullets: [
+          'C4 261.63 Hz, C♯4 277.18 Hz, D4 293.66 Hz, D♯4 311.13 Hz',
+          'E4 329.63 Hz, F4 349.23 Hz, F♯4 369.99 Hz, G4 392.00 Hz',
+          'G♯4 415.30 Hz, A4 440.00 Hz, A♯4 466.16 Hz, B4 493.88 Hz',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It reads one note at a time. Chords, double stops and several players at once confuse it.',
+          'It listens between about 30 Hz and 1,500 Hz, which is B0 up to F♯6. Notes outside that range are not read.',
+          'It does not choose a string for you. For a guitar or a ukulele, the [guitar tuner](/guitar-tuner) and [ukulele tuner](/ukulele-tuner) light the string you are tuning and play its reference note.',
+          'It does not tune a piano. It can show how one note reads against its pitch, a single key at a time; it does not set a temperament.',
+          'It shows the sounding pitch, not the written note, so transposing instruments read differently from their music.',
+        ],
+      },
+    ],
+    steps: [
+      'Press Start the tuner and allow the microphone. Chromatic is already chosen.',
+      'Play or sing one note and hold it. The big letter is the nearest note, and the needle shows how far sharp or flat.',
+      'Adjust until the needle sits in the shaded middle and it says In tune.',
+    ],
+    faq: [
+      { q: 'What is the difference between a chromatic tuner and an instrument tuner?', a: 'An instrument tuner compares what you play with a few open strings. A chromatic tuner compares it with every semitone, so the needle shows the distance to the nearest note, never more than half a semitone either way. That is why it works for a voice or a wind instrument, which have no strings to aim at.' },
+      { q: 'Why does it say A♯ when my music says B♭?', a: 'They are the same pitch with two names, and this page writes sharps only. B♭ is A♯, E♭ is D♯, A♭ is G♯, D♭ is C♯ and G♭ is F♯.' },
+      { q: 'I play a B♭ or E♭ instrument. Why does it name a different note from the one I read?', a: 'The page names the sound that comes out. A B♭ clarinet, trumpet or tenor sax sounds a whole step below its written note, and an E♭ alto sax sounds a major sixth below. When a band asks for concert B♭, you play your written C and the page should show A♯.' },
+      { q: 'How low and how high can it hear?', a: 'From about 30 Hz to about 1,500 Hz: B0 at 30.87 Hz up to F♯6 at 1,479.98 Hz. That covers the open strings of a four-string bass and the range of most voices and instruments; a piccolo’s highest notes are beyond it.' },
+      micPrivacy,
+    ],
+  },
+  {
+    slug: 'banjo-tuner',
+    base: 'tuner',
+    name: 'Banjo tuner',
+    title: 'Banjo Tuner Online, Open G, with Microphone, Free | Stayput',
+    description: 'Tune a five-string banjo online to open G (g D G B D) with the microphone, or by ear with reference notes. The sound stays in your browser. Free.',
+    heading: 'Banjo tuner',
+    tagline: 'Open G, g D G B D, one string at a time, with the sound kept on your device.',
+    keywords: ['banjo tuner', 'online banjo tuner', 'banjo tuner online free', 'banjo tuner with microphone', 'tune banjo', '5 string banjo tuner', 'open g banjo tuning'],
+    defaults: { instrument: 'banjo' },
+    sizeFact: 'Free, no account. The microphone is on only until you press Stop',
+    lead: 'Tune a five-string banjo to open G (g D G B D) with your microphone, or press a string button to hear each note and tune by ear. The tuner shows the string it heard and whether it is sharp or flat. It is free, and the sound from your microphone is not uploaded: everything runs in your browser on your device.',
+    intro: [
+      'A five-string banjo in open G is tuned g D G B D. The short fifth string is G4, the highest note on the banjo even though it sits next to the lowest string; the other four are D3, G3, B3 and D4. Played open, they sound a G major chord with nothing fretted. Press Start the tuner, pluck one open string, and the tuner lights the string it is closest to and shows how far off it is.',
+      'A worked example: you pluck the third string and the tuner shows G with the needle to the right and “26 cents sharp: tune down”. Slacken the peg past the note, then bring it back up until the needle sits in the shaded middle and the G button fills in. A banjo note dies away quickly, so the page keeps the last note on screen for about a second after the sound stops; pluck again to refresh it.',
+      'The fifth string is the one people forget. It starts at its own peg partway up the neck, at the fifth fret, which is why it is short and why it is tuned above the rest: it is a drone that sounds the G of the chord against the melody. Tune it like any other string, with its own button, G4.',
+    ],
+    sections: [
+      {
+        heading: 'The five open strings',
+        paragraphs: ['Shown in the order the page lists them, the way open G is written: g D G B D. The frequencies use A4 = 440 Hz in equal temperament, the same numbers the page shows as a tooltip on each string button.'],
+        bullets: [
+          '**5th string, g:** G4, 392.00 Hz (the short drone string)',
+          '**4th string, D:** D3, 146.83 Hz',
+          '**3rd string, G:** G3, 196.00 Hz',
+          '**2nd string, B:** B3, 246.94 Hz',
+          '**1st string, D:** D4, 293.66 Hz',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It is open G only. Double C (g C G C D), G modal or sawmill (g D G C D) and four-string tenor or plectrum tunings are not in the list; choose Chromatic for those.',
+          'Take the capo off first. With it on, every string sounds higher than the list expects.',
+          'A string more than about a semitone and a half off can be taken for its neighbour. Bring a very slack new string close by ear with the string buttons, then use the needle.',
+          'It hears one string at a time. Strumming, or a roll, gives it several pitches at once.',
+        ],
+      },
+    ],
+    steps: [
+      'Press Start the tuner and allow the microphone. Banjo, 5-string open G is already chosen.',
+      'Pluck one open string and let it ring. The nearest of g, D, G, B and D lights up and the needle shows sharp or flat.',
+      'Turn the peg until it says In tune, then tune the next string.',
+    ],
+    faq: [
+      { q: 'Why is the fifth string tuned higher than the rest?', a: 'It is a drone. The fifth string is short, starts at the fifth fret and is tuned to G4, above the first string’s D4. In open G it plays the root of the chord against the melody on the other four, which is much of the banjo’s ringing sound. Its peg is on the side of the neck, so reach for that one separately.' },
+      { q: 'How do I get from open G to double C or sawmill?', a: 'Choose Chromatic, which names any note. For double C, g C G C D, lower the fourth string from D3 to C3 (130.81 Hz) and raise the second string from B3 up to C4 (261.63 Hz); the other three stay. For sawmill, g D G C D, raise only the second string from B3 to C4. Chromatic has no string buttons, so there is no reference tone.' },
+      { q: 'Why does my banjo drift out of tune?', a: 'The head is a drum skin stretched over the pot, and the bridge rests on it, so temperature and humidity change its tension and with it the pitch. A banjo that has just come in from a cold car often reads flat for the first few minutes. Let it sit in the room, then tune again.' },
+      micPrivacy,
+    ],
+  },
+  {
+    slug: 'mandolin-tuner',
+    base: 'tuner',
+    name: 'Mandolin tuner',
+    title: 'Mandolin Tuner Online, G D A E, with Microphone, Free | Stayput',
+    description: 'Tune a mandolin online to G, D, A and E with the microphone, or by ear with reference notes, one string of each pair at a time. Not uploaded. Free.',
+    heading: 'Mandolin tuner',
+    tagline: 'G, D, A and E, one string of each pair at a time, with the sound kept on your device.',
+    keywords: ['mandolin tuner', 'online mandolin tuner', 'mandolin tuner online free', 'mandolin tuner with microphone', 'tune mandolin', 'mandolin tuning GDAE'],
+    defaults: { instrument: 'mandolin' },
+    sizeFact: 'Free, no account. The microphone is on only until you press Stop',
+    lead: 'Tune your mandolin to G, D, A and E with your microphone, or press a string button to hear each note and tune by ear. The tuner shows which string it heard and whether it is sharp or flat; tune one string of each pair, then match its partner by ear. It is free, and the sound from your microphone is not uploaded: everything runs in your browser on your device.',
+    intro: [
+      'A mandolin has eight strings in four pairs, called courses, tuned G3, D4, A4 and E5 from the thickest pair to the thinnest. The two strings of a course are tuned to the same note. Press Start the tuner, pick one string, and the tuner lights the course it is closest to and shows how far off it is.',
+      'A worked example: lay a fingertip lightly across one string of the A course to mute it and pick the other. The tuner shows A with “13 cents flat: tune up”. Bring that string up until the needle sits in the shaded middle and the A button fills in. Lift your finger and pick the partner on its own, and tune it until it sounds as one with the first.',
+      'The tuner hears one pitch, so when you play a pair together it cannot tell which of the two is out. That is why you tune a string at a time. When the pair is right, there is no slow wobble when you play both. Work up the courses, G, D, A and E, and go round once more at the end.',
+    ],
+    sections: [
+      {
+        heading: 'The four courses',
+        paragraphs: ['Each is a pair of strings tuned to the same note. The frequencies use A4 = 440 Hz in equal temperament, the same numbers the page shows as a tooltip on each string button.'],
+        bullets: [
+          '**4th course, G:** G3, 196.00 Hz',
+          '**3rd course, D:** D4, 293.66 Hz',
+          '**2nd course, A:** A4, 440.00 Hz',
+          '**1st course, E:** E5, 659.26 Hz',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It does not tune the two strings of a pair against each other. The microphone hears one pitch; matching the partner is done by ear, by listening for the wobble to slow and stop.',
+          'It does not know which of two strings is out when both ring. Mute one with a fingertip.',
+          'It is for a standard mandolin. An octave mandolin or a mandola is tuned differently; choose Chromatic for those.',
+          'It does not set the bridge position. If each open pair is in tune but fretted notes are not, the bridge is the thing to look at.',
+        ],
+      },
+    ],
+    steps: [
+      'Press Start the tuner and allow the microphone. Mandolin is already chosen.',
+      'Mute one string of a pair and pick the other. The nearest of G, D, A and E lights up and the needle shows sharp or flat.',
+      'Turn the peg until it says In tune, then un-mute the partner and tune it to match. Move to the next pair.',
+    ],
+    faq: [
+      { q: 'What is the wobble I hear when I play a pair?', a: 'Two strings that are close in pitch but not equal make a slow pulse, called beating. The further apart they are, the faster it pulses. As you bring the second string toward the first the pulse slows, and when it stops the pair is in tune.' },
+      { q: 'Is a mandolin tuned like a violin?', a: 'Yes, the four pitches are the same: G3 196.00 Hz, D4 293.66 Hz, A4 440.00 Hz and E5 659.26 Hz. The mandolin has pairs of steel strings and a fretted neck. The [violin tuner](/violin-tuner) shows the same notes.' },
+      { q: 'Can I tune an octave mandolin or a mandola?', a: 'Choose Chromatic and tune each string to its note. An octave mandolin is G2 D3 A3 E4 (98.00, 146.83, 220.00 and 329.63 Hz); a mandola is C3 G3 D4 A4 (130.81, 196.00, 293.66 and 440.00 Hz). Chromatic has no string buttons, so there are no reference tones.' },
+      micPrivacy,
     ],
   },
   {

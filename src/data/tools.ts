@@ -2807,7 +2807,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How accurate is it?',
-        a: 'Within about one cent on a clear, sustained note, which is finer than most ears can hear (a semitone is 100 cents). Let the string ring rather than plucking it repeatedly, and tune in a quiet room: other notes or chatter make the reading jump.',
+        a: 'Within a few cents on a clear, sustained note, which is close to the limit of what most ears can hear (a semitone is 100 cents, and the needle counts 5 cents either side as in tune). Let the string ring rather than plucking it repeatedly, and tune in a quiet room: other notes or chatter make the reading jump.',
       },
       {
         q: 'What does A4 = 440 Hz mean? Should I change it?',
