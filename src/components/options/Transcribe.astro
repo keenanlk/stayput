@@ -29,6 +29,7 @@ const formats = [
   ['srt', 'Subtitles (.srt)'],
   ['vtt', 'Web captions (.vtt)'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="language">Spoken language</label>
@@ -49,4 +50,6 @@ const formats = [
     <label><input type="radio" name="task" value="translate" checked={task === 'translate'} /><span>Translate to English</span></label>
   </div>
 </div>
-<p class="muted small">Expect about two to three minutes of work for every ten minutes of sound on a laptop, or about one minute on a computer with WebGPU, and longer on a phone.</p>
+<OptionDetails>
+  <p>Expect about two to three minutes of work for every ten minutes of sound on a laptop, or about one minute on a computer with WebGPU, and longer on a phone.</p>
+</OptionDetails>

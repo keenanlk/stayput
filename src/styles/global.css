@@ -257,6 +257,15 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .file-item .actions { display: flex; gap: 4px; }
 .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; padding: 4px 0 2px; }
 .options .wide { grid-column: 1 / -1; }
+/* Notes and the Details disclosure sit on their own full-width row, never in a grid cell. */
+.options > p, .options > details { grid-column: 1 / -1; margin: 0; }
+.options > p { font-size: 14px; color: var(--muted); }
+.options > p + p { margin-top: -10px; }
+@media (min-width: 900px) { .options > .check { grid-column: span 2; } }
+.hint { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+.opt-details summary { cursor: pointer; font-size: 14px; font-weight: 620; color: var(--ink-2); width: fit-content; }
+.opt-details p { margin: 8px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
+.opt-details p:first-of-type { margin-top: 10px; }
 .run-dock { display: grid; gap: 12px; }
 .run-dock .error { max-height: 30vh; overflow-y: auto; }
 .run-hint { font-size: 14px; color: var(--ink-2); }

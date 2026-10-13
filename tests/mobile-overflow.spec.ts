@@ -16,6 +16,7 @@ const pages = [
   '/tools/crop-video',
   '/tools/resize-gif',
   '/tools/crop-gif',
+  '/tools/merge-gifs',
   '/tools/add-text-to-gif',
   '/tools/barcode-generator',
   '/tools/qr-code-scanner',

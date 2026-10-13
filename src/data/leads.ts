@@ -23,6 +23,7 @@ const does: Record<string, string> = {
   'compress-png': 'Compresses PNG files with a smart colour palette or losslessly, keeps transparency, and saves smaller PNGs.',
   'strip-exif': 'Removes EXIF metadata, GPS location and camera details from JPG, PNG and WebP photos, copying the image data unchanged unless a sideways JPG is turned upright.',
   'exif-viewer': 'Shows the EXIF data inside a JPG, PNG, WebP, HEIC or TIFF photo: GPS location, camera, date and every other field.',
+  'merge-gifs': 'Joins several animated GIFs into one, in the order you set, fitting GIFs of other sizes to the first and keeping each frame’s timing.',
   'merge-pdf': 'Combines several PDF files into one PDF, in the order you set.',
   'split-pdf': 'Splits a PDF into single pages, a page range or chunks, and saves the pieces as PDFs.',
   'compress-pdf': 'Makes a PDF smaller, from a lossless cleanup to aggressive compression, or fits it under a size such as 1 MB.',

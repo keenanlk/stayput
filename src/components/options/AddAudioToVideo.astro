@@ -3,8 +3,8 @@
 interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
 const mode = defaults.mode ?? 'replace';
+import OptionDetails from '../OptionDetails.astro';
 ---
-<p class="small muted wide" style="margin:0">Drop one video and one sound file: an MP3, WAV or M4A, or another video to take its sound. If both are videos, the top one keeps its picture.</p>
 <div class="field">
   <label for="mode">The video’s own sound</label>
   <select id="mode">
@@ -16,3 +16,6 @@ const mode = defaults.mode ?? 'replace';
   <label class="check"><input type="checkbox" id="loop" checked={defaults.loop !== 'false'} /> Loop the sound if it is shorter than the video</label>
   <label class="check"><input type="checkbox" id="fade" checked={defaults.fade !== 'false'} /> Fade the sound out at the end</label>
 </div>
+<OptionDetails>
+  <p>Drop one video and one sound file: an MP3, WAV or M4A, or another video to take its sound. If both are videos, the top one keeps its picture.</p>
+</OptionDetails>
