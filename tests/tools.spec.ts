@@ -712,6 +712,15 @@ function cachedPaths(page: Page) {
   return page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).map((r) => new URL(r.url).pathname));
 }
 
+/** Paths in the service worker's page cache and asset cache. */
+function savedPaths(page: Page) {
+  return page.evaluate(async () => {
+    const out: string[] = [];
+    for (const name of ['stayput-pages', 'stayput-assets']) for (const r of await (await caches.open(name)).keys()) out.push(new URL(r.url).pathname);
+    return out;
+  });
+}
+
 /** Wait for the page's report that the service worker holds its decoders ("none" when it needs none). */
 async function decoderCache(page: Page, expected: 'cached' | 'none') {
   const state = () => page.evaluate(() => {
@@ -1639,23 +1648,128 @@ test.describe('offline', () => {
     expect(missing?.status()).toBe(404);
   });
 
-  test('After one visit every tool works offline, including code it never loaded online', async ({ page, context }) => {
-    // Before the fix the service worker cached only chunks the visit happened to
-    // load, so a first-time visitor who went offline could not run a PDF tool.
+  test('A tool page that was opened works offline, including code it never loaded online', async ({ page, context }) => {
+    // The service worker used to cache only chunks the visit happened to load, so a first-time
+    // visitor who went offline could not run a PDF tool. Opening the page now saves everything
+    // that page can load, with no visit to the home page first.
     await stubAnalytics(page);
-    await page.goto('/');
+    await page.goto('/tools/merge-pdf');
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;
     });
-    // Wait until the install step has put every asset in the cache.
+    // Wait until the worker has put the page's on-demand code (pdf-lib, pdf.js, the worker) in the cache.
     await expect
-      .poll(async () => page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).length), { timeout: 30_000 })
-      .toBeGreaterThan(20);
+      .poll(async () => (await savedPaths(page)).some((p) => /\/pdf\.worker\.min-/.test(p)), { timeout: 30_000 })
+      .toBe(true);
     await context.setOffline(true);
     await page.goto('/tools/merge-pdf');
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     const { downloads } = await run(page, ['text.pdf', 'scan.pdf']);
     expect((await PDFDocument.load(await bytesOf(downloads[0]!))).getPageCount()).toBe(5);
+    await context.setOffline(false);
+  });
+
+  /** Requests this site receives, from the page and from its service worker, until none arrive for `quiet` ms. */
+  async function countRequests(page: Page, context: BrowserContext, quiet = 3000) {
+    const seen: string[] = [];
+    context.on('request', (r) => {
+      const u = new URL(r.url());
+      if (u.hostname === 'localhost') seen.push(u.pathname);
+    });
+    return {
+      seen,
+      async settled() {
+        let last = -1;
+        let since = Date.now();
+        while (Date.now() - since < quiet) {
+          await page.waitForTimeout(250);
+          if (seen.length !== last) {
+            last = seen.length;
+            since = Date.now();
+          }
+        }
+        return seen.length;
+      },
+    };
+  }
+
+  test('A first visit saves a small set, not the whole site', async ({ page, context }) => {
+    // The first visit used to fetch all 444 pages and every script (about 780 requests).
+    const counter = await countRequests(page, context);
+    await stubAnalytics(page);
+    await page.goto('/tools/heic-to-jpg');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    const total = await counter.settled();
+    expect(total).toBeLessThan(100);
+    const paths = await savedPaths(page);
+    const pages = paths.filter((p) => !p.startsWith('/_astro/') && !p.startsWith('/fonts/') && !p.startsWith('/vendor/'));
+    expect(pages).toContain('/tools/heic-to-jpg');
+    expect(pages).toContain('/');
+    expect(pages).not.toContain('/tools/merge-pdf');
+    expect(pages.length).toBeLessThan(40);
+    expect(paths.filter((p) => p.startsWith('/_astro/')).length).toBeLessThan(60);
+  });
+
+  test('Installing the app saves every page and script, and a page never opened then works offline', async ({ page, context }) => {
+    await stubAnalytics(page);
+    await page.goto('/tools/heic-to-jpg');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    const before = (await savedPaths(page)).length;
+    // The browser fires this when the visitor installs the app; the page asks the worker to save everything.
+    await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
+    const isPage = (p: string) => !p.startsWith('/_astro/') && !p.startsWith('/fonts/') && !p.startsWith('/vendor/');
+    await expect.poll(async () => (await savedPaths(page)).filter(isPage).length, { timeout: 60_000 }).toBeGreaterThanOrEqual(440);
+    await expect.poll(async () => (await savedPaths(page)).filter((p) => p.startsWith('/_astro/')).length, { timeout: 60_000 }).toBeGreaterThanOrEqual(300);
+    expect((await savedPaths(page)).length).toBeGreaterThan(before + 500);
+    await context.setOffline(true);
+    await page.goto('/tools/compress-pdf');
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await context.setOffline(false);
+  });
+
+  test('Caches left by earlier versions are cleaned up and saved pages are kept across updates', async ({ page }) => {
+    // Earlier workers kept pages in stayput-<version>-pages and dropped them on every deploy.
+    await stubAnalytics(page);
+    await page.route('**/register-sw.js', (route) => route.fulfill({ contentType: 'text/javascript', body: '' }));
+    await page.goto('/tools/heic-to-jpg');
+    await page.evaluate(async () => {
+      const old = await caches.open('stayput-abc123-pages');
+      await old.put('/tools/old-page', new Response('old'));
+      const assets = await caches.open('stayput-assets');
+      await assets.put('/_astro/gone.0000.js', new Response('old'));
+      await assets.put('/models/keep-me.onnx', new Response('model'));
+    });
+    await page.unroute('**/register-sw.js');
+    await page.reload();
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) await new Promise((r) => navigator.serviceWorker.addEventListener('controllerchange', r, { once: true }));
+    });
+    const names = await page.evaluate(() => caches.keys());
+    expect(names).not.toContain('stayput-abc123-pages');
+    expect(names).toContain('stayput-pages');
+    const paths = await savedPaths(page);
+    expect(paths).not.toContain('/_astro/gone.0000.js');
+    expect(paths).toContain('/models/keep-me.onnx');
+    expect(paths).toContain('/tools/heic-to-jpg');
+  });
+
+  test('A model tool opened once and run online loads offline with everything it needs', async ({ page, context }) => {
+    // The model itself is stored by transformers.js (tests/speech-model-cache.spec.ts runs it offline);
+    // here the page and the code around it must come from the worker's cache.
+    await stubAnalytics(page);
+    await page.goto('/auto-caption-video');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    await expect.poll(async () => (await savedPaths(page)).some((p) => /transcribe\.worker/.test(p)), { timeout: 30_000 }).toBe(true);
+    await context.setOffline(true);
+    await page.goto('/auto-caption-video');
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     await context.setOffline(false);
   });
 

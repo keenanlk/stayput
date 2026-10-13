@@ -601,13 +601,13 @@ export const guides: Guide[] = [
       {
         h: 'Working offline after one visit, and installing it',
         p: [
-          'Because every tool is a static page and a script, the site caches its pages and code once a page has loaded, and most tools keep working with the network off from then on; the few that download a model or engine need one online run first. In Chrome, Edge and Safari you can install it as an app from the browser menu; it takes no space worth mentioning and opens like any other program.',
+          'Because every tool is a static page and a script, the site saves a page and the code it needs once the page has loaded, so a tool you have opened keeps working with the network off from then on; the few that download a model or engine need one online run first. In Chrome, Edge and Safari you can install it as an app from the browser menu, and after your first visit the installed app keeps every tool working offline; it opens like any other program.',
         ],
       },
     ],
     faq: [
       { q: 'Is a browser tool slower than a desktop app?', a: 'For these jobs, not noticeably. WebAssembly runs the same code at close to native speed, and the work happens on your own processor.' },
-      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu; after one visit and a short wait, most tools then work offline, and the few that download a model or engine need one online run first.' },
+      { q: 'Do I need to install anything?', a: 'No. Open the page. Optionally install it as an app from the browser menu; after your first visit the installed app keeps every tool working offline, and the few that download a model or engine need one online run first.' },
       { q: 'What about very large files?', a: 'The limit is your device\'s memory. A few hundred megabytes of PDF or a few hundred photos are fine on a laptop; a phone manages less at once.' },
       { q: 'How do I know the code does what it says?', a: 'It is open source under the MIT licence. The repository is linked in the footer of every page, and the network tab shows what the page does while you use it.' },
     ],

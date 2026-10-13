@@ -24,7 +24,7 @@ test('home hero offers six starting tiles that link to their tools', async ({ pa
   await expect(page.getByRole('link', { name: /^See all \d+ tools$/ })).toHaveCount(1);
 });
 
-test('home lede says offline works after one visit and a short wait', async ({ page }) => {
+test('home lede says offline works for any tool you have opened', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.hero .lede')).toContainText('After one visit and a short wait, most tools keep working with the Wi-Fi off; the ones that download a model or engine need one online run first.');
+  await expect(page.locator('.hero .lede')).toContainText('Any tool you have opened keeps working with the Wi-Fi off after a short wait; the ones that download a model or engine need one online run first.');
 });

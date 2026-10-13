@@ -153,8 +153,9 @@ const downloads: Record<string, Download> = {
  * Tools whose engine is fetched on first use rather than on page load, so they work offline only
  * after one run: a model (the `downloads` above), the MP3 encoder, the archive, checksum, noise
  * and encrypted-PDF engines, and the face finder behind blur-image. tests/claims.spec.ts
- * checks that a tool importing one of these engines is listed. Everything else is fully cached
- * on the first visit (pages, scripts and the image decoders).
+ * checks that a tool importing one of these engines is listed. Everything else is saved by one
+ * visit to its page: the page, every script it can load, and the image decoders. Pages the
+ * visitor has not opened are saved only by installing the app.
  */
 const firstUseEngines = [
   'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-converter', 'compress-audio', 'volume-booster',
@@ -162,7 +163,7 @@ const firstUseEngines = [
   'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image', 'qr-code-scanner',
 ];
 
-/** The offline badge: after the first visit, or, for tools that fetch an engine on first run, after the first use. */
+/** The offline badge (per page): after the first visit to that page, or, for tools that fetch an engine on first run, after the first use. */
 export function offlineBadge(base: string): string {
   return needsFirstUse(base) ? 'Works offline after first use' : 'Works offline after first visit';
 }

@@ -11,6 +11,9 @@ site will render this file.
 - The Image Converter detects each file's real format from its bytes (and says when the extension is wrong), has a searchable format picker, and can now save PDF, ICO (favicon sizes 16 to 256), GIF, BMP and TIFF as well as JPG, PNG and WebP.
 - This changelog.
 
+### Changed
+- Offline caching is lighter: a first visit saves the shared scripts, the page you opened with the code that tool needs, and a short list of popular pages (about 50 requests instead of about 780). Pages you open later are saved as you go, installing the app saves everything, and saved pages now survive site updates: only the pages that changed are fetched again.
+
 ### Fixed
 - Password-protected and owner-restricted PDFs now open in every PDF tool. They are unlocked in the tab by qpdf (WebAssembly); before, they produced blank or broken output.
 - Page numbers and signatures land on the visible page when a PDF's page box does not start at 0,0 or is cropped.
