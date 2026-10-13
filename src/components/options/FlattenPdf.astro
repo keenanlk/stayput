@@ -7,11 +7,14 @@ const modes = [
   ['vector', 'Fields and annotations'],
   ['image', 'Whole pages, as images'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field wide">
   <label>Flatten</label>
   <div class="segmented" role="radiogroup" aria-label="Flatten">
     {modes.map(([v, l]) => <label><input type="radio" name="mode" value={v} checked={v === mode} /><span>{l}</span></label>)}
   </div>
-  <p class="muted small">Fields and annotations keeps the text sharp and selectable. Whole pages as images leaves nothing to select, copy or edit, and the file is usually larger.</p>
 </div>
+<OptionDetails>
+  <p>Fields and annotations keeps the text sharp and selectable. Whole pages as images leaves nothing to select, copy or edit, and the file is usually larger.</p>
+</OptionDetails>

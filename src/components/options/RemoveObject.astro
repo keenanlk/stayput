@@ -11,11 +11,11 @@ const formats = [
   ['image/png', 'PNG (lossless)'],
   ['image/webp', 'WebP'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field wide">
   <label for="brush">Brush size <output id="brush-out">{brush}</output></label>
   <input type="range" id="brush" min="8" max="120" step="2" value={brush} />
-  <p class="muted small">Cover the whole object and a little around it, including its shadow. Erase works best on one thing at a time.</p>
 </div>
 <div class="field">
   <label for="format">Output format</label>
@@ -27,3 +27,6 @@ const formats = [
   <label for="quality">Quality <output id="quality-out">{quality}</output></label>
   <input type="range" id="quality" min="30" max="100" value={quality} />
 </div>
+<OptionDetails>
+  <p>Cover the whole object and a little around it, including its shadow. Erase works best on one thing at a time.</p>
+</OptionDetails>

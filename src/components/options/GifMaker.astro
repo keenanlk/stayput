@@ -22,6 +22,7 @@ const widths = [
   ['640', '640 px'],
   ['800', '800 px (large file)'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="delay">Time per picture</label>
@@ -54,9 +55,11 @@ const widths = [
   <label class="check"><input type="checkbox" id="loop" checked={loop} /> Loop forever</label>
   <label class="check"><input type="checkbox" id="bounce" checked={bounce} /> Play forward, then back</label>
 </div>
-<p class="muted small">Pictures play in the order they are listed. Use the arrows in the list to move them.</p>
 <style>
   .colour-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   #background { width: 44px; height: 36px; padding: 2px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); }
   .swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); cursor: pointer; }
 </style>
+<OptionDetails>
+  <p>Pictures play in the order they are listed. Use the arrows in the list to move them.</p>
+</OptionDetails>
