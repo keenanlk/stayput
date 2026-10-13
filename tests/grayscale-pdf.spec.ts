@@ -24,11 +24,8 @@ function makeJpegs() {
   const prog = join(dir, 'prog.jpg');
   python(`
 from PIL import Image
-import numpy as np
-x = np.linspace(0, 255, 200)[None, :].repeat(150, 0)
-y = np.linspace(0, 255, 150)[:, None].repeat(200, 1)
-img = np.stack([x, y, 255 - x], -1).astype('uint8')
-im = Image.fromarray(img)
+im = Image.new('RGB', (200, 150))
+im.putdata([(round(x * 255 / 199), round(y * 255 / 149), 255 - round(x * 255 / 199)) for y in range(150) for x in range(200)])
 im.save(${JSON.stringify(rgb)}, quality=92)
 im.save(${JSON.stringify(prog)}, quality=92, progressive=True)
 Image.new('CMYK', (64, 48), (128, 0, 0, 51)).save(${JSON.stringify(cmyk)}, quality=95)
