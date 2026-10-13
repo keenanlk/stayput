@@ -11,7 +11,7 @@ export const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G�
 export interface Instrument {
   id: string;
   label: string;
-  /** Open strings, low to high, as MIDI note numbers. */
+  /** Open strings as MIDI note numbers, in the order players name them (low to high, except re-entrant tunings). */
   strings: number[];
 }
 
@@ -23,6 +23,9 @@ export const instruments: Instrument[] = [
   { id: 'ukulele', label: 'Ukulele, standard (G C E A)', strings: [67, 60, 64, 69] },
   { id: 'ukulele-low-g', label: 'Ukulele, low G (G C E A)', strings: [55, 60, 64, 69] },
   { id: 'violin', label: 'Violin (G D A E)', strings: [55, 62, 69, 76] },
+  { id: 'cello', label: 'Cello (C G D A)', strings: [36, 43, 50, 57] },
+  { id: 'banjo', label: 'Banjo, 5-string open G (g D G B D)', strings: [67, 50, 55, 59, 62] },
+  { id: 'mandolin', label: 'Mandolin (G D A E)', strings: [55, 62, 69, 76] },
 ];
 
 export const instrumentById = (id: string) => instruments.find((i) => i.id === id) ?? instruments[0]!;

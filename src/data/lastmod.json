@@ -59,9 +59,17 @@
   "date": "2026-10-12",
   "hash": "fc40f79a5d17a12f"
  },
+ "/banjo-tuner": {
+  "date": "2026-10-13",
+  "hash": "944c8f5004c3479b"
+ },
  "/barcode-scanner-online": {
   "date": "2026-10-12",
   "hash": "50a76466ec4b566e"
+ },
+ "/bass-tuner": {
+  "date": "2026-10-13",
+  "hash": "52d6fae43eb24f4c"
  },
  "/black-and-white-pdf": {
   "date": "2026-10-12",
@@ -103,9 +111,17 @@
   "date": "2026-10-12",
   "hash": "f2d05dc56c6d366e"
  },
+ "/cello-tuner": {
+  "date": "2026-10-13",
+  "hash": "5ebb1c1a6bf6c5de"
+ },
  "/change-video-resolution": {
   "date": "2026-10-12",
   "hash": "be672ac71539971e"
+ },
+ "/chromatic-tuner": {
+  "date": "2026-10-13",
+  "hash": "34692571ac06743b"
  },
  "/code-128-barcode-generator": {
   "date": "2026-10-12",
@@ -903,6 +919,10 @@
   "date": "2026-10-12",
   "hash": "4dfcacc4d685b8b6"
  },
+ "/mandolin-tuner": {
+  "date": "2026-10-13",
+  "hash": "d4005d1e699902d7"
+ },
  "/mcp": {
   "date": "2026-10-03",
   "hash": "a6562a5355b951f2"
@@ -1620,8 +1640,8 @@
   "hash": "124680eca7c049a4"
  },
  "/tools/tuner": {
-  "date": "2026-10-12",
-  "hash": "8f23ac7a8cfc6884"
+  "date": "2026-10-13",
+  "hash": "f53aa12af43e99d8"
  },
  "/tools/unlock-pdf": {
   "date": "2026-10-12",
@@ -1722,6 +1742,10 @@
  "/video-to-text": {
   "date": "2026-10-12",
   "hash": "0ddbf8c65f6cb640"
+ },
+ "/violin-tuner": {
+  "date": "2026-10-13",
+  "hash": "5df98c349dd4093c"
  },
  "/watermark-id-copy": {
   "date": "2026-10-12",

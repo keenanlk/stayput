@@ -6008,6 +6008,51 @@ test('Ukulele tuner page starts on ukulele, reads a chromatic note on A4 = 432, 
   await expect(page.locator('#tuner-message')).toContainText('press a string');
 });
 
+test('The six instrument tuner pages open on their instrument with its string buttons, and no offline claim in the lead', async ({ page }) => {
+  const pagesWanted: [slug: string, instrument: string, h1: string, strings: string[]][] = [
+    ['violin-tuner', 'violin', 'Violin tuner', ['G3', 'D4', 'A4', 'E5']],
+    ['bass-tuner', 'bass', 'Bass tuner', ['E1', 'A1', 'D2', 'G2']],
+    ['cello-tuner', 'cello', 'Cello tuner', ['C2', 'G2', 'D3', 'A3']],
+    ['chromatic-tuner', 'chromatic', 'Chromatic tuner', []],
+    ['banjo-tuner', 'banjo', 'Banjo tuner', ['G4', 'D3', 'G3', 'B3', 'D4']],
+    ['mandolin-tuner', 'mandolin', 'Mandolin tuner', ['G3', 'D4', 'A4', 'E5']],
+  ];
+  for (const [slug, instrument, h1, strings] of pagesWanted) {
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool'), slug).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('h1'), slug).toHaveText(h1);
+    await expect(page.locator('#instrument'), slug).toHaveValue(instrument);
+    if (strings.length) await expect(page.locator('.tuner-string'), slug).toHaveText(strings);
+    else await expect(page.locator('.tuner-string'), slug).toHaveCount(0);
+    await expect(page.locator('.hero-lead'), slug).toContainText('not uploaded');
+    await expect(page.locator('.hero-lead'), slug).not.toContainText('offline');
+  }
+});
+
+test('Cello and banjo tuner pages read their lowest and shortest open strings from a tone', async ({ page }) => {
+  await stubAnalytics(page);
+  // Cello open C, C2 = 65.41 Hz, 12 cents sharp.
+  await fakeTone(page, 65.41 * 2 ** (12 / 1200));
+  await page.goto('/cello-tuner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-name')).toHaveText('C');
+  await expect(page.locator('#tuner-octave')).toHaveText('2');
+  await expect(page.locator('#tuner-hint')).toHaveText(/1[0-4] cents sharp: tune down/);
+  await expect(page.locator('.tuner-string').first()).toHaveAttribute('data-active', 'true');
+
+  // Banjo fifth string, G4 = 392 Hz, listed first; it must not light the open third string G3.
+  await fakeTone(page, 392);
+  await page.goto('/banjo-tuner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-name')).toHaveText('G');
+  await expect(page.locator('#tuner-octave')).toHaveText('4');
+  await expect(page.locator('#tuner-hint')).toHaveText('In tune');
+  await expect(page.locator('.tuner-string').nth(0)).toHaveAttribute('data-active', 'true');
+  await expect(page.locator('.tuner-string').nth(2)).not.toHaveAttribute('data-active', 'true');
+});
+
 /** Record when each metronome click is scheduled to sound, on the audio clock. */
 async function recordClicks(page: Page) {
   await page.addInitScript(() => {
