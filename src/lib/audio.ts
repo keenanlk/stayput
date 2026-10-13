@@ -18,8 +18,8 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
   let buffer: AudioBuffer;
   try {
     buffer = await ctx.decodeAudioData(bytes);
-  } catch {
-    buffer = await decodeThroughDemuxer(file, rate);
+  } catch (e) {
+    buffer = await decodeThroughDemuxer(file, rate, e);
   }
   return buffer.numberOfChannels > 2 ? downmixToStereo(buffer) : buffer;
 }
@@ -28,10 +28,12 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
  * Safari cannot decode a QuickTime .mov (what an iPhone records) as a whole, so the sound
  * track's packets are lifted out with the demuxer and decoded from a small MP4 wrapper.
  */
-async function decodeThroughDemuxer(file: File, rate: number): Promise<AudioBuffer> {
+async function decodeThroughDemuxer(file: File, rate: number, firstError: unknown): Promise<AudioBuffer> {
   const { demuxedFileSound } = await import('./demux-audio');
-  const chans = await demuxedFileSound(file, rate, false).catch(() => null);
-  if (!chans?.length) throw audioDecodeError();
+  // The browser's refusal is what a failed run is recorded under, unless the demuxer fails in a way of its own.
+  let cause = firstError;
+  const chans = await demuxedFileSound(file, rate, false).catch((e) => ((cause = e instanceof Error ? e : cause), null));
+  if (!chans?.length) throw audioDecodeError(undefined, cause);
   const buffer = new AudioBuffer({ length: chans[0]!.length, numberOfChannels: chans.length, sampleRate: rate });
   chans.forEach((ch, c) => buffer.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
   return buffer;
