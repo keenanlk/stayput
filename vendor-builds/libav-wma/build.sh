@@ -11,7 +11,8 @@
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 out="$(mkdir -p "${1:-$here/dist}" && cd "${1:-$here/dist}" && pwd)"
-work="$(mktemp -d)"
+# Docker must be able to mount the work directory: BUILD_TMP names one (Docker Desktop shares your home folder).
+work="$(mktemp -d "${BUILD_TMP:-${TMPDIR:-/tmp}}/libav-wma.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
 LIBAVJS=6.10.9
 FULL=6.10.9.0
