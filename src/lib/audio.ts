@@ -17,11 +17,33 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
   const ctx = new OfflineAudioContext(2, 1, rate);
   let buffer: AudioBuffer;
   try {
-    buffer = await ctx.decodeAudioData(bytes);
+    buffer = await ctx.decodeAudioData(bytes.slice(0));
   } catch {
-    buffer = await decodeThroughDemuxer(file, rate);
+    buffer = await decodeThroughDemuxer(file, rate).catch(async (error) => {
+      // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.
+      const aiff = await decodeAiff(bytes, rate);
+      if (!aiff) throw error;
+      return aiff;
+    });
   }
   return buffer.numberOfChannels > 2 ? downmixToStereo(buffer) : buffer;
+}
+
+/** PCM AIFF or AIFC as an AudioBuffer at `rate`, or null when it is not one this can read. */
+async function decodeAiff(bytes: ArrayBuffer, rate: number): Promise<AudioBuffer | null> {
+  const { parseAiff } = await import('./aiff');
+  const aiff = parseAiff(bytes);
+  if (!aiff) return null;
+  const length = aiff.channels[0]!.length;
+  const source = new AudioBuffer({ length, numberOfChannels: aiff.channels.length, sampleRate: aiff.sampleRate });
+  aiff.channels.forEach((ch, c) => source.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
+  if (aiff.sampleRate === rate) return source;
+  const ctx = new OfflineAudioContext(source.numberOfChannels, Math.max(1, Math.ceil((length * rate) / aiff.sampleRate)), rate);
+  const node = ctx.createBufferSource();
+  node.buffer = source;
+  node.connect(ctx.destination);
+  node.start();
+  return ctx.startRendering();
 }
 
 /**
