@@ -121,6 +121,7 @@ const does: Record<string, string> = {
   'redact-pdf': 'Blacks out names, numbers and addresses in a PDF so the text underneath is removed, not just covered.',
   'file-checksum': 'Computes the MD5, SHA-1 or SHA-256 checksum of a file so you can compare it with the one the publisher lists.',
   'audio-splitter': 'Splits one audio file into separate MP3 or WAV parts at the times you set or at equal lengths.',
+  'subtitle-converter': 'Converts a subtitle file from SRT to WebVTT or from WebVTT to SRT, keeping every caption’s words and timing.',
   'json-to-csv': 'Converts JSON to CSV or CSV to JSON, flattening nested objects, with the delimiter, headers and Excel-friendly encoding you choose.',
 };
 
