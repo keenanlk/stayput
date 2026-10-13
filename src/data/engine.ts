@@ -163,6 +163,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. The part you chose is copied, faded if asked, and written as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
     versus: 'Online audio cutters upload your file to a server, surround the download with ads, and some keep the file. Voice memos, interviews and unreleased tracks are private. Here the sound never leaves your device.',
   },
+  'audio-splitter': {
+    how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. Each part is copied out between the points you chose, with no fades, so every part starts at the sample where the one before it ended, and is written as MP3 by LAME compiled to WebAssembly or as a 16-bit WAV. The parts are packed into a zip by code in the page.',
+    versus: 'The recording is decoded and cut on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
+  },
   'audio-converter': {
     how: 'Your browser decodes the sound with the decoders it uses to play media on any website. The new file is written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, FLAC by a small lossless encoder in this site’s code (fixed predictors and Rice coding, as the FLAC format describes), and M4A or OGG by the browser’s own AAC and Opus encoders (WebCodecs), packed by Mediabunny (MPL-2.0). WAV and FLAC keep the original sample rate.',
     versus: 'Online audio converters upload every file, queue it, cap free use at a few files or a few hundred megabytes, and keep the upload for hours. Recordings of meetings, unreleased songs and voice memos are private. Here the files never leave your device and a whole folder converts at once.',

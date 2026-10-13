@@ -4624,6 +4624,56 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'audio-splitter',
+    name: 'Audio splitter',
+    title: 'Audio Splitter: Split an MP3 or WAV into Parts | Stayput',
+    description: 'Split an MP3, WAV, M4A or FLAC file into separate parts at times you set or every few minutes, in your browser. Free, no account, not uploaded.',
+    heading: 'Split an audio file',
+    tagline: 'Cut one long recording into separate files at the times you choose or at equal lengths. Done on this device, and the file is not uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac,.mp4,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a sound file to split',
+    action: 'Split audio',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long recording may need a computer.',
+    keywords: ['audio splitter', 'split audio', 'split mp3', 'mp3 splitter', 'split audio file', 'split wav file', 'audio splitter online', 'cut audio into parts'],
+    lead: 'Splits one audio file into separate parts, either at the times you type or every few minutes, and saves them as MP3 or WAV files. It is free, needs no account and adds no watermark, and your file is not uploaded: your browser decodes the sound and cuts it inside this tab. The size limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.',
+    steps: [
+      'Drop a sound file (MP3, WAV, M4A, OGG, FLAC) or a video, or tap to pick one.',
+      'Choose how to split: type the times where each new part should start, or pick a length such as every 10 minutes. The page lists the parts it will make.',
+      'Press Split audio. The parts are saved as MP3 or WAV files, and Download all gives you them in one zip.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have rehearsal.wav, a 62-minute recording of a band practice, and you want each song as its own file. The songs start at 11:30, 24:10 and 41:45. Choose At times I type and type 11:30, 24:10, 41:45.',
+          'Press Split audio and you get four parts: 0:00 to 11:30, 11:30 to 24:10, 24:10 to 41:45, and 41:45 to the end. They are named rehearsal-part-1 to rehearsal-part-4. Every part starts at the sample where the one before it ended, so no sound falls between two parts.',
+          'Prefer equal pieces? Choose Every so often and type 10 minutes: a 25-minute file becomes parts of 10, 10 and 5 minutes. The last part is whatever is left.',
+        ],
+      },
+      {
+        heading: 'What this page does and does not do',
+        bullets: [
+          'It splits where you say. It does not find silences or chapters on its own. To take the long pauses out of a recording, use [Remove silence](/tools/remove-silence).',
+          'It works on one file at a time. The whole file is decoded in your browser’s memory, so a long recording takes more memory, and a phone may run out of it sooner than a computer.',
+          'It makes up to 100 parts in one run. Parts are saved as MP3 at 192 kbps or as 16-bit WAV at 44.1 kHz. To keep just one stretch of a file, [Trim audio](/tools/trim-audio) is the simpler page.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I split an audio file?', a: 'Drop the file, type the times where each new part should begin (for example 12:30 and 31:05), and press Split audio. Each part is a separate file, and a Download all button gives you the lot as one zip.' },
+      { q: 'Can I split a file into equal parts?', a: 'Yes. Choose Every so often and give a length in minutes or seconds. A file is cut into parts of that length, and the last part is the remainder, so it can be shorter.' },
+      { q: 'How many parts can it make?', a: 'Up to 100 in one run. If your times or length would make more, the page says so and shows how many it would make; use fewer times or a longer length, or run the file again on a part.' },
+      { q: 'Does splitting lower the quality?', a: 'WAV parts keep the sound exactly as your browser decoded it, written as 16-bit at 44.1 kHz. MP3 parts are encoded again at 192 kbps, so they lose a little, as any MP3 re-encode does. A file at another sample rate, or with more than two channels, is converted to 44.1 kHz and at most stereo first. If you will edit the parts further, choose WAV.' },
+      { q: 'How long a file can I split?', a: 'The size limit is your device’s memory, and phones hold less than computers. The whole file is decoded in the tab before it is cut, so a very long recording needs more memory than a short one. If a phone struggles, a computer will usually manage, or cut the recording down first with [Trim audio](/tools/trim-audio).' },
+      { q: 'Will the parts play back to back without a gap?', a: 'WAV parts join exactly. MP3 parts can have a very short gap when played back to back, because MP3 encoders add a little padding at the start and end of each file. If the parts must play back with no gap, choose WAV.' },
+      { q: 'Can it split where the silence is?', a: 'Not on this page: you give the times. [Remove silence](/tools/remove-silence) cuts long pauses out of a recording, but it makes one file, not several.' },
+      { q: 'Can I split the sound of a video?', a: 'Yes. Drop the video and its sound track is loaded; the parts are saved as audio only.' },
+      { q: 'Can I split an audio file without uploading it?', a: 'Yes. Your browser decodes the sound, cuts it and writes each part with code running in this tab. Open the network tab, run a split, and your recording is not among the requests. After one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.' },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
