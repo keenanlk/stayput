@@ -3,6 +3,7 @@ import { decodeWithWasm, sniffWasmCodec, type WasmCodec } from './codecs';
 import { extOf, isHeicFile, readHead } from './files';
 import { decodePsd, isPsdFile } from './psd';
 import { decodeTiffPages, isTiffFile } from './tiff';
+import { svgFallbackSize } from './svg-size';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
 
@@ -14,7 +15,9 @@ export interface Decoded {
   heic: boolean;
 }
 
-function loadViaImageElement(file: Blob): Promise<ImageBitmap> {
+async function loadViaImageElement(file: Blob): Promise<ImageBitmap> {
+  const isSvg = file.type === 'image/svg+xml' || (file instanceof File && /\.svg$/i.test(file.name));
+  const fallback = isSvg ? svgFallbackSize(await file.text()) : undefined;
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
@@ -22,8 +25,8 @@ function loadViaImageElement(file: Blob): Promise<ImageBitmap> {
     img.onload = async () => {
       try {
         // SVGs without intrinsic size render at 300x150; give them a sane size.
-        const w = img.naturalWidth || 1024;
-        const h = img.naturalHeight || 1024;
+        const w = fallback?.width ?? (img.naturalWidth || 1024);
+        const h = fallback?.height ?? (img.naturalHeight || 1024);
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
