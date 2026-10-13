@@ -8,7 +8,8 @@
 // --browsers chromium,chrome,pixel,webkit (all; webkit runs once per cell whatever --runs says unless
 // --webkit-runs is given), --clips 60,600 (clip lengths in seconds), --tools auto-caption-video,video-to-subtitles,
 // --timeout MINUTES per run (45), --out FILE (results as JSON lines, appended as each run finishes),
-// --headed. Needs ffmpeg. `pixel` is Chromium with Pixel 7 emulation and 4x CPU throttling (main thread only).
+// --with-sw (let the service worker run: it precaches hundreds of pages per fresh profile, so it
+// is blocked by default), --headed. Needs ffmpeg. `pixel` is Chromium with Pixel 7 emulation and 4x CPU throttling (main thread only).
 // Prints one markdown row per run as it finishes and a summary table at the end.
 import { chromium, webkit, devices } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
@@ -30,6 +31,7 @@ const tools = String(arg('tools', 'auto-caption-video,video-to-subtitles')).spli
 const timeout = Number(arg('timeout', 45)) * 60_000;
 const out = arg('out', null);
 const headed = arg('headed', false) === true;
+const withSw = arg('with-sw', false) === true;
 
 const dir = mkdtempSync(join(tmpdir(), 'stayput-live-'));
 const wav = fileURLToPath(new URL('../tests/fixtures/static/jfk.wav', import.meta.url));
@@ -58,7 +60,9 @@ async function run(browserName, tool, seconds, n) {
   const network = [];
   let context;
   try {
-    context = await type.launchPersistentContext(profile, { headless: !headed, reducedMotion: 'reduce', ...options });
+    context = await type.launchPersistentContext(profile, { headless: !headed, reducedMotion: 'reduce', serviceWorkers: withSw ? 'allow' : 'block', ...options });
+    // register-sw.js skips automated browsers; --with-sw opts in.
+    if (withSw) await context.addInitScript(() => { window.__stayputAllowSW = true; });
     context.on('requestfailed', (r) => network.push(`${r.failure()?.errorText} ${r.url()}`));
     context.on('response', (r) => r.status() >= 400 && network.push(`HTTP ${r.status()} ${r.url()}`));
     const page = context.pages()[0] ?? (await context.newPage());

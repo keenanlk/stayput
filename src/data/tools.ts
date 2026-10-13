@@ -226,9 +226,9 @@ export const tools: Tool[] = [
   {
     slug: 'compress-gif',
     name: 'Compress GIF',
-    title: 'GIF Compressor: Reduce GIF File Size Online, No Upload | Stayput',
+    title: 'GIF Compressor for Discord and Slack: Make a GIF Smaller | Stayput',
     description:
-      'Compress animated GIFs in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. Often 50 to 80% smaller. No upload.',
+      'Compress animated GIFs for Discord, Slack or email in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. No upload.',
     heading: 'Compress a GIF',
     tagline: 'Make an animated GIF small enough for Discord, Slack, email or a web page. It is compressed on this device and never uploaded.',
     category: 'images',
@@ -252,7 +252,7 @@ export const tools: Tool[] = [
         a: 'Most GIFs store every frame whole, even when only a small part of the picture moves. Each frame is rewritten to hold just the area that changed, with the unchanged pixels left see-through so the frame before shows through. Medium and Strong also ignore changes too small to notice and use fewer colours, which is where GIF compressors such as gifsicle and ezgif get most of their savings.',
       },
       {
-        q: 'How do I get a GIF under a size limit?',
+        q: 'How do I compress a GIF for Discord or get it under a size limit?',
         a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels (to set exact pixel dimensions instead, use [Resize GIF](/tools/resize-gif)). Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB.',
       },
       {
@@ -1336,6 +1336,40 @@ export const tools: Tool[] = [
       {
         q: 'Which formats can I convert?',
         a: 'MOV (iPhone, Mac screen recordings, cameras), MKV (OBS recordings, downloads), WebM (browser and screen recordings) and MP4 itself. AVI, WMV and FLV are not supported, because browsers cannot read the video inside them.',
+      },
+    ],
+  },
+  {
+    slug: 'video-to-mov',
+    name: 'Video to MOV',
+    title: 'Convert Video to MOV: MP4 to MOV, No Upload | Stayput',
+    description:
+      'Convert MP4, WebM and MKV videos to MOV in your browser. H.264 files are copied in seconds with no quality loss. Batch, free, not uploaded.',
+    heading: 'Convert video to MOV',
+    tagline: 'Turn MP4, WebM and MKV files into QuickTime MOV files. Converted on this device, not uploaded.',
+    category: 'media',
+    accept: 'video/mp4,video/webm,video/x-matroska,.mp4,.m4v,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to convert to MOV',
+    action: 'Convert to MOV',
+    keywords: ['video to mov', 'convert video to mov', 'mkv to mov', 'webm to mov', 'mov converter'],
+    steps: [
+      'Drop one or more videos (MP4, WebM or MKV), or tap to pick them.',
+      'Tick Remove the sound if you want a silent video. There is nothing else to set.',
+      'Convert. H.264 videos are rewrapped in seconds; others are re-encoded in your browser. One downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process. After one visit and a short wait the page works offline.',
+      },
+      {
+        q: 'Why was my file converted so fast?',
+        a: 'An MP4, WebM or MKV often holds H.264 video and AAC sound, which a MOV can hold too. Those are copied as they are, which takes about as long as reading the file, and the picture is the same. The result says "copied, no quality loss" when that happens.',
+      },
+      {
+        q: 'Which formats can I convert?',
+        a: 'MP4, WebM and MKV. Video your browser cannot decode is refused with a message instead of producing a broken file. A MOV only ever holds H.264 video (or HEVC copied as it is) and AAC sound, so a browser that cannot write those says so instead of writing a file QuickTime may not play.',
       },
     ],
   },
@@ -2534,6 +2568,10 @@ export const tools: Tool[] = [
         q: 'Can I edit the text later?',
         a: 'Not in the saved image: the text becomes part of the picture. Keep your original, which is never changed, and run it again with new text.',
       },
+      {
+        q: 'Can I add text to an animated GIF?',
+        a: 'This page is for still pictures. For an animated GIF, use [Add text to GIF](/tools/add-text-to-gif), which draws the same text on every frame and keeps the timing.',
+      },
     ],
   },
   {
@@ -2699,9 +2737,9 @@ export const tools: Tool[] = [
   {
     slug: 'bpm-key-finder',
     name: 'BPM and key finder',
-    title: 'BPM and Key Finder: Free, From a File, No Upload | Stayput',
+    title: 'BPM and Key Finder: Tempo, Key and Camelot Code, Free | Stayput',
     description: 'Find the BPM and musical key of a song from an audio file, with its Camelot code. Free, no sign-up, and the song is not uploaded.',
-    heading: 'Find the BPM and key of a song',
+    heading: 'BPM and key finder with Camelot codes',
     tagline: 'Drop an audio file and read its tempo, key and Camelot code. The song is analysed on this device.',
     category: 'media',
     accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.webm,.mp4,.mov',
@@ -2709,7 +2747,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop songs to find their BPM and key',
     action: 'Find BPM and key',
     sizeFact: 'No account, no watermark',
-    keywords: ['bpm finder', 'bpm and key finder', 'bpm detector', 'bpm finder mp3', 'bpm analyzer', 'song bpm finder', 'find bpm of a song', 'audio bpm finder', 'key and bpm finder'],
+    keywords: ['bpm and key finder', 'key and bpm finder', 'bpm key finder', 'bpm detector', 'bpm analyzer', 'song key and bpm'],
     steps: [
       'Drop one or more songs, or tap to pick them. MP3, WAV, M4A, FLAC, Ogg and most other audio files work; a video’s sound works too.',
       'Press Find BPM and key. A three-minute song takes a few seconds.',
@@ -2737,6 +2775,7 @@ export const tools: Tool[] = [
       {
         heading: 'Without a file',
         bullets: [
+          'If you only want the tempo, the [BPM finder](/bpm-finder) page puts the BPM first and the key second.',
           'Tap along with a song you can only hear on the [Tap tempo](/tap-tempo) page, and check the answer against a click on the [online metronome](/tools/metronome).',
         ],
       },
@@ -2806,7 +2845,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How accurate is it?',
-        a: 'Within about one cent on a clear, sustained note, which is finer than most ears can hear (a semitone is 100 cents). Let the string ring rather than plucking it repeatedly, and tune in a quiet room: other notes or chatter make the reading jump.',
+        a: 'Within a few cents on a clear, sustained note, which is close to the limit of what most ears can hear (a semitone is 100 cents, and the needle counts 5 cents either side as in tune). Let the string ring rather than plucking it repeatedly, and tune in a quiet room: other notes or chatter make the reading jump.',
       },
       {
         q: 'What does A4 = 440 Hz mean? Should I change it?',
@@ -3066,6 +3105,10 @@ export const tools: Tool[] = [
         a: 'Type the pixel size the platform asks for, such as 128 by 128. Those platforms also cap the file size in kilobytes, which resizing alone may not meet. The [emote resizer](/tools/emote-resizer) fits both size and limit in one step, and [Compress GIF](/tools/compress-gif) makes a GIF lighter without changing its dimensions.',
       },
       {
+        q: 'Can I add a caption to a GIF?',
+        a: 'Yes. [Add text to GIF](/tools/add-text-to-gif) draws a caption on every frame and keeps each frame’s timing and the loop.',
+      },
+      {
         q: 'Is my GIF uploaded?',
         a: 'No. The GIF is read and rewritten by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
@@ -3113,9 +3156,129 @@ export const tools: Tool[] = [
         a: 'The page works in a mobile browser, and the crop box is built for touch: pick the GIF from Files or Photos, then drag the box with your finger. Drag the corners to resize it, or pick a shape and type exact numbers.',
       },
       {
+        q: 'Can I add text to a GIF?',
+        a: 'Yes. [Add text to GIF](/tools/add-text-to-gif) draws a caption on every frame and keeps each frame’s timing and the loop. Crop first if you want the caption placed against the cropped edges.',
+      },
+      {
         q: 'Is my GIF uploaded?',
         a: 'No. The GIF is decoded and cropped by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
+    ],
+  },
+  {
+    slug: 'add-text-to-gif',
+    name: 'Add text to GIF',
+    title: 'Add Text to GIF Online, Free, No Upload | Stayput',
+    description:
+      'Add a caption to an animated GIF in your browser: type it, drag it into place, pick a font, colour and outline. Free, no account, not uploaded.',
+    heading: 'Add text to a GIF',
+    tagline: 'Write a caption on every frame of an animated GIF and drag it where you want it. Done on this device, and the GIF is not uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: false,
+    dropLabel: 'Drop a GIF to add text to',
+    action: 'Add text',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or very large GIF may need a computer.',
+    keywords: ['add text to gif', 'caption a gif', 'write on gif', 'gif caption maker', 'put text on a gif', 'text on gif online', 'add words to gif'],
+    lead:
+      'Writes your text on every frame of an animated GIF, in the font, colour and outline you choose, and saves a new GIF that keeps each frame’s timing and the loop setting. It is free, needs no account and adds no watermark, and your GIF is not uploaded: every frame is drawn and rewritten by code in this tab. The size limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline.',
+    steps: [
+      'Drop an animated GIF, or tap to pick one.',
+      'Type your text, then drag it on the preview to place it. Pick a font, colour, size and an outline, shadow or box so it reads on every frame. Add a second text for a caption at the other end.',
+      'Press Add text. The text is drawn on every frame, and the new GIF downloads with the same size and timing.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have reaction.gif, 480 by 270 pixels with 40 frames, and you want WHEN THE BUILD PASSES across the bottom. Drop it, type the words, drag them to the bottom edge, choose the bold font with an outline so they stay readable over the changing picture, and set the size to 12.',
+          'The size is a share of the shorter side, so 12 on a GIF 270 pixels high gives letters 32 pixels tall. Press Add text. The same words are drawn in the same place on all 40 frames, and you download reaction-text.gif: 480 by 270 pixels, playing at the same speed as the original.',
+        ],
+      },
+      {
+        heading: 'What you can set',
+        bullets: [
+          'Up to two pieces of text, for example a top and a bottom caption, each dragged to where you want it.',
+          'Font: a clean sans, a bold face, a serif, a handwritten face or a monospace.',
+          'Colour, size, opacity, upper case, and an outline, a shadow or a box behind the letters.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'The text is the same on every frame. It cannot appear for only part of the animation, and it does not move.',
+          'It works on one GIF at a time. A long or very large GIF uses a lot of memory, and a phone may run out of it sooner than a computer.',
+          'The result is a GIF, so each frame holds at most 256 colours. To make the file lighter afterwards, use [Compress GIF](/tools/compress-gif).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I add text to a GIF?', a: 'Drop the GIF, type your text and drag it to where you want it on the preview. Choose a font, colour, size and an outline, then press Add text. The text is drawn on every frame, and the new GIF downloads with the same size and timing.' },
+      { q: 'Does the text appear on every frame?', a: 'Yes, in the same place and style on all of them. This page cannot show text for only part of the animation or move it.' },
+      { q: 'Does it change how fast the GIF plays?', a: 'No. Every frame keeps its own delay and the loop setting is copied, so the new GIF lasts as long as the original and repeats the same way. Frames with a delay of 10 milliseconds or less are written as 100 milliseconds, which is how browsers already play them.' },
+      { q: 'Will the colours or the file size change?', a: 'They can. A GIF holds at most 256 colours per frame, and the whole GIF is written again with your text on it, so smooth gradients and soft shadows can look a little different, and the file can come out larger or smaller than the original. [Compress GIF](/tools/compress-gif) makes a GIF lighter afterwards.' },
+      { q: 'Which fonts can I use?', a: 'A clean sans, a bold face, a serif, a handwritten face and a monospace. The sans and the handwritten face are this site’s own fonts; the bold face, the serif and the monospace are drawn with the fonts your device has, so they can look a little different on a phone than on a computer. Once the GIF is saved the letters are pixels and look the same everywhere.' },
+      { q: 'Can I add text to a GIF with a transparent background?', a: 'Yes, and transparent areas stay transparent. GIF transparency is on or off, so where text sits over a transparent area its edges can look rough. Choose an outline or a box to make it read cleanly.' },
+      { q: 'Can I add text to a GIF without uploading it?', a: 'Yes. Your browser reads the GIF, draws your text onto every frame and writes the new GIF with code running in this tab. Open the network tab, run it, and your GIF is not among the requests. After one visit and a short wait the page works offline.' },
+      { q: 'Can I add text to a photo or a video instead?', a: 'For a photo or a screenshot, use [Add text to image](/tools/add-text-to-image). To turn a video clip into a GIF first, use [Video to GIF](/tools/video-to-gif).' },
+    ],
+  },
+  {
+    slug: 'merge-gifs',
+    name: 'Merge GIFs',
+    title: 'Merge GIFs: Join Several GIFs into One, No Upload | Stayput',
+    description: 'Join two or more animated GIFs into one GIF, in the order you set. Different sizes are fitted for you. Free, no account, and your GIFs are not uploaded.',
+    heading: 'Merge GIFs into one',
+    tagline: 'Join several animated GIFs end to end, in the order you choose. They are put together on this device, and the GIFs are not uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop the GIFs to merge',
+    action: 'Merge GIFs',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): long or large GIFs may need a computer.',
+    keywords: ['merge gifs', 'combine gifs', 'join gifs', 'merge gif online', 'combine gifs into one', 'put gifs together', 'concatenate gifs'],
+    lead: 'Joins two or more animated GIFs into one GIF that plays them one after another, in the order you set, and saves it as a new GIF. Every frame keeps its own timing, and a GIF of another size is fitted to the size of the first one. It is free, needs no account and adds no watermark, and your GIFs are not uploaded: they are read and rewritten by code in this tab. The limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline.',
+    steps: [
+      'Drop two or more GIFs, or tap to pick them. Put them in order with the arrows in the list. The first one sets the size.',
+      'If a GIF is a different shape, choose Fit inside to show all of it with bars of a colour you pick, or Fill and crop to cover the frame and trim the edges.',
+      'Press Merge GIFs. The frames are joined in that order, and the new GIF downloads from your browser.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have intro.gif, 480 by 270 pixels with 30 frames at 0.1 seconds each, and loop.gif, 400 by 400 pixels with 20 frames at 0.05 seconds each. Drop intro.gif first and loop.gif second. The first GIF sets the size, so the result is 480 by 270.',
+          'loop.gif is square, so Fit inside shrinks it to 270 by 270 and puts it in the middle, with a white bar 105 pixels wide on each side. Press Merge GIFs and you download merged.gif: 480 by 270 pixels, 3 seconds of intro followed by 1 second of loop, 4 seconds in all.',
+        ],
+      },
+      {
+        heading: 'What you can set',
+        bullets: [
+          'The order, with the arrows in the file list. The first GIF sets the size of the result.',
+          'Fit inside, which shows all of each GIF, or Fill and crop, which covers the frame and trims what overflows from the centre.',
+          'The colour of the bars that Fit inside leaves, white to start with, or transparent.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'The GIFs play straight after one another. There is no transition between them and no pause, and it does not change how fast any of them plays.',
+          'The result is one GIF, so each frame holds at most 256 colours. To make the file lighter afterwards, use [Compress GIF](/tools/compress-gif).',
+          'It joins GIFs only. For a video clip, use [Video to GIF](/tools/video-to-gif) first, and for still pictures, use the [GIF maker](/tools/gif-maker).',
+          'Every frame is held in memory while the new GIF is written, so a long or large result may need a computer, and a phone may run out of memory sooner.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I merge GIFs into one?', a: 'Drop two or more GIFs, put them in the order you want with the arrows in the list, and press Merge GIFs. The frames of the second GIF follow the last frame of the first, and so on, and the new GIF downloads with each frame’s own timing.' },
+      { q: 'What happens when the GIFs are different sizes?', a: 'The first GIF in the list sets the size of the result, so put the one whose shape you want first. Every other GIF is fitted inside that size without being stretched, and the space left over becomes bars in a colour you choose, white to start with. A smaller GIF is enlarged to fit, which can make it look soft. Choose Fill and crop to cover the frame instead, which trims the edges from the centre. For a size you pick yourself, merge first and then use [Resize GIF](/tools/resize-gif).' },
+      { q: 'Does the merged GIF keep each GIF’s speed?', a: 'Yes. Every frame keeps its own delay, so each part plays as fast as it did before and the merged GIF lasts as long as the originals added together. Frames with a delay of 10 milliseconds or less are written as 100 milliseconds, which is how browsers already play them. Two frames that look the same side by side may be written as one frame shown for longer, so the frame count can be lower while the length stays the same.' },
+      { q: 'What happens to a GIF with a transparent background?', a: 'With a bar colour chosen, transparent areas are filled with that colour, so the result is a solid picture and a smaller file. To keep transparency, set the bars to transparent. GIF transparency is on or off, so soft edges can look rough over a coloured page.' },
+      { q: 'Will the merged GIF loop?', a: 'It follows the loop setting of the first GIF in the list: if that GIF repeats forever, so does the merged one, and it repeats as a whole, from the first GIF to the last. If the first GIF plays once, the merged GIF plays once.' },
+      { q: 'Will the colours or the file size change?', a: 'They can. A GIF holds at most 256 colours per frame, and the frames are written again, so smooth gradients can look a little different. The file is usually about as large as the originals together, and a GIF fitted to a larger size comes out bigger. [Compress GIF](/tools/compress-gif) makes a GIF lighter afterwards.' },
+      { q: 'How many GIFs, or how long, can I merge?', a: 'The limit is your device’s memory, and phones hold less. Every frame of the merged GIF is held in memory while the file is written, so many GIFs, a long result or a large first GIF may need a computer. If the page says it is too large, merge fewer GIFs at a time, or make them smaller first with [Resize GIF](/tools/resize-gif).' },
+      { q: 'Can I merge GIFs without uploading them?', a: 'Yes. Your browser reads each GIF, joins the frames and writes the new GIF with code running in this tab. Open the network tab, run it, and your GIFs are not among the requests. After one visit and a short wait the page works offline.' },
+      { q: 'Can I merge a GIF with a video or a photo?', a: 'Not on this page, which takes GIFs only. To turn a video clip into a GIF first, use [Video to GIF](/tools/video-to-gif). To make a GIF from still pictures, use the [GIF maker](/tools/gif-maker), then merge the result here.' },
     ],
   },
   {
@@ -3402,7 +3565,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'Slower than the video plays, because every frame is examined and redrawn on your device. On a MacBook Pro with an M3 Max chip a 10-second 30 fps clip took about a minute, about 6 times its length, so a 10-minute clip would take about an hour (we timed 10 seconds, not 10 minutes). The Fast option is the quicker one: the same clip took about 13 seconds at 720p, and 14 to 22 seconds at 1080p, but its edges are rougher around hair and in dim light. Phones vary and we have not benchmarked one: a single run on an iPhone in Safari took roughly 5 to 10 minutes for a 2-minute video with the default finder, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
+        a: 'Every frame is examined and redrawn on your device, so it can take longer than the video plays. The default finder, Better edges, runs on the graphics chip where the browser offers one. On a MacBook Pro with an M3 Max chip a 10-second 30 fps clip took about 6 seconds in Chrome and about 10 seconds in Safari, so a 10-minute clip would take about 6 to 11 minutes (we timed 10 seconds, not the longer clip). Where the browser cannot use a graphics chip (software rendering, some virtual machines and browser settings) it falls back to the processor, and the same clip took about 55 seconds, so a 10-minute clip would take about an hour. The Fast option runs on the processor and took about 5 seconds in Chrome and 8 to 9 seconds in Safari on the same clip, so it is only a little quicker than Better edges on a graphics chip and several times quicker than Better edges without one, but its edges are rougher around hair and in dim light. Phones vary and we have not benchmarked one with the graphics chip: a single run on an iPhone in Safari, before this change, took roughly 5 to 10 minutes for a 2-minute video, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
       },
       {
         q: 'Why does the browser console mention a Google address?',
@@ -3595,6 +3758,10 @@ export const tools: Tool[] = [
         a: 'Password-protected ZIP files open after you enter the password: type it before pressing Extract. Encrypted 7z and RAR archives are not supported yet (in our tests they did not open even with the correct password). It cannot guess or remove a password you do not have.',
       },
       {
+        q: 'How do I remove the password from a ZIP file?',
+        a: 'Open the ZIP here, type its password before pressing Extract, then press Download all as zip. The new ZIP has the same files and no password. You need the password: this page cannot recover a forgotten one, and encrypted 7z and RAR archives are not supported yet.',
+      },
+      {
         q: 'Is the archive uploaded?',
         a: 'No. libarchive, the same open-source code behind the tar command on macOS and FreeBSD, runs in this tab as WebAssembly, so the archive and everything in it stay on your device.',
       },
@@ -3695,7 +3862,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop photos to remove the background',
     action: 'Remove background',
     lead:
-      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model (about 46 MB) to your browser, and after that the tool works offline.',
+      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model and its WebAssembly runtime (about 42 MB in all) to your browser, and after that the tool works offline.',
     sections: [
       {
         heading: 'A worked example: a product photo on a white background',
@@ -3717,7 +3884,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is the first photo slow?',
-        a: 'The first time, the page downloads the model (about 46 MB) and the WebAssembly runtime that runs it, and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
+        a: 'The first time, the page downloads the model and the WebAssembly runtime that runs it (about 42 MB in all), and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
       },
       {
         q: 'What resolution is the result?',
@@ -3750,7 +3917,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this an alternative to remove.bg?',
-        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model of about 46 MB. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
+        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 12 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 42 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
       },
     ],
   },
@@ -3782,11 +3949,11 @@ export const tools: Tool[] = [
       },
     ],
     lead:
-      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models (about 50 MB) to your browser, and after that the tool works offline.',
+      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models and their WebAssembly runtimes (about 46 MB in all) to your browser, and after that the tool works offline.',
     faq: [
       {
         q: 'Can I make a passport photo without uploading my photo?',
-        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
+        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model (about 39 MB) and the WebAssembly runtime that runs the cut-out model (about 3 MB), all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
       },
       {
         q: 'How is the head sized?',
@@ -4388,7 +4555,7 @@ export const tools: Tool[] = [
     name: 'Grayscale PDF',
     title: 'Convert PDF to Grayscale, Text Kept, No Upload | Stayput',
     description:
-      'Turn a colour PDF into grayscale for printing or submission. Text stays text and sharp (scanned pages are images and stay images), and the file barely grows. Runs in your browser; nothing is uploaded.',
+      'Turn a colour PDF into grayscale for printing or submission. The colour is rewritten to gray inside the file, text stays text and sharp (scanned pages are images and stay images), and the file does not grow. Runs in your browser; nothing is uploaded.',
     heading: 'Convert a PDF to grayscale',
     tagline: 'Every colour becomes its own shade of grey, and the text stays text.',
     category: 'pdf',
@@ -4409,11 +4576,11 @@ export const tools: Tool[] = [
       },
       {
         q: 'Will the text still be selectable?',
-        a: 'If the PDF has text, yes. The pages are not turned into pictures. A grey layer that removes colour is placed over each page, so text can still be selected, searched and copied, and it stays sharp at any zoom. A scanned PDF is made of page images with no text layer, so it stays that way unless it was run through OCR.',
+        a: 'If the PDF has text, yes. The pages are not turned into pictures: the colour settings inside each page are rewritten to gray and the text itself is not touched, so it can still be selected, searched and copied, and it stays sharp at any zoom. A scanned PDF is made of page images with no text layer, so it stays that way unless it was run through OCR.',
       },
       {
         q: 'Why would I need a grayscale PDF?',
-        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo. One caveat for strict checks: the pages look and print grey, but the original colour data stays inside the file, so a system that inspects colour spaces may still flag it. If a portal or print shop rejects the copy, print the PDF to a new PDF in greyscale from your PDF reader, or use a preflight tool.',
+        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo. The colour is taken out of the file itself, not just painted over, so a colour-space check passes for everything the tool can read. The exception is rare colour kinds, such as spot colours (Pantone and similar), Lab colour and JPEG 2000 images, which it can’t rewrite: a page with any of those is greyed over instead, and the result says how many pages that was.',
       },
       {
         q: 'Do different colours stay distinguishable?',
@@ -4421,11 +4588,15 @@ export const tools: Tool[] = [
       },
       {
         q: 'Are comments and form fields converted too?',
-        a: 'Highlights, sticky notes and form fields are drawn by your PDF reader on top of the page, so they keep their colour. Flatten them into the page first if they must be grey as well.',
+        a: 'Highlights, sticky notes and form fields that store their own look are converted along with the page, and so are their border and fill colours. Rich-text styling inside some comments is not rewritten, so such a note can still show colour in a reader. Flatten them into the page first if everything must be grey.',
+      },
+      {
+        q: 'What happens to colour it can’t convert?',
+        a: 'That page keeps a grey layer drawn over it, so it looks and prints grey, but its colour data is still stored in the file. The result line says how many pages that is, for example “12 pages converted; 1 page has colour we couldn’t convert and is greyed on top”. The other pages are converted for real.',
       },
       {
         q: 'Does the file get bigger?',
-        a: 'Only by a few hundred bytes per document. Nothing is re-rendered, so there are no page images to add, unlike converters that rasterise every page.',
+        a: 'Usually not. Colour images become one-channel gray images, so a PDF with photos or colour scans is often smaller, and a text-only PDF changes by a few dozen bytes. JPEG photos are decoded in your tab and saved again as grayscale JPEGs at high quality, which adds a very small extra loss. A page that falls back to the grey layer gets a few hundred bytes more.',
       },
     ],
   },
@@ -4621,6 +4792,56 @@ export const tools: Tool[] = [
         q: 'Can it handle a big file?',
         a: 'The conversion runs in the background so the page stays usable. A file over 200 MB is refused as too large for a browser tab, and a phone may run out of memory on a smaller one, in which case the page says so instead of giving a half result. Split the file and convert the pieces if that happens.',
       },
+    ],
+  },
+  {
+    slug: 'audio-splitter',
+    name: 'Audio splitter',
+    title: 'Audio Splitter: Split an MP3 or WAV into Parts | Stayput',
+    description: 'Split an MP3, WAV, M4A or FLAC file into separate parts at times you set or every few minutes, in your browser. Free, no account, not uploaded.',
+    heading: 'Split an audio file',
+    tagline: 'Cut one long recording into separate files at the times you choose or at equal lengths. Done on this device, and the file is not uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac,.mp4,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a sound file to split',
+    action: 'Split audio',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long recording may need a computer.',
+    keywords: ['audio splitter', 'split audio', 'split mp3', 'mp3 splitter', 'split audio file', 'split wav file', 'audio splitter online', 'cut audio into parts'],
+    lead: 'Splits one audio file into separate parts, either at the times you type or every few minutes, and saves them as MP3 or WAV files. It is free, needs no account and adds no watermark, and your file is not uploaded: your browser decodes the sound and cuts it inside this tab. The size limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.',
+    steps: [
+      'Drop a sound file (MP3, WAV, M4A, OGG, FLAC) or a video, or tap to pick one.',
+      'Choose how to split: type the times where each new part should start, or pick a length such as every 10 minutes. The page lists the parts it will make.',
+      'Press Split audio. The parts are saved as MP3 or WAV files, and Download all gives you them in one zip.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have rehearsal.wav, a 62-minute recording of a band practice, and you want each song as its own file. The songs start at 11:30, 24:10 and 41:45. Choose At times I type and type 11:30, 24:10, 41:45.',
+          'Press Split audio and you get four parts: 0:00 to 11:30, 11:30 to 24:10, 24:10 to 41:45, and 41:45 to the end. They are named rehearsal-part-1 to rehearsal-part-4. Every part starts at the sample where the one before it ended, so no sound falls between two parts.',
+          'Prefer equal pieces? Choose Every so often and type 10 minutes: a 25-minute file becomes parts of 10, 10 and 5 minutes. The last part is whatever is left.',
+        ],
+      },
+      {
+        heading: 'What this page does and does not do',
+        bullets: [
+          'It splits where you say. It does not find silences or chapters on its own. To take the long pauses out of a recording, use [Remove silence](/tools/remove-silence).',
+          'It works on one file at a time. The whole file is decoded in your browser’s memory, so a long recording takes more memory, and a phone may run out of it sooner than a computer.',
+          'It makes up to 100 parts in one run. Parts are saved as MP3 at 192 kbps or as 16-bit WAV at 44.1 kHz. To keep just one stretch of a file, [Trim audio](/tools/trim-audio) is the simpler page.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I split an audio file?', a: 'Drop the file, type the times where each new part should begin (for example 12:30 and 31:05), and press Split audio. Each part is a separate file, and a Download all button gives you the lot as one zip.' },
+      { q: 'Can I split a file into equal parts?', a: 'Yes. Choose Every so often and give a length in minutes or seconds. A file is cut into parts of that length, and the last part is the remainder, so it can be shorter.' },
+      { q: 'How many parts can it make?', a: 'Up to 100 in one run. If your times or length would make more, the page says so and shows how many it would make; use fewer times or a longer length, or run the file again on a part.' },
+      { q: 'Does splitting lower the quality?', a: 'WAV parts keep the sound exactly as your browser decoded it, written as 16-bit at 44.1 kHz. MP3 parts are encoded again at 192 kbps, so they lose a little, as any MP3 re-encode does. A file at another sample rate, or with more than two channels, is converted to 44.1 kHz and at most stereo first. If you will edit the parts further, choose WAV.' },
+      { q: 'How long a file can I split?', a: 'The size limit is your device’s memory, and phones hold less than computers. The whole file is decoded in the tab before it is cut, so a very long recording needs more memory than a short one. If a phone struggles, a computer will usually manage, or cut the recording down first with [Trim audio](/tools/trim-audio).' },
+      { q: 'Will the parts play back to back without a gap?', a: 'WAV parts join exactly. MP3 parts can have a very short gap when played back to back, because MP3 encoders add a little padding at the start and end of each file. If the parts must play back with no gap, choose WAV.' },
+      { q: 'Can it split where the silence is?', a: 'Not on this page: you give the times. [Remove silence](/tools/remove-silence) cuts long pauses out of a recording, but it makes one file, not several.' },
+      { q: 'Can I split the sound of a video?', a: 'Yes. Drop the video and its sound track is loaded; the parts are saved as audio only.' },
+      { q: 'Can I split an audio file without uploading it?', a: 'Yes. Your browser decodes the sound, cuts it and writes each part with code running in this tab. Open the network tab, run a split, and your recording is not among the requests. After one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.' },
     ],
   },
 ];

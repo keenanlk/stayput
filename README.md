@@ -50,6 +50,7 @@ That is the whole pitch, and you can check it in three ways:
 | [GIF to MP4](https://stayput.dev/tools/gif-to-mp4) (animated GIF to video, up to 90% smaller) | [Extract images from PDF](https://stayput.dev/tools/extract-pdf-images) (every picture at its stored size) |
 | [Compress video](https://stayput.dev/tools/compress-video) (MP4, MOV, WebM; fit 10 MB for Discord or 25 MB for email) | |
 | [Video to MP4](https://stayput.dev/tools/video-to-mp4) (MOV, MKV, WebM; H.264 copied with no quality loss) | |
+| [Video to MOV](https://stayput.dev/tools/video-to-mov) (MP4, WebM, MKV; H.264 and AAC copied with no quality loss) | |
 | [Trim video](https://stayput.dev/tools/trim-video) (cut a clip without re-encoding) | |
 | [Mute video](https://stayput.dev/tools/mute-video) (remove the sound, picture copied untouched) | |
 | [Resize video](https://stayput.dev/tools/resize-video) (1080p, 720p, custom size) | |
@@ -61,10 +62,11 @@ That is the whole pitch, and you can check it in three ways:
 | [Reverse video](https://stayput.dev/tools/reverse-video) (play a clip backwards) | |
 | [Video to JPG](https://stayput.dev/tools/video-to-jpg) (save frames as JPG or PNG) | |
 | [Trim audio](https://stayput.dev/tools/trim-audio) (cut MP3, WAV, M4A with a waveform) | |
+| [Audio splitter](https://stayput.dev/tools/audio-splitter) (split an MP3 or WAV into parts at times or every N minutes) | |
 | [Screen recorder](https://stayput.dev/tools/screen-recorder) (screen, window or tab, with sound and microphone) | |
 | [Collage maker](https://stayput.dev/tools/collage-maker) (grids, side by side, stitched screenshots) | |
 | [Split image](https://stayput.dev/tools/split-image) (Instagram grids and carousels) | |
-| [Add text to image](https://stayput.dev/tools/add-text-to-image) (captions, memes, watermarks) | |
+| [Add text to image](https://stayput.dev/tools/add-text-to-image) (captions, memes, watermarks) | [Add text to GIF](https://stayput.dev/tools/add-text-to-gif) (a caption on every frame) |
 | [AI image upscaler](https://stayput.dev/tools/upscale-image) (2×, 3× or 4× with Real-ESRGAN, on the device) | |
 | [Remove object from photo](https://stayput.dev/tools/remove-object) (paint over it, MI-GAN fills it in on the device) | |
 | [Adjust photo](https://stayput.dev/tools/adjust-image) (brightness, contrast, saturation, warmth, sharpen, invert) | |
@@ -85,6 +87,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Merge audio](https://stayput.dev/tools/merge-audio) (join MP3, WAV, M4A with silence or crossfades) | |
 | [Metronome](https://stayput.dev/tools/metronome) (any time signature, subdivisions, tap tempo) | |
 | [GIF maker](https://stayput.dev/tools/gif-maker) (animated GIF from photos or screenshots; timing, size, loop, there-and-back) | |
+| [Merge GIFs](https://stayput.dev/tools/merge-gifs) (join animated GIFs end to end, fitted to the first one's size) | |
 | [Image to SVG](https://stayput.dev/tools/image-to-svg) (trace PNG or JPG into vector shapes; black and white, logo or detailed) | |
 | [Transcribe audio to text](https://stayput.dev/tools/transcribe) (Whisper on your device; text, SRT or WebVTT; 16+ languages) | |
 | [Add subtitles to video](https://stayput.dev/tools/add-subtitles-to-video) (captions from the speech or your SRT, burned into the picture) | |

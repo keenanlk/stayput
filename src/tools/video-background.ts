@@ -5,6 +5,7 @@ import { describeEdit } from './video-edit-shell';
 import { InputError } from '../lib/input-error';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
+import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
 
 /**
  * Video background remover: the people in each frame are found by MediaPipe's
@@ -59,7 +60,31 @@ function cover(ctx: CanvasRenderingContext2D, img: ImageBitmap) {
   ctx.drawImage(img, (width - w) / 2, (height - h) / 2, w, h);
 }
 
+/** Longest side of a clip a phone handles comfortably: 1080p. Bigger ones are slow and more likely to run out of memory. */
+const PHONE_SAFE_SIDE = 1920;
+const phoneNote = document.getElementById('phone-note');
+let phoneCheck = 0;
+
+/** On a phone, a long or 4K clip gets a one-line suggestion. Never blocks the run. */
+async function checkPhoneClip(files: { file: File }[]) {
+  if (!phoneNote) return;
+  const mine = ++phoneCheck;
+  phoneNote.hidden = true;
+  if (!isPhoneBrowser()) return;
+  const videos = files.map((f) => f.file).filter((f) => !isImage(f));
+  let big = videos.some((f) => f.size > PHONE_SAFE_BYTES);
+  if (!big && videos.length > 0) {
+    const { videoSize } = await import('../lib/video-edit');
+    for (const f of videos) {
+      const s = await videoSize(f).catch(() => undefined);
+      if (s && Math.max(s.width, s.height) > PHONE_SAFE_SIDE) big = true;
+    }
+  }
+  if (mine === phoneCheck) phoneNote.hidden = !big;
+}
+
 createShell({
+  onFilesChanged: checkPhoneClip,
   keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
@@ -91,7 +116,8 @@ createShell({
       const share = (f: number) => (index + f) / videos.length;
       const matte = new Matte(which);
       const blurred = document.createElement('canvas');
-      const timeLeft = new TimeLeft();
+      // The first figures of a slow start run long (2 to 3 times too long on a phone), so wait for 8% and 10 s of real work.
+      const timeLeft = new TimeLeft(undefined, { minFraction: 0.08, minSeconds: 10 });
       const r = await editVideo(file, {
         // The frame is only drawn on and copied from; the person finder reads its own small canvas.
         readsBack: false,
@@ -106,7 +132,7 @@ createShell({
         },
         onProgress: (f) => {
           // It is slower than the video plays, so say how long is left: a long run with only a percentage reads as stuck.
-          const left = timeLeft.update(f) ?? 'working out the time left';
+          const left = timeLeft.update(f) ?? 'Estimating time left…';
           progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}% · ${left}. Keep this tab open.`, share(0.03 + f * 0.97));
         },
       });
@@ -116,7 +142,7 @@ createShell({
         name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
         blob: r.blob,
         originalSize: file.size,
-        note: `${describeEdit(r)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}`,
+        note: `${describeEdit(r)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}`,
       });
     }
     return outputs;

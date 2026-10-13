@@ -3,6 +3,7 @@
 interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
 const size = defaults.colors ?? '6';
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="colors">Main colours to find</label>
@@ -10,4 +11,6 @@ const size = defaults.colors ?? '6';
     {['4', '6', '8', '10', '12'].map((v) => <option value={v} selected={v === size}>{v}</option>)}
   </select>
 </div>
-<p class="muted small">Save palette downloads the main colours and the ones you picked as an image, with every HEX code ready to copy.</p>
+<OptionDetails>
+  <p>Save palette downloads the main colours and the ones you picked as an image, with every HEX code ready to copy.</p>
+</OptionDetails>

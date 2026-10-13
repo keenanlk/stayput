@@ -111,6 +111,14 @@ export const engines: Record<string, Engine> = {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. Each frame is drawn at the new width and height on a canvas, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Reaction GIFs and screen recordings are often personal. Here the GIF is resized in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), no watermark is added, and you can resize several at once.',
   },
+  'add-text-to-gif': {
+    how: 'The GIF is decoded frame by frame with gifuct-js (MIT) and each frame is composited the way browsers play it. Your text is drawn on every frame on a canvas by your browser, and the frames are written back as a GIF with gifenc’s (MIT) colour quantizer and LZW coder. Everything runs in your tab.',
+    versus: 'The GIF is read and rewritten on your device, so the limit is how much memory your device has: a long or very large GIF may need a computer.',
+  },
+  'merge-gifs': {
+    how: 'gifuct-js (MIT) reads each GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. The frames of all the GIFs are drawn in order on one canvas the size of the first GIF, and gifenc’s (MIT) colour quantizer and LZW coder write them back as one GIF with their delays and the loop setting. The new GIF is assembled in memory.',
+    versus: 'Reaction GIFs and screen recordings are often personal. Here the GIFs are joined in this tab: the files are not uploaded, the limit is your device’s memory (phones hold less), and no watermark is added.',
+  },
   'crop-gif': {
     how: 'Your browser draws the first frame of the GIF so you can place the box. gifuct-js (MIT) then reads the GIF byte by byte in your tab and every frame is composited the way browsers play it; the part inside the box is cut from each frame, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Here the GIF is cropped in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), and no watermark is added.',
@@ -162,6 +170,10 @@ export const engines: Record<string, Engine> = {
   'trim-audio': {
     how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. The part you chose is copied, faded if asked, and written as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
     versus: 'Online audio cutters upload your file to a server, surround the download with ads, and some keep the file. Voice memos, interviews and unreleased tracks are private. Here the sound never leaves your device.',
+  },
+  'audio-splitter': {
+    how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. Each part is copied out between the points you chose, with no fades, so every part starts at the sample where the one before it ended, and is written as MP3 by LAME compiled to WebAssembly or as a 16-bit WAV. The parts are packed into a zip by code in the page.',
+    versus: 'The recording is decoded and cut on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
   },
   'audio-converter': {
     how: 'Your browser decodes the sound with the decoders it uses to play media on any website. The new file is written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, FLAC by a small lossless encoder in this site’s code (fixed predictors and Rice coding, as the FLAC format describes), and M4A or OGG by the browser’s own AAC and Opus encoders (WebCodecs), packed by Mediabunny (MPL-2.0). WAV and FLAC keep the original sample rate.',
@@ -331,6 +343,10 @@ export const engines: Record<string, Engine> = {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MOV, MKV, WebM or MP4 container in your tab. H.264 video and AAC or MP3 sound are copied into the new MP4 packet by packet, which takes seconds and changes nothing in the picture. Other video (VP8, VP9, AV1) is decoded and re-encoded by your browser’s own video encoder through WebCodecs, H.264 where available, and other sound becomes AAC or Opus. The MP4 is written in memory.',
     versus: 'Online converters upload the whole video just to rewrap it, which can take longer than the conversion itself, cap free files at 100 MB to 1 GB, and keep a copy on their server. Here the file never leaves your device, and a large MOV from your phone converts in seconds because nothing is re-encoded that does not need to be.',
   },
+  'video-to-mov': {
+    how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, WebM or MKV container in your tab and writes a QuickTime MOV. H.264 video and AAC sound are copied across as they are. Anything else is decoded and re-encoded by your browser’s own encoders (WebCodecs) to H.264 and AAC, and where the browser cannot write those it says so instead of writing a file QuickTime may not play.',
+    versus: 'The video is read from your disk and the MOV is written in memory on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
+  },
   'compress-video': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, MOV, WebM or MKV container in your tab. Your browser’s own hardware-backed video decoder and encoder (WebCodecs) re-encode the picture at the bitrate and size you chose, H.264 where available and VP9 or AV1 otherwise, and the sound as AAC or Opus. Mediabunny then writes a new MP4 in memory. For a target size, the bitrate is worked out from the length of the video, and the resolution is lowered when a long video would otherwise turn to mush.',
     versus: 'Online compressors upload the whole video before they start, cap free files at a few hundred megabytes, and often add a watermark or a queue. Phone videos are some of the most personal files people have. Here the video never leaves your device, and a 2 GB file is compressed as fast as your computer can encode it.',
@@ -380,8 +396,8 @@ export const engines: Record<string, Engine> = {
     versus: 'Photo filter sites upload your pictures to apply a filter a phone could do offline, and many add a watermark or keep the images. Here the photos stay on your device, the limit on how many you convert at once is your device’s memory (phones hold less), and the result is not recompressed more than once.',
   },
   'grayscale-pdf': {
-    how: 'pdf-lib (MIT) opens the PDF in your tab and draws one neutral grey rectangle over each page with the PDF Saturation blend mode. Blending keeps the brightness of whatever is underneath and takes the grey’s zero saturation, so every colour, in text, drawings and photos alike, turns into its own shade of grey. Nothing on the page is rewritten or re-rendered, so text stays text. For the same reason the original colour data is still in the file: the page looks and prints grey, but a check that inspects colour spaces may still detect colour.',
-    versus: 'Most online converters rasterise every page to make it grayscale, which uploads your document, makes text unselectable and often makes the file much larger. Here nothing leaves your device, text stays sharp and searchable, and the file grows by a few hundred bytes.',
+    how: 'pdf-lib (MIT) opens the PDF in your tab and reads the drawing instructions of every page, form, pattern and comment appearance. Each colour setting (RGB, CMYK, ICC-based and indexed colours, and shading gradients) is rewritten to gray with the luminance 0.299 R + 0.587 G + 0.114 B; the instructions that draw text are copied byte for byte, so text stays text. Colour images become 8-bit gray images: Flate images are converted exactly, and JPEGs are decoded in your tab and written again as grayscale JPEGs. Colour it can’t rewrite (spot colours, Lab, JPEG 2000 images) keeps a neutral grey rectangle with the Saturation blend mode on that page only, and the result says which pages those are.',
+    versus: 'Most online converters rasterise every page to make it grayscale, which uploads your document, makes text unselectable and often makes the file much larger. Here nothing leaves your device, text stays sharp and searchable, the colour is taken out of the file rather than painted over, and the file usually shrinks.',
   },
   'crop-pdf': {
     how: 'pdf.js (Apache 2.0) draws each page in your tab so you can see what you are keeping. Trim white margins renders every page at 72 dpi and finds the smallest box holding all the ink. When you save, pdf-lib (MIT) sets each page’s media and crop box to that area, mapped through the page’s rotation. The page content itself is not re-rendered, so text stays sharp and selectable and the file barely changes size.',

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { detectPitch, instrumentById, nearestString, noteFor, noteLabel } from '../src/lib/tuner';
+import { detectPitch, instrumentById, isDecayOctaveJump, midiToFreq, nearestString, noteFor, noteLabel } from '../src/lib/tuner';
 
 const RATE = 48000;
 const tone = (partials: [freq: number, amp: number][], n = 4096, rate = RATE) => {
@@ -53,4 +53,118 @@ test('nearestString picks the closest open string for each instrument', () => {
   const uke = instrumentById('ukulele').strings;
   expect(nearestString(262, uke)!.index).toBe(1);
   expect(instrumentById('nope').id).toBe('chromatic');
+});
+
+test('the string instruments have the right open strings, as notes and as frequencies', () => {
+  const expected: Record<string, { notes: string[]; hz: number[] }> = {
+    violin: { notes: ['G3', 'D4', 'A4', 'E5'], hz: [196, 293.66, 440, 659.26] },
+    bass: { notes: ['E1', 'A1', 'D2', 'G2'], hz: [41.2, 55, 73.42, 98] },
+    cello: { notes: ['C2', 'G2', 'D3', 'A3'], hz: [65.41, 98, 146.83, 220] },
+    // Open G, in the order players name it: the short fifth string first.
+    banjo: { notes: ['G4', 'D3', 'G3', 'B3', 'D4'], hz: [392, 146.83, 196, 246.94, 293.66] },
+    mandolin: { notes: ['G3', 'D4', 'A4', 'E5'], hz: [196, 293.66, 440, 659.26] },
+  };
+  for (const [id, want] of Object.entries(expected)) {
+    const strings = instrumentById(id).strings;
+    expect(instrumentById(id).id, id).toBe(id);
+    expect(strings.map(noteLabel), id).toEqual(want.notes);
+    strings.forEach((m, i) => expect(midiToFreq(m)).toBeCloseTo(want.hz[i]!, 1));
+  }
+  expect(instrumentById('chromatic').strings).toEqual([]);
+});
+
+test('cello, banjo and bass open strings are read as themselves, an octave off is a long way off', () => {
+  const cello = instrumentById('cello').strings;
+  const c2 = detectPitch(tone([[65.41, 0.3]]), RATE);
+  expect(c2).toBeDefined();
+  expect(nearestString(c2!.freq, cello)).toMatchObject({ index: 0 });
+  expect(Math.abs(nearestString(c2!.freq, cello)!.cents)).toBeLessThan(2);
+  // A viola's A4 against the cello list is an octave from A3, so the needle pins.
+  expect(nearestString(440, cello)!.cents).toBeCloseTo(1200, 0);
+  const banjo = instrumentById('banjo').strings;
+  expect(nearestString(392, banjo)).toMatchObject({ index: 0 });
+  expect(nearestString(146.83, banjo)).toMatchObject({ index: 1 });
+  // Four-string bass: its low E is 41.2 Hz.
+  const bass = instrumentById('bass').strings;
+  expect(nearestString(41.2, bass)).toMatchObject({ index: 0 });
+  expect(Math.abs(nearestString(41.2, bass)!.cents)).toBeLessThan(0.5);
+});
+
+test('a note whose fundamental is weak against its harmonics, like a cello C2 or a banjo G4, still reads as the fundamental', () => {
+  // Harmonic levels measured on recorded notes: cello C2 about 0.1 : 1 : 0.7 : 0.85 : 0.5.
+  const cello = detectPitch(tone([[65.41, 0.03], [130.82, 0.3], [196.23, 0.21], [261.64, 0.25], [327.05, 0.15]]), RATE);
+  expect(cello).toBeDefined();
+  expect(Math.abs(1200 * Math.log2(cello!.freq / 65.41))).toBeLessThan(5);
+  // Banjo G4: 0.4 : 1 : 0.3 : 0.1.
+  const banjo = detectPitch(tone([[392, 0.12], [784, 0.3], [1176, 0.09], [1568, 0.03]]), RATE);
+  expect(banjo).toBeDefined();
+  expect(Math.abs(1200 * Math.log2(banjo!.freq / 392))).toBeLessThan(3);
+});
+
+test('below the 30 Hz floor reads nothing, and a note just above it is read', () => {
+  expect(detectPitch(tone([[27.5, 0.3]]), RATE)).toBeUndefined();
+  const b0 = detectPitch(tone([[30.87, 0.3], [61.74, 0.2], [92.61, 0.1]]), RATE);
+  expect(b0).toBeDefined();
+  expect(Math.abs(1200 * Math.log2(b0!.freq / 30.87))).toBeLessThan(5);
+});
+
+/** The tuner's per-window smoothing and octave-tail guard (src/tools/tuner.ts listen()), one reading per 50 ms. */
+function shownFor(windows: { freq: number; rms: number }[]) {
+  let recent: number[] = [];
+  let lastRms = 0;
+  let skipped = 0;
+  const shown: number[] = [];
+  for (const { freq, rms } of windows) {
+    const before = lastRms;
+    lastRms = rms;
+    if (recent.length && isDecayOctaveJump(freq, recent[recent.length - 1]!, rms, before, recent.length, skipped)) {
+      skipped++;
+    } else {
+      skipped = 0;
+      if (recent.length && Math.abs(1200 * Math.log2(freq / recent[recent.length - 1]!)) > 100) recent = [];
+      recent.push(freq);
+      if (recent.length > 5) recent.shift();
+    }
+    shown.push([...recent].sort((a, b) => a - b)[Math.floor(recent.length / 2)]!);
+  }
+  return shown;
+}
+const held = (n: number, freq: number, rms: number) => Array.from({ length: n }, () => ({ freq, rms }));
+
+test('the tail of a note that reads an octave up is held on the played note', () => {
+  // Banjo G4: 14 windows on 392 Hz, then the fundamental has faded and the second harmonic reads 784 Hz, still getting quieter.
+  const tail = Array.from({ length: 7 }, (_, i) => ({ freq: 784, rms: 0.05 - i * 0.004 }));
+  const shown = shownFor([...held(14, 392, 0.1).map((w, i) => ({ ...w, rms: 0.1 - i * 0.003 })), ...tail]);
+  expect(shown.at(-1)).toBe(392);
+  expect(shown.every((f) => f === 392)).toBe(true);
+  // The detector really does read the harmonic there.
+  const raw = detectPitch(tone([[392, 0.004], [784, 0.02]]), RATE);
+  expect(raw!.freq).toBeGreaterThan(780);
+});
+
+test('a new, louder pluck an octave up is accepted at once', () => {
+  const shown = shownFor([...held(8, 392, 0.05).map((w, i) => ({ ...w, rms: 0.05 - i * 0.002 })), { freq: 784, rms: 0.2 }]);
+  expect(shown.at(-1)).toBe(784);
+});
+
+test('a sustained note that moves up an octave is accepted within 300 ms', () => {
+  // Steady voice or bowed note, loudness wobbling a little: 6 windows is 300 ms.
+  const wobble = [0.1, 0.099, 0.102, 0.098, 0.1, 0.101, 0.099, 0.1];
+  const windows = [...held(8, 392, 0.1), ...wobble.map((rms) => ({ freq: 784, rms }))];
+  const shown = shownFor(windows).slice(8);
+  const first = shown.findIndex((f) => f === 784);
+  expect(first).toBeGreaterThanOrEqual(0);
+  expect(first).toBeLessThan(6);
+  // Even a perfectly steadily falling level is let through after the cap, 400 ms.
+  const falling = Array.from({ length: 12 }, (_, i) => ({ freq: 784, rms: 0.1 - i * 0.002 }));
+  expect(shownFor([...held(8, 392, 0.1), ...falling]).at(-1)).toBe(784);
+});
+
+test('an octave read at the start of a note is never held back', () => {
+  // A guitar's attack can read an octave low; the true pitch must replace it even though the sound is falling.
+  const shown = shownFor([{ freq: 45.4, rms: 0.2 }, { freq: 90.8, rms: 0.18 }, { freq: 90.8, rms: 0.17 }]);
+  expect(shown.at(-1)).toBe(90.8);
+  expect(isDecayOctaveJump(392, 392, 0.014, 0.016, 5, 0)).toBe(false);
+  expect(isDecayOctaveJump(588, 392, 0.014, 0.016, 5, 0)).toBe(false);
+  expect(isDecayOctaveJump(196, 392, 0.014, 0.016, 5, 0)).toBe(false);
 });

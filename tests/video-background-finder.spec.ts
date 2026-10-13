@@ -23,6 +23,9 @@ for (const finder of ['fast', 'edges'] as const) {
     test.setTimeout(420_000);
     const fetched: string[] = [];
     page.on('request', (r) => r.url().includes('/models/') && fetched.push(new URL(r.url()).pathname));
+    // Headless Chromium and CI's WebKit render WebGL in software: the person finder must not be handed to it.
+    const logged: string[] = [];
+    page.on('console', (m) => logged.push(m.text()));
     await open(page, finder);
     const download = page.waitForEvent('download');
     await page.locator('#run').click();
@@ -50,6 +53,8 @@ for (const finder of ['fast', 'edges'] as const) {
     console.log(`${browserName} ${finder}: corners ${JSON.stringify(shot.corners)} person ${JSON.stringify(shot.person)}`);
     expect(shot.corners.every(magenta), 'the room around the person is replaced').toBe(true);
     expect(shot.person.every((p) => !magenta(p!)), 'the person stays, all over').toBe(true);
+    // (Mac WebKit has a real chip, so only Chromium, whose headless build is software, is checked.)
+    if (browserName === 'chromium') expect(logged.some((l) => /SOFTMAX activation function chosen on GPU/.test(l))).toBe(false);
     // Only the model that was asked for is fetched.
     const wanted = finder === 'fast' ? /selfie_segmenter(_landscape)?\.tflite$/ : /selfie_multiclass_256x256\.tflite$/;
     expect(fetched.filter((u) => /selfie/.test(u)).every((u) => wanted.test(u))).toBe(true);

@@ -25,6 +25,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'gif-to-mp4': () => import('./gif-to-mp4'),
   'compress-video': () => import('./compress-video'),
   'video-to-mp4': () => import('./video-to-mp4'),
+  'video-to-mov': () => import('./video-to-mov'),
   'compress-png': () => import('./compress-png'),
   'compress-gif': () => import('./compress-gif'),
   'trim-video': () => import('./trim-video'),
@@ -87,6 +88,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'create-zip': () => import('./create-zip'),
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
+  'json-to-csv': () => import('./json-to-csv'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

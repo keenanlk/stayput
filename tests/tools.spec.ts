@@ -10,6 +10,7 @@ import { PDFDocument, PDFHexString, PDFName, PDFArray, PDFRawStream, decodePDFRa
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { inspect, sniffFormat } from '../src/lib/exif';
+import { allowServiceWorker } from './allow-sw';
 
 const fixtures = fileURLToPath(new URL('./fixtures/generated/', import.meta.url));
 const fx = (name: string) => fixtures + name;
@@ -158,7 +159,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(102);
+  expect(await page.locator('.index .tool-card').count()).toBe(106);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -569,7 +570,7 @@ test('PDF to image renders selected pages', async ({ page }) => {
 });
 
 test('every tool page renders with structured data and no errors', async ({ page }) => {
-  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'signature-maker', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'bpm-key-finder', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image', 'json-to-csv'];
+  const slugs = ['heic-to-jpg', 'convert-image', 'compress-image', 'strip-exif', 'merge-pdf', 'split-pdf', 'compress-pdf', 'rotate-pdf', 'image-to-pdf', 'pdf-to-image', 'reorder-pdf', 'sign-pdf', 'pdf-page-numbers', 'pdf-to-word', 'crop-image', 'favicon-generator', 'unlock-pdf', 'protect-pdf', 'exif-viewer', 'video-to-gif', 'blur-image', 'rotate-image', 'video-to-mp3', 'image-to-text', 'color-picker', 'gif-to-mp4', 'compress-video', 'video-to-mp4', 'compress-png', 'trim-video', 'mute-video', 'resize-video', 'rotate-video', 'compress-gif', 'resize-gif', 'crop-gif', 'merge-gifs', 'crop-video', 'video-speed', 'merge-videos', 'add-audio-to-video', 'reverse-video', 'video-to-jpg', 'remove-background', 'trim-audio', 'audio-splitter', 'passport-photo', 'audio-converter', 'watermark-image', 'watermark-pdf', 'qr-code-generator', 'barcode-generator', 'qr-code-scanner', 'signature-maker', 'screen-recorder', 'voice-recorder', 'remove-pdf-metadata', 'sticker-maker', 'profile-picture-maker', 'volume-booster', 'redact-pdf', 'merge-audio', 'mic-test', 'crop-pdf', 'webcam-test', 'grayscale-pdf', 'audio-to-video', 'compress-audio', 'add-text-to-image', 'add-text-to-gif', 'split-image', 'collage-maker', 'extract-pdf-images', 'black-and-white-image', 'pitch-changer', 'bpm-key-finder', 'tuner', 'metronome', 'fill-pdf-form', 'blur-face-video', 'remove-silence', 'image-to-svg', 'gif-maker', 'flatten-pdf', 'resize-pdf', 'remove-noise', 'upscale-image', 'transcribe', 'remove-object', 'add-subtitles-to-video', 'adjust-image', 'vocal-remover', 'video-background-remover', 'ocr-pdf', 'document-scanner', 'epub-to-pdf', 'pdf-to-epub', 'archive-extractor', 'create-zip', 'emote-resizer', 'pixel-art-converter', 'photo-to-sketch', 'add-border-to-image', 'json-to-csv'];
   for (const slug of slugs) {
     const errors = await open(page, slug);
     expect(await page.locator('script[type="application/ld+json"]').count()).toBe(3);
@@ -723,6 +724,7 @@ async function decoderCache(page: Page, expected: 'cached' | 'none') {
 
 test.describe('decoder caching', () => {
   test.use({ serviceWorkers: 'allow' });
+  test.beforeEach(async ({ context }) => allowServiceWorker(context));
   test('Decoders are cached only by pages that can need them, from this site, and only when the browser lacks one', async ({ page }) => {
     await stubAnalytics(page);
     // A PDF tool never needs an image decoder, so a visit costs none of those bytes.
@@ -1125,6 +1127,10 @@ test('preset landing pages render, run their base tool with the preset options a
         expect(await page.locator('#file-input').getAttribute('accept')).toContain(`.${ext}`);
       }],
     ),
+    ['mp4-to-mov', 'video-to-mov', async () => {
+      await expect(page.locator('#mute')).not.toBeChecked();
+      expect(await page.locator('#file-input').getAttribute('accept')).toContain('.mp4');
+    }],
     ['png-compressor', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['reduce-png-size', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['cut-video', 'trim-video', async () => expect(page.locator('#exact')).not.toBeChecked()],
@@ -1618,6 +1624,7 @@ test('A file that cannot be opened shows an error as soon as it is added', async
 
 test.describe('offline', () => {
   test.use({ serviceWorkers: 'allow' });
+  test.beforeEach(async ({ context }) => allowServiceWorker(context));
   test('Returning visitors get pages from the browser\'s own request, and missing pages still 404', async ({ page }) => {
     // The worker used to re-fetch every page itself, and Chrome showed ERR_FAILED on
     // the first open of each page for returning visitors. Navigation preload hands the
@@ -3110,7 +3117,7 @@ test('Trim video copies the part between start and end, keeps the format, and no
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(clip);
   // The recording has no length in its header; the page finds it anyway.
-  await expect(page.locator('#vg-panel')).toBeVisible();
+  await expect(page.locator('#vg-panel[data-duration]')).toBeVisible();
   const length = Number(await page.locator('#vg-panel').getAttribute('data-duration'));
   expect(length).toBeGreaterThan(2.5);
   await expect(page.locator('#vg-end')).toHaveValue(String(length));
@@ -3139,7 +3146,7 @@ test('Trim video cuts exactly on request, and an end before the start is refused
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const clip = await recordClip(page);
   await page.locator('#file-input').setInputFiles(clip);
-  await expect(page.locator('#vg-panel')).toBeVisible();
+  await expect(page.locator('#vg-panel[data-duration]')).toBeVisible();
   await page.locator('#vg-start').fill('2');
   await page.locator('#vg-end').fill('1');
   await expect(page.locator('#vg-estimate')).toHaveText('The end must come after the start.');
@@ -4262,9 +4269,16 @@ test('Watermark image draws the text over the whole photo at full size, and no b
 test('Watermark PDF stamps every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'watermark-pdf');
   const net = watchNetwork(page);
-  const source = readFileSync(fx('rotated.pdf'));
+  // Built here, in its own folder, so this test never depends on another test (or its parallel worker) having written it.
+  const rotated = await PDFDocument.create();
+  const rotatedPage = rotated.addPage([612, 792]);
+  rotatedPage.setRotation(degrees(90));
+  rotatedPage.drawText('Keep this text', { x: 60, y: 700, size: 20, font: await rotated.embedFont(StandardFonts.Helvetica) });
+  const rotatedPath = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'rotated.pdf');
+  writeFileSync(rotatedPath, await rotated.save());
+  const source = readFileSync(rotatedPath);
   const before = await PDFDocument.load(source);
-  const { downloads } = await run(page, ['rotated.pdf'], async () => {
+  const { downloads } = await run(page, [rotatedPath], async () => {
     await expect(page.locator('#wm-panel')).toBeVisible();
     await expect(page.locator('#wm-hint')).toContainText(`all ${before.getPageCount()} page`);
     await page.locator('#wm-text').fill('DRAFT');
@@ -4283,6 +4297,7 @@ test('Watermark PDF stamps every page, keeps the text, and no bytes leave the ta
   // The original text is still there to select and search.
   const was = (await textItems(new Uint8Array(source), 1)).map((t) => t.str).join('');
   const now = (await textItems(out, 1)).map((t) => t.str).join('');
+  expect(was).toContain('Keep this text');
   expect(now).toBe(was);
   net.assertNothingLeft(['rotated.pdf']);
   expect(errors).toEqual([]);
@@ -5477,19 +5492,23 @@ test('Mic test shows the level and a verdict, plays back a short recording, and 
   expect(errors).toEqual([]);
 });
 
-test('Grayscale PDF lays a saturation blend over every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
+test('Grayscale PDF rewrites the colours on every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'grayscale-pdf');
   const net = watchNetwork(page);
   const { downloads } = await run(page, [fx('text.pdf')]);
   const download = downloads[0]!;
   expect(download.suggestedFilename()).toBe('text-grayscale.pdf');
+  await expect(page.locator('#results-list')).toContainText('3 pages converted to grayscale');
   const out = await bytesOf(download);
   const doc = await PDFDocument.load(out);
   expect(doc.getPageCount()).toBe(3);
+  // The colour is rewritten, not covered: no blend-mode overlay and no RGB colour operators.
+  expect(Buffer.from(out).toString('latin1')).not.toContain('/Saturation');
   for (const p of doc.getPages()) {
-    const gs = p.node.Resources()!.lookup(PDFName.of('ExtGState')) as unknown as { values(): Parameters<typeof doc.context.lookup>[0][] };
-    const modes = gs.values().map((v) => String(doc.context.lookup(v)));
-    expect(modes.some((m) => m.includes('/BM /Saturation'))).toBe(true);
+    const c = p.node.lookup(PDFName.of('Contents')) as PDFRawStream;
+    const ops = Buffer.from(decodePDFRawStream(c).decode()).toString('latin1');
+    expect(ops).not.toMatch(/(^|\s)(rg|RG)(\s|$)/);
+    expect(ops).toMatch(/\bg\b/);
   }
   expect((await textItems(out, 2)).map((t) => t.str).join(' ')).toContain('Page 2 of the fixture');
   // The green box on the page now renders grey: draw the result in the crop tool's preview and read a pixel.
@@ -6006,6 +6025,51 @@ test('Ukulele tuner page starts on ukulele, reads a chromatic note on A4 = 432, 
   await page.locator('#tuner-start').click();
   await expect(page.locator('#tuner-message')).toContainText('microphone is blocked');
   await expect(page.locator('#tuner-message')).toContainText('press a string');
+});
+
+test('The six instrument tuner pages open on their instrument with its string buttons, and no offline claim in the lead', async ({ page }) => {
+  const pagesWanted: [slug: string, instrument: string, h1: string, strings: string[]][] = [
+    ['violin-tuner', 'violin', 'Violin tuner', ['G3', 'D4', 'A4', 'E5']],
+    ['bass-tuner', 'bass', 'Bass tuner', ['E1', 'A1', 'D2', 'G2']],
+    ['cello-tuner', 'cello', 'Cello tuner', ['C2', 'G2', 'D3', 'A3']],
+    ['chromatic-tuner', 'chromatic', 'Chromatic tuner', []],
+    ['banjo-tuner', 'banjo', 'Banjo tuner', ['G4', 'D3', 'G3', 'B3', 'D4']],
+    ['mandolin-tuner', 'mandolin', 'Mandolin tuner', ['G3', 'D4', 'A4', 'E5']],
+  ];
+  for (const [slug, instrument, h1, strings] of pagesWanted) {
+    await page.goto(`/${slug}`);
+    await expect(page.locator('#tool'), slug).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('h1'), slug).toHaveText(h1);
+    await expect(page.locator('#instrument'), slug).toHaveValue(instrument);
+    if (strings.length) await expect(page.locator('.tuner-string'), slug).toHaveText(strings);
+    else await expect(page.locator('.tuner-string'), slug).toHaveCount(0);
+    await expect(page.locator('.hero-lead'), slug).toContainText('not uploaded');
+    await expect(page.locator('.hero-lead'), slug).not.toContainText('offline');
+  }
+});
+
+test('Cello and banjo tuner pages read their lowest and shortest open strings from a tone', async ({ page }) => {
+  await stubAnalytics(page);
+  // Cello open C, C2 = 65.41 Hz, 12 cents sharp.
+  await fakeTone(page, 65.41 * 2 ** (12 / 1200));
+  await page.goto('/cello-tuner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-name')).toHaveText('C');
+  await expect(page.locator('#tuner-octave')).toHaveText('2');
+  await expect(page.locator('#tuner-hint')).toHaveText(/1[0-4] cents sharp: tune down/);
+  await expect(page.locator('.tuner-string').first()).toHaveAttribute('data-active', 'true');
+
+  // Banjo fifth string, G4 = 392 Hz, listed first; it must not light the open third string G3.
+  await fakeTone(page, 392);
+  await page.goto('/banjo-tuner');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#tuner-start').click();
+  await expect(page.locator('#tuner-name')).toHaveText('G');
+  await expect(page.locator('#tuner-octave')).toHaveText('4');
+  await expect(page.locator('#tuner-hint')).toHaveText('In tune');
+  await expect(page.locator('.tuner-string').nth(0)).toHaveAttribute('data-active', 'true');
+  await expect(page.locator('.tuner-string').nth(2)).not.toHaveAttribute('data-active', 'true');
 });
 
 /** Record when each metronome click is scheduled to sound, on the audio clock. */
@@ -6823,9 +6887,16 @@ async function yellowBands(page: Page, bytes: Uint8Array, t: number) {
   return page.evaluate(async ({ data, t }) => {
     const v = document.createElement('video');
     v.muted = true;
+    v.preload = 'auto';
     v.src = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: 'video/mp4' }));
     await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('video will not load')); });
-    await new Promise<void>((ok) => { v.requestVideoFrameCallback(() => ok()); v.currentTime = t; });
+    // `seeked` fires once for every seek and says the frame at `t` is current. (A frame callback on a detached,
+    // paused video is not guaranteed to fire, which left this wait hanging for the whole test timeout.)
+    await new Promise<void>((ok, bad) => {
+      v.onseeked = () => ok();
+      v.onerror = () => bad(new Error('video will not seek'));
+      v.currentTime = t;
+    });
     const c = document.createElement('canvas');
     c.width = v.videoWidth;
     c.height = v.videoHeight;

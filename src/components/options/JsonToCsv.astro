@@ -1,5 +1,11 @@
 ---
-/** Option controls for JSON ↔ CSV. Groups are shown for the direction in use (see tools/json-to-csv.ts). */
+/**
+ * Option controls for JSON ↔ CSV. Groups are shown for the direction in use (see tools/json-to-csv.ts).
+ * defaults.start is the direction shown before any data is given; the radio stays on "Pick from my data".
+ */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const start = defaults.start === 'csv-to-json' ? 'csv-to-json' : 'json-to-csv';
 ---
 <div class="field wide">
   <label>Direction</label>
@@ -9,7 +15,7 @@
     <label><input type="radio" name="direction" value="csv-to-json" /><span>CSV to JSON</span></label>
   </div>
 </div>
-<div class="jc-group" id="jc-to-csv">
+<div class="jc-group" id="jc-to-csv" data-start={start} hidden={start === 'csv-to-json'}>
   <div class="field">
     <label for="jc-out-delimiter">Delimiter</label>
     <select id="jc-out-delimiter">
@@ -36,7 +42,7 @@
     <select id="jc-which"></select>
   </div>
 </div>
-<div class="jc-group" id="jc-to-json" hidden>
+<div class="jc-group" id="jc-to-json" hidden={start !== 'csv-to-json'}>
   <div class="field">
     <label for="jc-in-delimiter">Delimiter</label>
     <select id="jc-in-delimiter">

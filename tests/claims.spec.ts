@@ -196,3 +196,19 @@ test('the link-preview card text makes no banned claim', () => {
   expect([...claimsIn(`<p>${script.replace(/\n/g, '</p><p>')}</p>`), ...(bannedPhrases.exec(script) ? ['banned phrase in make-og.mjs'] : [])]).toEqual([]);
   expect(claimsIn('<p>Nothing is uploaded, nothing is capped, it works offline.</p>')).not.toEqual([]);
 });
+
+// The image background remover family downloads the cut-out model and its onnxruntime WebAssembly runtime:
+// about 42 MB on the wire (38.7 + 3.3), 46.5 MB of it model once decoded. Passport photo and profile
+// picture add the ~4 MB face finder (about 46 MB). The old "about 46 MB" for the model alone was the
+// decoded model size, and "about 50 MB" for the face tools was derived from it.
+test('cut-out model pages quote the measured download, not the decoded model size', () => {
+  const files = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') || f === 'llms.txt');
+  const bad = files.flatMap((f) => {
+    const text = scannable(readFileSync(new URL(f, dist), 'utf8'));
+    // "46 MB" is right only where the face finder is added to the 42 MB (passport photo, profile picture).
+    return text.split(/(?<=[.!?])\s+/).filter((s) => /cut-?out model/i.test(s) && /\b(46|50) ?MB\b/.test(s) && !/face finder/i.test(s)).map((s) => `${f}: ${s}`);
+  });
+  expect(bad).toEqual([]);
+  for (const f of ['remove-background', 'sticker-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 42 MB/);
+  for (const f of ['passport-photo', 'profile-picture-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 46 MB/);
+});

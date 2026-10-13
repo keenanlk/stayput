@@ -32,6 +32,7 @@ const formats = [
   ['image/png', 'PNG (lossless, allows transparent)'],
   ['image/webp', 'WebP'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label>Layout</label>
@@ -83,7 +84,6 @@ const formats = [
   <label for="quality">Quality <output id="quality-out">{quality}</output></label>
   <input type="range" id="quality" min="30" max="100" value={quality} />
 </div>
-<p class="muted small">Pictures are placed in the order they are listed. Use the arrows in the list to move them.</p>
 <style>
   .collage-row { gap: 12px; }
   .collage-row .field { flex: 1 1 140px; }
@@ -91,3 +91,6 @@ const formats = [
   #background { width: 44px; height: 36px; padding: 2px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); }
   .swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); cursor: pointer; }
 </style>
+<OptionDetails>
+  <p>Pictures are placed in the order they are listed. Use the arrows in the list to move them.</p>
+</OptionDetails>

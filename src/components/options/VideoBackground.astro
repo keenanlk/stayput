@@ -30,6 +30,7 @@ const finder = defaults.finder ?? 'edges';
   <label for="bg-color">Colour</label>
   <input type="color" id="bg-color" value={color} />
 </div>
-<p class="muted small" id="image-hint" hidden={bg !== 'image'}>Drop a JPG or PNG together with the video; it fills the frame behind the person.</p>
-<p class="muted small">Made for people: talking heads, presenters, dancers. The first run downloads the person finder (about 28 MB, model and engine; about 12 MB with Fast) to this browser. Fast is several times quicker but rougher around hair and in dim light.</p>
-<p class="muted small" id="time-note">This is slower than the video plays: about 6 times its length on a MacBook Pro with an M3 Max chip (Fast: about 1.3 to 2.2 times), and longer on slower devices. The time left shows once it is running.</p>
+<p class="hint" id="image-hint" hidden={bg !== 'image'}>Drop a JPG or PNG with the video to fill the frame behind the person.</p>
+<p class="hint">Made for people. Fast is rougher around hair and in dim light.</p>
+<p class="hint" id="time-note">Can run slower than the video plays; the time left shows as it runs.</p>
+<p class="hint" id="phone-note" hidden>This clip is big for a phone. For a faster, steadier run, trim it first or use a 1080p copy.</p>
