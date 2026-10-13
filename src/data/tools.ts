@@ -2699,9 +2699,9 @@ export const tools: Tool[] = [
   {
     slug: 'bpm-key-finder',
     name: 'BPM and key finder',
-    title: 'BPM and Key Finder: Free, From a File, No Upload | Stayput',
+    title: 'BPM and Key Finder: Tempo, Key and Camelot Code, Free | Stayput',
     description: 'Find the BPM and musical key of a song from an audio file, with its Camelot code. Free, no sign-up, and the song is not uploaded.',
-    heading: 'Find the BPM and key of a song',
+    heading: 'BPM and key finder with Camelot codes',
     tagline: 'Drop an audio file and read its tempo, key and Camelot code. The song is analysed on this device.',
     category: 'media',
     accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.webm,.mp4,.mov',
@@ -2709,7 +2709,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop songs to find their BPM and key',
     action: 'Find BPM and key',
     sizeFact: 'No account, no watermark',
-    keywords: ['bpm finder', 'bpm and key finder', 'bpm detector', 'bpm finder mp3', 'bpm analyzer', 'song bpm finder', 'find bpm of a song', 'audio bpm finder', 'key and bpm finder'],
+    keywords: ['bpm and key finder', 'key and bpm finder', 'bpm key finder', 'bpm detector', 'bpm analyzer', 'song key and bpm'],
     steps: [
       'Drop one or more songs, or tap to pick them. MP3, WAV, M4A, FLAC, Ogg and most other audio files work; a video’s sound works too.',
       'Press Find BPM and key. A three-minute song takes a few seconds.',
@@ -2737,6 +2737,7 @@ export const tools: Tool[] = [
       {
         heading: 'Without a file',
         bullets: [
+          'If you only want the tempo, the [BPM finder](/bpm-finder) page puts the BPM first and the key second.',
           'Tap along with a song you can only hear on the [Tap tempo](/tap-tempo) page, and check the answer against a click on the [online metronome](/tools/metronome).',
         ],
       },

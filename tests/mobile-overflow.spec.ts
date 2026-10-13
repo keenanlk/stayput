@@ -24,6 +24,7 @@ const pages = [
   '/itf-14-barcode-generator',
   '/tools/bpm-key-finder',
   '/camelot-wheel',
+  '/bpm-finder',
   '/press',
   '/licenses',
 ];

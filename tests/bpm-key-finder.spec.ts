@@ -88,7 +88,7 @@ test('refuses a file longer than 15 minutes, and a clip under 10 seconds, with t
   await expect(page.locator('.bk-failed .bk-error')).toContainText('This clip is 3 seconds long, which is too short to find a tempo. Use a clip of at least 10 seconds.', { timeout: 60_000 });
 });
 
-for (const [slug, focus] of [['song-key-finder', 'key'], ['camelot-wheel', 'camelot']] as const) {
+for (const [slug, focus] of [['song-key-finder', 'key'], ['camelot-wheel', 'camelot'], ['bpm-finder', 'both']] as const) {
   test(`/${slug} is a preset of the finder with its own structured data and social image`, async ({ page }) => {
     const { errors } = await open(page, `/${slug}`);
     await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(3);
@@ -111,4 +111,19 @@ test('the main page carries FAQPage data, and Tap tempo points to the new tool',
   expect(data.mainEntity[0].acceptedAnswer.text).not.toContain('](');
   await page.goto('/tap-tempo');
   await expect(page.locator('a[href="/tools/bpm-key-finder"]').first()).toBeVisible();
+});
+
+test('/bpm-finder owns the BPM finder title and heading, and the tool page leads with BPM and key and links to it', async ({ page }) => {
+  await open(page, '/bpm-finder');
+  await expect(page).toHaveTitle(/^BPM Finder: /);
+  await expect(page.locator('h1')).toHaveText('BPM finder for song files');
+  await expect(page.locator('body')).not.toContainText(/always (shown?|shows?|lists?)/i);
+  await expect(page.locator('body')).not.toContainText('](');
+  await expect(page.locator('a[href="/tools/bpm-key-finder"]').first()).toBeVisible();
+  await page.goto('/tools/bpm-key-finder');
+  await expect(page).toHaveTitle(/^BPM and Key Finder: .*Camelot/);
+  await expect(page.locator('h1')).toHaveText('BPM and key finder with Camelot codes');
+  await expect(page.locator('a[href="/bpm-finder"]').first()).toBeVisible();
+  const sitemap = await (await page.request.get('/sitemap-0.xml')).text();
+  expect(sitemap).toContain('https://stayput.dev/bpm-finder<');
 });
