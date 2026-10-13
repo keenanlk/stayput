@@ -76,15 +76,15 @@ test('/tools has no page of its own: vercel.json sends it, and only it, to the t
   expect((await request.get('/tools/heic-to-jpg')).status()).toBe(200);
 });
 
-test('archive tool pages only claim password support for ZIP, in the visible FAQ and in the FAQPage data', async ({ request }) => {
+test('archive tool pages claim password support for ZIP, 7z and RAR in the visible FAQ and in the FAQPage data, and no more', async ({ request }) => {
   for (const path of ['/tools/archive-extractor', '/rar-extractor', '/open-7z-file']) {
     const html = await (await request.get(path)).text();
     const ld = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]!)).find((j) => j['@type'] === 'FAQPage');
     expect(ld, path).toBeTruthy();
     const answers: string[] = ld.mainEntity.map((q: { acceptedAnswer: { text: string } }) => q.acceptedAnswer.text);
     for (const a of answers) expect(html, path).toContain(a.replace(/&/g, '&amp;').replace(/’/g, '’'));
-    expect(html, path).not.toMatch(/including (encrypted 7z|password-protected ones)|password-protected ones too/);
-    if (path === '/tools/archive-extractor') expect(answers.join(' ')).toMatch(/ZIP files open after you enter the password.*7z and RAR archives are not supported yet/);
+    expect(html, path).not.toMatch(/not supported yet[^.]*(encrypted|password)|(encrypted|password)[^.]*not supported yet/i);
+    if (path === '/tools/archive-extractor') expect(answers.join(' ')).toMatch(/password-protected ZIP files, for 7z archives.*for RAR archives.*archives split into parts are not supported/);
   }
 });
 
