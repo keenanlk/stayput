@@ -66,6 +66,7 @@ const does: Record<string, string> = {
   'signature-maker': 'Makes a signature image you can draw, type in a script font or take from a photo of your handwriting, and saves it as a transparent PNG, or an SVG when you draw it.',
   'screen-recorder': 'Records your screen, a window or a browser tab, with sound and your microphone if you choose, and saves the video.',
   'voice-recorder': 'Records your voice with your microphone and saves it as MP3, WAV or M4A.',
+  'audio-reverser': 'Plays an audio file backwards, from MP3, WAV, M4A, FLAC or OGG, and saves it in the same or another format.',
   'volume-booster': 'Makes an MP3, voice memo or video louder or quieter, or normalizes a batch to the same loudness.',
   'remove-noise': 'Cleans hiss, hum, fan and room noise out of a voice recording or video and keeps its format.',
   'merge-audio': 'Joins two or more audio files into one MP3 or WAV, in the order you choose, with silence or a crossfade between them.',
@@ -164,7 +165,7 @@ const downloads: Record<string, Download> = {
  * on the first visit (pages, scripts and the image decoders).
  */
 const firstUseEngines = [
-  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-splitter', 'audio-converter', 'compress-audio', 'volume-booster',
+  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-splitter', 'audio-converter', 'compress-audio', 'volume-booster', 'audio-reverser',
   'pitch-changer', 'remove-silence', 'voice-recorder', 'remove-noise', 'file-checksum',
   'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image', 'qr-code-scanner',
 ];

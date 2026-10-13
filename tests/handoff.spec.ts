@@ -221,7 +221,7 @@ test('every shipped pair is one of the tool\'s next steps', () => {
 const kindOf = (from: string): { name: string; type: string; bytes: number[] } => {
   if (/gif/.test(from)) return { name: 'out.gif', type: 'image/gif', bytes: [...readFileSync(fx('generated/anim.gif'))] };
   if (/pdf/.test(from)) return { name: 'out.pdf', type: 'application/pdf', bytes: [...readFileSync(fx('generated/text.pdf'))] };
-  if (['audio-converter', 'volume-booster', 'pitch-changer', 'remove-noise', 'remove-silence', 'compress-audio', 'merge-audio', 'vocal-remover'].includes(from))
+  if (['audio-converter', 'audio-reverser', 'volume-booster', 'pitch-changer', 'remove-noise', 'remove-silence', 'compress-audio', 'merge-audio', 'vocal-remover'].includes(from))
     return { name: 'out.wav', type: 'audio/wav', bytes: [...readFileSync(fx('generated/tone.wav'))] };
   return { name: 'out.mp4', type: 'video/mp4', bytes: [...readFileSync(clip)] };
 };
