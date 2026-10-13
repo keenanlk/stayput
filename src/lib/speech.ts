@@ -106,6 +106,14 @@ export interface Speech {
   language: string;
   /** Seconds. */
   duration: number;
+  /** A plain sentence on which path wrote the captions, for the result line. */
+  pathNote: string;
+}
+
+/** Which path recognised the pieces: the graphics chip (WebGPU) or the processor (WebAssembly), as for the video background tools. */
+function pathNote(onChip: number, onCpu: number): string {
+  if (onChip === 0) return 'Wrote the captions with the processor.';
+  return onCpu === 0 ? 'Wrote the captions with the graphics chip.' : 'Wrote the captions with the graphics chip, then with the processor after the chip stopped.';
 }
 
 /**
@@ -126,6 +134,8 @@ export async function transcribeFile(
   // Detected once, from the first piece, then kept for the rest of the recording.
   let spoken: string | null = opts.language === 'auto' ? null : opts.language;
   let retriedModel = false;
+  let onChip = 0;
+  let onCpu = 0;
   for (let i = 1; i < cuts.length; i++) {
     const from = cuts[i - 1]!;
     const at = from / RATE;
@@ -146,8 +156,10 @@ export async function transcribeFile(
       found = await recognise(piece, spoken, opts.task, loading);
     }
     modelReady = true;
+    if (onGpu) onChip++;
+    else onCpu++;
     spoken = found.language;
     segments.push(...found.chunks.map((s) => ({ start: s.start + at, end: s.end + at, text: s.text })));
   }
-  return { segments: clean(segments), language: spoken!, duration: total };
+  return { segments: clean(segments), language: spoken!, duration: total, pathNote: pathNote(onChip, onCpu) };
 }

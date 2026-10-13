@@ -14,15 +14,19 @@ import { isPhoneBrowser } from './phone-limit';
 export const WEBGPU_CAPTIONS = true;
 
 /**
- * Phones and tablets: not measured on a real device, so they stay on the 8-bit path. iPhones and iPads
- * run captions at about 1.1-1.7 GB of memory already, and Safari does not say how much memory a device has.
+ * Phones and tablets: not measured on a real device, so they stay on the 8-bit path unless the address
+ * says `?webgpu=1` (or storage `stayput-webgpu` is `1`). iPhones and iPads run captions at about
+ * 1.1-1.7 GB of memory already, and Safari does not say how much memory a device has.
  */
 export const WEBGPU_CAPTIONS_ON_PHONES = false;
 
 /** Computers that report less memory than this (in GB; Chrome rounds down to a power of two, up to 8) stay on the 8-bit path. */
 export const WEBGPU_MIN_DEVICE_MEMORY_GB = 4;
 
-/** The name that turns the WebGPU path off in the address (`?webgpu=0`) or in localStorage (`stayput-webgpu`, set to `0`). */
+/**
+ * The name that sets the path in the address or in localStorage (`stayput-webgpu`): `0` turns the WebGPU path off,
+ * `1` opts a phone or tablet in (the worker's probe for WebGPU and shader-f16 and the fall back to 8-bit still apply).
+ */
 export const WEBGPU_OVERRIDE = 'webgpu';
 /** Set by the page when the WebGPU path failed on this device: the time of the failure. It is tried again a week later. */
 const FAILED_KEY = 'stayput-webgpu-failed';
@@ -45,23 +49,27 @@ function environment(): Env {
   return { search: location.search, store, nav: navigator as Env['nav'], now: Date.now() };
 }
 
-/** The forced setting from the address or storage, if there is one: '0' is off. */
-function forcedOff(env: Env): boolean {
+/** The setting forced from the address (first) or storage, if there is one: '0' is off, '1' is on even for a phone. */
+function forced(env: Env): string | null {
   const query = new URLSearchParams(env.search).get(WEBGPU_OVERRIDE);
-  if (query !== null) return query === '0';
+  if (query !== null) return query;
   try {
-    return env.store?.getItem(`stayput-${WEBGPU_OVERRIDE}`) === '0';
+    return env.store?.getItem(`stayput-${WEBGPU_OVERRIDE}`) ?? null;
   } catch {
-    return false;
+    return null;
   }
 }
 
 /** Whether to try the WebGPU path at all. The worker still probes for a real adapter and device before it loads anything. */
 export function wantsWebgpu(env: Env = environment()): boolean {
-  if (!WEBGPU_CAPTIONS || forcedOff(env)) return false;
+  const force = forced(env);
+  if (!WEBGPU_CAPTIONS || force === '0') return false;
   if (!('gpu' in env.nav) || !env.nav.gpu) return false;
-  if (isPhoneBrowser(env.nav) && !WEBGPU_CAPTIONS_ON_PHONES) return false;
+  const optedIn = force === '1';
+  if (isPhoneBrowser(env.nav) && !WEBGPU_CAPTIONS_ON_PHONES && !optedIn) return false;
   if (typeof env.nav.deviceMemory === 'number' && env.nav.deviceMemory < WEBGPU_MIN_DEVICE_MEMORY_GB) return false;
+  // Opting in tries again even where it failed in the last week.
+  if (optedIn) return true;
   try {
     const failed = Number(env.store?.getItem(FAILED_KEY));
     if (failed && env.now - failed < RETRY_AFTER_MS) return false;

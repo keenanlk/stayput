@@ -37,6 +37,13 @@ test('the WebGPU path is chosen only where it can work, and one flag and two ove
   // The address and storage overrides.
   expect(wantsWebgpu(env({}, '?webgpu=0'))).toBe(false);
   expect(wantsWebgpu(env({}, '?webgpu=1'))).toBe(true);
+  // `?webgpu=1` (or storage) opts a phone or tablet in, but not one without WebGPU or with little memory, and `?webgpu=0` still wins.
+  const phone = { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1', maxTouchPoints: 5 };
+  expect(wantsWebgpu(env(phone, '?webgpu=1'))).toBe(true);
+  expect(wantsWebgpu(env(phone, '', { 'stayput-webgpu': '1' }))).toBe(true);
+  expect(wantsWebgpu(env(phone, '?webgpu=0'))).toBe(false);
+  expect(wantsWebgpu(env({ ...phone, gpu: undefined }, '?webgpu=1'))).toBe(false);
+  expect(wantsWebgpu(env({ ...phone, deviceMemory: 2 }, '?webgpu=1'))).toBe(false);
   expect(wantsWebgpu(env({}, '', { 'stayput-webgpu': '0' }))).toBe(false);
   // A failure is remembered for a week, then tried again.
   expect(wantsWebgpu(env({}, '', { 'stayput-webgpu-failed': String(1_000_000 - 3600_000) }))).toBe(false);
@@ -85,6 +92,8 @@ async function transcribe(page: Page, search = '') {
   await expect(page.locator('#error')).not.toHaveClass(/is-active/);
   await expect(page.locator('#results-list')).toContainText(/English speech/);
 }
+
+const PHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1';
 
 function track(page: Page) {
   const files: string[] = [];
@@ -137,4 +146,37 @@ test('with a real WebGPU adapter, the 16-bit encoder runs and the 8-bit encoder 
   await transcribe(page);
   expect([...seen.files].sort()).toEqual(['decoder_model_merged_quantized.onnx', 'encoder_model_fp16.onnx']);
   await expect(page.locator('#results-list')).toContainText(/22 words/);
+  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.');
+});
+
+test.describe('on a phone', () => {
+  test.use({ userAgent: PHONE });
+
+  test('with no flag the 8-bit path is chosen, and the path line says the processor wrote the captions', async ({ page }) => {
+    test.setTimeout(180_000);
+    await pretendWebgpu(page);
+    const seen = track(page);
+    await transcribe(page);
+    expect([...seen.files].sort()).toEqual(['decoder_model_merged_quantized.onnx', 'encoder_model_quantized.onnx']);
+    expect(seen.scripts).toEqual([]);
+    await expect(page.locator('#results-list')).toContainText('Wrote the captions with the processor.');
+  });
+
+  test('with ?webgpu=1 the 16-bit WebGPU path is chosen, and a WebGPU that cannot run falls back to 8-bit with the captions written', async ({ page }) => {
+    test.setTimeout(180_000);
+    await pretendWebgpu(page);
+    const seen = track(page);
+    await transcribe(page, '?webgpu=1');
+    // The WebGPU worker and the 16-bit encoder were asked for, then the 8-bit encoder wrote the words.
+    expect(seen.scripts.length).toBeGreaterThan(0);
+    expect(seen.files).toContain('encoder_model_fp16.onnx');
+    expect(seen.files).toContain('encoder_model_quantized.onnx');
+    await expect(page.locator('#results-list')).toContainText('Wrote the captions with the processor.');
+  });
+});
+
+test('on a computer the path line says the processor wrote the captions when WebGPU is off', async ({ page }) => {
+  test.setTimeout(180_000);
+  await transcribe(page, '?webgpu=0');
+  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the processor.');
 });

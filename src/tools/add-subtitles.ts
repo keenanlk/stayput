@@ -94,6 +94,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
     const share = (f: number) => (index + f) / videos.length;
     let segments: Segment[];
     let from = 'from your subtitle file';
+    let path = '';
     if (given) segments = given;
     else {
       const speechModule = await import('../lib/speech');
@@ -109,6 +110,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       // The model is no longer needed; free its memory before the video is redrawn.
       speechModule.releaseSpeechModel();
       segments = speech.segments;
+      path = ` ${speech.pathNote}`;
       if (segments.length === 0) throw noSpeechFound(`No speech was found in ${file.name}, so there are no subtitles to add.`);
       const spoken = new Intl.DisplayNames(['en'], { type: 'language' }).of(speech.language) ?? speech.language;
       from = bool('translate') ? `translated to English from ${spoken} speech` : `written from ${spoken} speech`;
@@ -151,7 +153,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       name: suffixName(file.name, '-subtitled', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}`,
+      note: `${describeEdit(r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
     });
     if (saveSrt) outputs.push(srtOutput(file, segments));
   }
