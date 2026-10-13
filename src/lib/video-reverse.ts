@@ -28,7 +28,6 @@ import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
-import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 
 export interface ReverseOptions {
   mute: boolean;
@@ -110,6 +109,8 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
       }
     }
     // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
+    // Loaded here: tests import this file in Node, which cannot read the encoder's vendor.json import.
+    const { firstEncodableSound, noAudioEncoder } = await import('./mp3-fallback');
     const audioCodec = sound
       ? await firstEncodableSound(['aac', 'opus'], { numberOfChannels: sound.length, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH })
       : null;
