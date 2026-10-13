@@ -4,6 +4,7 @@ interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
 const stems = defaults.stems ?? 'instrumental';
 const format = defaults.format ?? 'mp3';
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="stems">Keep</label>
@@ -20,4 +21,6 @@ const format = defaults.format ?? 'mp3';
     <option value="wav" selected={format === 'wav'}>WAV (lossless, larger)</option>
   </select>
 </div>
-<p class="muted small">The first run downloads the separation model (67 MB) and the engine that runs it to this browser. In browsers with WebGPU (recent Chrome and Edge on computers, Safari 26) it runs on the graphics chip and is much faster; on the CPU alone, separating takes several times as long as the song.</p>
+<OptionDetails>
+  <p>The first run downloads the separation model (67 MB) and the engine that runs it to this browser. In browsers with WebGPU (recent Chrome and Edge on computers, Safari 26) it runs on the graphics chip and is much faster; on the CPU alone, separating takes several times as long as the song.</p>
+</OptionDetails>

@@ -2,6 +2,7 @@
 /** Option controls for trimming a video, shared by the tool page and its landing pages. */
 interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field-row wide vg-trim">
   <div class="field">
@@ -15,7 +16,6 @@ const { defaults = {} } = Astro.props;
 </div>
 <div class="field">
   <label class="check"><input type="checkbox" id="exact" checked={defaults.exact === 'true'} /> Cut exactly on the frame (re-encodes, slower)</label>
-  <p class="muted small">Left off, the clip is copied without re-encoding: instant and with no quality loss, starting at most half a second early.</p>
 </div>
 <div class="field">
   <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
@@ -30,3 +30,6 @@ const { defaults = {} } = Astro.props;
   .vg-estimate { margin: 0; grid-column: 1 / -1; }
   .vg-estimate.is-over { color: var(--warn); font-weight: 600; }
 </style>
+<OptionDetails>
+  <p>Left off, the clip is copied without re-encoding: instant and with no quality loss, starting at most half a second early.</p>
+</OptionDetails>

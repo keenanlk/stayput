@@ -12,13 +12,13 @@ const looks = [
   ['bw', 'Black and white'],
   ['original', 'As photographed'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field wide">
   <label>Look</label>
   <div class="segmented" role="radiogroup" aria-label="Look">
     {looks.map(([v, l]) => <label><input type="radio" name="look" value={v} checked={v === look} /><span>{l}</span></label>)}
   </div>
-  <p class="muted small">Colour, Grey and Black and white turn the paper white and lift shadows. Black and white is the sharpest for typed text; keep Colour for stamps, signatures in blue ink and highlighter.</p>
 </div>
 <div class="field">
   <label>Save as</label>
@@ -37,5 +37,8 @@ const looks = [
 </div>
 <div class="field wide">
   <label class="check"><input type="checkbox" id="crop" checked={crop} /> Find the page and straighten it</label>
-  <p class="muted small">Works best with the paper on a darker surface, all four corners in the photo. The preview outlines the page it found.</p>
 </div>
+<OptionDetails>
+  <p>Colour, Grey and Black and white turn the paper white and lift shadows. Black and white is the sharpest for typed text; keep Colour for stamps, signatures in blue ink and highlighter.</p>
+  <p>Works best with the paper on a darker surface, all four corners in the photo. The preview outlines the page it found.</p>
+</OptionDetails>

@@ -5,6 +5,7 @@ const { defaults = {} } = Astro.props;
 const paper = defaults.paper ?? 'a5';
 const typeSize = defaults['type-size'] ?? 'medium';
 const contents = defaults.contents !== 'false';
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="paper">Page size</label>
@@ -24,5 +25,7 @@ const contents = defaults.contents !== 'false';
 </div>
 <div class="field wide">
   <label class="check"><input type="checkbox" id="contents" checked={contents} /> Add a contents page listing the chapters</label>
-  <p class="muted small">Only DRM-free books can be converted: ones from Project Gutenberg, Standard Ebooks, Humble Bundle, many publishers and authors. Books locked with DRM, as most bought from Kobo, Apple Books or Google Play are, cannot be read.</p>
 </div>
+<OptionDetails>
+  <p>Only DRM-free books can be converted: ones from Project Gutenberg, Standard Ebooks, Humble Bundle, many publishers and authors. Books locked with DRM, as most bought from Kobo, Apple Books or Google Play are, cannot be read.</p>
+</OptionDetails>

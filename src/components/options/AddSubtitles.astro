@@ -26,7 +26,7 @@ const languages = [
   ['zh', 'Chinese'],
 ] as const;
 ---
-<p class="muted small" id="subs-source">Drop an SRT or VTT file along with the video to burn in your own subtitles. Without one, they are written from the speech.</p>
+<p class="hint" id="subs-source">Add an SRT or VTT file to use your own subtitles.</p>
 <div class="field" id="language-field">
   <label for="language">Spoken language</label>
   <select id="language">
@@ -58,4 +58,4 @@ const languages = [
 </div>
 <label class="check"><input type="checkbox" id="translate" checked={defaults.translate === 'true'} /> Translate the speech to English</label>
 <label class="check"><input type="checkbox" id="save-srt" checked={defaults.saveSrt === 'true'} /> Also save the subtitles as an SRT file</label>
-<p class="muted small">Every frame is drawn again and the video re-encoded, which takes longer for longer and sharper videos.</p>
+<p class="hint">Every frame is redrawn and re-encoded, so longer, sharper videos take longer.</p>
