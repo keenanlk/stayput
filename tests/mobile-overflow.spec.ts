@@ -32,6 +32,7 @@ const pages = [
   '/press',
   '/licenses',
   '/avi-to-mp4',
+  '/wma-to-mp3',
 ];
 
 for (const path of pages) {

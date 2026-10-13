@@ -1,5 +1,6 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
+import { id3Tag, wmaTagsOf } from '../lib/wma-convert';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, formatDuration, type Bitrate } from '../lib/audio';
 
 const format = () => str('format', 'mp3') as 'mp3' | 'wav';
@@ -26,6 +27,9 @@ createShell({
         blob = encodeWav(chans);
       } else {
         blob = await encodeMp3(chans, bitrate, (f) => progress.set(`Encoding ${entry.file.name} to MP3: ${Math.round(f * 100)}%`, share(0.1 + f * 0.9)));
+        // A WMA's title, artist and album go into the MP3 as an ID3 tag.
+        const tag = id3Tag(wmaTagsOf(buffer));
+        if (tag) blob = new Blob([tag as BlobPart, blob], { type: 'audio/mpeg' });
       }
       const out: OutputFile = {
         name: replaceExt(entry.file.name, fmt),

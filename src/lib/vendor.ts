@@ -56,7 +56,9 @@ export async function decodersFor(accept: string): Promise<VendorLib[]> {
   // The AVI decoder is for a container no browser reads, so there is nothing to ask the browser first.
   // (".avi" and the MIME type, not "avi", which "avif" contains.)
   const avi = /\.avi\b|x-msvideo/.test(a) ? (['libav'] as const) : [];
-  return [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi];
+  // The WMA decoder, likewise: nothing in a browser reads WMA. The MP3 encoder comes with it so the page works offline.
+  const wma = /\.wma\b|x-ms-wma/.test(a) ? (['libav-wma', 'lame'] as const) : [];
+  return [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi, ...wma];
 }
 
 interface WarmReply {
