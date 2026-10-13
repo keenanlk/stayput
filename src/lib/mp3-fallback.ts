@@ -5,7 +5,7 @@
  * LGPL, served from /vendor/) is registered with Mediabunny as an MP3 encoder,
  * and MP4 carries MP3 sound that iPhones play.
  */
-import { CustomAudioEncoder, EncodedPacket, registerEncoder, type AudioCodec, type AudioSample } from 'mediabunny';
+import { CustomAudioEncoder, EncodedPacket, getFirstEncodableAudioCodec, registerEncoder, type AudioCodec, type AudioSample, type Quality } from 'mediabunny';
 import { vendorDir } from './vendor';
 import { splitMp3Frames } from './mp3-frames';
 
@@ -69,4 +69,30 @@ export function registerMp3Fallback(): void {
   if (registered) return;
   registered = true;
   registerEncoder(Mp3AudioEncoder);
+}
+
+/** The browser has no encoder for any sound format the video can hold (iOS 18 and earlier, and the MP3 fallback failed to load). */
+export class NoAudioEncoder extends Error {
+  constructor(message: string) {
+    super(message);
+    // Set by hand: a minified class name would not survive into the name.
+    this.name = 'NoAudioEncoder';
+  }
+}
+
+/** The error for a video that has sound this browser cannot write: what to do about it, for the visitor. */
+export function noAudioEncoder(canMute: boolean): NoAudioEncoder {
+  return new NoAudioEncoder(
+    `This browser cannot write sound into a video.${canMute ? ' Tick Remove the sound to get the picture alone, or' : ''} On an iPhone, update iOS or use a computer; elsewhere, use a recent Chrome, Edge, Safari or Firefox.`,
+  );
+}
+
+/**
+ * The first sound codec this browser can encode, from `preferred` (the browser's own AAC and Opus
+ * encoders, in that order) and then MP3 from the WebAssembly encoder, which only runs when the
+ * browser has none of the others. Null when none can be written.
+ */
+export async function firstEncodableSound(preferred: AudioCodec[], config: { numberOfChannels: number; sampleRate: number; bitrate: number | Quality }): Promise<AudioCodec | null> {
+  registerMp3Fallback();
+  return getFirstEncodableAudioCodec([...preferred, 'mp3'], config);
 }
