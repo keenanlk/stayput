@@ -32,17 +32,19 @@ sync();
 const BLUR_WORK = 480;
 
 /**
- * Draw `frame` blurred over the whole canvas. Done by hand on a small copy, not with the canvas `filter` property:
+ * Draw the frame blurred over the whole canvas. Done by hand on a small copy, not with the canvas `filter` property:
  * Safari has no such property, and there the "blur" was a no-op that left the whole background sharp.
+ * `seen` is the 512-pixel copy the person finder looked at: blurring that, not the full-size frame, saves reading a
+ * 4K frame back for every frame (9 ms a frame in the iOS Simulator), and a heavy blur shows no difference.
  */
-function drawBlurred(ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement, small: HTMLCanvasElement, strength: number) {
+function drawBlurred(ctx: CanvasRenderingContext2D, seen: HTMLCanvasElement, small: HTMLCanvasElement, strength: number) {
   const { width, height } = ctx.canvas;
   // Same strength as before: a Gaussian of about min side x strength / 250 pixels, here measured on the small copy.
   const k = Math.min(1, BLUR_WORK / Math.max(width, height));
   small.width = Math.max(2, Math.round(width * k));
   small.height = Math.max(2, Math.round(height * k));
   const sctx = small.getContext('2d', { willReadFrequently: true })!;
-  sctx.drawImage(frame, 0, 0, small.width, small.height);
+  sctx.drawImage(seen, 0, 0, small.width, small.height);
   const sigma = Math.max(2, (Math.min(width, height) * strength) / 250) * k;
   // boxBlur's radius is twice the Gaussian's spread; it reads clamped edges, so no dark border is pulled in.
   boxBlur(sctx, { x: 0, y: 0, w: small.width, h: small.height }, Math.max(2, Math.round(sigma * 2)));
@@ -60,27 +62,58 @@ function cover(ctx: CanvasRenderingContext2D, img: ImageBitmap) {
   ctx.drawImage(img, (width - w) / 2, (height - h) / 2, w, h);
 }
 
+/** Where a frame's time went, for the result line: the person and background, against waiting on decode and encode. */
+function frameSplit(t: { frames: number; paintMs: number; loopMs: number } | undefined): string {
+  if (!t || t.frames < 10) return '';
+  const paint = Math.round(t.paintMs / t.frames);
+  const wait = Math.max(0, Math.round((t.loopMs - t.paintMs) / t.frames));
+  return ` Each frame took about ${paint} ms to find the person and draw the background, and ${wait} ms more waiting for the picture to be decoded and the result encoded.`;
+}
+
 /** Longest side of a clip a phone handles comfortably: 1080p. Bigger ones are slow and more likely to run out of memory. */
 const PHONE_SAFE_SIDE = 1920;
 const phoneNote = document.getElementById('phone-note');
+const sizeNote = document.getElementById('size-note');
 let phoneCheck = 0;
 
-/** On a phone, a long or 4K clip gets a one-line suggestion. Never blocks the run. */
+/** The 1080p output is preselected on a phone for a bigger clip, unless the person has chosen a size themselves. */
+let sizeChosen = false;
+for (const r of document.querySelectorAll<HTMLInputElement>('input[name="size"]')) r.addEventListener('change', () => (sizeChosen = true));
+
+/** The output's size for a source: 1080p caps the longest side at 1920, and never makes a picture bigger. */
+function outputSize(source: { width: number; height: number }): { width?: number; height?: number } {
+  if (radio('size', 'full') !== 'hd') return {};
+  const longest = Math.max(source.width, source.height);
+  if (longest <= PHONE_SAFE_SIDE) return {};
+  const k = PHONE_SAFE_SIDE / longest;
+  return { width: Math.round(source.width * k), height: Math.round(source.height * k) };
+}
+
+/** On a phone, a long or 4K clip gets a one-line suggestion, and 1080p output is preselected for a 4K one. Never blocks the run. */
 async function checkPhoneClip(files: { file: File }[]) {
   if (!phoneNote) return;
   const mine = ++phoneCheck;
   phoneNote.hidden = true;
+  if (sizeNote) sizeNote.hidden = true;
   if (!isPhoneBrowser()) return;
   const videos = files.map((f) => f.file).filter((f) => !isImage(f));
-  let big = videos.some((f) => f.size > PHONE_SAFE_BYTES);
-  if (!big && videos.length > 0) {
+  let heavy = videos.some((f) => f.size > PHONE_SAFE_BYTES);
+  let tall = false;
+  if (videos.length > 0) {
     const { videoSize } = await import('../lib/video-edit');
     for (const f of videos) {
       const s = await videoSize(f).catch(() => undefined);
-      if (s && Math.max(s.width, s.height) > PHONE_SAFE_SIDE) big = true;
+      if (s && Math.max(s.width, s.height) > PHONE_SAFE_SIDE) tall = true;
     }
   }
-  if (mine === phoneCheck) phoneNote.hidden = !big;
+  if (mine !== phoneCheck) return;
+  if (tall && !sizeChosen) {
+    const hd = document.querySelector<HTMLInputElement>('input[name="size"][value="hd"]');
+    if (hd) hd.checked = true;
+  }
+  const hdOn = tall && radio('size', 'full') === 'hd';
+  if (sizeNote) sizeNote.hidden = !hdOn;
+  phoneNote.hidden = !(heavy || tall) || hdOn;
 }
 
 createShell({
@@ -114,6 +147,7 @@ createShell({
     for (const [index, entry] of videos.entries()) {
       const file = entry.file;
       const share = (f: number) => (index + f) / videos.length;
+      const sizeFor = async (f: File) => outputSize((await videoSize(f).catch(() => undefined)) ?? { width: 0, height: 0 });
       const matte = new Matte(which);
       const blurred = document.createElement('canvas');
       // The first figures of a slow start run long (2 to 3 times too long on a phone), so wait for 8% and 10 s of real work.
@@ -121,13 +155,16 @@ createShell({
       const r = await editVideo(file, {
         // The frame is only drawn on and copied from; the person finder reads its own small canvas.
         readsBack: false,
+        // Not bigger than it went in: the default quality writes about 70% more bits than a phone does.
+        matchSourceBitrate: true,
+        ...(await sizeFor(file)),
         async paint(ctx) {
-          await matte.apply(ctx, (c, frame) => {
+          await matte.apply(ctx, (c, _frame, seen) => {
             if (bgKind === 'color') {
               c.fillStyle = color;
               c.fillRect(0, 0, c.canvas.width, c.canvas.height);
             } else if (bgKind === 'image') cover(c, picture!);
-            else drawBlurred(c, frame, blurred, strength);
+            else drawBlurred(c, seen, blurred, strength);
           });
         },
         onProgress: (f) => {
@@ -142,7 +179,7 @@ createShell({
         name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
         blob: r.blob,
         originalSize: file.size,
-        note: `${describeEdit(r)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}`,
+        note: `${describeEdit(r)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
       });
     }
     return outputs;

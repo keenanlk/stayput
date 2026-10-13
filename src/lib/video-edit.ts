@@ -19,6 +19,7 @@ import {
   Output,
   QTFF,
   QUALITY_HIGH,
+  Quality,
   WEBM,
   WebMOutputFormat,
   type InputVideoTrack,
@@ -30,6 +31,7 @@ import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile } from './input-error';
 import { openOpfsOutput } from './opfs-output';
+import { matchedBitrate } from './output-bitrate';
 
 export interface EditOptions {
   mute?: boolean;
@@ -51,6 +53,11 @@ export interface EditOptions {
    * a canvas kept for reading holds a copy of every frame in Safari until it is freed, which ran phones out of memory.
    */
   readsBack?: boolean;
+  /**
+   * Keep the output's bitrate near the source's (scaled for a smaller picture) when the default for "high" quality
+   * would be above it. Without it a 4K phone clip came out 44% bigger than it went in.
+   */
+  matchSourceBitrate?: boolean;
   /** Output size. With only one side set, the other follows the aspect ratio. */
   width?: number;
   height?: number;
@@ -71,6 +78,8 @@ export interface EditResult {
   audio: boolean;
   /** Set when the input had sound this browser could not carry over. */
   audioDropped: boolean;
+  /** For a painted edit: frames done, and milliseconds in `paint` and in all of the frame loop (page-local, never sent). */
+  timing?: { frames: number; paintMs: number; loopMs: number };
 }
 
 /**
@@ -90,6 +99,21 @@ async function finishOutput(out: { disk?: Awaited<ReturnType<typeof openOpfsOutp
   const buffer = out.buffer?.buffer;
   if (!buffer) throw new Error('The video could not be written.');
   return new Blob([buffer], { type });
+}
+
+/**
+ * A turn of the event loop. A timer of 0 ms is held to 4 ms once nested, which at 3,500 frames is 14 s of waiting;
+ * a message to ourselves gives the same turn at once.
+ */
+function nextTurn(): Promise<void> {
+  const { port1, port2 } = new MessageChannel();
+  return new Promise((done) => {
+    port1.onmessage = () => {
+      port1.close();
+      done();
+    };
+    port2.postMessage(0);
+  });
 }
 
 const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
@@ -197,7 +221,14 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     width = even(width);
     height = even(height);
 
-    const videoCodec = await pickVideoCodec({ width, height, bitrate: QUALITY_HIGH });
+    let bitrate: Quality = QUALITY_HIGH;
+    if (opts.matchSourceBitrate && duration > 0) {
+      const average = await video.getAverageBitrate().catch(() => null);
+      const sourceBps = average && average > 0 ? average : (file.size * 8) / duration - (sound ? 128_000 : 0);
+      const wanted = matchedBitrate(sourceBps, video.codec, shown.width * shown.height, width * height);
+      if (wanted) bitrate = new Quality({ bitrate: wanted });
+    }
+    const videoCodec = await pickVideoCodec({ width, height, bitrate });
     if (!videoCodec) {
       throw hasVideoEncoder() ? new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.') : new EncoderUnavailable();
     }
@@ -210,6 +241,11 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     }
 
     const paint = opts.paint;
+    const timing = { frames: 0, paintMs: 0, loopMs: 0 };
+    let loopStart = 0;
+    // When the painter draws every frame at the output size anyway, the decoded frame is scaled there, once: asking
+    // Mediabunny to resize first as well is a second full-size pass over every frame (it doubled the time per frame at 4K).
+    const paintScales = !!paint && !rotate && !flip && !crop;
     let frame: CanvasRenderingContext2D | undefined;
     if (paint) {
       const canvas = document.createElement('canvas');
@@ -229,13 +265,11 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
         tracks: 'primary',
         video: {
           codec: videoCodec,
-          bitrate: QUALITY_HIGH,
+          bitrate,
           rotate: rotate as Rotation,
           flip,
           crop,
-          width,
-          height,
-          fit: 'fill',
+          ...(paintScales ? { processedWidth: width, processedHeight: height } : { width, height, fit: 'fill' as const }),
           forceTranscode: true,
           // Bake the rotation and flip into the pixels so every player shows the result the same way.
           allowTransformationMetadata: false,
@@ -247,8 +281,13 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
                   // Let go of the decoded frame now, and give the browser a turn between frames: without
                   // it the frames pile up faster than they are freed (about 10 MB per second of 1080p video in Safari).
                   sample.close();
+                  const began = performance.now();
+                  if (!loopStart) loopStart = began;
                   await paint(frame!, at);
-                  await new Promise((r) => setTimeout(r, 0));
+                  timing.paintMs += performance.now() - began;
+                  await nextTurn();
+                  timing.frames++;
+                  timing.loopMs = performance.now() - loopStart;
                   return frame!.canvas;
                 }
               : undefined,
@@ -276,6 +315,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       reencoded: true,
       audio: kept,
       audioDropped: !opts.mute && !!sound && !kept,
+      timing: paint ? timing : undefined,
     };
   } finally {
     input.dispose?.();
