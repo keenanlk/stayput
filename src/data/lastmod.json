@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "a49886e022cb505c"
+  "hash": "db10f56101bd108a"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -1482,6 +1482,10 @@
  "/tools/merge-audio": {
   "date": "2026-10-12",
   "hash": "fe5728f889f2e691"
+ },
+ "/tools/merge-gifs": {
+  "date": "2026-10-13",
+  "hash": "55cbd0e7f01b5aba"
  },
  "/tools/merge-pdf": {
   "date": "2026-10-12",
