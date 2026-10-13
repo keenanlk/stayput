@@ -11,7 +11,8 @@ import { isPhoneBrowser } from './phone-limit';
  *
  * This file is the one switch. To turn the WebGPU path off for everybody, set WEBGPU_CAPTIONS to false.
  */
-export const WEBGPU_CAPTIONS = true;
+// Off while stopping the WebGPU speech worker crashes WebKit after the captions are written.
+export const WEBGPU_CAPTIONS = false;
 
 /**
  * Phones and tablets: not measured on a real device, so they stay on the 8-bit path unless the address
