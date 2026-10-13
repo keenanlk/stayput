@@ -4740,6 +4740,75 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'bpm-finder',
+    base: 'bpm-key-finder',
+    name: 'BPM finder',
+    title: 'BPM Finder: Find a Song’s Tempo From a File, Free | Stayput',
+    description: 'Read a song’s BPM from an audio file, with its tempo name, key and Camelot code. Free, no sign-up, and the song is not uploaded.',
+    heading: 'BPM finder for song files',
+    tagline: 'Drop a song and read its BPM. The key and Camelot code come with it.',
+    keywords: ['bpm finder', 'bpm finder online', 'free bpm finder', 'bpm finder mp3', 'song bpm finder', 'audio bpm finder'],
+    dropLabel: 'Drop songs to find their BPM',
+    action: 'Find BPM',
+    sizeFact: 'No account, no watermark',
+    lead:
+      'This BPM finder reads the tempo of a song from an audio file you drop on the page, and shows its key and Camelot code as well. It is free, and your files are not uploaded: everything runs in your browser on your device. Files longer than 15 minutes are not analysed, and after one visit the page works offline.',
+    intro: [
+      'BPM is beats per minute: how many times the steady pulse of a song falls in one minute, the beat you would tap your foot to. DJs match records by it, runners pick playlists by it, and producers need it to line a sample up with a session. This page works it out from the audio itself, so you need the song as a file.',
+      'The page finds the loudness jumps in the sound and the steady beat they line up with. It rounds the answer to a whole number and gives the tempo its traditional name, such as Andante or Allegro.',
+      'A worked example: you drop track.mp3 and the page shows 100 BPM, Andante, with the line “Also read as: 50 or 200”. Under it come the key, A minor, its Camelot code, 8A, and the relative key, C major, 8B, marked Likely. The BPM is the part to use if you only need the tempo; the rest is there for mixing.',
+      'If you have no file and only hear the song, use [Tap tempo](/tap-tempo) and tap along instead.',
+    ],
+    steps: [
+      'Drop one or more songs, or tap to pick them. MP3, WAV, M4A, FLAC, Ogg and most other audio files work; a video’s sound works too.',
+      'Press Find BPM. A three-minute song takes a few seconds.',
+      'Read the BPM and check it by ear against a click on the online metronome.',
+    ],
+    sections: [
+      {
+        heading: 'How to read the BPM',
+        bullets: [
+          'The number is the pulse of the whole file, rounded to a whole BPM, with its tempo name underneath.',
+          'The page folds every answer into 70 to 180 BPM. A slow ballad that the detector hears at 60 is shown as 120, and a very fast track is shown at half. The detector’s own number is in the results file, in the bpm_raw column.',
+          'When the headline is between about 80 and 120 BPM, the page adds “Also read as” with the half and the double, because a slow song with busy drums and a fast one can have the same pulse. Outside that range it shows no alternatives, since the half or the double would be too slow or too fast to be useful.',
+          'Pick the reading that matches how the song feels, or the one your DJ software or session expects.',
+        ],
+      },
+      {
+        heading: 'More than one song',
+        bullets: [
+          'Drop several files and the page analyses them one after another, with a card for each.',
+          'Press the button on a card to copy its result as text, or save all of them as a file named bpm-key-results.csv.',
+          'The results file lists the file name, the length, the BPM, the key, its Camelot code and whether the key was Likely or Unsure. It is made on your device and not sent anywhere.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It assumes one steady tempo. A song that speeds up, slows down or is played without a click can get a BPM that matches only part of it.',
+          'It reads a file, not a link. A streaming-service or video link cannot be analysed, because the page never fetches anything for you.',
+          'It refuses a clip shorter than 10 seconds, which is too short to find a tempo, and a file longer than 15 minutes. For a longer file, cut the part you want with [Trim audio](/tools/trim-audio).',
+          'A file with no steady beat, such as speech, a drone or a very quiet recording, gets no BPM. The key is still shown if it could be read.',
+        ],
+      },
+      {
+        heading: 'The key and the Camelot code',
+        paragraphs: [
+          'Each result also names the key, with its relative major or minor and its Camelot code, which DJ software shows next to the BPM. A key marked Unsure is a guess to check against an instrument. For a page that starts from the key, see the [BPM and key finder](/tools/bpm-key-finder), and for all 24 codes see the [Camelot wheel](/camelot-wheel).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I find the BPM of a song file?', a: 'Drop the audio file here and press Find BPM. The page decodes it in your browser, finds the beat and shows the tempo in beats per minute, with its tempo name. If you only have the song playing and no file, use the [Tap tempo](/tap-tempo) page and tap along.' },
+      { q: 'Why is the BPM double or half of what I expected?', a: 'Both readings are the same pulse counted twice. A slow song with a busy hi-hat can be written either way, and a detector cannot always tell which you mean. The page folds its answer into 70 to 180 BPM and, for headlines from about 80 to 120, lists the half and the double next to it. Pick the one that matches how the song feels, or that your DJ software expects.' },
+      { q: 'How do I check the result?', a: 'Play the song next to a click on the [online metronome](/tools/metronome) set to that BPM and see whether they stay together for a whole verse. It is an estimate made from the sound, not a lookup, so a check by ear is worth doing.' },
+      { q: 'What happens with songs that change tempo?', a: 'The page assumes one steady tempo for the whole file, so it reports what fits most of the song. If the song has a tempo change, cut the part you care about with [Trim audio](/tools/trim-audio) and analyse that.' },
+      { q: 'Which files work, and how long can they be?', a: 'Whatever your browser can decode: MP3, WAV, M4A, AAC, FLAC and Ogg are the usual ones, and the sound of a video works too. A file must be between 10 seconds and 15 minutes long. For a longer one, cut the part you want first.' },
+      { q: 'Can I paste a YouTube or Spotify link?', a: 'No. The page analyses files on your device and does not fetch anything from other sites. Use an audio file you have, or tap the tempo with the [Tap tempo](/tap-tempo) page.' },
+      { q: 'Is the song uploaded anywhere?', a: 'No. The file is decoded and analysed by code running in this page, and the results, including the file name in the results file, stay on your device. After one visit you can turn off your internet connection and it still works.' },
+    ],
+  },
+  {
     slug: 'png-to-svg',
     base: 'image-to-svg',
     name: 'PNG to SVG',
