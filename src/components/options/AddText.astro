@@ -1,7 +1,7 @@
 ---
 /** Option controls for add text to image, shared by the tool page and its landing pages. */
-interface Props { defaults?: Record<string, string> }
-const { defaults = {} } = Astro.props;
+interface Props { defaults?: Record<string, string>; /** For GIFs: no output format or quality, the result is always a GIF. */ gif?: boolean }
+const { defaults = {}, gif = false } = Astro.props;
 const text1 = defaults.text1 ?? '';
 const text2 = defaults.text2 ?? '';
 const font = defaults.font ?? 'sans';
@@ -73,6 +73,7 @@ const formats = [
 <div class="field">
   <label class="check"><input type="checkbox" id="upper" checked={upper} /> ALL CAPS</label>
 </div>
+{!gif && <>
 <div class="field">
   <label for="format">Output format</label>
   <select id="format">
@@ -83,6 +84,7 @@ const formats = [
   <label for="quality">Quality <output id="quality-out">{quality}</output></label>
   <input type="range" id="quality" min="30" max="100" value={quality} />
 </div>
+</>}
 <input type="hidden" id="pos1" value={defaults.pos1 ?? '0.5,0.5'} />
 <input type="hidden" id="pos2" value={defaults.pos2 ?? '0.5,0.88'} />
 <style>
