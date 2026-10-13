@@ -125,15 +125,26 @@ export async function transcribeFile(
   const segments: Segment[] = [];
   // Detected once, from the first piece, then kept for the rest of the recording.
   let spoken: string | null = opts.language === 'auto' ? null : opts.language;
+  let retriedModel = false;
   for (let i = 1; i < cuts.length; i++) {
     const from = cuts[i - 1]!;
     const at = from / RATE;
     onProgress(`Transcribing ${file.name}: ${formatDuration(at)} of ${formatDuration(total)}`, 0.05 + 0.95 * (at / total));
     // A copy, because the samples are handed over to the worker.
     const piece = samples.slice(from, cuts[i]);
-    const found = await recognise(piece, spoken, opts.task, (f) => {
+    const loading = (f: number) => {
       if (!modelReady) onProgress(`Downloading the speech model, once (${onGpu ? SPEECH_MODEL_MB.webgpu : SPEECH_MODEL_MB.q8} MB): ${Math.round(f * 100)}%`, 0.05 * f);
-    });
+    };
+    let found;
+    try {
+      found = await recognise(piece.slice(), spoken, opts.task, loading);
+    } catch (err) {
+      // A kept model that would not start was dropped by the worker: a fresh worker downloads it again, once.
+      if (modelReady || retriedModel || !(err instanceof Error) || err.name !== 'ModelLoadError') throw err;
+      retriedModel = true;
+      releaseSpeechModel();
+      found = await recognise(piece, spoken, opts.task, loading);
+    }
     modelReady = true;
     spoken = found.language;
     segments.push(...found.chunks.map((s) => ({ start: s.start + at, end: s.end + at, text: s.text })));

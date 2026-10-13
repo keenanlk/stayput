@@ -14,6 +14,7 @@ import type * as Transformers from '@huggingface/transformers';
 import type { AutomaticSpeechRecognitionPipeline } from '@huggingface/transformers';
 import { vendorDir } from './vendor';
 import { loadWithRetry } from './retry';
+import { fetchResumable, wholeOrNull } from './model-fetch';
 import { looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, type SpeechError } from './speech-errors';
 
 export const MODEL = 'whisper-base';
@@ -52,35 +53,50 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
   // Set when a file could not be fetched: on the WebGPU path, the one failure that says nothing about WebGPU.
   let fetchFailed = false;
   let download: { sizes: Map<string, [number, number]>; report: () => void } | undefined;
+  //  - Each file is read to its last byte here, resuming a dropped connection (see model-fetch.ts),
+  //    so what transformers.js receives, and caches, is always the whole file.
   env.fetch = async (input, init) => {
+    const url = String(input);
+    const counted = download && /\.onnx$/.test(url) ? download : undefined;
+    const onProgress = counted && ((got: number, total: number) => total && (counted.sizes.set(url, [got, total]), counted.report()));
     let res: Response;
     try {
-      res = (await fetchOnce(input, { ...init, cache: 'no-store' })) as Response;
+      res = await fetchResumable((i, o) => fetchOnce(i as string | URL, { ...o, cache: 'no-store' }) as Promise<Response>, url, init, onProgress);
     } catch (err) {
       fetchFailed = true;
       throw err;
     }
     if (!res.ok) fetchFailed = true;
-    const url = String(input);
-    const total = Number(res.headers.get('content-length'));
-    if (!download || !res.ok || !res.body || !/\.onnx$/.test(url) || !total) return res;
-    const { sizes, report } = download;
-    sizes.set(url, [0, total]);
-    const count = new TransformStream<Uint8Array, Uint8Array>({
-      transform(chunk, out) {
-        sizes.set(url, [sizes.get(url)![0] + chunk.byteLength, total]);
-        report();
-        out.enqueue(chunk);
-      },
-    });
-    return new Response(res.body.pipeThrough(count), { status: res.status, statusText: res.statusText, headers: res.headers });
+    return res;
   };
   const store = (): Promise<Cache | undefined> => (typeof caches === 'undefined' ? Promise.resolve(undefined) : caches.open(env.cacheKey).catch(() => undefined));
   env.useCustomCache = true;
   env.customCache = {
-    match: async (key) => (await store().then((c) => c?.match(key)).catch(() => undefined)) ?? undefined,
-    put: async (key, response) => void (await store().then((c) => c?.put(key, response)).catch(() => undefined)),
+    // A kept file that is not the size it promises is dropped and fetched again.
+    match: async (key) => {
+      try {
+        const cache = await store();
+        const hit = await cache?.match(key);
+        if (!hit) return undefined;
+        const whole = await wholeOrNull(hit);
+        if (!whole) await cache!.delete(key);
+        return whole ?? undefined;
+      } catch {
+        return undefined;
+      }
+    },
+    // Only a whole file is written.
+    put: async (key, response) => {
+      try {
+        const whole = await wholeOrNull(response);
+        if (whole) await (await store())?.put(key, whole);
+      } catch {
+        // A model that cannot be kept is still used for this run.
+      }
+    },
   };
+  /** Drop every kept model file, so the next load downloads them again. */
+  const evict = () => (typeof caches === 'undefined' ? Promise.resolve(false) : caches.delete(env.cacheKey)).catch(() => false);
   const wasm = env.backends.onnx.wasm!;
   wasm.wasmPaths = vendorDir('ort');
   // Threads need a cross-origin-isolated page, which this site is not.
@@ -114,10 +130,22 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     return asr;
   }
 
-  /** Load the model; a dropped connection gets two more tries, after a short wait. */
+  /**
+   * Load the model; a dropped connection gets two more tries, after a short wait. A model that will
+   * not start (a RangeError from a bad buffer, a parse error) may be a damaged kept copy, so the kept
+   * files are dropped before the error goes back; the page then starts a fresh worker, which downloads
+   * them again (this worker's runtime is not trusted after a failed start).
+   */
   async function load(id: number, gpu: boolean): Promise<AutomaticSpeechRecognitionPipeline> {
-    // On the WebGPU path a failure goes straight to the 8-bit path, which retries a dropped download itself.
-  return gpu ? start(id, gpu) : loadWithRetry(() => start(id, gpu), looksLikeNetwork);
+    // On the WebGPU path a failure goes straight to the 8-bit path, which retries a dropped download itself
+    // and keeps the files: a WebGPU that will not start says nothing about them.
+    if (gpu) return start(id, gpu);
+    try {
+      return await loadWithRetry(() => start(id, gpu), looksLikeNetwork);
+    } catch (err) {
+      if (!looksLikeNetwork(err) && !looksLikeMemory(err)) await evict();
+      throw err;
+    }
   }
 
   /** The named error for a failure while loading the model or while recognising. */
