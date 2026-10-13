@@ -207,6 +207,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser records the microphone with its built-in recorder (MediaRecorder), with its own noise and echo reduction if you leave it on. When you stop, the sound is decoded and written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, or M4A by the browser’s AAC encoder.',
     versus: 'Online voice recorders upload the recording to their servers to convert it, show ads around the download, and some keep your recordings in an account. Voice memos, interviews and dictation are private. Here the sound never leaves your device.',
   },
+  'audio-reverser': {
+    how: 'Your browser decodes the sound with its own audio decoders into plain samples in your tab. Each channel is then copied from its last sample to its first, so left and right stay in step. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site (at the original sample rate), M4A and OGG by the browser’s own encoders.',
+    versus: 'Online audio reversers upload the recording, cap the length, and keep the file for a while. Here the reversing happens on your device and nothing leaves it.',
+  },
   'volume-booster': {
     how: 'Your browser decodes the sound with its own audio decoders. Every sample is multiplied by the gain you chose (or the gain that brings the gated loudness to about −14 LUFS), then a look-ahead peak limiter turns down only the moments that would pass −1 dBFS, easing in over 5 ms and out over 150 ms. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders. For a video, Mediabunny (MPL-2.0) copies the picture packets unchanged and adds the new sound.',
     versus: 'Online volume boosters upload the recording or video, cap the file size, and often just multiply the samples so loud parts clip and crackle. Here nothing leaves your device and the limiter keeps boosted sound clean.',
