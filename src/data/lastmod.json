@@ -349,7 +349,7 @@
  },
  "/guides": {
   "date": "2026-10-13",
-  "hash": "63ca5ce495e5c98e"
+  "hash": "e938240c9a2b0864"
  },
  "/guides/camscanner-alternative": {
   "date": "2026-10-08",
@@ -440,8 +440,8 @@
   "hash": "d3cb0366d5c885ec"
  },
  "/guides/how-to-convert-a-photo-to-black-and-white": {
-  "date": "2026-10-12",
-  "hash": "f726667b929d92bc"
+  "date": "2026-10-13",
+  "hash": "387079f263f21e88"
  },
  "/guides/how-to-convert-a-photo-to-pdf": {
   "date": "2026-09-29",
@@ -532,16 +532,16 @@
   "hash": "5634221f0ff8b530"
  },
  "/guides/how-to-merge-multiple-videos-into-one": {
-  "date": "2026-09-29",
-  "hash": "095556193c5b1524"
+  "date": "2026-10-13",
+  "hash": "f029a271fe6d6074"
  },
  "/guides/how-to-merge-pdfs-on-iphone": {
   "date": "2026-09-29",
   "hash": "a844270f5f3404af"
  },
  "/guides/how-to-open-a-rar-file": {
-  "date": "2026-10-04",
-  "hash": "2469d572ba2bef0f"
+  "date": "2026-10-13",
+  "hash": "5da6b9ab5a7e57a3"
  },
  "/guides/how-to-password-protect-a-pdf": {
   "date": "2026-09-29",
@@ -1324,8 +1324,8 @@
   "hash": "497f7346cadb43e3"
  },
  "/tools/archive-extractor": {
-  "date": "2026-10-12",
-  "hash": "4a81e4fbaa8569a6"
+  "date": "2026-10-13",
+  "hash": "66565a8fdbce4cf9"
  },
  "/tools/audio-converter": {
   "date": "2026-10-12",
@@ -1372,8 +1372,8 @@
   "hash": "394e5000644774cb"
  },
  "/tools/compress-gif": {
-  "date": "2026-10-12",
-  "hash": "90847c84357ac90f"
+  "date": "2026-10-13",
+  "hash": "538b4a857e79bf92"
  },
  "/tools/compress-image": {
   "date": "2026-10-12",
