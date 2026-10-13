@@ -30,8 +30,10 @@ async function runAndRead(page: Page) {
     v.muted = true;
     v.src = URL.createObjectURL(new Blob([Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))], { type: 'video/mp4' }));
     await new Promise((ok) => (v.onloadeddata = ok));
-    await new Promise<void>((ok) => {
-      v.requestVideoFrameCallback(() => ok());
+    // `seeked` says the frame at 0.7 s is current; a frame callback can fail to fire after a seek under load.
+    await new Promise<void>((ok, bad) => {
+      v.onseeked = () => ok();
+      v.onerror = () => bad(new Error('video will not seek'));
       v.currentTime = 0.7;
     });
     const c = document.createElement('canvas');
