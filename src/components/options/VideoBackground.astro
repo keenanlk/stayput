@@ -6,6 +6,7 @@ const bg = defaults.bg ?? 'blur';
 const strength = defaults.strength ?? '6';
 const color = defaults.color ?? '#00b140';
 const finder = defaults.finder ?? 'edges';
+const size = defaults.size ?? 'full';
 ---
 <div class="field">
   <label>New background</label>
@@ -22,6 +23,13 @@ const finder = defaults.finder ?? 'edges';
     <label><input type="radio" name="finder" value="fast" checked={finder === 'fast'} /><span>Fast</span></label>
   </div>
 </div>
+<div class="field">
+  <label>Output size</label>
+  <div class="segmented" role="radiogroup" aria-label="Output size">
+    <label><input type="radio" name="size" value="full" checked={size === 'full'} /><span>Same as the video</span></label>
+    <label><input type="radio" name="size" value="hd" checked={size === 'hd'} /><span>1080p</span></label>
+  </div>
+</div>
 <div class="field" id="strength-field" hidden={bg !== 'blur'}>
   <label for="strength">Blur <output id="strength-out">{strength}</output></label>
   <input type="range" id="strength" min="1" max="10" step="1" value={strength} />
@@ -34,3 +42,4 @@ const finder = defaults.finder ?? 'edges';
 <p class="hint">Made for people. Fast is rougher around hair and in dim light.</p>
 <p class="hint" id="time-note">Can run slower than the video plays; the time left shows as it runs.</p>
 <p class="hint" id="phone-note" hidden>This clip is big for a phone. For a faster, steadier run, trim it first or use a 1080p copy.</p>
+<p class="hint" id="size-note" hidden>This video is bigger than 1080p, so the output is set to 1080p on a phone: much quicker and a smaller file. Choose Same as the video to keep the size.</p>
