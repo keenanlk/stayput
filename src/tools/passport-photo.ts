@@ -26,7 +26,7 @@ createShell({
           throw new Error('There is more than one person in this photo. A passport photo must show only you.');
         }
         const mask = await findSubject(bitmap, (f) =>
-          progress.set(`Downloading the cut-out model (one time, about 46 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),
+          progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),
         );
         progress.set(`Sizing ${entry.file.name}…`, share(0.8));
         const head = measureHead(mask, face, bitmap.width, bitmap.height);
