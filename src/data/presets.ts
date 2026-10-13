@@ -5338,7 +5338,7 @@ export const presets: Preset[] = [
   {
     slug: 'video-to-subtitles',
     lead:
-      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, needs no account and adds no watermark, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (76 MB) and the engine that runs it, and after that it works offline.',
+      'Makes an SRT subtitle file, or WebVTT captions, from the speech in an MP4, MOV or WebM video (or an audio file) with Whisper, in 16 or more languages. It is free, needs no account and adds no watermark, and your files are not uploaded: only the soundtrack is read, and the speech model runs in your browser. The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it, and after that it works offline.',
     base: 'transcribe',
     name: 'Video to subtitles',
     title: 'Subtitle Generator: Auto SRT Subtitles from Video, Free, No Upload | Stayput',
@@ -5417,7 +5417,7 @@ export const presets: Preset[] = [
     intro: [
       'Audio recorders, meeting apps and phones all save sound in different formats: WAV from a handheld recorder, OGG or Opus from a chat app, FLAC from a lossless capture, M4A from a phone. This page reads all of them and writes out what is said as paragraphs of plain text you can search, quote and paste into your notes. For a single MP3 or a voice memo, [MP3 to text](/mp3-to-text) is the same tool with that case in mind.',
       'A worked example: a one-hour team meeting saved as a WAV by a recorder on the table. Drop it here with the language left on Detect. The sound is decoded in the tab, cut at pauses into pieces, and each piece is transcribed by Whisper on your device. A paragraph break falls wherever there was a pause of two seconds or more, which usually lands where someone else starts talking. It does not label who is speaking, so add names when you read it through.',
-      'The first run downloads the speech model (76 MB) and the engine that runs it from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer and need memory, since the whole recording is decoded first.',
+      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer and need memory, since the whole recording is decoded first.',
       'If the recording is a video, such as a recorded lecture or a Zoom MP4, use [Video to text](/video-to-text). For timed captions instead of plain text, choose Subtitles (.srt) on the general [transcribe](/tools/transcribe) tool.',
     ],
     steps: [
@@ -5428,7 +5428,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Which audio formats does it read?', a: 'MP3, WAV, M4A, AAC, OGG, Opus and FLAC, plus WebM audio. A video file works too, on [Video to text](/video-to-text).' },
       { q: 'Is there a length limit?', a: 'No fixed limit. Long recordings take proportionally longer, and very long ones (several hours) need a device with plenty of memory, since the whole recording is decoded first.' },
-      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (76 MB) are stored by your browser, so you can transcribe without a connection.' },
+      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (77 MB, or 95 MB on computers with WebGPU) are stored by your browser, so you can transcribe without a connection.' },
       { q: 'Can it translate the recording?', a: 'Into English only. Choose Translate to English for a foreign-language recording; for text in the spoken language, leave it off. It does not translate into other languages.' },
       { q: 'Does it say who is speaking?', a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph, which usually falls where the speaker changes.' },
       noUpload,
@@ -5450,7 +5450,7 @@ export const presets: Preset[] = [
     intro: [
       'A recorded lecture, a Zoom call, a screen recording of a demo: the words are in the video, but finding the one you need means watching it all. This page reads the soundtrack of the video and writes what is said as paragraphs of plain text you can search, quote and paste into your notes.',
       'A worked example: a 50-minute lecture saved from Zoom as an MP4. Drop it here with the language left on Detect. Only the soundtrack is decoded, in the tab; the picture is never touched. The speech is cut at pauses into pieces and transcribed by Whisper on your device, and a new paragraph starts wherever there was a pause of two seconds or more. Copy it, or download it as a .txt file.',
-      'The first run downloads the speech model (76 MB) and the engine that runs it from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer and need memory, since the whole soundtrack is decoded first. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
+      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer and need memory, since the whole soundtrack is decoded first. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
     ],
     steps: [
       'Drop the video: MP4, MOV, M4V, WebM or MKV.',
@@ -5460,7 +5460,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Which video files does it read?', a: 'MP4, MOV, M4V, WebM and MKV, as long as your browser can play the sound track. For audio-only files use [Audio to text](/audio-to-text).' },
       { q: 'Is there a length limit?', a: 'No fixed limit. Long videos take proportionally longer, and very long ones (several hours) need a device with plenty of memory, since the whole soundtrack is decoded first.' },
-      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (76 MB) are stored by your browser, so you can transcribe without a connection.' },
+      { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (77 MB, or 95 MB on computers with WebGPU) are stored by your browser, so you can transcribe without a connection.' },
       { q: 'Can I get subtitles instead of plain text?', a: 'Yes. Use [Video to subtitles](/video-to-subtitles) for an SRT or WebVTT file timed to the speech.' },
       { q: 'Does it say who is speaking?', a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph, which usually falls where the speaker changes.' },
       noUpload,
@@ -5469,7 +5469,7 @@ export const presets: Preset[] = [
   {
     slug: 'auto-caption-video',
     lead:
-      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (76 MB) and the engine that runs it, and after that it works offline; the longest video you can caption depends on your device’s memory.',
+      'Writes captions from the speech in an MP4, MOV or WebM video with Whisper and burns them large into the picture, for videos watched with the sound off, then saves a new MP4. It is free, needs no account and adds no watermark, and your video is not uploaded: the speech is transcribed and every frame redrawn in your browser. The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it, and after that it works offline; the longest video you can caption depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     sizeFact: 'No watermark. On a phone, a video over about 200 MB (2 minutes of iPhone video) may run out of memory',
     name: 'Auto caption video',
@@ -5484,7 +5484,7 @@ export const presets: Preset[] = [
     defaults: { size: 'large' },
     intro: [
       'Most short videos are watched on mute, in a feed, on a phone. A talking-head clip without captions loses those viewers in the first second, and apps that ignore subtitle files, such as Instagram Stories and WhatsApp, only show captions that are part of the picture. This page writes the captions from the speech and draws them into every frame, so they travel with the video wherever it goes.',
-      'A worked example: a 45-second vertical clip from your phone, 1080×1920, of you explaining a recipe. Drop it here; Large is already chosen, which on a 1080-pixel-wide vertical video sets the text at about 90 pixels, readable on a small screen. The speech model writes the captions (it downloads once, 76 MB), each is wrapped to at most two lines across the width of the frame, and the clip is re-encoded with the words in the lower part of the picture. You get recipe-subtitled.mp4, ready to post. If the app puts its buttons over the bottom of the video, choose Top instead.',
+      'A worked example: a 45-second vertical clip from your phone, 1080×1920, of you explaining a recipe. Drop it here; Large is already chosen, which on a 1080-pixel-wide vertical video sets the text at about 90 pixels, readable on a small screen. The speech model writes the captions (it downloads once, 77 MB, or 95 MB on computers with WebGPU), each is wrapped to at most two lines across the width of the frame, and the clip is re-encoded with the words in the lower part of the picture. You get recipe-subtitled.mp4, ready to post. If the app puts its buttons over the bottom of the video, choose Top instead.',
       'Speech models slip on names, brand words and mumbled phrases, and a burned-in mistake cannot be edited later. For anything important, tick Also save the subtitles as an SRT file, fix the words in a text editor, and run the clip again with the corrected SRT dropped next to it.',
     ],
     steps: [
@@ -5498,14 +5498,14 @@ export const presets: Preset[] = [
       { q: 'Can it caption a video in another language?', a: 'Yes, with limits. The language is detected from the first seconds, or you can choose it. The speech model is small, so it is most accurate in English and makes more mistakes in other languages, especially on short or noisy clips; if the words come out wrong, choose the language yourself. Tick Translate the speech to English for rough English captions on a video in another language, and check them before you post.' },
       { q: 'Can I get a separate subtitle file instead?', a: 'Yes. [Video to subtitles](/video-to-subtitles) is a subtitle generator that makes an SRT or WebVTT file from the speech, without touching the video.' },
       { q: 'Can I add captions to a video without uploading it?', a: 'Yes. The speech is transcribed and the frames are redrawn in this tab. Unposted clips, family videos and client footage stay on your device.' },
-      { q: 'How long a video can I caption?', a: 'The limit is your device’s memory, not a set length. On a phone, a video over about 200 MB (around 2 minutes of iPhone video) may run out of memory, and the page warns you before it starts. A laptop handles longer clips. The first run also downloads the speech model (76 MB).' },
+      { q: 'How long a video can I caption?', a: 'The limit is your device’s memory, not a set length. On a phone, a video over about 200 MB (around 2 minutes of iPhone video) may run out of memory, and the page warns you before it starts. A laptop handles longer clips. The first run also downloads the speech model (77 MB, or 95 MB on computers with WebGPU).' },
       noAccount,
     ],
   },
   {
     slug: 'burn-subtitles-into-video',
     lead:
-      'Burns an SRT or VTT subtitle file permanently into an MP4, MOV or WebM video, in the look, size and place you pick, and saves a new MP4. It is free, needs no account and adds no watermark, and your files are not uploaded: the video is re-encoded in your browser, and your own subtitle file needs no model. If you drop only the video, a speech model (76 MB) downloads once to write the subtitles, and the longest video you can burn depends on your device’s memory.',
+      'Burns an SRT or VTT subtitle file permanently into an MP4, MOV or WebM video, in the look, size and place you pick, and saves a new MP4. It is free, needs no account and adds no watermark, and your files are not uploaded: the video is re-encoded in your browser, and your own subtitle file needs no model. If you drop only the video, a speech model (77 MB, or 95 MB on computers with WebGPU) downloads once to write the subtitles, and the longest video you can burn depends on your device’s memory.',
     base: 'add-subtitles-to-video',
     name: 'Burn subtitles into video',
     title: 'Burn SRT Subtitles into Video (Hardcode), Free, No Upload | Stayput',

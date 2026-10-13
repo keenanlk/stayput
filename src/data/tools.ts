@@ -3418,7 +3418,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my recording uploaded?',
-        a: 'No. The sound is decoded in this tab and the Whisper speech model runs in your browser, so interviews, medical dictation, meetings and voice notes stay on your device. What gets downloaded is the speech model and the engine that runs it, both from this site, the first time.',
+        a: 'No. The sound is decoded in this tab and the Whisper speech model runs in your browser, so interviews, medical dictation, meetings and voice notes stay on your device. What gets downloaded is the speech model and the engine that runs it (model and runtime), both from this site, the first time: about 77 MB for the model, or 95 MB on computers with WebGPU.',
       },
       {
         q: 'How accurate is it?',
@@ -3426,7 +3426,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'It depends on your device. On a recent laptop, ten minutes of sound takes about two to three minutes, plus a few seconds to load the model; on a phone it is several times slower. Keep the tab open while it works.',
+        a: 'It depends on your device. On a recent laptop, ten minutes of sound takes about two to three minutes, or about one minute on a computer with WebGPU, plus a few seconds to load the model; on a phone it is several times slower. Keep the tab open while it works.',
       },
       {
         q: 'Can it make subtitles for a video?',
@@ -3465,7 +3465,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Is my video uploaded?',
-        a: 'No. The soundtrack is transcribed by a speech model running in this tab, and the frames are redrawn and encoded by your browser’s own video encoder. What gets downloaded is the speech model and the engine that runs it, both from this site, the first time.',
+        a: 'No. The soundtrack is transcribed by a speech model running in this tab, and the frames are redrawn and encoded by your browser’s own video encoder. What gets downloaded is the speech model and the engine that runs it (model and runtime), both from this site, the first time: about 77 MB for the model, or 95 MB on computers with WebGPU.',
       },
       {
         q: 'What is the difference between burned-in and separate subtitles?',
@@ -3477,7 +3477,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'Writing the captions takes about two to three minutes for every ten minutes of speech on a laptop. Redrawing and encoding the video then depends on its length and resolution and on your device’s video encoder. Keep the tab open while it works.',
+        a: 'Writing the captions takes about two to three minutes for every ten minutes of speech on a laptop, or about one minute on a computer with WebGPU. Redrawing and encoding the video then depends on its length and resolution and on your device’s video encoder. Keep the tab open while it works.',
       },
       {
         q: 'Is there a watermark or a length limit?',

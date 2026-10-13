@@ -33,7 +33,7 @@ const shell = createShell({
     return processEach(files, progress, 'Transcribing', async (entry, index) => {
       const file = entry.file;
       const share = (f: number) => (index + f) / files.length;
-      const { segments: tidy, language: spoken, duration: total } = await transcribeFile(file, {
+      const { segments: tidy, language: spoken, duration: total, pathNote } = await transcribeFile(file, {
         language,
         task,
         onProgress: (message, f) => progress.set(message, share(f)),
@@ -50,7 +50,7 @@ const shell = createShell({
         name: suffixName(file.name, task === 'translate' ? '-english' : '', EXT[format]),
         blob: new Blob([body], { type: `${TYPE[format]};charset=utf-8` }),
         originalSize: file.size,
-        note: `${formatDuration(total)} of ${NAMES.of(spoken) ?? spoken} speech, ${amount}${format === 'txt' ? '' : ` in ${tidy.length} caption${tidy.length === 1 ? '' : 's'}`}`,
+        note: `${formatDuration(total)} of ${NAMES.of(spoken) ?? spoken} speech, ${amount}${format === 'txt' ? '' : ` in ${tidy.length} caption${tidy.length === 1 ? '' : 's'}`}. ${pathNote}`,
         text: body,
       };
       return out;

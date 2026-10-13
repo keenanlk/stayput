@@ -5,7 +5,10 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 
 const dist = new URL('../dist/', import.meta.url);
 const assets = [];
-for (const f of await readdir(new URL('_astro/', dist))) if (/\.(js|mjs|css|wasm)$/.test(f)) assets.push(`/_astro/${f}`);
+// The WebGPU speech worker and its own copy of transformers.js (about 0.6 MB) load only on the WebGPU path, so
+// they are fetched when a computer with WebGPU first writes captions, not by every visitor's first visit.
+const onDemand = /^(transcribe-gpu\.worker|transformers\.web)-[\w-]+\.js$/;
+for (const f of await readdir(new URL('_astro/', dist))) if (/\.(js|mjs|css|wasm)$/.test(f) && !onDemand.test(f)) assets.push(`/_astro/${f}`);
 try {
   for (const f of await readdir(new URL('fonts/', dist))) if (/\.(woff2?|ttf|otf)$/.test(f)) assets.push(`/fonts/${f}`);
 } catch {
