@@ -16,6 +16,7 @@ import OptionDetails from '../OptionDetails.astro';
   <label class="check"><input type="checkbox" id="loop" checked={defaults.loop !== 'false'} /> Loop the sound if it is shorter than the video</label>
   <label class="check"><input type="checkbox" id="fade" checked={defaults.fade !== 'false'} /> Fade the sound out at the end</label>
 </div>
+<p class="hint">Songs from Apple Music or Spotify are locked and can’t be used: pick a downloaded audio file such as MP3, M4A or WAV.</p>
 <OptionDetails>
   <p>Drop one video and one sound file: an MP3, WAV or M4A, or another video to take its sound. If both are videos, the top one keeps its picture.</p>
 </OptionDetails>

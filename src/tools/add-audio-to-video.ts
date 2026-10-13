@@ -17,6 +17,12 @@ createShell({
   keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
+    if (files.length === 1) {
+      // Say which one is missing: a picture means the sound file is the one to add.
+      const { hasVideo } = await import('../lib/video-audio');
+      if (await hasVideo(files[0]!.file)) throw new InputError('Add a sound file too: this tool needs one video and one audio file (MP3, WAV, M4A, or another video to take the sound from).');
+      throw new InputError('Add a video too: this tool needs one video and one audio file, and this one is only sound.');
+    }
     if (files.length !== 2) throw new InputError('Add one video and one sound file (MP3, WAV, M4A, or another video to take the sound from).');
     const { addAudio, hasVideo } = await import('../lib/video-audio');
     progress.set('Reading the files…', 0.01);
