@@ -112,11 +112,22 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       video: copyVideo
         ? {}
         : { codec: videoCodec, bitrate: QUALITY_HIGH, width: evenW, height: evenH, fit: 'contain', allowTransformationMetadata: false },
-      audio: audioCodec ? { codec: audioCodec, bitrate: QUALITY_HIGH, sampleRate: await aacSafeSampleRate(sound) } : { discard: true },
+      // Sound copied as it is must not be given a bitrate: any encoder option makes Mediabunny decode and
+      // re-encode it, and a browser that cannot decode AAC (Chromium on Linux) then drops the track.
+      audio: audioCodec
+        ? sound!.codec === audioCodec
+          ? {}
+          : { codec: audioCodec, bitrate: QUALITY_HIGH, sampleRate: await aacSafeSampleRate(sound) }
+        : { discard: true },
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
       throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+    }
+    // The sound track can still be discarded when this browser cannot decode it.
+    const soundLost = !!audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack());
+    if (soundLost && mov) {
+      throw new Error('This browser cannot read this file’s sound, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
     }
     await executeWatched(conversion, opts.onProgress);
     const buffer = output.target.buffer;
@@ -128,8 +139,8 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       duration,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       videoCopied: copyVideo,
-      audio: !!audioCodec,
-      audioDropped: !!sound && !audioCodec,
+      audio: !!audioCodec && !soundLost,
+      audioDropped: !!sound && (!audioCodec || soundLost),
     };
   } finally {
     input.dispose?.();

@@ -84,3 +84,15 @@ test('Unsupported input gets a plain message, not a broken file', async ({ page 
   await page.locator('#run').click();
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 30_000 });
 });
+
+test('AAC sound is copied, not decoded: a browser with no AAC decoder still keeps the sound track', async ({ page }) => {
+  // Chromium on Linux cannot decode AAC in the page; asking for a bitrate made the sound go through a decoder and vanish.
+  test.setTimeout(240_000);
+  await page.addInitScript(() => {
+    const real = AudioDecoder.isConfigSupported.bind(AudioDecoder);
+    AudioDecoder.isConfigSupported = async (config) => (/^mp4a/.test(config.codec) ? { supported: false, config } : real(config));
+  });
+  await open(page, '/tools/video-to-mov');
+  const r = await convert(page, mp4);
+  await expectQuickTime(r.bytes);
+});
