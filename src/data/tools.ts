@@ -3255,6 +3255,45 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'gif-speed',
+    name: 'Change GIF speed',
+    title: 'Change GIF Speed or Reverse a GIF, No Upload | Stayput',
+    description:
+      'Speed up, slow down or reverse an animated GIF in your browser. Every frame’s timing is rescaled and the loop kept. Your GIF is not uploaded; no watermark.',
+    heading: 'Change GIF speed or play it backwards',
+    tagline: 'Make an animated GIF faster or slower, or play it in reverse. Done on this device, and the GIF is not uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to speed up, slow down or reverse',
+    action: 'Change GIF',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or very large GIF may need a computer.',
+    keywords: ['change gif speed', 'gif speed changer', 'speed up gif', 'slow down gif', 'reverse gif', 'gif reverser'],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Choose a speed from 0.25× to 4×, and tick Play it backwards to reverse the order of the frames.',
+      'Press Change GIF. Each GIF keeps its size and loop setting; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'How fast can a GIF go?',
+        a: 'Browsers show a frame time under 0.02 seconds as about 0.1 seconds, so every frame is held to at least 0.02 seconds. A GIF that is already very fast cannot be made much faster, and speeding it up further only shortens the frames that were longer.',
+      },
+      {
+        q: 'Does reversing keep each frame’s timing?',
+        a: 'Yes. The frames are written last to first, and each one takes its own time with it, so a pause on the last frame becomes a pause on the first. The loop setting is copied as it was.',
+      },
+      {
+        q: 'Can I speed up and reverse at once?',
+        a: 'Yes. Pick a speed and tick Play it backwards in the same run. The file name says which you chose, such as -reversed-2x.',
+      },
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded and rewritten by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
+      },
+    ],
+  },
+  {
     slug: 'add-text-to-gif',
     name: 'Add text to GIF',
     title: 'Add Text to GIF Online, Free, No Upload | Stayput',
