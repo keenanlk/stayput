@@ -7,9 +7,19 @@
  * multiclass segmenter. The model comes from /models/ on first use. Frames
  * are scaled down before segmenting, and the mask is smoothed over time so
  * its edge does not flicker. Nothing leaves the tab.
+ *
+ * The better-edges model runs on the graphics chip (MediaPipe's GPU delegate,
+ * which is WebGL) where the browser has a real one: several times quicker
+ * than the CPU, with the same people found. The small model gains nothing on
+ * the chip, and a software renderer is slower than the CPU, so both stay on
+ * the CPU. A chip that cannot start the model, or fails part way, drops back
+ * to the CPU and the run carries on.
  */
 import type { ImageSegmenter } from '@mediapipe/tasks-vision';
 import { vendorDir } from './vendor';
+
+/** Roll-back switch: false puts every finder back on the CPU delegate. */
+const GPU_FOR_EDGES = true;
 
 /** "fast" is the small binary segmenter; "edges" the 16 MB multiclass one, about 28 times slower per frame. */
 export type PersonFinder = 'fast' | 'edges';
@@ -34,7 +44,36 @@ const WORK = 512;
 const KEEP = 0.45;
 
 /** One loaded model at a time: a second engine would hold its own copy of the WebAssembly memory. */
-let segmenter: { model: string; ready: Promise<ImageSegmenter> } | undefined;
+let segmenter: { model: string; ready: Promise<ImageSegmenter>; gpu: boolean; sentinel?: WebGL2RenderingContext | null } | undefined;
+/** How long the graphics chip has to start the model (well under a second on a Mac). */
+const GPU_START_MS = 20_000;
+/** Set once the graphics chip could not run the model; the CPU is used from then on. */
+let gpuFailed = false;
+
+/** Software renderers (SwiftShader, llvmpipe, Windows' basic adapter) are slower than the CPU delegate. */
+const isSoftwareRenderer = (renderer: string) => /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
+
+/**
+ * What WebGL the browser gives, asked the way the engine asks (an offscreen canvas). The engine's CPU path needs a
+ * WebGL context too, and a context it cannot get leaves its module unusable (a retry on the same module fails as
+ * well), so this is checked, and the probe context released, before the model is created.
+ */
+function probeWebGL(): { any: boolean; chip: boolean } {
+  try {
+    const gl = makeGL();
+    if (!gl || gl.isContextLost()) return { any: false, chip: false };
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    // A browser that hides the chip's name is treated as having none.
+    const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return { any: true, chip: renderer !== '' && !isSoftwareRenderer(renderer) };
+  } catch {
+    return { any: false, chip: false };
+  }
+}
+
+const makeGL = () => (typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas')).getContext('webgl2') as WebGL2RenderingContext | null;
+
 /**
  * The segmenter is shared by every video and requires timestamps that keep
  * growing across calls, so the clock lives here and is never reset.
@@ -49,10 +88,14 @@ export class MemoryError extends Error {
   }
 }
 
+/** The graphics context was lost under the engine. */
+class GpuLost extends Error {}
+
 /** Throw away the shared segmenter, so the next run builds a fresh one. */
 function drop() {
   const old = segmenter;
   segmenter = undefined;
+  old?.sentinel?.getExtension('WEBGL_lose_context')?.loseContext();
   old?.ready.then((s) => s.close()).catch(() => {});
 }
 
@@ -61,7 +104,11 @@ const isAbort = (e: unknown) => /^Aborted\(|out of memory|Cannot enlarge memory|
 
 function load(model: string): Promise<ImageSegmenter> {
   if (segmenter && segmenter.model !== model) drop();
-  segmenter ??= { model, ready: build(model) };
+  if (!segmenter) {
+    const holder = { model, gpu: false, ready: undefined as unknown as Promise<ImageSegmenter> };
+    holder.ready = build(model, holder);
+    segmenter = holder;
+  }
   const mine = segmenter;
   mine.ready.catch((e) => {
     if (segmenter === mine) segmenter = undefined;
@@ -76,16 +123,37 @@ function load(model: string): Promise<ImageSegmenter> {
   });
 }
 
-function build(model: string): Promise<ImageSegmenter> {
+function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2RenderingContext | null }): Promise<ImageSegmenter> {
   return (async () => {
     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
-    const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
-    return ImageSegmenter.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: model, delegate: 'CPU' },
-      runningMode: 'VIDEO',
-      outputConfidenceMasks: true,
-      outputCategoryMask: false,
-    });
+    // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
+    const webgl = probeWebGL();
+    if (!webgl.any) throw new Error('The person finder needs WebGL, which this browser does not provide. Turn on hardware acceleration in the browser settings, or use an up-to-date Chrome, Edge, Firefox or Safari.');
+    const make = async (delegate: 'CPU' | 'GPU') => {
+      const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
+      return ImageSegmenter.createFromOptions(fileset, {
+        baseOptions: { modelAssetPath: model, delegate },
+        runningMode: 'VIDEO',
+        outputConfidenceMasks: true,
+        outputCategoryMask: false,
+      });
+    };
+    if (GPU_FOR_EDGES && model === MODELS.edges && !gpuFailed && webgl.chip) {
+      try {
+        // A chip whose graphics cannot be set up may never answer, rather than fail: give it a while, then move on.
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const late = new Promise<never>((_, no) => (timer = setTimeout(() => no(new Error('The graphics chip did not start the person finder in time')), GPU_START_MS)));
+        const seg = await Promise.race([make('GPU'), late]).finally(() => clearTimeout(timer));
+        holder.gpu = true;
+        // The engine's own context is out of reach; one held here is lost together with it when the graphics driver resets.
+        holder.sentinel = makeGL();
+        return seg;
+      } catch (e) {
+        gpuFailed = true;
+        console.warn('The graphics chip could not start the person finder, using the CPU', e);
+      }
+    }
+    return make('CPU');
   })();
 }
 
@@ -108,7 +176,8 @@ export class Matte {
 
   async apply(ctx: CanvasRenderingContext2D, background: (ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement) => void) {
     const { width, height } = ctx.canvas;
-    const seg = await load(modelFor(this.finder, ctx.canvas));
+    const model = modelFor(this.finder, ctx.canvas);
+    let seg = await load(model);
     const k = Math.min(1, WORK / Math.max(width, height));
     const sw = Math.max(16, Math.round(width * k));
     const sh = Math.max(16, Math.round(height * k));
@@ -123,10 +192,24 @@ export class Matte {
     let result;
     try {
       result = seg.segmentForVideo(this.small, clock);
+      // A lost context does not make the engine throw: it returns masks that are wrong. Rerun the frame on the CPU.
+      if (segmenter?.gpu && segmenter.sentinel?.isContextLost()) {
+        result.close();
+        throw new GpuLost();
+      }
     } catch (e) {
-      if (!isAbort(e)) throw e;
+      if (isAbort(e)) {
+        drop();
+        throw new MemoryError();
+      }
+      if (!segmenter?.gpu) throw e;
+      // The graphics chip failed part way (a lost context, say): rebuild on the CPU and finish from this frame.
+      console.warn('The graphics chip stopped the person finder, using the CPU', e instanceof GpuLost ? 'context lost' : e);
+      gpuFailed = true;
       drop();
-      throw new MemoryError();
+      seg = await load(model);
+      clock += 33;
+      result = seg.segmentForVideo(this.small, clock);
     }
     const found = result.confidenceMasks?.[0];
     if (!found) throw new Error('The person finder returned no mask.');
