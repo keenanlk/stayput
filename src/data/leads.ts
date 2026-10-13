@@ -6,6 +6,7 @@
  * Built from the data below, or from a hand-written `lead` on a Tool or Preset. Claims rules
  * (tests/lead.spec.ts guards them): say "files are not uploaded", never "no data", "zero requests",
  * "any device", "unlimited" or "no size limit" without the device-memory qualifier; never name ffmpeg
+ * (the licenses, privacy and about pages carry the approved FFmpeg-libraries wording, not the leads)
  * or competitors.
  */
 import type { Tool } from './tools';

@@ -1,46 +1,46 @@
-ok   decoder mpeg4          present (shipped)
-ok   decoder h263           present (shipped)
-ok   decoder mjpeg          present (shipped)
-ok   decoder mp3            present (shipped)
-ok   decoder mp2            present (shipped)
-ok   decoder ac3            present (shipped)
-ok   decoder pcm_s16le      present (shipped)
-ok   decoder pcm_u8         present (shipped)
-ok   decoder pcm_alaw       present (shipped)
-ok   decoder pcm_mulaw      present (shipped)
-ok   decoder wmv1           absent  (absent)
-ok   decoder wmv2           absent  (absent)
-ok   decoder wmv3           absent  (absent)
-ok   decoder vc1            absent  (absent)
-ok   decoder wmv3image      absent  (absent)
-ok   decoder vc1image       absent  (absent)
-ok   decoder vp6            absent  (absent)
-ok   decoder vp6f           absent  (absent)
-ok   decoder vp6a           absent  (absent)
-ok   decoder flv            absent  (absent)
-ok   decoder h264           absent  (absent)
-ok   decoder hevc           absent  (absent)
-ok   decoder vp8            absent  (absent)
-ok   decoder vp9            absent  (absent)
-ok   decoder av1            absent  (absent)
-ok   decoder msmpeg4v1      absent  (absent)
-ok   decoder msmpeg4v2      absent  (absent)
-ok   decoder msmpeg4v3      absent  (absent)
-ok   decoder mpeg1video     absent  (absent)
-ok   decoder mpeg2video     absent  (absent)
-ok   decoder wmav1          absent  (absent)
-ok   decoder wmav2          absent  (absent)
-ok   decoder wmapro         absent  (absent)
-ok   decoder wmalossless    absent  (absent)
-ok   decoder wmavoice       absent  (absent)
-ok   decoder aac            absent  (absent)
-ok   decoder aac_latm       absent  (absent)
-ok   decoder adpcm_ms       absent  (absent)
-ok   decoder adpcm_ima_wav  absent  (absent)
-ok   decoder nellymoser     absent  (absent)
-ok   decoder opus           absent  (absent)
-ok   decoder vorbis         absent  (absent)
-ok   decoder flac           absent  (absent)
+ok   decoder mpeg4          present
+ok   decoder h263           present
+ok   decoder mjpeg          present
+ok   decoder mp3            present
+ok   decoder mp2            present
+ok   decoder ac3            present
+ok   decoder pcm_s16le      present
+ok   decoder pcm_u8         present
+ok   decoder pcm_alaw       present
+ok   decoder pcm_mulaw      present
+ok   decoder wmv1           absent 
+ok   decoder wmv2           absent 
+ok   decoder wmv3           absent 
+ok   decoder vc1            absent 
+ok   decoder wmv3image      absent 
+ok   decoder vc1image       absent 
+ok   decoder vp6            absent 
+ok   decoder vp6f           absent 
+ok   decoder vp6a           absent 
+ok   decoder flv            absent 
+ok   decoder h264           absent 
+ok   decoder hevc           absent 
+ok   decoder vp8            absent 
+ok   decoder vp9            absent 
+ok   decoder av1            absent 
+ok   decoder msmpeg4v1      absent 
+ok   decoder msmpeg4v2      absent 
+ok   decoder msmpeg4v3      absent 
+ok   decoder mpeg1video     absent 
+ok   decoder mpeg2video     absent 
+ok   decoder wmav1          absent 
+ok   decoder wmav2          absent 
+ok   decoder wmapro         absent 
+ok   decoder wmalossless    absent 
+ok   decoder wmavoice       absent 
+ok   decoder aac            absent 
+ok   decoder aac_latm       absent 
+ok   decoder adpcm_ms       absent 
+ok   decoder adpcm_ima_wav  absent 
+ok   decoder nellymoser     absent 
+ok   decoder opus           absent 
+ok   decoder vorbis         absent 
+ok   decoder flac           absent 
 ok   demuxer avi            present
 ok   demuxer asf            absent 
 ok   demuxer flv            absent 
@@ -51,4 +51,7 @@ ok   demuxer mpegts         absent
 ok   demuxer ogg            absent 
 ok   demuxer wav            absent 
 ok   demuxer rm             absent 
-encoders: aac absent
+ok   encoder aac            absent 
+ok   encoder libx264        absent 
+ok   encoder mpeg4          absent 
+ok   encoder mjpeg          absent 
