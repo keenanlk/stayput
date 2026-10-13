@@ -2075,6 +2075,24 @@
    "copyright": "Copyright 2011 The Roboto Project Authors"
   },
   {
+   "id": "f-dejavu-sans-mono",
+   "name": "DejaVu Sans Mono font (subset)",
+   "version": "2.37",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Bitstream-Vera",
+     "url": "https://spdx.org/licenses/Bitstream-Vera.html"
+    }
+   ],
+   "project": "https://github.com/dejavu-fonts/dejavu-fonts",
+   "source": "https://github.com/dejavu-fonts/dejavu-fonts/releases/tag/version_2_37",
+   "shipped": "/fonts/DejaVuSansMono-subset.ttf (licence at /fonts/LICENSE-DejaVu.txt)",
+   "note": "Subset of DejaVu Sans Mono 2.37 for monospace text and symbols in Text to PDF. Fonts are copyright Bitstream; DejaVu changes are in the public domain; glyphs imported from Arev are copyright Tavmjong Bah. The full notice is at /fonts/LICENSE-DejaVu.txt.",
+   "kind": "font",
+   "copyright": "Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved. DejaVu changes are in public domain."
+  },
+  {
    "id": "zxing-wasm",
    "name": "zxing-wasm",
    "version": "3.1.5",

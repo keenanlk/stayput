@@ -83,6 +83,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'ocr-pdf': () => import('./ocr-pdf'),
   'document-scanner': () => import('./document-scanner'),
   'epub-to-pdf': () => import('./epub-to-pdf'),
+  'text-to-pdf': () => import('./text-to-pdf'),
   'pdf-to-epub': () => import('./pdf-to-epub'),
   'archive-extractor': () => import('./archive-extractor'),
   'create-zip': () => import('./create-zip'),
