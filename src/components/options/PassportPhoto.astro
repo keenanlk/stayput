@@ -10,6 +10,7 @@ const backgrounds = [
   ['white', 'Replace with white'],
   ['grey', 'Replace with light grey'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field wide">
   <label for="size">Photo size</label>
@@ -23,9 +24,6 @@ const backgrounds = [
     {backgrounds.map(([v, l]) => <label><input type="radio" name="bg" value={v} checked={v === bg} /><span>{l}</span></label>)}
   </div>
 </div>
-<p class="field wide passport-note">
-  Stand in front of a plain white or light wall if you can: some offices reject photos whose background was changed by software. Replacing it is here for when that is not possible. The first photo downloads the face finder, the cut-out model and their WebAssembly runtime once (about 46 MB in all).
-</p>
 
 <style>
   .passport-note {
@@ -34,3 +32,6 @@ const backgrounds = [
     color: var(--ink-2);
   }
 </style>
+<OptionDetails>
+  <p>Stand in front of a plain white or light wall if you can: some offices reject photos whose background was changed by software. Replacing it is here for when that is not possible. The first photo downloads the face finder, the cut-out model and their WebAssembly runtime once (about 46 MB in all).</p>
+</OptionDetails>

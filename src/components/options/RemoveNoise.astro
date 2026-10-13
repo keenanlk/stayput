@@ -12,6 +12,7 @@ const formats = [
   ['m4a', 'M4A (AAC)'],
   ['ogg', 'OGG (Opus)'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label>Strength</label>
@@ -20,7 +21,6 @@ const formats = [
     <label><input type="radio" name="strength" value="medium" checked={strength === 'medium'} /><span>Medium</span></label>
     <label><input type="radio" name="strength" value="light" checked={strength === 'light'} /><span>Light</span></label>
   </div>
-  <p class="muted small">Strong keeps only the voice. Medium and Light leave a little of the room in, which sounds more natural.</p>
 </div>
 <div class="field" id="format-field">
   <label for="format">Save as</label>
@@ -29,3 +29,6 @@ const formats = [
   </select>
   <p class="muted small">Videos keep their picture untouched and get the cleaned sound.</p>
 </div>
+<OptionDetails>
+  <p>Strong keeps only the voice. Medium and Light leave a little of the room in, which sounds more natural.</p>
+</OptionDetails>

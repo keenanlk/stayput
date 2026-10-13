@@ -12,13 +12,13 @@ const repeats = [
   ['5', 'Play 5 times'],
   ['10', 'Play 10 times'],
 ] as const;
+import OptionDetails from '../OptionDetails.astro';
 ---
 <div class="field">
   <label for="repeat">Length</label>
   <select id="repeat">
     {repeats.map(([v, l]) => <option value={v} selected={v === repeat}>{l}</option>)}
   </select>
-  <p class="muted small">A video plays once, where a GIF loops. Short loops are repeated so Instagram, WhatsApp and other apps accept them.</p>
 </div>
 <div class="field">
   <label>Transparent areas</label>
@@ -27,3 +27,6 @@ const repeats = [
     <label><input type="radio" name="background" value="black" checked={background === 'black'} /><span>Black</span></label>
   </div>
 </div>
+<OptionDetails>
+  <p>A video plays once, where a GIF loops. Short loops are repeated so Instagram, WhatsApp and other apps accept them.</p>
+</OptionDetails>
