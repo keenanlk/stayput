@@ -8,7 +8,8 @@
 //   node scripts/first-visit-models.mjs --browser chrome --tool auto-caption-video
 //   node scripts/first-visit-models.mjs --with-sw --warm     # full visit, service worker included
 //
-// Options: --base URL (default http://localhost:4321), --browser chromium|chrome,
+// Options: --webgpu on|off (default on: a browser with a WebGPU adapter takes the 16-bit encoder path and
+// requests encoder_model_fp16.onnx; off adds ?webgpu=0 for the 8-bit files; headless Chromium needs --headed on some machines to get an adapter), --base URL (default http://localhost:4321), --browser chromium|chrome,
 // --tool auto-caption-video|video-to-subtitles|all, --runs N, --seconds N (clip length, 60),
 // --with-sw (let the site's service worker run; by default it is blocked, so a run against a
 // deployed site doesn't also precache every page, which costs hundreds of requests per fresh
@@ -36,6 +37,7 @@ const warm = arg('warm', false) === true;
 const onDisk = arg('profile', false) === true;
 const cacheDir = arg('cache-dir', null);
 const headed = arg('headed', false) === true;
+const webgpuOff = arg('webgpu', 'on') === 'off';
 const tools = toolArg === 'all' ? ['auto-caption-video', 'video-to-subtitles'] : [toolArg];
 
 const dir = mkdtempSync(join(tmpdir(), 'stayput-first-visit-'));
@@ -63,7 +65,7 @@ for (const tool of tools) {
   for (let n = 1; n <= runs; n++) {
     // A new browser each time: a fresh profile, so no HTTP cache, Cache API or service worker survives.
     const profile = onDisk ? mkdtempSync(join(tmpdir(), 'stayput-profile-')) : null;
-    const launch = { headless: !headed, ...(cacheDir && { args: [`--disk-cache-dir=${cacheDir}`], ...(browserName === 'chromium' && { executablePath: sandboxed }) }), ...(browserName === 'chrome' ? { channel: 'chrome' } : {}) };
+    const launch = { headless: !headed, args: ['--enable-unsafe-webgpu'], ...(cacheDir && { args: [`--disk-cache-dir=${cacheDir}`], ...(browserName === 'chromium' && { executablePath: sandboxed }) }), ...(browserName === 'chrome' ? { channel: 'chrome' } : {}) };
     const contextOptions = { serviceWorkers: swBlocked ? 'block' : 'allow', reducedMotion: 'reduce', baseURL: base };
     const browser = onDisk ? null : await chromium.launch(launch);
     const context = onDisk ? await chromium.launchPersistentContext(profile, { ...launch, ...contextOptions }) : await browser.newContext(contextOptions);
@@ -85,7 +87,7 @@ for (const tool of tools) {
           if (!navigator.serviceWorker.controller) await new Promise((r) => navigator.serviceWorker.addEventListener('controllerchange', r, { once: true }));
         });
       }
-      await page.goto(`/${tool}`);
+      await page.goto(`/${tool}${webgpuOff ? '?webgpu=0' : ''}`);
       await page.locator('#tool[data-ready="true"]').waitFor();
       await page.locator('#file-input').setInputFiles(clip);
       await page.locator('#run').click();
