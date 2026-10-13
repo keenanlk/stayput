@@ -196,7 +196,11 @@ export class Matte {
     return this.cpuFrames === 0 ? `Found the person with ${chip}.` : `Found the person with ${chip}, then with the processor after the chip stopped or was slow.`;
   }
 
-  async apply(ctx: CanvasRenderingContext2D, background: (ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement) => void) {
+  /**
+   * `background` paints the new background over `ctx`. It gets the full-size copy of the frame and `seen`, the
+   * small copy the finder looked at: a blur made from `seen` does not have to read the whole frame back first.
+   */
+  async apply(ctx: CanvasRenderingContext2D, background: (ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement, seen: HTMLCanvasElement) => void) {
     const { width, height } = ctx.canvas;
     const model = modelFor(this.finder, ctx.canvas);
     let seg = await load(model);
@@ -283,7 +287,7 @@ export class Matte {
     const p = this.person.getContext('2d')!;
     p.globalCompositeOperation = 'copy';
     p.drawImage(ctx.canvas, 0, 0);
-    background(ctx, this.person);
+    background(ctx, this.person, this.small);
     p.globalCompositeOperation = 'destination-in';
     p.imageSmoothingQuality = 'high';
     p.drawImage(this.mask, 0, 0, width, height);
