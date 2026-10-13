@@ -5492,19 +5492,23 @@ test('Mic test shows the level and a verdict, plays back a short recording, and 
   expect(errors).toEqual([]);
 });
 
-test('Grayscale PDF lays a saturation blend over every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
+test('Grayscale PDF rewrites the colours on every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'grayscale-pdf');
   const net = watchNetwork(page);
   const { downloads } = await run(page, [fx('text.pdf')]);
   const download = downloads[0]!;
   expect(download.suggestedFilename()).toBe('text-grayscale.pdf');
+  await expect(page.locator('#results-list')).toContainText('3 pages converted to grayscale');
   const out = await bytesOf(download);
   const doc = await PDFDocument.load(out);
   expect(doc.getPageCount()).toBe(3);
+  // The colour is rewritten, not covered: no blend-mode overlay and no RGB colour operators.
+  expect(Buffer.from(out).toString('latin1')).not.toContain('/Saturation');
   for (const p of doc.getPages()) {
-    const gs = p.node.Resources()!.lookup(PDFName.of('ExtGState')) as unknown as { values(): Parameters<typeof doc.context.lookup>[0][] };
-    const modes = gs.values().map((v) => String(doc.context.lookup(v)));
-    expect(modes.some((m) => m.includes('/BM /Saturation'))).toBe(true);
+    const c = p.node.lookup(PDFName.of('Contents')) as PDFRawStream;
+    const ops = Buffer.from(decodePDFRawStream(c).decode()).toString('latin1');
+    expect(ops).not.toMatch(/(^|\s)(rg|RG)(\s|$)/);
+    expect(ops).toMatch(/\bg\b/);
   }
   expect((await textItems(out, 2)).map((t) => t.str).join(' ')).toContain('Page 2 of the fixture');
   // The green box on the page now renders grey: draw the result in the crop tool's preview and read a pixel.

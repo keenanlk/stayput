@@ -4934,7 +4934,7 @@ export const guides: Guide[] = [
     heading: "How to make a PDF black and white",
     dek: "Choosing black and white when you print only changes the paper. If a portal or a printer wants the file itself in black and white, you need a converted copy.",
     keywords: ["how to make a pdf black and white", "convert pdf to grayscale", "pdf to black and white", "print pdf in grayscale", "remove color from a pdf"],
-    updated: "2026-10-04",
+    updated: "2026-10-13",
     tools: ["grayscale-pdf", "compress-pdf"],
     sections: [
       {
@@ -4949,16 +4949,16 @@ export const guides: Guide[] = [
         h: "Making a grayscale copy in the browser",
         p: ["The [grayscale PDF tool](/tools/grayscale-pdf) opens one or several PDFs and writes a copy of each with every colour turned into its own shade of grey. There is nothing to set: press **Convert to grayscale** and download. The copy is named like the original with -grayscale added. The page [Convert a PDF to black and white](/black-and-white-pdf) opens the same tool."],
         list: [
-          "**The text stays text.** The pages are not turned into pictures. A grey layer that removes colour is drawn over each page, so text can still be selected, searched and copied, and it stays sharp when you zoom in. Links and bookmarks are kept.",
+          "**The text stays text.** The pages are not turned into pictures. The colour settings inside each page are rewritten to gray and the text is not touched, so it can still be selected, searched and copied, and it stays sharp when you zoom in. Links and bookmarks are kept.",
           "**Every colour becomes a grey of the same brightness,** in text, drawings and photos alike. Colours of similar brightness, such as a mid red and a mid green, can end up almost the same grey, so check charts and colour-coded tables.",
-          "**The file barely changes size.** Nothing is drawn again, so there are no page images to add.",
-          "**Comments and form fields** are drawn by your PDF reader on top of the page, so they can keep their colour. Flatten them into the page first if they must be grey too.",
+          "**The file does not grow.** Colour images become one-channel gray images, so a PDF with photos is usually smaller, and a text-only PDF changes by a few dozen bytes.",
+          "**Comments and form fields** that store their own look are converted with the page. Rich-text styling inside some comments is not rewritten, so flatten them into the page first if they must be grey too.",
         ],
-        after: ["In our test, a generated two-page PDF with red and green boxes and blue text went from 1,219 bytes to 1,698 bytes. Rendering the first page showed 19,084 coloured pixels before and none after, and extracting the text from the result still returned the heading on each page. The result note reads \"text still selectable\" for every file, including a scan: a scanned PDF is a picture of each page, so it has no text to select in the first place.", "Everything happens inside your browser tab, so the document never leaves your device."],
+        after: ["In our test, a one-page PDF printed from a web page, with a red heading, blue and green text, two gradients, a JPEG photo and a link, went from 36,238 bytes to 30,740 bytes. Rendered, the largest gap between a pixel's red, green and blue values was 255 before and 0 after, the text and the link were still there, and no RGB or CMYK colour setting was left in the page content. A scanned PDF is a picture of each page, so it has no text to select in the first place.", "Everything happens inside your browser tab, so the document never leaves your device."],
       },
       {
-        h: "What this does not do",
-        p: ["When we rendered the result, it came out grey. It is made by drawing a grey layer over the original page content, not by rewriting the colours inside the file, so the colour is still stored underneath. A portal that only looks at how the pages appear will see grey. A checker that reads the colour information stored in the file may still report colour, and for that a converter that turns each page into a grey picture is the only route, at the cost of unselectable text and a bigger file. If a portal has a rule like that, check its instructions first. To make the copy smaller afterwards, use the [PDF compressor](/tools/compress-pdf)."],
+        h: "What this does not convert",
+        p: ["A few colour kinds can't be turned into a gray value from the file alone, so they are left as they are: spot colours (Separation and DeviceN, such as Pantone inks), Lab colour, JPEG 2000 images and a few special shading functions. A page that contains one is greyed over instead. It looks and prints grey, but its colour data is still stored, and the result line says how many pages that affects. A checker that reads the stored colour information may still report colour for those pages, and for them a converter that turns each page into a grey picture is the only route, at the cost of unselectable text and a bigger file. To make the copy smaller afterwards, use the [PDF compressor](/tools/compress-pdf)."],
       },
     ],
     faq: [
