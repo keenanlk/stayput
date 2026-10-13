@@ -29,7 +29,24 @@ export default defineConfig({
   ],
   vite: {
     build: { target: 'es2022', assetsInlineLimit: 0 },
-    worker: { format: 'es' },
+    worker: {
+      format: 'es',
+      // Worker bundles take their plugins from here, not from the page's list.
+      plugins: () => [
+        {
+          // transformers.js asks for 'onnxruntime-web/webgpu'. Everywhere that is the WebAssembly-only build (see the
+          // alias note below); the copy loaded for the WebGPU speech worker gets the real WebGPU build, with its
+          // own .wasm loaded from /vendor/ only on that path.
+          name: 'stayput-transformers-gpu',
+          enforce: 'pre',
+          resolveId(source, importer) {
+            if (source !== 'onnxruntime-web/webgpu') return null;
+            const build = importer?.endsWith('?gpu') ? 'ort.webgpu.min.mjs' : 'ort.wasm.min.mjs';
+            return fileURLToPath(new URL(`./node_modules/onnxruntime-web/dist/${build}`, import.meta.url));
+          },
+        },
+      ],
+    },
     resolve: {
       // onnxruntime-web's default wasm entry embeds its 14 MB .wasm as a build asset, which would
       // land in /_astro/ and be precached for every visitor. This entry loads it from /vendor/
@@ -38,7 +55,9 @@ export default defineConfig({
       // it is pointed at the same WebAssembly-only build, already cached for the background remover.
       alias: [
         { find: /^onnxruntime-web\/wasm$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.wasm.min.mjs', import.meta.url)) },
-        { find: /^onnxruntime-web\/webgpu$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.wasm.min.mjs', import.meta.url)) },
+        // The WebGPU speech worker's own copy of transformers.js (the '?gpu' query makes it a separate module);
+        // the stayput-transformers-gpu plugin below points that copy, and only that copy, at the WebGPU runtime.
+        { find: /^transformers-gpu$/, replacement: fileURLToPath(new URL('./node_modules/@huggingface/transformers/dist/transformers.web.js', import.meta.url)) + '?gpu' },
         // The vocal remover's fast path on WebGPU; it loads its own 27 MB .wasm from /vendor/, only there.
         { find: /^ort-webgpu$/, replacement: fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/ort.webgpu.min.mjs', import.meta.url)) },
       ],

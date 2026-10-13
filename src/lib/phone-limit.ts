@@ -26,4 +26,4 @@ export function phoneLimitNote(bytes: number, phone = isPhoneBrowser()): string 
 export const TRIM_LINK = { text: 'Trim it first', href: '/tools/trim-video' };
 
 /** Shown above Run before any run, so the download is no surprise on mobile data. */
-export const MODEL_DOWNLOAD_NOTE = 'The first run downloads the speech model, about 76 MB, once.';
+export const MODEL_DOWNLOAD_NOTE = 'The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once.';

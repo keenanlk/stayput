@@ -6894,10 +6894,10 @@ test('Video to subtitles shows the download line before any run and the phone si
   await p.goto('/video-to-subtitles');
   await expect(p.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await expect(p.locator('#run-hint')).toBeVisible();
-  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once. Keep the screen on while it works.');
+  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once. Keep the screen on while it works.');
   await p.locator('#file-input').setInputFiles(big);
   await expect(p.locator('#run-hint')).toContainText('about 200 MB');
-  await expect(p.locator('#run-hint')).toContainText('about 76 MB');
+  await expect(p.locator('#run-hint')).toContainText('about 77 MB (95 MB on computers with WebGPU)');
   await expect(p.locator('#run-hint').getByRole('link', { name: 'Trim it first' })).toHaveAttribute('href', '/tools/trim-video');
   await phone.close();
 });
@@ -6920,7 +6920,7 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   await p.locator('#clear').click();
   await p.locator('#file-input').setInputFiles(small);
   // No size warning for a video that is small enough: the download line and the keep-the-screen-on line are left.
-  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once. Keep the screen on while it works.');
+  await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once. Keep the screen on while it works.');
   await phone.close();
   const desktop = await browser.newContext();
   const d = await desktop.newPage();
@@ -6929,7 +6929,7 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   await d.locator('#file-input').setInputFiles(big);
   await expect(d.locator('#run')).toBeVisible();
   // No size warning and no keep-awake line on a computer; only what the first run downloads.
-  await expect(d.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 76 MB, once.');
+  await expect(d.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once.');
   await desktop.close();
 });
 
