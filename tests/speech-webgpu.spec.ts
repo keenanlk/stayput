@@ -22,8 +22,7 @@ const env = (over: Record<string, unknown> = {}, search = '', store: Record<stri
 });
 
 test('the WebGPU path is chosen only where it can work, and one flag and two overrides turn it off', () => {
-  // The switch is off for now (WebKit crash after the captions): every device, ?webgpu=1 included, gets the 8-bit path.
-  test.skip(!WEBGPU_CAPTIONS, 'WEBGPU_CAPTIONS is off');
+  expect(WEBGPU_CAPTIONS).toBe(true);
   expect(wantsWebgpu(env())).toBe(true);
   // No WebGPU in the browser.
   expect(wantsWebgpu(env({ gpu: undefined }))).toBe(false);
@@ -49,13 +48,6 @@ test('the WebGPU path is chosen only where it can work, and one flag and two ove
   // A failure is remembered for a week, then tried again.
   expect(wantsWebgpu(env({}, '', { 'stayput-webgpu-failed': String(1_000_000 - 3600_000) }))).toBe(false);
   expect(wantsWebgpu(env({}, '', { 'stayput-webgpu-failed': String(1_000_000 - 8 * 24 * 3600_000) }))).toBe(true);
-});
-
-test('while the WebGPU switch is off, every device and ?webgpu=1 get the 8-bit path', () => {
-  test.skip(WEBGPU_CAPTIONS, 'WEBGPU_CAPTIONS is on');
-  expect(wantsWebgpu(env())).toBe(false);
-  expect(wantsWebgpu(env({}, '?webgpu=1'))).toBe(false);
-  expect(wantsWebgpu(env({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1', maxTouchPoints: 5 }, '?webgpu=1'))).toBe(false);
 });
 
 test('the download sizes in the copy are the sizes of the files', () => {
@@ -114,7 +106,6 @@ function track(page: Page) {
 }
 
 test('when WebGPU fails after it passed the probe, the 8-bit path writes the captions, and the next run goes straight there', async ({ page }) => {
-  test.skip(!WEBGPU_CAPTIONS, 'WEBGPU_CAPTIONS is off: the WebGPU path is never tried');
   test.setTimeout(180_000);
   await pretendWebgpu(page);
   const seen = track(page);
@@ -140,7 +131,6 @@ test('with WebGPU forced off, only the 8-bit files are fetched and no WebGPU cod
 });
 
 test('with a real WebGPU adapter, the 16-bit encoder runs and the 8-bit encoder is not fetched', async ({ page }) => {
-  test.skip(!WEBGPU_CAPTIONS, 'WEBGPU_CAPTIONS is off: the 8-bit path runs everywhere');
   test.setTimeout(180_000);
   await page.goto('/');
   const real = await page.evaluate(async () => {
@@ -162,17 +152,6 @@ test('with a real WebGPU adapter, the 16-bit encoder runs and the 8-bit encoder 
 test.describe('on a phone', () => {
   test.use({ userAgent: PHONE });
 
-  test('with the WebGPU switch off, ?webgpu=1 on a phone still gets the 8-bit path', async ({ page }) => {
-    test.skip(WEBGPU_CAPTIONS, 'WEBGPU_CAPTIONS is on');
-    test.setTimeout(180_000);
-    await pretendWebgpu(page);
-    const seen = track(page);
-    await transcribe(page, '?webgpu=1');
-    expect([...seen.files].sort()).toEqual(['decoder_model_merged_quantized.onnx', 'encoder_model_quantized.onnx']);
-    expect(seen.scripts).toEqual([]);
-    await expect(page.locator('#results-list')).toContainText('Wrote the captions with the processor.');
-  });
-
   test('with no flag the 8-bit path is chosen, and the path line says the processor wrote the captions', async ({ page }) => {
     test.setTimeout(180_000);
     await pretendWebgpu(page);
@@ -184,7 +163,6 @@ test.describe('on a phone', () => {
   });
 
   test('with ?webgpu=1 the 16-bit WebGPU path is chosen, and a WebGPU that cannot run falls back to 8-bit with the captions written', async ({ page }) => {
-    test.skip(!WEBGPU_CAPTIONS, 'WEBGPU_CAPTIONS is off: ?webgpu=1 gets the 8-bit path too');
     test.setTimeout(180_000);
     await pretendWebgpu(page);
     const seen = track(page);
