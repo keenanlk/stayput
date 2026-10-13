@@ -13,7 +13,7 @@
  * generic failure.
  */
 import { ALL_FORMATS, AudioBufferSink, BlobSource, Input, type InputAudioTrack } from 'mediabunny';
-import { demuxedSound, NO_SOUND } from './demux-audio';
+import { demuxedSound, grown, NO_SOUND, plannedSamples } from './demux-audio';
 import { decodeAudio, channelsOf } from './audio';
 import { audioDecodeError, looksLikeMemory, outOfMemoryError, SpeechError } from './speech-errors';
 
@@ -24,8 +24,15 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   try {
     const hasVideo = !!(await input.getPrimaryVideoTrack().catch(() => null));
-    const track = await input.getPrimaryAudioTrack().catch(() => null);
-    if (hasVideo && !track) throw audioDecodeError(NO_SOUND);
+    // The first thing that went wrong on the way, kept so a failed run is named for it (a class name, never the message).
+    let cause: unknown;
+    const track = await input.getPrimaryAudioTrack().catch((e) => ((cause ??= e), null));
+    if (hasVideo && !track) {
+      // A video with no sound track is its own kind of failure to the stats, unless the reader failed with an error of its own.
+      const none = audioDecodeError(NO_SOUND, cause);
+      if (cause === undefined) none.name = 'NoSoundTrack';
+      throw none;
+    }
     let failed = false;
     if (hasVideo) {
       // A phone video's sound is copied out and decoded a stretch at a time. A stretch the browser refuses is not
@@ -35,6 +42,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         if (mono) return mono[0]!;
       } catch (e) {
         if (looksLikeMemory(e) || (e instanceof SpeechError && e.message === NO_SOUND)) throw e;
+        cause ??= e;
         failed = true;
       }
     }
@@ -43,6 +51,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         return await wholeFile(file);
       } catch (e) {
         if (looksLikeMemory(e)) throw e;
+        cause ??= e;
       }
     }
     if (track) {
@@ -51,9 +60,10 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         if (samples) return samples;
       } catch (e) {
         if (looksLikeMemory(e)) throw e;
+        cause ??= e;
       }
     }
-    throw audioDecodeError(await undecodableMessage(file, track));
+    throw audioDecodeError(await undecodableMessage(file, track, cause), cause);
   } catch (e) {
     throw asSpeechError(e);
   } finally {
@@ -63,8 +73,9 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
 
 /** Anything a decode throws, as one of the page's own errors. */
 function asSpeechError(e: unknown): Error {
+  if (e instanceof SpeechError && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.kind)) return e;
   if (e instanceof Error && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.name)) return e;
-  return looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError();
+  return looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError(undefined, e);
 }
 
 async function wholeFile(file: File): Promise<Float32Array> {
@@ -79,13 +90,15 @@ async function wholeFile(file: File): Promise<Float32Array> {
 async function decodedByCodecs(track: InputAudioTrack, rate: number, onProgress?: (fraction: number) => void): Promise<Float32Array | null> {
   if (!track.codec || !(await track.canDecode())) return null;
   const seconds = await track.computeDuration();
-  const out = new Float32Array(Math.ceil(seconds * rate) + rate);
+  // The container's duration only sizes the first guess: a wrong one must not decide how much memory is asked for.
+  let out = new Float32Array(plannedSamples(seconds, rate));
   let end = 0;
   for await (const { buffer, timestamp } of new AudioBufferSink(track).buffers()) {
     const step = buffer.sampleRate / rate;
     const chans = Array.from({ length: buffer.numberOfChannels }, (_, c) => buffer.getChannelData(c));
     const at = Math.max(0, Math.round(timestamp * rate));
-    const n = Math.min(Math.floor(buffer.length / step), out.length - at);
+    const n = Math.floor(buffer.length / step);
+    out = grown(out, at + n);
     for (let j = 0; j < n; j++) {
       const from = Math.floor(j * step);
       const to = Math.max(from + 1, Math.min(buffer.length, Math.floor((j + 1) * step)));
@@ -128,7 +141,11 @@ function soundFormat(track: InputAudioTrack | null): string {
 }
 
 /** The sentence for a sound this browser could not read, naming its format where that is known. */
-async function undecodableMessage(file: File, track: InputAudioTrack | null): Promise<string> {
+async function undecodableMessage(file: File, track: InputAudioTrack | null, cause?: unknown): Promise<string> {
+  // A file the browser could not even read (cloud storage that is not on the device, say) is not a sound format problem.
+  if (cause instanceof Error && ['NotReadableError', 'NotFoundError'].includes(cause.name)) {
+    return 'This file could not be read. If it is in cloud storage (Google Drive or Photos, say), save a copy on this device first and add that.';
+  }
   let format = soundFormat(track);
   // A bare .amr file has no container for the demuxer to read; its first bytes say what it is.
   if (!format && !track) {
