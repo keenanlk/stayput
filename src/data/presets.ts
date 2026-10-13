@@ -1615,6 +1615,70 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'extract-audio-from-video',
+    base: 'video-to-mp3',
+    name: 'Extract audio from video',
+    title: 'Extract Audio from Video, MP3 or WAV, No Upload | Stayput',
+    description: 'Pull the sound out of an MP4, MOV, WebM or MKV video and keep it as an MP3 or a WAV. Free, no sign-up, and the video is not uploaded.',
+    heading: 'Extract the audio from a video',
+    tagline: 'Keep the sound of a video as an MP3 or a WAV. The picture is left behind, and the video stays on this device.',
+    keywords: ['extract audio from video', 'extract audio from video free', 'extract audio from video online', 'get audio from video', 'save audio from video', 'video to audio'],
+    dropLabel: 'Drop videos to take the audio from',
+    action: 'Extract audio',
+    sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
+    lead:
+      'Takes the sound out of a video and saves it as an MP3 or a WAV, from MP4, MOV, WebM, MKV and other video files whose sound your browser can play. It is free, and your video is not uploaded: your browser reads the sound track and writes the new file on your device. The MP3 encoder is fetched the first time you use it, so after your first run the page works offline.',
+    intro: [
+      'A video file holds a picture and a sound track in one container. To keep only the sound, the page reads the sound track, decodes it, and writes it again as a file of its own. The picture is not used, which is why the audio file is a small fraction of the video’s size.',
+      'The first choice is the format, on the [Video to MP3](/tools/video-to-mp3) tool and on this page alike. MP3 is the small one that plays on nearly everything; at 192 kbps it takes about 1.4 MB a minute. WAV is uncompressed, which is what audio editors and some upload forms ask for, and it takes about 10.6 MB a minute in stereo. For a 10-minute video that is about 14 MB as an MP3 and about 106 MB as a WAV.',
+      'The second choice is how much to keep. Voice recordings such as lectures, calls and interviews are fine at 96 or 128 kbps in mono, and come out around 7 MB for those 10 minutes at 96 kbps. Music is better at 192 kbps or higher. Neither format can bring back detail that the video’s own sound track did not have, and a WAV is not a better copy of the sound; it is the same sound without a second round of compression.',
+      'Drop several videos at once and they are converted one after another. One file downloads straight away, and several come as a zip. If you only want the words, drop the video on [Video to text](/video-to-text) instead; it reads the sound track itself.',
+    ],
+    steps: [
+      'Drop one or more video files, or tap to pick them from your files or camera roll.',
+      'Choose MP3 or WAV. For MP3 pick a quality: 192 kbps for music, 96 to 128 kbps for speech. Choose mono to halve the size of a voice recording.',
+      'Extract. The audio file downloads when it is ready, named like the video; several files come as a zip.',
+    ],
+    sections: [
+      {
+        heading: 'Which videos work',
+        bullets: [
+          'MP4, M4V and MOV files from phones, cameras and screen recorders, and WebM and MKV files.',
+          'What counts is the sound track, not the picture: the page only reads the sound, and needs your browser to be able to play it.',
+          'If a file will not open, try the page in another browser. Safari reads some Apple files that other browsers do not.',
+          'A video with no sound track, such as a screen recording made without a microphone, gives an error saying no audio could be read.',
+        ],
+      },
+      {
+        heading: 'What you get',
+        bullets: [
+          'An MP3 at 96 to 320 kbps, in stereo or mono, or a 16-bit WAV at 44.1 kHz, with the same name as the video.',
+          'Surround sound is mixed down to stereo, and the centre channel, where film dialogue sits, is kept.',
+          'The whole video is read into your device’s memory first, so a very long film may be too much for an older phone.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It takes files from your device, not links. A YouTube or other web address cannot be pasted here, because the page never fetches anything for you.',
+          'It converts the whole video. To keep only part of it, cut the audio afterwards with [Trim audio](/tools/trim-audio).',
+          'It does not copy the sound track unchanged: the sound is decoded and written again as MP3 or WAV.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I extract the audio from a video?', a: 'Drop the video on this page, choose MP3 or WAV, and press Extract audio. Your browser decodes the sound track and the page writes it as a file of its own, with the picture left out. For a step-by-step guide that covers phones, QuickTime and Windows, see [how to convert a video to MP3](/guides/how-to-convert-a-video-to-mp3).' },
+      { q: 'Should I choose MP3 or WAV?', a: 'MP3 for listening, sharing and uploads: it is small and plays everywhere. WAV if you will edit the sound further or a program asks for it, because nothing is compressed a second time. At the default 192 kbps, a WAV is about seven times the size of the MP3.' },
+      { q: 'Does extracting the audio lose quality?', a: 'WAV keeps what the decoder produced, so nothing more is lost. MP3 compresses the sound again, which at 192 kbps or higher is not noticeable for most music and speech. In both cases the sound cannot be better than the sound track in the video.' },
+      { q: 'Which video formats can I use?', a: 'MP4, M4V, MOV, WebM and MKV are what this page is built for, and it works with any video whose sound track your browser can decode. There is no list of codecs to check: if a file will not open, you get a message, and another browser may read it.' },
+      { q: 'Can I paste a link to a video?', a: 'No. The page works on files on your device and does not fetch anything from other sites. Use a video file you already have.' },
+      { q: 'Can I extract the audio from a video on my iPhone or Android phone?', a: 'Yes. Open this page in your phone’s browser, tap the drop area and pick the video from your photo library or files. The audio file is written on the phone and saved to your downloads.' },
+      { q: 'Is there a length or size limit?', a: 'There is no file size cap from us. The whole video is read into your device’s memory, so a long film works on a laptop but may be too much for an older phone.' },
+      { q: 'What if I only need part of the audio?', a: 'Extract the whole sound track first, then cut the part you want with [Trim audio](/tools/trim-audio). Both steps run on your device.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'extract-text-from-image',
     base: 'image-to-text',
     name: 'Extract text from image',
@@ -4541,7 +4605,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'What speed is best for podcasts and lectures?', a: 'Most people follow speech easily at 1.25× to 1.5×. Above 1.75× only very clear speakers stay comfortable, and background music starts to sound choppy before the voice does.' },
-      { q: 'Can I make a sped-up song for TikTok or Reels?', a: 'Yes. Tick “Let the pitch follow the speed” for the higher, brighter sped-up sound those edits use, or leave it off to keep the key. 1.2× to 1.3× is the usual range for sped-up versions of songs.' },
+      { q: 'Can I make a sped-up song for TikTok or Reels?', a: 'Yes. Tick “Let the pitch follow the speed” for the higher, brighter sped-up sound those edits use, or leave it off to keep the key. The [Nightcore maker](/nightcore-maker) opens with the pitch following the speed already.' },
       { q: 'Why is my file shorter but the same size in MB?', a: 'A lossy file is written again at about the bitrate of the original, and size follows bitrate times length. A file that plays 25% faster is 20% shorter, so it should be about 20% smaller. If the size did not drop, the original was probably a low-bitrate file saved at a higher rate; pick MP3 and it is written at a sensible bitrate.' },
       { q: 'Does speeding up remove pauses?', a: 'No. Everything plays faster by the same amount, pauses included. To cut silences out of a recording, trim them with Trim audio first, then speed up what is left.' },
       noUpload,
@@ -4575,6 +4639,123 @@ export const presets: Preset[] = [
       { q: 'How slow can it go?', a: 'Down to 0.5×. Below about 0.7×, drums and sharp attacks start to sound soft or doubled, which is normal for any time stretch. Sustained notes, voices and guitar lines hold up much better than percussion.' },
       { q: 'How do I make a slowed and reverb version?', a: 'Tick “Let the pitch follow the speed” and choose 0.8× to 0.9×: the song drops in key as it slows, like a record played at the wrong speed. This page adds no reverb, so put the slowed copy into an editor or app for that last step.' },
       { q: 'Can I slow down a YouTube video I am learning from?', a: 'YouTube’s own speed setting already slows playback while keeping the pitch. Use this page for files you have on your device, such as a lesson recording, a voice memo of a teacher, or a practice track, when you want a slower copy to keep.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'key-changer',
+    base: 'pitch-changer',
+    name: 'Key changer',
+    title: 'Key Changer: Change a Song’s Key Online, No Upload | Stayput',
+    description: 'Change the key of an MP3 or other song file up or down by semitones, up to an octave, and keep the speed. Free, no sign-up, and the file is not uploaded.',
+    heading: 'Change the key of a song',
+    tagline: 'Move a song up or down by semitones to suit your voice or your instrument. The speed stays the same.',
+    keywords: ['key changer', 'key changer online', 'key changer for songs', 'key changer mp3', 'change key of a song', 'song key changer'],
+    dropLabel: 'Drop songs to change the key of',
+    action: 'Change key',
+    lead:
+      'Changes the key of a song file up or down by whole semitones, up to an octave either way, and keeps its speed the same. It is free, and your music is not uploaded: the key is shifted in your browser tab. The page works on files, not links, and after your first run it works offline.',
+    intro: [
+      'A key changer moves every note of a song up or down by the same amount, so the song fits your voice or your instrument without being played faster or slower. A singer who cannot reach the high notes moves the key down; a guitarist who finds the chords awkward moves it to a key with friendlier ones.',
+      'The amount is counted in semitones, the steps on a piano from one key to the next. Going from C up to D is +2, from E down to C is −4, and 12 semitones is one octave. Minor keys move the same way: a song in A minor moved down 3 semitones is in F♯ minor.',
+      'A worked example: a ballad in G is too high for your voice. Move the slider to −2 and the song plays in F, one whole step lower, at the same speed and in the same length. If that is still too high, try −3 or −4 and listen again. The slider moves in whole semitones from −12 to +12, and the page does not tell you which key the song is in, so you need to know it, or find it by ear, to count the steps.',
+      'The new file is written in the format you dropped unless you pick another. A small shift of a few semitones sounds natural; a very large one, such as a whole octave, adds some smearing, as every pitch shifter does.',
+    ],
+    steps: [
+      'Drop one or more songs (MP3, WAV, M4A, FLAC or OGG), or tap to pick them.',
+      'Move the pitch slider by the number of semitones you want, up or down. At 0 nothing changes, and the page says so.',
+      'Press Change key. Each file downloads when it is ready, with the shift in its name, such as song-down2.mp3.',
+    ],
+    sections: [
+      {
+        heading: 'Counting semitones',
+        bullets: [
+          'One semitone is the step from one piano key to the next, white or black.',
+          'Up 2 is a whole step: C to D, G to A. Down 2: G to F.',
+          'Up 7 is a fifth, and 12 is a whole octave. The slider stops at 12 each way.',
+          'To move a song from one key to another, count the semitones between the two key names, and use a minus sign to go down.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It does not find the key of a song. You tell it how far to move.',
+          'It takes sound files, not links. A YouTube or streaming address cannot be pasted here, because the page never fetches anything for you.',
+          'It moves in whole semitones only. A shift smaller than one semitone is not available.',
+          'It shifts the whole mix. It does not move the voice and the band separately.',
+          'It takes sound files only, not video. For a video, save the sound first with [Extract audio from video](/extract-audio-from-video), then bring it here.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I change the key of a song?', a: 'Drop the song file here, move the pitch slider by the number of semitones between the key it is in and the key you want, and press Change key. From C to D is +2; from E to C is −4. The speed and the length stay the same.' },
+      { q: 'How many semitones is an octave?', a: '12. The slider goes from −12 to +12, so you can move a song up or down by a whole octave. Shifts of a few semitones sound the most natural.' },
+      { q: 'Will the song get faster or slower?', a: 'No. With the speed left at 1×, only the key changes and the song keeps its length. If you also want it faster or slower, use the Speed list on the same page.' },
+      { q: 'Can I change the key of a YouTube or Spotify song?', a: 'Not from a link. This page works on a sound file on your device and does not fetch anything from other sites. Use a file you already have, such as a recording of your own band, a backing track or a voice memo.' },
+      { q: 'How do I find the key of the song first?', a: 'Play the song along with a piano or guitar and find the note that sounds like “home” at the end; the [tuner](/tools/tuner) shows the name of a single note you play. This page does not detect the key for you.' },
+      { q: 'How good is the quality?', a: 'Small changes, a few semitones, sound natural. A very large one, a whole octave, adds some smearing, as every pitch shifter does. Save as WAV or FLAC if you will edit the result further.' },
+      { q: 'Does it change only the voice?', a: 'No. It moves everything in the file by the same amount: voices, guitars, drums and all.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'nightcore-maker',
+    base: 'pitch-changer',
+    name: 'Nightcore maker',
+    title: 'Nightcore Maker: Speed Up and Pitch Up a Song | Stayput',
+    description: 'Make a nightcore version of a song: faster, with the pitch rising with the speed, saved as an MP3. Free, no sign-up, and the song is not uploaded.',
+    heading: 'Make a nightcore version of a song',
+    tagline: 'Speed a song up and let the pitch rise with it, then save it as an MP3.',
+    keywords: ['nightcore maker', 'nightcore maker online', 'make nightcore', 'nightcore mp3', 'nightcore converter', 'speed up and pitch up a song'],
+    dropLabel: 'Drop songs to make nightcore',
+    action: 'Make nightcore',
+    defaults: { speed: '1.25', tape: 'true', format: 'mp3' },
+    lead:
+      'Speeds a song up and raises its pitch with the speed, the sound known as nightcore, and saves it as an MP3. It is free, and your music is not uploaded: the song is changed in your browser tab. It makes that one change and adds no effects, and after your first run the page works offline.',
+    intro: [
+      'Nightcore is a song played faster, so that it also sounds higher, like a record spun too fast. This page does exactly that and nothing more: it plays the song faster and lets the pitch follow the speed, then saves the result as an MP3. It adds no effect, no echo and no picture.',
+      'It starts at 1.25× speed. At that speed the pitch rises by almost four semitones, and a 3-minute-30-second song comes out at 2 minutes 48. Pick a different speed from 1.05× to 2× in the list: the higher the speed, the higher the pitch, and 2× is a whole octave up.',
+      'A worked example: you drop song.mp3 and leave the speed at 1.25×. The page writes song-faster.mp3, which plays in 80% of the time and about 3.9 semitones higher. The note on the result says “1.25× speed, pitch following”.',
+      'The pitch slider is still there. While the box is ticked, a shift in semitones is added on top of the rise from the speed, so 1.25× with the slider at +2 is about 5.9 semitones up. Untick “Let the pitch follow the speed” to speed up without raising the pitch.',
+    ],
+    steps: [
+      'Drop one or more songs (MP3, WAV, M4A, FLAC or OGG), or tap to pick them.',
+      'Leave the speed at 1.25× or pick another. The tick-box keeps the pitch rising with the speed; the pitch slider adds a further shift if you want one.',
+      'Press Make nightcore. Each file downloads when it is ready, as an MP3; several come as a zip.',
+    ],
+    sections: [
+      {
+        heading: 'How much higher does it go?',
+        paragraphs: [
+          'With the pitch following the speed, the rise is set by the speed alone: each doubling of the speed is one octave, 12 semitones.',
+        ],
+        bullets: [
+          '1.1×: about 1.7 semitones higher.',
+          '1.2×: about 3.2 semitones.',
+          '1.25×: about 3.9 semitones (the starting speed).',
+          '1.3×: about 4.5 semitones.',
+          '1.5×: about 7.0 semitones.',
+          '2×: 12 semitones, one octave.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'It adds no effects. There is no reverb, echo, bass boost or picture; only the speed and the pitch change.',
+          'It takes sound files, not links and not video. For a video, save the sound first with [Extract audio from video](/extract-audio-from-video), then bring it here.',
+          'It does not keep the key. To speed a song up and keep its key, tick the box off, or use [Speed up audio](/speed-up-audio).',
+          'It works on a whole file. To make nightcore of one part, cut it first with [Trim audio](/tools/trim-audio).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is nightcore?', a: 'A version of a song that is played faster, so that it also sounds higher, like a record played at too high a speed. This page makes that change and nothing else.' },
+      { q: 'How do I make a nightcore version of a song?', a: 'Drop the song file here and press Make nightcore. The page speeds it up to 1.25×, lets the pitch rise with the speed, and saves an MP3. Pick another speed in the list if you want it faster or slower.' },
+      { q: 'What speed should I use?', a: 'The page starts at 1.25×. Raise it for a faster, higher result and lower it for a gentler one. At 1.5× the pitch is about seven semitones higher, which is a big change; listen before you share it.' },
+      { q: 'Can I speed a song up without raising the pitch?', a: 'Yes. Untick “Let the pitch follow the speed” and the speed changes alone, so the song keeps its key. The [Speed up audio](/speed-up-audio) page opens that way.' },
+      { q: 'Can I make nightcore from a YouTube link?', a: 'No. The page works on files on your device and does not fetch anything from other sites. Use a song file you already have.' },
+      { q: 'Does it add reverb, bass or any other effect?', a: 'No. The page changes the speed and the pitch of the sound and nothing else.' },
+      { q: 'Is it OK to share the result?', a: 'That depends on who owns the song. Changing its speed does not change who owns it, so a nightcore copy of someone else’s song needs their permission to publish.' },
       noUpload,
     ],
   },
@@ -5827,7 +6008,7 @@ export const presets: Preset[] = [
     action: 'Extract RAR',
     intro: [
       'RAR is a format from the makers of WinRAR, and many systems still cannot open it on their own: the Archive Utility on a Mac says it cannot expand it, Chromebooks and phones need an app, and Windows only added native RAR support in Windows 11 in 2023. This page opens RAR files in the browser with libarchive, the same open-source library Windows now uses for it.',
-      'A worked example: a photographer sends wedding-photos.rar, 800 MB, through a download link, and you are on a MacBook. Drop it here and press Extract RAR. The list shows every photo with its folder; press Download all as zip to get one ZIP that macOS opens with a double click, or download just the few pictures you need. Password-protected (encrypted) RAR archives are not supported yet, so if the photographer locked it, ask for a ZIP instead.',
+      'A worked example: a photographer sends wedding-photos.rar, 800 MB, through a download link, and you are on a MacBook. Drop it here and press Extract RAR. The list shows every photo with its folder; press Download all as zip to get one ZIP that macOS opens with a double click, or download just the few pictures you need. If the photographer locked it with a password, type the password before pressing Extract RAR; it opens the same way, with the file names too if they were encrypted.',
       'Very large archives are held in your device’s memory while they are unpacked, so on a phone keep to a few hundred megabytes at a time. RAR archives split into parts (photos.part1.rar, photos.part2.rar) are not supported yet.',
     ],
     steps: [
@@ -5836,7 +6017,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Does it open RAR5?', a: 'Yes. RAR5, the format WinRAR has used by default since version 5, opens as well as the older RAR4.' },
-      { q: 'Can it open a password-protected RAR?', a: 'Not yet. In our tests, encrypted RAR archives did not open here even with the correct password, so use WinRAR or 7-Zip for those. Ask the sender for a ZIP if they can: password-protected ZIP files do open here.' },
+      { q: 'Can it open a password-protected RAR?', a: 'Yes, if you have the password. Type it before pressing Extract RAR. Encrypted RAR4 and RAR5 archives both open, including ones whose file names are encrypted too. A wrong password shows an error and nothing is extracted. This page cannot guess or remove a password.' },
       { q: 'Can it make RAR files?', a: 'No. Creating RAR files needs WinRAR’s own licensed code. For sending files, a ZIP works everywhere without extra software.' },
       { q: 'Is it safe to open a RAR from someone I do not know?', a: 'Extracting only unpacks the files; nothing inside runs. The danger is opening what comes out, especially .exe, .scr, .js or Office files with macros from an unknown sender.' },
       { q: 'Is the RAR uploaded?', a: 'No. It is unpacked in this tab, on your device.' },
@@ -5847,7 +6028,7 @@ export const presets: Preset[] = [
     base: 'archive-extractor',
     name: 'Open 7z file',
     title: 'Open 7z Files Online Without 7-Zip, Free, No Upload | Stayput',
-    description: 'Extract .7z archives in your browser on any computer or phone, no 7-Zip install needed. Encrypted 7z archives are not supported yet. Nothing is uploaded.',
+    description: 'Extract .7z archives in your browser on any computer or phone, no 7-Zip install needed, including encrypted ones when you have the password. Nothing is uploaded.',
     heading: 'Open a 7z file without installing 7-Zip',
     tagline: '7-Zip archives unpacked in the browser, for computers where you cannot install 7-Zip.',
     keywords: ['open 7z file', '7z extractor', 'extract 7z online', '7z opener mac', 'open 7z without 7zip'],
@@ -5856,7 +6037,7 @@ export const presets: Preset[] = [
     action: 'Extract 7z',
     intro: [
       '7z is the format of 7-Zip, a free Windows archiver that squeezes files smaller than ZIP does, which is why game mods, datasets and software downloads often come as .7z. Macs, Chromebooks and phones have nothing built in to open it, and on a managed work PC you may not be allowed to install 7-Zip.',
-      'A worked example: a colleague shares survey-data.7z. Drop the file here and press Extract 7z. The CSV files inside appear in a list; download the one you need, or all of them as a ZIP that every system opens. Password-protected (encrypted) 7z archives are not supported yet: in our tests they did not open even with the correct password, so use 7-Zip for those or ask for a ZIP.',
+      'A worked example: a colleague shares survey-data.7z. Drop the file here and press Extract 7z. The CSV files inside appear in a list; download the one you need, or all of them as a ZIP that every system opens. If the archive is password-protected, type the password before pressing Extract 7z; archives with only the contents encrypted and archives with the file names encrypted too both open.',
       'Solid 7z archives, where many files are compressed as one block, are unpacked from the start each time, so extracting from a large solid archive takes a little while even if you want one file.',
     ],
     steps: [
@@ -5865,10 +6046,10 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Which 7z compression methods work?', a: 'LZMA and LZMA2, the defaults, as well as BZip2, Deflate and stored archives. Zstandard-compressed 7z files from 7-Zip forks may not open.' },
-      { q: 'Can it open an encrypted 7z?', a: 'Not yet. Encrypted 7z archives did not open in our tests even with the correct password. Password-protected ZIP files do open here.' },
+      { q: 'Can it open an encrypted 7z?', a: 'Yes, if you have the password. Type it before pressing Extract 7z. It opens archives where only the contents are encrypted and archives where the file names are hidden too, and a wrong password shows an error. This page cannot guess or remove a password. Password-protected ZIP files open here as well.' },
       { q: 'Can it split or join .7z.001 volumes?', a: 'Not yet. Join the parts with 7-Zip or with a command-line copy first, then open the joined file here.' },
       { q: 'Why is a 7z much smaller than the same files zipped?', a: '7z’s LZMA compression looks much further back for repeated data than ZIP’s Deflate, so text, code and data files often shrink a third more. Photos and videos are already compressed and barely shrink in either.' },
-      { q: 'Is the file uploaded?', a: 'No. The archive is read by libarchive running in this tab.' },
+      { q: 'Is the file uploaded?', a: 'No. The archive is read by libarchive (and by 7-Zip, for password-protected archives) running in this tab.' },
     ],
   },
   {

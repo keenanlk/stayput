@@ -1117,14 +1117,14 @@ export const tools: Tool[] = [
       'Pull the audio out of MOV, MKV, WebM or other video, or turn M4A, WAV and FLAC into MP3. Converted in your browser, nothing uploaded, no sign-up.',
     heading: 'Convert video or audio to MP3',
     tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
-    taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3).',
+    taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3). To keep the sound of any video as MP3 or WAV, see [Extract audio from video](/extract-audio-from-video).',
     sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
     category: 'media',
     accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
     multiple: true,
     dropLabel: 'Drop videos or audio files to convert',
     action: 'Convert',
-    keywords: ['video to mp3', 'extract audio from video', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
+    keywords: ['video to mp3', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
     steps: [
       'Drop one or more videos or audio files (MP4, MOV, WebM, M4A, WAV, FLAC and more), or tap to pick them.',
       'Choose MP3 or WAV. For MP3 pick a quality: 192 kbps suits music, 96 kbps is plenty for speech. Choose mono to halve the size of a voice recording.',
@@ -1149,7 +1149,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I get a WAV instead?',
-        a: 'Yes. Choose WAV and you get uncompressed 16-bit, 44.1 kHz audio, the format audio editors and some upload forms ask for. It is about ten times the size of an MP3.',
+        a: 'Yes. Choose WAV and you get uncompressed 16-bit, 44.1 kHz audio, the format audio editors and some upload forms ask for. It is about seven times the size of an MP3 at the default 192 kbps.',
       },
       {
         q: 'Do I need the audio if I only want the words?',
@@ -2705,7 +2705,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop audio files to change pitch or speed',
     action: 'Change',
-    keywords: ['pitch changer', 'change pitch of audio', 'audio pitch shifter', 'change key of song', 'speed up audio', 'slow down audio', 'mp3 speed changer', 'transpose audio'],
+    keywords: ['pitch changer', 'change pitch of audio', 'audio pitch shifter', 'speed up audio', 'slow down audio', 'mp3 speed changer', 'pitch shifter online'],
     steps: [
       'Drop one or more sound files (MP3, WAV, M4A, FLAC, OGG), or tap to pick them.',
       'Move the pitch in semitones, choose a speed, or both. Keep the original format or pick another.',
@@ -2718,7 +2718,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How do I change the key of a song?',
-        a: 'Move the pitch slider by the number of semitones between the keys: from C to D is +2, from E to C is −4. The tempo and length stay the same, so you can sing or play along in a key that suits your voice or instrument.',
+        a: 'Move the pitch slider by the number of semitones between the keys: from C to D is +2, from E to C is −4. The tempo and length stay the same, so you can sing or play along in a key that suits your voice or instrument. The [Key changer](/key-changer) page opens on this control.',
       },
       {
         q: 'Will speeding up make voices sound like chipmunks?',
@@ -3730,7 +3730,7 @@ export const tools: Tool[] = [
     name: 'Open ZIP, RAR and 7z',
     title: 'Open RAR, ZIP and 7z Files Online: Extract Without Uploading | Stayput',
     description:
-      'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ZIP files, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
+      'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ZIP, 7z and RAR files when you have the password, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
     heading: 'Open ZIP, RAR and 7z files',
     tagline: 'The files inside an archive, unpacked on your own device, without installing WinRAR or 7-Zip.',
     category: 'pdf',
@@ -3741,7 +3741,7 @@ export const tools: Tool[] = [
     keywords: ['rar extractor', 'open rar file', 'zip file opener', 'unzip files online', '7z extractor', 'extract rar online', 'open 7z file'],
     steps: [
       'Drop a ZIP, RAR, 7z or TAR archive, or several.',
-      'If the ZIP is password-protected, type its password.',
+      'If the archive is password-protected, type its password.',
       'Press Extract, then download the files you need, or all of them as one ZIP.',
     ],
     faq: [
@@ -3755,15 +3755,15 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can it open password-protected archives?',
-        a: 'Password-protected ZIP files open after you enter the password: type it before pressing Extract. Encrypted 7z and RAR archives are not supported yet (in our tests they did not open even with the correct password). It cannot guess or remove a password you do not have.',
+        a: 'Yes, when you have the password: type it before pressing Extract. That works for password-protected ZIP files, for 7z archives (whether only the contents are encrypted or the file names are too) and for RAR archives (old RAR and RAR5, with or without encrypted file names). A wrong password shows an error and nothing is extracted. For 7z and RAR the page loads 7-Zip, about 0.7 MB more, only when you type a password for one of them. It cannot guess or remove a password you do not have, and archives split into parts are not supported.',
       },
       {
         q: 'How do I remove the password from a ZIP file?',
-        a: 'Open the ZIP here, type its password before pressing Extract, then press Download all as zip. The new ZIP has the same files and no password. You need the password: this page cannot recover a forgotten one, and encrypted 7z and RAR archives are not supported yet.',
+        a: 'Open the ZIP here, type its password before pressing Extract, then press Download all as zip. The new ZIP has the same files and no password. You need the password: this page cannot recover a forgotten one. The same works for an encrypted 7z or RAR: type the password, press Extract, then Download all as zip to get the files in a ZIP with no password.',
       },
       {
         q: 'Is the archive uploaded?',
-        a: 'No. libarchive, the same open-source code behind the tar command on macOS and FreeBSD, runs in this tab as WebAssembly, so the archive and everything in it stay on your device.',
+        a: 'No. libarchive, the same open-source code behind the tar command on macOS and FreeBSD, runs in this tab as WebAssembly, and so does 7-Zip for password-protected 7z and RAR files, so the archive, its password and everything in it stay on your device.',
       },
     ],
   },

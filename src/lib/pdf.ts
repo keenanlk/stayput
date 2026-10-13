@@ -2,6 +2,7 @@
  * PDF helpers. pdf-lib edits document structure; pdf.js renders pages.
  * Both are loaded on demand so tool pages stay light until a file is dropped.
  */
+import { UnreadableFile } from './input-error';
 import type * as PdfLib from 'pdf-lib';
 import type * as PdfJs from 'pdfjs-dist';
 import type { TextContent } from 'pdfjs-dist/types/src/display/api';
@@ -47,7 +48,7 @@ export async function openWithPdfJs(source: Uint8Array): Promise<PdfJs.PDFDocume
   } catch (e) {
     worker.destroy();
     port.terminate();
-    throw new Error(`This file could not be opened as a PDF${e instanceof Error && e.message ? ` (${e.message})` : ''}.`);
+    throw new UnreadableFile(`This file could not be opened as a PDF${e instanceof Error && e.message ? ` (${e.message})` : ''}.`);
   }
 }
 
@@ -121,15 +122,21 @@ export async function loadDocument(source: Uint8Array): Promise<PdfLib.PDFDocume
   try {
     doc = await PDFDocument.load(bytes, { ignoreEncryption: true, updateMetadata: false });
   } catch (e) {
-    throw new Error(`This file could not be read as a PDF. It may be damaged${e instanceof Error && e.message ? ` (${e.message.split('\n')[0]})` : ''}.`);
+    throw new UnreadableFile(`This file could not be read as a PDF. It may be damaged${e instanceof Error && e.message ? ` (${e.message.split('\n')[0]})` : ''}.`);
   }
-  if (doc.isEncrypted) throw new Error('This PDF uses an encryption method that could not be removed in the browser.');
+  if (doc.isEncrypted) throw new UnreadableFile('This PDF uses an encryption method that could not be removed in the browser.');
+  try {
+    // pdf-lib reads a body with no page tree without complaint, and then fails with a TypeError at the first page.
+    doc.getPageCount();
+  } catch {
+    throw new UnreadableFile('This file could not be read as a PDF. It may be damaged: no pages could be found in it.');
+  }
   return doc;
 }
 
 function assertPdfHeader(bytes: Uint8Array): void {
-  if (bytes.length === 0) throw new Error('This file is empty.');
-  if (!isPdfHeader(bytes)) throw new Error('This file is not a PDF. It does not start with a PDF header.');
+  if (bytes.length === 0) throw new UnreadableFile('This file is empty.');
+  if (!isPdfHeader(bytes)) throw new UnreadableFile('This file is not a PDF. It does not start with a PDF header.');
 }
 
 /** True when the first 1 KB contains "%PDF-" (some producers prepend junk). */

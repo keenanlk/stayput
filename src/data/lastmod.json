@@ -20,8 +20,8 @@
   "hash": "9994c502bbb85e81"
  },
  "/about": {
-  "date": "2026-10-12",
-  "hash": "5fe8d610d79f5e9a"
+  "date": "2026-10-13",
+  "hash": "f54f8ccacbc0a607"
  },
  "/acapella-extractor": {
   "date": "2026-10-12",
@@ -287,6 +287,10 @@
   "date": "2026-10-12",
   "hash": "3b797fa70372edcc"
  },
+ "/extract-audio-from-video": {
+  "date": "2026-10-13",
+  "hash": "a561e495295c90eb"
+ },
  "/extract-frames-from-video": {
   "date": "2026-10-12",
   "hash": "7aa20a98269081eb"
@@ -449,7 +453,7 @@
  },
  "/guides/how-to-convert-a-video-to-mp3": {
   "date": "2026-09-29",
-  "hash": "a5a46587b3ad551f"
+  "hash": "94b23c01973cef6e"
  },
  "/guides/how-to-convert-an-image-to-svg": {
   "date": "2026-10-04",
@@ -541,7 +545,7 @@
  },
  "/guides/how-to-open-a-rar-file": {
   "date": "2026-10-13",
-  "hash": "5da6b9ab5a7e57a3"
+  "hash": "5400250e67568a06"
  },
  "/guides/how-to-password-protect-a-pdf": {
   "date": "2026-09-29",
@@ -891,13 +895,17 @@
   "date": "2026-10-12",
   "hash": "b8bc9f51b41f04b8"
  },
+ "/key-changer": {
+  "date": "2026-10-13",
+  "hash": "6c177b1a9ee5e712"
+ },
  "/letter-to-a4": {
   "date": "2026-10-12",
   "hash": "f2e0a7fc9e46d25e"
  },
  "/licenses": {
-  "date": "2026-10-12",
-  "hash": "b0cd1ad7a7c29314"
+  "date": "2026-10-13",
+  "hash": "66baef42991bd76a"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-13",
@@ -1011,6 +1019,10 @@
   "date": "2026-10-12",
   "hash": "ea0c45f7d830f899"
  },
+ "/nightcore-maker": {
+  "date": "2026-10-13",
+  "hash": "32d01fc14f604f5d"
+ },
  "/normalize-audio": {
   "date": "2026-10-12",
   "hash": "3f40d97089ca719a"
@@ -1024,8 +1036,8 @@
   "hash": "36a5e9000c55f799"
  },
  "/open-7z-file": {
-  "date": "2026-10-12",
-  "hash": "568a59b7e3bd4d8e"
+  "date": "2026-10-13",
+  "hash": "b5b4c940d1f86107"
  },
  "/opus-to-mp3": {
   "date": "2026-10-12",
@@ -1140,8 +1152,8 @@
   "hash": "2e83b10003c7644a"
  },
  "/rar-extractor": {
-  "date": "2026-10-12",
-  "hash": "2a1db8a43d84ad70"
+  "date": "2026-10-13",
+  "hash": "a7d8e94a677359c3"
  },
  "/receipt-scanner": {
   "date": "2026-10-12",
@@ -1264,8 +1276,8 @@
   "hash": "1b529026688d4544"
  },
  "/speed-up-audio": {
-  "date": "2026-10-12",
-  "hash": "1b1243eea73717fa"
+  "date": "2026-10-13",
+  "hash": "cb83e054e74a8a64"
  },
  "/speed-up-video": {
   "date": "2026-10-12",
@@ -1329,7 +1341,7 @@
  },
  "/tools/archive-extractor": {
   "date": "2026-10-13",
-  "hash": "66565a8fdbce4cf9"
+  "hash": "70a6d24182418e51"
  },
  "/tools/audio-converter": {
   "date": "2026-10-12",
@@ -1544,8 +1556,8 @@
   "hash": "c63bceb44c5782fa"
  },
  "/tools/pitch-changer": {
-  "date": "2026-10-12",
-  "hash": "e10c1127d2576bf5"
+  "date": "2026-10-13",
+  "hash": "e99bdba6c2fe1b9b"
  },
  "/tools/pixel-art-converter": {
   "date": "2026-10-12",
@@ -1696,8 +1708,8 @@
   "hash": "2b9f92686f72b92f"
  },
  "/tools/video-to-mp3": {
-  "date": "2026-10-12",
-  "hash": "4b2ba2e771c4403f"
+  "date": "2026-10-13",
+  "hash": "99b799798f7951c5"
  },
  "/tools/video-to-mp4": {
   "date": "2026-10-12",

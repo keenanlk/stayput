@@ -185,5 +185,18 @@ export class EncoderUnavailable extends Error {
   }
 }
 
+/**
+ * Thrown when a browser's encoder said it could take the settings and then refused to start
+ * (Chrome on Android: an OperationError, "Encoder creation error"), at every size and codec tried.
+ * The name is the error kind a failed run records, so these split from a plain "Error" and from
+ * a stalled encoder.
+ */
+export class EncoderRefused extends Error {
+  constructor() {
+    super("This device's video encoder refused to start, even at smaller sizes. Try a recent Chrome or Edge, or a computer.");
+    this.name = 'EncoderRefused';
+  }
+}
+
 /** Whether this browser has a video encoder to ask. False means no tool that re-encodes can work here. */
 export const hasVideoEncoder = () => typeof VideoEncoder !== 'undefined';
