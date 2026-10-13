@@ -5,6 +5,9 @@
  * 4000 px photo and on its preview.
  */
 
+/** A page canvas or an OffscreenCanvas context (the GIF rewriter draws on the latter). */
+export type Ctx2D = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+
 export type FontChoice = 'sans' | 'impact' | 'serif' | 'hand' | 'mono';
 export type Effect = 'outline' | 'shadow' | 'box' | 'none';
 
@@ -54,7 +57,7 @@ export async function loadFont(choice: FontChoice): Promise<void> {
 }
 
 /** Split into lines that fit `max` pixels, keeping the user's own line breaks. */
-export function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: number): string[] {
+export function wrapLines(ctx: Ctx2D, text: string, max: number): string[] {
   const out: string[] = [];
   for (const para of text.split('\n')) {
     const words = para.split(/\s+/).filter(Boolean);
@@ -79,7 +82,7 @@ export function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: numb
 export interface Box { x: number; y: number; w: number; h: number }
 
 /** Draw the blocks on a canvas already holding the image. Returns each block's box, for hit testing. */
-export function drawText(ctx: CanvasRenderingContext2D, width: number, height: number, blocks: TextBlock[], style: TextStyle): Box[] {
+export function drawText(ctx: Ctx2D, width: number, height: number, blocks: TextBlock[], style: TextStyle): Box[] {
   const px = Math.max(6, Math.round((Math.min(width, height) * style.size) / 100));
   const lineH = Math.round(px * 1.15);
   const boxes: Box[] = [];

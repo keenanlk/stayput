@@ -2568,6 +2568,10 @@ export const tools: Tool[] = [
         q: 'Can I edit the text later?',
         a: 'Not in the saved image: the text becomes part of the picture. Keep your original, which is never changed, and run it again with new text.',
       },
+      {
+        q: 'Can I add text to an animated GIF?',
+        a: 'This page is for still pictures. For an animated GIF, use [Add text to GIF](/tools/add-text-to-gif), which draws the same text on every frame and keeps the timing.',
+      },
     ],
   },
   {
@@ -3101,6 +3105,10 @@ export const tools: Tool[] = [
         a: 'Type the pixel size the platform asks for, such as 128 by 128. Those platforms also cap the file size in kilobytes, which resizing alone may not meet. The [emote resizer](/tools/emote-resizer) fits both size and limit in one step, and [Compress GIF](/tools/compress-gif) makes a GIF lighter without changing its dimensions.',
       },
       {
+        q: 'Can I add a caption to a GIF?',
+        a: 'Yes. [Add text to GIF](/tools/add-text-to-gif) draws a caption on every frame and keeps each frame’s timing and the loop.',
+      },
+      {
         q: 'Is my GIF uploaded?',
         a: 'No. The GIF is read and rewritten by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
@@ -3148,9 +3156,71 @@ export const tools: Tool[] = [
         a: 'The page works in a mobile browser, and the crop box is built for touch: pick the GIF from Files or Photos, then drag the box with your finger. Drag the corners to resize it, or pick a shape and type exact numbers.',
       },
       {
+        q: 'Can I add text to a GIF?',
+        a: 'Yes. [Add text to GIF](/tools/add-text-to-gif) draws a caption on every frame and keeps each frame’s timing and the loop. Crop first if you want the caption placed against the cropped edges.',
+      },
+      {
         q: 'Is my GIF uploaded?',
         a: 'No. The GIF is decoded and cropped by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
+    ],
+  },
+  {
+    slug: 'add-text-to-gif',
+    name: 'Add text to GIF',
+    title: 'Add Text to GIF Online, Free, No Upload | Stayput',
+    description:
+      'Add a caption to an animated GIF in your browser: type it, drag it into place, pick a font, colour and outline. Free, no account, not uploaded.',
+    heading: 'Add text to a GIF',
+    tagline: 'Write a caption on every frame of an animated GIF and drag it where you want it. Done on this device, and the GIF is not uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: false,
+    dropLabel: 'Drop a GIF to add text to',
+    action: 'Add text',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or very large GIF may need a computer.',
+    keywords: ['add text to gif', 'caption a gif', 'write on gif', 'gif caption maker', 'put text on a gif', 'text on gif online', 'add words to gif'],
+    lead:
+      'Writes your text on every frame of an animated GIF, in the font, colour and outline you choose, and saves a new GIF that keeps each frame’s timing and the loop setting. It is free, needs no account and adds no watermark, and your GIF is not uploaded: every frame is drawn and rewritten by code in this tab. The size limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline.',
+    steps: [
+      'Drop an animated GIF, or tap to pick one.',
+      'Type your text, then drag it on the preview to place it. Pick a font, colour, size and an outline, shadow or box so it reads on every frame. Add a second text for a caption at the other end.',
+      'Press Add text. The text is drawn on every frame, and the new GIF downloads with the same size and timing.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have reaction.gif, 480 by 270 pixels with 40 frames, and you want WHEN THE BUILD PASSES across the bottom. Drop it, type the words, drag them to the bottom edge, choose the bold font with an outline so they stay readable over the changing picture, and set the size to 12.',
+          'The size is a share of the shorter side, so 12 on a GIF 270 pixels high gives letters 32 pixels tall. Press Add text. The same words are drawn in the same place on all 40 frames, and you download reaction-text.gif: 480 by 270 pixels, playing at the same speed as the original.',
+        ],
+      },
+      {
+        heading: 'What you can set',
+        bullets: [
+          'Up to two pieces of text, for example a top and a bottom caption, each dragged to where you want it.',
+          'Font: a clean sans, a bold face, a serif, a handwritten face or a monospace.',
+          'Colour, size, opacity, upper case, and an outline, a shadow or a box behind the letters.',
+        ],
+      },
+      {
+        heading: 'What this page does not do',
+        bullets: [
+          'The text is the same on every frame. It cannot appear for only part of the animation, and it does not move.',
+          'It works on one GIF at a time. A long or very large GIF uses a lot of memory, and a phone may run out of it sooner than a computer.',
+          'The result is a GIF, so each frame holds at most 256 colours. To make the file lighter afterwards, use [Compress GIF](/tools/compress-gif).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I add text to a GIF?', a: 'Drop the GIF, type your text and drag it to where you want it on the preview. Choose a font, colour, size and an outline, then press Add text. The text is drawn on every frame, and the new GIF downloads with the same size and timing.' },
+      { q: 'Does the text appear on every frame?', a: 'Yes, in the same place and style on all of them. This page cannot show text for only part of the animation or move it.' },
+      { q: 'Does it change how fast the GIF plays?', a: 'No. Every frame keeps its own delay and the loop setting is copied, so the new GIF lasts as long as the original and repeats the same way. Frames with a delay of 10 milliseconds or less are written as 100 milliseconds, which is how browsers already play them.' },
+      { q: 'Will the colours or the file size change?', a: 'They can. A GIF holds at most 256 colours per frame, and the whole GIF is written again with your text on it, so smooth gradients and soft shadows can look a little different, and the file can come out larger or smaller than the original. [Compress GIF](/tools/compress-gif) makes a GIF lighter afterwards.' },
+      { q: 'Which fonts can I use?', a: 'A clean sans, a bold face, a serif, a handwritten face and a monospace. The sans and the handwritten face are this site’s own fonts; the bold face, the serif and the monospace are drawn with the fonts your device has, so they can look a little different on a phone than on a computer. Once the GIF is saved the letters are pixels and look the same everywhere.' },
+      { q: 'Can I add text to a GIF with a transparent background?', a: 'Yes, and transparent areas stay transparent. GIF transparency is on or off, so where text sits over a transparent area its edges can look rough. Choose an outline or a box to make it read cleanly.' },
+      { q: 'Can I add text to a GIF without uploading it?', a: 'Yes. Your browser reads the GIF, draws your text onto every frame and writes the new GIF with code running in this tab. Open the network tab, run it, and your GIF is not among the requests. After one visit and a short wait the page works offline.' },
+      { q: 'Can I add text to a photo or a video instead?', a: 'For a photo or a screenshot, use [Add text to image](/tools/add-text-to-image). To turn a video clip into a GIF first, use [Video to GIF](/tools/video-to-gif).' },
     ],
   },
   {

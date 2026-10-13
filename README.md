@@ -66,7 +66,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Screen recorder](https://stayput.dev/tools/screen-recorder) (screen, window or tab, with sound and microphone) | |
 | [Collage maker](https://stayput.dev/tools/collage-maker) (grids, side by side, stitched screenshots) | |
 | [Split image](https://stayput.dev/tools/split-image) (Instagram grids and carousels) | |
-| [Add text to image](https://stayput.dev/tools/add-text-to-image) (captions, memes, watermarks) | |
+| [Add text to image](https://stayput.dev/tools/add-text-to-image) (captions, memes, watermarks) | [Add text to GIF](https://stayput.dev/tools/add-text-to-gif) (a caption on every frame) |
 | [AI image upscaler](https://stayput.dev/tools/upscale-image) (2×, 3× or 4× with Real-ESRGAN, on the device) | |
 | [Remove object from photo](https://stayput.dev/tools/remove-object) (paint over it, MI-GAN fills it in on the device) | |
 | [Adjust photo](https://stayput.dev/tools/adjust-image) (brightness, contrast, saturation, warmth, sharpen, invert) | |

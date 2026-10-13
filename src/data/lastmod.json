@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "0bd2ffdbb58ed6f7"
+  "hash": "f8bd3cddb2610a26"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -1315,9 +1315,13 @@
   "date": "2026-10-12",
   "hash": "7c98ce937d1a76e2"
  },
+ "/tools/add-text-to-gif": {
+  "date": "2026-10-13",
+  "hash": "feb2be5023605bae"
+ },
  "/tools/add-text-to-image": {
-  "date": "2026-10-12",
-  "hash": "463e0cb8c307266f"
+  "date": "2026-10-13",
+  "hash": "8a1f17c3b0509d51"
  },
  "/tools/adjust-image": {
   "date": "2026-10-12",
@@ -1400,8 +1404,8 @@
   "hash": "26c96a238712864e"
  },
  "/tools/crop-gif": {
-  "date": "2026-10-12",
-  "hash": "1d8b0560a018baf0"
+  "date": "2026-10-13",
+  "hash": "82c6d96c1a5fdf94"
  },
  "/tools/crop-image": {
   "date": "2026-10-12",
@@ -1588,8 +1592,8 @@
   "hash": "1517a100acb43c00"
  },
  "/tools/resize-gif": {
-  "date": "2026-10-12",
-  "hash": "f169540a31495843"
+  "date": "2026-10-13",
+  "hash": "932dbfa1b2a7cd50"
  },
  "/tools/resize-pdf": {
   "date": "2026-10-12",
