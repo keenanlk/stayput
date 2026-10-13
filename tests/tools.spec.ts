@@ -4265,6 +4265,10 @@ test('Watermark image draws the text over the whole photo at full size, and no b
 test('Watermark PDF stamps every page, keeps the text, and no bytes leave the tab', async ({ page }) => {
   const errors = await open(page, 'watermark-pdf');
   const net = watchNetwork(page);
+  // The page-number test writes this file; write it here too so the test does not depend on running after it.
+  const rotated = await PDFDocument.create();
+  rotated.addPage([612, 792]).setRotation(degrees(90));
+  writeFileSync(fx('rotated.pdf'), await rotated.save());
   const source = readFileSync(fx('rotated.pdf'));
   const before = await PDFDocument.load(source);
   const { downloads } = await run(page, ['rotated.pdf'], async () => {
