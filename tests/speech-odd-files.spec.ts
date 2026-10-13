@@ -100,3 +100,12 @@ test('a recording the device cannot read is recorded under the error that stoppe
   expect(run?.outcome).toBe('error');
   expect(run?.error_class).toBe('NotReadableError');
 });
+
+// A video with a picture and no sound track at all is told apart from a sound that could not be read.
+test('a video with no sound track is recorded as NoSoundTrack', async ({ page }) => {
+  await page.addInitScript(() => delete (window as unknown as { AudioDecoder?: unknown }).AudioDecoder);
+  const silent = readFileSync(fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url)));
+  await transcribe(page, silent, 'clip.webm');
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect((await lastRun(page))?.error_class).toBe('NoSoundTrack');
+});

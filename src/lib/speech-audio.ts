@@ -27,7 +27,12 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
     // The first thing that went wrong on the way, kept so a failed run is named for it (a class name, never the message).
     let cause: unknown;
     const track = await input.getPrimaryAudioTrack().catch((e) => ((cause ??= e), null));
-    if (hasVideo && !track) throw audioDecodeError(NO_SOUND, cause);
+    if (hasVideo && !track) {
+      // A video with no sound track is its own kind of failure to the stats, unless the reader failed with an error of its own.
+      const none = audioDecodeError(NO_SOUND, cause);
+      if (cause === undefined) none.name = 'NoSoundTrack';
+      throw none;
+    }
     let failed = false;
     if (hasVideo) {
       // A phone video's sound is copied out and decoded a stretch at a time. A stretch the browser refuses is not
