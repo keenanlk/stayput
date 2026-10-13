@@ -7446,6 +7446,27 @@ test('Resize PNG page keeps a PNG and its transparent pixels when the picture is
   expect(out.px[1]![3]).toBe(255);
 });
 
+test('Nightcore maker opens with speed 1.25×, the pitch following the speed and MP3 chosen; Key changer and Speed up audio open with the pitch kept', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/nightcore-maker');
+  await expect(page.locator('#speed')).toHaveValue('1.25');
+  await expect(page.locator('#tape')).toBeChecked();
+  await expect(page.locator('#format')).toHaveValue('mp3');
+  await page.goto('/key-changer');
+  await expect(page.locator('#semitones')).toHaveValue('0');
+  await expect(page.locator('#speed')).toHaveValue('1');
+  await expect(page.locator('#tape')).not.toBeChecked();
+  await page.goto('/speed-up-audio');
+  await expect(page.locator('#tape')).not.toBeChecked();
+});
+
+test('Extract audio from video opens on the video converter with MP3 at 192 kbps', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/extract-audio-from-video');
+  await expect(page.locator('#file-input')).toHaveAttribute('accept', /\.mkv/);
+  await expect(page.locator('#format')).toHaveValue('mp3');
+});
+
 test('Compress PDF fits a file size with the gentlest step, and says when a limit cannot be met', async ({ page }) => {
   test.setTimeout(120_000);
   await stubAnalytics(page);
