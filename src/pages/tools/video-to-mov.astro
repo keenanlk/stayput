@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VideoToMov from '../../components/options/VideoToMov.astro';
+const tool = toolBySlug('video-to-mov')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VideoToMov /></Fragment>
+</ToolLayout>
+<script src="../../tools/video-to-mov.ts"></script>

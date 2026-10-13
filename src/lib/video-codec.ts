@@ -13,9 +13,12 @@ export const VIDEO_CODECS: VideoCodec[] = ['avc', 'vp9', 'av1'];
  * browser's H.264 encoder is checked (once per page; a working variant is
  * registered with Mediabunny when its default settings are silent).
  */
-export async function pickVideoCodec(size: { width: number; height: number; bitrate?: number | Quality }): Promise<VideoCodec | null> {
+export async function pickVideoCodec(
+  size: { width: number; height: number; bitrate?: number | Quality },
+  codecs: VideoCodec[] = VIDEO_CODECS,
+): Promise<VideoCodec | null> {
   await requireH264Encoder();
-  return getFirstEncodableVideoCodec(VIDEO_CODECS, size);
+  return getFirstEncodableVideoCodec(codecs, size);
 }
 
 /**

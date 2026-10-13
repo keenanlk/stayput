@@ -1,10 +1,12 @@
 /**
- * Convert a video to MP4 in the browser. Mediabunny (MPL-2.0) reads MOV, MKV,
+ * Convert a video to MP4 (or, for Video to MOV, a QuickTime MOV) in the browser. Mediabunny (MPL-2.0) reads MOV, MKV,
  * WebM or MP4 and writes an MP4. Tracks that MP4 players everywhere already
  * play (H.264 video, AAC or MP3 sound) are copied as they are: instant and
  * with no quality loss. Anything else is re-encoded by the browser's own
  * WebCodecs encoder, H.264 and AAC where available, VP9 and Opus otherwise.
- * Nothing leaves the tab.
+ * A MOV is for QuickTime, so it only ever holds H.264 (or HEVC copied as it
+ * is) and AAC: where the browser cannot write those, the conversion is refused
+ * rather than falling back to VP9, AV1 or Opus. Nothing leaves the tab.
  */
 import {
   BlobSource,
@@ -13,6 +15,7 @@ import {
   Input,
   MATROSKA,
   MP4,
+  MovOutputFormat,
   Mp4OutputFormat,
   Output,
   QTFF,
@@ -48,7 +51,13 @@ export interface ConvertResult {
 const PLAYS_EVERYWHERE_VIDEO: string[] = ['avc'];
 const PLAYS_EVERYWHERE_AUDIO: AudioCodec[] = ['aac', 'mp3'];
 
-export async function convertToMp4(file: File, opts: ConvertOptions): Promise<ConvertResult> {
+export type ConvertFormat = 'mp4' | 'mov';
+
+export const convertToMp4 = (file: File, opts: ConvertOptions) => convertVideo(file, opts, 'mp4');
+export const convertToMov = (file: File, opts: ConvertOptions) => convertVideo(file, opts, 'mov');
+
+async function convertVideo(file: File, opts: ConvertOptions, container: ConvertFormat): Promise<ConvertResult> {
+  const mov = container === 'mov';
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
@@ -61,7 +70,7 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
     // The best codec this browser can write; re-encoding into the codec the file already has gains nothing.
     // A silent H.264 encoder only matters if the picture really is re-encoded; copying needs no encoder.
     let silent: H264Unavailable | undefined;
-    const best = await pickVideoCodec({ width: evenW, height: evenH, bitrate: QUALITY_HIGH }).catch((e) => {
+    const best = await pickVideoCodec({ width: evenW, height: evenH, bitrate: QUALITY_HIGH }, mov ? ['avc'] : undefined).catch((e) => {
       if (e instanceof H264Unavailable) silent = e;
       else throw e;
       return null;
@@ -74,21 +83,28 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
       else throw new Error(unplayable());
     }
     if (!copyVideo && silent) throw silent;
+    if (!copyVideo && !best && mov) throw new Error('This browser cannot write H.264 video, which a MOV needs to play in QuickTime. Use a recent Safari, Chrome or Edge.');
     if (!copyVideo && !best) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const videoCodec = copyVideo ? sourceVideo! : best!;
     const duration = await input.computeDuration();
 
+    // MP3 is re-encoded for a MOV: QuickTime's own sound codec is AAC.
+    const audioCopy = mov ? ['aac'] : PLAYS_EVERYWHERE_AUDIO;
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     let audioCodec: AudioCodec | null = null;
     if (sound) {
       const src = sound.codec;
-      if (src && PLAYS_EVERYWHERE_AUDIO.includes(src)) audioCodec = src;
+      if (src && audioCopy.includes(src)) audioCodec = src;
       else if (await sound.canDecode()) {
-        audioCodec = await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: QUALITY_HIGH });
+        audioCodec = await getFirstEncodableAudioCodec(mov ? ['aac'] : ['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: QUALITY_HIGH });
       }
     }
 
-    const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
+    if (mov && sound && !audioCodec) {
+      throw new Error('This browser cannot convert this file’s sound to AAC, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
+    }
+
+    const output = new Output({ format: mov ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
     const conversion = await Conversion.init({
       input,
       output,
@@ -96,24 +112,35 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
       video: copyVideo
         ? {}
         : { codec: videoCodec, bitrate: QUALITY_HIGH, width: evenW, height: evenH, fit: 'contain', allowTransformationMetadata: false },
-      audio: audioCodec ? { codec: audioCodec, bitrate: QUALITY_HIGH, sampleRate: await aacSafeSampleRate(sound) } : { discard: true },
+      // Sound copied as it is must not be given a bitrate: any encoder option makes Mediabunny decode and
+      // re-encode it, and a browser that cannot decode AAC (Chromium on Linux) then drops the track.
+      audio: audioCodec
+        ? sound!.codec === audioCodec
+          ? {}
+          : { codec: audioCodec, bitrate: QUALITY_HIGH, sampleRate: await aacSafeSampleRate(sound) }
+        : { discard: true },
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
       throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
     }
+    // The sound track can still be discarded when this browser cannot decode it.
+    const soundLost = !!audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack());
+    if (soundLost && mov) {
+      throw new Error('This browser cannot read this file’s sound, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
+    }
     await executeWatched(conversion, opts.onProgress);
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     return {
-      blob: new Blob([buffer], { type: 'video/mp4' }),
+      blob: new Blob([buffer], { type: mov ? 'video/quicktime' : 'video/mp4' }),
       width,
       height,
       duration,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       videoCopied: copyVideo,
-      audio: !!audioCodec,
-      audioDropped: !!sound && !audioCodec,
+      audio: !!audioCodec && !soundLost,
+      audioDropped: !!sound && (!audioCodec || soundLost),
     };
   } finally {
     input.dispose?.();
