@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 
 // Better edges runs the model on the graphics chip (MediaPipe's GPU delegate, which is WebGL) where there is a real one,
 // and must still finish on the CPU where there is not, or where the chip goes away part way. Playwright's headless
-// Chromium renders WebGL in software (SwiftShader), which the page keeps on the CPU; the chip-only tests below ask
-// Chromium on a Mac for Metal and skip themselves where it does not give a real chip.
+// Chromium renders WebGL in software (SwiftShader), which the page keeps on the CPU (video-background-finder.spec.ts
+// checks that run); the chip-only tests below ask Chromium on a Mac for Metal and skip themselves elsewhere.
 const clip = fileURLToPath(new URL('./fixtures/static/iphone-portrait-person.mov', import.meta.url));
 const SOFTMAX_ON_GPU = /SOFTMAX activation function chosen on GPU/;
 
@@ -54,16 +54,6 @@ function expectPersonKept(shot: Awaited<ReturnType<typeof runAndRead>>) {
 const wantsChip = process.platform === 'darwin' && !process.env.CI;
 
 test.describe('on the CPU', () => {
-  test('Better edges finishes where WebGL is only a software renderer, and does not hand the model to it', async ({ page, browserName }) => {
-    test.skip(browserName !== 'chromium', 'headless WebKit reports a real chip');
-    test.setTimeout(420_000);
-    const logged: string[] = [];
-    page.on('console', (m) => logged.push(m.text()));
-    await setUp(page);
-    expectPersonKept(await runAndRead(page));
-    expect(logged.some((l) => SOFTMAX_ON_GPU.test(l))).toBe(false);
-  });
-
   test('with no WebGL at all it says so, plainly, and writes no file', async ({ page }) => {
     await page.addInitScript(() => {
       for (const C of [HTMLCanvasElement, typeof OffscreenCanvas !== 'undefined' ? OffscreenCanvas : null]) {
@@ -88,6 +78,8 @@ test.describe('on the CPU', () => {
 
 test.describe('on the graphics chip', () => {
   test.skip(!wantsChip, 'needs a real chip; CI runners have none');
+  // Two Metal Chromiums encoding at once stalled each other on a Mac: one at a time.
+  test.describe.configure({ mode: 'serial' });
 
   /** A headless Chromium of its own, started with Metal so WebGL has the Mac's chip rather than SwiftShader. */
   async function withChip(baseURL: string | undefined, run: (page: Page) => Promise<void>) {
@@ -153,6 +145,24 @@ test.describe('on the graphics chip', () => {
       await setUp(page);
       expectPersonKept(await runAndRead(page));
       expect(logged.some((l) => /The graphics chip stopped the person finder, using the CPU/.test(l))).toBe(true);
+    });
+  });
+
+  test('a chip that is slower than the CPU is dropped after a few frames', async ({ baseURL, browserName }) => {
+    test.skip(browserName !== 'chromium');
+    test.setTimeout(420_000);
+    await withChip(baseURL, async (page) => {
+      // Every reading of the clock jumps 200 ms, so each frame looks as slow as emulated graphics would make it.
+      await page.addInitScript(() => {
+        const real = performance.now.bind(performance);
+        let skew = 0;
+        performance.now = () => real() + (skew += 200);
+      });
+      const logged: string[] = [];
+      page.on('console', (m) => logged.push(m.text()));
+      await setUp(page);
+      expectPersonKept(await runAndRead(page));
+      expect(logged.some((l) => /slower than the CPU here, using the CPU/.test(l))).toBe(true);
     });
   });
 });

@@ -44,9 +44,17 @@ const WORK = 512;
 const KEEP = 0.45;
 
 /** One loaded model at a time: a second engine would hold its own copy of the WebAssembly memory. */
-let segmenter: { model: string; ready: Promise<ImageSegmenter>; gpu: boolean; sentinel?: WebGL2RenderingContext | null } | undefined;
+let segmenter: { model: string; ready: Promise<ImageSegmenter>; gpu: boolean; sentinel?: WebGL2RenderingContext | null; frameMs?: number[] } | undefined;
 /** How long the graphics chip has to start the model (well under a second on a Mac). */
 const GPU_START_MS = 20_000;
+/**
+ * A chip that is really emulation (some Linux and virtual-machine setups name it like hardware) runs the model slower
+ * than the CPU does: the median of the first few frames on the chip, in ms, above which the CPU takes over. A real
+ * chip takes about 15 ms a frame on a Mac and the CPU path about 130, so this only catches the very slow.
+ */
+const GPU_TOO_SLOW_MS = 150;
+/** Frames timed before judging: the first is left out, it compiles the shaders. */
+const GPU_TIMED_FRAMES = 6;
 /** Set once the graphics chip could not run the model; the CPU is used from then on. */
 let gpuFailed = false;
 
@@ -123,7 +131,7 @@ function load(model: string): Promise<ImageSegmenter> {
   });
 }
 
-function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2RenderingContext | null }): Promise<ImageSegmenter> {
+function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2RenderingContext | null; frameMs?: number[] }): Promise<ImageSegmenter> {
   return (async () => {
     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
@@ -145,6 +153,7 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
         const late = new Promise<never>((_, no) => (timer = setTimeout(() => no(new Error('The graphics chip did not start the person finder in time')), GPU_START_MS)));
         const seg = await Promise.race([make('GPU'), late]).finally(() => clearTimeout(timer));
         holder.gpu = true;
+        holder.frameMs = [];
         // The engine's own context is out of reach; one held here is lost together with it when the graphics driver resets.
         holder.sentinel = makeGL();
         return seg;
@@ -190,6 +199,7 @@ export class Matte {
     // Timestamps must only grow, across videos too; the frame's own time can repeat after a seek, so count instead.
     clock += 33;
     let result;
+    const began = performance.now();
     try {
       result = seg.segmentForVideo(this.small, clock);
       // A lost context does not make the engine throw: it returns masks that are wrong. Rerun the frame on the CPU.
@@ -214,6 +224,7 @@ export class Matte {
     const found = result.confidenceMasks?.[0];
     if (!found) throw new Error('The person finder returned no mask.');
     const conf = found.getAsFloat32Array();
+    const frameMs = performance.now() - began;
     const mw = found.width;
     const mh = found.height;
     const cur = new Float32Array(mw * mh);
@@ -221,6 +232,16 @@ export class Matte {
     if (this.finder === 'edges') for (let i = 0; i < cur.length; i++) cur[i] = 1 - conf[i]!;
     else cur.set(conf);
     result.close();
+    const timing = segmenter?.gpu ? segmenter.frameMs : undefined;
+    if (timing && timing.length < GPU_TIMED_FRAMES && timing.push(frameMs) === GPU_TIMED_FRAMES) {
+      const sorted = timing.slice(1).sort((a, b) => a - b);
+      if (sorted[sorted.length >> 1]! > GPU_TOO_SLOW_MS) {
+        // Slower than the CPU would be: use the CPU from the next frame on.
+        console.warn('The graphics chip is slower than the CPU here, using the CPU');
+        gpuFailed = true;
+        drop();
+      }
+    }
     if (this.mask.width !== mw || this.mask.height !== mh) {
       this.mask.width = mw;
       this.mask.height = mh;
