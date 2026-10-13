@@ -17,6 +17,7 @@
  */
 import type { ImageSegmenter } from '@mediapipe/tasks-vision';
 import { vendorDir } from './vendor';
+import { StageError } from './input-error';
 
 /** Roll-back switch: false puts every finder back on the CPU delegate. */
 const GPU_FOR_EDGES = true;
@@ -55,6 +56,15 @@ const GPU_START_MS = 20_000;
 const GPU_TOO_SLOW_MS = 150;
 /** Frames timed before judging: the first is left out, it compiles the shaders. */
 const GPU_TIMED_FRAMES = 6;
+/**
+ * The chip is re-checked during the run, every this many chip frames, on the median of those frames. The bar is
+ * well over the CPU path's ~130 ms a frame (about twice it): a chip over it has throttled or is a slow phone
+ * chip, and the processor will do better. Under it the chip stays, even if slower than at the start.
+ */
+const GPU_RECHECK_FRAMES = 60;
+const GPU_SUSTAINED_SLOW_MS = 250;
+/** One frame taking longer than this, measured when it returns, is a failure of the path it ran on. */
+const FRAME_STALL_MS = 5_000;
 /** Set once the graphics chip could not run the model; the CPU is used from then on. */
 let gpuFailed = false;
 
@@ -185,6 +195,9 @@ export class Matte {
   /** Milliseconds the finder took for each frame, on the graphics chip and on the CPU. Page-local, never sent. */
   private chipMs: number[] = [];
   private cpuFrames = 0;
+  /** The chip stopped or was dropped for slowness part way, so the rest ran on the processor. */
+  private switched = false;
+  private sinceCheck = 0;
 
   /** A plain sentence on which path found the people in this video, for the result line. */
   pathNote(): string {
@@ -193,7 +206,8 @@ export class Matte {
     const sorted = [...this.chipMs].sort((a, b) => a - b);
     const ms = Math.max(1, Math.round(sorted[sorted.length >> 1]!));
     const chip = `the graphics chip (about ${ms} ms a frame)`;
-    return this.cpuFrames === 0 ? `Found the person with ${chip}.` : `Found the person with ${chip}, then with the processor after the chip stopped or was slow.`;
+    if (!this.switched && this.cpuFrames === 0) return `Found the person with ${chip}.`;
+    return `Found the person with ${chip}, then switched to the processor part way, after the chip stopped or was slow.`;
   }
 
   /**
@@ -216,7 +230,7 @@ export class Matte {
     // Timestamps must only grow, across videos too; the frame's own time can repeat after a seek, so count instead.
     clock += 33;
     let result;
-    const began = performance.now();
+    let began = performance.now();
     try {
       result = seg.segmentForVideo(this.small, clock);
       // A lost context does not make the engine throw: it returns masks that are wrong. Rerun the frame on the CPU.
@@ -233,16 +247,19 @@ export class Matte {
       // The graphics chip failed part way (a lost context, say): rebuild on the CPU and finish from this frame.
       console.warn('The graphics chip stopped the person finder, using the CPU', e instanceof GpuLost ? 'context lost' : e);
       gpuFailed = true;
+      this.switched = true;
       drop();
       seg = await load(model);
       clock += 33;
+      began = performance.now();
       result = seg.segmentForVideo(this.small, clock);
     }
     const found = result.confidenceMasks?.[0];
     if (!found) throw new Error('The person finder returned no mask.');
     const conf = found.getAsFloat32Array();
     const frameMs = performance.now() - began;
-    if (segmenter?.gpu) this.chipMs.push(frameMs);
+    const onChip = !!segmenter?.gpu;
+    if (onChip) this.chipMs.push(frameMs);
     else this.cpuFrames++;
     const mw = found.width;
     const mh = found.height;
@@ -258,6 +275,26 @@ export class Matte {
         // Slower than the CPU would be: use the CPU from the next frame on.
         console.warn('The graphics chip is slower than the CPU here, using the CPU');
         gpuFailed = true;
+        this.switched = true;
+        drop();
+      }
+    }
+    if (frameMs > FRAME_STALL_MS) {
+      // The frame came back, so it is used; but this path is no good for the rest of the run.
+      if (!onChip) {
+        throw new StageError('PersonFinderStalled', new Error('Finding the person in one frame took more than 5 seconds on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
+      }
+      console.warn('One frame took over 5 seconds on the graphics chip, using the CPU');
+      gpuFailed = true;
+      this.switched = true;
+      drop();
+    } else if (onChip && segmenter?.gpu && ++this.sinceCheck >= GPU_RECHECK_FRAMES) {
+      this.sinceCheck = 0;
+      const recent = this.chipMs.slice(-GPU_RECHECK_FRAMES).sort((a, b) => a - b);
+      if (recent[recent.length >> 1]! > GPU_SUSTAINED_SLOW_MS) {
+        console.warn('The graphics chip has slowed down, using the CPU for the rest');
+        gpuFailed = true;
+        this.switched = true;
         drop();
       }
     }
