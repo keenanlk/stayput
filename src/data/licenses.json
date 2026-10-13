@@ -420,6 +420,34 @@
    "copyright": "Copyright (c) 2018 Nika Begiashvili"
   },
   {
+   "id": "7z-wasm",
+   "name": "7z-wasm (7-Zip)",
+   "version": "1.2.0",
+   "npm": "7z-wasm",
+   "licences": [
+    {
+     "name": "GNU LGPL 2.1 or later, plus the unRAR restriction (the licence text 7-Zip ships)",
+     "url": "/vendor/7z-wasm@1.2.0/LICENSE-7zip.txt"
+    },
+    {
+     "name": "unRAR restriction",
+     "url": "/vendor/7z-wasm@1.2.0/unRarLicense.txt"
+    },
+    {
+     "name": "LGPL-3.0",
+     "url": "/licenses/LGPL-3.0.txt"
+    }
+   ],
+   "project": "https://github.com/use-strict/7z-wasm",
+   "source": "https://github.com/use-strict/7z-wasm/tree/v1.2.0",
+   "shipped": "Served as separate files, /vendor/7z-wasm@1.2.0/7zz.es6.js and 7zz.wasm, loaded only when a password is typed for a 7z or RAR archive. It is 7-Zip 24.09 compiled to WebAssembly.",
+   "kind": "library",
+   "copyleft": "lgpl",
+   "copyright": "Copyright (C) 1999-2024 Igor Pavlov (7-Zip); WebAssembly build by Alexandru Ciuca",
+   "replace": "/vendor/7z-wasm@1.2.0/7zz.wasm",
+   "note": "7-Zip is LGPL with the unRAR restriction: the RAR decoder was developed from the unRAR source code, whose copyright is Alexander Roshal's, and it cannot be used to develop a RAR (WinRAR) compatible archiver. This page only reads archives. Its npm licence field says SEE LICENSE IN License.txt; that file and unRarLicense.txt are copied verbatim and served next to the wasm. The 7-Zip sources are at https://www.7-zip.org/download.html (24.09) and are patched to build for the browser at the link above."
+  },
+  {
    "id": "comlink",
    "name": "Comlink",
    "version": "4.4.2",

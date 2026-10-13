@@ -25,16 +25,8 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES } from './video-compress';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
-import { registerMp3Fallback } from './mp3-fallback';
+import { NoAudioEncoder, registerMp3Fallback } from './mp3-fallback';
 import { UnreadableFile } from './input-error';
-
-/** The browser has no encoder for any sound format an MP4 can hold (iOS 18 and earlier, and the MP3 fallback failed to load). */
-export class NoAudioEncoder extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'NoAudioEncoder';
-  }
-}
 
 export interface AddAudioOptions {
   /** Replace the video's sound, or play both together. */

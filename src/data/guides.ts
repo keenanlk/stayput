@@ -4636,7 +4636,7 @@ export const guides: Guide[] = [
         p: ["The [archive extractor](/tools/archive-extractor) opens ZIP, RAR (old RAR and RAR5), 7z, TAR and its compressed forms, ISO and CAB files, one or several at once. Each file inside is listed so you can download it on its own, or all of them as one ZIP.", "If all you have is a RAR, the [RAR extractor](/rar-extractor) page is set up for it; for a .7z, use the [7z opener](/open-7z-file)."],
         list: [
           "**Folders:** the paths inside the archive are kept, so files from a folder show as folder/name.",
-          "**Passwords, as of October 2026:** a password-protected ZIP opens after you enter the password, so type it before pressing Extract; a wrong one shows an error. Encrypted 7z and RAR archives are not supported yet: in our tests they did not open even with the correct password. Use 7-Zip for an encrypted 7z, and WinRAR or The Unarchiver for an encrypted RAR.",
+          "**Passwords, as of October 2026:** a password-protected ZIP opens after you enter the password, so type it before pressing Extract; a wrong one shows an error. Password-protected 7z and RAR archives (old RAR and RAR5, with or without encrypted file names) open the same way when you type the right password; the page loads 7-Zip for them, about 0.7 MB more, only then.",
           "**Split archives:** archives in parts, such as .part1.rar or .7z.001, are not supported.",
           "**Size:** the tool sets no size limit, but the archive is unpacked in your device's memory, so a very large one may not fit on a phone.",
         ],
@@ -4644,12 +4644,12 @@ export const guides: Guide[] = [
       },
       {
         h: "Which one to choose",
-        p: ["On Windows 11 with a plain archive, File Explorer is enough. For a locked 7z, or a lot of archives, install 7-Zip. On a Mac, The Unarchiver is the simple option. On a Chromebook, a work computer where you cannot install anything, or a phone, the browser tool is the quickest. To pack files up again, the [ZIP creator](/tools/create-zip) makes a ZIP that every device opens."],
+        p: ["On Windows 11 with a plain archive, File Explorer is enough. For a lot of archives, install 7-Zip. On a Mac, The Unarchiver is the simple option. On a Chromebook, a work computer where you cannot install anything, or a phone, the browser tool is the quickest. To pack files up again, the [ZIP creator](/tools/create-zip) makes a ZIP that every device opens."],
       },
     ],
     faq: [
       { q: "How do I open a RAR file on a Mac?", a: "Apple's help only describes ZIP files, so install a free app such as The Unarchiver, or drop the file on the [archive extractor](/tools/archive-extractor) in a browser." },
-      { q: "How do I open a 7z file?", a: "Windows 11, version 24H2 opens 7z files in File Explorer per Microsoft's support page. Elsewhere, use 7-Zip on Windows or the [archive extractor](/tools/archive-extractor) in any browser. Encrypted 7z and RAR archives are not supported yet (in our tests they did not open even with the correct password), but password-protected ZIP files open after you enter the password." },
+      { q: "How do I open a 7z file?", a: "Windows 11, version 24H2 opens 7z files in File Explorer per Microsoft's support page. Elsewhere, use 7-Zip on Windows or the [archive extractor](/tools/archive-extractor) in any browser. Password-protected ZIP, 7z and RAR archives open after you type the password; a wrong one shows an error." },
       { q: "Can I open a RAR file on my phone?", a: "Not with the built-in Files by Google app, which supports ZIP only. A browser works: the [archive extractor](/tools/archive-extractor) runs on the phone itself." },
       { q: "Is my archive uploaded?", a: "No. The archive is opened by code running in your browser tab, so it and the files inside stay on your device." },
     ],
