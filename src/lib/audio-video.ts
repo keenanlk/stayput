@@ -5,7 +5,7 @@
  * social apps that only take video. Mediabunny (MPL-2.0) and the browser's
  * WebCodecs encoders write the file. Nothing leaves the tab.
  */
-import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource, getFirstEncodableAudioCodec, type VideoCodec } from 'mediabunny';
+import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource, type VideoCodec } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
 import { VIDEO_CODECS, pickVideoCodec } from './video-codec';
@@ -13,6 +13,7 @@ import { InputError, UnreadableFile } from './input-error';
 import { EncoderRefused, EncoderUnavailable } from './encoder-probe';
 import { blur as boxBlur } from './blur';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
+import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 
 export type Shape = 'landscape' | 'square' | 'portrait';
 export type Backdrop = 'blur' | 'black' | 'white';
@@ -134,8 +135,10 @@ async function encodeStill(
 ): Promise<AudioVideoResult> {
   const videoCodec = await pickVideoCodec({ ...frame, bitrate: QUALITY_HIGH }, videoCodecs);
   if (!videoCodec) throw new EncoderUnavailable('This browser cannot encode video. Try a recent version of Chrome, Edge or Safari.');
-  const audioCodec = await getFirstEncodableAudioCodec(audioCodecs, { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 });
-  if (!audioCodec) throw new EncoderUnavailable('This browser cannot encode sound for video. Try a recent version of Chrome, Edge or Safari.');
+  // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
+  // The sound itself is already decoded above by the page's audio decoder, not WebCodecs.
+  const audioCodec = await firstEncodableSound(audioCodecs, { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 });
+  if (!audioCodec) throw noAudioEncoder(false);
 
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
   // A still picture needs very few bits; a key frame every two seconds keeps seeking quick.
