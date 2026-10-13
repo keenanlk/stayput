@@ -25,6 +25,7 @@ const pages = [
   '/tools/bpm-key-finder',
   '/camelot-wheel',
   '/bpm-finder',
+  '/csv-to-json',
   '/press',
   '/licenses',
 ];
