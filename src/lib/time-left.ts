@@ -11,6 +11,8 @@ const WARM_UP = 2.5;
 const WINDOW = 30;
 /** A new estimate within this share of the time left is ignored, so the figure counts down instead of jittering. */
 const HOLD = 0.1;
+/** The figure only goes up for a slowdown worth showing: a rise smaller than this (seconds) is rounding, not news. */
+const MIN_RISE = 10;
 
 export function formatTimeLeft(seconds: number): string {
   if (seconds < 60) return `${Math.max(10, Math.round(seconds / 10) * 10)} s left`;
@@ -43,7 +45,14 @@ export class TimeLeft {
     if (now - first.t < WARM_UP || fraction <= first.f) return undefined;
     const rate = (fraction - first.f) / (now - first.t);
     const fresh = now + (1 - fraction) / rate;
-    if (this.eta === undefined || Math.abs(fresh - this.eta) > HOLD * Math.max(1, this.eta - now)) this.eta = fresh;
+    if (this.eta === undefined) this.eta = fresh;
+    else {
+      const left = Math.max(1, this.eta - now);
+      const change = fresh - this.eta;
+      // Coming down only needs to clear the hold. Going up must also be a real slowdown, so a 14 s estimate that turns into
+      // 16 s doesn't flip "10 s left" to "20 s left" on the rounding alone.
+      if (change < -HOLD * left || change > Math.max(HOLD * left, MIN_RISE)) this.eta = fresh;
+    }
     return `about ${formatTimeLeft(Math.max(0, this.eta - now))}`;
   }
 }
