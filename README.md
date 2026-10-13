@@ -50,6 +50,7 @@ That is the whole pitch, and you can check it in three ways:
 | [GIF to MP4](https://stayput.dev/tools/gif-to-mp4) (animated GIF to video, up to 90% smaller) | [Extract images from PDF](https://stayput.dev/tools/extract-pdf-images) (every picture at its stored size) |
 | [Compress video](https://stayput.dev/tools/compress-video) (MP4, MOV, WebM; fit 10 MB for Discord or 25 MB for email) | |
 | [Video to MP4](https://stayput.dev/tools/video-to-mp4) (MOV, MKV, WebM; H.264 copied with no quality loss) | |
+| [Video to MOV](https://stayput.dev/tools/video-to-mov) (MP4, WebM, MKV; H.264 and AAC copied with no quality loss) | |
 | [Trim video](https://stayput.dev/tools/trim-video) (cut a clip without re-encoding) | |
 | [Mute video](https://stayput.dev/tools/mute-video) (remove the sound, picture copied untouched) | |
 | [Resize video](https://stayput.dev/tools/resize-video) (1080p, 720p, custom size) | |

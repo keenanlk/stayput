@@ -43,6 +43,7 @@ const does: Record<string, string> = {
   'gif-to-mp4': 'Converts animated GIFs to MP4 video (H.264, with no sound track since GIFs have none), usually much smaller than the GIF.',
   'compress-video': 'Makes MP4, MOV and WebM videos smaller, or fits them under a size such as 10 MB for Discord or 25 MB for email, and saves an MP4.',
   'video-to-mp4': 'Converts MOV, MKV and WebM videos to MP4.',
+  'video-to-mov': 'Converts MP4, WebM and MKV videos to MOV, copying H.264 video and AAC sound as they are and re-encoding anything else.',
   'trim-video': 'Trims a video to the start and end you pick (MP4, MOV, WebM or MKV) and saves the clip in the same format.',
   'mute-video': 'Removes the sound track from a video (MP4, MOV, WebM or MKV) and saves it in the same format, with the picture copied untouched.',
   'resize-video': 'Resizes a video, for example 4K to 1080p or 1080p to 720p, from MP4, MOV or WebM to MP4.',
