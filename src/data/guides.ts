@@ -2848,7 +2848,7 @@ export const guides: Guide[] = [
     heading: 'remove.bg is closing: a free alternative that does not upload your photos',
     dek: 'remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). Stayput\'s background remover is free, needs no account, and your photos are not uploaded.',
     keywords: ['remove.bg alternative', 'remove.bg shutting down', 'remove.bg closing', 'remove.bg canva', 'remove.bg replacement', 'free remove.bg alternative', 'background remover no upload', 'remove.bg alternative full resolution'],
-    updated: '2026-10-12',
+    updated: '2026-10-13',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
     sections: [
       {
