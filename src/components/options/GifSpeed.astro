@@ -1,0 +1,30 @@
+---
+/** Option controls for changing a GIF's speed or playing it backwards, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+import OptionDetails from '../OptionDetails.astro';
+const speed = defaults.speed ?? '2';
+const speeds = [
+  ['0.25', '0.25× (4 times slower)'],
+  ['0.5', '0.5× (half speed)'],
+  ['0.75', '0.75×'],
+  ['1', '1× (same speed)'],
+  ['1.5', '1.5×'],
+  ['2', '2× (twice as fast)'],
+  ['3', '3×'],
+  ['4', '4× (four times as fast)'],
+] as const;
+---
+<div class="field">
+  <label for="speed">Speed</label>
+  <select id="speed">
+    {speeds.map(([v, l]) => <option value={v} selected={v === speed}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="reverse" checked={defaults.reverse === 'true'} /> Play it backwards</label>
+</div>
+<OptionDetails>
+  <p>Every frame’s time is multiplied by the speed and rounded to a hundredth of a second. Browsers show anything under 0.02 s as about 0.1 s, so a GIF that is already very fast cannot be made faster: its frames stop at 0.02 s.</p>
+  <p>Backwards plays the frames last to first, each with its own time, and the loop setting is kept.</p>
+</OptionDetails>

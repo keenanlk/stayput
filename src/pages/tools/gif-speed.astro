@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import GifSpeed from '../../components/options/GifSpeed.astro';
+const tool = toolBySlug('gif-speed')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><GifSpeed /></Fragment>
+</ToolLayout>
+<script src="../../tools/gif-speed.ts"></script>
