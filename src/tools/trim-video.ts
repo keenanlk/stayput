@@ -49,12 +49,19 @@ function unload() {
   url = undefined;
   duration = 0;
   panel.hidden = true;
+  delete panel.dataset.duration;
+  player.style.display = '';
+  info.textContent = '';
   estimate.textContent = '';
 }
 
 async function load(file: File) {
   unload();
   url = URL.createObjectURL(file);
+  // Show a note, not an empty gap, while the browser opens the file (can take seconds for a camera file or an iCloud one).
+  info.textContent = 'Loading preview…';
+  player.style.display = 'none';
+  panel.hidden = false;
   const loaded = once('loadeddata', 20_000);
   player.src = url;
   await loaded;
@@ -67,7 +74,7 @@ async function load(file: File) {
     duration = Number.isFinite(player.duration) ? player.duration : 0;
     player.currentTime = 0;
   }
-  panel.hidden = false;
+  player.style.display = '';
   for (const el of [startInput, endInput]) el.max = String(round1(duration));
   startInput.value = '0';
   endInput.value = String(round1(duration));
