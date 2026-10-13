@@ -159,7 +159,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(105);
+  expect(await page.locator('.index .tool-card').count()).toBe(106);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -1127,6 +1127,10 @@ test('preset landing pages render, run their base tool with the preset options a
         expect(await page.locator('#file-input').getAttribute('accept')).toContain(`.${ext}`);
       }],
     ),
+    ['mp4-to-mov', 'video-to-mov', async () => {
+      await expect(page.locator('#mute')).not.toBeChecked();
+      expect(await page.locator('#file-input').getAttribute('accept')).toContain('.mp4');
+    }],
     ['png-compressor', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['reduce-png-size', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['cut-video', 'trim-video', async () => expect(page.locator('#exact')).not.toBeChecked()],

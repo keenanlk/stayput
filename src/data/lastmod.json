@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "213c92dae98cf938"
+  "hash": "26006ee29e821ddd"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -960,8 +960,8 @@
   "hash": "c5e0dbfd3bc598b6"
  },
  "/mov-to-mp4": {
-  "date": "2026-10-12",
-  "hash": "6eb2b654c79acf8e"
+  "date": "2026-10-13",
+  "hash": "3ea44c4363fb0c8e"
  },
  "/mov-to-wav": {
   "date": "2026-10-12",
@@ -998,6 +998,10 @@
  "/mp4-to-gif": {
   "date": "2026-10-12",
   "hash": "8b6ee97b3b4c0b64"
+ },
+ "/mp4-to-mov": {
+  "date": "2026-10-13",
+  "hash": "e24a1bb68e86e9ba"
  },
  "/mp4-to-mp3": {
   "date": "2026-10-12",
@@ -1686,6 +1690,10 @@
  "/tools/video-to-jpg": {
   "date": "2026-10-12",
   "hash": "706a90d1f56d4035"
+ },
+ "/tools/video-to-mov": {
+  "date": "2026-10-13",
+  "hash": "2b9f92686f72b92f"
  },
  "/tools/video-to-mp3": {
   "date": "2026-10-12",
