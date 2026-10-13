@@ -5,10 +5,12 @@
  * social apps that only take video. Mediabunny (MPL-2.0) and the browser's
  * WebCodecs encoders write the file. Nothing leaves the tab.
  */
-import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource, getFirstEncodableAudioCodec } from 'mediabunny';
+import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource, getFirstEncodableAudioCodec, type VideoCodec } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
-import { pickVideoCodec } from './video-codec';
+import { VIDEO_CODECS, pickVideoCodec } from './video-codec';
+import { InputError, UnreadableFile } from './input-error';
+import { EncoderRefused, EncoderUnavailable } from './encoder-probe';
 import { blur as boxBlur } from './blur';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 
@@ -81,21 +83,59 @@ export function drawStill(ctx: OffscreenCanvasRenderingContext2D | CanvasRenderi
   ctx.fillText(title, width / 2, height / 2);
 }
 
+/** Errors a browser's encoders raise when they refuse to start or fail at once; another size or codec may still work. */
+const ENCODER_REFUSAL = new Set(['OperationError', 'EncodingError', 'InvalidStateError', 'NotSupportedError']);
+
+/**
+ * What to try, in order. Android Chrome can say a 1080p H.264 or AAC encoder is supported and then fail
+ * to create it ("Encoder creation error", an OperationError), so a refusal moves to a smaller frame
+ * and, at the end, to the other codecs (VP9 and Opus in the same MP4).
+ */
+const ATTEMPTS: { scale: number; video: VideoCodec[]; audio: ('aac' | 'opus')[] }[] = [
+  { scale: 1, video: VIDEO_CODECS, audio: ['aac', 'opus'] },
+  { scale: 2 / 3, video: VIDEO_CODECS, audio: ['aac', 'opus'] },
+  { scale: 4 / 9, video: ['vp9', 'avc', 'av1'], audio: ['opus', 'aac'] },
+];
+
+/** A frame scaled down, each side kept even as H.264 needs. */
+export function scaledFrame(frame: { width: number; height: number }, scale: number) {
+  const even = (n: number) => Math.max(2, Math.round((n * scale) / 2) * 2);
+  return scale === 1 ? { ...frame } : { width: even(frame.width), height: even(frame.height) };
+}
+
 export async function audioToVideo(
   audio: File,
   picture: ImageBitmap | null,
   opts: { shape: Shape; backdrop: Backdrop; title: string; onProgress?: (f: number) => void },
 ): Promise<AudioVideoResult> {
   const pcm = await decodePcm(audio);
-  if (!pcm) throw new Error('No sound could be read from this file. It may use a format this browser cannot decode.');
+  if (!pcm) throw new UnreadableFile('No sound could be read from this file. It may use a format this browser cannot decode.');
   const sound = stereo(pcm);
   const duration = sound[0]!.length / SAMPLE_RATE;
-  if (duration < 0.1) throw new Error('This sound is too short to make a video from.');
-  const frame = SHAPES[opts.shape];
-  const videoCodec = await pickVideoCodec({ ...frame, bitrate: QUALITY_HIGH });
-  if (!videoCodec) throw new Error('This browser cannot encode video. Try a recent version of Chrome, Edge or Safari.');
-  const audioCodec = await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 });
-  if (!audioCodec) throw new Error('This browser cannot encode sound for video. Try a recent version of Chrome, Edge or Safari.');
+  if (duration < 0.1) throw new InputError('This sound is too short to make a video from.');
+  for (const attempt of ATTEMPTS) {
+    try {
+      return await encodeStill(sound, duration, picture, opts, scaledFrame(SHAPES[opts.shape], attempt.scale), attempt.video, attempt.audio);
+    } catch (e) {
+      if (!(e instanceof Error) || !ENCODER_REFUSAL.has(e.name)) throw e;
+    }
+  }
+  throw new EncoderRefused();
+}
+
+async function encodeStill(
+  sound: Float32Array[],
+  duration: number,
+  picture: ImageBitmap | null,
+  opts: { backdrop: Backdrop; title: string; onProgress?: (f: number) => void },
+  frame: { width: number; height: number },
+  videoCodecs: VideoCodec[],
+  audioCodecs: ('aac' | 'opus')[],
+): Promise<AudioVideoResult> {
+  const videoCodec = await pickVideoCodec({ ...frame, bitrate: QUALITY_HIGH }, videoCodecs);
+  if (!videoCodec) throw new EncoderUnavailable('This browser cannot encode video. Try a recent version of Chrome, Edge or Safari.');
+  const audioCodec = await getFirstEncodableAudioCodec(audioCodecs, { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 });
+  if (!audioCodec) throw new EncoderUnavailable('This browser cannot encode sound for video. Try a recent version of Chrome, Edge or Safari.');
 
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
   // A still picture needs very few bits; a key frame every two seconds keeps seeking quick.
@@ -103,33 +143,39 @@ export async function audioToVideo(
   output.addVideoTrack(videoSource);
   const audioSource = new AudioSampleSource({ codec: audioCodec, bitrate: 192_000 });
   output.addAudioTrack(audioSource);
-  await output.start();
-  const feed = pcmFeeder(audioSource, sound);
+  try {
+    await output.start();
+    const feed = pcmFeeder(audioSource, sound);
 
-  const canvas = new OffscreenCanvas(frame.width, frame.height);
-  drawStill(canvas.getContext('2d')!, frame, picture, opts.backdrop, opts.title);
-  await watchEncode(
-    async (progress) => {
-      const report = (f: number) => {
-        progress(f);
-        opts.onProgress?.(f);
-      };
-      // One frame a second: players show the same picture, and the file stays small.
-      for (let t = 0; t < duration; t += 1) {
-        const d = Math.min(1, duration - t);
-        const sample = new VideoSample(canvas, { timestamp: t, duration: d });
-        await feed.until(t);
-        await videoSource.add(sample);
-        sample.close();
-        report(Math.min(0.99, t / duration));
-      }
-      await feed.until(Infinity);
-      videoSource.close();
-      audioSource.close();
-      await output.finalize();
-    },
-    () => output.cancel(),
-  );
+    const canvas = new OffscreenCanvas(frame.width, frame.height);
+    drawStill(canvas.getContext('2d')!, frame, picture, opts.backdrop, opts.title);
+    await watchEncode(
+      async (progress) => {
+        const report = (f: number) => {
+          progress(f);
+          opts.onProgress?.(f);
+        };
+        // One frame a second: players show the same picture, and the file stays small.
+        for (let t = 0; t < duration; t += 1) {
+          const d = Math.min(1, duration - t);
+          const sample = new VideoSample(canvas, { timestamp: t, duration: d });
+          await feed.until(t);
+          await videoSource.add(sample);
+          sample.close();
+          report(Math.min(0.99, t / duration));
+        }
+        await feed.until(Infinity);
+        videoSource.close();
+        audioSource.close();
+        await output.finalize();
+      },
+      () => output.cancel(),
+    );
+  } catch (e) {
+    // Free what the failed attempt holds before another one starts.
+    await Promise.resolve(output.cancel()).catch(() => undefined);
+    throw e;
+  }
   const buffer = output.target.buffer;
   if (!buffer) throw new Error('The video could not be written.');
   opts.onProgress?.(1);

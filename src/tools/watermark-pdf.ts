@@ -3,6 +3,7 @@ import { canvasToBlob, makeCanvas } from '../lib/image';
 import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, renderPage, stampPdf, type Stamp } from '../lib/pdf';
 import { suffixName, type OutputFile } from '../lib/files';
 import { drawWatermark, type WatermarkOptions } from '../lib/watermark';
+import { StageError } from '../lib/input-error';
 import { requireText, setPreview, watermarkOptions } from './watermark-common';
 
 /** Layer resolution: 3 pixels per point is about 216 dpi, sharp in print. */
@@ -53,14 +54,19 @@ const shell = createShell({
         const key = `${Math.round(w)}x${Math.round(h)}`;
         let png = layers.get(key);
         if (!png) {
-          png = await layerPng(w, h, o);
+          png = await layerPng(w, h, o).catch((e) => {
+            throw new StageError('WatermarkLayerError', e);
+          });
           layers.set(key, png);
         }
         stamps.push({ page: i, png, x: 0, y: 0, width: 1, height: 1 });
       }
       const out = await stampPdf(source, stamps, (done, all) =>
         progress.set(`Watermarking page ${done} of ${all}`, (index + done / all) / files.length),
-      );
+      ).catch((e) => {
+        // The file was read and stamped in memory; a failure here is the writer's, and named as such unless it already has a name.
+        throw e instanceof Error && e.name !== 'Error' ? e : new StageError('PdfWriteError', e);
+      });
       const file: OutputFile = {
         name: suffixName(entry.file.name, '-watermarked', 'pdf'),
         blob: new Blob([out as BlobPart], { type: 'application/pdf' }),

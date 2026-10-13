@@ -14,7 +14,7 @@
  * once; the outputs are written without encryption.
  */
 import { vendorDir } from './vendor';
-import { InputError } from './input-error';
+import { InputError, UnreadableFile } from './input-error';
 
 interface QpdfModule {
   FS: {
@@ -157,7 +157,7 @@ export async function decryptPdf(bytes: Uint8Array, password = ''): Promise<Uint
   if (!out) {
     if (/invalid password/i.test(stderr)) throw new PasswordRequiredError(password !== '');
     const detail = lastLine(stderr);
-    throw new Error(`This PDF could not be unlocked${detail ? ` (${detail})` : ''}.`);
+    throw new UnreadableFile(`This PDF could not be unlocked${detail ? ` (${detail})` : ''}.`);
   }
   return out;
 }
@@ -172,7 +172,7 @@ export async function encryptPdf(bytes: Uint8Array, password: string): Promise<U
   const { stderr, out } = await runQpdf(bytes, ['--encrypt', `--user-password=${password}`, `--owner-password=${password}`, '--bits=256', '--']);
   if (!out) {
     const detail = lastLine(stderr);
-    throw new Error(`This PDF could not be protected${detail ? ` (${detail})` : ''}.`);
+    throw new UnreadableFile(`This PDF could not be protected${detail ? ` (${detail})` : ''}.`);
   }
   return out;
 }
@@ -221,7 +221,7 @@ export async function unlockPdf(bytes: Uint8Array, opts: UnlockOptions = {}): Pr
     } catch (e) {
       if (!(e instanceof PasswordRequiredError)) throw e;
       const next = ask(attempt);
-      if (!next) throw new Error('This PDF is password-protected. Enter its password to open it, or remove the password in the app that created it.');
+      if (!next) throw new InputError('This PDF is password-protected. Enter its password to open it, or remove the password in the app that created it.');
       password = next;
     }
   }
