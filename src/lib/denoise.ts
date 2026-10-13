@@ -119,6 +119,13 @@ export async function resample(chans: Float32Array[], from: number, to: number):
  * that reads as running out of memory says so.
  */
 export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseWriteError', e: unknown): Error {
+  if (e instanceof Error && e.name === 'NotReadableError') {
+    // The browser could not read the file from disk (a big video, or one the phone moved or is still preparing). The name is kept.
+    const out = new Error('This file could not be read. Pick the video again, or copy it to the phone first, and try again.');
+    out.name = 'NotReadableError';
+    out.cause = e;
+    return out;
+  }
   if (e instanceof Error && e.name !== 'Error') return e;
   const text = e instanceof Error ? e.message : String(e);
   const memory = /memory|allocation|bad_alloc/i.test(text) || (e instanceof RangeError && /array|buffer|length/i.test(text));
