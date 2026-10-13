@@ -1,0 +1,41 @@
+---
+/** Option controls for Audio splitter: how to split, where, and the format. */
+---
+<fieldset class="field sp-mode">
+  <legend>Split</legend>
+  <label class="check"><input type="radio" name="sp-mode" value="times" checked /> At times I type</label>
+  <label class="check"><input type="radio" name="sp-mode" value="every" /> Every so often</label>
+</fieldset>
+<div class="field" id="sp-times-field">
+  <label for="sp-times">Times where each new part starts</label>
+  <input type="text" id="sp-times" placeholder="12:30, 31:05" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" />
+  <p class="muted small">Minutes and seconds (12:30), hours too (1:02:45), or plain seconds (750), separated by commas.</p>
+</div>
+<div class="field" id="sp-every-field" hidden>
+  <label for="sp-every">Length of each part</label>
+  <div class="sp-every">
+    <input type="number" id="sp-every" min="0" step="any" value="10" inputmode="decimal" />
+    <select id="sp-unit" aria-label="Unit">
+      <option value="60" selected>minutes</option>
+      <option value="1">seconds</option>
+    </select>
+  </div>
+</div>
+<div class="field">
+  <label for="format">Save as</label>
+  <select id="format">
+    <option value="mp3" selected>MP3 (plays everywhere)</option>
+    <option value="wav">WAV (no quality loss, larger)</option>
+  </select>
+</div>
+<p class="muted small sp-info" id="sp-info" aria-live="polite"></p>
+<ol class="sp-parts small" id="sp-parts" hidden></ol>
+<style is:global>
+  .sp-mode { border: 0; padding: 0; margin: 0; }
+  .sp-mode legend { padding: 0; font-weight: 600; }
+  .sp-every { display: flex; gap: 6px; }
+  .sp-every input { flex: 1 1 100px; min-width: 0; }
+  .sp-info { margin: 0; }
+  .sp-info.is-over { color: var(--warn); font-weight: 600; }
+  .sp-parts { margin: 0; padding-left: 1.6em; max-height: 14em; overflow: auto; overflow-wrap: anywhere; }
+</style>

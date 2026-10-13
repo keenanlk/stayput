@@ -1,15 +1,15 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "d89769dca8e4282e"
+  "hash": "0bd2ffdbb58ed6f7"
  },
  "/2x2-photo": {
-  "date": "2026-10-12",
-  "hash": "8d86e8d92f24c4c0"
+  "date": "2026-10-13",
+  "hash": "1a719a468a3d2027"
  },
  "/35x45-photo": {
-  "date": "2026-10-12",
-  "hash": "e4c533b3115c5600"
+  "date": "2026-10-13",
+  "hash": "9e43a6e3d4d2fa07"
  },
  "/a4-to-letter": {
   "date": "2026-10-12",
@@ -76,8 +76,8 @@
   "hash": "c03a764ddc3255c0"
  },
  "/blur-background": {
-  "date": "2026-10-12",
-  "hash": "466fe6a8156fb8f5"
+  "date": "2026-10-13",
+  "hash": "b1656c209b92abe9"
  },
  "/blur-face": {
   "date": "2026-10-12",
@@ -88,8 +88,8 @@
   "hash": "f237a69606b30d8d"
  },
  "/blur-video-background": {
-  "date": "2026-10-12",
-  "hash": "5d3baac3e0a419e9"
+  "date": "2026-10-13",
+  "hash": "dcfec15cf71bed58"
  },
  "/bmp-to-jpg": {
   "date": "2026-10-12",
@@ -247,6 +247,10 @@
   "date": "2026-10-12",
   "hash": "2d4e8e80e49ca71a"
  },
+ "/csv-to-json": {
+  "date": "2026-10-13",
+  "hash": "98f123987c7bbf11"
+ },
  "/cursive-signature-generator": {
   "date": "2026-10-12",
   "hash": "03c63de12e075c52"
@@ -340,8 +344,8 @@
   "hash": "579e80bc540d9181"
  },
  "/green-screen-video": {
-  "date": "2026-10-12",
-  "hash": "0b6f67c0264e8dd1"
+  "date": "2026-10-13",
+  "hash": "8498a21967e1eeee"
  },
  "/guides": {
   "date": "2026-10-12",
@@ -724,8 +728,8 @@
   "hash": "10a3f767a17969d7"
  },
  "/guides/remove-bg-alternative": {
-  "date": "2026-10-12",
-  "hash": "af15fa1617c6abca"
+  "date": "2026-10-13",
+  "hash": "0bfddbb926279ff7"
  },
  "/guides/remove-exif-data-from-android-photos": {
   "date": "2026-10-12",
@@ -896,8 +900,8 @@
   "hash": "b0cd1ad7a7c29314"
  },
  "/linkedin-profile-picture": {
-  "date": "2026-10-12",
-  "hash": "400198c9c63d981a"
+  "date": "2026-10-13",
+  "hash": "3c45f8897cd3cd6d"
  },
  "/m4a-to-mp3": {
   "date": "2026-10-12",
@@ -916,8 +920,8 @@
   "hash": "2197d00edc7bccca"
  },
  "/make-background-transparent": {
-  "date": "2026-10-12",
-  "hash": "d6e57758f1da16ef"
+  "date": "2026-10-13",
+  "hash": "33bfed750105a747"
  },
  "/make-pdf-searchable": {
   "date": "2026-10-12",
@@ -1327,6 +1331,10 @@
   "date": "2026-10-12",
   "hash": "9a2745f0e06215ec"
  },
+ "/tools/audio-splitter": {
+  "date": "2026-10-13",
+  "hash": "0f50b4f7f5ebac6a"
+ },
  "/tools/audio-to-video": {
   "date": "2026-10-12",
   "hash": "057e89da3790b33e"
@@ -1472,8 +1480,8 @@
   "hash": "06b39f1e88e9230a"
  },
  "/tools/json-to-csv": {
-  "date": "2026-10-12",
-  "hash": "ce531dd180e6fbef"
+  "date": "2026-10-13",
+  "hash": "25f87375a5ed7f43"
  },
  "/tools/merge-audio": {
   "date": "2026-10-12",
@@ -1504,8 +1512,8 @@
   "hash": "b086285639002e16"
  },
  "/tools/passport-photo": {
-  "date": "2026-10-12",
-  "hash": "8e3e9eae92f5a500"
+  "date": "2026-10-13",
+  "hash": "b7f273130838c4d8"
  },
  "/tools/pdf-page-numbers": {
   "date": "2026-10-12",
@@ -1536,8 +1544,8 @@
   "hash": "6fd6721c264a847f"
  },
  "/tools/profile-picture-maker": {
-  "date": "2026-10-12",
-  "hash": "4e4b2b26377081ff"
+  "date": "2026-10-13",
+  "hash": "e33595a7d5a1e594"
  },
  "/tools/protect-pdf": {
   "date": "2026-10-12",
@@ -1556,8 +1564,8 @@
   "hash": "5e63fe1decd8ede1"
  },
  "/tools/remove-background": {
-  "date": "2026-10-12",
-  "hash": "976d4947b08c4ae8"
+  "date": "2026-10-13",
+  "hash": "bef614b30a028dfb"
  },
  "/tools/remove-noise": {
   "date": "2026-10-12",
@@ -1628,8 +1636,8 @@
   "hash": "60e35a473fa4d5ad"
  },
  "/tools/sticker-maker": {
-  "date": "2026-10-12",
-  "hash": "f02706698c2c732d"
+  "date": "2026-10-13",
+  "hash": "280a22250abf9c7c"
  },
  "/tools/strip-exif": {
   "date": "2026-10-12",
@@ -1660,8 +1668,8 @@
   "hash": "07a4d4cbd265249c"
  },
  "/tools/video-background-remover": {
-  "date": "2026-10-12",
-  "hash": "015f92921d058318"
+  "date": "2026-10-13",
+  "hash": "9bd2e19b2f8a40d7"
  },
  "/tools/video-speed": {
   "date": "2026-10-12",
@@ -1804,12 +1812,12 @@
   "hash": "7e592b0f75fcf7e9"
  },
  "/whatsapp-sticker-maker": {
-  "date": "2026-10-12",
-  "hash": "305ebfa7729421ab"
+  "date": "2026-10-13",
+  "hash": "c770c9dedb30a7bb"
  },
  "/white-background": {
-  "date": "2026-10-12",
-  "hash": "0d38d33abebe9d31"
+  "date": "2026-10-13",
+  "hash": "85caa0d8506ebf46"
  },
  "/wifi-qr-code-generator": {
   "date": "2026-10-12",

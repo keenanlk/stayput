@@ -93,6 +93,8 @@ import EpubToPdf from '../components/options/EpubToPdf.astro';
 import PdfToEpub from '../components/options/PdfToEpub.astro';
 import ArchiveExtractor from '../components/options/ArchiveExtractor.astro';
 import CreateZip from '../components/options/CreateZip.astro';
+import JsonToCsv from '../components/options/JsonToCsv.astro';
+import JsonToCsvPaste from '../components/JsonToCsvPaste.astro';
 import WatermarkStage from '../components/WatermarkStage.astro';
 import ColorStage from '../components/ColorStage.astro';
 import CropStage from '../components/CropStage.astro';
@@ -192,6 +194,7 @@ const options = {
   'pdf-to-epub': PdfToEpub,
   'archive-extractor': ArchiveExtractor,
   'create-zip': CreateZip,
+  'json-to-csv': JsonToCsv,
   // Sign PDF, the QR, barcode and signature makers and the screen recorder have no option controls outside their stages.
   'sign-pdf': null,
   'qr-code-generator': null,
@@ -220,6 +223,7 @@ const Options = options[base as keyof typeof options];
   {base === 'signature-maker' && <SignatureStage slot="panel" defaults={defaults} />}
   {base === 'qr-code-scanner' && <ScanStage slot="panel" defaults={defaults} />}
   {base === 'screen-recorder' && <RecordStage slot="panel" defaults={defaults} />}
+  {base === 'json-to-csv' && <JsonToCsvPaste slot="panel" />}
   {base === 'blur-image' && <BlurStage slot="panel" />}
   {base === 'remove-object' && <EraseStage slot="panel" />}
   {base === 'adjust-image' && <AdjustStage slot="panel" />}

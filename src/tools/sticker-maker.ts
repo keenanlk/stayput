@@ -18,7 +18,7 @@ createShell({
       try {
         progress.set(`Finding the subject in ${entry.file.name}…`, share(0.05));
         const mask = await findSubject(bitmap, (f) =>
-          progress.set(`Downloading the cut-out model (one time, about 46 MB): ${Math.round(f * 100)}%`, share(0.1 * f)),
+          progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 * f)),
         );
         if (coverage(mask) < 0.005) throw new Error('No subject was found in this photo. Stickers work best with one clear person, pet or object.');
         const box = subjectBox(mask, bitmap.width, bitmap.height)!;

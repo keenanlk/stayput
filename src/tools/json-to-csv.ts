@@ -19,8 +19,10 @@ const which = $<HTMLSelectElement>('jc-which');
 
 /** The file made from pasted text, while it is the one in the list. */
 let pasted: File | undefined;
+/** The direction shown before any data is given; a preset can start on CSV to JSON. */
+const startDirection: Direction = toCsv.dataset.start === 'csv-to-json' ? 'csv-to-json' : 'json-to-csv';
 /** The direction detected from the file in the list. */
-let detectedDirection: Direction = 'json-to-csv';
+let detectedDirection: Direction = startDirection;
 let lastResult: Blob | undefined;
 /** The direction of the run in progress or last run. */
 let ranDirection: Direction = 'json-to-csv';
@@ -45,6 +47,8 @@ async function head(file: File): Promise<string> {
 async function detect(file: File | undefined) {
   if (!file) {
     detected.hidden = true;
+    detectedDirection = startDirection;
+    syncGroups();
     return;
   }
   detectedDirection = detectDirection(await head(file));

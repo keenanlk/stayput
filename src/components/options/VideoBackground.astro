@@ -31,5 +31,5 @@ const finder = defaults.finder ?? 'edges';
   <input type="color" id="bg-color" value={color} />
 </div>
 <p class="muted small" id="image-hint" hidden={bg !== 'image'}>Drop a JPG or PNG together with the video; it fills the frame behind the person.</p>
-<p class="muted small">Made for people: talking heads, presenters, dancers. The first run downloads the person finder (about 28 MB, model and engine; about 12 MB with Fast) to this browser. Fast is several times quicker but rougher around hair and in dim light.</p>
-<p class="muted small" id="time-note">This is slower than the video plays: about 6 times its length on a MacBook Pro with an M3 Max chip (Fast: about 1.3 to 2.2 times), and longer on slower devices. The time left shows once it is running.</p>
+<p class="muted small">Made for people: talking heads, presenters, dancers. The first run downloads the person finder (about 28 MB, model and engine; about 12 MB with Fast) to this browser. Fast is rougher around hair and in dim light; it is only a little quicker than Better edges where the browser can use a graphics chip, and several times quicker where it cannot.</p>
+<p class="muted small" id="time-note">This can be slower than the video plays. On a MacBook Pro with an M3 Max chip, Better edges took about 6 seconds in Chrome and 10 in Safari for a 10-second clip, and about 5 times its length where the browser cannot use the graphics chip (Fast: about 5 seconds in Chrome and 8 to 9 in Safari). Slower devices take longer. The time left shows once it is running.</p>

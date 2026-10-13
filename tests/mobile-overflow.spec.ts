@@ -22,9 +22,11 @@ const pages = [
   '/transparent-signature-png',
   '/qr-code-scanner-for-pc',
   '/itf-14-barcode-generator',
+  '/tools/audio-splitter',
   '/tools/bpm-key-finder',
   '/camelot-wheel',
   '/bpm-finder',
+  '/csv-to-json',
   '/press',
   '/licenses',
 ];

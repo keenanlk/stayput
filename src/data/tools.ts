@@ -3437,7 +3437,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long does it take?',
-        a: 'Slower than the video plays, because every frame is examined and redrawn on your device. On a MacBook Pro with an M3 Max chip a 10-second 30 fps clip took about a minute, about 6 times its length, so a 10-minute clip would take about an hour (we timed 10 seconds, not 10 minutes). The Fast option is the quicker one: the same clip took about 13 seconds at 720p, and 14 to 22 seconds at 1080p, but its edges are rougher around hair and in dim light. Phones vary and we have not benchmarked one: a single run on an iPhone in Safari took roughly 5 to 10 minutes for a 2-minute video with the default finder, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
+        a: 'Every frame is examined and redrawn on your device, so it can take longer than the video plays. The default finder, Better edges, runs on the graphics chip where the browser offers one. On a MacBook Pro with an M3 Max chip a 10-second 30 fps clip took about 6 seconds in Chrome and about 10 seconds in Safari, so a 10-minute clip would take about 6 to 11 minutes (we timed 10 seconds, not the longer clip). Where the browser cannot use a graphics chip (software rendering, some virtual machines and browser settings) it falls back to the processor, and the same clip took about 55 seconds, so a 10-minute clip would take about an hour. The Fast option runs on the processor and took about 5 seconds in Chrome and 8 to 9 seconds in Safari on the same clip, so it is only a little quicker than Better edges on a graphics chip and several times quicker than Better edges without one, but its edges are rougher around hair and in dim light. Phones vary and we have not benchmarked one with the graphics chip: a single run on an iPhone in Safari, before this change, took roughly 5 to 10 minutes for a 2-minute video, which is a rough guide, not a measurement. Slower devices take longer, and so do longer or 60 fps videos. The page shows the time left once it is running; keep the tab open while it works.',
       },
       {
         q: 'Why does the browser console mention a Google address?',
@@ -3730,7 +3730,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop photos to remove the background',
     action: 'Remove background',
     lead:
-      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model (about 46 MB) to your browser, and after that the tool works offline.',
+      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model and its WebAssembly runtime (about 42 MB in all) to your browser, and after that the tool works offline.',
     sections: [
       {
         heading: 'A worked example: a product photo on a white background',
@@ -3752,7 +3752,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is the first photo slow?',
-        a: 'The first time, the page downloads the model (about 46 MB) and the WebAssembly runtime that runs it, and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
+        a: 'The first time, the page downloads the model and the WebAssembly runtime that runs it (about 42 MB in all), and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
       },
       {
         q: 'What resolution is the result?',
@@ -3785,7 +3785,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this an alternative to remove.bg?',
-        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model of about 46 MB. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
+        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 42 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
       },
     ],
   },
@@ -3817,11 +3817,11 @@ export const tools: Tool[] = [
       },
     ],
     lead:
-      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models (about 50 MB) to your browser, and after that the tool works offline.',
+      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models and their WebAssembly runtimes (about 46 MB in all) to your browser, and after that the tool works offline.',
     faq: [
       {
         q: 'Can I make a passport photo without uploading my photo?',
-        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model (about 46 MB) and the WebAssembly runtime that runs the cut-out model, all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
+        a: 'Yes. A face detector finds your eyes and mouth, a segmentation model finds the outline of your head, and the photo is cropped and drawn on a canvas, all inside your browser tab. The downloads are the face finder (about 4 MB, with its own WebAssembly runtime), the cut-out model (about 39 MB) and the WebAssembly runtime that runs the cut-out model (about 3 MB), all fetched from this site the first time. A passport photo is an identity document; it has no business on a stranger’s server.',
       },
       {
         q: 'How is the head sized?',
@@ -4656,6 +4656,56 @@ export const tools: Tool[] = [
         q: 'Can it handle a big file?',
         a: 'The conversion runs in the background so the page stays usable. A file over 200 MB is refused as too large for a browser tab, and a phone may run out of memory on a smaller one, in which case the page says so instead of giving a half result. Split the file and convert the pieces if that happens.',
       },
+    ],
+  },
+  {
+    slug: 'audio-splitter',
+    name: 'Audio splitter',
+    title: 'Audio Splitter: Split an MP3 or WAV into Parts | Stayput',
+    description: 'Split an MP3, WAV, M4A or FLAC file into separate parts at times you set or every few minutes, in your browser. Free, no account, not uploaded.',
+    heading: 'Split an audio file',
+    tagline: 'Cut one long recording into separate files at the times you choose or at equal lengths. Done on this device, and the file is not uploaded.',
+    category: 'media',
+    accept: 'audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac,.mp4,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a sound file to split',
+    action: 'Split audio',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long recording may need a computer.',
+    keywords: ['audio splitter', 'split audio', 'split mp3', 'mp3 splitter', 'split audio file', 'split wav file', 'audio splitter online', 'cut audio into parts'],
+    lead: 'Splits one audio file into separate parts, either at the times you type or every few minutes, and saves them as MP3 or WAV files. It is free, needs no account and adds no watermark, and your file is not uploaded: your browser decodes the sound and cuts it inside this tab. The size limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.',
+    steps: [
+      'Drop a sound file (MP3, WAV, M4A, OGG, FLAC) or a video, or tap to pick one.',
+      'Choose how to split: type the times where each new part should start, or pick a length such as every 10 minutes. The page lists the parts it will make.',
+      'Press Split audio. The parts are saved as MP3 or WAV files, and Download all gives you them in one zip.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have rehearsal.wav, a 62-minute recording of a band practice, and you want each song as its own file. The songs start at 11:30, 24:10 and 41:45. Choose At times I type and type 11:30, 24:10, 41:45.',
+          'Press Split audio and you get four parts: 0:00 to 11:30, 11:30 to 24:10, 24:10 to 41:45, and 41:45 to the end. They are named rehearsal-part-1 to rehearsal-part-4. Every part starts at the sample where the one before it ended, so no sound falls between two parts.',
+          'Prefer equal pieces? Choose Every so often and type 10 minutes: a 25-minute file becomes parts of 10, 10 and 5 minutes. The last part is whatever is left.',
+        ],
+      },
+      {
+        heading: 'What this page does and does not do',
+        bullets: [
+          'It splits where you say. It does not find silences or chapters on its own. To take the long pauses out of a recording, use [Remove silence](/tools/remove-silence).',
+          'It works on one file at a time. The whole file is decoded in your browser’s memory, so a long recording takes more memory, and a phone may run out of it sooner than a computer.',
+          'It makes up to 100 parts in one run. Parts are saved as MP3 at 192 kbps or as 16-bit WAV at 44.1 kHz. To keep just one stretch of a file, [Trim audio](/tools/trim-audio) is the simpler page.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I split an audio file?', a: 'Drop the file, type the times where each new part should begin (for example 12:30 and 31:05), and press Split audio. Each part is a separate file, and a Download all button gives you the lot as one zip.' },
+      { q: 'Can I split a file into equal parts?', a: 'Yes. Choose Every so often and give a length in minutes or seconds. A file is cut into parts of that length, and the last part is the remainder, so it can be shorter.' },
+      { q: 'How many parts can it make?', a: 'Up to 100 in one run. If your times or length would make more, the page says so and shows how many it would make; use fewer times or a longer length, or run the file again on a part.' },
+      { q: 'Does splitting lower the quality?', a: 'WAV parts keep the sound exactly as your browser decoded it, written as 16-bit at 44.1 kHz. MP3 parts are encoded again at 192 kbps, so they lose a little, as any MP3 re-encode does. A file at another sample rate, or with more than two channels, is converted to 44.1 kHz and at most stereo first. If you will edit the parts further, choose WAV.' },
+      { q: 'How long a file can I split?', a: 'The size limit is your device’s memory, and phones hold less than computers. The whole file is decoded in the tab before it is cut, so a very long recording needs more memory than a short one. If a phone struggles, a computer will usually manage, or cut the recording down first with [Trim audio](/tools/trim-audio).' },
+      { q: 'Will the parts play back to back without a gap?', a: 'WAV parts join exactly. MP3 parts can have a very short gap when played back to back, because MP3 encoders add a little padding at the start and end of each file. If the parts must play back with no gap, choose WAV.' },
+      { q: 'Can it split where the silence is?', a: 'Not on this page: you give the times. [Remove silence](/tools/remove-silence) cuts long pauses out of a recording, but it makes one file, not several.' },
+      { q: 'Can I split the sound of a video?', a: 'Yes. Drop the video and its sound track is loaded; the parts are saved as audio only.' },
+      { q: 'Can I split an audio file without uploading it?', a: 'Yes. Your browser decodes the sound, cuts it and writes each part with code running in this tab. Open the network tab, run a split, and your recording is not among the requests. After one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.' },
     ],
   },
 ];
