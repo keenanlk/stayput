@@ -21,7 +21,7 @@
  },
  "/about": {
   "date": "2026-10-13",
-  "hash": "6a83b0252d64b775"
+  "hash": "1e93db96a039d786"
  },
  "/acapella-extractor": {
   "date": "2026-10-12",
@@ -549,7 +549,7 @@
  },
  "/guides/how-to-open-a-rar-file": {
   "date": "2026-10-13",
-  "hash": "5da6b9ab5a7e57a3"
+  "hash": "5400250e67568a06"
  },
  "/guides/how-to-password-protect-a-pdf": {
   "date": "2026-09-29",
@@ -909,7 +909,7 @@
  },
  "/licenses": {
   "date": "2026-10-13",
-  "hash": "10abd7ba65548da5"
+  "hash": "1d380fc1dce1d709"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-13",
@@ -1040,8 +1040,8 @@
   "hash": "36a5e9000c55f799"
  },
  "/open-7z-file": {
-  "date": "2026-10-12",
-  "hash": "568a59b7e3bd4d8e"
+  "date": "2026-10-13",
+  "hash": "b5b4c940d1f86107"
  },
  "/opus-to-mp3": {
   "date": "2026-10-12",
@@ -1156,8 +1156,8 @@
   "hash": "2e83b10003c7644a"
  },
  "/rar-extractor": {
-  "date": "2026-10-12",
-  "hash": "2a1db8a43d84ad70"
+  "date": "2026-10-13",
+  "hash": "a7d8e94a677359c3"
  },
  "/receipt-scanner": {
   "date": "2026-10-12",
@@ -1345,7 +1345,7 @@
  },
  "/tools/archive-extractor": {
   "date": "2026-10-13",
-  "hash": "66565a8fdbce4cf9"
+  "hash": "70a6d24182418e51"
  },
  "/tools/audio-converter": {
   "date": "2026-10-12",

@@ -32,10 +32,10 @@ export default defineConfig({
         launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {},
       },
     },
-    // WebKit (Safari's engine) runs only the caption-encoder, video-encoder, video-to-mov, mic-verdict, mov-audio, handoff, psd-pairs, qr-scan-webkit, video-background-rotated, video-background-finder (local only: Linux WebKit reads video frames back blank), video-background-time-left, audio-video-backdrop, audio-split, add-text-to-gif, avi-to-mp4 and bpm-key (the unit spec and a smoke run of the finder, since decoding differs between engines) specs: Safari's video encoder is the odd one out.
+    // WebKit (Safari's engine) runs only the caption-encoder, video-encoder, video-to-mov, mic-verdict, mov-audio, handoff, psd-pairs, qr-scan-webkit, video-background-rotated, video-background-finder (local only: Linux WebKit reads video frames back blank), video-background-time-left, audio-video-backdrop, audio-split, add-text-to-gif, archive-encrypted, avi-to-mp4 and bpm-key (the unit spec and a smoke run of the finder, since decoding differs between engines) specs: Safari's video encoder is the odd one out.
     // On in CI, or locally with PW_WEBKIT=1.
     ...(process.env.CI || process.env.PW_WEBKIT
-      ? [{ name: 'webkit', testMatch: /((caption|video)-encoder|video-to-mov|wake-lock|mic-verdict|mov-audio|noise-video-iphone|handoff\.spec|psd-pairs|qr-scan-webkit|video-background-rotated|video-background-finder|video-background-time-left|audio-video-backdrop|bpm-key|audio-split|merge-gifs|add-text-to-gif\.spec|avi-to-mp4)/, use: { browserName: 'webkit' as const } }]
+      ? [{ name: 'webkit', testMatch: /((caption|video)-encoder|video-to-mov|wake-lock|mic-verdict|mov-audio|noise-video-iphone|handoff\.spec|psd-pairs|qr-scan-webkit|video-background-rotated|video-background-finder|video-background-time-left|audio-video-backdrop|bpm-key|audio-split|merge-gifs|add-text-to-gif\.spec|archive-encrypted|avi-to-mp4)/, use: { browserName: 'webkit' as const } }]
       : []),
     // Firefox runs a small smoke spec only. It is on in CI, or locally with PW_FIREFOX=1
     // once `npx playwright install firefox` has been run.
