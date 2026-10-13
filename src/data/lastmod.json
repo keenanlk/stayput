@@ -348,8 +348,8 @@
   "hash": "8498a21967e1eeee"
  },
  "/guides": {
-  "date": "2026-10-12",
-  "hash": "f7a54ca00be6542b"
+  "date": "2026-10-13",
+  "hash": "63ca5ce495e5c98e"
  },
  "/guides/camscanner-alternative": {
   "date": "2026-10-08",
@@ -729,7 +729,7 @@
  },
  "/guides/remove-bg-alternative": {
   "date": "2026-10-13",
-  "hash": "0bfddbb926279ff7"
+  "hash": "99b4f068c849c565"
  },
  "/guides/remove-exif-data-from-android-photos": {
   "date": "2026-10-12",
@@ -1565,7 +1565,7 @@
  },
  "/tools/remove-background": {
   "date": "2026-10-13",
-  "hash": "bef614b30a028dfb"
+  "hash": "e68820b7c364eced"
  },
  "/tools/remove-noise": {
   "date": "2026-10-12",
