@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { detectPitch, instrumentById, midiToFreq, nearestString, noteFor, noteLabel } from '../src/lib/tuner';
+import { detectPitch, instrumentById, isDecayOctaveJump, midiToFreq, nearestString, noteFor, noteLabel } from '../src/lib/tuner';
 
 const RATE = 48000;
 const tone = (partials: [freq: number, amp: number][], n = 4096, rate = RATE) => {
@@ -106,4 +106,18 @@ test('below the 30 Hz floor reads nothing, and a note just above it is read', ()
   const b0 = detectPitch(tone([[30.87, 0.3], [61.74, 0.2], [92.61, 0.1]]), RATE);
   expect(b0).toBeDefined();
   expect(Math.abs(1200 * Math.log2(b0!.freq / 30.87))).toBeLessThan(5);
+});
+
+test('an octave jump while the sound is dying away is held; a louder one is a new note', () => {
+  // Banjo G4 tail: the fundamental has faded and the second harmonic reads an octave up.
+  const tail = detectPitch(tone([[392, 0.004], [784, 0.02]]), RATE);
+  expect(tail).toBeDefined();
+  expect(tail!.freq).toBeGreaterThan(780);
+  expect(isDecayOctaveJump(tail!.freq, 392, 0.014, 0.016)).toBe(true);
+  // The same reading on a louder window is a new pluck.
+  expect(isDecayOctaveJump(tail!.freq, 392, 0.2, 0.016)).toBe(false);
+  // Other jumps, and the same note, are not octave jumps.
+  expect(isDecayOctaveJump(392, 392, 0.014, 0.016)).toBe(false);
+  expect(isDecayOctaveJump(588, 392, 0.014, 0.016)).toBe(false);
+  expect(isDecayOctaveJump(196, 392, 0.014, 0.016)).toBe(false);
 });

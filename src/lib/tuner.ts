@@ -61,6 +61,20 @@ export function nearestString(freq: number, strings: number[], a4 = 440): { inde
   return best;
 }
 
+/**
+ * True for a reading about an octave above the note being held, taken while the
+ * sound is getting quieter. As a short or heavy string dies away its
+ * fundamental fades before its second harmonic does, and the detector then
+ * correctly reports the harmonic; the tuner should keep showing the note the
+ * player plucked. A fresh pluck an octave up is louder than the tail, so it
+ * passes, and so does a steady note that really moves up an octave, within a
+ * window or two.
+ */
+export function isDecayOctaveJump(freq: number, held: number, rms: number, lastRms: number): boolean {
+  const cents = 1200 * Math.log2(freq / held);
+  return cents > 1100 && cents < 1300 && rms < lastRms;
+}
+
 export interface Pitch {
   freq: number;
   /** 0 to 1: how periodic the sound is. Plucked strings read above 0.9. */
