@@ -86,6 +86,9 @@ export interface EditResult {
  * Where to write the output: a file on this device where the browser allows it (the tab then never holds the
  * whole video), otherwise a buffer in memory as before.
  */
+/** An error with its own class name, so a failed run records which step it was (never the message). */
+const failure = (name: string, message: string) => Object.assign(new Error(message), { name });
+
 async function outputTarget(inputBytes: number) {
   const disk = await openOpfsOutput(inputBytes);
   if (disk) return { target: disk.target, disk, buffer: undefined };
@@ -97,7 +100,7 @@ async function outputTarget(inputBytes: number) {
 async function finishOutput(out: { disk?: Awaited<ReturnType<typeof openOpfsOutput>>; buffer?: BufferTarget }, type: string): Promise<Blob> {
   if (out.disk) return out.disk.finish(type);
   const buffer = out.buffer?.buffer;
-  if (!buffer) throw new Error('The video could not be written.');
+  if (!buffer) throw failure('OutputNotWritten', 'The video could not be written.');
   return new Blob([buffer], { type });
 }
 
@@ -173,7 +176,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       try {
         const output = new Output({ format: outFormat, target: out.target });
         conversion = await Conversion.init({ input, output, tracks: 'primary', video: {}, audio: opts.mute ? { discard: true } : {} });
-        if (!conversion.isValid) throw new Error('This browser cannot rewrite this video.');
+        if (!conversion.isValid) throw failure('ConversionInvalid', 'This browser cannot rewrite this video.');
         conversion.onProgress = (p) => opts.onProgress?.(p);
         await conversion.execute();
         blob = await finishOutput(out, outFormat.mimeType);
@@ -252,7 +255,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       canvas.width = width;
       canvas.height = height;
       frame = canvas.getContext('2d', { willReadFrequently: opts.readsBack !== false }) ?? undefined;
-      if (!frame) throw new Error('Canvas is not available in this browser.');
+      if (!frame) throw failure('CanvasUnavailable', 'Canvas is not available in this browser.');
     }
     const out = await outputTarget(file.size);
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
@@ -296,7 +299,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       });
       if (!conversion.isValid) {
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-        throw reason === 'undecodable_source_codec' ? new UnreadableFile(unplayable()) : new Error('This browser cannot edit this video.');
+        throw reason === 'undecodable_source_codec' ? new UnreadableFile(unplayable()) : failure('EditUnsupported', 'This browser cannot edit this video.');
       }
       await executeWatched(conversion, opts.onProgress);
       blob = await finishOutput(out, 'video/mp4');

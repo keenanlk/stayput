@@ -1,4 +1,5 @@
 import { isPhoneBrowser } from './phone-limit';
+import { SpeechError } from './speech-errors';
 
 /**
  * Keeps the screen on while a long video job runs, and notes whether the page
@@ -93,7 +94,7 @@ const NOT_INTERRUPTION = ['InputError', 'UnreadableFile', 'NoSpeechFound', 'Audi
  * were. The name is the only part that is recorded.
  */
 export function interruptedError(e: unknown, wasHidden: boolean, action: string, phone = isPhoneBrowser()): unknown {
-  if (!(e instanceof Error) || NOT_INTERRUPTION.includes(e.name)) return e;
+  if (!(e instanceof Error) || NOT_INTERRUPTION.includes(e.name) || (e instanceof SpeechError && e.kind === 'AudioDecodeError')) return e;
   const reclaimed = looksReclaimed(e);
   if (!wasHidden && !reclaimed) return e;
   const salvage = (e as { salvage?: unknown[] }).salvage;

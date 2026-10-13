@@ -21,8 +21,8 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
   let buffer: AudioBuffer;
   try {
     buffer = await ctx.decodeAudioData(bytes.slice(0));
-  } catch {
-    buffer = await decodeThroughDemuxer(file, rate).catch(async (error) => {
+  } catch (first) {
+    buffer = await decodeThroughDemuxer(file, rate, first).catch(async (error) => {
       // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.
       const aiff = await decodeAiff(bytes, rate);
       if (!aiff) throw error;
@@ -53,10 +53,12 @@ async function decodeAiff(bytes: ArrayBuffer, rate: number): Promise<AudioBuffer
  * Safari cannot decode a QuickTime .mov (what an iPhone records) as a whole, so the sound
  * track's packets are lifted out with the demuxer and decoded from a small MP4 wrapper.
  */
-async function decodeThroughDemuxer(file: File, rate: number): Promise<AudioBuffer> {
+async function decodeThroughDemuxer(file: File, rate: number, firstError: unknown): Promise<AudioBuffer> {
   const { demuxedFileSound } = await import('./demux-audio');
-  const chans = await demuxedFileSound(file, rate, false).catch(() => null);
-  if (!chans?.length) throw audioDecodeError();
+  // The browser's refusal is what a failed run is recorded under, unless the demuxer fails in a way of its own.
+  let cause = firstError;
+  const chans = await demuxedFileSound(file, rate, false).catch((e) => ((cause = e instanceof Error ? e : cause), null));
+  if (!chans?.length) throw audioDecodeError(undefined, cause);
   const buffer = new AudioBuffer({ length: chans[0]!.length, numberOfChannels: chans.length, sampleRate: rate });
   chans.forEach((ch, c) => buffer.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
   return buffer;

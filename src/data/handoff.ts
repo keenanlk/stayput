@@ -35,6 +35,7 @@ export const handoffs: Record<string, string[]> = {
   // GIF → GIF (a run that makes several files never hands anything over)
   'resize-gif': ['compress-gif', 'gif-to-mp4'],
   'crop-gif': ['resize-gif', 'compress-gif'],
+  'gif-speed': ['compress-gif', 'gif-to-mp4'],
   'add-text-to-gif': ['resize-gif', 'compress-gif'],
   // Audio → audio
   'audio-converter': ['trim-audio'],
