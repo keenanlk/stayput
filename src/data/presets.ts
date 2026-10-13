@@ -2641,6 +2641,56 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'flv-to-mp4',
+    base: 'video-to-mp4',
+    name: 'FLV to MP4',
+    title: 'FLV to MP4 Converter, Free, No Upload | Stayput',
+    description: 'Convert FLV to MP4 in your browser: Flash-era videos with H.264 picture become MP4s that play on phones and TVs, without re-encoding. Nothing is uploaded.',
+    lead:
+      'Converts FLV videos that hold H.264 picture, with AAC or MP3 sound, to MP4. The picture is copied into the MP4 without re-encoding, so it is fast and loses no quality. It is free and needs no account, and your videos are not uploaded: everything runs in your browser on your device, and after one visit and a short wait the page works offline.',
+    heading: 'Convert FLV to MP4',
+    tagline: 'Turn Flash-era FLV files into MP4s that iPhones, Android phones, TVs and editors play, without uploading them.',
+    keywords: ['flv to mp4', 'convert flv to mp4', 'flv to mp4 converter', 'flv to mp4 online', 'flv to mp4 free', 'change flv to mp4', 'flv to mp4 no upload'],
+    dropLabel: 'Drop FLV files to convert to MP4',
+    accept: 'video/x-flv,.flv,video/*',
+    intro: [
+      'FLV is the Flash Video container. Sites that streamed video in the Flash era saved clips as FLV, screen and stream recorders still write it, and a lot of old downloads are sitting in folders as .flv files that nothing on a phone or a modern computer will open.',
+      'Most FLV files from 2008 onward hold H.264 video, the same picture format an MP4 uses. This page reads the FLV in your browser and copies that picture into a new MP4 as it is, with the sound alongside it. Nothing in the picture is re-encoded, so a long recording converts in seconds and looks exactly like the original.',
+      'The file never leaves your device. Recordings and downloads are exactly what you should not hand to a stranger’s server just to change the wrapper, and here there is no upload to wait for and no copy kept anywhere.',
+    ],
+    sections: [
+      {
+        heading: 'Which FLV files this converts',
+        bullets: [
+          'Picture: H.264, which is what Flash Player 9 and later, YouTube’s old FLV files, OBS and most stream recorders write.',
+          'Sound: AAC is copied as it is. MP3 is converted to AAC, and low-quality MP3 is brought up to 48 kHz so every player accepts it.',
+          'Not converted: older FLV files whose picture is Sorenson Spark or VP6 (the codecs of Flash Player 6 to 8), or whose sound is Nellymoser or Speex. The page names the codec it found, so you know what you have.',
+        ],
+      },
+      {
+        heading: 'What this page loads',
+        paragraphs: [
+          "Most video runs on your browser's WebCodecs through Mediabunny. For old formats the browser cannot read, the page loads a decoder built from FFmpeg's libraries (LGPL) only when you convert such a file.",
+          'For FLV that module is small, well under 1 MB, and comes from stayput.dev, not from anyone else’s server. It only reads the container: the picture is not decoded, and the licenses page links its exact source and how it was built.',
+        ],
+      },
+    ],
+    steps: [
+      'Drop one or more FLV files, or tap to pick them.',
+      'Tick Remove the sound if you only need the picture.',
+      'Convert, then open or share the MP4. Several files download together as a zip.',
+    ],
+    faq: [
+      { q: 'Does converting FLV to MP4 lose quality?', a: 'Not for the picture. The H.264 video in the FLV is copied into the MP4 as it is, so nothing is re-encoded. AAC sound is copied too. MP3 sound is converted to AAC, which is the one step that touches the audio.' },
+      { q: 'Why does it say the video uses VP6 or Sorenson Spark?', a: 'FLV is only a wrapper. Files from the early Flash years hold Sorenson Spark or On2 VP6 picture, which this page does not open, and it tells you which one it found instead of failing without a reason. Files made since about 2008 are nearly always H.264.' },
+      { q: 'Why does the message mention the sound?', a: 'The sound inside the FLV is in a format this page does not read, such as Nellymoser or Speex. Tick Remove the sound to convert the picture alone.' },
+      { q: 'Will the MP4 play on my iPhone and TV?', a: 'Yes. It holds H.264 picture and AAC sound, which iPhones, Android phones, Windows, macOS and current smart TVs play. The line under the result says the picture was copied.' },
+      { q: 'Is the FLV uploaded anywhere?', a: 'No. The file is read from your disk in slices by code running in a background worker in your tab, and the MP4 is written in memory. The reader module downloads from stayput.dev when you first convert, and it carries none of your data.' },
+      { q: 'Can I convert a whole folder of FLV files?', a: 'Select them all at once and they are converted one after another; several download together as a zip. Each MP4 keeps the name of its FLV with the new extension.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'webm-to-mp4',
     base: 'video-to-mp4',
     name: 'WebM to MP4',

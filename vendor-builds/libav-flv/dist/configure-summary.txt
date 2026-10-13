@@ -1,0 +1,27 @@
+Enabled decoders:
+mp3
+
+Enabled encoders:
+
+Enabled hwaccels:
+
+Enabled parsers:
+mpegaudio
+
+Enabled demuxers:
+flv
+
+Enabled muxers:
+
+Enabled protocols:
+data                    file
+
+Enabled filters:
+
+Enabled bsfs:
+
+Enabled indevs:
+
+Enabled outdevs:
+
+License: LGPL version 2.1 or later

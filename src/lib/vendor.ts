@@ -56,7 +56,8 @@ export async function decodersFor(accept: string): Promise<VendorLib[]> {
   // The AVI decoder is for a container no browser reads, so there is nothing to ask the browser first.
   // (".avi" and the MIME type, not "avi", which "avif" contains.)
   const avi = /\.avi\b|x-msvideo/.test(a) ? (['libav'] as const) : [];
-  return [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi];
+  const flv = /\.flv\b|x-flv/.test(a) ? (['libavFlv'] as const) : [];
+  return [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi, ...flv];
 }
 
 interface WarmReply {
