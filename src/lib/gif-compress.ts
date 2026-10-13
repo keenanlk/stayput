@@ -47,6 +47,11 @@ export interface GifCompressOptions {
   fill?: string;
   /** Always return the rewritten GIF, even if it is not smaller than the input. */
   force?: boolean;
+  /**
+   * Draw on every kept frame, at the output size, after the frame is painted and before its pixels
+   * are read. Called once per kept frame, with the same dimensions as the output.
+   */
+  overlay?: (ctx: OffscreenCanvasRenderingContext2D, width: number, height: number) => void;
   onProgress?: (fraction: number) => void;
 }
 
@@ -181,6 +186,7 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
           octx.fillRect(0, 0, width, height);
         }
         octx.drawImage(comp, src[0]!, src[1]!, src[2]!, src[3]!, dst[0]!, dst[1]!, dst[2]!, dst[3]!);
+        opts.overlay?.(octx, width, height);
         const rgba = octx.getImageData(0, 0, width, height).data;
         for (let p = 3; p < rgba.length && !transparent; p += 4) if (rgba[p]! < 128) transparent = true;
         full.push({ rgba, delay });
