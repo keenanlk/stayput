@@ -173,6 +173,7 @@ const jsonLd = [
             <ul class="chips">{next.map((t) => <li><a href={toolPath(t)} data-to={t.slug} data-handoff={handoffs[base ?? tool.slug]?.includes(t.slug) ? '' : undefined}>{t.name}</a></li>)}</ul>
           </nav>
         )}
+        <p class="hint support-note">Free, no ads. <a href="https://ko-fi.com/stayputdev" target="_blank" rel="noopener">Support StayPut</a></p>
       </div>
       <div class="install" id="install" hidden role="region" aria-label="Install Stayput">
         <div>
