@@ -71,6 +71,7 @@ const does: Record<string, string> = {
   'merge-audio': 'Joins two or more audio files into one MP3 or WAV, in the order you choose, with silence or a crossfade between them.',
   'mic-test': 'Tests your microphone with a live level meter, a plain verdict, and a 5-second recording you can play back.',
   'webcam-test': 'Tests your webcam with a live preview, its real resolution and frame rate, a mirror view and a snapshot.',
+  'speaker-test': 'Plays a tone through the left speaker, the right speaker or both, a frequency sweep or pink noise, so you can hear whether each side works.',
   'audio-to-video': 'Makes a video from a song, podcast or voice note and a cover picture, in 16:9, square or 9:16.',
   'compress-audio': 'Makes MP3, WAV, M4A and other audio files smaller, or fits them under 8, 16 or 25 MB.',
   'add-text-to-image': 'Puts text on a photo, with the font, colour, outline or box you choose, and saves the image at full size.',

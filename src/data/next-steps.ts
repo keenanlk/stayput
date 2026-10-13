@@ -74,6 +74,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'tuner': ['metronome', 'pitch-changer'],
   'mic-test': ['merge-audio', 'audio-converter'],
   'webcam-test': ['mic-test', 'compress-image'],
+  'speaker-test': ['mic-test', 'tuner'],
   'audio-to-video': ['compress-video', 'trim-video'],
   'compress-audio': ['trim-audio', 'audio-converter'],
   'add-text-to-image': ['watermark-image', 'compress-image'],

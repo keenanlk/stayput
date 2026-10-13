@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "74ebdf9325b00891"
+  "hash": "2f5df4841297416d"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -1654,6 +1654,10 @@
  "/tools/signature-maker": {
   "date": "2026-10-12",
   "hash": "6169f9cc20d106aa"
+ },
+ "/tools/speaker-test": {
+  "date": "2026-10-13",
+  "hash": "4127f381bca1aafb"
  },
  "/tools/split-image": {
   "date": "2026-10-12",
