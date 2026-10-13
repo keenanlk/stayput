@@ -3755,7 +3755,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can it open password-protected archives?',
-        a: 'Yes, when you have the password: type it before pressing Extract. That works for password-protected ZIP files, for 7z archives (whether only the contents are encrypted or the file names are too) and for RAR archives (old RAR and RAR5, with or without encrypted file names). A wrong password shows an error and nothing is extracted. For 7z and RAR the page loads 7-Zip, about 0.7 MB more, only when you type a password for one of them. It cannot guess or remove a password you do not have, and archives split into parts are not supported.',
+        a: 'Yes, when you have the password: type it before pressing Extract. That works for password-protected ZIP files, for 7z archives (whether only the contents are encrypted or the file names are too) and for RAR archives (old RAR and RAR5, with or without encrypted file names). A wrong password shows an error and nothing is extracted. For 7z and RAR the page downloads 7-Zip, about 0.7 MB more, only when an archive needs it: when it has a password, or when its list of files is itself encrypted so the page cannot read it without 7-Zip. Everything still runs in your browser and nothing is uploaded. It cannot guess or remove a password you do not have, and archives split into parts are not supported.',
       },
       {
         q: 'How do I remove the password from a ZIP file?',

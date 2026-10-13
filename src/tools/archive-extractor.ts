@@ -24,7 +24,6 @@ function load(): Promise<Archive> {
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n.toLocaleString('en')} ${n === 1 ? one : many}`;
 
-/** A wrong password shows up in libarchive's messages in a few wordings. */
 /** Errors with a name of their own: the name is all a failed run records (see classifyError). */
 class NamedError extends Error {
   constructor(name: string, message: string) {
@@ -35,6 +34,7 @@ class NamedError extends Error {
 const PASSWORD_REQUIRED = 'This archive is password-protected. Type its password in the box above and press Extract again.';
 const WRONG_PASSWORD = 'The password is wrong, or the archive is damaged. Check the password and try again.';
 
+/** A wrong password shows up in libarchive's messages in a few wordings. */
 const badPassword = (e: unknown) => /passphrase|password|decrypt|encrypt/i.test(e instanceof Error ? e.message : String(e));
 
 const NO_FILES = 'This archive has no files in it (only empty folders).';
