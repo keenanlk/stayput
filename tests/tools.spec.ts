@@ -3113,7 +3113,7 @@ test('Trim video copies the part between start and end, keeps the format, and no
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(clip);
   // The recording has no length in its header; the page finds it anyway.
-  await expect(page.locator('#vg-panel')).toBeVisible();
+  await expect(page.locator('#vg-panel[data-duration]')).toBeVisible();
   const length = Number(await page.locator('#vg-panel').getAttribute('data-duration'));
   expect(length).toBeGreaterThan(2.5);
   await expect(page.locator('#vg-end')).toHaveValue(String(length));
@@ -3142,7 +3142,7 @@ test('Trim video cuts exactly on request, and an end before the start is refused
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const clip = await recordClip(page);
   await page.locator('#file-input').setInputFiles(clip);
-  await expect(page.locator('#vg-panel')).toBeVisible();
+  await expect(page.locator('#vg-panel[data-duration]')).toBeVisible();
   await page.locator('#vg-start').fill('2');
   await page.locator('#vg-end').fill('1');
   await expect(page.locator('#vg-estimate')).toHaveText('The end must come after the start.');

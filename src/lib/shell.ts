@@ -14,7 +14,7 @@ import { droppedFiles } from './folder-drop';
 import { takeHandoff } from './handoff';
 import { releaseOutput } from './opfs-output';
 import { guardRun, interruptedError, KEEP_SCREEN_ON_HINT } from './wake-lock';
-import { isPhoneBrowser } from './phone-limit';
+import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 
 export interface ShellFile {
   id: number;
@@ -156,6 +156,8 @@ export function createShell(opts: ShellOptions) {
   const multiple = root.dataset.multiple === 'true';
   const reorder = opts.reorder ?? multiple;
   const drop = $('drop');
+  const iosNote = document.getElementById('ios-picker-note');
+  if (iosNote && isIosBrowser()) iosNote.hidden = false;
   const input = $<HTMLInputElement>('file-input');
   const list = $('file-list');
   const run = $<HTMLButtonElement>('run');
