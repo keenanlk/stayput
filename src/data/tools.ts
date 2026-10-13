@@ -3751,7 +3751,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this an alternative to remove.bg?',
-        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 8 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 42 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
+        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 12 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 42 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
       },
     ],
   },
