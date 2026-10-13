@@ -96,6 +96,10 @@ async function recognise(audio: Float32Array, language: string | null, task: Req
 
 /** Stop the speech worker and give back the memory its model holds (about 0.7 GB), for work that follows on a phone. The next run starts it again from the stored model. */
 export function releaseSpeechModel() {
+  // A WebGPU worker is never stopped here: stopping one while onnxruntime's session is live kills the whole
+  // page in WebKit (letting go of the session first did not help). It is kept for the next run, and the
+  // page's unload frees it, as on the Transcribe page.
+  if (onGpu) return;
   worker?.terminate();
   worker = undefined;
 }
