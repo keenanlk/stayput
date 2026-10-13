@@ -1340,6 +1340,40 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-to-mov',
+    name: 'Video to MOV',
+    title: 'Convert Video to MOV: MP4 to MOV, No Upload | Stayput',
+    description:
+      'Convert MP4, WebM and MKV videos to MOV in your browser. H.264 files are copied in seconds with no quality loss. Batch, free, not uploaded.',
+    heading: 'Convert video to MOV',
+    tagline: 'Turn MP4, WebM and MKV files into QuickTime MOV files. Converted on this device, not uploaded.',
+    category: 'media',
+    accept: 'video/mp4,video/webm,video/x-matroska,.mp4,.m4v,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to convert to MOV',
+    action: 'Convert to MOV',
+    keywords: ['video to mov', 'convert video to mov', 'mkv to mov', 'webm to mov', 'mov converter'],
+    steps: [
+      'Drop one or more videos (MP4, WebM or MKV), or tap to pick them.',
+      'Tick Remove the sound if you want a silent video. There is nothing else to set.',
+      'Convert. H.264 videos are rewrapped in seconds; others are re-encoded in your browser. One downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The file is read and written by code in this page, and any re-encoding is done by your browser’s own video encoder. There is no server in the process. After one visit and a short wait the page works offline.',
+      },
+      {
+        q: 'Why was my file converted so fast?',
+        a: 'An MP4, WebM or MKV often holds H.264 video and AAC sound, which a MOV can hold too. Those are copied as they are, which takes about as long as reading the file, and the picture is the same. The result says "copied, no quality loss" when that happens.',
+      },
+      {
+        q: 'Which formats can I convert?',
+        a: 'MP4, WebM and MKV. Video your browser cannot decode is refused with a message instead of producing a broken file. A MOV only ever holds H.264 video (or HEVC copied as it is) and AAC sound, so a browser that cannot write those says so instead of writing a file QuickTime may not play.',
+      },
+    ],
+  },
+  {
     slug: 'trim-video',
     name: 'Trim video',
     title: 'Trim Video Online: Cut MP4, MOV, WebM, No Upload | Stayput',

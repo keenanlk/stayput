@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 
-// A run of the video background tools is slower than the clip plays, so the progress line has to say how long is left
+// (a bare percentage reads as stuck). The figure waits for 8% and 10 s of work; tests/time-left.spec.ts has the exact rules.
 // (a bare percentage reads as stuck). 45 frames of 720x1280 take several seconds, enough to pass the short warm-up.
 const clip = fileURLToPath(new URL('./fixtures/static/iphone-portrait-person.mov', import.meta.url));
 
@@ -25,8 +25,12 @@ for (const path of ['/blur-video-background', '/green-screen-video', '/tools/vid
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 240_000 });
     const seen = await page.evaluate(() => (window as unknown as { __seen: string[] }).__seen);
     const withTime = seen.filter((t) => /about [\d ]+(s|min|h)[\d ]*(min|s)? left/.test(t));
-    // On a graphics chip the short clip can finish inside the warm-up, before any estimate is worth showing.
-    if (withTime.length === 0 && Date.now() - started < 6_000) return;
+    // The figure waits for 8% and 10 s of real work, so a short clip can finish before any figure is worth showing:
+    // it then says it is estimating, and never a figure.
+    if (withTime.length === 0 && Date.now() - started < 14_000) {
+      expect(seen.some((t) => t.includes('Estimating time left…'))).toBe(true);
+      return;
+    }
     expect(withTime.length, `no time-left in: ${seen.slice(-5).join(' | ')}`).toBeGreaterThan(0);
     // Plausible: a clip that finishes in well under a minute never claims more than a minute (nor "0").
     const last = withTime[withTime.length - 1]!;

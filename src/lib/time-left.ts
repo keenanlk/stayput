@@ -27,22 +27,42 @@ export function formatTimeLeft(seconds: number): string {
   return m === 0 || m === 60 ? `${m === 60 ? h + 1 : h} h left` : `${h} h ${m} min left`;
 }
 
+/** A job can ask to stay quiet until enough has been done and measured: the early figures of a slow start run long. */
+export interface TimeLeftOptions {
+  /** Share of the work (0 to 1) that must be done before any figure is shown. */
+  minFraction?: number;
+  /** Seconds of real work to measure, counted from the first report, before any figure is shown. */
+  minSeconds?: number;
+}
+
 export class TimeLeft {
   private samples: { t: number; f: number }[] = [];
   /** When the job is expected to finish, in the clock's seconds. */
   private eta: number | undefined;
+  /** When the first report came: the quiet period is measured from here. */
+  private began: number | undefined;
 
-  constructor(private readonly clock: () => number = () => performance.now() / 1000) {}
+  constructor(
+    private readonly clock: () => number = () => performance.now() / 1000,
+    private readonly quiet: TimeLeftOptions = {},
+  ) {}
 
   /** Report `fraction` (0 to 1) of the work done. Returns "about 6 min left", or undefined while it is still measuring. */
   update(fraction: number): string | undefined {
     const now = this.clock();
     // The first report is the baseline: it leaves out whatever start-up came before the first frame.
-    if (this.samples.length === 0 || fraction < this.samples[this.samples.length - 1]!.f) this.samples = [{ t: now, f: fraction }];
-    else this.samples.push({ t: now, f: fraction });
+    if (this.samples.length === 0 || fraction < this.samples[this.samples.length - 1]!.f) {
+      this.samples = [{ t: now, f: fraction }];
+      this.began = now;
+    } else this.samples.push({ t: now, f: fraction });
     while (this.samples.length > 2 && now - this.samples[1]!.t >= WINDOW) this.samples.shift();
     const first = this.samples[0]!;
     if (now - first.t < WARM_UP || fraction <= first.f) return undefined;
+    // Still too early to be worth showing. Nothing is kept from this stretch, so the first figure is a fresh one.
+    if (fraction < (this.quiet.minFraction ?? 0) || now - this.began! < (this.quiet.minSeconds ?? 0)) {
+      this.eta = undefined;
+      return undefined;
+    }
     const rate = (fraction - first.f) / (now - first.t);
     const fresh = now + (1 - fraction) / rate;
     if (this.eta === undefined) this.eta = fresh;
