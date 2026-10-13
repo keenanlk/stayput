@@ -25,8 +25,8 @@ const bitrates = [
   <select id="format">
     {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
   </select>
-  <p class="muted small" id="format-note" hidden></p>
 </div>
+<p class="hint" id="format-note" hidden></p>
 <div class="field" id="bitrate-field">
   <label for="bitrate">Quality</label>
   <select id="bitrate">
