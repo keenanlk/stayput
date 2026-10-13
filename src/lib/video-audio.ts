@@ -25,6 +25,16 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES } from './video-compress';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
+import { registerMp3Fallback } from './mp3-fallback';
+import { UnreadableFile } from './input-error';
+
+/** The browser has no encoder for any sound format an MP4 can hold (iOS 18 and earlier, and the MP3 fallback failed to load). */
+export class NoAudioEncoder extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'NoAudioEncoder';
+  }
+}
 
 export interface AddAudioOptions {
   /** Replace the video's sound, or play both together. */
@@ -65,9 +75,9 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
   const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video || !video.codec) throw new Error(`${videoFile.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
+    if (!video || !video.codec) throw new UnreadableFile(`${videoFile.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
     const decoderConfig = await video.getDecoderConfig();
-    if (!decoderConfig) throw new Error(`${videoFile.name} uses a video format this browser cannot copy.`);
+    if (!decoderConfig) throw new UnreadableFile(`${videoFile.name} uses a video format this browser cannot copy.`);
 
     // Picture length from the packets themselves.
     const first = await video.getFirstTimestamp();
@@ -77,7 +87,7 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     const len = Math.max(1, Math.round(duration * SAMPLE_RATE));
 
     const added = await decodePcm(soundFile);
-    if (!added || !added[0]?.length) throw new Error(`${soundFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
+    if (!added || !added[0]?.length) throw new UnreadableFile(`${soundFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
     const [inL, inR] = stereo(added);
     const soundLength = inL!.length / SAMPLE_RATE;
     const looped = opts.loop && inL!.length < len;
@@ -110,12 +120,13 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
 
     // MP4 plays everywhere, but VP8 in MP4 does not play in Safari; keep VP8 in WebM.
     const format = video.codec === 'vp8' ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: 'in-memory' });
-    const audioCodec = await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs().filter((c) => c === 'aac' || c === 'opus'), {
-      numberOfChannels: 2,
-      sampleRate: SAMPLE_RATE,
-      bitrate: QUALITY_HIGH,
-    });
-    if (!audioCodec) throw new Error('This browser cannot encode sound. Use a recent version of Chrome, Edge, Safari or Firefox.');
+    // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
+    registerMp3Fallback();
+    const audioCodec = await getFirstEncodableAudioCodec(
+      format.getSupportedAudioCodecs().filter((c) => c === 'aac' || c === 'opus' || c === 'mp3'),
+      { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH },
+    );
+    if (!audioCodec) throw new NoAudioEncoder("This browser cannot write the new sound into a video. On an iPhone, update iOS or use a computer; elsewhere, use a recent Chrome, Edge, Safari or Firefox.");
 
     const output = new Output({ format, target: new BufferTarget() });
     const videoSource = new EncodedVideoPacketSource(video.codec);
