@@ -3,7 +3,8 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
 import { cropBox } from '../lib/crop-box';
 import { InputError } from '../lib/input-error';
-import { DamagedGif, GifTooLarge, UnreadableFile, checkGif, explain, gifSize } from '../lib/gif-errors';
+import { DamagedGif, UnreadableFile, checkGif, explain, gifSize } from '../lib/gif-errors';
+import { firstFrame } from '../lib/gif-preview';
 import type { GifLevel } from '../lib/gif-compress';
 
 /**
@@ -14,28 +15,6 @@ import type { GifLevel } from '../lib/gif-compress';
  */
 
 const TOO_LARGE = 'Try a desktop browser, or crop to a smaller area and run it again.';
-
-/** The first frame, drawn at the GIF's logical screen size (the size in its header). */
-async function firstFrame(buffer: ArrayBuffer, bytes: Uint8Array): Promise<{ source: CanvasImageSource; width: number; height: number }> {
-  checkGif(bytes, undefined, 1, 1);
-  const size = gifSize(bytes)!;
-  if (!size.width || !size.height) throw new DamagedGif();
-  try {
-    const bitmap = await createImageBitmap(new Blob([buffer], { type: 'image/gif' }));
-    // Crop coordinates are in logical-screen pixels: a picture of another size would shift every crop.
-    if (bitmap.width === size.width && bitmap.height === size.height) return { source: bitmap, width: size.width, height: size.height };
-    bitmap.close();
-  } catch {
-    // Fall through to drawing the frame ourselves.
-  }
-  const { firstFrameCanvas } = await import('../lib/gif-compress');
-  try {
-    return { source: firstFrameCanvas(buffer), width: size.width, height: size.height };
-  } catch (e) {
-    const known = explain(e);
-    throw known instanceof GifTooLarge || known instanceof DamagedGif ? known : new DamagedGif();
-  }
-}
 
 function unload() {
   cropBox.hide();
