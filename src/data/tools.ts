@@ -226,9 +226,9 @@ export const tools: Tool[] = [
   {
     slug: 'compress-gif',
     name: 'Compress GIF',
-    title: 'GIF Compressor: Reduce GIF File Size Online, No Upload | Stayput',
+    title: 'GIF Compressor for Discord and Slack: Make a GIF Smaller | Stayput',
     description:
-      'Compress animated GIFs in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. Often 50 to 80% smaller. No upload.',
+      'Compress animated GIFs for Discord, Slack or email in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. No upload.',
     heading: 'Compress a GIF',
     tagline: 'Make an animated GIF small enough for Discord, Slack, email or a web page. It is compressed on this device and never uploaded.',
     category: 'images',
@@ -252,7 +252,7 @@ export const tools: Tool[] = [
         a: 'Most GIFs store every frame whole, even when only a small part of the picture moves. Each frame is rewritten to hold just the area that changed, with the unchanged pixels left see-through so the frame before shows through. Medium and Strong also ignore changes too small to notice and use fewer colours, which is where GIF compressors such as gifsicle and ezgif get most of their savings.',
       },
       {
-        q: 'How do I get a GIF under a size limit?',
+        q: 'How do I compress a GIF for Discord or get it under a size limit?',
         a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels (to set exact pixel dimensions instead, use [Resize GIF](/tools/resize-gif)). Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB.',
       },
       {
@@ -3722,6 +3722,10 @@ export const tools: Tool[] = [
       {
         q: 'Can it open password-protected archives?',
         a: 'Password-protected ZIP files open after you enter the password: type it before pressing Extract. Encrypted 7z and RAR archives are not supported yet (in our tests they did not open even with the correct password). It cannot guess or remove a password you do not have.',
+      },
+      {
+        q: 'How do I remove the password from a ZIP file?',
+        a: 'Open the ZIP here, type its password before pressing Extract, then press Download all as zip. The new ZIP has the same files and no password. You need the password: this page cannot recover a forgotten one, and encrypted 7z and RAR archives are not supported yet.',
       },
       {
         q: 'Is the archive uploaded?',

@@ -13,6 +13,11 @@ export function isPhoneBrowser(nav: Pick<Navigator, 'userAgent' | 'maxTouchPoint
   return /iPhone|iPad|iPod|Android/i.test(nav.userAgent) || (/Macintosh/.test(nav.userAgent) && nav.maxTouchPoints > 1);
 }
 
+/** An iPhone or iPad only (not Android); iPadOS Safari reports itself as a Mac, so touch gives it away. */
+export function isIosBrowser(nav: Pick<Navigator, 'userAgent' | 'maxTouchPoints'> = navigator): boolean {
+  return /iPhone|iPad|iPod/.test(nav.userAgent) || (/Macintosh/.test(nav.userAgent) && nav.maxTouchPoints > 1);
+}
+
 /** A video bigger than a phone can caption reliably, on a phone. */
 export const overPhoneLimit = (bytes: number, phone = isPhoneBrowser()): boolean => phone && bytes > PHONE_SAFE_BYTES;
 
