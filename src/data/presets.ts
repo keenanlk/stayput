@@ -3714,7 +3714,7 @@ export const presets: Preset[] = [
     defaults: {},
     intro: [
       'Plenty of places still want documents without colour: e-filing systems for courts, visa and grant portals, university submission rules, and print shops quoting a cheaper mono rate. A printer set to black and white will do it on paper, but when the file itself has to be black and white, you need a converted copy.',
-      'Drop the PDF and you get that copy in a moment. Each colour becomes the grey of the same brightness, the way a black and white photocopy would show it, while the text stays real text: you can still search it, copy from it and zoom in without blur. The file stays almost exactly the same size.',
+      'Drop the PDF and you get that copy in a moment. Each colour becomes the grey of the same brightness, the way a black and white photocopy would show it, while the text stays real text: you can still search it, copy from it and zoom in without blur. The file stays about the same size, and often gets smaller.',
       'Strictly speaking the result is grayscale, with shades of grey for photos and coloured areas, which is what black and white means in nearly every submission guideline. It is made in your browser, so the document is not sent anywhere.',
     ],
     steps: [
@@ -3724,7 +3724,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Is it pure black and white or grayscale?', a: 'Grayscale: photos and coloured shapes become shades of grey so they stay readable. Black text stays black. That is what printers and filing systems mean by black and white; pure two-tone output would turn photos into blotches.' },
-      { q: 'Will a court or portal accept it?', a: 'The pages look and print grey, which is what most of those rules are after. But the original colour data stays inside the file, so a system that inspects colour spaces may still flag it as colour. If a portal or print shop rejects it, print the PDF to a new PDF in greyscale from your PDF reader, or run it through a preflight tool. Hyperlinks and bookmarks keep working and the text is searchable, which many e-filing systems also require.' },
+      { q: 'Will a court or portal accept it?', a: 'The pages look and print grey, which is what most of those rules are after. The colour is taken out of the file itself, so a colour-space check passes for everything the tool can read. Rare colour kinds such as spot colours (Pantone and similar) and JPEG 2000 images can’t be rewritten: a page with one of those is greyed over instead, and the result line says how many pages. If a portal rejects one of those pages, run the file through a preflight tool. Hyperlinks and bookmarks keep working and the text is searchable, which many e-filing systems also require.' },
       { q: 'Can I check the result before printing?', a: 'Yes. Open the downloaded copy in any PDF reader. It shows exactly what a mono printer will print, which is a quick way to see whether a chart still reads without colour.' },
       noUpload,
     ],

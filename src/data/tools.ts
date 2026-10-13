@@ -4555,7 +4555,7 @@ export const tools: Tool[] = [
     name: 'Grayscale PDF',
     title: 'Convert PDF to Grayscale, Text Kept, No Upload | Stayput',
     description:
-      'Turn a colour PDF into grayscale for printing or submission. Text stays text and sharp (scanned pages are images and stay images), and the file barely grows. Runs in your browser; nothing is uploaded.',
+      'Turn a colour PDF into grayscale for printing or submission. The colour is rewritten to gray inside the file, text stays text and sharp (scanned pages are images and stay images), and the file does not grow. Runs in your browser; nothing is uploaded.',
     heading: 'Convert a PDF to grayscale',
     tagline: 'Every colour becomes its own shade of grey, and the text stays text.',
     category: 'pdf',
@@ -4576,11 +4576,11 @@ export const tools: Tool[] = [
       },
       {
         q: 'Will the text still be selectable?',
-        a: 'If the PDF has text, yes. The pages are not turned into pictures. A grey layer that removes colour is placed over each page, so text can still be selected, searched and copied, and it stays sharp at any zoom. A scanned PDF is made of page images with no text layer, so it stays that way unless it was run through OCR.',
+        a: 'If the PDF has text, yes. The pages are not turned into pictures: the colour settings inside each page are rewritten to gray and the text itself is not touched, so it can still be selected, searched and copied, and it stays sharp at any zoom. A scanned PDF is made of page images with no text layer, so it stays that way unless it was run through OCR.',
       },
       {
         q: 'Why would I need a grayscale PDF?',
-        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo. One caveat for strict checks: the pages look and print grey, but the original colour data stays inside the file, so a system that inspects colour spaces may still flag it. If a portal or print shop rejects the copy, print the PDF to a new PDF in greyscale from your PDF reader, or use a preflight tool.',
+        a: 'Some courts, universities, grant portals and print shops ask for documents in black and white, and a grayscale copy shows how a colour chart or slide deck will look on a mono printer before you print it. Office printers set to colour can also charge a colour page for a single blue logo. The colour is taken out of the file itself, not just painted over, so a colour-space check passes for everything the tool can read. The exception is rare colour kinds, such as spot colours (Pantone and similar), Lab colour and JPEG 2000 images, which it can’t rewrite: a page with any of those is greyed over instead, and the result says how many pages that was.',
       },
       {
         q: 'Do different colours stay distinguishable?',
@@ -4588,11 +4588,15 @@ export const tools: Tool[] = [
       },
       {
         q: 'Are comments and form fields converted too?',
-        a: 'Highlights, sticky notes and form fields are drawn by your PDF reader on top of the page, so they keep their colour. Flatten them into the page first if they must be grey as well.',
+        a: 'Highlights, sticky notes and form fields that store their own look are converted along with the page, and so are their border and fill colours. Rich-text styling inside some comments is not rewritten, so such a note can still show colour in a reader. Flatten them into the page first if everything must be grey.',
+      },
+      {
+        q: 'What happens to colour it can’t convert?',
+        a: 'That page keeps a grey layer drawn over it, so it looks and prints grey, but its colour data is still stored in the file. The result line says how many pages that is, for example “12 pages converted; 1 page has colour we couldn’t convert and is greyed on top”. The other pages are converted for real.',
       },
       {
         q: 'Does the file get bigger?',
-        a: 'Only by a few hundred bytes per document. Nothing is re-rendered, so there are no page images to add, unlike converters that rasterise every page.',
+        a: 'Usually not. Colour images become one-channel gray images, so a PDF with photos or colour scans is often smaller, and a text-only PDF changes by a few dozen bytes. JPEG photos are decoded in your tab and saved again as grayscale JPEGs at high quality, which adds a very small extra loss. A page that falls back to the grey layer gets a few hundred bytes more.',
       },
     ],
   },
