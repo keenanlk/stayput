@@ -7,15 +7,16 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { changedUrls } from './indexnow-changes.mjs';
-import { main, MAX_URLS, urlSetHash } from './indexnow.mjs';
+import { main, MAX_URLS, urlSetHash, LIVE_CHECK_ATTEMPTS } from './indexnow.mjs';
 
 const site = 'https://stayput.dev';
 const keyFile = `${'a'.repeat(32)}.txt`;
 const entry = (hash, date = '2026-10-01') => ({ date, hash });
 const pages = (n, hash = 'h') => Object.fromEntries(Array.from({ length: n }, (_, i) => [`/p${String(i).padStart(3, '0')}`, entry(hash)]));
 
-// A fetch stand-in that serves the key file and records every other request.
-function stub(sitemapUrls = []) {
+// A fetch stand-in that serves the key file and records every other request. Any other page on the
+// site is live (200, indexable) unless `live` maps its URL to a response, or to a function of the attempt number.
+function stub(sitemapUrls = [], live = {}) {
   const calls = [];
   const fetch = async (url, init) => {
     calls.push({ url, init });
@@ -24,6 +25,12 @@ function stub(sitemapUrls = []) {
     if (url === `${site}/sitemap-index.xml`) return ok('<loc>https://stayput.dev/sitemap-0.xml</loc>');
     if (url === `${site}/sitemap-0.xml`) return ok(sitemapUrls.map((u) => `<loc>${u}</loc>`).join(''));
     if (url === 'https://api.indexnow.org/indexnow') return ok('');
+    if (url.startsWith(`${site}/`)) {
+      const attempt = calls.filter((c) => c.url === url).length;
+      const r = typeof live[url] === 'function' ? live[url](attempt) : live[url];
+      const { status = 200, body = '<html><head><link rel="canonical" href="x"></head></html>', headers = {} } = r ?? {};
+      return { ok: status < 400, status, headers: { get: (h) => headers[h.toLowerCase()] ?? null }, text: async () => body };
+    }
     throw new Error(`unexpected request ${url}`);
   };
   const submissions = () => calls.filter((c) => c.url.includes('api.indexnow.org')).map((c) => JSON.parse(c.init.body).urlList);
@@ -35,7 +42,7 @@ async function run(argv, { previous, next, fetch, now = 1_000_000 }) {
   const out = [];
   const errs = [];
   const maps = { 'HEAD~1': previous, HEAD: next };
-  const code = await main(argv, { fetch, keyFile, now, mapAt: (rev) => maps[rev] ?? null, log: (l) => out.push(l), err: (l) => errs.push(l) });
+  const code = await main(argv, { fetch, keyFile, now, sleep: async () => {}, mapAt: (rev) => maps[rev] ?? null, log: (l) => out.push(l), err: (l) => errs.push(l) });
   return { code, out: out.join('\n'), errs: errs.join('\n') };
 }
 
@@ -153,6 +160,69 @@ test('dedup: a failed submission is not recorded', async () => {
   const r = await run([`--dedup-file=${file}`], { previous: null, next: pages(2), fetch: failing });
   assert.equal(r.code, 1);
   assert.throws(() => readFileSync(file));
+});
+
+const NOINDEX = '<html><head><meta name="robots" content="noindex"></head><body>Page not found</body></html>';
+
+test('live check: a 404 URL is dropped and logged, the 200 URL is submitted', async () => {
+  const s = stub([], { [`${site}/p001`]: { status: 404, body: NOINDEX } });
+  const r = await run([], { previous: null, next: pages(3), fetch: s.fetch });
+  assert.equal(r.code, 0);
+  assert.deepEqual(s.submissions(), [[`${site}/p000`, `${site}/p002`]]);
+  assert.match(r.out, /dropped.*\/p001: HTTP 404/);
+});
+
+test('live check: a 200 with a noindex meta is dropped', async () => {
+  const s = stub([], { [`${site}/p000`]: { status: 200, body: NOINDEX } });
+  const r = await run([], { previous: null, next: pages(2), fetch: s.fetch });
+  assert.deepEqual(s.submissions(), [[`${site}/p001`]]);
+  assert.match(r.out, /dropped.*\/p000: noindex meta/);
+});
+
+test('live check: an X-Robots-Tag noindex header is dropped', async () => {
+  const s = stub([], { [`${site}/p000`]: { headers: { 'x-robots-tag': 'noindex, nofollow' } } });
+  await run([], { previous: null, next: pages(2), fetch: s.fetch });
+  assert.deepEqual(s.submissions(), [[`${site}/p001`]]);
+});
+
+test('live check: a redirect is not followed and is dropped; fetch asks for no cache', async () => {
+  const s = stub([], { [`${site}/p000`]: { status: 308 } });
+  await run([], { previous: null, next: pages(2), fetch: s.fetch });
+  assert.deepEqual(s.submissions(), [[`${site}/p001`]]);
+  const page = s.calls.find((c) => c.url === `${site}/p000`);
+  assert.equal(page.init.redirect, 'manual');
+  assert.equal(page.init.cache, 'no-store');
+});
+
+test('live check: nothing is sent when every URL fails, and the exit code is non-zero', async () => {
+  const gone = { status: 404, body: NOINDEX };
+  const s = stub([], { [`${site}/p000`]: gone, [`${site}/p001`]: gone });
+  const r = await run([], { previous: null, next: pages(2), fetch: s.fetch });
+  assert.equal(r.code, 1);
+  assert.deepEqual(s.submissions(), []);
+  assert.match(r.errs, /Nothing was sent/);
+  // each failing URL was retried before giving up
+  assert.equal(s.calls.filter((c) => c.url === `${site}/p000`).length, LIVE_CHECK_ATTEMPTS);
+});
+
+test('live check: a deploy that goes live after a few retries is still announced', async () => {
+  const s = stub([], { [`${site}/p000`]: (attempt) => (attempt < 3 ? { status: 404, body: NOINDEX } : {}) });
+  const r = await run([], { previous: null, next: pages(1), fetch: s.fetch });
+  assert.equal(r.code, 0);
+  assert.deepEqual(s.submissions(), [[`${site}/p000`]]);
+});
+
+test('live check: the 50 cap still applies before the check', async () => {
+  const s = stub();
+  await run([], { previous: null, next: pages(73), fetch: s.fetch });
+  assert.equal(s.calls.filter((c) => c.url.startsWith(`${site}/p`)).length, MAX_URLS);
+});
+
+test('live check: --all --force drops dead sitemap URLs too', async () => {
+  const urls = [`${site}/a`, `${site}/b`, `${site}/c`];
+  const s = stub(urls, { [`${site}/b`]: { status: 404 } });
+  await run(['--all', '--force'], { previous: null, next: pages(1), fetch: s.fetch });
+  assert.deepEqual(s.submissions(), [[`${site}/a`, `${site}/c`]]);
 });
 
 test('CLI: `--all` alone exits non-zero before any network access', () => {
