@@ -132,6 +132,22 @@
       "BUILD.md": "vendor-builds/libav-avi/README.md"
     }
   },
+  "libavFlv": {
+    "package": "libav.js",
+    "version": "6.10.9.0",
+    "local": "vendor-builds/libav-flv/dist/",
+    "entry": "libav-6.10.9.0-flv.mjs",
+    "files": {
+      "libav-6.10.9.0-flv.mjs": "libav-6.10.9.0-flv.mjs",
+      "libav-6.10.9.0-flv.wasm.mjs": "libav-6.10.9.0-flv.wasm.mjs",
+      "libav-6.10.9.0-flv.wasm.wasm": "libav-6.10.9.0-flv.wasm.wasm"
+    },
+    "licences": {
+      "LGPL-2.1.txt": "public/licenses/LGPL-2.1.txt",
+      "ffmpeg-config-flv.txt": "vendor-builds/libav-flv/dist/ffmpeg-config.txt",
+      "BUILD-flv.md": "vendor-builds/libav-flv/README.md"
+    }
+  },
   "zxing": {
     "package": "zxing-wasm",
     "version": "3.1.5",

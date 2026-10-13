@@ -32,6 +32,7 @@ const pages = [
   '/press',
   '/licenses',
   '/avi-to-mp4',
+  '/flv-to-mp4',
 ];
 
 for (const path of pages) {
