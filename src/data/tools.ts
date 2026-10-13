@@ -1117,14 +1117,14 @@ export const tools: Tool[] = [
       'Pull the audio out of MOV, MKV, WebM or other video, or turn M4A, WAV and FLAC into MP3. Converted in your browser, nothing uploaded, no sign-up.',
     heading: 'Convert video or audio to MP3',
     tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
-    taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3).',
+    taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3). To keep the sound of any video as MP3 or WAV, see [Extract audio from video](/extract-audio-from-video).',
     sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
     category: 'media',
     accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
     multiple: true,
     dropLabel: 'Drop videos or audio files to convert',
     action: 'Convert',
-    keywords: ['video to mp3', 'extract audio from video', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
+    keywords: ['video to mp3', 'mp3 converter', 'convert video to mp3', 'm4a to mp3', 'mov to mp3', 'wav to mp3'],
     steps: [
       'Drop one or more videos or audio files (MP4, MOV, WebM, M4A, WAV, FLAC and more), or tap to pick them.',
       'Choose MP3 or WAV. For MP3 pick a quality: 192 kbps suits music, 96 kbps is plenty for speech. Choose mono to halve the size of a voice recording.',
@@ -1149,7 +1149,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I get a WAV instead?',
-        a: 'Yes. Choose WAV and you get uncompressed 16-bit, 44.1 kHz audio, the format audio editors and some upload forms ask for. It is about ten times the size of an MP3.',
+        a: 'Yes. Choose WAV and you get uncompressed 16-bit, 44.1 kHz audio, the format audio editors and some upload forms ask for. It is about seven times the size of an MP3 at the default 192 kbps.',
       },
       {
         q: 'Do I need the audio if I only want the words?',
@@ -2705,7 +2705,7 @@ export const tools: Tool[] = [
     multiple: true,
     dropLabel: 'Drop audio files to change pitch or speed',
     action: 'Change',
-    keywords: ['pitch changer', 'change pitch of audio', 'audio pitch shifter', 'change key of song', 'speed up audio', 'slow down audio', 'mp3 speed changer', 'transpose audio'],
+    keywords: ['pitch changer', 'change pitch of audio', 'audio pitch shifter', 'speed up audio', 'slow down audio', 'mp3 speed changer', 'pitch shifter online'],
     steps: [
       'Drop one or more sound files (MP3, WAV, M4A, FLAC, OGG), or tap to pick them.',
       'Move the pitch in semitones, choose a speed, or both. Keep the original format or pick another.',
@@ -2718,7 +2718,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How do I change the key of a song?',
-        a: 'Move the pitch slider by the number of semitones between the keys: from C to D is +2, from E to C is −4. The tempo and length stay the same, so you can sing or play along in a key that suits your voice or instrument.',
+        a: 'Move the pitch slider by the number of semitones between the keys: from C to D is +2, from E to C is −4. The tempo and length stay the same, so you can sing or play along in a key that suits your voice or instrument. The [Key changer](/key-changer) page opens on this control.',
       },
       {
         q: 'Will speeding up make voices sound like chipmunks?',
