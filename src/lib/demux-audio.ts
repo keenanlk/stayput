@@ -17,6 +17,31 @@ const PRE_ROLL = 4;
 /** Codecs the browsers' own decoders read from an MP4 wrapper. */
 const WRAPPABLE = new Set(['aac', 'mp3']);
 
+/** The most sound allocated up front from a container's own duration: a duration that is wrong (damaged timestamps, a lying header) must not decide how much memory is asked for. A longer recording grows the buffer as its sound arrives. */
+const MAX_PLANNED_SECONDS = 3600;
+/** The longest silence taken at its word between two packets; a bigger jump is damaged timestamps, and the sound follows on. */
+const MAX_GAP_SECONDS = 60;
+
+/** Samples to allocate for a sound of `seconds` (as the container says) at `rate`. */
+export function plannedSamples(seconds: number, rate: number): number {
+  const plausible = Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds, MAX_PLANNED_SECONDS) : 60;
+  return Math.ceil(plausible * rate) + rate;
+}
+
+/** `channel`, or a bigger copy of it that holds at least `need` samples. */
+export function grown(channel: Float32Array<ArrayBuffer>, need: number): Float32Array<ArrayBuffer> {
+  if (need <= channel.length) return channel;
+  const bigger = new Float32Array(Math.max(need, Math.ceil(channel.length * 1.5)));
+  bigger.set(channel);
+  return bigger;
+}
+
+/** Where a stretch starting at `seconds` goes: at its time, unless that is a leap past what has been written (damaged timestamps). */
+export function placedAt(seconds: number, written: number, rate: number): number {
+  const at = Math.round(Math.max(0, seconds) * rate);
+  return at > written + MAX_GAP_SECONDS * rate ? written : at;
+}
+
 export const NO_SOUND = 'No sound track was found in this file, so there is no speech to write down.';
 
 /** A file's sound as `demuxedSound` reads it, or null when the file has no sound track that can be copied out. */
@@ -40,8 +65,9 @@ export async function demuxedSound(input: Input, rate: number, mono: boolean, on
   const config = await track.getDecoderConfig();
   if (!config) return null;
 
-  const length = Math.ceil((await input.computeDuration()) * rate) + rate;
-  let out: Float32Array[] | null = null;
+  const declared = await input.computeDuration();
+  const planned = plannedSamples(declared, rate);
+  let out: Float32Array<ArrayBuffer>[] | null = null;
   let written = 0;
   let packets: EncodedPacket[] = [];
   let tail: EncodedPacket[] = [];
@@ -50,15 +76,16 @@ export async function demuxedSound(input: Input, rate: number, mono: boolean, on
   const flush = async () => {
     if (packets.length === 0) return;
     const chans = await decodeStretch(tail, packets, config, rate, mono);
-    out ??= chans.map(() => new Float32Array(length));
-    const at = Math.round(spanStart * rate);
-    for (const [c, ch] of chans.entries()) out[Math.min(c, out.length - 1)]!.set(ch.subarray(0, Math.max(0, Math.min(ch.length, length - at))), at);
-    written = Math.max(written, at + chans[0]!.length);
+    const at = placedAt(spanStart, written, rate);
+    const need = at + chans[0]!.length;
+    out = out ? out.map((ch) => grown(ch, need)) : chans.map(() => new Float32Array(Math.max(planned, need)));
+    for (const [c, ch] of chans.entries()) out[Math.min(c, out.length - 1)]!.set(ch, at);
+    written = Math.max(written, need);
     tail = packets.slice(-PRE_ROLL);
     packets = [];
   };
 
-  const duration = Math.max(1, length / rate);
+  const duration = Number.isFinite(declared) ? Math.max(1, declared) : 1;
   for await (const p of new EncodedPacketSink(track).packets()) {
     if (packets.length === 0) spanStart = Math.max(0, p.timestamp);
     packets.push(p);
@@ -69,8 +96,7 @@ export async function demuxedSound(input: Input, rate: number, mono: boolean, on
   }
   await flush();
   if (written === 0 || !out) throw audioDecodeError(NO_SOUND);
-  const end = Math.min(length, written);
-  return (out as Float32Array[]).map((ch) => ch.subarray(0, end));
+  return (out as Float32Array[]).map((ch) => ch.subarray(0, written));
 }
 
 /** Wrap some packets in an MP4 and decode it; the pre-roll packets are decoded too, then dropped from the front. */
