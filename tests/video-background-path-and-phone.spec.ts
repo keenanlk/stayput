@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 // "Estimating time left…" before its first figure, and on a phone a big clip gets a one-line hint that never blocks Run.
 const clip = fileURLToPath(new URL('./fixtures/static/iphone-portrait-person.mov', import.meta.url));
 const uhd = fileURLToPath(new URL('./fixtures/static/uhd-flat.mp4', import.meta.url));
+const withSound = fileURLToPath(new URL('./fixtures/static/speech.mov', import.meta.url));
 const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1';
 
 test.describe('which path ran', () => {
@@ -138,5 +139,13 @@ test.describe('output size', () => {
   test('1080p never makes a smaller clip bigger', async ({ page }) => {
     test.setTimeout(240_000);
     expect(await run(page, 'hd', clip)).toContain('720×1280');
+  });
+
+  test('the picture is written beside the sound, which is kept', async ({ page }) => {
+    test.setTimeout(240_000);
+    const text = await run(page, 'full', withSound);
+    expect(text).toContain('160×90');
+    expect(text).not.toContain('no sound');
+    expect(text).not.toContain('sound left out');
   });
 });
