@@ -21,6 +21,7 @@ import {
   QTFF,
   QUALITY_HIGH,
   WEBM,
+  AudioSampleSource,
   getFirstEncodableAudioCodec,
   type AudioCodec,
 } from 'mediabunny';
@@ -28,6 +29,8 @@ import { executeWatched } from './encoder-watchdog';
 import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
 import { H264Unavailable } from './encoder-probe';
 import { CODEC_NAMES, unplayable } from './video-compress';
+import { firstEncodableSound } from './mp3-fallback';
+import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
 export interface ConvertOptions {
   mute: boolean;
@@ -96,8 +99,18 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       const src = sound.codec;
       if (src && audioCopy.includes(src)) audioCodec = src;
       else if (await sound.canDecode()) {
-        audioCodec = await getFirstEncodableAudioCodec(mov ? ['aac'] : ['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: QUALITY_HIGH });
+        // A MOV is AAC only; an MP4 may hold MP3 from the WebAssembly encoder when the browser has no AAC or Opus.
+        const config = { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: QUALITY_HIGH };
+        audioCodec = mov ? await getFirstEncodableAudioCodec(['aac'], config) : await firstEncodableSound(['aac', 'opus'], config);
       }
+    }
+
+    // iOS 18 and earlier can neither decode nor encode sound with WebCodecs, so Mediabunny cannot re-encode it.
+    // The page's own audio decoder reads it instead, and the MP3 encoder writes it as a second track.
+    let pcm: Float32Array[] | null = null;
+    if (!mov && sound && !audioCodec && !(await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: 2, sampleRate: 48_000, bitrate: QUALITY_HIGH }))) {
+      pcm = await decodePcm(file);
+      if (pcm && !(await firstEncodableSound([], { numberOfChannels: pcm.length, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH }))) pcm = null;
     }
 
     if (mov && sound && !audioCodec) {
@@ -109,6 +122,8 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       input,
       output,
       tracks: 'primary',
+      // With a sound track of our own on the output, the output is started and finished here.
+      composable: !!pcm,
       video: copyVideo
         ? {}
         : { codec: videoCodec, bitrate: QUALITY_HIGH, width: evenW, height: evenH, fit: 'contain', allowTransformationMetadata: false },
@@ -117,7 +132,7 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       audio: audioCodec
         ? sound!.codec === audioCodec
           ? {}
-          : { codec: audioCodec, bitrate: QUALITY_HIGH, sampleRate: await aacSafeSampleRate(sound) }
+          : { codec: audioCodec, bitrate: QUALITY_HIGH, sampleRate: audioCodec === 'mp3' ? SAMPLE_RATE : await aacSafeSampleRate(sound) }
         : { discard: true },
     });
     if (!conversion.isValid) {
@@ -129,7 +144,17 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     if (soundLost && mov) {
       throw new Error('This browser cannot read this file’s sound, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
     }
-    await executeWatched(conversion, opts.onProgress);
+    let feeding: Promise<void> | null = null;
+    if (pcm) {
+      const source = new AudioSampleSource({ codec: 'mp3', bitrate: QUALITY_HIGH });
+      output.addAudioTrack(source);
+      await output.start();
+      feeding = pcmFeeder(source, pcm)
+        .until(Infinity)
+        .then(() => source.close());
+    }
+    await Promise.all([executeWatched(conversion, opts.onProgress), feeding]);
+    if (pcm) await output.finalize();
     const buffer = output.target.buffer;
     if (!buffer) throw new Error('The video could not be written.');
     return {
@@ -139,8 +164,8 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       duration,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       videoCopied: copyVideo,
-      audio: !!audioCodec && !soundLost,
-      audioDropped: !!sound && (!audioCodec || soundLost),
+      audio: (!!audioCodec && !soundLost) || !!pcm,
+      audioDropped: !!sound && !pcm && (!audioCodec || soundLost),
     };
   } finally {
     input.dispose?.();
