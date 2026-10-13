@@ -127,10 +127,10 @@ interface Download {
 
 /** Tools that download a model or engine on first use, by base tool slug. */
 const downloads: Record<string, Download> = {
-  'remove-background': { what: 'cut-out model', size: '46 MB' },
-  'sticker-maker': { what: 'cut-out model', size: '46 MB' },
-  'passport-photo': { what: 'face finder and cut-out model', size: '50 MB' },
-  'profile-picture-maker': { what: 'face finder and cut-out model', size: '50 MB' },
+  'remove-background': { what: 'cut-out model', size: '42 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 42 MB in all) to your browser, and after that the tool works offline.' },
+  'sticker-maker': { what: 'cut-out model', size: '42 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 42 MB in all) to your browser, and after that the tool works offline.' },
+  'passport-photo': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
+  'profile-picture-maker': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
   'upscale-image': { what: 'upscaling model', size: '4.9 MB' },
   'remove-object': { what: 'object removal model', size: '28 MB' },
   'image-to-text': { what: 'text reader', size: '6 MB' },

@@ -62,7 +62,7 @@ test('hand-written leads on the six most-visited pages say what the code does', 
   expect(lead('/tools/mute-video')).toMatch(/same format/);
   expect(lead('/tools/gif-to-mp4')).toMatch(/no sound track/);
   // Model tools carry their download size and the offline note.
-  expect(lead('/tools/remove-background')).toMatch(/about 46 MB.*offline/);
+  expect(lead('/tools/remove-background')).toMatch(/about 42 MB in all.*offline/);
   expect(lead('/tools/vocal-remover')).toMatch(/about 67 MB.*offline/);
   expect(lead('/tools/transcribe')).toMatch(/about 76 MB.*offline/);
   // A base tool's hand-written lead must not leak onto its presets.
