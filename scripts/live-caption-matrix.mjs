@@ -61,6 +61,8 @@ async function run(browserName, tool, seconds, n) {
   let context;
   try {
     context = await type.launchPersistentContext(profile, { headless: !headed, reducedMotion: 'reduce', serviceWorkers: withSw ? 'allow' : 'block', ...options });
+    // register-sw.js skips automated browsers; --with-sw opts in.
+    if (withSw) await context.addInitScript(() => { window.__stayputAllowSW = true; });
     context.on('requestfailed', (r) => network.push(`${r.failure()?.errorText} ${r.url()}`));
     context.on('response', (r) => r.status() >= 400 && network.push(`HTTP ${r.status()} ${r.url()}`));
     const page = context.pages()[0] ?? (await context.newPage());

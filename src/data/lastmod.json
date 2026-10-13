@@ -91,6 +91,10 @@
   "date": "2026-10-12",
   "hash": "56aed264384e493d"
  },
+ "/bpm-finder": {
+  "date": "2026-10-13",
+  "hash": "2e2bc11cb788f46c"
+ },
  "/brighten-photo": {
   "date": "2026-10-12",
   "hash": "3f2570287bc5b8e1"
@@ -1320,8 +1324,8 @@
   "hash": "e00364f0ee586cda"
  },
  "/tools/bpm-key-finder": {
-  "date": "2026-10-12",
-  "hash": "b8ec81c37f79e157"
+  "date": "2026-10-13",
+  "hash": "c296fef1fdbb297e"
  },
  "/tools/collage-maker": {
   "date": "2026-10-12",
