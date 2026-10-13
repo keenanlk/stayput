@@ -263,6 +263,10 @@
   "date": "2026-10-12",
   "hash": "3b797fa70372edcc"
  },
+ "/extract-audio-from-video": {
+  "date": "2026-10-13",
+  "hash": "a561e495295c90eb"
+ },
  "/extract-frames-from-video": {
   "date": "2026-10-12",
   "hash": "7aa20a98269081eb"
@@ -425,7 +429,7 @@
  },
  "/guides/how-to-convert-a-video-to-mp3": {
   "date": "2026-09-29",
-  "hash": "a5a46587b3ad551f"
+  "hash": "94b23c01973cef6e"
  },
  "/guides/how-to-convert-an-image-to-svg": {
   "date": "2026-10-04",
@@ -867,6 +871,10 @@
   "date": "2026-10-12",
   "hash": "b8bc9f51b41f04b8"
  },
+ "/key-changer": {
+  "date": "2026-10-13",
+  "hash": "6c177b1a9ee5e712"
+ },
  "/letter-to-a4": {
   "date": "2026-10-12",
   "hash": "f2e0a7fc9e46d25e"
@@ -978,6 +986,10 @@
  "/mp4-to-wav": {
   "date": "2026-10-12",
   "hash": "ea0c45f7d830f899"
+ },
+ "/nightcore-maker": {
+  "date": "2026-10-13",
+  "hash": "32d01fc14f604f5d"
  },
  "/normalize-audio": {
   "date": "2026-10-12",
@@ -1232,8 +1244,8 @@
   "hash": "1b529026688d4544"
  },
  "/speed-up-audio": {
-  "date": "2026-10-12",
-  "hash": "1b1243eea73717fa"
+  "date": "2026-10-13",
+  "hash": "cb83e054e74a8a64"
  },
  "/speed-up-video": {
   "date": "2026-10-12",
@@ -1500,8 +1512,8 @@
   "hash": "c63bceb44c5782fa"
  },
  "/tools/pitch-changer": {
-  "date": "2026-10-12",
-  "hash": "e10c1127d2576bf5"
+  "date": "2026-10-13",
+  "hash": "e99bdba6c2fe1b9b"
  },
  "/tools/pixel-art-converter": {
   "date": "2026-10-12",
@@ -1648,8 +1660,8 @@
   "hash": "706a90d1f56d4035"
  },
  "/tools/video-to-mp3": {
-  "date": "2026-10-12",
-  "hash": "4b2ba2e771c4403f"
+  "date": "2026-10-13",
+  "hash": "99b799798f7951c5"
  },
  "/tools/video-to-mp4": {
   "date": "2026-10-12",

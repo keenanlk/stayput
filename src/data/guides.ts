@@ -2113,7 +2113,7 @@ export const guides: Guide[] = [
       {
         h: 'A direct converter to MP3',
         p: [
-          'Stayput\'s [video to MP3](/tools/video-to-mp3) tool does this directly, on your phone or computer: drop in a video (or several, in a batch) and it extracts the audio and saves it as an MP3 or WAV, in the browser, without uploading the file. It skips the extra M4A-to-MP3 conversion step that QuickTime\'s export leaves you with.',
+          'Stayput\'s [video to MP3](/tools/video-to-mp3) tool does this directly, on your phone or computer: drop in a video (or several, in a batch) and it extracts the audio and saves it as an MP3 or WAV, in the browser, without uploading the file. It skips the extra M4A-to-MP3 conversion step that QuickTime\'s export leaves you with. To choose between MP3 and WAV for any video format, see [Extract audio from video](/extract-audio-from-video).',
         ],
       },
     ],
