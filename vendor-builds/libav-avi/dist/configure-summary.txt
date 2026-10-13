@@ -1,0 +1,31 @@
+Enabled decoders:
+ac3                     mp3                     pcm_s16le
+h263                    mpeg4                   pcm_u8
+mjpeg                   pcm_alaw
+mp2                     pcm_mulaw
+
+Enabled encoders:
+
+Enabled hwaccels:
+
+Enabled parsers:
+ac3                     mpeg4video              mpegaudio
+
+Enabled demuxers:
+avi
+
+Enabled muxers:
+
+Enabled protocols:
+data                    file
+
+Enabled filters:
+aresample               scale
+
+Enabled bsfs:
+
+Enabled indevs:
+
+Enabled outdevs:
+
+License: LGPL version 2.1 or later

@@ -31,6 +31,7 @@ const pages = [
   '/csv-to-json',
   '/press',
   '/licenses',
+  '/avi-to-mp4',
 ];
 
 for (const path of pages) {
