@@ -448,3 +448,69 @@ test('beforeSend strips everything but the documented fields', () => {
   expect(beforeSend('event', { ...full, url: '/a/b?x=1' })!.url).toBe('/a/b');
   expect(beforeSend('event', { ...full, url: undefined })!.url).toBeUndefined();
 });
+
+/** A failed run on `slug` with one file: the tool_run's error class, the message shown, and nothing else sent. */
+async function failedRunOf(page: Page, baseURL: string, slug: string, file: Parameters<ReturnType<Page['locator']>['setInputFiles']>[0], prepare?: () => Promise<void>) {
+  const sent = await captureAnalytics(page, baseURL);
+  await page.goto(`${SITE}/tools/${slug}`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await prepare?.();
+  await page.locator('#file-input').setInputFiles(file);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
+  const run = sent.find((s) => s.payload.name === 'tool_run')!;
+  expect(violations(run), JSON.stringify(run)).toEqual([]);
+  return { shown: (await page.locator('#error').innerText()).replace(/\s+/g, ' '), data: run.payload.data as Record<string, string>, raw: JSON.stringify(sent) };
+}
+
+for (const [label, body] of [
+  ['text with a .pdf name', 'secret-notes plain text with a .pdf extension\n'.repeat(20)],
+  ['a PDF header and then damage', '%PDF-1.4\nsecret-notes this is not a PDF body\n'.repeat(20)],
+] as const) {
+  test(`Watermark PDF on ${label} fails as UnreadableFile, not a bare Error`, async ({ page, baseURL }) => {
+    const out = await failedRunOf(page, baseURL!, 'watermark-pdf', { name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from(body) }, async () => {
+      await page.locator('#wm-text').fill('DRAFT');
+    });
+    expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'UnreadableFile' });
+    expect(out.raw).not.toContain('secret-notes');
+  });
+}
+
+test('Audio to video reports EncoderRefused when the browser encoder fails at creation at every size', async ({ page, baseURL }) => {
+  test.setTimeout(180_000);
+  await page.addInitScript(() => {
+    const Real = window.VideoEncoder;
+    (window as unknown as { VideoEncoder: unknown }).VideoEncoder = class extends Real {
+      private fail: (e: DOMException) => void;
+      constructor(init: VideoEncoderInit) {
+        super(init);
+        this.fail = init.error;
+      }
+      override configure(config: VideoEncoderConfig) {
+        // The 320x240 start-up probe is let through; everything the tool asks for is refused.
+        if (config.width > 320) {
+          setTimeout(() => {
+            this.fail(new DOMException('Encoder creation error.', 'OperationError'));
+            this.close();
+          });
+          return;
+        }
+        super.configure(config);
+      }
+    };
+  });
+  const out = await failedRunOf(page, baseURL!, 'audio-to-video', fx('tone.wav'));
+  expect(out.data).toMatchObject({ tool: 'audio-to-video', outcome: 'error', error_class: 'EncoderRefused' });
+  expect(out.shown).toContain('refused to start');
+});
+
+test('Watermark PDF on a password-protected PDF whose prompt is dismissed fails as InputError, not a bare Error', async ({ page, baseURL }) => {
+  page.on('dialog', (d) => void d.dismiss());
+  const locked = { name: 'user-locked.pdf', mimeType: 'application/pdf', buffer: readFileSync(fileURLToPath(new URL('./fixtures/static/user-locked.pdf', import.meta.url))) };
+  const out = await failedRunOf(page, baseURL!, 'watermark-pdf', locked, async () => {
+    await page.locator('#wm-text').fill('DRAFT');
+  });
+  expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'InputError' });
+  expect(out.shown).toContain('password-protected');
+});
