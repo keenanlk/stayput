@@ -85,6 +85,106 @@ for (const t of tools) {
   });
 }
 
+const song = fixture('song.mp3');
+const face = fixture('face.jpg');
+
+/** The page plays the MP4 and reports its length (MP3 sound only: Linux WebKit never answers for AAC in an MP4). */
+async function playedLength(page: Page, bytes: Buffer, type: string) {
+  return page.evaluate(
+    (data) =>
+      new Promise<number>((resolve, reject) => {
+        const v = document.createElement('video');
+        v.preload = 'metadata';
+        v.onloadedmetadata = () => resolve(v.duration);
+        v.onerror = () => reject(new Error('cannot play'));
+        v.src = URL.createObjectURL(new Blob([new Uint8Array(data.bytes)], { type: data.type }));
+      }),
+    { bytes: [...bytes], type },
+  );
+}
+
+test('audio-to-video writes the sound as MP3 when the browser has no audio encoder', async ({ page }) => {
+  test.setTimeout(240_000);
+  await noAudioCodecs(page);
+  await page.goto('/tools/audio-to-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([song, face]);
+  const download = page.waitForEvent('download', { timeout: 200_000 });
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  const bytes = readFileSync((await (await download).path())!);
+  const out = new Input({ source: new BlobSource(new Blob([new Uint8Array(bytes)])), formats: ALL_FORMATS });
+  const audio = await out.getPrimaryAudioTrack();
+  expect(audio, 'the download has a sound track').not.toBeNull();
+  expect(audio!.codec).toBe('mp3');
+  const expected = await sourceDuration(song);
+  const duration = await out.computeDuration();
+  expect(duration).toBeGreaterThan(expected * 0.9);
+  expect(duration).toBeLessThan(expected * 1.1);
+  const played = await playedLength(page, bytes, 'video/mp4');
+  expect(played).toBeGreaterThan(expected * 0.9);
+  expect(played).toBeLessThan(expected * 1.1);
+});
+
+// speech.mov (AAC) cannot be re-encoded here, so exact mode copies its sound: the cut is still exact on the picture.
+for (const exact of [true, false]) {
+  test(`trim-video ${exact ? 'exact' : 'fast'} keeps the sound when the browser has no audio encoder`, async ({ page }) => {
+    test.setTimeout(240_000);
+    await noAudioCodecs(page);
+    await page.goto('/tools/trim-video');
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await page.locator('#file-input').setInputFiles(speech);
+    await expect(page.locator('#vg-panel[data-duration]')).toBeVisible({ timeout: 60_000 });
+    const length = await sourceDuration(speech);
+    // Fast mode starts at 0, a key frame: a start between key frames re-encodes the head of the clip, which stalls
+    // in Playwright's WebKit with or without audio codecs (the same on main), and is not what this test is about.
+    const start = exact ? 1 : 0;
+    const end = Math.min(length, 4);
+    await page.locator('#vg-start').fill(String(start));
+    await page.locator('#vg-end').fill(String(end));
+    if (exact) await page.locator('#exact').check();
+    const download = page.waitForEvent('download', { timeout: 200_000 });
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+    await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+    const d = await download;
+    expect(d.suggestedFilename()).toMatch(/\.mov$/);
+    const out = new Input({ source: new BlobSource(new Blob([new Uint8Array(readFileSync((await d.path())!))])), formats: ALL_FORMATS });
+    const audio = await out.getPrimaryAudioTrack();
+    expect(audio, 'the download has a sound track').not.toBeNull();
+    expect(audio!.codec).toBe('aac');
+    expect(await out.getPrimaryVideoTrack()).not.toBeNull();
+    const duration = await out.computeDuration();
+    const expected = end - start;
+    expect(duration).toBeGreaterThan(expected * 0.9);
+    expect(duration).toBeLessThan(expected * 1.1 + (exact ? 0 : 0.5));
+  });
+}
+
+test('trim-video exact copies an Opus WebM\'s sound when the browser has no audio encoder', async ({ page }) => {
+  test.setTimeout(240_000);
+  await noAudioCodecs(page);
+  await page.goto('/tools/trim-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(talk);
+  await expect(page.locator('#vg-panel[data-duration]')).toBeVisible({ timeout: 60_000 });
+  const length = await sourceDuration(talk);
+  const end = Math.min(length, 3);
+  await page.locator('#vg-start').fill('1');
+  await page.locator('#vg-end').fill(String(end));
+  await page.locator('#exact').check();
+  const download = page.waitForEvent('download', { timeout: 200_000 });
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  const out = new Input({ source: new BlobSource(new Blob([new Uint8Array(readFileSync((await (await download).path())!))])), formats: ALL_FORMATS });
+  expect((await out.getPrimaryAudioTrack())?.codec).toBe('opus');
+  const duration = await out.computeDuration();
+  expect(duration).toBeGreaterThan((end - 1) * 0.9);
+  expect(duration).toBeLessThan((end - 1) * 1.1);
+});
+
 test('if the MP3 encoder cannot load, the page says the sound encoder could not load', async ({ page }) => {
   test.setTimeout(90_000);
   await noAudioCodecs(page);
