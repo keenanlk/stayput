@@ -157,7 +157,6 @@ createShell({
         readsBack: false,
         // Not bigger than it went in: the default quality writes about 70% more bits than a phone does.
         matchSourceBitrate: true,
-        ownFrameLoop: true,
         ...(await sizeFor(file)),
         async paint(ctx) {
           await matte.apply(ctx, (c, _frame, seen) => {

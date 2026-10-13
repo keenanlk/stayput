@@ -8,7 +8,6 @@
  */
 import {
   BlobSource,
-  CanvasSource,
   BufferTarget,
   Conversion,
   Input,
@@ -21,14 +20,13 @@ import {
   QTFF,
   QUALITY_HIGH,
   Quality,
-  VideoSampleSink,
   WEBM,
   WebMOutputFormat,
   type InputVideoTrack,
   type Rotation,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
-import { executeWatched, watchEncode } from './encoder-watchdog';
+import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile } from './input-error';
@@ -60,12 +58,6 @@ export interface EditOptions {
    * would be above it. Without it a 4K phone clip came out 44% bigger than it went in.
    */
   matchSourceBitrate?: boolean;
-  /**
-   * Decode, paint and encode the picture in our own loop and let Mediabunny handle only the sound, instead of
-   * giving it a per-frame `process` hook. For a phone clip stored sideways that skips its full-size rotate
-   * re-render of every frame. Needs `paint`, and no rotate, flip or crop.
-   */
-  ownFrameLoop?: boolean;
   /** Output size. With only one side set, the other follows the aspect ratio. */
   width?: number;
   height?: number;
@@ -261,89 +253,6 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       canvas.height = height;
       frame = canvas.getContext('2d', { willReadFrequently: opts.readsBack !== false }) ?? undefined;
       if (!frame) throw new Error('Canvas is not available in this browser.');
-    }
-    if (opts.ownFrameLoop && paintScales && paint && frame) {
-      const out = await outputTarget(file.size);
-      const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
-      let blob: Blob;
-      let conversion: Conversion;
-      try {
-        const source = new CanvasSource(frame.canvas, { codec: videoCodec, bitrate });
-        output.addVideoTrack(source, { frameRate: undefined });
-        // Only the sound goes through the conversion; it is composable so the picture can be added beside it.
-        conversion = await Conversion.init({ input, output, composable: true, tracks: 'primary', video: { discard: true }, audio: opts.mute ? { discard: true } : {} });
-        if (!conversion.isValid && !conversion.discardedTracks.every((d) => d.track.isVideoTrack() || d.reason === 'discarded_by_user')) {
-          throw new Error('This browser cannot edit this video.');
-        }
-        // Same zero point the conversion uses for the sound: the first timestamp of what it carries.
-        const audioTrack = sound && !opts.mute && !conversion.discardedTracks.some((d) => d.track.isAudioTrack()) ? sound : null;
-        const first = await (audioTrack ?? video).getFirstTimestamp();
-        const zero = Math.max(first, 0);
-        await output.start();
-        let stopped = false;
-        const loop = async (progress: (f: number) => void) => {
-          const sink = new VideoSampleSink(video);
-          let loopStart = 0;
-          for await (const sample of sink.samples()) {
-            if (stopped) {
-              sample.close();
-              break;
-            }
-            const at = sample.timestamp - zero;
-            if (at < 0) {
-              sample.close();
-              continue;
-            }
-            sample.draw(frame!, 0, 0, width, height);
-            const length = sample.duration;
-            sample.close();
-            const began = performance.now();
-            if (!loopStart) loopStart = began;
-            await paint(frame!, at);
-            timing.paintMs += performance.now() - began;
-            await nextTurn();
-            await source.add(at, length);
-            timing.frames++;
-            timing.loopMs = performance.now() - loopStart;
-            const f = duration > 0 ? Math.min(1, at / duration) : 0;
-            progress(f);
-            opts.onProgress?.(f);
-          }
-          source.close();
-        };
-        await watchEncode(
-          async (progress) => {
-            // With no sound track there is nothing for the conversion to do.
-            const audioDone = conversion.isValid ? conversion.execute() : Promise.resolve();
-            audioDone.catch(() => undefined);
-            await Promise.all([loop(progress), audioDone]);
-            await output.finalize();
-          },
-          async () => {
-            stopped = true;
-            await conversion.cancel().catch(() => undefined);
-            await output.cancel().catch(() => undefined);
-          },
-        );
-        opts.onProgress?.(1);
-        blob = await finishOutput(out, 'video/mp4');
-      } catch (e) {
-        await out.disk?.abort();
-        throw e;
-      }
-      const kept = !opts.mute && !!sound && !conversion.discardedTracks.some((d) => d.track.isAudioTrack());
-      return {
-        blob,
-        ext: 'mp4',
-        width,
-        height,
-        duration,
-        videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
-        reencoded: true,
-        audio: kept,
-        audioDropped: !opts.mute && !!sound && !kept,
-        timing,
-      };
     }
     const out = await outputTarget(file.size);
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
