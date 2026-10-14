@@ -82,7 +82,9 @@ test('a 40-frame animated WebP becomes an MP4 as long as its frame delays, at it
   expect(errors).toEqual([]);
 });
 
-test('blend and dispose modes render as the file says, and transparency takes the chosen colour', async ({ page }) => {
+test('blend and dispose modes render as the file says, and transparency takes the chosen colour', async ({ page, browserName }) => {
+  // Linux WebKit in CI reads decoded video frames back black; macOS WebKit and Chromium (CI) check the pixels.
+  test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit cannot read video frames back');
   await open(page);
   const mp4 = await convert(page, staticFx('blend-dispose.webp'));
   const r = await probe(page, mp4, [
