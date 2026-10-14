@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect, type Page, type Download, type Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

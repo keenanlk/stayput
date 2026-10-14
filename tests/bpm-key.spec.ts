@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect } from '@playwright/test';
 import MusicTempo from 'music-tempo';
 import { alsoReadAs, analyseKey, analyseTempo, camelot, confidenceLabel, CSV_HEADER, foldTempo, halve, keyName, NAMES, relativeOf, resultsCsv, type Mode } from '../src/lib/bpm-key';

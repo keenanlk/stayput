@@ -1,4 +1,11 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { defineConfig } from '@playwright/test';
+
+// To run a spec on WebKit too, put `// @webkit-project` on its first line; no list to edit here.
+const WEBKIT_MARKER = '// @webkit-project';
+const webkitSpecs = readdirSync('./tests')
+  .filter((f) => f.endsWith('.spec.ts') && readFileSync(`./tests/${f}`, 'utf8').slice(0, 400).includes(WEBKIT_MARKER))
+  .map((f) => `**/${f}`);
 
 export default defineConfig({
   testDir: './tests',
@@ -32,10 +39,10 @@ export default defineConfig({
         launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {},
       },
     },
-    // WebKit (Safari's engine) runs only the caption-encoder, video-encoder, video-to-mov, mic-verdict, mov-audio, noise-video-iphone, video-tools-iphone, handoff, psd-pairs, qr-scan-webkit, video-background-rotated, video-background-finder (local only: Linux WebKit reads video frames back blank), video-background-time-left, audio-video-backdrop, audio-split, add-text-to-gif, archive-encrypted, avi-to-mp4, flv-to-mp4, speaker-test, aiff-to-mp3, gap-batch-5 and bpm-key (the unit spec and a smoke run of the finder, since decoding differs between engines) specs: Safari's video encoder is the odd one out.
+    // WebKit (Safari's engine) runs the specs marked `// @webkit-project`: Safari's video encoder is the odd one out. video-background-finder is local only (Linux WebKit reads video frames back blank).
     // On in CI, or locally with PW_WEBKIT=1.
     ...(process.env.CI || process.env.PW_WEBKIT
-      ? [{ name: 'webkit', testMatch: /((caption|video)-encoder|video-to-mov|wake-lock|mic-verdict|mov-audio|noise-video-iphone|video-tools-iphone|handoff\.spec|psd-pairs|qr-scan-webkit|video-background-rotated|video-background-finder|video-background-time-left|audio-video-backdrop|bpm-key|audio-split|merge-gifs|add-text-to-gif\.spec|archive-encrypted|speech-gpu-worker-kept|avi-to-mp4|support-link|flv-to-mp4|speaker-test|aiff-to-mp3|speech-odd-files|gif-speed|gap-batch-5|reverse-audio)/, use: { browserName: 'webkit' as const } }]
+      ? [{ name: 'webkit', testMatch: webkitSpecs, use: { browserName: 'webkit' as const } }]
       : []),
     // Firefox runs a small smoke spec only. It is on in CI, or locally with PW_FIREFOX=1
     // once `npx playwright install firefox` has been run.
