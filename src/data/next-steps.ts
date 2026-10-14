@@ -70,6 +70,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'archive-extractor': ['create-zip', 'compress-pdf'],
   'file-checksum': ['archive-extractor', 'create-zip'],
   'create-zip': ['archive-extractor', 'protect-pdf'],
+  'rename-files': ['create-zip', 'archive-extractor'],
   'resize-pdf': ['merge-pdf', 'pdf-page-numbers'],
   'transcribe': ['add-subtitles-to-video', 'remove-silence'],
   'add-subtitles-to-video': ['compress-video', 'trim-video'],

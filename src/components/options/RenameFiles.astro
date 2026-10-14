@@ -1,0 +1,68 @@
+---
+/** Option controls and live preview for Rename files (see src/tools/rename-files.ts). */
+---
+<div class="field">
+  <label for="rn-prefix">Add before the name</label>
+  <input type="text" id="rn-prefix" autocomplete="off" spellcheck="false" />
+</div>
+<div class="field">
+  <label for="rn-suffix">Add after the name</label>
+  <input type="text" id="rn-suffix" autocomplete="off" spellcheck="false" />
+</div>
+<div class="field">
+  <label for="rn-find">Find</label>
+  <input type="text" id="rn-find" autocomplete="off" spellcheck="false" />
+</div>
+<div class="field">
+  <label for="rn-replace">Replace with</label>
+  <input type="text" id="rn-replace" autocomplete="off" spellcheck="false" />
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="rn-case-sensitive" /> Match upper and lower case when finding</label>
+</div>
+<div class="field wide">
+  <label>Letter case</label>
+  <div class="segmented" role="radiogroup" aria-label="Letter case">
+    <label><input type="radio" name="rn-casing" value="keep" checked /><span>Keep</span></label>
+    <label><input type="radio" name="rn-casing" value="lower" /><span>lower</span></label>
+    <label><input type="radio" name="rn-casing" value="upper" /><span>UPPER</span></label>
+    <label><input type="radio" name="rn-casing" value="title" /><span>Title</span></label>
+  </div>
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="rn-number" /> Number the files</label>
+</div>
+<div class="field">
+  <label for="rn-start">Start at</label>
+  <input type="number" id="rn-start" value="1" min="0" step="1" />
+</div>
+<div class="field">
+  <label for="rn-pad">Digits (zero-padding)</label>
+  <input type="number" id="rn-pad" value="3" min="0" max="12" step="1" />
+</div>
+<div class="field wide">
+  <label>Number goes</label>
+  <div class="segmented" role="radiogroup" aria-label="Number position">
+    <label><input type="radio" name="rn-place" value="after" checked /><span>After the name</span></label>
+    <label><input type="radio" name="rn-place" value="before" /><span>Before the name</span></label>
+  </div>
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="rn-keep-ext" checked /> Keep the original file extension</label>
+</div>
+<div class="field wide">
+  <p class="muted small">Browsers cannot rename files on your disk, so the renamed files come back in one ZIP. The file bytes are not changed, and nothing is uploaded. If two files would get the same name, a counter such as -2 is added to the later one. Characters that file names cannot hold (\ / : * ? " &lt; &gt; |) are removed.</p>
+  <div class="rn-preview" id="rn-preview" hidden>
+    <table>
+      <thead><tr><th scope="col">Now</th><th scope="col">Renamed to</th></tr></thead>
+      <tbody id="rn-rows"></tbody>
+    </table>
+    <p class="muted small" id="rn-note" hidden></p>
+  </div>
+</div>
+<style>
+  .rn-preview { overflow-x: auto; max-height: 24rem; overflow-y: auto; }
+  .rn-preview table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .rn-preview th, .rn-preview td { text-align: left; padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--line, #ddd); overflow-wrap: anywhere; }
+  .rn-preview tr.rn-adjusted td:last-child { font-style: italic; }
+</style>
