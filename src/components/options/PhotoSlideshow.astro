@@ -1,0 +1,55 @@
+---
+/** Option controls for the photo slideshow maker. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const shape = defaults.shape ?? 'landscape';
+const seconds = defaults.seconds ?? '3';
+const fit = defaults.fit ?? 'fit';
+const backdrop = defaults.backdrop ?? 'blur';
+const transition = defaults.transition ?? 'none';
+import OptionDetails from '../OptionDetails.astro';
+---
+<div class="field">
+  <label for="seconds">Seconds per photo</label>
+  <div class="seconds-row">
+    <input type="number" id="seconds" min="1" max="10" step="0.1" value={seconds} inputmode="decimal" />
+    <button type="button" id="match-song" class="btn btn-sm" disabled>Match the song</button>
+  </div>
+</div>
+<div class="field">
+  <label>Shape</label>
+  <div class="segmented" role="radiogroup" aria-label="Shape">
+    <label><input type="radio" name="shape" value="landscape" checked={shape === 'landscape'} /><span>Wide 16:9</span></label>
+    <label><input type="radio" name="shape" value="square" checked={shape === 'square'} /><span>Square</span></label>
+    <label><input type="radio" name="shape" value="portrait" checked={shape === 'portrait'} /><span>Tall 9:16</span></label>
+  </div>
+</div>
+<div class="field">
+  <label for="fit">Photos of another shape</label>
+  <select id="fit">
+    <option value="fit" selected={fit === 'fit'}>Show the whole photo</option>
+    <option value="fill" selected={fit === 'fill'}>Fill the frame (crop edges)</option>
+  </select>
+</div>
+<div class="field">
+  <label for="backdrop">Around the photo</label>
+  <select id="backdrop">
+    <option value="blur" selected={backdrop === 'blur'}>Blurred copy of the photo</option>
+    <option value="black" selected={backdrop === 'black'}>Black</option>
+    <option value="white" selected={backdrop === 'white'}>White</option>
+  </select>
+</div>
+<div class="field">
+  <label for="transition">Between photos</label>
+  <select id="transition">
+    <option value="none" selected={transition === 'none'}>Straight cut</option>
+    <option value="fade" selected={transition === 'fade'}>Half-second crossfade</option>
+  </select>
+</div>
+<style>
+  .seconds-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seconds-row input { width: 5.5rem; }
+</style>
+<OptionDetails>
+  <p>Drop two to 100 photos and, if you like, one song (MP3, WAV, M4A). Put the photos in order with the arrows in the list. A song that is longer than the slideshow is cut with a one-second fade; a shorter one repeats.</p>
+</OptionDetails>
