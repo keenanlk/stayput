@@ -1,7 +1,7 @@
 {
  "/": {
-  "date": "2026-10-13",
-  "hash": "cafdec05b6580e2d"
+  "date": "2026-10-14",
+  "hash": "483cf5be281c1fab"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -16,11 +16,11 @@
   "hash": "ab5b3fde899b524f"
  },
  "/aac-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "630a48ea99669719"
  },
  "/about": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "1ad1c0cfc1c343ec"
  },
  "/acapella-extractor": {
@@ -296,7 +296,7 @@
   "hash": "3b797fa70372edcc"
  },
  "/extract-audio-from-video": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "45621fd17c25d230"
  },
  "/extract-frames-from-video": {
@@ -316,11 +316,11 @@
   "hash": "ca11b96cc782e0bd"
  },
  "/flac-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "df93b6d29c9971ec"
  },
  "/flac-to-wav": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "94ead746ccdbc251"
  },
  "/flip-image": {
@@ -920,19 +920,19 @@
   "hash": "f2e0a7fc9e46d25e"
  },
  "/licenses": {
-  "date": "2026-10-13",
-  "hash": "7b78480a838ab6ba"
+  "date": "2026-10-14",
+  "hash": "844b5fd792e97e48"
  },
  "/linkedin-profile-picture": {
   "date": "2026-10-13",
   "hash": "3c45f8897cd3cd6d"
  },
  "/m4a-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "2e5c4e6f7aaaf984"
  },
  "/m4a-to-wav": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "70e3ad20af55e705"
  },
  "/m4v-to-mp4": {
@@ -968,7 +968,7 @@
   "hash": "e55b48acd17369ff"
  },
  "/mkv-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "7928df2395a04705"
  },
  "/mkv-to-mp4": {
@@ -980,7 +980,7 @@
   "hash": "70bcc9e1199404fe"
  },
  "/mov-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "de9e9fd6f5d1cd0a"
  },
  "/mov-to-mp4": {
@@ -988,7 +988,7 @@
   "hash": "85de9d5aaca52587"
  },
  "/mov-to-wav": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "0a4b6ead141f1ba8"
  },
  "/mp3-cutter": {
@@ -1016,7 +1016,7 @@
   "hash": "74fd1492d32558d5"
  },
  "/mp3-to-wav": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "17e67e5a39c04fe4"
  },
  "/mp4-to-gif": {
@@ -1028,11 +1028,11 @@
   "hash": "e24a1bb68e86e9ba"
  },
  "/mp4-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "fbb4c852f0fe5564"
  },
  "/mp4-to-wav": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "9cbeec222202aa0c"
  },
  "/nightcore-maker": {
@@ -1044,11 +1044,11 @@
   "hash": "3f40d97089ca719a"
  },
  "/ogg-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "f3002ec44cd8edf5"
  },
  "/ogg-to-wav": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "4f31ce3ae1d43330"
  },
  "/open-7z-file": {
@@ -1056,7 +1056,7 @@
   "hash": "b5b4c940d1f86107"
  },
  "/opus-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "a3a30c2e6f009753"
  },
  "/password-protect-zip-file": {
@@ -1711,6 +1711,10 @@
   "date": "2026-10-12",
   "hash": "69b0d095adebeb6f"
  },
+ "/tools/text-to-pdf": {
+  "date": "2026-10-14",
+  "hash": "368b21a6b061988a"
+ },
  "/tools/transcribe": {
   "date": "2026-10-13",
   "hash": "a162e4dfa775c875"
@@ -1756,7 +1760,7 @@
   "hash": "2b9f92686f72b92f"
  },
  "/tools/video-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "c62e85458db55c7f"
  },
  "/tools/video-to-mp4": {
@@ -1802,6 +1806,10 @@
  "/twitch-emote-resizer": {
   "date": "2026-10-12",
   "hash": "d6c897a30476e51f"
+ },
+ "/txt-to-pdf": {
+  "date": "2026-10-14",
+  "hash": "f4c08a8f5d38972a"
  },
  "/ukulele-tuner": {
   "date": "2026-10-12",
@@ -1852,7 +1860,7 @@
   "hash": "92716126f1e55f45"
  },
  "/wav-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "78fba93941b43ca2"
  },
  "/wav-to-ogg": {
@@ -1864,7 +1872,7 @@
   "hash": "411481108403f0e4"
  },
  "/webm-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "7e23683e53f4e682"
  },
  "/webm-to-mp4": {
@@ -1900,7 +1908,7 @@
   "hash": "91e8982d73d3fa49"
  },
  "/wma-to-mp3": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "2110de1e548c69d9"
  },
  "/youtube-banner-resizer": {
