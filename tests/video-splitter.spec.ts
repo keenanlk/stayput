@@ -174,5 +174,8 @@ test('the pages link the other video tools and say the video is not uploaded', a
   await expect(page).toHaveTitle('Video Splitter: Cut a Video into Parts, No Upload | Stayput');
   await expect(page.locator('h1')).toHaveText('Split a video into parts');
   expect(html).toContain('cut one video into parts');
-  expect(html).not.toMatch(/side by side|split screen/i);
+  // The other page's main phrase is in the sentence that links it, not in this page's title or heading.
+  expect(html).toContain('href="/tools/side-by-side-video"');
+  await expect(page).not.toHaveTitle(/side by side|split screen/i);
+  await expect(page.locator('h1')).not.toHaveText(/side by side|split screen/i);
 });

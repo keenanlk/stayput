@@ -1,0 +1,32 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import SideBySideVideo from '../../components/options/SideBySideVideo.astro';
+const tool = toolBySlug('side-by-side-video')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" class="sbs-panel">
+    <div class="sbs-slots">
+      <div class="sbs-slot" id="sbs-slot-a" role="button" tabindex="0" aria-label="Video A: click or drop to choose">
+        <span class="sbs-tag">A</span><span class="sbs-name" id="sbs-name-a">Drop video A</span><span class="muted small" id="sbs-size-a"></span>
+      </div>
+      <div class="sbs-slot" id="sbs-slot-b" role="button" tabindex="0" aria-label="Video B: click or drop to choose">
+        <span class="sbs-tag">B</span><span class="sbs-name" id="sbs-name-b">Drop video B</span><span class="muted small" id="sbs-size-b"></span>
+      </div>
+    </div>
+    <input class="visually-hidden" id="sbs-file-a" type="file" accept={tool.accept} tabindex="-1" aria-hidden="true" />
+    <input class="visually-hidden" id="sbs-file-b" type="file" accept={tool.accept} tabindex="-1" aria-hidden="true" />
+    <div><button class="btn btn-sm" id="sbs-swap" type="button">Swap A and B</button></div>
+  </div>
+  <Fragment slot="options"><SideBySideVideo /></Fragment>
+</ToolLayout>
+<style is:global>
+  .sbs-panel { display: grid; gap: 12px; }
+  .sbs-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sbs-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 14px; border: 2px dashed var(--line); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
+  .sbs-slot.is-over, .sbs-slot:focus-visible { border-color: var(--accent, currentColor); }
+  .sbs-tag { font-weight: 700; color: var(--ink); }
+  .sbs-name { overflow-wrap: anywhere; color: var(--ink-2); }
+  @media (max-width: 480px) { .sbs-slots { grid-template-columns: 1fr; } }
+</style>
+<script src="../../tools/side-by-side-video.ts"></script>
