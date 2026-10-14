@@ -1,0 +1,18 @@
+---
+/** The paste box for Text to PDF, shared by the tool page and its landing pages. */
+---
+<div class="tp-paste">
+  <label for="tp-text">Type or paste text here</label>
+  <textarea id="tp-text" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Type or paste text here"></textarea>
+  <div class="tp-bar">
+    <p id="tp-count" class="muted small" aria-live="polite">0 characters</p>
+    <button type="button" class="btn btn-primary" id="tp-make" disabled>Make PDF from this text</button>
+  </div>
+</div>
+<style is:global>
+  .tp-paste { display: grid; gap: 8px; margin-top: 16px; }
+  .tp-paste label { font-weight: 560; color: var(--ink); }
+  .tp-paste textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; font: 14px var(--mono); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); resize: vertical; }
+  .tp-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+  .tp-bar p { margin: 0; }
+</style>
