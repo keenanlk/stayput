@@ -14,6 +14,13 @@ const speeds = [
   ['3', '3×'],
   ['4', '4× (four times as fast)'],
 ] as const;
+const loops = defaults.loops ?? 'keep';
+const loopModes = [
+  ['keep', 'Keep the GIF’s own setting'],
+  ['forever', 'Loop forever'],
+  ['times', 'Play a set number of times'],
+  ['once', 'Play once'],
+] as const;
 ---
 <div class="field">
   <label for="speed">Speed</label>
@@ -24,7 +31,21 @@ const speeds = [
 <div class="field">
   <label class="check"><input type="checkbox" id="reverse" checked={defaults.reverse === 'true'} /> Play it backwards</label>
 </div>
+<div class="field">
+  <label for="loops">Loop</label>
+  <select id="loops">
+    {loopModes.map(([v, l]) => <option value={v} selected={v === loops}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="loop-times">Times to play (1 to 100)</label>
+  <input type="number" id="loop-times" min="1" max="100" step="1" value={defaults['loop-times'] ?? '3'} />
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="pingpong" checked={defaults.pingpong === 'true'} /> Play forward, then back (doubles the frames)</label>
+</div>
 <OptionDetails>
   <p>Every frame’s time is multiplied by the speed and rounded to a hundredth of a second. Browsers show anything under 0.02 s as about 0.1 s, so a GIF that is already very fast cannot be made faster: its frames stop at 0.02 s.</p>
+  <p>The loop setting is a small block in the GIF’s header. Forever writes a count of 0, a number writes how many times to play, and once leaves the block out. Some viewers and chat apps ignore it and always loop. Forward then back adds the frames in reverse after the originals, so the file is about twice the size.</p>
   <p>Backwards plays the frames last to first, each with its own time, and the loop setting is kept.</p>
 </OptionDetails>

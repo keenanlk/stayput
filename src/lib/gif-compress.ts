@@ -52,6 +52,13 @@ export interface GifCompressOptions {
    * before they are reordered, so partial frames and disposal rules still draw correctly.
    */
   reverse?: boolean;
+  /** After the frames, play them back to the first, without repeating the end frames (forward then back). Doubles the frame count. */
+  pingPong?: boolean;
+  /**
+   * What the NETSCAPE2.0 loop block says: 0 forever, N for N more plays after the first, `null` for no
+   * block (a player shows the GIF once). Left out, the source's setting is copied.
+   */
+  loops?: number | null;
   /**
    * Play this many times faster (2 halves every delay, 0.5 doubles it). Delays are rounded to whole
    * centiseconds and held to at least 2 cs, because browsers show anything shorter as about 100 ms.
@@ -227,6 +234,7 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
   }
 
   if (opts.reverse) full.reverse();
+  if (opts.pingPong && full.length > 2) full.push(...full.slice(1, -1).reverse());
   const speed = opts.speed ?? 1;
   if (speed !== 1) {
     if (!(speed > 0)) throw new Error('The speed must be above zero.');
@@ -293,7 +301,7 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
     if (n % 10 === 9) await new Promise((r) => setTimeout(r, 0));
   }
 
-  const bytes = writeGif(width, height, written, loopCount(gif));
+  const bytes = writeGif(width, height, written, opts.loops === undefined ? loopCount(gif) : (opts.loops ?? undefined));
   const unchanged = !opts.force && !more.length && bytes.length >= input.byteLength;
   return {
     bytes: unchanged ? new Uint8Array(input) : bytes,
