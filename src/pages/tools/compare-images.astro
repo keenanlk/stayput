@@ -1,0 +1,57 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('compare-images')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" class="cmp-panel" id="cmp-panel">
+    <div class="cmp-slots">
+      <div class="cmp-slot" id="cmp-slot-a" role="button" tabindex="0" aria-label="Image A: click or drop to choose">
+        <span class="cmp-tag">A</span><span class="cmp-name" id="cmp-name-a">Drop image A</span><span class="muted small" id="cmp-size-a"></span>
+      </div>
+      <div class="cmp-slot" id="cmp-slot-b" role="button" tabindex="0" aria-label="Image B: click or drop to choose">
+        <span class="cmp-tag">B</span><span class="cmp-name" id="cmp-name-b">Drop image B</span><span class="muted small" id="cmp-size-b"></span>
+      </div>
+    </div>
+    <input class="visually-hidden" id="cmp-file-a" type="file" accept={tool.accept} tabindex="-1" aria-hidden="true" />
+    <input class="visually-hidden" id="cmp-file-b" type="file" accept={tool.accept} tabindex="-1" aria-hidden="true" />
+    <div id="cmp-result" hidden>
+      <p class="cmp-readout" id="cmp-readout" role="status" aria-live="polite"></p>
+      <p class="cmp-warn" id="cmp-warn" role="status" hidden></p>
+      <div class="cmp-modes" role="radiogroup" aria-label="View">
+        <label class="check"><input type="radio" name="cmp-mode" value="slider" checked /> Slider</label>
+        <label class="check"><input type="radio" name="cmp-mode" value="difference" /> Difference</label>
+        <label class="check"><input type="radio" name="cmp-mode" value="fade" /> Fade</label>
+      </div>
+      <div class="rotate-stage"><canvas id="cmp-canvas" aria-label="Comparison of image A and image B"></canvas></div>
+      <div class="field" id="cmp-pos-field">
+        <label for="cmp-pos" id="cmp-pos-label">Divider <output id="cmp-pos-out">50</output>%</label>
+        <input type="range" id="cmp-pos" min="0" max="100" step="1" value="50" />
+      </div>
+      <div class="field">
+        <label for="cmp-threshold">Sensitivity threshold <output id="cmp-threshold-out">0</output></label>
+        <input type="range" id="cmp-threshold" min="0" max="64" step="1" value="0" />
+        <span class="muted small">0 flags any change. Raise it to ignore small colour noise, such as JPEG artefacts.</span>
+      </div>
+      <div class="field">
+        <label class="check"><input type="checkbox" id="cmp-fit" checked /> Fit B to A’s size</label>
+      </div>
+      <button class="btn btn-sm" id="cmp-swap" type="button">Swap A and B</button>
+    </div>
+  </div>
+</ToolLayout>
+<style is:global>
+  .cmp-panel { display: grid; gap: 14px; }
+  .cmp-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cmp-slot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 14px; border: 2px dashed var(--line); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; }
+  .cmp-slot.is-over, .cmp-slot:focus-visible { border-color: var(--accent, currentColor); }
+  .cmp-tag { font-weight: 700; color: var(--ink); }
+  .cmp-name { overflow-wrap: anywhere; color: var(--ink-2); }
+  #cmp-result { display: grid; gap: 12px; }
+  .cmp-readout { margin: 0; font-weight: 560; color: var(--ink); }
+  .cmp-warn { margin: 0; color: var(--warn); font-size: 14px; }
+  .cmp-modes { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  #cmp-canvas { cursor: ew-resize; }
+  @media (max-width: 480px) { .cmp-slots { grid-template-columns: 1fr; } }
+</style>
+<script src="../../tools/compare-images.ts"></script>

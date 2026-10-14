@@ -5690,6 +5690,49 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'compare-images',
+    icon: 'sliders',
+    name: 'Compare images',
+    title: 'Compare Two Images: Find the Differences, No Upload | Stayput',
+    description:
+      'Compare two images side by side: drag a slider, see the changed pixels highlighted, or fade between them. Shows the percent that differ. Nothing is uploaded.',
+    heading: 'Compare two images',
+    tagline: 'Find what changed between two pictures with a slider, a difference map or a fade, all on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    multiple: true,
+    dropLabel: 'Drop two images to compare',
+    action: 'Save difference map',
+    keywords: ['compare images', 'compare two images', 'image difference', 'image diff', 'spot the difference', 'compare photos', 'visual diff'],
+    steps: [
+      'Drop two images, or choose one for A and one for B.',
+      'Pick Slider, Difference or Fade, and set the sensitivity threshold.',
+      'Read the percentage of pixels that differ, and save the difference map as a PNG if you want it.',
+    ],
+    faq: [
+      {
+        q: 'What does it compare?',
+        a: 'Pixels, not meaning. Each pixel in A is checked against the pixel in the same place in B. A photo shifted by a few pixels, or the same scene taken twice, shows as mostly different even though a person would call them alike. It cannot tell whether two photos show the same scene.',
+      },
+      {
+        q: 'Why do two JPEGs of the same picture show small differences?',
+        a: 'JPEG changes colours slightly every time it is saved, which leaves faint noise around edges. Raise the sensitivity threshold until the noise disappears and only real changes are left. At 0 any change counts.',
+      },
+      {
+        q: 'What happens when the images are different sizes?',
+        a: 'With “Fit B to A’s size” on, B is scaled to A’s width and height before comparing, and a warning appears when the two have different aspect ratios because B is then stretched. Turn it off to compare at B’s own size, with anything outside it counted as different.',
+      },
+      {
+        q: 'Is there a size limit?',
+        a: 'Very large pictures are compared at no more than 4,096 pixels on the long side, and the page says when that happened, so a 24 megapixel pair does not freeze a phone. The difference map you save is that size too.',
+      },
+      {
+        q: 'Are my images uploaded?',
+        a: 'No. Both images are decoded and compared on a canvas in your browser tab, and the difference map is saved from there. Your files are not uploaded, and it works offline after one visit and a short wait.',
+      },
+    ],
+  },
+  {
     slug: 'pixel-art-converter',
     icon: 'grid',
     name: 'Pixel art converter',
