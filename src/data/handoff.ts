@@ -40,6 +40,7 @@ export const handoffs: Record<string, string[]> = {
   // Audio → audio
   'audio-converter': ['trim-audio'],
   'volume-booster': ['trim-audio', 'audio-converter'],
+  'audio-reverser': ['trim-audio', 'audio-converter'],
   'pitch-changer': ['trim-audio', 'volume-booster'],
   'remove-noise': ['volume-booster', 'remove-silence'],
   'remove-silence': ['compress-audio', 'trim-audio'],

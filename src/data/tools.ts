@@ -2230,6 +2230,44 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'audio-reverser',
+    name: 'Audio reverser',
+    title: 'Audio Reverser: Play a Sound File Backwards, No Upload | Stayput',
+    description:
+      'Reverse an MP3, WAV, M4A, FLAC or OGG file so it plays backwards, in your browser. Save as WAV or another format. Batch, not uploaded, no sign-up.',
+    heading: 'Reverse an audio file',
+    tagline: 'Turn a sound file around so it plays from the end to the start. Done on this device; your files are not uploaded.',
+    category: 'media',
+    accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif',
+    multiple: true,
+    dropLabel: 'Drop audio files to reverse',
+    action: 'Reverse',
+    keywords: ['audio reverser', 'reverse audio', 'reverse sound', 'play audio backwards', 'reverse mp3', 'backwards audio', 'reverse wav'],
+    steps: [
+      'Drop one or more sound files (MP3, WAV, M4A, FLAC, OGG), or tap to pick them.',
+      'Keep the original format, or choose WAV or FLAC to keep every sample, or MP3, M4A or OGG for a smaller file.',
+      'Press Reverse. Each file downloads when it is ready, with -reversed added to its name; several come as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Are my files uploaded?',
+        a: 'No. Your browser decodes the sound with its own decoders, the samples are put in the opposite order in the page, and the new file is written in your tab. Your files are not uploaded, so the limit is your device’s memory (phones hold less), and the page works offline after your first run.',
+      },
+      {
+        q: 'Is the reversed WAV exact?',
+        a: 'Yes. WAV and FLAC output keep the sample rate of the original and every sample, only in the opposite order. MP3, M4A and OGG have to be encoded again, which discards a little detail, so choose WAV or FLAC if you plan to edit the result further.',
+      },
+      {
+        q: 'Does it work on stereo files?',
+        a: 'Yes. Left and right are reversed together, so the stereo picture stays in step. Files with more than two channels are mixed down to stereo first.',
+      },
+      {
+        q: 'Can I reverse the sound of a video?',
+        a: 'Drop the video on [Reverse video](/tools/reverse-video), which flips the picture and, if you want, the sound together.',
+      },
+    ],
+  },
+  {
     slug: 'remove-noise',
     name: 'Remove background noise',
     title: 'Remove Background Noise from Audio or Video, No Upload | Stayput',

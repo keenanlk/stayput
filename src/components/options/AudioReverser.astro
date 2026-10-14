@@ -1,0 +1,21 @@
+---
+/** Option controls for the audio reverser, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'same';
+const formats = [
+  ['same', 'Same as the original'],
+  ['wav', 'WAV (uncompressed, exact)'],
+  ['flac', 'FLAC (lossless)'],
+  ['mp3', 'MP3'],
+  ['m4a', 'M4A (AAC)'],
+  ['ogg', 'OGG (Opus)'],
+] as const;
+---
+<div class="field" id="format-field">
+  <label for="format">Save as</label>
+  <select id="format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+  <p class="muted small">WAV and FLAC keep every sample, just in reverse order. MP3, M4A and OGG are encoded again.</p>
+</div>

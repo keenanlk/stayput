@@ -6,6 +6,9 @@
 // sitemap; --all on its own is refused, so a stray flag can't resubmit the whole site.
 // A ping for the same set of URLs as one sent in the last 10 minutes is skipped; with
 // --dedup-file=<path> the record of recent pings lives in that file (the workflow caches it).
+// Before anything is sent, every URL is fetched on the live site and only those that return 200
+// without a noindex are submitted; the rest are logged and dropped (retried first, in case the
+// deploy that triggered the ping is not serving yet).
 // Usage: node scripts/indexnow.mjs [--dry-run] [--all --force] [--from=<rev>] [--to=<rev>] [--dedup-file=<path>] [https://stayput.dev/some-page ...]
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -17,6 +20,52 @@ import { changedUrls } from './indexnow-changes.mjs';
 const site = 'https://stayput.dev';
 export const MAX_URLS = 50;
 export const DEDUP_WINDOW_MS = 10 * 60 * 1000;
+export const LIVE_CHECK_ATTEMPTS = 8;
+export const LIVE_CHECK_DELAY_MS = 30 * 1000;
+const LIVE_CHECK_CONCURRENCY = 8;
+const NOINDEX_META = /<meta\b[^>]*\bname\s*=\s*["']?robots["']?[^>]*\bnoindex/i;
+
+// Why `url` should not be announced yet, or '' when it serves 200 without a noindex.
+// Redirects are not followed and nothing is cached: IndexNow must only get URLs that answer 200 themselves.
+export async function liveProblem(url, doFetch) {
+  let res;
+  try {
+    res = await doFetch(url, { redirect: 'manual', cache: 'no-store', headers: { 'cache-control': 'no-cache' } });
+  } catch (e) {
+    return `fetch failed (${e.message})`;
+  }
+  if (res.status !== 200) return `HTTP ${res.status}`;
+  if (/noindex/i.test(res.headers?.get?.('x-robots-tag') ?? '')) return 'X-Robots-Tag noindex';
+  if (NOINDEX_META.test(await res.text())) return 'noindex meta';
+  return '';
+}
+
+// Splits `urls` into those live and indexable and those dropped, retrying the failures
+// `attempts` times, `delayMs` apart, so a deploy that is still going live is not dropped too early.
+export async function checkLive(urls, { doFetch, attempts = LIVE_CHECK_ATTEMPTS, delayMs = LIVE_CHECK_DELAY_MS, sleep = (ms) => new Promise((r) => setTimeout(r, ms)), log = console.log }) {
+  const ok = new Set();
+  let pending = urls;
+  let problems = new Map();
+  for (let attempt = 1; attempt <= attempts && pending.length > 0; attempt++) {
+    if (attempt > 1) {
+      log(`${pending.length} URLs not live yet; checking again in ${Math.round(delayMs / 1000)}s (attempt ${attempt} of ${attempts})`);
+      await sleep(delayMs);
+    }
+    problems = new Map();
+    const queue = [...pending];
+    await Promise.all(
+      Array.from({ length: Math.min(LIVE_CHECK_CONCURRENCY, queue.length) }, async () => {
+        for (let u = queue.shift(); u !== undefined; u = queue.shift()) {
+          const problem = await liveProblem(u, doFetch);
+          if (problem) problems.set(u, problem);
+          else ok.add(u);
+        }
+      }),
+    );
+    pending = pending.filter((u) => problems.has(u));
+  }
+  return { ok: urls.filter((u) => ok.has(u)), dropped: pending.map((u) => ({ url: u, reason: problems.get(u) })) };
+}
 
 // The lastmod map as committed at `rev`; null when that commit has none (or does not exist).
 function gitMapAt(rev) {
@@ -46,7 +95,7 @@ export const urlSetHash = (urls) => createHash('sha256').update([...urls].sort()
 
 // Returns the process exit code. `deps` lets tests stub fetch, git and the clock; nothing else is injected.
 export async function main(argv, deps = {}) {
-  const { fetch: doFetch = fetch, mapAt = gitMapAt, keyFile = defaultKeyFile(), now = Date.now(), log = console.log, err = console.error } = deps;
+  const { fetch: doFetch = fetch, sleep, attempts, delayMs, mapAt = gitMapAt, keyFile = defaultKeyFile(), now = Date.now(), log = console.log, err = console.error } = deps;
   const dryRun = argv.includes('--dry-run');
   const all = argv.includes('--all');
   const force = argv.includes('--force');
@@ -101,6 +150,15 @@ export async function main(argv, deps = {}) {
   }
   urls = urls.filter((u) => u.startsWith(`${site}/`));
   if (urls.length === 0) throw new Error('No URLs to submit');
+
+  const live = await checkLive(urls, { doFetch, sleep, attempts, delayMs, log });
+  for (const d of live.dropped) log(`dropped (not live and indexable on ${site}): ${d.url}: ${d.reason}`);
+  if (live.ok.length === 0) {
+    err(`None of the ${urls.length} URLs serves 200 without noindex on ${site}. Nothing was sent.`);
+    return 1;
+  }
+  if (live.dropped.length > 0) log(`${live.ok.length} of ${urls.length} URLs are live; dropped ${live.dropped.length}`);
+  urls = live.ok;
 
   const hash = urlSetHash(urls);
   const recent = readRecent(dedupFile, now);

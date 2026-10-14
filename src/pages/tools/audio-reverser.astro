@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import AudioReverser from '../../components/options/AudioReverser.astro';
+const tool = toolBySlug('audio-reverser')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><AudioReverser /></Fragment>
+</ToolLayout>
+<script src="../../tools/audio-reverser.ts"></script>
