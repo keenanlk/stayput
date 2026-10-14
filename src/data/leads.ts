@@ -20,6 +20,7 @@ const does: Record<string, string> = {
   'resize-gif': 'Changes the width and height of animated GIFs by percent or in exact pixels, keeping the animation, frame timing and loop.',
   'add-text-to-gif': 'Puts text on every frame of an animated GIF, with the font, colour and outline you choose, and saves a new GIF with the same timing.',
   'gif-speed': 'Speeds an animated GIF up or slows it down, or plays it backwards, by rescaling every frame’s time and saving a new GIF with the same loop setting.',
+  'gif-rotate': 'Turns an animated GIF by 90°, 180° or 270° or flips it horizontally or vertically, keeping every frame, its timing and the loop.',
   'crop-gif': 'Crops an animated GIF to a box you draw, a square, 16:9 or 9:16, keeping every frame, its timing and the loop.',
   'compress-gif': 'Shrinks animated GIFs by dropping unchanged pixels, reducing colours, resizing or removing frames, and saves a smaller GIF.',
   'compress-png': 'Compresses PNG files with a smart colour palette or losslessly, keeps transparency, and saves smaller PNGs.',

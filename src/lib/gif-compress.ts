@@ -37,6 +37,8 @@ export interface GifCompressOptions {
   box?: { width: number; height: number; fit: 'contain' | 'cover' | 'stretch' };
   /** Keep only this rectangle (GIF pixels, whole numbers) of every composited frame, before any scaling. Not together with `box`. */
   crop?: { x: number; y: number; width: number; height: number };
+  /** Turn every frame clockwise by 0, 90, 180 or 270 degrees, then mirror it. 90 and 270 swap width and height. Not together with `box`, `crop` or `append`. */
+  transform?: { rotate: 0 | 90 | 180 | 270; flipH?: boolean; flipV?: boolean };
   /**
    * More GIFs whose frames follow the input's, in order (a merge). They are fitted into `box`, which is
    * then required, and each is composited on a canvas of its own so nothing carries over from the one
@@ -126,8 +128,11 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
       throw new Error('The crop rectangle is not inside the GIF.');
     }
   }
-  const width = box ? box.width : crop ? Math.max(1, Math.round(crop.width * scale)) : Math.max(1, Math.round(gw * scale));
-  const height = box ? box.height : crop ? Math.max(1, Math.round(crop.height * scale)) : Math.max(1, Math.round(gh * scale));
+  const turn = opts.transform;
+  if (turn && (box || crop || more.length)) throw new Error('A rotation cannot be used with a box, a crop or a merge.');
+  const sideways = turn?.rotate === 90 || turn?.rotate === 270;
+  const width = box ? box.width : crop ? Math.max(1, Math.round(crop.width * scale)) : Math.max(1, Math.round((sideways ? gh : gw) * scale));
+  const height = box ? box.height : crop ? Math.max(1, Math.round(crop.height * scale)) : Math.max(1, Math.round((sideways ? gw : gh) * scale));
   // Source and destination rectangles for each frame of a GIF of size gw by gh: the whole GIF, unless it is cropped, stretched, fitted into or cropped to a box.
   const place = (gw: number, gh: number) => {
     let src = crop ? [crop.x, crop.y, crop.width, crop.height] : [0, 0, gw, gh];
@@ -195,7 +200,17 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
           octx.fillStyle = opts.fill;
           octx.fillRect(0, 0, width, height);
         }
-        octx.drawImage(comp, src[0]!, src[1]!, src[2]!, src[3]!, dst[0]!, dst[1]!, dst[2]!, dst[3]!);
+        if (turn) {
+          // Turn about the centre, then mirror the result; the frame is drawn centred at its own size.
+          octx.save();
+          octx.translate(width / 2, height / 2);
+          octx.scale(turn.flipH ? -1 : 1, turn.flipV ? -1 : 1);
+          octx.rotate((turn.rotate * Math.PI) / 180);
+          octx.drawImage(comp, -source.gw / 2, -source.gh / 2);
+          octx.restore();
+        } else {
+          octx.drawImage(comp, src[0]!, src[1]!, src[2]!, src[3]!, dst[0]!, dst[1]!, dst[2]!, dst[3]!);
+        }
         opts.overlay?.(octx, width, height);
         const rgba = octx.getImageData(0, 0, width, height).data;
         for (let p = 3; p < rgba.length && !transparent; p += 4) if (rgba[p]! < 128) transparent = true;
