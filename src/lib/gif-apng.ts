@@ -37,6 +37,8 @@ export interface GifPictures {
   frames: { rgba: Uint8ClampedArray; delayMs: number }[];
   /** 0 is forever; a GIF with no loop setting plays once. */
   plays: number;
+  /** The NETSCAPE loop count as stored (a count of repeats after the first play), or undefined when the GIF has none. */
+  loop: number | undefined;
   poster: ImageBitmap;
 }
 
@@ -73,7 +75,7 @@ export async function gifPictures(input: ArrayBuffer, onProgress?: (fraction: nu
   }
   const loops = loopCount(gif);
   // No loop extension means the GIF plays once.
-  return { width: gw, height: gh, frames: out, plays: loops === undefined ? 1 : loops, poster: poster! };
+  return { width: gw, height: gh, frames: out, plays: loops === undefined ? 1 : loops, loop: loops, poster: poster! };
 }
 
 export async function gifToApng(input: ArrayBuffer, onProgress?: (fraction: number) => void): Promise<GifToApngResult> {

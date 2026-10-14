@@ -11,6 +11,8 @@ import { frameAsWebp, parseAnimatedWebp } from '../src/lib/webp-anim';
  * with the GIF that went in: frame count, summed delay, loop count and frame pixels. The browser
  * decodes each frame's still WebP for the pixel check. Runs in Chromium and WebKit.
  *
+ * Loop count: a GIF loop N (N repeats) is N + 1 plays, the WebP ANIM count; 0 is forever; none plays once.
+ *
  * Lossless must match the GIF's frames exactly. Lossy at quality 90 must keep the mean absolute
  * error per colour channel at or below LOSSY_MEAN_ERROR (the fixture is flat blocks and a gradient).
  */
@@ -75,9 +77,9 @@ async function convert(page: Page, file: string, mode: 'lossy' | 'lossless') {
 
 for (const [mode, repeat, loops] of [
   ['lossless', 0, 0],
-  ['lossy', 3, 3],
+  ['lossy', 3, 4],
 ] as const) {
-  test(`GIF to animated WebP (${mode}, loop ${loops === 0 ? 'forever' : loops}) keeps frames, delays, loop count and pixels, and nothing but the encoder is fetched`, async ({ page }) => {
+  test(`GIF to animated WebP (${mode}, GIF loop ${repeat === 0 ? 'forever' : repeat} -> ANIM ${loops}) keeps frames, delays, loop count and pixels, and nothing but the encoder is fetched`, async ({ page }) => {
     const { file, bytes: gif } = await makeGif('secret-name.gif', repeat);
     const shown = readGif(gif);
     expect(shown.delays).toEqual(DELAYS);

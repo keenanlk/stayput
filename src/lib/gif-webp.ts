@@ -44,8 +44,11 @@ export async function gifToWebp(input: ArrayBuffer, opts: GifToWebpOptions): Pro
       opts.onProgress?.(0.1 + (0.9 * (i + 1)) / pics.frames.length);
       if (i % 4 === 3) await new Promise((r) => setTimeout(r, 0));
     }
-    const bytes = muxAnimatedWebp({ width: pics.width, height: pics.height, frames, loops: pics.plays });
-    return { bytes, width: pics.width, height: pics.height, frames: frames.length, plays: pics.plays, duration: frames.reduce((a, b) => a + b.delayMs, 0), poster: pics.poster };
+    // A GIF loop count N means N repeats after the first play (N + 1 plays); WebP counts total plays.
+    // 0 is forever in both, and a GIF with no loop setting plays once.
+    const plays = pics.loop === undefined ? 1 : pics.loop === 0 ? 0 : pics.loop + 1;
+    const bytes = muxAnimatedWebp({ width: pics.width, height: pics.height, frames, loops: plays });
+    return { bytes, width: pics.width, height: pics.height, frames: frames.length, plays, duration: frames.reduce((a, b) => a + b.delayMs, 0), poster: pics.poster };
   } catch (e) {
     pics.poster.close();
     throw e;
