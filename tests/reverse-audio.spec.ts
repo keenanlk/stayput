@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 
 const RATE = 44100;

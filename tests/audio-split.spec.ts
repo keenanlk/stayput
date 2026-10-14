@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect } from '@playwright/test';
 import { cutPart, MAX_PARTS, parseTime, parseTimes, partName, planAtTimes, planEvery } from '../src/lib/audio-split';
 

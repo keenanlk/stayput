@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { channelGains, levelToGain, pinkNoise, sweepFrequency, SWEEP_FROM, SWEEP_TO, SWEEP_SECONDS, DEFAULT_LEVEL, MAX_LEVEL } from '../src/lib/speaker-test';
 
