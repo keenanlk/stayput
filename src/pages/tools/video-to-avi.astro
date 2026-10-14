@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VideoToAvi from '../../components/options/VideoToAvi.astro';
+const tool = toolBySlug('video-to-avi')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VideoToAvi /></Fragment>
+</ToolLayout>
+<script src="../../tools/video-to-avi.ts"></script>

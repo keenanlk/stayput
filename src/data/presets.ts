@@ -2821,6 +2821,39 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'mp4-to-avi',
+    base: 'video-to-avi',
+    name: 'MP4 to AVI',
+    title: 'MP4 to AVI Converter, Free, No Upload | Stayput',
+    description: 'Convert MP4, MOV, WebM and MKV to AVI in your browser, as Motion JPEG that QuickTime and VLC open, or smaller H.264. Free, no account, not uploaded.',
+    heading: 'Convert MP4 to AVI',
+    tagline: 'Turn MP4, MOV, WebM and MKV files into AVI files on this device, as Motion JPEG for the widest player support or as smaller H.264.',
+    keywords: ['mp4 to avi', 'convert mp4 to avi', 'mp4 to avi converter', 'mp4 to avi online', 'mp4 to avi free', 'mov to avi', 'mkv to avi', 'webm to avi'],
+    dropLabel: 'Drop MP4, MOV, WebM or MKV files to convert to AVI',
+    action: 'Convert to AVI',
+    accept: 'video/mp4,video/quicktime,video/webm,video/x-matroska,.mp4,.m4v,.mov,.webm,.mkv',
+    lead: 'Converts MP4, MOV, WebM and MKV videos to AVI. It is free, needs no account and adds no watermark, and your video is not uploaded: your browser re-encodes the picture and writes the AVI inside this tab. The size and frame rate stay as they were (up to 60 fps) and the sound is kept. An AVI here cannot be larger than 1.9 GB, and the page works offline after one visit and a short wait.',
+    intro: [
+      'AVI is an old Microsoft container that some DVD players, car stereos, older editing programs and hardware media players still ask for. A modern MP4 is not a file they open, so this page re-encodes the video into an AVI that they can.',
+      'Nothing can be copied across, unlike MP4 to MOV: an AVI cannot hold the AAC sound an MP4 has, and the picture has to be rewritten for the AVI container. Your browser re-encodes it at the same size (rounded to an even number) and the same frame rate, up to 60 frames a second.',
+      'By default the picture is written as Motion JPEG (MJPEG): every frame is a separate JPEG, with uncompressed 16-bit PCM sound. We chose it because it is the kind of AVI that opened in every player we tried, QuickTime included. The price is size: an MJPEG AVI is many times larger than the MP4.',
+      'Untick Maximum compatibility for a much smaller AVI with H.264 video. Sound is then PCM for clips under 2 minutes and MP3 for longer ones. We checked those files in VLC, which plays them, and in the QuickTime playback engine on a Mac, which does not open H.264 inside an AVI. We have not been able to test Windows players, so if you need one of those, convert a short clip first.',
+      'An AVI cannot be bigger than 1.9 GB here, and a video that would pass it is refused before anything is encoded, with a message that says so. To go the other way, use [AVI to MP4](/avi-to-mp4): the two are separate jobs.',
+    ],
+    steps: [
+      'Drop one or more MP4, MOV, WebM or MKV files, or tap to pick them.',
+      'Leave Maximum compatibility ticked for the widest player support, untick it for a smaller H.264 file, or tick Remove the sound for a silent AVI.',
+      'Press Convert to AVI. One file downloads straight away; several download as a zip.',
+    ],
+    faq: [
+      { q: 'How do I convert MP4 to AVI?', a: 'Drop the .mp4 file on this page and press Convert to AVI. Your browser re-encodes the picture and writes an AVI with the same name and a .avi ending. Nothing needs installing, and you can drop several files at once.' },
+      { q: 'How do I play an AVI, and which players open these files?', a: 'Browsers cannot play AVI files, so open the file in a desktop player. On a Mac we tested VLC 3.0, which plays both kinds of file this page writes, and the QuickTime playback engine, which plays the Maximum compatibility (MJPEG) file and does not open the H.264 one. We have not tested Windows players. If a player refuses the file, keep Maximum compatibility ticked and try again.' },
+      { q: 'Why is the AVI so much bigger than the MP4?', a: 'AVI is an older container, and MP4 video is compressed by comparing each frame with its neighbours. The Maximum compatibility file stores every frame as its own JPEG picture and the sound uncompressed, so it is many times larger. Untick it for H.264, which is far smaller but is not opened by QuickTime.' },
+      { q: 'Why is there a 1.9 GB limit?', a: 'This is the classic AVI layout, which is written in one piece and cannot be larger than 2 GB, and the page keeps a margin. The size is estimated before encoding starts, so a long or large video is refused at once instead of failing after a long wait. Trim it first, untick Maximum compatibility for a smaller file, or pick MP4 or MOV, which have no such limit.' },
+      { q: 'Can I convert MP4 to AVI without uploading the file?', a: 'Yes. Your browser reads the MP4 from your disk, re-encodes it with its own video encoder and writes the AVI with code running in this tab. Open the network tab, run a conversion, and your video is not among the requests. After one visit and a short wait the page works offline.' },
+    ],
+  },
+  {
     slug: 'mkv-to-mp4',
     base: 'video-to-mp4',
     name: 'MKV to MP4',
@@ -2870,6 +2903,7 @@ export const presets: Preset[] = [
       'This page reads the AVI in your browser, decodes the picture and sound, and writes a new MP4 with H.264 video and AAC sound, the combination that plays everywhere. Unlike a simple rewrap, an AVI always has to be re-encoded, because the video inside (Xvid, DivX, Motion JPEG) is not a format an MP4 player expects. A clip converts at several times its running time or faster on a laptop, and slower on a phone.',
       'The file never leaves your device. Home videos and camera footage are exactly what you should not hand to a stranger’s server just to change the wrapper, and here there is no upload to wait for and no copy kept anywhere.',
       'The picture is re-encoded at a high quality setting, so the MP4 can come out larger than the AVI when the original was heavily compressed. If it is bigger than you want for email or chat, run it through Compress video afterwards.',
+      'To go the other way, use [MP4 to AVI](/mp4-to-avi). The two are separate jobs, each with its own settings.',
     ],
     sections: [
       {
