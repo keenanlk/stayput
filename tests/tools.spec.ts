@@ -5977,9 +5977,14 @@ test('Tuner names the guitar string, shows it flat, then in tune, and sends noth
   await expect(page.locator('#tuner-octave')).toHaveText('2');
   await expect(page.locator('#tuner-hint')).toHaveText(/1[6-9] cents flat: tune up/);
   await expect(page.locator('.tuner-string').nth(1)).toHaveAttribute('data-active', 'true');
-  const left = await page.locator('#tuner-needle').evaluate((n) => parseFloat(n.style.left));
-  expect(left).toBeGreaterThan(29);
-  expect(left).toBeLessThan(35);
+  // The needle is driven by a median of the last few readings, so right after the first hint it can still
+  // show a start-up reading; wait for it to settle at 50 - 18 = 32 rather than sampling it once.
+  await expect
+    .poll(() => page.locator('#tuner-needle').evaluate((n) => parseFloat((n as HTMLElement).style.left)))
+    .toBeGreaterThan(29);
+  await expect
+    .poll(() => page.locator('#tuner-needle').evaluate((n) => parseFloat((n as HTMLElement).style.left)))
+    .toBeLessThan(35);
   await page.evaluate(() => (window as unknown as { __osc: OscillatorNode }).__osc.frequency.setValueAtTime(110, 0));
   await expect(page.locator('#tuner-hint')).toHaveText('In tune');
   await expect(page.locator('#tuner-panel')).toHaveAttribute('data-tuned', 'true');
