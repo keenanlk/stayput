@@ -3649,6 +3649,10 @@ export const tools: Tool[] = [
         a: 'Yes. [Add text to GIF](/tools/add-text-to-gif) draws a caption on every frame and keeps each frame’s timing and the loop. Crop first if you want the caption placed against the cropped edges.',
       },
       {
+        q: 'Can I save the frames of a GIF as pictures?',
+        a: 'Yes. [Split GIF](/split-gif) saves every frame of an animated GIF as a PNG, one by one or as a ZIP, with each frame’s delay.',
+      },
+      {
         q: 'Can I rotate a GIF as well?',
         a: 'Yes. [Rotate GIF](/rotate-gif) turns an animated GIF by 90, 180 or 270 degrees, or flips it, and keeps every frame’s timing.',
       },
@@ -3735,6 +3739,46 @@ export const tools: Tool[] = [
       {
         q: 'Is my GIF uploaded?',
         a: 'No. The GIF is decoded and rewritten by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
+      },
+    ],
+  },
+  {
+    slug: 'gif-frame-splitter',
+    icon: 'grid',
+    name: 'GIF frame splitter',
+    title: 'Split a GIF into Frames: Save Each as PNG, No Upload | Stayput',
+    description:
+      'Split an animated GIF into its frames in your browser. See each frame’s delay, save one as a PNG or all as a ZIP. Frames are whole pictures. No upload.',
+    heading: 'Split a GIF into frames',
+    tagline: 'Pull every frame out of an animated GIF as a PNG, with each frame’s delay. It stays on this device.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop a GIF to split into frames',
+    action: 'Split GIF',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or very large GIF may need a computer.',
+    keywords: ['split gif', 'gif frame splitter', 'gif to png frames', 'extract frames from gif', 'gif to frames', 'gif splitter', 'split gif into frames'],
+    steps: [
+      'Drop an animated GIF, or tap to pick one.',
+      'Press Split GIF. The frame count and total time show above the frames, and each frame lists its delay.',
+      'Save one frame as a PNG, or all of them as a zip named frame-001.png, frame-002.png and so on.',
+    ],
+    faq: [
+      {
+        q: 'Are the frames whole pictures?',
+        a: 'Yes. Many GIFs store only the part that changed from one frame to the next. Each frame here is drawn the way a browser plays the GIF, with the earlier frames and the disposal rules applied, so every PNG is the full picture.',
+      },
+      {
+        q: 'Do I get each frame’s timing?',
+        a: 'Yes. Every frame lists its delay in milliseconds, and the total shows above them. A delay of 10 ms or less is shown as 100 ms, which is how browsers play it.',
+      },
+      {
+        q: 'Can I put the frames back together?',
+        a: 'Yes. [GIF maker](/tools/gif-maker) builds a GIF from pictures, so you can edit frames and join the ones you keep. To play a GIF backwards without splitting it, use [Reverse GIF](/reverse-gif).',
+      },
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
     ],
   },

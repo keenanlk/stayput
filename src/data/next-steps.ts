@@ -34,6 +34,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'resize-gif': ['compress-gif', 'gif-to-mp4'],
   'crop-gif': ['resize-gif', 'compress-gif'],
   'gif-speed': ['compress-gif', 'gif-to-mp4'],
+  'gif-frame-splitter': ['gif-maker', 'resize-gif'],
   'gif-rotate': ['resize-gif', 'compress-gif'],
   'merge-gifs': ['compress-gif', 'gif-to-mp4'],
   'add-text-to-gif': ['resize-gif', 'compress-gif'],
