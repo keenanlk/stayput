@@ -251,9 +251,21 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser’s Web Audio API makes each sound in this tab: an oscillator at the pitch you chose, or a loop of pink noise, sent to the left channel, the right or both, through a volume control. The sweep moves the oscillator’s pitch smoothly from low to high.',
     versus: 'Nothing here needs a file, an account or a download: the sounds are made in your tab and go straight to your speakers.',
   },
+  'keyboard-tester': {
+    how: 'Your browser sends this page a keydown and a keyup event for each key it receives. The page reads the physical key’s code and the character it produced, lights the matching key on the drawn keyboard and adds a line to the log, all in this tab.',
+    versus: 'Nothing here needs a file, an account or a download: the key presses are read in your tab and drawn on the page, and they are not stored or sent.',
+  },
+  'tone-generator': {
+    how: 'Your browser’s Web Audio API runs one oscillator in this tab at the pitch and wave you chose, through a volume control that fades in and out so it does not click. Changing the pitch or the wave moves the same oscillator while it plays.',
+    versus: 'Nothing here needs a file, an account or a download: the tone is made in your tab and goes straight to your speakers.',
+  },
   'audio-to-video': {
     how: 'Your browser decodes the sound into plain samples, draws the picture once onto a canvas (fitted whole over a blurred copy, or the title on a plain colour), and its own WebCodecs encoders write that still frame once a second with the sound as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
     versus: 'Online MP3-to-video converters upload your music and cover art, add their logo to free videos, and cap the length. Unreleased tracks and private recordings stay private here: nothing leaves your device.',
+  },
+  'photo-slideshow-maker': {
+    how: 'Your browser decodes each photo in the tab (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas the size of the video frame, whole over a blurred copy of itself or cropped to fill. Its own WebCodecs encoders write one frame a second while a photo holds, and a short run of frames for each crossfade, with the song as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
+    versus: 'Online slideshow makers upload your photos, put their logo on the free video, and ask you to sign in before you can download. Family photos stay on your device here, and the file you save carries no mark.',
   },
   'compress-audio': {
     how: 'Your browser decodes the sound with its own audio decoders. When you set a size limit, the bitrate is worked out from the length of the sound so the file lands under it. The smaller file is then written in your tab, as MP3 by LAME compiled to WebAssembly or as OGG by the browser’s own Opus encoder (WebCodecs) with Mediabunny (MPL-2.0) writing the container.',

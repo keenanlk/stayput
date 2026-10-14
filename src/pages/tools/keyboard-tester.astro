@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import KeyboardStage from '../../components/KeyboardStage.astro';
+const tool = toolBySlug('keyboard-tester')!;
+---
+<ToolLayout tool={tool}>
+  <KeyboardStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/keyboard-tester.ts"></script>

@@ -1,0 +1,67 @@
+---
+/**
+ * The tone generator: a wave, a pitch (slider and typed Hz), a level and a
+ * play toggle, with a low starting level and a hearing warning. It replaces
+ * the drop zone. Driven by src/tools/tone-generator.ts.
+ */
+import { WAVES, PRESETS, DEFAULT_HZ, DEFAULT_LEVEL, MAX_LEVEL, MIN_HZ, MAX_HZ, SLIDER_MAX, hzToSlider } from '../lib/tone-generator';
+---
+<div id="tone-panel" class="tone-panel" data-state="stopped" data-hz={DEFAULT_HZ} data-wave="sine">
+  <div class="tone-deck">
+    <p class="tone-now" id="tone-now" aria-live="polite">Nothing is playing.</p>
+    <p class="muted small">Starting quiet. Your device volume is separate: lower it first.</p>
+  </div>
+  <p class="tone-warn" id="tone-warn">Start low and turn up slowly, and take care with headphones. Very low and very high tones can be hard to hear and still be loud enough to hurt, so do not judge the volume by how it sounds. Stop if it hurts.</p>
+  <div class="tone-controls">
+    <button type="button" class="btn btn-primary btn-lg" id="tone-toggle" aria-pressed="false">Play</button>
+  </div>
+  <fieldset class="tone-waves">
+    <legend>Wave</legend>
+    {WAVES.map((w) => (
+      <label class="tone-choice"><input type="radio" name="tone-wave" value={w.type} checked={w.type === 'sine'} /><span>{w.label}</span></label>
+    ))}
+  </fieldset>
+  <div class="tone-options">
+    <div class="field">
+      <label for="tone-freq">Frequency: <output id="tone-freq-text" for="tone-freq">{DEFAULT_HZ} Hz</output></label>
+      <input id="tone-freq" type="range" min="0" max={SLIDER_MAX} step="1" value={hzToSlider(DEFAULT_HZ)} />
+    </div>
+    <div class="field">
+      <label for="tone-hz">Type a frequency (Hz)</label>
+      <input id="tone-hz" type="number" inputmode="decimal" min={MIN_HZ} max={MAX_HZ} step="1" value={DEFAULT_HZ} />
+    </div>
+    <div class="field">
+      <label for="tone-level">Level in this page: <output id="tone-level-text" for="tone-level">{DEFAULT_LEVEL}%</output></label>
+      <input id="tone-level" type="range" min="0" max={MAX_LEVEL} step="1" value={DEFAULT_LEVEL} />
+    </div>
+  </div>
+  <div class="tone-presets" role="group" aria-label="Presets">
+    {PRESETS.map((p) => <button type="button" class="btn" data-hz={p.hz}>{p.label}</button>)}
+  </div>
+  <p class="muted small tone-note" id="tone-note" aria-live="polite"></p>
+</div>
+<style is:global>
+  .tool-panel:has(#tone-panel) #drop,
+  .tool-panel:has(#tone-panel) #file-list,
+  .tool-panel:has(#tone-panel) .run-dock { display: none; }
+  .tone-panel { display: grid; gap: 16px; }
+  .tone-deck { min-height: 120px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius); display: grid; place-content: center; justify-items: center; gap: 6px; padding: 20px; text-align: center; }
+  .tone-now { margin: 0; font-size: 1.4rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .tone-deck p.muted { margin: 0; }
+  .tone-warn { margin: 0; padding: 10px 14px; border: 1px solid var(--warn); border-radius: var(--radius); color: var(--ink); font-size: 14px; }
+  .tone-controls .btn { width: 100%; }
+  .tone-waves { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .tone-waves legend { padding: 0; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+  .tone-choice { flex: 1 1 90px; position: relative; }
+  .tone-choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .tone-choice span { display: block; text-align: center; padding: 12px 10px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-weight: 600; }
+  .tone-choice input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tone-choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tone-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px 28px; align-items: end; }
+  .tone-options input[type='range'] { width: 100%; accent-color: var(--accent); }
+  .tone-options input[type='number'] { width: 100%; }
+  .tone-presets { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tone-presets .btn { flex: 1 1 140px; }
+  .tone-note { margin: 0; }
+  .tone-note.is-warn { color: var(--warn); font-weight: 600; }
+</style>
