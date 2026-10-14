@@ -1988,7 +1988,7 @@ export const tools: Tool[] = [
     slug: 'repeat-video',
     icon: 'rotate',
     name: 'Repeat video',
-    title: 'Repeat a Video N Times: Make a Clip Longer, Free, No Upload | Stayput',
+    title: 'Repeat a Video N Times: Make a Clip Longer, Free | Stayput',
     description:
       'Repeat a video clip 2 to 50 times, or until it reaches a length you set, and save one longer file. MP4, MOV, WebM, MKV. Sound repeats too. No upload.',
     heading: 'Repeat a video',
