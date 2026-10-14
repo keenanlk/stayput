@@ -27,6 +27,11 @@
       "permanent": true
     },
     {
+      "source": "/side-by-side-video",
+      "destination": "/tools/side-by-side-video",
+      "permanent": true
+    },
+    {
       "source": "/upscale-image",
       "destination": "/tools/upscale-image",
       "permanent": true

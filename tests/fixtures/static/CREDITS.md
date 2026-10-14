@@ -23,3 +23,5 @@
 - `loop-10s.mp4`: 10 s of ffmpeg `testsrc2` at 320x240, 15 fps (H.264 Main, key frame every second, with a 440 Hz mono AAC tone), for the Repeat video tests; no third-party material.
 - `loop-mp3-in-mov.mov`: 2 s of ffmpeg `testsrc2` at 320x240 (H.264, with a 440 Hz MP3 tone in a MOV, which a MOV copy cannot hold), so Repeat video takes its re-encode path; no third-party material.
 - `split-60s.mp4`: 60 s of ffmpeg's `smptebars` pattern (160x120, 10 fps, H.264 with a key frame every 2 s) with a 440 Hz mono AAC tone, generated for the Video splitter tests; no third-party material.
+- `sbs-a-24fps.mp4`, `sbs-b-30fps.mp4`, `sbs-b-30fps-6s.mp4`: 1280x720 clips of 10 s, 10 s and 6 s whose grey level rises steadily from black to white over 10 s (a counter: the brightness says what time it is), at 24 and 30 fps, H.264 with a 440 Hz or 880 Hz AAC tone, made by `make-sbs.sh` with ffmpeg for the Side by side video tests; no third-party material.
+- `sbs-long-20min.mp4`: 20 minutes of flat blue (320x180, 1 fps, H.264, no sound), made by `make-sbs.sh` for the Side by side video memory-guard test; no third-party material.

@@ -54,7 +54,7 @@ const MAX_FPS = 60;
 const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 
 /** How long the picture of a track lasts, from its packets. */
-async function pictureLength(track: InputVideoTrack): Promise<{ first: number; length: number }> {
+export async function pictureLength(track: InputVideoTrack): Promise<{ first: number; length: number }> {
   const first = await track.getFirstTimestamp();
   let end = first;
   for await (const p of new EncodedPacketSink(track).packets(undefined, undefined, { metadataOnly: true })) end = Math.max(end, p.timestamp + p.duration);
@@ -77,7 +77,7 @@ async function copyableSound(inputs: Input[]): Promise<InputAudioTrack[] | null>
 }
 
 /** Copy one clip's sound packets into the merged track, shifted to where the clip starts and cut where its picture ends. */
-async function copyClipSound(target: EncodedAudioPacketSource, track: InputAudioTrack, clip: { first: number; length: number }, offset: number) {
+export async function copyClipSound(target: EncodedAudioPacketSource, track: InputAudioTrack, clip: { first: number; length: number }, offset: number) {
   const meta = { decoderConfig: (await track.getDecoderConfig()) ?? undefined };
   for await (const p of new EncodedPacketSink(track).packets()) {
     const t = p.timestamp - clip.first;

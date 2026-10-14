@@ -179,6 +179,10 @@ export const engines: Record<string, Engine> = {
     how: 'Mediabunny (MPL-2.0) reads each MP4, MOV, WebM or MKV clip in your tab. Your browser decodes the frames (WebCodecs), draws them one clip after another onto a picture the size of the first clip, and encodes the whole once into an MP4, H.264 where available and VP9 or AV1 otherwise. Each clip’s sound is decoded by your browser and laid end to end to match.',
     versus: 'Online video mergers upload every clip before they start, cap free files at a few hundred megabytes, and often stamp a watermark on the result. Here the clips never leave your device.',
   },
+  'side-by-side-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV clips in your tab. For every frame of the result, your browser decodes the picture each clip shows at that moment (WebCodecs), draws the two side by side or stacked on a canvas, and encodes the canvas into an MP4, H.264 where available and VP9 or AV1 otherwise. The sound of the clip you chose, or a mix, is decoded by your browser and encoded as AAC.',
+    versus: 'Online split-screen makers upload both clips, cap free files at a few hundred megabytes and often put their watermark on the result. Here the clips never leave your device, and there is no watermark.',
+  },
   'repeat-video': {
     how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV clip in your tab. When the container can hold its codecs, each packet of picture and sound is written again with a later time, once per repeat, with no decoding or encoding. Otherwise your browser decodes the frames (WebCodecs) and encodes the repeated clip once into an MP4, H.264 where available.',
     versus: 'Online video loopers upload the clip to a server, cap free files and lengths, and often stamp a watermark on the longer result. Here the clip never leaves your device and the repeated file is written from memory in your tab.',

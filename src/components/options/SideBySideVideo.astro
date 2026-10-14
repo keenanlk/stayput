@@ -1,0 +1,38 @@
+---
+/** Option controls for Side by side video: layout, fit, sound and length. */
+---
+<div class="field">
+  <label for="sbs-layout">Layout</label>
+  <select id="sbs-layout">
+    <option value="row" selected>Left | Right</option>
+    <option value="column">Top | Bottom</option>
+  </select>
+</div>
+<div class="field">
+  <label for="sbs-fit">Fit</label>
+  <select id="sbs-fit">
+    <option value="contain" selected>Scale to match, nothing cropped</option>
+    <option value="cover">Crop to fill</option>
+  </select>
+</div>
+<div class="field">
+  <label for="sbs-sound">Sound</label>
+  <select id="sbs-sound">
+    <option value="a" selected>From video A</option>
+    <option value="b">From video B</option>
+    <option value="mix">Mix both</option>
+    <option value="none">None</option>
+  </select>
+</div>
+<div class="field">
+  <label for="sbs-length">Length</label>
+  <select id="sbs-length">
+    <option value="shorter" selected>End with the shorter video</option>
+    <option value="longer">Run to the longer, freeze the shorter on its last frame</option>
+  </select>
+</div>
+<p class="muted small sbs-info" id="sbs-info" aria-live="polite"></p>
+<style is:global>
+  .sbs-info { margin: 0; }
+  .sbs-info.is-over { color: var(--warn); font-weight: 600; }
+</style>
