@@ -1,0 +1,19 @@
+---
+/** Option controls for PDF to SVG. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<div class="field wide">
+  <label>Pages <span class="muted" id="page-info"></span></label>
+  <div class="segmented" role="radiogroup" aria-label="Pages">
+    <label><input type="radio" name="pages" value="all" checked /><span>All pages</span></label>
+    <label><input type="radio" name="pages" value="range" /><span>Choose pages</span></label>
+  </div>
+</div>
+<div class="field wide" id="range-field" hidden>
+  <label for="range">Pages</label>
+  <input type="text" id="range" placeholder="e.g. 1-3, 5" autocomplete="off" />
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="background" checked={defaults.background !== 'false'} /> White page behind the drawing</label>
+</div>

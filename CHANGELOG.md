@@ -7,6 +7,7 @@ site will render this file.
 ## Unreleased
 
 ### Added
+- PDF to SVG: converts each page of a PDF to an SVG in the tab, with vector shapes, gradients and transparency, text drawn from the embedded fonts plus a selectable text layer, and pictures embedded. Several pages come as a zip. A page that uses blend modes, soft masks, tiling patterns, mesh gradients or Type 3 fonts is saved as a picture inside the SVG, with a note saying why.
 - WMA to MP3: converts Windows Media Audio (versions 1 and 2) files to MP3 in the tab, keeping the title and artist. WMA Pro, WMA Lossless and WMA Voice are refused by name. The decoder is built from FFmpeg's libraries (LGPL) with only the ASF demuxer and the two WMA decoders, and loads only when you convert a WMA.
 - FLV to MP4: converts FLV files that hold H.264 picture with AAC or MP3 sound in the tab, copying the picture without re-encoding. FLVs with VP6 or Sorenson Spark video get a message naming the codec. The reader is built from FFmpeg's libraries (LGPL) and loads only when you convert an FLV; /licenses links its source and build.
 - AVI to MP4: converts Xvid, DivX 4+ and Motion JPEG AVI files in the tab. The decoder is built from FFmpeg's libraries (LGPL) and loads only when you convert an AVI; /licenses links its source and build.

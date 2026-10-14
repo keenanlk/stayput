@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import PdfToSvg from '../../components/options/PdfToSvg.astro';
+const tool = toolBySlug('pdf-to-svg')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><PdfToSvg /></Fragment>
+</ToolLayout>
+<script src="../../tools/pdf-to-svg.ts"></script>

@@ -34,7 +34,7 @@ const workers = new WeakMap<PdfJs.PDFDocumentProxy, { worker: PdfJs.PDFWorker; p
  * Open a PDF with pdf.js on its own dedicated web worker. Call `closePdfJs`
  * when done so the worker is terminated and memory is released.
  */
-export async function openWithPdfJs(source: Uint8Array): Promise<PdfJs.PDFDocumentProxy> {
+export async function openWithPdfJs(source: Uint8Array, opts: { keepFontData?: boolean } = {}): Promise<PdfJs.PDFDocumentProxy> {
   assertPdfHeader(source);
   const { bytes } = await unlockPdf(source);
   const { lib, PdfWorker } = await loadPdfJs();
@@ -42,7 +42,8 @@ export async function openWithPdfJs(source: Uint8Array): Promise<PdfJs.PDFDocume
   const worker = lib.PDFWorker.create({ port });
   try {
     // pdf.js transfers the buffer to its worker, so hand it a copy.
-    const doc = await lib.getDocument({ data: bytes.slice(), worker }).promise;
+    // keepFontData: pdf.js keeps each embedded font's bytes, for tools that read glyph outlines (PDF to SVG).
+    const doc = await lib.getDocument({ data: bytes.slice(), worker, ...(opts.keepFontData ? { fontExtraProperties: true } : {}) }).promise;
     workers.set(doc, { worker, port });
     return doc;
   } catch (e) {

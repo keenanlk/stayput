@@ -93,6 +93,7 @@ const does: Record<string, string> = {
   'split-image': 'Cuts a picture into a grid, a carousel or any number of rows and columns, and saves the tiles.',
   'collage-maker': 'Combines photos into one image as a grid, side by side or stacked, with spacing and a background colour.',
   'extract-pdf-images': 'Saves every picture inside a PDF as PNG or JPG, at the resolution it was stored.',
+  'pdf-to-svg': 'Converts each page of a PDF to an SVG with vector shapes and selectable text, one file per page and a zip for several, and says which pages had to be saved as a picture.',
   'bpm-key-finder': 'Finds the tempo (BPM) and musical key of a song from an audio file, and gives the Camelot code DJs use to match keys.',
   'pitch-changer': 'Shifts a song or recording up or down by semitones without changing its length, or changes its speed without changing its pitch (MP3, WAV, M4A, FLAC).',
   'tuner': 'Tunes a guitar, bass, ukulele, violin or any instrument from your microphone, showing the note, the cents and a needle.',

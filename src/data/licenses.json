@@ -316,6 +316,23 @@
    "copyright": "Copyright (c) 2017 killercrush"
   },
   {
+   "id": "opentype-js",
+   "name": "opentype.js",
+   "version": "2.0.0",
+   "npm": "opentype.js",
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://opentype.js.org/",
+   "source": "https://github.com/opentypejs/opentype.js/tree/v2.0.0",
+   "shipped": "Bundled into the site JavaScript (reads glyph outlines for PDF to SVG)",
+   "kind": "library",
+   "copyright": "Copyright (c) 2020 Frederik De Bleser"
+  },
+  {
    "id": "fflate",
    "name": "fflate",
    "version": "0.8.3",
