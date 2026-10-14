@@ -725,6 +725,10 @@ export const tools: Tool[] = [
         q: 'My photos are of paper documents. Can they look scanned?',
         a: 'Use Document scanner instead: it cuts each page out of the photo, straightens it and turns the paper white before making the PDF.',
       },
+      {
+        q: 'Can I make a video of the pictures instead?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) puts them in an MP4, one after another, with an optional song.',
+      },
     ],
   },
   {
@@ -1377,6 +1381,10 @@ export const tools: Tool[] = [
         q: 'Is there a watermark or a file size limit?',
         a: 'No watermark and no upload limit. The video itself is limited by your device’s memory (phones hold less): a long 4K video works, because only the frames you pick are decoded, but the GIF itself is capped at 600 frames.',
       },
+      {
+        q: 'Can I make a video from photos instead?',
+        a: 'The [Photo slideshow maker](/tools/photo-slideshow-maker) turns still photos into an MP4, with a song if you like. The [GIF maker](/tools/gif-maker) makes a GIF from photos.',
+      },
     ],
   },
   {
@@ -1880,6 +1888,10 @@ export const tools: Tool[] = [
         q: 'Why does merging take a while?',
         a: 'Clips from different cameras rarely share the same format, so every frame is encoded again to make one continuous video. That runs on your device, using its hardware video encoder where the browser has one.',
       },
+      {
+        q: 'Can I make a video from photos instead of clips?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) turns photos into an MP4 with a song; then join it with other clips here.',
+      },
     ],
   },
   {
@@ -1918,6 +1930,10 @@ export const tools: Tool[] = [
       {
         q: 'Can I keep the original sound and add music under it?',
         a: 'Yes. Choose Keep it, with the new sound quieter underneath: the music plays at half volume under the voices in the video.',
+      },
+      {
+        q: 'Can I put a song under photos instead of a video?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) makes a video from your photos and adds the song in one go.',
       },
     ],
   },
@@ -2925,6 +2941,85 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'tone-generator',
+    icon: 'volume',
+    name: 'Tone generator',
+    title: 'Online Tone Generator and Frequency Generator | Stayput',
+    description:
+      'Play a test tone online: sine, square, triangle or sawtooth from 20 Hz to 20 kHz, with presets for 440 Hz, 1 kHz and bass. It starts quiet, and nothing is uploaded.',
+    heading: 'Online tone generator',
+    tagline: 'Play a steady tone at any pitch from 20 Hz to 20 kHz, as a sine, square, triangle or sawtooth wave. It starts quiet, and nothing is uploaded.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Play a tone',
+    action: 'Play',
+    lead:
+      'Plays a steady test tone at the pitch you choose, from 20 Hz to 20 kHz, as a sine, square, triangle or sawtooth wave, so you can check speakers, headphones and subwoofers, or find a reference note. It is free, and your choices are not uploaded: the tone is made by code in your browser, and the page uses no file and no microphone. After one visit and a short wait the page works offline.',
+    sections: [
+      {
+        heading: 'What this tool does',
+        bullets: [
+          'Plays one steady tone with a sine, square, triangle or sawtooth wave.',
+          'Sets the pitch with a slider on a log scale from 20 Hz to 20 kHz, or with a number you type; the two stay in step.',
+          'Has presets for 440 Hz (the A above middle C), 1 kHz and a 50 Hz test bass.',
+          'Starts at a low level and fades in and out, so starting and stopping do not click.',
+        ],
+      },
+      {
+        heading: 'Take care with your hearing',
+        bullets: [
+          'Turn your device volume down first and raise it slowly. A steady tone is harsher than music at the same setting.',
+          'Take extra care with headphones, which sit close to your ear.',
+          'Very low and very high tones can be hard to hear and still be loud, so do not judge the volume by how it sounds. Stop if it hurts.',
+        ],
+      },
+      {
+        heading: 'What this tool cannot tell you',
+        bullets: [
+          'The page plays sound and you listen. It cannot hear your speakers, so it does not measure their quality, loudness or frequency response.',
+          'Small speakers play very low and very high tones weakly or not at all, and people differ in how high a sound they hear.',
+        ],
+      },
+    ],
+    keywords: ['tone generator', 'online tone generator', 'frequency generator', 'sine wave generator', 'test tone', 'hz tone generator', 'square wave generator', 'sound generator'],
+    steps: [
+      'Turn your device volume down, choose a wave, and set the pitch with the slider, by typing Hz or with a preset.',
+      'Press Play and raise the level slowly if you need to. Change the wave or the pitch while it plays.',
+      'Press Stop when you are done. The tone also stops when you leave the tab.',
+    ],
+    faq: [
+      {
+        q: 'Is anything recorded or uploaded?',
+        a: 'No. The tone is made by an oscillator in this page and played through your speakers. The page does not use your microphone and does not ask for any permission, and nothing about what you play is sent anywhere.',
+      },
+      {
+        q: 'Is this an online tone generator or a frequency generator?',
+        a: 'Both. It is an online tone generator that works as a frequency generator too: type any pitch from 20 Hz to 20 kHz, or drag the slider, and it plays that frequency as a steady tone you can use to test speakers or find a reference note.',
+      },
+      {
+        q: 'Which wave should I use?',
+        a: 'A sine is a single pure pitch, the cleanest for checking speakers. A square and a sawtooth are buzzier because they carry many harmonics, and a triangle sits between a sine and a square. Use them to hear how a speaker handles a richer sound.',
+      },
+      {
+        q: 'Is it safe for my ears and my speakers?',
+        a: 'It starts at a low level and the level slider tops out well below full scale, but your device volume is separate, so lower it first. Very low and very high tones can be hard to hear and still be loud, so raise the volume a little at a time and stop if it hurts. Avoid long, loud tones through small speakers.',
+      },
+      {
+        q: 'Why can I not hear the lowest or the highest tones?',
+        a: 'Small speakers, such as those in a phone or laptop, play very low notes weakly or not at all, and hearing for high pitches varies between people and fades with age. Many adults hear little above 15 kHz.',
+      },
+      {
+        q: 'What is 440 Hz?',
+        a: 'It is concert A, the A above middle C, which most modern music is tuned to. The 440 Hz preset gives you a reference note to tune against. For tuning by ear, the tuner on this site can also listen to your instrument.',
+      },
+      {
+        q: 'Can I check my speakers left and right?',
+        a: 'This page plays both sides together. To send a tone to the left or the right side only, use the speaker test.',
+      },
+    ],
+  },
+  {
     slug: 'audio-to-video',
     icon: 'film',
     name: 'Audio to video',
@@ -2960,6 +3055,76 @@ export const tools: Tool[] = [
       {
         q: 'Will YouTube accept it?',
         a: 'Yes. It is a standard MP4 at 1920×1080 (or 1080×1080, or 1080×1920 for Shorts). In Chrome, Edge and Safari the picture is H.264 and the sound AAC, which play everywhere.',
+      },
+      {
+        q: 'What if I have many pictures, not one?',
+        a: 'Use the [Photo slideshow maker](/tools/photo-slideshow-maker): it puts up to 100 photos in order, with your song under them, in one MP4.',
+      },
+    ],
+  },
+  {
+    slug: 'photo-slideshow-maker',
+    icon: 'film',
+    name: 'Photo slideshow maker',
+    title: 'Photo Slideshow Maker: Pictures to MP4, No Upload | Stayput',
+    description:
+      'Turn photos into an MP4 slideshow: set the order, seconds per photo, fade between them and add a song. Free, no watermark, nothing uploaded.',
+    heading: 'Make a photo slideshow video',
+    tagline: 'Drop your photos, put them in order, pick how long each one stays, add a song and download an MP4. It all happens on this device; nothing is uploaded.',
+    category: 'media',
+    accept: 'image/*,audio/*,.heic,.heif,.avif,.jxl,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac',
+    multiple: true,
+    dropLabel: 'Drop your photos, and a song if you like',
+    action: 'Make video',
+    sizeFact: 'No watermark. From 2 to 100 photos; the limit is your device’s memory (phones hold less).',
+    keywords: ['photo slideshow maker', 'slideshow maker', 'photo to video', 'photos to video', 'picture to video', 'slideshow video maker', 'photo video maker', 'photo slideshow with music'],
+    steps: [
+      'Drop your photos, and a song if you like. Pictures from an iPhone (HEIC) work too.',
+      'Put the photos in order with the arrows or by dragging, and set the seconds per photo.',
+      'Press Make video and download the MP4.',
+    ],
+    sections: [
+      {
+        heading: 'What it doesn’t do',
+        paragraphs: [
+          'There is no text on slides, no pan and zoom, no templates and no stock music, and every photo stays on screen for the same time. For words on a video, use [Add subtitles to video](/tools/add-subtitles-to-video). To join video clips, use [Merge videos](/tools/merge-videos).',
+        ],
+      },
+      {
+        heading: 'Where the video plays',
+        paragraphs: [
+          'The result is a standard MP4 that WhatsApp, Instagram, TikTok, YouTube, PowerPoint and TVs open. Pick tall 9:16 for Reels and TikTok, square for feeds, or wide 16:9 for YouTube and slides. Trim the result with [Trim video](/tools/trim-video), or make it smaller with [Compress video](/tools/compress-video).',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'Is there a watermark or a limit?',
+        a: 'There is no watermark and no sign-up. You can use 2 to 100 photos, and the limit is your device’s memory (phones hold less), so a long slideshow of large photos may need a computer.',
+      },
+      {
+        q: 'Can I add music?',
+        a: 'Yes. Drop one song with the photos: it is cut at the end with a one-second fade, or repeats if it is shorter. To add sound to a slideshow you already made, use [Add audio to video](/tools/add-audio-to-video).',
+      },
+      {
+        q: 'How long will the video be?',
+        a: 'The number of photos times the seconds per photo. Twenty photos at 3 seconds each make a one-minute video. The Match the song button sets the seconds so the photos fill the song.',
+      },
+      {
+        q: 'What shape should I pick for Instagram, TikTok or YouTube?',
+        a: 'Tall 9:16 for Reels, Shorts and TikTok, square for feed posts, wide 16:9 for YouTube and slides. For an existing video, see [Crop video for TikTok](/crop-video-for-tiktok).',
+      },
+      {
+        q: 'Can I use HEIC photos from my iPhone?',
+        a: 'Yes. HEIC, JPG, PNG, WebP and AVIF photos are read in your browser, so there is no need to convert them first.',
+      },
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. They are decoded and the video is written in this tab, with no photo or file name sent anywhere. Open the network tab, run it, and your photos are not among the requests.',
+      },
+      {
+        q: 'Can I make a GIF instead?',
+        a: 'Yes: the [GIF maker](/tools/gif-maker) makes a looping GIF from the same kind of photos. For one picture under a song, see [Audio to video](/tools/audio-to-video).',
       },
     ],
   },
@@ -3124,6 +3289,10 @@ export const tools: Tool[] = [
       {
         q: 'Is there a watermark or a limit?',
         a: 'No watermark, and no set limit on the number of pictures beyond your device’s memory (phones hold less).',
+      },
+      {
+        q: 'Can I make a video of the pictures instead?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) shows them one after another in an MP4, with seconds per photo and an optional song.',
       },
     ],
   },
@@ -3916,6 +4085,7 @@ export const tools: Tool[] = [
       'Make an animated GIF from photos, screenshots or drawings. Set the order, the time per picture, the size and the loop, with a live preview. Nothing is uploaded.',
     heading: 'Make a GIF from images',
     tagline: 'Your pictures turned into one looping GIF, put together on this device, with no watermark.',
+    taglineMd: 'Your pictures turned into one looping GIF, put together on this device, with no watermark. Want sound or a bigger file? Make a video with the [photo slideshow maker](/tools/photo-slideshow-maker).',
     category: 'images',
     accept: 'image/*,.heic,.heif,.avif,.jxl',
     multiple: true,
@@ -3944,6 +4114,10 @@ export const tools: Tool[] = [
       {
         q: 'How big will the GIF be?',
         a: 'Roughly the number of frames times the frame size, since GIF compression is weak on photos. Twenty photos at 480 pixels wide come to about 1 to 3 MB. Choose 320 pixels for a smaller file, or fewer pictures; the note under the download gives the exact size.',
+      },
+      {
+        q: 'How do I add sound, or get a bigger file?',
+        a: 'Make a video instead. The [Photo slideshow maker](/tools/photo-slideshow-maker) turns the same pictures into an MP4 with a song, a crossfade and the shape of your choice.',
       },
     ],
   },

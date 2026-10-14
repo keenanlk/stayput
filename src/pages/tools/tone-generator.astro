@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ToneStage from '../../components/ToneStage.astro';
+const tool = toolBySlug('tone-generator')!;
+---
+<ToolLayout tool={tool}>
+  <ToneStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/tone-generator.ts"></script>

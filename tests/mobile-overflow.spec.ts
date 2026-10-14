@@ -28,6 +28,7 @@ const pages = [
   '/tools/audio-splitter',
   '/tools/speaker-test',
   '/tools/keyboard-tester',
+  '/tools/tone-generator',
   '/tools/bpm-key-finder',
   '/camelot-wheel',
   '/bpm-finder',
