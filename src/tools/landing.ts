@@ -30,6 +30,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'compress-video': () => import('./compress-video'),
   'video-to-mp4': () => import('./video-to-mp4'),
   'video-to-mov': () => import('./video-to-mov'),
+  'video-to-webm': () => import('./video-to-webm'),
   'compress-png': () => import('./compress-png'),
   'compress-gif': () => import('./compress-gif'),
   'trim-video': () => import('./trim-video'),

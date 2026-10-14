@@ -20,8 +20,9 @@
 export const handoffs: Record<string, string[]> = {
   // Video → video
   'add-subtitles-to-video': ['compress-video', 'trim-video'],
-  'video-to-mp4': ['compress-video', 'video-to-gif'],
+  'video-to-mp4': ['compress-video', 'video-to-webm'],
   'video-to-mov': ['compress-video', 'video-to-gif'],
+  'video-to-webm': ['compress-video', 'video-to-gif'],
   'compress-video': ['video-to-mp3', 'video-to-gif'],
   'trim-video': ['compress-video', 'video-to-gif'],
   'mute-video': ['compress-video'],
