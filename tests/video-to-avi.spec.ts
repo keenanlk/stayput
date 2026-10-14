@@ -22,6 +22,11 @@ async function open(page: Page, path: string) {
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
 }
 
+/** Linux WebKit in CI has no working video decoder or encoder (the run just never ends); Mac WebKit does, locally. */
+function skipOnLinuxWebkit(browserName: string) {
+  test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit in CI cannot decode or encode video; verified on Mac WebKit locally');
+}
+
 async function convert(page: Page, file: string, tag: string): Promise<{ bytes: Uint8Array; name: string; note: string }> {
   await page.locator('#file-input').setInputFiles([file]);
   const download = page.waitForEvent('download');
@@ -148,7 +153,8 @@ test('avcC samples become Annex B with the parameter sets in front of key frames
   expect([...avcToAnnexB(sample, 4, parameterSets)].slice(0, 11)).toEqual([...parameterSets]);
 });
 
-test('a 10 s 720p clip becomes an H.264 AVI of the same length with picture and sound', async ({ page }) => {
+test('a 10 s 720p clip becomes an H.264 AVI of the same length with picture and sound', async ({ page, browserName }) => {
+  skipOnLinuxWebkit(browserName);
   test.setTimeout(300_000);
   await open(page, '/tools/video-to-avi');
   // Maximum compatibility (Motion JPEG) is the default; H.264 is the smaller option.
@@ -176,7 +182,8 @@ test('a 10 s 720p clip becomes an H.264 AVI of the same length with picture and 
   expect(r.note).toContain('H.264');
 });
 
-test('clips of two minutes or more get MP3 sound', async ({ page }) => {
+test('clips of two minutes or more get MP3 sound', async ({ page, browserName }) => {
+  skipOnLinuxWebkit(browserName);
   test.setTimeout(300_000);
   await open(page, '/tools/video-to-avi');
   await page.locator('#compat').uncheck();
@@ -188,7 +195,8 @@ test('clips of two minutes or more get MP3 sound', async ({ page }) => {
   expect(avi.audioChunks).toBeGreaterThan(100);
 });
 
-test('Maximum compatibility writes MJPG pictures with PCM sound', async ({ page }) => {
+test('Maximum compatibility writes MJPG pictures with PCM sound', async ({ page, browserName }) => {
+  skipOnLinuxWebkit(browserName);
   test.setTimeout(300_000);
   await open(page, '/mp4-to-avi');
   await expect(page.locator('#compat')).toBeChecked();
@@ -206,7 +214,8 @@ test('Maximum compatibility writes MJPG pictures with PCM sound', async ({ page 
   expect(r.note).toContain('Motion JPEG');
 });
 
-test('Remove the sound writes an AVI with a picture stream only', async ({ page }) => {
+test('Remove the sound writes an AVI with a picture stream only', async ({ page, browserName }) => {
+  skipOnLinuxWebkit(browserName);
   test.setTimeout(300_000);
   await open(page, '/tools/video-to-avi');
   await page.locator('#mute').check();
@@ -249,7 +258,8 @@ test('Unsupported input gets a plain message, not a broken file', async ({ page 
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 30_000 });
 });
 
-test('no file bytes or names leave the tab during a conversion', async ({ page }) => {
+test('no file bytes or names leave the tab during a conversion', async ({ page, browserName }) => {
+  skipOnLinuxWebkit(browserName);
   test.setTimeout(300_000);
   await page.route('https://stats.keenankaufman.com/**', (r) => r.fulfill({ status: 200, body: '' }));
   await open(page, '/tools/video-to-avi');
