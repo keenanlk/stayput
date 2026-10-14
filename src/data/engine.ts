@@ -67,6 +67,10 @@ export const engines: Record<string, Engine> = {
     how: 'pdf.js renders a thumbnail of every page so you can see what you are moving. When you save, pdf-lib copies the pages you kept, in your order, into a new document. The page contents are not re-rendered or recompressed, so text stays text and images keep their quality.',
     versus: 'Reordering pages is a five-second job that upload-based tools turn into an upload, a queue and a download page, often behind a login or a daily cap. Here the thumbnails appear as fast as your device can draw them and the result is written in your tab.',
   },
+  'edit-pdf': {
+    how: 'pdf.js draws each page in your tab so you can see where to click. Your additions are drawn onto the original pages with pdf-lib: typed text with the standard PDF fonts as real text, boxes and pen strokes as vector shapes, images as pictures. Page changes copy the pages you kept into the new file in your order. Nothing already on the page is rewritten, which is why existing text cannot be changed.',
+    versus: 'Online PDF editors upload the document, then keep text editing, extra downloads or a watermark behind an account or a plan. This one has no server: the marks you add are written on your device, and the file you download has none of ours.',
+  },
   'sign-pdf': {
     how: 'Your signature is captured as strokes on a canvas (or typed with an embedded handwriting font), turned into a transparent PNG in memory, and drawn onto the page with pdf-lib at the exact spot and size you chose on the pdf.js preview. The signed PDF is assembled in your tab and handed to your browser’s download.',
     versus: 'E-signature sites keep a copy of your contract, your signature and your email address, and most limit free users to a few documents a month. This tool has no server, so there is nothing to keep, nothing to count and nothing to leak.',
@@ -154,6 +158,10 @@ export const engines: Record<string, Engine> = {
   'crop-video': {
     how: 'Your browser shows a frame from the video on your device so you can draw the box. Mediabunny (MPL-2.0) then reads the MP4, MOV, WebM or MKV container in your tab; each frame is decoded by your browser (WebCodecs), cut to the box, and encoded again, H.264 where available and VP9 or AV1 otherwise. The sound is copied as it is when the MP4 can hold it.',
     versus: 'Online croppers upload the whole video to change its frame, cap free files at a few hundred megabytes, and many stamp a watermark on the result. Here the video never leaves your device.',
+  },
+  'add-watermark-to-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV container in your tab. Each frame is decoded by your browser (WebCodecs) onto a canvas, your text or logo is drawn over it at the position, size and opacity you chose, and the frame is encoded again, H.264 where available and VP9 or AV1 otherwise. The sound is copied as it is when the MP4 can hold it.',
+    versus: 'Online watermarking sites upload the video to stamp it, cap free files at a few hundred megabytes, and often add their own watermark on top of yours. Here the video and your logo never leave your device, and the only mark on the result is the one you chose.',
   },
   'video-speed': {
     how: 'Mediabunny (MPL-2.0) decodes the video in your tab and gives every frame a new time; when speeding up, frames beyond 60 a second are dropped. The sound track is decoded by your browser and stretched with WSOLA, a method that overlaps short slices of sound so the pitch stays the same. Both are encoded again by your browser (WebCodecs) into an MP4, H.264 and AAC where available.',

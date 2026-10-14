@@ -27,9 +27,12 @@ export function videoEditShell(config: {
   options: (file: File) => Promise<Omit<EditOptions, 'onProgress'>> | Omit<EditOptions, 'onProgress'>;
   /** More to say about the file just made, after the size and codec. */
   note?: () => string | undefined;
+  /** Called after files are added or removed (for example to show a preview). */
+  onFilesChanged?: Parameters<typeof createShell>[0]['onFilesChanged'];
 }) {
   return createShell({
     keepAwake: true,
+    onFilesChanged: config.onFilesChanged,
     async process(files, progress) {
       // About 400 KB of video code, loaded only when someone runs the tool.
       const { editVideo } = await import('../lib/video-edit');

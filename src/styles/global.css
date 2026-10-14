@@ -675,3 +675,17 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .licenses .lic-card { padding: 14px 16px; border: 1.5px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); }
 .licenses .lic-card { border-bottom: 1.5px solid var(--line-strong); }
 .licenses .muted { color: var(--muted); font-size: 14.5px; }
+
+/* Edit PDF */
+.edit-layer { cursor: crosshair; }
+.edit-layer.is-draw, .edit-layer.is-cover, .edit-layer.is-highlight { touch-action: none; }
+.edit-item { position: absolute; cursor: move; touch-action: none; border: 1px dashed transparent; box-sizing: border-box; line-height: 1; }
+.edit-item:hover, .edit-item:focus-visible, .edit-item.is-active { border-color: var(--accent); outline: none; }
+.edit-item img, .edit-item svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+.edit-item .edit-words { white-space: pre; pointer-events: none; display: block; }
+.edit-item:hover .stamp-remove, .edit-item:focus-visible .stamp-remove, .edit-item.is-active .stamp-remove,
+.edit-item:hover .stamp-handle, .edit-item:focus-visible .stamp-handle, .edit-item.is-active .stamp-handle { display: flex; }
+.edit-draft { position: absolute; pointer-events: none; border: 1px dashed var(--accent); box-sizing: border-box; }
+.page-thumb.is-current { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+.page-thumb .thumb-open { background: none; border: 0; padding: 0; cursor: pointer; display: grid; gap: 4px; justify-items: center; color: inherit; font: inherit; }
+.page-thumb .thumb-frame { height: 150px; display: flex; align-items: center; justify-content: center; overflow: hidden; }

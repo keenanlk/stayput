@@ -458,8 +458,8 @@ export const guides: Guide[] = [
     heading: 'How to sign a PDF without Adobe Acrobat',
     dek: 'Sign a contract in your browser in a minute, with nothing uploaded, and the built-in options on every platform.',
     keywords: ['sign pdf without adobe', 'how to sign a pdf', 'sign pdf free', 'add signature to pdf', 'sign pdf online safe', 'electronic signature pdf free'],
-    updated: '2026-10-12',
-    tools: ['sign-pdf', 'merge-pdf', 'pdf-page-numbers'],
+    updated: '2026-10-14',
+    tools: ['sign-pdf', 'merge-pdf', 'pdf-page-numbers', 'edit-pdf'],
     sections: [
       {
         h: 'What "signing a PDF" usually means',
@@ -3593,8 +3593,8 @@ export const guides: Guide[] = [
     heading: 'How to redact a PDF',
     dek: 'Painting a black rectangle over a name in a PDF usually just covers it, since the text is still selectable underneath. Here is how to actually delete it, for free, without uploading the document.',
     keywords: ['how to redact a pdf', 'redact pdf free', 'redact pdf online free', 'black out text in pdf', 'remove text from pdf permanently'],
-    updated: '2026-09-30',
-    tools: ['redact-pdf'],
+    updated: '2026-10-14',
+    tools: ['redact-pdf', 'edit-pdf'],
     sections: [
       {
         h: 'Why a black box is not redaction',
@@ -3803,8 +3803,8 @@ export const guides: Guide[] = [
     heading: 'How to fill out a PDF form',
     dek: 'Filling in a form that carries your income, your ID number or your address means thinking about where that file goes. Here is how to fill it out on your own device instead.',
     keywords: ['how to fill out a pdf form', 'fill pdf form online free', 'fill in pdf form without printing', 'edit pdf form fields', 'fill pdf form no upload'],
-    updated: '2026-09-30',
-    tools: ['fill-pdf-form'],
+    updated: '2026-10-14',
+    tools: ['fill-pdf-form', 'edit-pdf'],
     sections: [
       {
         h: 'Fillable vs. flat PDFs',

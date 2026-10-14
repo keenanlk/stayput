@@ -441,6 +441,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
+      {
         q: 'Is there a limit on the number or size of files?',
         a: 'No. Other free tools cap you at two or three tasks an hour or a set file size because they pay for servers. This tool does the work on your device, so the limit is your device’s memory (phones hold less). Merging fifty PDFs or a few hundred megabytes is fine on a normal laptop.',
       },
@@ -600,6 +604,10 @@ export const tools: Tool[] = [
       'Save the rotated PDF.',
     ],
     faq: [
+      {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
       {
         q: 'Is the rotation permanent?',
         a: 'Yes. Unlike rotating in a viewer, which only changes the display, this writes the rotation into each page so every PDF reader shows it the right way up.',
@@ -776,6 +784,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
+      {
         q: 'Does reordering change the quality of the pages?',
         a: 'No. Pages are copied into the new document as they are, with their text, images and vector graphics untouched. Only the order and the set of pages change.',
       },
@@ -790,6 +802,87 @@ export const tools: Tool[] = [
       {
         q: 'Is the PDF uploaded?',
         a: 'No. Thumbnails are rendered with pdf.js and the new file is written with pdf-lib, both running in your browser. After one visit and a short wait, switch off your network and it still works.',
+      },
+    ],
+  },
+  {
+    slug: 'edit-pdf',
+    icon: 'text',
+    name: 'Edit PDF',
+    title: 'Edit PDF Online Free: Add Text, Cover, Draw | Stayput',
+    description:
+      "Add text, white-out, highlight, draw or add an image on a PDF, then rotate, delete or reorder pages. Free, no upload, no watermark. Existing text can't be changed.",
+    heading: 'Edit a PDF',
+    tagline: 'Mark up and rearrange a PDF in your browser. Add text, cover a spot, highlight, draw or drop in an image; rotate, delete or reorder pages. Your file never leaves this device.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF to edit',
+    action: 'Download edited PDF',
+    keywords: ['edit pdf', 'edit pdf online free', 'pdf editor free', 'edit pdf no upload', 'add text to pdf', 'edit pdf without acrobat', 'how to edit a pdf'],
+    steps: [
+      'Drop the PDF.',
+      'Pick Text, Cover, Highlight, Draw or Image and click the page.',
+      'Rotate, delete or reorder pages if you need to, then download the edited PDF.',
+    ],
+    sections: [
+      {
+        heading: 'What this can and can’t do',
+        paragraphs: [
+          'This is an annotate-and-arrange editor: it puts new things on top of a page and changes which pages are in the file. It does not open up the text that is already there.',
+        ],
+        bullets: [
+          '**Can:** add new text in Helvetica, Times or Courier, cover a spot with a box, highlight, draw by hand, add an image, and rotate, delete or reorder pages.',
+          '**Can’t:** change, replace or reflow text that is already in the PDF, or edit the words on a scanned page. To make scanned text selectable first, use [OCR PDF](/tools/ocr-pdf); to start from an editable copy, [PDF to Word](/tools/pdf-to-word) gives a starting point.',
+          '**Can’t:** remove what a cover box hides. The text underneath is still in the file; [Redact PDF](/tools/redact-pdf) removes it for good.',
+        ],
+      },
+      {
+        heading: 'Which tool for which job',
+        bullets: [
+          '[Sign PDF](/tools/sign-pdf): draw, type or place a signature, initials or a date.',
+          '[Fill PDF form](/tools/fill-pdf-form): type into a form’s own fields.',
+          '[Redact PDF](/tools/redact-pdf): remove sensitive text for good.',
+          '[Watermark PDF](/tools/watermark-pdf): the same mark on every page.',
+          '[PDF page numbers](/tools/pdf-page-numbers): number every page.',
+          '[Reorder PDF](/tools/reorder-pdf), [Rotate PDF](/tools/rotate-pdf) and [Delete PDF pages](/delete-pdf-pages): page changes only.',
+          '[Merge PDF](/tools/merge-pdf), [Split PDF](/tools/split-pdf), [Crop PDF](/tools/crop-pdf) and [Compress PDF](/tools/compress-pdf): the file as a whole.',
+          '[Protect PDF](/tools/protect-pdf) and [Unlock PDF](/tools/unlock-pdf): passwords.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'Can I edit the existing text in a PDF here?',
+        a: 'No. You can add new text, cover old text and draw, but the words already in the file stay as they are. Covering is not removal: use [Redact PDF](/tools/redact-pdf) to take text out. To change the wording of a document, start from the source file; for a Word source, [PDF to Word](/tools/pdf-to-word) gives a starting point.',
+      },
+      {
+        q: 'Is it really free? Is there a watermark or sign-up?',
+        a: 'There is no account, no watermark and no page limit. The only limit is your device’s memory, and phones hold less than computers.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. pdf.js shows the pages and pdf-lib writes your changes, both inside this tab. Open your browser’s Network tab while you edit and you will see no file leave the page.',
+      },
+      {
+        q: 'Can I edit a scanned PDF?',
+        a: 'You can add text and cover boxes on top of a scan. To make the scanned text selectable, run [OCR PDF](/tools/ocr-pdf) first.',
+      },
+      {
+        q: 'Does covering text hide it?',
+        a: 'Visually, yes. The text is still in the file and can be copied out. Use [Redact PDF](/tools/redact-pdf) when it has to be gone.',
+      },
+      {
+        q: 'How do I fill in a form or sign?',
+        a: 'Use [Fill PDF form](/tools/fill-pdf-form) for a form’s own fields and [Sign PDF](/tools/sign-pdf) for a signature.',
+      },
+      {
+        q: 'Can I edit a PDF on an iPhone, a Mac or in Chrome?',
+        a: 'Yes, in the browser: there is no app to install, and drawing works with a finger. Safari on iPhone and Mac, Chrome and Firefox are all fine.',
+      },
+      {
+        q: 'Which page edits are supported?',
+        a: 'Rotate a page a quarter turn at a time, delete pages and drag them into a new order. To join files or cut one apart, use [Merge PDF](/tools/merge-pdf) or [Split PDF](/tools/split-pdf).',
       },
     ],
   },
@@ -814,6 +907,10 @@ export const tools: Tool[] = [
       'Click a page to place the signature, drag it into position, resize it, then download the signed PDF.',
     ],
     faq: [
+      {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
       {
         q: 'Is this a legally binding signature?',
         a: 'It adds an image of your signature to the document, the same as printing, signing and scanning. Whether a signature like this is accepted depends on who asked you to sign and the rules where you are, so check with them. It is not a cryptographic digital certificate; if a counterparty requires one, they will usually say so.',
@@ -861,6 +958,10 @@ export const tools: Tool[] = [
       'Add page numbers and download. The preview shows the first numbered page.',
     ],
     faq: [
+      {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
       {
         q: 'Can I skip the cover page?',
         a: 'Yes. Set "First page to number" to 2 and the cover stays clean. You can also choose the number printed on that first numbered page, so page 2 can be numbered 1.',
@@ -1376,7 +1477,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Which file sizes can I fit a video under?',
-        a: '8, 10, 16, 25, 50 or 100 MB. 10 MB is Discord’s free limit, 16 MB is WhatsApp’s and 25 MB is the attachment limit for Gmail and Outlook. Choose Fit a file size and the resolution is lowered automatically when a long video needs it.',
+        a: '8, 10, 16, 25, 50 or 100 MB. 10 MB is Discord’s free limit, 16 MB is WhatsApp’s and 25 MB is the attachment limit for Gmail and Outlook. Choose Fit a file size and the resolution is lowered automatically when a long video needs it. Add a name or logo first with [Add watermark to video](/tools/add-watermark-to-video), then compress.',
       },
       {
         q: 'Which formats can I compress?',
@@ -1660,7 +1761,54 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I crop just part of the video’s length?',
-        a: 'This crops the picture for the whole video. To keep only part of the time, use Trim video first or afterwards.',
+        a: 'This crops the picture for the whole video. To keep only part of the time, use Trim video first or afterwards. To put your name or logo on the cropped result, use [Add watermark to video](/tools/add-watermark-to-video).',
+      },
+    ],
+  },
+  {
+    slug: 'add-watermark-to-video',
+    icon: 'stamp',
+    name: 'Add watermark to video',
+    title: 'Add Watermark to Video Online, Text or Logo, No Upload | Stayput',
+    description:
+      'Add a text or logo watermark to a video in your browser: pick the corner or centre, size and opacity. MP4, MOV, WebM in, MP4 out. No upload, no sign-up.',
+    heading: 'Add a watermark to a video',
+    tagline: 'Put your name, a copyright line or your logo on every frame of a video, with the sound kept. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to watermark',
+    action: 'Add watermark',
+    keywords: ['add watermark to video', 'video watermark', 'watermark video online', 'add logo to video', 'add text to video', 'put a logo on a video', 'watermark mp4'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them. A frame from the first one shows the watermark as you set it up.',
+      'Choose Text and type it, or choose Image or logo and pick a PNG. Set the position, size and opacity.',
+      'Add watermark. Every frame is drawn with the mark and the video is written again as an MP4, with its sound kept.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes the video, this page draws the watermark on each frame, and the browser’s own video encoder writes the MP4, all in this tab. There is no upload, so unreleased footage and client work stay on your device, and nothing is added to the result except your mark.',
+      },
+      {
+        q: 'Can I use my logo?',
+        a: 'Yes. Choose Image or logo and pick a PNG, JPG or WebP. A PNG with a transparent background looks best because only the logo itself is drawn over the picture. The logo is read on your device and is not uploaded either.',
+      },
+      {
+        q: 'Where can the watermark go?',
+        a: 'In any of the four corners or in the centre, at a size from a small credit to a large mark, and at 5 to 100 per cent opacity. The mark is static: it sits in the same place for the whole video. Animated or timed watermarks are not supported.',
+      },
+      {
+        q: 'Does the sound stay?',
+        a: 'Yes. The sound is carried over as it is, unless you tick Remove the sound. The output is always an MP4, with H.264 video where your browser can write it.',
+      },
+      {
+        q: 'Does it lower the quality?',
+        a: 'The picture has to be encoded again to carry the watermark, which is done at high quality, so the result looks very close to the original. A very short or already heavily compressed clip can come out a little larger than it went in; run it through Compress video afterwards if you need it smaller.',
+      },
+      {
+        q: 'Can the watermark be removed?',
+        a: 'It is burned into the pixels of every frame, so it cannot be switched off like a subtitle track. A determined person with editing software can still cover or paint it out, as with any watermark, so use a larger or central position for footage you are worried about.',
       },
     ],
   },
@@ -3263,6 +3411,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
+      {
         q: 'Is my form uploaded anywhere?',
         a: 'No. The PDF is opened, drawn and filled by code running in this tab, and the filled copy is saved straight to your device. Forms often hold your name, address, date of birth, and tax or ID numbers, which is exactly what should not go to a stranger’s server.',
       },
@@ -3319,7 +3471,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Does it keep the sound?',
-        a: 'Yes, unless you tick Remove the sound. Voices, names said aloud and background noises can identify people too, so consider removing it for sensitive footage.',
+        a: 'Yes, unless you tick Remove the sound. Voices, names said aloud and background noises can identify people too, so consider removing it for sensitive footage. To mark the finished video with your name or logo, use [Add watermark to video](/tools/add-watermark-to-video).',
       },
       {
         q: 'How long does it take?',
@@ -4580,6 +4732,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
+      {
         q: 'Is my PDF uploaded?',
         a: 'No. The PDF is opened, stamped and saved by code running in your browser tab. The documents people watermark are usually the sensitive ones, such as contracts, bank statements, pay slips and scans of IDs, and here they never reach a server.',
       },
@@ -5214,6 +5370,10 @@ export const tools: Tool[] = [
       'Download the redacted PDF. Pages with a box become flat images with the text removed; the other pages stay as they were.',
     ],
     faq: [
+      {
+        q: 'Can I add text, a highlight or an image to the PDF too?',
+        a: 'Yes. [Edit PDF](/tools/edit-pdf) adds text, cover boxes, highlights, drawings and images to a page and rotates, deletes or reorders pages, all in your browser. It cannot change the text already in the file.',
+      },
       {
         q: 'Is the text really gone, or just covered?',
         a: 'Gone. Each page you redact is redrawn as an image with the black boxes painted into it, and the page’s original text, fonts, links, comments and form values are deleted from the file. Copy and paste, search and text extractors find nothing under the boxes. That is the difference from drawing a black rectangle in a PDF editor, which leaves the words underneath for anyone to select.',

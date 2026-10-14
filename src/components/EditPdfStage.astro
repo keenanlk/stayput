@@ -1,0 +1,91 @@
+---
+/** Page editor stage for Edit PDF: a toolbar, the page with its edits, and the page strip. */
+---
+<div id="edit-panel" class="sign-panel" hidden>
+  <div class="sign-maker">
+    <div class="field-row" style="justify-content:space-between">
+      <div class="segmented" role="radiogroup" aria-label="What to add">
+        <label><input type="radio" name="edit-mode" value="text" checked /><span>Text</span></label>
+        <label><input type="radio" name="edit-mode" value="cover" /><span>Cover</span></label>
+        <label><input type="radio" name="edit-mode" value="highlight" /><span>Highlight</span></label>
+        <label><input type="radio" name="edit-mode" value="draw" /><span>Draw</span></label>
+        <label><input type="radio" name="edit-mode" value="image" /><span>Image</span></label>
+      </div>
+      <button class="btn btn-sm" type="button" id="undo" disabled>Undo</button>
+    </div>
+    <div id="opts-text" class="field-row">
+      <input type="text" id="edit-text" class="sig-text" placeholder="Type the text, then click the page" aria-label="Text to add" autocomplete="off" />
+      <select id="edit-font" aria-label="Font">
+        <option value="helvetica">Helvetica</option>
+        <option value="times">Times</option>
+        <option value="courier">Courier</option>
+      </select>
+      <select id="edit-size" aria-label="Text size in points">
+        <option value="12">12 pt</option>
+        <option value="16">16 pt</option>
+        <option value="24" selected>24 pt</option>
+        <option value="36">36 pt</option>
+        <option value="48">48 pt</option>
+        <option value="72">72 pt</option>
+        <option value="8">8 pt</option>
+      </select>
+      <select id="edit-color" aria-label="Text colour">
+        <option value="#111111">Black</option>
+        <option value="#1a3f8f">Blue</option>
+        <option value="#c0392b">Red</option>
+        <option value="#ffffff">White</option>
+        <option value="custom">Custom</option>
+      </select>
+      <input type="color" id="edit-custom" value="#1b7a4a" aria-label="Custom colour" hidden />
+    </div>
+    <div id="opts-cover" class="field-row" hidden>
+      <label class="small" for="cover-color">Fill</label>
+      <select id="cover-color" aria-label="Cover colour">
+        <option value="#ffffff">White</option>
+        <option value="#000000">Black</option>
+      </select>
+      <span class="muted small">Drag a box on the page. Cover hides text on screen but does not remove it from the file. To remove it, use <a href="/tools/redact-pdf">Redact PDF</a>.</span>
+    </div>
+    <div id="opts-highlight" class="field-row" hidden>
+      <span class="muted small">Drag a box over what you want to mark. Highlights are yellow.</span>
+    </div>
+    <div id="opts-draw" class="field-row" hidden>
+      <select id="pen-color" aria-label="Pen colour">
+        <option value="#111111">Black</option>
+        <option value="#1a3f8f">Blue</option>
+        <option value="#c0392b">Red</option>
+      </select>
+      <select id="pen-width" aria-label="Pen thickness">
+        <option value="1.5">Thin</option>
+        <option value="3" selected>Medium</option>
+        <option value="6">Thick</option>
+      </select>
+      <span class="muted small">Draw on the page with a mouse, pen or finger.</span>
+    </div>
+    <div id="opts-image" class="field-row" hidden>
+      <button class="btn" type="button" id="edit-image-choose">Choose an image</button>
+      <input type="file" id="edit-image-file" accept="image/png,image/jpeg,image/webp" hidden />
+      <span class="muted small">A PNG, JPG or WebP. It lands on the page shown; drag it into place and use the corner to resize. To sign, use <a href="/tools/sign-pdf">Sign PDF</a>.</span>
+    </div>
+    <p class="muted small" id="edit-hint">Changes are drawn on top of the page. Existing text cannot be edited here.</p>
+  </div>
+  <div class="pdf-stage-wrap">
+    <div class="field-row pager">
+      <button class="btn btn-sm" type="button" id="prev-page" aria-label="Previous page">←</button>
+      <span id="page-label" class="small" style="font-weight:600">Page 1 of 1</span>
+      <button class="btn btn-sm" type="button" id="next-page" aria-label="Next page">→</button>
+      <span class="muted small" id="placement-count"></span>
+    </div>
+    <div class="pdf-stage" id="stage">
+      <canvas id="page-canvas"></canvas>
+      <div class="stamp-layer edit-layer" id="edit-layer"></div>
+    </div>
+  </div>
+  <div>
+    <div class="field-row" style="margin-bottom:12px">
+      <span class="small" id="page-info" style="font-weight:600"></span>
+      <span class="muted small">Pages: click one to edit it, drag or use the arrows to reorder, ↻ to rotate, × to delete.</span>
+    </div>
+    <div class="thumb-grid reorder-grid" id="page-grid" role="list" aria-label="Pages in their new order"></div>
+  </div>
+</div>

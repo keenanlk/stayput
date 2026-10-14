@@ -42,6 +42,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run check-links
+      - name: Page titles (30-65 characters, no duplicates)
+        run: npm run check-titles
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
