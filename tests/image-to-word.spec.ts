@@ -45,6 +45,9 @@ async function convert(page: Page, files: string[]) {
   return { name: downloads[0]!.suggestedFilename(), xml, text };
 }
 
+/** The fields every tool event already carries (see the privacy page); this tool adds none. */
+const FIELDS = ['tool', 'files', 'input', 'output', 'duration', 'outcome', 'attempt', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns'];
+
 test.describe.configure({ timeout: 180_000 });
 
 test('a JPG becomes a .docx holding its words, via /jpg-to-word', async ({ page }) => {
@@ -86,7 +89,7 @@ test('two images give one document with both texts in order, a page break betwee
   const blob = JSON.stringify(events);
   for (const leak of ['ocr-note', 'ocr-letter', 'Invoice', 'quick brown fox', 'Stayput reads']) expect(blob).not.toContain(leak);
   for (const e of events) {
-    for (const [k, v] of Object.entries(e.d ?? {})) expect(['tool', 'files', 'inputBytes', 'outputBytes', 'ms', 'outcome', 'firstOk', 'format', 'errorClass'], k).toContain(k);
+    for (const [k] of Object.entries(e.d ?? {})) expect(FIELDS, k).toContain(k);
     for (const v of Object.values(e.d ?? {})) expect(typeof v === 'string' ? v.length : 0).toBeLessThan(40);
   }
   for (const q of requests) {
