@@ -126,7 +126,7 @@ export async function applyEdits(source: Uint8Array, edits: Edit[], layout: Page
       for (let k = 0; k < pts.length - 1; k++) {
         page.drawLine({ start: pts[k]!, end: pts[k + 1]!, thickness: e.thickness, color: rgb(r, g, b), lineCap: LineCapStyle.Round });
       }
-    } else {
+    } else if (e.kind === 'image') {
       const img = await image(e.png);
       const p = displayedToUserSpace(page, e.x, 1 - e.y - e.height);
       page.drawImage(img, { x: p.x, y: p.y, width: e.width * dw, height: e.height * dh, rotate: degrees(p.rotate) });
