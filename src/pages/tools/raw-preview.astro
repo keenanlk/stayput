@@ -1,0 +1,17 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RawPreview from '../../components/options/RawPreview.astro';
+const tool = toolBySlug('raw-preview')!;
+---
+<ToolLayout tool={tool}>
+  <ul slot="panel" id="raw-results" class="raw-results" hidden></ul>
+  <Fragment slot="options"><RawPreview /></Fragment>
+</ToolLayout>
+<style is:global>
+  .raw-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .raw-item { padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); display: grid; gap: 2px; overflow-wrap: anywhere; }
+  .raw-item span { color: var(--ink-2); }
+  .raw-bad { border: 1px solid currentColor; }
+</style>
+<script src="../../tools/raw-preview.ts"></script>

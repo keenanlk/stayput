@@ -5220,6 +5220,57 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'raw-preview',
+    icon: 'convert',
+    name: 'RAW preview extractor',
+    title: 'RAW Preview Extractor: Get the JPG Inside a RAW | Stayput',
+    description:
+      'Extract the JPEG preview from a RAW file (CR2, CR3, NEF, ARW, DNG) without a RAW editor. The camera’s own JPEG, unchanged. Free, in your browser, nothing is uploaded.',
+    heading: 'Extract a JPG from a RAW file',
+    tagline: 'Extract the JPEG preview from a RAW file: the picture your camera already saved inside it, copied out unchanged. This is not a RAW develop, and the file never leaves this tab.',
+    category: 'images',
+    accept: '.cr2,.cr3,.nef,.arw,.dng',
+    multiple: true,
+    dropLabel: 'Drop RAW files (CR2, CR3, NEF, ARW, DNG)',
+    action: 'Extract JPG previews',
+    keywords: ['raw to jpg', 'raw preview extractor', 'extract jpg from raw', 'extract jpeg from raw', 'cr2 to jpg', 'nef to jpg', 'arw to jpg', 'cr3 to jpg', 'dng to jpg'],
+    steps: [
+      'Drop one or more RAW files (CR2, CR3, NEF, ARW or DNG), or tap to pick them.',
+      'The page lists the size of the largest preview each file holds, for example 6000 x 4000, or says that only a thumbnail is stored.',
+      'Press Extract. Each preview is saved as a JPG, and several files come as one ZIP.',
+    ],
+    faq: [
+      {
+        q: 'What is an embedded preview?',
+        a: 'Cameras that shoot RAW also save a finished JPEG inside the file, so the camera’s screen and file browsers have something to show. This tool copies that JPEG out. It is the camera’s own rendering, so it is not a conversion of the RAW data.',
+      },
+      {
+        q: 'Why can the JPG be smaller or softer than a developed RAW?',
+        a: 'The preview is made by the camera at its own size and compression, and many cameras store one smaller than the sensor’s full resolution. A RAW editor builds a new picture from the sensor data, at full size, with the settings you choose. The page tells you the preview’s size before you download it.',
+      },
+      {
+        q: 'Does it change exposure or white balance?',
+        a: 'No. The bytes are copied exactly as the camera wrote them, with no editing and no re-compression. To change exposure, white balance or noise, develop the RAW in a RAW editor such as Lightroom, RawTherapee or darktable.',
+      },
+      {
+        q: 'Which cameras and formats were tested?',
+        a: 'Canon CR2 (EOS 5D Mark III) and CR3 (EOS R6), Nikon NEF (D3200), Sony ARW (A7 III) and Adobe DNG (Pentax K-5). A DNG from a Leica M8 holds no JPEG preview at all, and the page says so instead of extracting anything. Other cameras of the same formats usually work the same way, but they were not tested.',
+      },
+      {
+        q: 'What if the file holds only a thumbnail?',
+        a: 'Then nothing is extracted. A thumbnail is about 160 x 120 pixels, too small to be a photo, and the page tells you that rather than giving you a JPG named like one.',
+      },
+      {
+        q: 'Is the JPG re-encoded?',
+        a: 'No. The preview’s bytes are saved as they are. The one option that re-encodes is turning the picture upright for a RAW that the camera marked as rotated, which saves it again at quality 95. Many previews carry no EXIF of their own, and the page says which yours does.',
+      },
+      {
+        q: 'Is my RAW file uploaded?',
+        a: 'No. Your browser reads only the parts of the file it needs, in this tab, and there is no server in the process. After one visit and a short wait the page works offline.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     icon: 'image',
     name: 'Favicon generator',
