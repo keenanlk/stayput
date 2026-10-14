@@ -1,0 +1,10 @@
+---
+/** Options for RAW preview extraction; the tool page and the /raw-to-jpg landing page share this copy. */
+import OptionDetails from '../OptionDetails.astro';
+---
+<div class="field">
+  <label class="check"><input type="checkbox" id="upright" /> Turn the picture upright when the camera marked it as rotated</label>
+</div>
+<OptionDetails>
+  <p>This pulls out the JPEG preview the camera wrote into the RAW file, and saves its bytes unchanged. It does not develop the RAW: no exposure, white balance or noise changes are made. Turning a picture upright is the one exception, and it re-encodes the JPEG at quality 95.</p>
+</OptionDetails>

@@ -56,10 +56,10 @@ export const tools: Tool[] = [
     slug: 'heic-to-jpg',
     icon: 'image',
     name: 'HEIC to JPG',
-    title: 'Online HEIC to JPG Converter: Free, Batch, No Upload | Stayput',
+    title: 'Online HEIC to JPG / JPEG Converter: Free, Batch | Stayput',
     description:
-      'Online HEIC to JPG converter: turn iPhone HEIC photos into JPG or PNG in your browser. Drop many at once, keep or drop location data. Nothing is uploaded; no watermark.',
-    heading: 'Convert HEIC to JPG online',
+      'Online HEIC to JPG / JPEG converter: turn iPhone HEIC photos into JPG or PNG in your browser. Drop many at once, keep or drop location data. Nothing is uploaded; no watermark.',
+    heading: 'Convert HEIC to JPG (JPEG) online',
     tagline:
       'Turn iPhone and iPad photos into JPG or PNG files that open anywhere. Your photos never leave this device.',
     category: 'images',
@@ -99,6 +99,10 @@ export const tools: Tool[] = [
       'Download each converted photo, or grab them all in one zip.',
     ],
     faq: [
+      {
+        q: 'Is a JPG the same as a JPEG?',
+        a: 'Yes. JPG and JPEG are the same format under two spellings; the short .jpg ending exists because old Windows file extensions were limited to three letters. The file this page makes is a standard JPEG that opens everywhere.',
+      },
       {
         q: 'Why do my iPhone photos end up as HEIC files?',
         a: 'Since iOS 11, iPhones save photos in HEIC (High Efficiency Image Container) because it stores the same picture in about half the space of JPG. Windows, many websites and older programs still cannot open HEIC, so people convert to JPG to share or upload them.',
@@ -5212,6 +5216,57 @@ export const tools: Tool[] = [
       {
         q: 'Is my image uploaded?',
         a: 'No. The file is read by your browser’s FileReader and encoded in this tab. There is no server in the process, and after one visit and a short wait the page works offline.',
+      },
+    ],
+  },
+  {
+    slug: 'raw-preview',
+    icon: 'convert',
+    name: 'RAW preview extractor',
+    title: 'RAW Preview Extractor: Get the JPG Inside a RAW | Stayput',
+    description:
+      'Extract the JPEG preview from a RAW file (CR2, CR3, NEF, ARW, DNG) without a RAW editor. The camera’s own JPEG, unchanged. Free, in your browser, nothing is uploaded.',
+    heading: 'Extract a JPG from a RAW file',
+    tagline: 'Extract the JPEG preview from a RAW file: the picture your camera already saved inside it, copied out unchanged. This is not a RAW develop, and the file never leaves this tab.',
+    category: 'images',
+    accept: '.cr2,.cr3,.nef,.arw,.dng',
+    multiple: true,
+    dropLabel: 'Drop RAW files (CR2, CR3, NEF, ARW, DNG)',
+    action: 'Extract JPG previews',
+    keywords: ['raw to jpg', 'raw preview extractor', 'extract jpg from raw', 'extract jpeg from raw', 'cr2 to jpg', 'nef to jpg', 'arw to jpg', 'cr3 to jpg', 'dng to jpg'],
+    steps: [
+      'Drop one or more RAW files (CR2, CR3, NEF, ARW or DNG), or tap to pick them.',
+      'The page lists the size of the largest preview each file holds, for example 6000 x 4000, or says that only a thumbnail is stored.',
+      'Press Extract. Each preview is saved as a JPG, and several files come as one ZIP.',
+    ],
+    faq: [
+      {
+        q: 'What is an embedded preview?',
+        a: 'Cameras that shoot RAW also save a finished JPEG inside the file, so the camera’s screen and file browsers have something to show. This tool copies that JPEG out. It is the camera’s own rendering, so it is not a conversion of the RAW data.',
+      },
+      {
+        q: 'Why can the JPG be smaller or softer than a developed RAW?',
+        a: 'The preview is made by the camera at its own size and compression, and many cameras store one smaller than the sensor’s full resolution. A RAW editor builds a new picture from the sensor data, at full size, with the settings you choose. The page tells you the preview’s size before you download it.',
+      },
+      {
+        q: 'Does it change exposure or white balance?',
+        a: 'No. The bytes are copied exactly as the camera wrote them, with no editing and no re-compression. To change exposure, white balance or noise, develop the RAW in a RAW editor such as Lightroom, RawTherapee or darktable.',
+      },
+      {
+        q: 'Which cameras and formats were tested?',
+        a: 'Canon CR2 (EOS 5D Mark III) and CR3 (EOS R6), Nikon NEF (D3200), Sony ARW (A7 III) and Adobe DNG (Pentax K-5). A DNG from a Leica M8 holds no JPEG preview at all, and the page says so instead of extracting anything. Other cameras of the same formats usually work the same way, but they were not tested.',
+      },
+      {
+        q: 'What if the file holds only a thumbnail?',
+        a: 'Then nothing is extracted. A thumbnail is about 160 x 120 pixels, too small to be a photo, and the page tells you that rather than giving you a JPG named like one.',
+      },
+      {
+        q: 'Is the JPG re-encoded?',
+        a: 'No. The preview’s bytes are saved as they are. The one option that re-encodes is turning the picture upright for a RAW that the camera marked as rotated, which saves it again at quality 95. Many previews carry no EXIF of their own, and the page says which yours does.',
+      },
+      {
+        q: 'Is my RAW file uploaded?',
+        a: 'No. Your browser reads only the parts of the file it needs, in this tab, and there is no server in the process. After one visit and a short wait the page works offline.',
       },
     ],
   },

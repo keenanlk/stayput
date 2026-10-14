@@ -118,6 +118,7 @@ const does: Record<string, string> = {
   'archive-extractor': 'Extracts ZIP, RAR, 7z and TAR archives, including password-protected ZIP files, and downloads the files inside.',
   'create-zip': 'Zips files or whole folders into one ZIP and can lock it with an AES-256 password.',
   'rename-files': 'Renames many files at once with a prefix or suffix, numbering, find and replace or a letter-case change, shows every new name first, and downloads the result as a ZIP.',
+  'raw-preview': 'Pulls the full-size JPEG preview out of Canon CR2 and CR3, Nikon NEF, Sony ARW and DNG RAW files, byte for byte, and tells you its size before you download it.',
   'image-to-base64': 'Encodes PNG, JPG, WebP, GIF, SVG, AVIF and ICO images as Base64 and gives you the data URI, HTML and CSS snippets, with the size the encoding adds.',
   'favicon-generator': 'Makes favicon.ico, apple-touch-icon, Android and maskable icons and a site.webmanifest from one PNG, JPG or SVG.',
   'remove-background': 'Removes the background from a photo and saves a transparent PNG, or a white or coloured background, at full resolution.',
