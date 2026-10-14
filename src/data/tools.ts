@@ -5685,6 +5685,49 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'image-to-ascii',
+    icon: 'text',
+    name: 'Image to ASCII art',
+    title: 'Image to ASCII Art Converter, Free, No Upload | Stayput',
+    description:
+      'Convert an image to ASCII art: pick the width and character set, then copy the text or save it as .txt or PNG. Not OCR. Your image is not uploaded.',
+    heading: 'Convert an image to ASCII art',
+    tagline: 'Turn a picture into text characters you can copy, paste or save, made on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    multiple: false,
+    dropLabel: 'Drop a picture to turn into ASCII art',
+    action: 'Make ASCII art',
+    keywords: ['image to ascii art', 'image to ascii', 'picture to ascii art', 'photo to ascii', 'ascii art generator from image', 'convert image to text art', 'jpg to ascii'],
+    steps: [
+      'Drop a photo, drawing or logo (JPG, PNG, WebP, HEIC or SVG).',
+      'Set the width in characters and pick a character set, and invert it for a dark background.',
+      'Press Make ASCII art, then copy the text or download it as a .txt file or a PNG.',
+    ],
+    faq: [
+      {
+        q: 'Why does the result look wrong when I paste it?',
+        a: 'ASCII art is plain text, so it lines up only in a monospace font such as Courier or Menlo. In a proportional font, narrow letters squash the rows and the picture falls apart. Paste it into a code block, a text editor or a terminal, or save the PNG, which has the characters already drawn in a monospace font.',
+      },
+      {
+        q: 'How many characters wide should I use?',
+        a: 'The default of 100 suits a portrait or logo. Wide landscapes and detailed photos need 150 to 200 columns to keep their shapes, and small avatars look best at 40 to 60. The rows follow the picture’s shape, halved because a text character is about twice as tall as it is wide.',
+      },
+      {
+        q: 'Is this the same as OCR?',
+        a: 'No. This draws a picture out of characters, using bright and dark areas to choose them. It does not read any words in the image. To pull the text out of a screenshot or scan, use [Image to text](/tools/image-to-text). To turn a picture into chunky coloured blocks instead, use the [pixel art converter](/tools/pixel-art-converter).',
+      },
+      {
+        q: 'Does the output contain my file name?',
+        a: 'No. The text holds only the characters that draw the picture. Your file name is used only to name the downloads, such as photo-ascii.txt, and the file stays on your device.',
+      },
+      {
+        q: 'Are my images uploaded?',
+        a: 'No. The image is decoded and shrunk on a canvas in your browser tab and the characters are chosen there, so your picture is not uploaded. It works offline after one visit and a short wait.',
+      },
+    ],
+  },
+  {
     slug: 'pixel-art-converter',
     icon: 'grid',
     name: 'Pixel art converter',
