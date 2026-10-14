@@ -25,6 +25,8 @@ npm run dev
 
 See the README for the test setup. Please run `npm run check`, `npm run build`, `npm run check-links` and `npm test` before opening a pull request. CI runs the same.
 
+To run a spec on WebKit as well, put `// @webkit-project` on the first line of the spec file; `playwright.config.ts` picks it up, so there is no list to edit.
+
 ## Adding a tool
 
 Follow "Adding a tool" in the README. Keep the shell (`src/lib/shell.ts`) generic; tool-specific behaviour belongs in the tool's own module.

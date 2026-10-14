@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 
 import { aiff } from './aiff-helpers';
