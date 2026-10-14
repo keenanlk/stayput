@@ -2425,6 +2425,34 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'apng-to-gif',
+    base: 'animated-png-to-gif',
+    name: 'APNG to GIF',
+    title: 'APNG to GIF Converter, Free, No Upload | Stayput',
+    description: 'Convert an APNG, an animated PNG, to GIF in your browser. Each frame keeps its delay and the loop count. Free, not uploaded.',
+    heading: 'Convert APNG to GIF',
+    tagline: 'Make a GIF from an animated PNG, with its timing and looping, on your own device.',
+    keywords: ['apng to gif', 'convert apng to gif', 'apng to gif converter', 'animated png to gif', 'apng to gif online', 'png to animated gif'],
+    dropLabel: 'Drop APNG files to turn into GIF',
+    intro: [
+      'An APNG is an animated PNG: a .png file with extra chunks that tell a browser to play several frames. Many chat apps, social sites and upload forms only accept GIF, or show an APNG as a still picture. A GIF plays almost anywhere.',
+      'Drop an APNG and every frame is decoded, composited the way browsers play it (its dispose and blend rules applied), and written as a GIF frame with its own delay and its own 256-colour palette. The picture size and the loop count are kept. Your browser does all of it; the file is not uploaded and there is no watermark.',
+      'Know what you are giving up: GIF has 256 colours per frame and its transparency is on or off, so gradients can band and soft edges become hard edges. The file size usually shrinks only a little. If you need the full-colour version, keep the APNG.',
+    ],
+    steps: [
+      'Drop one or more animated PNG files, or tap to pick them.',
+      'Convert. Each one becomes a GIF in your browser.',
+      'Download the .gif, or a zip when you converted several.',
+    ],
+    faq: [
+      { q: 'Why does the GIF look worse than the APNG?', a: 'GIF holds 256 colours per frame and its transparency is on or off. Smooth gradients can show banding, and soft or anti-aliased edges become hard edges. An APNG has full colour and 8-bit transparency.' },
+      { q: 'Will the GIF be smaller?', a: 'Usually only a little. For a much smaller file, use [Compress GIF](/tools/compress-gif) afterwards, or [GIF to MP4](/tools/gif-to-mp4).' },
+      { q: 'Why do chat apps want a GIF?', a: 'Many chat apps and upload forms only accept GIF for animated pictures, or flatten an APNG to its first frame. GIF is the format they all know.' },
+      { q: 'Can I go the other way?', a: 'Yes. [GIF to APNG](/gif-to-apng) turns a GIF back into an animated PNG with full colour.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'gif-to-apng',
     base: 'gif-to-animated-png',
     name: 'GIF to APNG',
@@ -2446,7 +2474,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Will the APNG be smaller than the GIF?', a: 'Often not. Every frame is stored whole in full colour, so flat-colour animation usually comes out larger. For a smaller file, try [GIF to MP4](/tools/gif-to-mp4) or [Compress GIF](/tools/compress-gif).' },
-      { q: 'Where does an APNG play?', a: 'In Safari, Chrome, Edge and Firefox. Some chat apps and social sites show only the first frame or reject the file, so check the place you will post it.' },
+      { q: 'Where does an APNG play?', a: 'In Safari, Chrome, Edge and Firefox. Some chat apps and social sites show only the first frame or reject the file, so check the place you will post it. If one rejects it, [APNG to GIF](/apng-to-gif) turns it back into a GIF.' },
       { q: 'Is the file uploaded?', a: 'No. It is decoded and written in your browser tab, and the page works offline after one visit.' },
       noUpload,
     ],

@@ -28,6 +28,7 @@ export const nextSteps: Record<string, string[]> = {
   'favicon-generator': ['crop-image', 'compress-image'],
   'video-to-gif': ['gif-to-mp4', 'compress-image'],
   'gif-to-mp4': ['video-to-gif', 'video-to-mp3'],
+  'animated-png-to-gif': ['compress-gif', 'gif-to-mp4'],
   'gif-to-animated-png': ['gif-to-mp4', 'compress-gif'],
   'compress-video': ['video-to-mp3', 'video-to-gif'],
   'video-to-mp4': ['compress-video', 'video-to-webm'],
