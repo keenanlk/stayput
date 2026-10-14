@@ -111,6 +111,8 @@ export function describeError(file: File, e: unknown): string {
 function rewrap(file: File, e: unknown): Error {
   const out = new Error(describeError(file, e));
   if (e instanceof Error && e.name) out.name = e.name;
+  const link = (e as { link?: { href: string; text: string } } | null)?.link;
+  if (link) (out as Error & { link?: typeof link }).link = link;
   return out;
 }
 
