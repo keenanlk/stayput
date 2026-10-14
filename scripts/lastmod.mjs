@@ -61,7 +61,8 @@ export async function computeEntries(root = root0) {
   const { presets, presetAsTool } = await imp('src/data/presets.ts');
   const { guides } = await imp('src/data/guides.ts');
   const { engines } = await imp('src/data/engine.ts');
-  const json = JSON.stringify;
+  // A tool's card icon is not page content, so it stays out of every fingerprint.
+  const json = (v) => JSON.stringify(v, (k, x) => (k === 'icon' ? undefined : x));
   const out = {};
   for (const t of tools) out[`/tools/${t.slug}`] = { hash: sha(json(t), json(engines[t.slug] ?? null), leadFor(t), read(root, `src/pages/tools/${t.slug}.astro`)) };
   for (const p of pairs) out[`/${p.slug}`] = { hash: sha(json(p), json(engines['convert-image'] ?? null), leadFor(pairAsTool(p), 'convert-image', 'landing')) };
