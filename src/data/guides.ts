@@ -3924,7 +3924,7 @@ export const guides: Guide[] = [
     heading: 'How to make a photo collage',
     dek: 'A free collage app often means a watermark on the download, or a small cap on how many photos fit. Here is a browser-based option with neither limit.',
     keywords: ['how to make a photo collage', 'photo collage maker free no watermark', 'combine photos into one image free', 'collage maker online free', 'make a picture grid online'],
-    updated: '2026-09-30',
+    updated: '2026-10-14',
     tools: ['collage-maker', 'combine-images', 'stitch-screenshots'],
     sections: [
       {
@@ -3951,6 +3951,7 @@ export const guides: Guide[] = [
       { q: 'How many photos can I put in one collage?', a: 'There is no fixed cap; the practical limit is how many photos your device can hold in memory at once while it lays out the grid.' },
       { q: 'Can I stack photos vertically instead of a grid?', a: 'Yes, Stayput\'s collage maker offers a grid, a row, or a vertical stack layout, with adjustable spacing between photos.' },
       { q: 'Can I combine several screenshots into one long image?', a: 'Yes, the stitch screenshots page joins them end to end in order, which suits a long scrolling capture split across multiple images better than a grid layout does.' },
+      { q: 'Can I turn photos into a video instead of one image?', a: 'Yes. The [photo slideshow maker](/tools/photo-slideshow-maker) shows photos one after another in an MP4, with seconds per photo and an optional song.' },
     ],
   },
   {
@@ -5050,7 +5051,7 @@ export const guides: Guide[] = [
     heading: "How to turn audio into a video",
     dek: "To put a song, a podcast episode or a voice note on YouTube, you need a video. Here is how to make one from the sound and a single picture.",
     keywords: ["how to turn audio into video", "how to make mp3 to mp4", "audio to video with a picture", "put music on youtube", "podcast to video"],
-    updated: "2026-10-04",
+    updated: '2026-10-14',
     tools: ["audio-to-video", "compress-video"],
     sections: [
       {
@@ -5081,6 +5082,7 @@ export const guides: Guide[] = [
       { q: "Can I upload an MP3 to YouTube?", a: "Not as a video. YouTube's help says audio files such as MP3 cannot be uploaded to create a video, as of October 2026, so make an MP4 first." },
       { q: "Can I make a video with a moving background or a waveform?", a: "Not with this tool, which makes a still-picture video. Use a video editor for moving pictures or a waveform." },
       { q: "Are my files uploaded?", a: "No. The sound is decoded and the video is written by code in your browser tab, so neither file leaves your device." },
+      { q: "What if I have many pictures, not one?", a: "Use the [photo slideshow maker](/tools/photo-slideshow-maker): it puts up to 100 photos in order, with your song under them, in one MP4." },
     ],
   },
   {

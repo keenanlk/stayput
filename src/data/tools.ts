@@ -725,6 +725,10 @@ export const tools: Tool[] = [
         q: 'My photos are of paper documents. Can they look scanned?',
         a: 'Use Document scanner instead: it cuts each page out of the photo, straightens it and turns the paper white before making the PDF.',
       },
+      {
+        q: 'Can I make a video of the pictures instead?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) puts them in an MP4, one after another, with an optional song.',
+      },
     ],
   },
   {
@@ -1377,6 +1381,10 @@ export const tools: Tool[] = [
         q: 'Is there a watermark or a file size limit?',
         a: 'No watermark and no upload limit. The video itself is limited by your device’s memory (phones hold less): a long 4K video works, because only the frames you pick are decoded, but the GIF itself is capped at 600 frames.',
       },
+      {
+        q: 'Can I make a video from photos instead?',
+        a: 'The [Photo slideshow maker](/tools/photo-slideshow-maker) turns still photos into an MP4, with a song if you like. The [GIF maker](/tools/gif-maker) makes a GIF from photos.',
+      },
     ],
   },
   {
@@ -1880,6 +1888,10 @@ export const tools: Tool[] = [
         q: 'Why does merging take a while?',
         a: 'Clips from different cameras rarely share the same format, so every frame is encoded again to make one continuous video. That runs on your device, using its hardware video encoder where the browser has one.',
       },
+      {
+        q: 'Can I make a video from photos instead of clips?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) turns photos into an MP4 with a song; then join it with other clips here.',
+      },
     ],
   },
   {
@@ -1918,6 +1930,10 @@ export const tools: Tool[] = [
       {
         q: 'Can I keep the original sound and add music under it?',
         a: 'Yes. Choose Keep it, with the new sound quieter underneath: the music plays at half volume under the voices in the video.',
+      },
+      {
+        q: 'Can I put a song under photos instead of a video?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) makes a video from your photos and adds the song in one go.',
       },
     ],
   },
@@ -2875,6 +2891,76 @@ export const tools: Tool[] = [
         q: 'Will YouTube accept it?',
         a: 'Yes. It is a standard MP4 at 1920×1080 (or 1080×1080, or 1080×1920 for Shorts). In Chrome, Edge and Safari the picture is H.264 and the sound AAC, which play everywhere.',
       },
+      {
+        q: 'What if I have many pictures, not one?',
+        a: 'Use the [Photo slideshow maker](/tools/photo-slideshow-maker): it puts up to 100 photos in order, with your song under them, in one MP4.',
+      },
+    ],
+  },
+  {
+    slug: 'photo-slideshow-maker',
+    icon: 'film',
+    name: 'Photo slideshow maker',
+    title: 'Photo Slideshow Maker: Pictures to MP4, No Upload | Stayput',
+    description:
+      'Turn photos into an MP4 slideshow: set the order, seconds per photo, fade between them and add a song. Free, no watermark, nothing uploaded.',
+    heading: 'Make a photo slideshow video',
+    tagline: 'Drop your photos, put them in order, pick how long each one stays, add a song and download an MP4. It all happens on this device; nothing is uploaded.',
+    category: 'media',
+    accept: 'image/*,audio/*,.heic,.heif,.avif,.jxl,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.flac',
+    multiple: true,
+    dropLabel: 'Drop your photos, and a song if you like',
+    action: 'Make video',
+    sizeFact: 'No watermark. From 2 to 100 photos; the limit is your device’s memory (phones hold less).',
+    keywords: ['photo slideshow maker', 'slideshow maker', 'photo to video', 'photos to video', 'picture to video', 'slideshow video maker', 'photo video maker', 'photo slideshow with music'],
+    steps: [
+      'Drop your photos, and a song if you like. Pictures from an iPhone (HEIC) work too.',
+      'Put the photos in order with the arrows or by dragging, and set the seconds per photo.',
+      'Press Make video and download the MP4.',
+    ],
+    sections: [
+      {
+        heading: 'What it doesn’t do',
+        paragraphs: [
+          'There is no text on slides, no pan and zoom, no templates and no stock music, and every photo stays on screen for the same time. For words on a video, use [Add subtitles to video](/tools/add-subtitles-to-video). To join video clips, use [Merge videos](/tools/merge-videos).',
+        ],
+      },
+      {
+        heading: 'Where the video plays',
+        paragraphs: [
+          'The result is a standard MP4 that WhatsApp, Instagram, TikTok, YouTube, PowerPoint and TVs open. Pick tall 9:16 for Reels and TikTok, square for feeds, or wide 16:9 for YouTube and slides. Trim the result with [Trim video](/tools/trim-video), or make it smaller with [Compress video](/tools/compress-video).',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'Is there a watermark or a limit?',
+        a: 'There is no watermark and no sign-up. You can use 2 to 100 photos, and the limit is your device’s memory (phones hold less), so a long slideshow of large photos may need a computer.',
+      },
+      {
+        q: 'Can I add music?',
+        a: 'Yes. Drop one song with the photos: it is cut at the end with a one-second fade, or repeats if it is shorter. To add sound to a slideshow you already made, use [Add audio to video](/tools/add-audio-to-video).',
+      },
+      {
+        q: 'How long will the video be?',
+        a: 'The number of photos times the seconds per photo. Twenty photos at 3 seconds each make a one-minute video. The Match the song button sets the seconds so the photos fill the song.',
+      },
+      {
+        q: 'What shape should I pick for Instagram, TikTok or YouTube?',
+        a: 'Tall 9:16 for Reels, Shorts and TikTok, square for feed posts, wide 16:9 for YouTube and slides. For an existing video, see [Crop video for TikTok](/crop-video-for-tiktok).',
+      },
+      {
+        q: 'Can I use HEIC photos from my iPhone?',
+        a: 'Yes. HEIC, JPG, PNG, WebP and AVIF photos are read in your browser, so there is no need to convert them first.',
+      },
+      {
+        q: 'Are my photos uploaded?',
+        a: 'No. They are decoded and the video is written in this tab, with no photo or file name sent anywhere. Open the network tab, run it, and your photos are not among the requests.',
+      },
+      {
+        q: 'Can I make a GIF instead?',
+        a: 'Yes: the [GIF maker](/tools/gif-maker) makes a looping GIF from the same kind of photos. For one picture under a song, see [Audio to video](/tools/audio-to-video).',
+      },
     ],
   },
   {
@@ -3038,6 +3124,10 @@ export const tools: Tool[] = [
       {
         q: 'Is there a watermark or a limit?',
         a: 'No watermark, and no set limit on the number of pictures beyond your device’s memory (phones hold less).',
+      },
+      {
+        q: 'Can I make a video of the pictures instead?',
+        a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) shows them one after another in an MP4, with seconds per photo and an optional song.',
       },
     ],
   },
@@ -3830,6 +3920,7 @@ export const tools: Tool[] = [
       'Make an animated GIF from photos, screenshots or drawings. Set the order, the time per picture, the size and the loop, with a live preview. Nothing is uploaded.',
     heading: 'Make a GIF from images',
     tagline: 'Your pictures turned into one looping GIF, put together on this device, with no watermark.',
+    taglineMd: 'Your pictures turned into one looping GIF, put together on this device, with no watermark. Want sound or a bigger file? Make a video with the [photo slideshow maker](/tools/photo-slideshow-maker).',
     category: 'images',
     accept: 'image/*,.heic,.heif,.avif,.jxl',
     multiple: true,
@@ -3858,6 +3949,10 @@ export const tools: Tool[] = [
       {
         q: 'How big will the GIF be?',
         a: 'Roughly the number of frames times the frame size, since GIF compression is weak on photos. Twenty photos at 480 pixels wide come to about 1 to 3 MB. Choose 320 pixels for a smaller file, or fewer pictures; the note under the download gives the exact size.',
+      },
+      {
+        q: 'How do I add sound, or get a bigger file?',
+        a: 'Make a video instead. The [Photo slideshow maker](/tools/photo-slideshow-maker) turns the same pictures into an MP4 with a song, a crossfade and the shape of your choice.',
       },
     ],
   },
