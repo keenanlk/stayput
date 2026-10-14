@@ -18,6 +18,8 @@ export interface Tool {
   /** One-line supporting copy under the heading. */
   tagline: string;
   category: Category;
+  /** Icon name for the tool card (see Icon.astro). Defaults: presets use their base tool's, pairs 'convert', else 'pdf'. */
+  icon?: string;
   /** Accept attribute for the file input. */
   accept: string;
   multiple: boolean;
@@ -52,6 +54,7 @@ const NOACCOUNT: Faq = {
 export const tools: Tool[] = [
   {
     slug: 'heic-to-jpg',
+    icon: 'image',
     name: 'HEIC to JPG',
     title: 'HEIC to JPG Converter: Free, Batch, No Upload | Stayput',
     description:
@@ -137,6 +140,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'convert-image',
+    icon: 'convert',
     name: 'Image Converter',
     title: 'Image Converter: JPG, PNG, WebP, PDF, ICO, No Upload | Stayput',
     description:
@@ -191,6 +195,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'compress-image',
+    icon: 'resize',
     name: 'Compress & Resize Images',
     title: 'Compress and Resize Images Online Without Uploading | Stayput',
     description:
@@ -233,6 +238,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'compress-gif',
+    icon: 'compress',
     name: 'Compress GIF',
     title: 'GIF Compressor for Discord and Slack | Stayput',
     description:
@@ -275,6 +281,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'compress-png',
+    icon: 'compress',
     name: 'Compress PNG',
     title: 'Compress PNG Images, Up to 80% Smaller, No Upload | Stayput',
     description:
@@ -317,6 +324,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'strip-exif',
+    icon: 'eye',
     name: 'Remove EXIF Data',
     title: 'Remove EXIF and GPS Data From Photos, Private | Stayput',
     description:
@@ -355,6 +363,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'exif-viewer',
+    icon: 'search',
     name: 'EXIF Viewer',
     title: 'EXIF Viewer: See Photo Metadata and GPS, No Upload | Stayput',
     description:
@@ -397,6 +406,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'merge-pdf',
+    icon: 'merge',
     name: 'Merge PDF',
     title: 'Merge PDF Files Online, Free, No Upload | Stayput',
     description:
@@ -451,6 +461,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'split-pdf',
+    icon: 'split',
     name: 'Split PDF',
     title: 'Split PDF or Extract Pages Online, Private | Stayput',
     description:
@@ -485,6 +496,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'compress-pdf',
+    icon: 'compress',
     name: 'Compress PDF',
     title: 'Compress PDF Online: Free, No Upload, Set a Size | Stayput',
     description:
@@ -565,6 +577,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'rotate-pdf',
+    icon: 'rotate',
     name: 'Rotate PDF',
     title: 'Rotate PDF Pages Online, Free and Private | Stayput',
     description:
@@ -665,6 +678,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'image-to-pdf',
+    icon: 'pdf',
     name: 'Image to PDF',
     title: 'Convert Images to PDF (JPG to PDF, PNG to PDF), Private | Stayput',
     description:
@@ -703,6 +717,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'pdf-to-image',
+    icon: 'image',
     name: 'PDF to Image',
     title: 'Convert PDF to JPG or PNG Online, Private | Stayput',
     description:
@@ -733,6 +748,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'reorder-pdf',
+    icon: 'grid',
     name: 'Reorder & Delete Pages',
     title: 'Reorder, Rearrange and Delete PDF Pages Online, Private | Stayput',
     description:
@@ -771,6 +787,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'sign-pdf',
+    icon: 'pen',
     name: 'Sign PDF',
     title: 'Sign a PDF Online Without Uploading It, Free | Stayput',
     description:
@@ -817,6 +834,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'pdf-page-numbers',
+    icon: 'hash',
     name: 'Add Page Numbers',
     title: 'Add Page Numbers to a PDF Online, Free and Private | Stayput',
     description:
@@ -859,6 +877,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'pdf-to-word',
+    icon: 'convert',
     name: 'PDF to Word',
     title: 'PDF to Word Converter, Free, No Upload | Stayput',
     description:
@@ -901,6 +920,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'crop-image',
+    icon: 'crop',
     name: 'Crop image',
     title: 'Crop Image Online, Free, No Upload | Stayput',
     description:
@@ -947,6 +967,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'blur-image',
+    icon: 'blur',
     name: 'Blur & pixelate image',
     title: 'Blur Image or Pixelate Faces Online, No Upload | Stayput',
     description:
@@ -993,6 +1014,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'rotate-image',
+    icon: 'rotate',
     name: 'Rotate & flip image',
     title: 'Rotate or Flip Image Online, Free, No Upload | Stayput',
     description:
@@ -1035,6 +1057,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'color-picker',
+    icon: 'color',
     name: 'Color picker from image',
     title: 'Color Picker from Image: HEX, RGB, Palette, No Upload | Stayput',
     description:
@@ -1077,6 +1100,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'image-to-text',
+    icon: 'text',
     name: 'Image to text',
     title: 'Image to Text Converter (OCR), Free, No Upload | Stayput',
     description:
@@ -1119,6 +1143,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'video-to-mp3',
+    icon: 'audio',
     name: 'Video to MP3',
     title: 'Video to MP3: Extract the Audio from a Video | Stayput',
     description:
@@ -1167,6 +1192,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'video-to-gif',
+    icon: 'video',
     name: 'Video to GIF',
     title: 'Video to GIF Converter, MP4 to GIF, No Upload | Stayput',
     description:
@@ -1210,6 +1236,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'gif-to-mp4',
+    icon: 'film',
     lead:
       'Converts animated GIFs to MP4 video (H.264 in Chrome, Edge and Safari, with no sound track since GIFs have none), often five to twenty times smaller, with each frame keeping its timing. It is free, and your GIFs are not uploaded: each frame is encoded by your browser’s own video encoder. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     name: 'GIF to MP4',
@@ -1254,6 +1281,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'compress-video',
+    icon: 'shrink',
     name: 'Compress video',
     title: 'Video Compressor, Compress MP4 Without Uploading | Stayput',
     description:
@@ -1311,6 +1339,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'video-to-mp4',
+    icon: 'video',
     name: 'Video to MP4',
     title: 'Convert Video to MP4: MOV, MKV, WebM to MP4, No Upload | Stayput',
     description:
@@ -1353,6 +1382,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'video-to-mov',
+    icon: 'video',
     name: 'Video to MOV',
     title: 'Convert Video to MOV: MP4 to MOV, No Upload | Stayput',
     description:
@@ -1387,6 +1417,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'trim-video',
+    icon: 'scissors',
     name: 'Trim video',
     title: 'Trim Video Online: Cut MP4, MOV, WebM, No Upload | Stayput',
     description:
@@ -1425,6 +1456,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'mute-video',
+    icon: 'mute',
     lead:
       'Removes the sound track from a video (MP4, MOV, WebM or MKV) and saves it in the same format, copying the picture untouched so it takes seconds with no quality loss. It is free, and your video is not uploaded: it is rewritten in your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     name: 'Mute video',
@@ -1465,6 +1497,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'resize-video',
+    icon: 'resize',
     name: 'Resize video',
     title: 'Resize Video to 1080p or 720p Online, No Upload | Stayput',
     description:
@@ -1503,6 +1536,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'rotate-video',
+    icon: 'rotate',
     name: 'Rotate video',
     title: 'Rotate Video 90 or 180 Degrees, Flip Video, No Upload | Stayput',
     description:
@@ -1541,6 +1575,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'crop-video',
+    icon: 'crop',
     name: 'Crop video',
     title: 'Crop Video Online to 9:16, 1:1 or Any Size, No Upload | Stayput',
     description:
@@ -1579,6 +1614,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'video-speed',
+    icon: 'speed',
     name: 'Change video speed',
     title: 'Change Video Speed: Speed Up or Slow Down, No Upload | Stayput',
     description:
@@ -1617,6 +1653,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'merge-videos',
+    icon: 'merge',
     name: 'Merge videos',
     title: 'Merge Videos Online: Combine Clips into One MP4 | Stayput',
     description:
@@ -1655,6 +1692,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'add-audio-to-video',
+    icon: 'audio',
     name: 'Add audio to video',
     title: 'Add Audio or Music to Video Online, No Upload | Stayput',
     description:
@@ -1693,6 +1731,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'reverse-video',
+    icon: 'back',
     sizeFact: 'No watermark. On a phone, up to about 2 minutes of 1080p video (30 seconds of 4K)',
     name: 'Reverse video',
     title: 'Reverse Video Online: Play a Clip Backwards, No Upload | Stayput',
@@ -1728,6 +1767,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'video-to-jpg',
+    icon: 'image',
     name: 'Video to JPG',
     title: 'Video to JPG: Save Video Frames as Images, No Upload | Stayput',
     description:
@@ -1762,6 +1802,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'trim-audio',
+    icon: 'scissors',
     name: 'Trim audio',
     title: 'Trim Audio Online: Cut MP3, WAV or M4A, No Upload | Stayput',
     description:
@@ -1796,6 +1837,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'audio-converter',
+    icon: 'audio',
     name: 'Audio converter',
     title: 'Audio Converter: MP3, WAV, M4A, OGG, FLAC, No Upload | Stayput',
     description:
@@ -1838,6 +1880,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'qr-code-generator',
+    icon: 'qr',
     name: 'QR code generator',
     title: 'Free QR Code Generator: Never Expires, No Sign-up | Stayput',
     description:
@@ -1880,6 +1923,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'barcode-generator',
+    icon: 'barcode',
     name: 'Barcode generator',
     title: 'Free Barcode Generator: PNG, SVG, PDF, No Sign-up | Stayput',
     description:
@@ -1956,6 +2000,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'signature-maker',
+    icon: 'pen',
     name: 'Signature maker',
     title: 'Free Signature Maker & Generator, Transparent PNG | Stayput',
     description: 'Draw, type or photograph your signature and save it as a transparent PNG, or an SVG when drawn. Free, no sign-up; nothing you make is uploaded.',
@@ -2040,6 +2085,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'qr-code-scanner',
+    icon: 'qr',
     name: 'QR code scanner',
     title: 'Free QR Code Scanner Online: Image or Camera | Stayput',
     description: 'Scan a QR code or barcode from an image, screenshot or your camera. Free, no sign-up, and nothing is uploaded or opened for you.',
@@ -2117,6 +2163,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'screen-recorder',
+    icon: 'record',
     name: 'Screen recorder',
     title: 'Free Online Screen Recorder, No Upload or Watermark | Stayput',
     description:
@@ -2159,6 +2206,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'voice-recorder',
+    icon: 'mic',
     name: 'Voice recorder',
     title: 'Online Voice Recorder: Record to MP3, No Upload | Stayput',
     description:
@@ -2201,6 +2249,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'volume-booster',
+    icon: 'volume',
     name: 'Volume booster',
     title: 'Volume Booster: Make Audio or Video Louder, No Upload | Stayput',
     description:
@@ -2281,6 +2330,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'remove-noise',
+    icon: 'mic',
     name: 'Remove background noise',
     title: 'Remove Background Noise from Audio or Video, No Upload | Stayput',
     description:
@@ -2323,6 +2373,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'merge-audio',
+    icon: 'merge',
     name: 'Merge audio',
     title: 'Merge Audio Files Online: Join MP3 and WAV, No Upload | Stayput',
     description:
@@ -2361,6 +2412,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'mic-test',
+    icon: 'mic',
     name: 'Mic test',
     title: 'Mic Test: Check Your Microphone Online, No Upload | Stayput',
     description:
@@ -2437,6 +2489,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'webcam-test',
+    icon: 'video',
     name: 'Webcam test',
     title: 'Webcam Test: Check Camera Resolution and FPS | Stayput',
     description:
@@ -2504,6 +2557,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'speaker-test',
+    icon: 'volume',
     name: 'Speaker test',
     title: 'Speaker Test: Left and Right Channel Check Online | Stayput',
     description:
@@ -2593,6 +2647,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'audio-to-video',
+    icon: 'film',
     name: 'Audio to video',
     title: 'Audio to Video: Turn MP3 into MP4 with a Picture | Stayput',
     description:
@@ -2631,6 +2686,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'compress-audio',
+    icon: 'compress',
     name: 'Compress audio',
     title: 'Compress Audio: Reduce MP3 and WAV File Size, No Upload | Stayput',
     description:
@@ -2669,6 +2725,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'add-text-to-image',
+    icon: 'text',
     name: 'Add text to image',
     title: 'Add Text to Image Online, Free, No Upload | Stayput',
     description:
@@ -2715,6 +2772,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'split-image',
+    icon: 'grid',
     name: 'Split image',
     title: 'Split Image into Grid: Instagram Grid Maker, No Upload | Stayput',
     description:
@@ -2753,6 +2811,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'collage-maker',
+    icon: 'merge',
     name: 'Collage maker',
     title: 'Photo Collage Maker: Combine Images, Free, No Upload | Stayput',
     description:
@@ -2791,6 +2850,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'extract-pdf-images',
+    icon: 'image',
     name: 'Extract Images from PDF',
     title: 'Extract Images from PDF at Full Resolution, No Upload | Stayput',
     description:
@@ -2833,6 +2893,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'pitch-changer',
+    icon: 'speed',
     name: 'Pitch and speed changer',
     title: 'Change Pitch or Speed of Audio Online, No Upload | Stayput',
     description:
@@ -2875,6 +2936,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'bpm-key-finder',
+    icon: 'metronome',
     name: 'BPM and key finder',
     title: 'BPM and Key Finder: Tempo, Key and Camelot Code, Free | Stayput',
     description: 'Find the BPM and musical key of a song from an audio file, with its Camelot code. Free, no sign-up, and the song is not uploaded.',
@@ -2960,6 +3022,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'tuner',
+    icon: 'tuner',
     name: 'Online tuner',
     title: 'Online Tuner: Guitar, Bass, Ukulele, Chromatic, Private | Stayput',
     description:
@@ -3002,6 +3065,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'metronome',
+    icon: 'metronome',
     name: 'Metronome',
     title: 'Online Metronome with Tap Tempo, Free, No Ads | Stayput',
     description:
@@ -3044,6 +3108,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'fill-pdf-form',
+    icon: 'text',
     name: 'Fill PDF form',
     title: 'Fill PDF Forms Online Without Uploading, Free | Stayput',
     description:
@@ -3086,6 +3151,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'blur-face-video',
+    icon: 'blur',
     name: 'Blur faces in video',
     title: 'Blur Faces in a Video Automatically, No Upload | Stayput',
     description:
@@ -3128,6 +3194,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'remove-silence',
+    icon: 'scissors',
     name: 'Remove silence',
     title: 'Remove Silence from Audio Online, No Upload | Stayput',
     description:
@@ -3166,6 +3233,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'image-to-svg',
+    icon: 'pen',
     name: 'Image to SVG',
     title: 'Image to SVG Converter: Vectorize PNG, JPG | Stayput',
     description:
@@ -3204,6 +3272,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'resize-gif',
+    icon: 'resize',
     name: 'Resize GIF',
     title: 'Resize GIF to Exact Pixels or Percent, No Upload | Stayput',
     description:
@@ -3255,6 +3324,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'crop-gif',
+    icon: 'crop',
     name: 'Crop GIF',
     title: 'Crop GIF Online to Any Box or Square, No Upload | Stayput',
     description:
@@ -3306,6 +3376,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'gif-speed',
+    icon: 'speed',
     name: 'Change GIF speed',
     title: 'Change GIF Speed or Reverse a GIF, No Upload | Stayput',
     description:
@@ -3345,6 +3416,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'add-text-to-gif',
+    icon: 'text',
     name: 'Add text to GIF',
     title: 'Add Text to GIF Online, Free, No Upload | Stayput',
     description:
@@ -3403,6 +3475,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'merge-gifs',
+    icon: 'merge',
     name: 'Merge GIFs',
     title: 'Merge GIFs: Join Several GIFs into One, No Upload | Stayput',
     description: 'Join two or more animated GIFs into one GIF, in the order you set. Different sizes are fitted for you. Free, no account, and your GIFs are not uploaded.',
@@ -3461,6 +3534,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'gif-maker',
+    icon: 'film',
     name: 'GIF maker',
     title: 'GIF Maker: Make an Animated GIF from Images, No Upload | Stayput',
     description:
@@ -3500,6 +3574,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'flatten-pdf',
+    icon: 'pdf',
     name: 'Flatten PDF',
     title: 'Flatten PDF Online: Lock Form Fields, No Upload | Stayput',
     description:
@@ -3538,6 +3613,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'resize-pdf',
+    icon: 'resize',
     name: 'Resize PDF pages',
     title: 'Resize PDF Page Size: A4, Letter, Legal, A3, No Upload | Stayput',
     description:
@@ -3576,6 +3652,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'transcribe',
+    icon: 'text',
     name: 'Transcribe audio to text',
     title: 'Transcribe Video to Text: Free, Private, No Upload | Stayput',
     description:
@@ -3622,6 +3699,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'add-subtitles-to-video',
+    icon: 'video',
     name: 'Add subtitles to video',
     title: 'Add Subtitles to a Video: Burned In, No Upload | Stayput',
     description:
@@ -3665,6 +3743,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'vocal-remover',
+    icon: 'mic',
     name: 'Vocal remover',
     title: 'Vocal Remover: Karaoke and Acapella, No Upload | Stayput',
     description:
@@ -3707,6 +3786,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'video-background-remover',
+    icon: 'cutout',
     name: 'Video background remover',
     title: 'Remove or Blur a Video Background, Free, No Upload | Stayput',
     description:
@@ -3753,6 +3833,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'ocr-pdf',
+    icon: 'text',
     name: 'OCR PDF',
     title: 'OCR PDF Online: Make a Scanned PDF Searchable | Stayput',
     description:
@@ -3791,6 +3872,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'document-scanner',
+    icon: 'crop',
     name: 'Document scanner',
     title: 'Document Scanner Online: Photo to Clean PDF | Stayput',
     description:
@@ -3829,6 +3911,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'epub-to-pdf',
+    icon: 'convert',
     name: 'EPUB to PDF',
     title: 'EPUB to PDF Converter: Free, No Upload, No Email | Stayput',
     description:
@@ -3867,6 +3950,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'text-to-pdf',
+    icon: 'text',
     name: 'Text to PDF',
     title: 'Text to PDF: Paste Text or Drop a TXT File | Stayput',
     description: 'Turn pasted text, or a .txt, .md, .csv or .log file, into a PDF in your browser. Choose A4 or Letter, type size and margins. Not uploaded.',
@@ -3939,6 +4023,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'pdf-to-epub',
+    icon: 'convert',
     name: 'PDF to EPUB',
     title: 'PDF to EPUB Converter: Free, No Upload | Stayput',
     description:
@@ -3977,6 +4062,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'archive-extractor',
+    icon: 'merge',
     name: 'Open ZIP, RAR and 7z',
     title: 'Open RAR, ZIP and 7z Files Online, No Upload | Stayput',
     description:
@@ -4019,6 +4105,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'create-zip',
+    icon: 'merge',
     name: 'Create ZIP',
     title: 'Create a ZIP File Online, Optional Password | Stayput',
     description:
@@ -4058,6 +4145,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'favicon-generator',
+    icon: 'image',
     name: 'Favicon generator',
     title: 'Favicon Generator: ICO, Apple and Manifest Icons | Stayput',
     description:
@@ -4100,6 +4188,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'remove-background',
+    icon: 'cutout',
     name: 'Remove background',
     title: 'Remove Background from Image, Free, No Upload | Stayput',
     description:
@@ -4173,6 +4262,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'passport-photo',
+    icon: 'portrait',
     name: 'Passport photo maker',
     title: 'Passport Photo Maker, Free, No Upload | Stayput',
     description:
@@ -4229,6 +4319,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'watermark-image',
+    icon: 'stamp',
     name: 'Watermark image',
     sizeFact: 'The limit is your device’s memory (phones hold less)',
     title: 'Add Watermark to Photo, Free, No Upload | Stayput',
@@ -4276,6 +4367,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'watermark-pdf',
+    icon: 'stamp',
     name: 'Watermark PDF',
     sizeFact: 'The limit is your device’s memory (phones hold less)',
     title: 'Add Watermark to PDF, Free, No Upload | Stayput',
@@ -4323,6 +4415,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'remove-pdf-metadata',
+    icon: 'shield',
     name: 'Remove PDF metadata',
     title: 'Remove Metadata from PDF, Free, No Upload | Stayput',
     description:
@@ -4369,6 +4462,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'sticker-maker',
+    icon: 'sticker',
     name: 'Sticker maker',
     title: 'Sticker Maker: Photo to Sticker, Free, No Upload | Stayput',
     description:
@@ -4415,6 +4509,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'profile-picture-maker',
+    icon: 'portrait',
     name: 'Profile picture maker',
     title: 'Profile Picture Maker: Cut Out, Colour, Circle | Stayput',
     description:
@@ -4465,6 +4560,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'upscale-image',
+    icon: 'resize',
     name: 'AI image upscaler',
     title: 'AI Image Upscaler: Enlarge Photos 2×, 3×, 4×, No Upload | Stayput',
     description:
@@ -4508,6 +4604,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'remove-object',
+    icon: 'eraser',
     name: 'Remove object from photo',
     title: 'Remove Objects from Photos (Magic Eraser), No Upload | Stayput',
     description:
@@ -4550,6 +4647,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'adjust-image',
+    icon: 'sliders',
     name: 'Adjust photo',
     title: 'Adjust Photo Brightness and Contrast, No Upload | Stayput',
     description:
@@ -4592,6 +4690,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'emote-resizer',
+    icon: 'smile',
     name: 'Emote resizer',
     title: 'Emote Resizer for Twitch, Discord and Slack, No Upload | Stayput',
     description:
@@ -4634,6 +4733,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'pixel-art-converter',
+    icon: 'grid',
     name: 'Pixel art converter',
     title: 'Pixel Art Converter: Turn a Picture into Pixel Art | Stayput',
     description:
@@ -4676,6 +4776,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'photo-to-sketch',
+    icon: 'pen',
     name: 'Photo to sketch',
     title: 'Photo to Sketch: Pencil Drawing from a Photo, Free | Stayput',
     description:
@@ -4718,6 +4819,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'add-border-to-image',
+    icon: 'frame',
     name: 'Add border to image',
     title: 'Add a Border or Rounded Corners to an Image, Free | Stayput',
     description:
@@ -4760,6 +4862,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'black-and-white-image',
+    icon: 'contrast',
     name: 'Black and white photo',
     title: 'Make a Photo Black and White, Free, No Upload | Stayput',
     description:
@@ -4802,6 +4905,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'grayscale-pdf',
+    icon: 'contrast',
     name: 'Grayscale PDF',
     title: 'Convert PDF to Grayscale, Text Kept, No Upload | Stayput',
     description:
@@ -4852,6 +4956,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'crop-pdf',
+    icon: 'crop',
     name: 'Crop PDF',
     title: 'Crop PDF Pages and Trim Margins, Free, No Upload | Stayput',
     description:
@@ -4898,6 +5003,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'redact-pdf',
+    icon: 'redact',
     name: 'Redact PDF',
     title: 'Redact PDF Free, Text Really Removed, No Upload | Stayput',
     description:
@@ -4944,6 +5050,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'file-checksum',
+    icon: 'hash',
     name: 'File Checksum',
     title: 'MD5 & SHA-256 File Checksum, No Upload | Stayput',
     description:
@@ -4991,6 +5098,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'json-to-csv',
+    icon: 'convert',
     name: 'JSON ↔ CSV',
     title: 'JSON to CSV and CSV to JSON Converter, No Upload | Stayput',
     description:
@@ -5046,6 +5154,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'audio-splitter',
+    icon: 'scissors',
     name: 'Audio splitter',
     title: 'Audio Splitter: Split an MP3 or WAV into Parts | Stayput',
     description: 'Split an MP3, WAV, M4A or FLAC file into separate parts at times you set or every few minutes, in your browser. Free, no account, not uploaded.',
@@ -5096,6 +5205,7 @@ export const tools: Tool[] = [
   },
   {
     slug: 'gif-to-animated-png',
+    icon: 'film',
     lead:
       'Converts animated GIFs to animated PNG (APNG), keeping every frame, its delay, the loop count and transparent areas, with full colour instead of the GIF’s 256. It is free, and your GIFs are not uploaded: each frame is decoded and written by your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
     name: 'GIF to APNG',
