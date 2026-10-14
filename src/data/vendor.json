@@ -132,6 +132,22 @@
       "BUILD.md": "vendor-builds/libav-avi/README.md"
     }
   },
+  "libav-wma": {
+    "package": "libav.js",
+    "version": "6.10.9.0",
+    "local": "vendor-builds/libav-wma/dist/",
+    "entry": "libav-6.10.9.0-wma.mjs",
+    "files": {
+      "libav-6.10.9.0-wma.mjs": "libav-6.10.9.0-wma.mjs",
+      "libav-6.10.9.0-wma.wasm.mjs": "libav-6.10.9.0-wma.wasm.mjs",
+      "libav-6.10.9.0-wma.wasm.wasm": "libav-6.10.9.0-wma.wasm.wasm"
+    },
+    "licences": {
+      "LGPL-2.1.txt": "public/licenses/LGPL-2.1.txt",
+      "ffmpeg-config-wma.txt": "vendor-builds/libav-wma/dist/ffmpeg-config.txt",
+      "BUILD-wma.md": "vendor-builds/libav-wma/README.md"
+    }
+  },
   "libavFlv": {
     "package": "libav.js",
     "version": "6.10.9.0",
