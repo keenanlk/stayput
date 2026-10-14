@@ -98,7 +98,8 @@ function isMp4(b: Buffer) {
   expect(b.includes(Buffer.from('mp4a'))).toBe(true);
 }
 
-test('text watermark lands in the chosen corner on every sampled frame, sound kept, colours unchanged', async ({ page }) => {
+test('text watermark lands in the chosen corner on every sampled frame, sound kept, colours unchanged', async ({ page, browserName }) => {
+  test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit in CI stalls decoding the clip; Chromium covers it there and macOS WebKit runs it locally');
   await open(page);
   await page.locator('#wm-text').fill('MARK');
   await page.locator('#wm-place').selectOption('bottom-right');
@@ -117,7 +118,8 @@ test('text watermark lands in the chosen corner on every sampled frame, sound ke
   }
 });
 
-test('logo watermark lands in the chosen corner', async ({ page }) => {
+test('logo watermark lands in the chosen corner', async ({ page, browserName }) => {
+  test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit in CI stalls decoding the clip; Chromium covers it there and macOS WebKit runs it locally');
   await open(page);
   await page.locator('label:has(input[name="kind"][value="image"])').click();
   await page.locator('#wm-logo').setInputFiles(logo);
