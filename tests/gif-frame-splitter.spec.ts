@@ -144,7 +144,7 @@ test('the zip holds exactly the frames, as whole composited PNGs', async ({ page
   expect(f3).toEqual([[0, 0, 255, 255], [0, 255, 0, 255], [255, 0, 0, 255]]);
   // Frame 3 is disposed to the background, so frame 4 shows nothing.
   const [clear] = await pixels(page, entries.get('frame-004.png')!, [[5, 5]]);
-  expect(clear[3]).toBe(0);
+  expect(clear![3]).toBe(0);
 });
 
 test('a single frame downloads as a valid PNG', async ({ page }) => {
