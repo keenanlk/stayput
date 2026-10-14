@@ -15,7 +15,7 @@ import { SPEECH_MODEL_SIZE } from './speech-size.ts';
 /** What each tool does, with its input and output formats. First sentence of the lead. */
 const does: Record<string, string> = {
   'heic-to-jpg': 'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and can keep or drop the location data.',
-  'convert-image': 'Converts images between JPG, PNG, WebP, GIF, BMP, TIFF, ICO and PDF, and reads HEIC, AVIF, JXL and SVG as input.',
+  'convert-image': 'Converts images between JPG, PNG, WebP, GIF, BMP, TIFF, ICO and PDF, and reads HEIC, AVIF, JXL and SVG as input, and has ready-made pages for turning any image into JPG or PNG.',
   'compress-image': 'Makes JPG, PNG and WebP images smaller: pick a quality, fit a file size such as 100 KB, or resize to exact pixels, for a single file or a batch.',
   'resize-gif': 'Changes the width and height of animated GIFs by percent or in exact pixels, keeping the animation, frame timing and loop.',
   'add-text-to-gif': 'Puts text on every frame of an animated GIF, with the font, colour and outline you choose, and saves a new GIF with the same timing.',
