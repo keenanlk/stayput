@@ -251,6 +251,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser’s Web Audio API makes each sound in this tab: an oscillator at the pitch you chose, or a loop of pink noise, sent to the left channel, the right or both, through a volume control. The sweep moves the oscillator’s pitch smoothly from low to high.',
     versus: 'Nothing here needs a file, an account or a download: the sounds are made in your tab and go straight to your speakers.',
   },
+  'keyboard-tester': {
+    how: 'Your browser sends this page a keydown and a keyup event for each key it receives. The page reads the physical key’s code and the character it produced, lights the matching key on the drawn keyboard and adds a line to the log, all in this tab.',
+    versus: 'Nothing here needs a file, an account or a download: the key presses are read in your tab and drawn on the page, and they are not stored or sent.',
+  },
   'tone-generator': {
     how: 'Your browser’s Web Audio API runs one oscillator in this tab at the pitch and wave you chose, through a volume control that fades in and out so it does not click. Changing the pitch or the wave moves the same oscillator while it plays.',
     versus: 'Nothing here needs a file, an account or a download: the tone is made in your tab and goes straight to your speakers.',
