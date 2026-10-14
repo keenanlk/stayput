@@ -1,0 +1,12 @@
+---
+/** Option controls for video to AVI, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="compat" checked={defaults.compat !== 'false'} /> Maximum compatibility (MJPEG, larger file)</label>
+  <p class="muted small">On: every frame is a JPEG picture with uncompressed sound. QuickTime, VLC and old AVI players open it, but the file is many times larger. Off: H.264 video, much smaller, which VLC opens and QuickTime does not.</p>
+</div>

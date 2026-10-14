@@ -1,6 +1,6 @@
 import { createShell, bindRange, num, str, bool, processEach, type ShellFile } from '../lib/shell';
 import { supportsNativeAvif } from '../lib/avif-encode';
-import { decodeImage, supportsWebpEncoding, thumbnail } from '../lib/image';
+import { decodeImage, thumbnail } from '../lib/image';
 import { writeAnimatedGif, writeImage } from '../lib/encoders';
 import { parseAnimatedWebp } from '../lib/webp-anim';
 import { detectKind, kindFromName, KIND_LABEL, type ImageKind } from '../lib/detect';
@@ -11,22 +11,8 @@ import { extOf, replaceExt, type OutputFile } from '../lib/files';
 bindRange('quality', 'quality-out');
 
 const formatSel = document.getElementById('format') as HTMLSelectElement;
-/** Formats this browser cannot write, with the reason shown in the picker. */
-const unavailable = new Map<OutputType, string>();
 /** Real formats of the files in the list, from their bytes. */
 let detected: { kind: ImageKind | undefined; renamed: boolean }[] = [];
-
-void supportsWebpEncoding().then((ok) => {
-  if (ok) return;
-  unavailable.set('image/webp', 'This browser cannot save WebP. Chrome, Edge and Firefox can.');
-  const opt = formatSel.querySelector<HTMLOptionElement>('option[value="image/webp"]');
-  if (opt) {
-    opt.disabled = true;
-    opt.textContent = 'WebP (not supported by this browser)';
-  }
-  if (formatSel.value === 'image/webp') setFormat('image/jpeg');
-  render();
-});
 
 /** Why a format is a poor or impossible choice for the current files, or undefined when it is fine. */
 function caveat(f: OutputFormat): string | undefined {
@@ -120,13 +106,11 @@ function renderList() {
       li.setAttribute('role', 'option');
       li.dataset.type = f.type;
       li.setAttribute('aria-selected', String(f.type === formatSel.value));
-      const why = unavailable.get(f.type);
-      if (why) li.setAttribute('aria-disabled', 'true');
       const name = Object.assign(document.createElement('span'), { className: 'name', textContent: f.label });
       const ext = Object.assign(document.createElement('span'), { className: 'ext', textContent: `.${f.ext}` });
-      const blurb = Object.assign(document.createElement('span'), { className: 'blurb', textContent: why ?? f.blurb });
+      const blurb = Object.assign(document.createElement('span'), { className: 'blurb', textContent: f.blurb });
       li.append(name, ext, blurb);
-      const flag = why ? undefined : caveat(f);
+      const flag = caveat(f);
       if (flag) li.append(Object.assign(document.createElement('span'), { className: 'flag', textContent: flag }));
       li.addEventListener('pointerdown', (e) => e.preventDefault());
       li.addEventListener('click', () => choose(index));
@@ -140,7 +124,7 @@ function renderList() {
 }
 
 function firstEnabled(from: number, step: 1 | -1): number {
-  for (let i = from; i >= 0 && i < shown.length; i += step) if (!unavailable.has(shown[i]!.type)) return i;
+  for (let i = from; i >= 0 && i < shown.length; i += step) if (shown[i]) return i;
   return -1;
 }
 
@@ -156,7 +140,7 @@ function highlight(i: number, scroll: boolean) {
 
 function choose(i: number) {
   const f = shown[i];
-  if (!f || unavailable.has(f.type)) return;
+  if (!f) return;
   setFormat(f.type);
   close(true);
 }

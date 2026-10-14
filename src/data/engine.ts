@@ -419,6 +419,10 @@ export const engines: Record<string, Engine> = {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, WebM or MKV container in your tab and writes a QuickTime MOV. H.264 video and AAC sound are copied across as they are. Anything else is decoded and re-encoded by your browser’s own encoders (WebCodecs) to H.264 and AAC, and where the browser cannot write those it says so instead of writing a file QuickTime may not play.',
     versus: 'The video is read from your disk and the MOV is written in memory on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
   },
+  'video-to-avi': {
+    how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, MOV, WebM or MKV container in your tab. With Maximum compatibility, each frame is drawn on a canvas and saved as a JPEG by your browser, and the sound is written as uncompressed 16-bit PCM. Without it, your browser’s own video encoder (WebCodecs) writes H.264 with no B-frames at a constant frame rate, and the page’s MP3 encoder (LAME, LGPL, compiled to WebAssembly) writes the sound; clips under 2 minutes keep PCM instead. A small AVI writer in this page’s own code then lays the frames and the index into a RIFF file in memory.',
+    versus: 'The video is read from your disk and the AVI is written in memory on your device, so there is no upload to wait for. An AVI of this kind cannot hold more than 1.9 GB, and a job that would pass it is refused before any encoding starts.',
+  },
   'video-to-webm': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, MOV, MKV or WebM container in your tab and writes a WebM. VP8, VP9 or AV1 video and Opus or Vorbis sound already in the file are copied across as they are. Anything else is decoded and re-encoded by your browser’s own encoders (WebCodecs), VP9 where the browser can write it and VP8 otherwise, with the sound as Opus. A browser with no VP8 or VP9 encoder says so instead of writing a broken file.',
     versus: 'The video is read from your disk and the WebM is written in memory on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
@@ -430,6 +434,10 @@ export const engines: Record<string, Engine> = {
   'gif-to-mp4': {
     how: 'Stayput reads the GIF byte by byte in your tab with gifuct-js (MIT), decompresses each frame and composites it the way browsers play GIFs, honouring each frame’s delay and disposal rule. Every finished frame goes to your browser’s own video encoder through WebCodecs: H.264 where the browser has one (Chrome, Edge, Safari), VP9 or AV1 where it does not. The encoded frames are written into an MP4 container by mp4-muxer (MIT), all in memory.',
     versus: 'GIF to MP4 sites upload the file to convert it on a server, cap the size, and some add a watermark or keep the file for hours. Here the conversion runs on your device, so a reaction GIF, a screen recording of your product or a clip of your kids never leaves it, and the page keeps working offline after one visit and a short wait.',
+  },
+  'animated-png-to-gif': {
+    how: 'UPNG.js (MIT, by Photopea) reads the animated PNG in your tab and composites each frame with its dispose and blend rules into a whole picture. gifenc (MIT) then reduces every picture to its own 256-colour palette, with pixels under half opacity made transparent, and writes it as a GIF frame with the APNG’s delay and loop count. The file is assembled in memory.',
+    versus: 'Online APNG to GIF converters upload the file to convert it on a server and may cap the size or keep a copy. Here the conversion runs on your device, and the page keeps working offline after one visit and a short wait.',
   },
   'gif-to-animated-png': {
     how: 'Stayput reads the GIF byte by byte in your tab with gifuct-js (MIT), decompresses each frame and composites it the way browsers play GIFs, honouring disposal rules and transparency. Every finished picture is written as a full frame of an animated PNG: the PNG header, an animation control chunk with the frame count and the GIF’s loop setting, then each frame’s control chunk (its delay) and its pixels, deflated by your browser’s own CompressionStream. The file is assembled in memory.',

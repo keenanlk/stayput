@@ -41,6 +41,18 @@
       "LICENSE": "LICENSE"
     }
   },
+  "webp": {
+    "package": "@jsquash/webp",
+    "version": "1.5.0",
+    "entry": "codec/enc/webp_enc.js",
+    "files": {
+      "utils.js": "utils.js",
+      "meta.js": "meta.js",
+      "codec/enc/webp_enc.js": "codec/enc/webp_enc.js",
+      "codec/enc/webp_enc.wasm": "codec/enc/webp_enc.wasm",
+      "LICENSE": "LICENSE"
+    }
+  },
   "qpdf": {
     "package": "@neslinesli93/qpdf-wasm",
     "version": "0.3.0",
