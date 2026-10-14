@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RepeatVideo from '../../components/options/RepeatVideo.astro';
+const tool = toolBySlug('repeat-video')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><RepeatVideo /></Fragment>
+</ToolLayout>
+<script src="../../tools/repeat-video.ts"></script>

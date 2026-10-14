@@ -111,6 +111,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser plays the video from the file on your device so you can pick the start and end. Mediabunny (MPL-2.0) then reads the MP4, MOV, WebM or MKV container in your tab and copies the packets between those two points into a new file of the same type, starting from the nearest key frame within half a second. When there is none that close, or when you ask for an exact cut, the clip is decoded and re-encoded by your browser’s own video encoder (WebCodecs).',
     versus: 'Online video cutters upload the whole file just to throw most of it away, cap free videos at a few hundred megabytes and often add a watermark. Here nothing is uploaded, and a clip from a 2 GB recording is cut in seconds because the video is copied rather than re-encoded.',
   },
+  'video-splitter': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV container in your tab to find its length, and the parts are planned in seconds so that each one ends where the next begins. Each part is then cut on its own: the video and sound packets between its two points are copied into a new file of the same type, starting from the nearest key frame, or, with exact cuts, decoded and re-encoded by your browser’s own video encoder (WebCodecs). The parts are packed into a zip by code in the page.',
+    versus: 'Online video splitters upload the whole file, cap free videos at a few hundred megabytes and often add a watermark. Here nothing is uploaded, and a long video splits in seconds because the video is copied rather than re-encoded.',
+  },
   'resize-gif': {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, honouring each frame’s delay and disposal rule. Each frame is drawn at the new width and height on a canvas, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Reaction GIFs and screen recordings are often personal. Here the GIF is resized in this tab: the file is not uploaded, there is no size cap beyond your device’s memory (phones hold less), no watermark is added, and you can resize several at once.',
@@ -174,6 +178,14 @@ export const engines: Record<string, Engine> = {
   'merge-videos': {
     how: 'Mediabunny (MPL-2.0) reads each MP4, MOV, WebM or MKV clip in your tab. Your browser decodes the frames (WebCodecs), draws them one clip after another onto a picture the size of the first clip, and encodes the whole once into an MP4, H.264 where available and VP9 or AV1 otherwise. Each clip’s sound is decoded by your browser and laid end to end to match.',
     versus: 'Online video mergers upload every clip before they start, cap free files at a few hundred megabytes, and often stamp a watermark on the result. Here the clips never leave your device.',
+  },
+  'side-by-side-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV clips in your tab. For every frame of the result, your browser decodes the picture each clip shows at that moment (WebCodecs), draws the two side by side or stacked on a canvas, and encodes the canvas into an MP4, H.264 where available and VP9 or AV1 otherwise. The sound of the clip you chose, or a mix, is decoded by your browser and encoded as AAC.',
+    versus: 'Online split-screen makers upload both clips, cap free files at a few hundred megabytes and often put their watermark on the result. Here the clips never leave your device, and there is no watermark.',
+  },
+  'repeat-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV clip in your tab. When the container can hold its codecs, each packet of picture and sound is written again with a later time, once per repeat, with no decoding or encoding. Otherwise your browser decodes the frames (WebCodecs) and encodes the repeated clip once into an MP4, H.264 where available.',
+    versus: 'Online video loopers upload the clip to a server, cap free files and lengths, and often stamp a watermark on the longer result. Here the clip never leaves your device and the repeated file is written from memory in your tab.',
   },
   'add-audio-to-video': {
     how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV video in your tab and copies its picture packet by packet into a new file, with no re-encoding. The sound file is decoded by your browser, looped or cut and faded to the length of the video, mixed with the video’s own sound if you asked, and encoded as AAC (or Opus) by your browser (WebCodecs).',
@@ -486,6 +498,10 @@ export const engines: Record<string, Engine> = {
   'compare-images': {
     how: 'Your browser decodes both pictures (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws them onto canvases of the same size, shrunk in halving steps when they pass 4,096 pixels. A short loop then compares every pixel’s red, green, blue and alpha values and flags those that are further apart than your threshold. The slider and fade views are two canvas draws; the difference map is saved as PNG.',
     versus: 'Online image comparison sites upload both pictures to a server and some cap the size. Here neither picture leaves your device, and the threshold and difference map are free.',
+  },
+  'image-to-ascii': {
+    how: 'Your browser decodes the picture (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and shrinks it in halving steps to one pixel per character, with the rows halved because a text character is about twice as tall as wide. Each pixel’s brightness is worked out with the Rec. 709 weights and picks a character from the set you chose, dark areas getting the heaviest. The text is shown in a plain text box, and the PNG is made by drawing those characters on a canvas.',
+    versus: 'Online ASCII converters upload your picture to a server, and many cap the width or put their site name on the result. Here the picture never leaves your device and every setting is free.',
   },
   'pixel-art-converter': {
     how: 'Your browser decodes the picture (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and shrinks it to the grid in halving steps, so each block is the average of the pixels it covers. The palette comes from gifenc’s (MIT) colour quantizer or a fixed retro set; each block snaps to the nearest colour, weighted the way the eye weighs red, green and blue, with optional Floyd–Steinberg dithering. The small image is then enlarged with smoothing off, so every block stays a crisp square, and saved as PNG.',

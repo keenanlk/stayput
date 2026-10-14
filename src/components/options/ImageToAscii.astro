@@ -1,0 +1,25 @@
+---
+/** Option controls for image to ASCII art. */
+---
+<div class="field">
+  <label for="cols">Width in characters <output id="cols-out">100</output></label>
+  <input type="range" id="cols" min="40" max="200" step="2" value="100" />
+  <span class="muted small">Wide or detailed pictures need more columns.</span>
+</div>
+<div class="field">
+  <label for="charset">Character set</label>
+  <select id="charset">
+    <option value="classic" selected>Classic ( .:-=+*#%@)</option>
+    <option value="blocks">Blocks (░▒▓█)</option>
+    <option value="simple">Simple ( .-+#)</option>
+    <option value="custom">Custom</option>
+  </select>
+</div>
+<div class="field" id="custom-field" hidden>
+  <label for="custom">Your characters, lightest to darkest</label>
+  <input type="text" id="custom" value=" .oO0@" maxlength="40" spellcheck="false" autocomplete="off" />
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="invert" /> Invert (light characters on a dark background)</label>
+  <label class="check"><input type="checkbox" id="colour" /> Colour (the PNG is coloured; the text stays plain)</label>
+</div>

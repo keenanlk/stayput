@@ -26,6 +26,8 @@ const pages = [
   '/qr-code-scanner-for-pc',
   '/itf-14-barcode-generator',
   '/tools/audio-splitter',
+  '/tools/video-splitter',
+  '/tools/side-by-side-video',
   '/tools/speaker-test',
   '/tools/keyboard-tester',
   '/tools/tone-generator',
