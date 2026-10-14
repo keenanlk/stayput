@@ -238,12 +238,12 @@ export const pairs: Pair[] = [
     keywords: ['png to webp', 'convert png to webp', 'png to webp converter', 'webp converter'],
     intro: [
       'WebP is what you serve on a website when you want a PNG’s transparency at a fraction of its size. A 400 KB PNG logo or illustration often becomes a 40 KB WebP with no visible difference, which is a real page-speed win. All current browsers display WebP.',
-      'The converter uses your browser’s own WebP encoder. Quality 80 to 90 is the sweet spot for graphics; for images with fine text, push it to 95. Transparency is preserved. If your browser cannot encode WebP (older Safari), the option is greyed out and the page says so.',
+      'The converter uses your browser’s own WebP encoder where it has one; Safari gets a small built-in WebP encoder that is fetched from this site the first time you save WebP. Quality 80 to 90 is the sweet spot for graphics; for images with fine text, push it to 95. Transparency is preserved.',
     ],
     faq: [
       { q: 'Is WebP transparency preserved?', a: 'Yes. WebP supports an alpha channel, and transparent PNG areas stay transparent.' },
       { q: 'Is WebP lossy or lossless?', a: 'It can be either. Browsers encode lossy WebP through this tool, controlled by the quality slider. At quality 100 the result is very close to lossless but still slightly compressed.' },
-      { q: 'Why is WebP greyed out?', a: 'Some browsers, notably older versions of Safari, can display WebP but not create it. Try a current version of Chrome, Firefox, Edge or Safari 16 or later.' },
+      { q: 'Does it work in Safari?', a: 'Yes. Safari can display WebP but cannot create it itself, so the page loads a small WebP encoder from this site the first time you save one. The picture is still encoded on your device and is not uploaded.' },
     ],
   },
   {
@@ -307,6 +307,27 @@ export const pairs: Pair[] = [
       { q: 'Is transparency preserved?', a: 'Yes. Transparent areas of the AVIF come through as transparent PNG.' },
       { q: 'Why is the PNG so big?', a: 'AVIF compresses very aggressively; PNG does not compress lossily at all. A 100 KB AVIF can become a multi-megabyte PNG. Use AVIF to JPG when size matters and transparency does not.' },
       { q: 'Which browsers can do this?', a: 'Any current version of Chrome, Edge, Firefox or Safari 16 and later. Decoding happens in the browser, so an old browser without AVIF support will show an error rather than upload the file anywhere.' },
+    ],
+  },
+  {
+    slug: 'avif-to-webp',
+    from: 'AVIF',
+    to: 'WebP',
+    outputType: 'image/webp',
+    accept: 'image/avif,.avif',
+    title: 'AVIF to WebP Converter, Free, No Upload | Stayput',
+    description: 'Convert AVIF images to WebP in your browser, transparency kept. Quality slider, batch conversion, nothing uploaded.',
+    heading: 'Convert AVIF to WebP',
+    tagline: 'Turn AVIF into WebP, which more tools and websites accept, on your device.',
+    keywords: ['avif to webp', 'convert avif to webp', 'avif to webp converter'],
+    intro: [
+      'AVIF is smaller than WebP, but WebP is accepted by more editors, CMS uploads and older browsers. If a site or tool refuses your AVIF, WebP is the closest format that it will usually take, and it keeps transparency.',
+      'The converter decodes the AVIF in your tab and writes a WebP at the quality you set. Both formats are lossy, so convert once from the best AVIF you have. Transparent areas stay transparent.',
+    ],
+    faq: [
+      { q: 'Is transparency preserved?', a: 'Yes. WebP has an alpha channel, so transparent AVIF areas stay transparent.' },
+      { q: 'Will the WebP be bigger than the AVIF?', a: 'Usually yes. AVIF is one of the most efficient formats, so a WebP of similar quality is typically larger. Lower the quality slider to trade detail for size.' },
+      { q: 'Does it work in Safari?', a: 'Yes. Safari can display WebP but cannot create it itself, so the page loads a small WebP encoder from this site the first time you save one. The picture is still encoded on your device and is not uploaded.' },
     ],
   },
   {
