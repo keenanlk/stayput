@@ -66,6 +66,7 @@ import PitchChanger from '../components/options/PitchChanger.astro';
 import AudioConverter from '../components/options/AudioConverter.astro';
 import AudioStage from '../components/AudioStage.astro';
 import ImageToText from '../components/options/ImageToText.astro';
+import ImageToBase64 from '../components/options/ImageToBase64.astro';
 import ColorPicker from '../components/options/ColorPicker.astro';
 import RemoveBackground from '../components/options/RemoveBackground.astro';
 import PassportPhoto from '../components/options/PassportPhoto.astro';
@@ -177,6 +178,7 @@ const options = {
   'audio-converter': AudioConverter,
   'image-to-text': ImageToText,
   'image-to-word': ImageToText,
+  'image-to-base64': ImageToBase64,
   'color-picker': ColorPicker,
   'remove-background': RemoveBackground,
   'passport-photo': PassportPhoto,
@@ -256,9 +258,21 @@ const Options = options[base as keyof typeof options];
   {base === 'split-image' && <GridStage slot="panel" />}
   {base === 'add-text-to-image' && <TextStage slot="panel" />}
   {base === 'color-picker' && <ColorStage slot="panel" />}
+  {base === 'image-to-base64' && <div slot="panel" id="b64-results" class="b64-results" hidden></div>}
   {(base === 'pdf-to-word' || base === 'image-to-word') && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>
 </ToolLayout>
+{base === 'image-to-base64' && (
+  <style is:global>
+    .b64-results { display: grid; gap: 16px; }
+    .b64-card { padding: 14px; border-radius: var(--radius-sm); background: var(--surface-2); display: grid; gap: 10px; }
+    .b64-card h3 { margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
+    .b64-size { margin: 0; color: var(--ink-2); }
+    .b64-warn { margin: 0; padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid currentColor; color: var(--ink-2); }
+    .b64-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .b64-block textarea { width: 100%; font: 12px/1.4 ui-monospace, monospace; resize: vertical; box-sizing: border-box; }
+  </style>
+)}
 {(base === 'pdf-to-word' || base === 'image-to-word') && (
   <style is:global>
     .text-preview { max-height: 260px; overflow: auto; white-space: pre-wrap; font: 14px/1.5 var(--font-body, inherit); padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); margin: 0; }

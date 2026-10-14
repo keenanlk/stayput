@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import PixelStage from '../../components/PixelStage.astro';
+const tool = toolBySlug('dead-pixel-test')!;
+---
+<ToolLayout tool={tool}>
+  <PixelStage slot="panel" />
+</ToolLayout>
+<script src="../../tools/dead-pixel-test.ts"></script>

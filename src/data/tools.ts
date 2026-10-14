@@ -3110,6 +3110,95 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'dead-pixel-test',
+    icon: 'grid',
+    name: 'Dead pixel test',
+    title: 'Dead Pixel Test: Full-Screen Screen Test Online | Stayput',
+    description:
+      'Free dead pixel checker: fill your whole screen with black, white, red, green and blue to find dead or stuck pixels. Step by click or arrow keys. Nothing is uploaded.',
+    heading: 'Test your screen for dead pixels',
+    tagline: 'A dead pixel checker and screen test: fill the whole screen with one solid colour at a time, so a dead or stuck pixel stands out. It runs in your browser, and nothing is uploaded.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your screen',
+    action: 'Test',
+    lead:
+      'Fills your whole screen with solid black, white, red, green and blue, one at a time, so a dead or stuck pixel stands out. It is a dead pixel checker and screen test: click or use the arrow keys to change colour, or let it cycle by itself. It is free, and your choices are not uploaded: the colours are drawn by code in your browser, and the page uses no file. After one visit and a short wait the page works offline.',
+    sections: [
+      {
+        heading: 'How to tell a dead pixel from a stuck one',
+        bullets: [
+          'A dead pixel stays black on every colour, including white. Look for a tiny dark dot on the white screen.',
+          'A stuck pixel stays one colour (red, green, blue or white) whatever the screen shows. Look for a bright dot on the black screen.',
+          'A hot pixel is a stuck pixel that is always white, so it is easiest to see on black.',
+          'Dust or a speck on the glass can look the same, so wipe the screen with a soft dry cloth first and look again.',
+        ],
+      },
+      {
+        heading: 'How to run the test',
+        bullets: [
+          'Clean the screen, set the brightness fairly high, and dim the room.',
+          'Press Start the test, then click or press the arrow keys to move through black, white, red, green and blue.',
+          'Look at each colour for a moment, close to the screen, and note where any odd dot sits.',
+          'Press Esc to leave, or turn on the automatic cycle to step through the colours hands-free.',
+        ],
+      },
+      {
+        heading: 'What this test cannot do',
+        bullets: [
+          'It cannot fix pixels. The page only shows plain colours; whether a pixel is dead or stuck is down to the panel itself.',
+          'It cannot measure your screen’s quality, colour accuracy or brightness, and it does not read what your screen shows.',
+          'Some stuck pixels come back to normal by themselves or with gentle pressure; a dead pixel almost never does. Check your maker’s dead pixel policy before you try anything.',
+        ],
+      },
+    ],
+    keywords: ['dead pixel test', 'dead pixel checker', 'screen test', 'stuck pixel test', 'monitor test', 'lcd screen test', 'check for dead pixels', 'pixel test online', 'screen colour test'],
+    steps: [
+      'Clean your screen, then press Start the test. The page goes full screen, or fills the window if your browser cannot.',
+      'Click, tap or press the arrow keys to step through black, white, red, green and blue, and look for dots that do not match.',
+      'Press Esc to leave the test. A dot that stays black on every colour is dead; one that stays one colour is stuck.',
+    ],
+    faq: [
+      {
+        q: 'Is anything uploaded or recorded?',
+        a: 'No. The colours are drawn by code in this page and nothing about your screen, your device or what you looked at is sent anywhere. The page asks for no permission.',
+      },
+      {
+        q: 'What is a dead pixel?',
+        a: 'A dead pixel is a tiny dot that never lights up, so it stays black on every colour. It shows best on the white screen. Pixels that stay lit are stuck pixels.',
+      },
+      {
+        q: 'What is the difference between a dead pixel and a stuck pixel?',
+        a: 'A dead pixel is always black. A stuck pixel is always one colour, such as red, green, blue or white, and shows best on the black screen. Stepping through all five colours tells you which one you have.',
+      },
+      {
+        q: 'Can this dead pixel checker fix a dead pixel?',
+        a: 'No. A software screen test can only show you the pixels; it cannot repair them. A stuck pixel sometimes clears by itself, and a dead pixel almost never does. If your screen is under warranty, ask the maker about its dead pixel policy.',
+      },
+      {
+        q: 'Why does the page need full screen?',
+        a: 'So that the colour covers every pixel, with no browser bars or taskbar in the way. Where your browser cannot go full screen, as on iPhone Safari, the test fills the browser window instead and the page tells you so; a little of the edge may still show browser controls.',
+      },
+      {
+        q: 'How do I leave the screen test?',
+        a: 'Press Esc. On a phone, where there is no Esc key, tap the × in the corner. The cursor is hidden while the test runs so it does not cover a pixel.',
+      },
+      {
+        q: 'Can I run this screen test on a phone or tablet?',
+        a: 'Yes. Open this page in your phone’s browser, press Start the test and tap to change colour. If your browser fills the window rather than the whole screen, the bars at the edge cannot be tested this way.',
+      },
+      {
+        q: 'Why is a dot visible on only one colour?',
+        a: 'A pixel is made of red, green and blue parts. If only one part is stuck on, the dot shows on the black screen as that colour, and may disappear on a screen that already has that colour. That is a stuck sub-pixel.',
+      },
+      {
+        q: 'Does the test work on a TV or a second monitor?',
+        a: 'Yes, if you open this page in a browser on that screen. Drag the window to the screen you want to check before you press Start the test, since full screen uses the display the window is on.',
+      },
+    ],
+  },
+  {
     slug: 'audio-to-video',
     icon: 'film',
     name: 'Audio to video',
@@ -4843,6 +4932,53 @@ export const tools: Tool[] = [
       {
         q: 'Are my files or their names uploaded?',
         a: 'No. The names are read and changed in this tab and the ZIP is built here. Neither the files nor their names are sent anywhere or counted by analytics.',
+      },
+    ],
+  },
+  {
+    slug: 'image-to-base64',
+    icon: 'convert',
+    name: 'Image to Base64',
+    title: 'Image to Base64 Converter, Data URI, No Upload | Stayput',
+    description:
+      'Turn PNG, JPG, WebP, GIF, SVG, AVIF or ICO images into Base64 and ready-to-paste data URIs, HTML and CSS snippets. Free, in your browser, nothing is uploaded.',
+    heading: 'Convert image to Base64',
+    tagline: 'Get the data URI, the raw Base64 and ready-made HTML and CSS for any image, with the size it adds. Your image never leaves this tab.',
+    category: 'images',
+    accept: 'image/*,.svg,.ico,.avif',
+    multiple: true,
+    dropLabel: 'Drop images to encode as Base64',
+    action: 'Encode to Base64',
+    keywords: ['image to base64', 'png to base64', 'base64 image', 'image to data uri', 'jpg to base64', 'svg to base64', 'convert image to base64 string'],
+    steps: [
+      'Drop one or more images (PNG, JPG, WebP, GIF, SVG, AVIF or ICO), or tap to pick them.',
+      'Encode. Each image gets its data URI, the raw Base64, an HTML img tag and a CSS background-image rule.',
+      'Press Copy next to the one you need, or download the data URI as a .txt file.',
+    ],
+    faq: [
+      {
+        q: 'What is the difference between the data URI and the Base64?',
+        a: 'The Base64 is the file’s bytes written as text. The data URI is that text with a prefix such as data:image/png;base64, in front, which is what a browser needs to show it from an img src or a CSS url(). Use the data URI for HTML and CSS, and the raw Base64 for an API field or JSON that wants only the encoded bytes.',
+      },
+      {
+        q: 'Why is the Base64 bigger than my image?',
+        a: 'Base64 writes three bytes as four characters, so the text is about 33% larger than the file. An image over about 1 MB is better linked as a file than embedded: a data URI makes the page itself heavier and cannot be cached separately. The result card shows both sizes, and warns above 1 MB.',
+      },
+      {
+        q: 'Which images should I embed as a data URI?',
+        a: 'Small ones: icons, logos and tiny backgrounds of a few kilobytes, where saving a request is worth more than the extra third. Photos are better as files. If an image is large, shrink it first with [Compress image](/tools/compress-image) or change its format with [Convert image](/tools/convert-image).',
+      },
+      {
+        q: 'Can I encode an SVG?',
+        a: 'Yes. The SVG file is encoded as it is. For an SVG you could also paste its markup straight into the page, which is smaller. To turn a raster picture into a vector first, use [Image to SVG](/tools/image-to-svg).',
+      },
+      {
+        q: 'Can I make a favicon this way?',
+        a: 'A data URI works in a link tag, but browsers cache a real file better and some ignore data URIs for icons. [Favicon generator](/tools/favicon-generator) writes the whole icon set and the HTML for it.',
+      },
+      {
+        q: 'Is my image uploaded?',
+        a: 'No. The file is read by your browser’s FileReader and encoded in this tab. There is no server in the process, and after one visit and a short wait the page works offline.',
       },
     ],
   },
