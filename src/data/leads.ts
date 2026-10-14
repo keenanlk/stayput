@@ -111,6 +111,7 @@ const does: Record<string, string> = {
   'pdf-to-epub': 'Converts a PDF into an EPUB ebook whose text reflows to fit a phone or e-reader screen, with chapters and a table of contents.',
   'archive-extractor': 'Extracts ZIP, RAR, 7z and TAR archives, including password-protected ZIP files, and downloads the files inside.',
   'create-zip': 'Zips files or whole folders into one ZIP and can lock it with an AES-256 password.',
+  'image-to-base64': 'Encodes PNG, JPG, WebP, GIF, SVG, AVIF and ICO images as Base64 and gives you the data URI, HTML and CSS snippets, with the size the encoding adds.',
   'favicon-generator': 'Makes favicon.ico, apple-touch-icon, Android and maskable icons and a site.webmanifest from one PNG, JPG or SVG.',
   'remove-background': 'Removes the background from a photo and saves a transparent PNG, or a white or coloured background, at full resolution.',
   'passport-photo': 'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, plus a 4 × 6 print sheet.',

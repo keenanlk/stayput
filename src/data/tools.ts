@@ -4744,6 +4744,53 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'image-to-base64',
+    icon: 'convert',
+    name: 'Image to Base64',
+    title: 'Image to Base64 Converter, Data URI, No Upload | Stayput',
+    description:
+      'Turn PNG, JPG, WebP, GIF, SVG, AVIF or ICO images into Base64 and ready-to-paste data URIs, HTML and CSS snippets. Free, in your browser, nothing is uploaded.',
+    heading: 'Convert image to Base64',
+    tagline: 'Get the data URI, the raw Base64 and ready-made HTML and CSS for any image, with the size it adds. Your image never leaves this tab.',
+    category: 'images',
+    accept: 'image/*,.svg,.ico,.avif',
+    multiple: true,
+    dropLabel: 'Drop images to encode as Base64',
+    action: 'Encode to Base64',
+    keywords: ['image to base64', 'png to base64', 'base64 image', 'image to data uri', 'jpg to base64', 'svg to base64', 'convert image to base64 string'],
+    steps: [
+      'Drop one or more images (PNG, JPG, WebP, GIF, SVG, AVIF or ICO), or tap to pick them.',
+      'Encode. Each image gets its data URI, the raw Base64, an HTML img tag and a CSS background-image rule.',
+      'Press Copy next to the one you need, or download the data URI as a .txt file.',
+    ],
+    faq: [
+      {
+        q: 'What is the difference between the data URI and the Base64?',
+        a: 'The Base64 is the file’s bytes written as text. The data URI is that text with a prefix such as data:image/png;base64, in front, which is what a browser needs to show it from an img src or a CSS url(). Use the data URI for HTML and CSS, and the raw Base64 for an API field or JSON that wants only the encoded bytes.',
+      },
+      {
+        q: 'Why is the Base64 bigger than my image?',
+        a: 'Base64 writes three bytes as four characters, so the text is about 33% larger than the file. An image over about 1 MB is better linked as a file than embedded: a data URI makes the page itself heavier and cannot be cached separately. The result card shows both sizes, and warns above 1 MB.',
+      },
+      {
+        q: 'Which images should I embed as a data URI?',
+        a: 'Small ones: icons, logos and tiny backgrounds of a few kilobytes, where saving a request is worth more than the extra third. Photos are better as files. If an image is large, shrink it first with [Compress image](/tools/compress-image) or change its format with [Convert image](/tools/convert-image).',
+      },
+      {
+        q: 'Can I encode an SVG?',
+        a: 'Yes. The SVG file is encoded as it is. For an SVG you could also paste its markup straight into the page, which is smaller. To turn a raster picture into a vector first, use [Image to SVG](/tools/image-to-svg).',
+      },
+      {
+        q: 'Can I make a favicon this way?',
+        a: 'A data URI works in a link tag, but browsers cache a real file better and some ignore data URIs for icons. [Favicon generator](/tools/favicon-generator) writes the whole icon set and the HTML for it.',
+      },
+      {
+        q: 'Is my image uploaded?',
+        a: 'No. The file is read by your browser’s FileReader and encoded in this tab. There is no server in the process, and after one visit and a short wait the page works offline.',
+      },
+    ],
+  },
+  {
     slug: 'favicon-generator',
     icon: 'image',
     name: 'Favicon generator',

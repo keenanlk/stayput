@@ -80,7 +80,7 @@ export const pairs: Pair[] = [
     tagline: 'A lossless PNG copy of every iPhone photo, made on your device.',
     keywords: ['heic to png', 'heic to png converter', 'convert heic to png free', 'iphone photo to png'],
     intro: [
-      'HEIC is the format iPhones and iPads have used since iOS 11. It packs a photo into about half the space of a JPG, but a lot of software still refuses to open it. If a smaller JPG will do, use the [HEIC to JPG converter](/tools/heic-to-jpg). PNG is the safe choice when you need the picture to open everywhere and you do not want a second round of lossy compression, for example when the photo is going into a design tool, a document, or an archive.',
+      'HEIC is the format iPhones and iPads have used since iOS 11. It packs a photo into about half the space of a JPG, but a lot of software still refuses to open it. If a smaller JPG will do, use the [HEIC to JPG converter](/tools/heic-to-jpg). For a file that ends in .heif rather than .heic, the [HEIF to PNG converter](/heif-to-png) is the page written for it. PNG is the safe choice when you need the picture to open everywhere and you do not want a second round of lossy compression, for example when the photo is going into a design tool, a document, or an archive.',
       'The decoder is libheif compiled to WebAssembly, running inside this tab. Your photo is decoded to pixels in memory and the browser writes the PNG. Expect the PNG to be much larger than the HEIC, often five to ten times, because PNG stores every pixel without loss.',
     ],
     faq: [
@@ -101,7 +101,7 @@ export const pairs: Pair[] = [
     tagline: 'Make a JPG copy of a .heif photo that opens on Windows, in editors and on any website, without uploading it.',
     keywords: ['heif to jpg', 'heif to jpg converter', 'convert heif to jpg', 'heif to jpg windows', 'heif file to jpg', 'heif to jpeg'],
     intro: [
-      'HEIF is the container format, and HEIC is the version Apple’s phones write, so a file ending in .heif and one ending in .heic hold the same kind of photo. You meet the .heif name in a folder exported from a Mac, on Android phones that shoot in HEIF and on camera cards. Windows shows a blank thumbnail for them until Microsoft’s HEIF image extension is installed, and most websites refuse to take them. For iPhone photos in .heic, the [HEIC to JPG converter](/tools/heic-to-jpg) does the same job with more options.',
+      'HEIF is the container format, and HEIC is the version Apple’s phones write, so a file ending in .heif and one ending in .heic hold the same kind of photo. You meet the .heif name in a folder exported from a Mac, on Android phones that shoot in HEIF and on camera cards. Windows shows a blank thumbnail for them until Microsoft’s HEIF image extension is installed, and most websites refuse to take them. For iPhone photos in .heic, the [HEIC to JPG converter](/tools/heic-to-jpg) does the same job with more options. If you want a lossless copy rather than a JPG, use [HEIF to PNG](/heif-to-png).',
       'Drop the files here and each one is decoded by libheif, compiled to WebAssembly and running in this tab, then saved as a JPG at the same pixel size. The quality slider starts at 90. The date, camera and location are left out unless you tick Keep EXIF metadata, so a JPG you are about to post does not carry where it was taken.',
       'Expect a JPG about twice the size of the HEIF, because HEIF stores the same picture in roughly half the space. A 2 MB photo of 4032 × 3024 pixels typically comes out near 4 MB. If the JPG has to be small for a form or an email, lower the quality here, or run it through Compress image afterwards and give it a file size.',
     ],
@@ -112,6 +112,31 @@ export const pairs: Pair[] = [
       { q: 'Does the JPG keep where the photo was taken?', a: 'Not unless you choose JPG and tick Keep EXIF metadata. Left unticked, the location, date and camera details stay behind in the HEIF, which is what you want before sharing a picture online.' },
       { q: 'Can I convert a .hif file from a camera?', a: 'Some cameras write the same format with a .hif extension. This page’s file picker lists .heif and .heic. If yours is greyed out, copy the file and rename the copy to .heif before dropping it.' },
       { q: 'Does my camera roll leave my computer?', a: 'No. The photos are read from your disk, decoded and written back to your disk by code running in this tab. There is no server in the process, so an album of family photos is never copied anywhere.' },
+    ],
+  },
+  {
+    slug: 'heif-to-png',
+    from: 'HEIF',
+    to: 'PNG',
+    outputType: 'image/png',
+    accept: '.heic,.heif,image/heic,image/heif',
+    title: 'HEIF to PNG Converter, Free, No Upload | Stayput',
+    description: 'Convert .heif and .heic files to lossless PNG in your browser, one file or a whole folder, at the original pixel size. No upload, no account, no watermark.',
+    heading: 'Convert HEIF to PNG',
+    tagline: 'Turn a .heif photo into a lossless PNG that opens in any editor, at the same pixel size, without uploading it.',
+    keywords: ['heif to png', 'heif to png converter', 'convert heif to png', 'heif file to png', 'heif to png windows', 'heif to png online'],
+    intro: [
+      'A file ending in .heif is a photo stored in the HEIF container, the same family as the .heic files iPhones write. You meet the .heif extension on Android phones and cameras that shoot in HEIF, and in folders exported from a Mac or a photo app. Windows shows no thumbnail for them until Microsoft’s HEIF image extension is installed, and most editors, forms and websites refuse them. A PNG opens everywhere. For files that end in .heic, the [HEIC to PNG converter](/heic-to-png) does the same job, and if a smaller file will do, the [HEIF to JPG converter](/heif-to-jpg) is the one to use.',
+      'Choose PNG when you want the picture kept exactly as decoded: nothing is lost in the save, so you can open it, edit it and save it again without it getting a little worse each time. Each file is decoded by libheif, compiled to WebAssembly and running in this tab, and the PNG has the same width and height as the photo. If the picture has transparency, as some HEIF images made from cut-outs do, the PNG keeps it.',
+      'PNG is far larger than HEIF. Expect five to ten times the size: a 2 MB photo of 4032 × 3024 pixels usually becomes a PNG of 15 to 25 MB. That is the price of storing every pixel without loss. If the file has to fit an upload limit, convert to JPG instead, or run the PNG through Compress PNG afterwards.',
+    ],
+    faq: [
+      { q: 'Is a .heif file the same as a .heic file?', a: 'They are the same kind of photo. HEIF is the container format and HEIC is the name Apple’s devices give it, so .heif and .heic files are converted the same way. This page accepts both.' },
+      { q: 'Does the PNG have the same pixel size as the HEIF?', a: 'Yes. The photo is decoded at full size and written out without resizing, so a 4032 × 3024 photo gives a 4032 × 3024 PNG. Nothing is cropped or scaled.' },
+      { q: 'Why is my PNG so much bigger than the HEIF?', a: 'HEIF compresses with lossy video-style coding, while PNG stores every pixel exactly. The same photo is routinely five to ten times larger as a PNG. For a photo you only need to share, the HEIF to JPG converter gives a much smaller file.' },
+      { q: 'Does the PNG keep the date and location?', a: 'No. PNG has no standard place for camera metadata, and browsers do not write it, so the date, camera and GPS position stay behind in the HEIF. That is what you want before posting a picture online.' },
+      { q: 'Can I convert a whole folder of .heif files?', a: 'Yes. Drop them all and each is converted one after another, then they download one by one or as one zip. The limit is your device’s memory, so split a very large batch on a phone into groups.' },
+      { q: 'Are my photos uploaded?', a: 'No. The files are read from your disk, decoded and written back by code running in this tab. There is no server in the process, so an album of family photos is never copied anywhere.' },
     ],
   },
   {

@@ -23,6 +23,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'fill-pdf-form': ['sign-pdf', 'compress-pdf'],
   'pdf-page-numbers': ['compress-pdf', 'sign-pdf'],
   'pdf-to-word': ['split-pdf', 'compress-pdf'],
+  'image-to-base64': ['compress-image', 'favicon-generator'],
   'favicon-generator': ['crop-image', 'compress-image'],
   'video-to-gif': ['gif-to-mp4', 'compress-image'],
   'gif-to-mp4': ['video-to-gif', 'video-to-mp3'],

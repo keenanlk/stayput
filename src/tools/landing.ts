@@ -63,6 +63,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'metronome': () => import('./metronome'),
   'audio-converter': () => import('./audio-converter'),
   'image-to-word': () => import('./image-to-word'),
+  'image-to-base64': () => import('./image-to-base64'),
   'image-to-text': () => import('./image-to-text'),
   'color-picker': () => import('./color-picker'),
   'remove-background': () => import('./remove-background'),
