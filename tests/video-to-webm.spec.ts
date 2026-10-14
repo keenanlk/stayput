@@ -70,3 +70,30 @@ test('MP4 to WebM preset converts without the sound when asked', async ({ page, 
   expect(w.audio).toBeNull();
   expect(r.note).toContain('no sound');
 });
+
+test('MKV to WebM preset converts an OBS-style H.264/AAC MKV to a WebM that plays', async ({ page, browserName }) => {
+  test.setTimeout(240_000);
+  test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit video decode stalls in CI');
+  await open(page, '/mkv-to-webm');
+  await expect(page.locator('#tool')).toHaveAttribute('data-base', 'video-to-webm');
+  const r = await convert(page, fixture('obs-h264-aac.mkv'));
+  if ('error' in r) return expectCleanRefusal(r, browserName);
+  expect(r.name).toBe('obs-h264-aac.webm');
+  const w = await read(r.bytes);
+  expect(['vp8', 'vp9']).toContain(w.video.codec);
+  expect(w.audio?.codec).toBe('opus');
+  expect(w.video.displayWidth).toBe(320);
+  expect(w.video.displayHeight).toBe(240);
+  expect(Math.abs(w.duration - 4)).toBeLessThan(0.2);
+});
+
+test('MKV to WebM copies VP8 video that is already WebM-compatible', async ({ page, browserName }) => {
+  test.setTimeout(240_000);
+  test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit video decode stalls in CI');
+  await open(page, '/mkv-to-webm');
+  const r = await convert(page, fixture('webm-in-mkv.mkv'));
+  if ('error' in r) return expectCleanRefusal(r, browserName);
+  const w = await read(r.bytes);
+  expect(w.video.codec).toBe('vp8');
+  expect(w.video.displayWidth).toBe(320);
+});
