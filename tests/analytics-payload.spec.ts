@@ -8,6 +8,9 @@ const fx = (name: string) => fileURLToPath(new URL(`./fixtures/generated/${name}
 const TRACKER = readFileSync(fileURLToPath(new URL('./vendor/umami-st.js', import.meta.url)), 'utf8');
 const SITE = 'https://stayput.dev';
 
+// This spec serves the site from the local build and feeds the real tracker; the live config blocks the stats host and has no local server.
+test.skip(!!process.env.PW_LIVE, 'needs the local build and the real tracker; not runnable against the live site');
+
 /** Top-level fields an event may carry. Keep in step with /privacy. */
 const TOP_LEVEL = new Set(['website', 'hostname', 'url', 'name', 'data']);
 const VISIT = ['landing', 'ref', 'from', 'visit', 'via'];
