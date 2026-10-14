@@ -2855,6 +2855,92 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'keyboard-tester',
+    icon: 'keyboard',
+    name: 'Keyboard test',
+    title: 'Keyboard Test: Check Every Key Online | Stayput',
+    description:
+      'Test your keyboard online: press each key and watch it light up on an on-screen ANSI or ISO layout, with a log of every key and code. Free, and nothing you type is sent.',
+    heading: 'Keyboard Test',
+    tagline: 'A free key tester: press any key and it lights up on an on-screen keyboard, in an ANSI or ISO layout, and stays marked so you can see which keys you have not tried yet. What you type stays in this tab.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your keyboard',
+    action: 'Test',
+    lead:
+      'A keyboard test and key tester in one page: press a key and it lights up on an on-screen keyboard, and stays marked as tested, so you can find a key that has stopped working, a stuck key or a chattering one. It shows each key’s name and its code in a log, handles F-keys, the numpad and the arrows, and switches between ANSI and ISO layouts. It is free, and what you type is not uploaded: the keys are read by code in your browser and drawn on the page, and the page uses no file. After one visit and a short wait the page works offline.',
+    sections: [
+      {
+        heading: 'What this test does',
+        bullets: [
+          'Lights each key on the on-screen keyboard when you press it, and keeps it marked as tested after you let go.',
+          'Logs every key press with the key it produced and its code, so you can see which physical key was pressed even when the typing language changes the letter.',
+          'Covers the letters, numbers, modifier keys, F1 to F12, the arrows, the navigation block and the numpad.',
+          'Shows an ANSI layout (US) or an ISO layout (UK and European), and counts how many keys you have tested.',
+          'Has a Reset button that clears the marks and the log, so you can test again.',
+        ],
+      },
+      {
+        heading: 'What this test cannot tell you',
+        bullets: [
+          'The page only sees keys the browser passes on. Fn, most media, volume and brightness keys, and shortcuts the system keeps for itself, such as Cmd+Tab or the Windows key, never reach a web page.',
+          'A key that does not light up here may be broken, or it may be one the browser never sees. Try it in a text editor to tell the two apart.',
+          'It cannot measure typing speed or how a key feels, and it cannot say whether a keyboard is worn out.',
+        ],
+      },
+      {
+        heading: 'A key that does not light up? Check these first',
+        bullets: [
+          'Press it firmly and a few times, and check that the page is the active window.',
+          'Check whether it is a function or media key that needs Fn held, and try it with and without Fn.',
+          'Clean under the key with compressed air, and try the keyboard on another computer.',
+          'Check the keyboard layout and language in your system settings if letters show differently than the key tops.',
+        ],
+      },
+    ],
+    keywords: ['keyboard test', 'keyboard tester', 'online keyboard test', 'key tester', 'test my keyboard', 'keyboard key test', 'check keyboard keys', 'keyboard ghosting test'],
+    steps: [
+      'Choose the ANSI or ISO layout that matches your keyboard.',
+      'Press each key. It lights up on the on-screen keyboard and stays marked, and the log shows its key and code.',
+      'Press Reset to start again, and try any key that stayed unmarked in a text editor to see whether it is broken or just not visible to the browser.',
+    ],
+    faq: [
+      {
+        q: 'Is anything I type recorded or uploaded?',
+        a: 'No. The page reads each key press in your tab and shows it on the page, and the log lives only in the tab’s memory. Nothing about the keys you press is sent anywhere, and it is gone when you close the tab or press Reset.',
+      },
+      {
+        q: 'How do I test my keyboard online?',
+        a: 'Open this page and press each key in turn. The matching key on the on-screen keyboard lights up and stays marked as tested. Any key left unmarked after you have pressed it a few times is one the keyboard is not sending, or one the browser does not see.',
+      },
+      {
+        q: 'Why does a key not light up?',
+        a: 'Either the key does not work, or the browser never receives it. Fn, most media and brightness keys and some system shortcuts, such as Cmd+Tab on a Mac or the Windows key, are handled by the system or the keyboard itself before a web page can see them.',
+      },
+      {
+        q: 'Can I use this key tester for ghosting or rollover?',
+        a: 'Partly. Hold several keys at once and watch which ones light up as pressed. Keys that go missing while others are held point to ghosting or a low rollover limit, but the result depends on the keyboard, the connection and the operating system, so treat it as a hint.',
+      },
+      {
+        q: 'What is the difference between the key and the code in the log?',
+        a: 'The key is what the press produces, such as a lowercase a, a capital A or a symbol, and it changes with Shift and with your language. The code names the physical key, such as KeyA, and stays the same whatever the layout.',
+      },
+      {
+        q: 'What is the difference between ANSI and ISO?',
+        a: 'ANSI is the US layout, with a wide, flat Enter key and a long left Shift. ISO is common in the UK and Europe, with a tall Enter key and an extra key next to the left Shift. Pick the one that looks like your keyboard.',
+      },
+      {
+        q: 'Does it work on a laptop or a Mac?',
+        a: 'Yes. A laptop’s built-in keyboard is tested the same way. On a Mac the Command keys show as Win/Cmd, and Fn and the media row do not reach the browser.',
+      },
+      {
+        q: 'Does the tester work with a phone or tablet keyboard?',
+        a: 'It works with a hardware keyboard connected to the phone or tablet. The on-screen keyboard of a phone does not send physical key codes, so it will not light the keys here.',
+      },
+    ],
+  },
+  {
     slug: 'tone-generator',
     icon: 'volume',
     name: 'Tone generator',
