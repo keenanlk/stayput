@@ -18,9 +18,9 @@ const pages = [
   },
   {
     path: '/tools/heic-to-jpg',
-    title: 'HEIC to JPG (JPEG) Converter: Free, Batch, No Upload | Stayput',
+    title: 'Online HEIC to JPG / JPEG Converter: Free, Batch | Stayput',
     h1: 'Convert HEIC to JPG (JPEG) online',
-    meta: 'Online HEIC to JPEG (JPG) converter: turn iPhone HEIC photos into JPEG or PNG in your browser. Drop many at once, keep or drop location data. Nothing is uploaded; no watermark.',
+    meta: 'Online HEIC to JPG / JPEG converter: turn iPhone HEIC photos into JPG or PNG in your browser. Drop many at once, keep or drop location data. Nothing is uploaded; no watermark.',
   },
   {
     path: '/tools/remove-background',
