@@ -69,6 +69,7 @@ import PitchChanger from '../components/options/PitchChanger.astro';
 import AudioConverter from '../components/options/AudioConverter.astro';
 import AudioStage from '../components/AudioStage.astro';
 import ImageToText from '../components/options/ImageToText.astro';
+import RawPreview from '../components/options/RawPreview.astro';
 import ImageToBase64 from '../components/options/ImageToBase64.astro';
 import ColorPicker from '../components/options/ColorPicker.astro';
 import RemoveBackground from '../components/options/RemoveBackground.astro';
@@ -184,6 +185,7 @@ const options = {
   'audio-converter': AudioConverter,
   'image-to-text': ImageToText,
   'image-to-word': ImageToText,
+  'raw-preview': RawPreview,
   'image-to-base64': ImageToBase64,
   'color-picker': ColorPicker,
   'remove-background': RemoveBackground,
@@ -264,10 +266,19 @@ const Options = options[base as keyof typeof options];
   {base === 'split-image' && <GridStage slot="panel" />}
   {base === 'add-text-to-image' && <TextStage slot="panel" />}
   {base === 'color-picker' && <ColorStage slot="panel" />}
-  {base === 'image-to-base64' && <div slot="panel" id="b64-results" class="b64-results" hidden></div>}
+  {base === 'raw-preview' && <ul slot="panel" id="raw-results" class="raw-results" hidden></ul>}
+{base === 'image-to-base64' && <div slot="panel" id="b64-results" class="b64-results" hidden></div>}
   {(base === 'pdf-to-word' || base === 'image-to-word') && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>
 </ToolLayout>
+{base === 'raw-preview' && (
+  <style is:global>
+    .raw-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .raw-item { padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); display: grid; gap: 2px; overflow-wrap: anywhere; }
+    .raw-item span { color: var(--ink-2); }
+    .raw-bad { border: 1px solid currentColor; }
+  </style>
+)}
 {base === 'image-to-base64' && (
   <style is:global>
     .b64-results { display: grid; gap: 16px; }
