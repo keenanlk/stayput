@@ -247,6 +247,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser opens the camera (getUserMedia) and shows it in a video element on this page. The resolution comes from the picture itself, the frame rate is counted from the frames that actually arrive, and a snapshot is drawn to a canvas and saved as JPG by your browser.',
     versus: 'Many online webcam tests send your picture to their servers to take a photo or record a clip, and run ads and trackers around the test. Here the picture goes from your camera to this tab and nowhere else.',
   },
+  'dead-pixel-test': {
+    how: 'Your browser draws a plain block of one colour over the whole page and asks for full screen so no browser bars are left. Each press of a key or click moves to the next colour: black, white, red, green, then blue.',
+    versus: 'Nothing here needs a file, an account or a download: the colours are made in your tab, and nothing about your screen leaves it.',
+  },
   'speaker-test': {
     how: 'Your browser’s Web Audio API makes each sound in this tab: an oscillator at the pitch you chose, or a loop of pink noise, sent to the left channel, the right or both, through a volume control. The sweep moves the oscillator’s pitch smoothly from low to high.',
     versus: 'Nothing here needs a file, an account or a download: the sounds are made in your tab and go straight to your speakers.',
@@ -498,6 +502,10 @@ export const engines: Record<string, Engine> = {
   'color-picker': {
     how: 'Your browser decodes the image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas in your tab. The colour under the cursor is read straight from that canvas, one pixel at a time, at up to 4096 pixels across, so a pick matches the file exactly. The main colours come from k-means clustering over a sample of about 20,000 pixels, run in the page with a fixed seed so the same image always gives the same palette.',
     versus: 'Colour pickers online upload the picture to show it back to you, which is a strange trade for a screenshot of a client’s unreleased design or a photo from your phone. Browser extensions that pick colours can read every page you visit. Here the image never leaves your device, and there is nothing to install.',
+  },
+  'image-to-base64': {
+    how: 'Your browser reads each file’s bytes with its own FileReader and writes them out as Base64 text. Nothing is decoded or re-encoded, so the Base64 is exactly the file you dropped. The data URI is that text with a data:image/…;base64, header in front, and the HTML and CSS snippets are plain strings built around it in your tab.',
+    versus: 'Online Base64 encoders send the image to a server to encode it, and the images people encode are often logos for unreleased products or screenshots with private details. Here the encoding is a built-in browser call on your device, so the image never goes anywhere.',
   },
   'favicon-generator': {
     how: 'Your browser decodes the logo (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and Stayput centres it on a 512 pixel square canvas, with your padding and background. Every icon is resized from that square with stepped downscaling so small sizes stay crisp. favicon.ico is written byte by byte by a small encoder in the page, and the manifest and HTML are plain text built in your tab.',

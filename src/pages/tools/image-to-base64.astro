@@ -1,0 +1,20 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ImageToBase64 from '../../components/options/ImageToBase64.astro';
+const tool = toolBySlug('image-to-base64')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="b64-results" class="b64-results" hidden></div>
+  <Fragment slot="options"><ImageToBase64 /></Fragment>
+</ToolLayout>
+<style is:global>
+  .b64-results { display: grid; gap: 16px; }
+  .b64-card { padding: 14px; border-radius: var(--radius-sm); background: var(--surface-2); display: grid; gap: 10px; }
+  .b64-card h3 { margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
+  .b64-size { margin: 0; color: var(--ink-2); }
+  .b64-warn { margin: 0; padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid currentColor; color: var(--ink-2); }
+  .b64-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .b64-block textarea { width: 100%; font: 12px/1.4 ui-monospace, monospace; resize: vertical; box-sizing: border-box; }
+</style>
+<script src="../../tools/image-to-base64.ts"></script>
