@@ -55,6 +55,7 @@ const does: Record<string, string> = {
   'video-to-mp4': 'Converts MOV, MKV and WebM videos to MP4.',
   'video-to-webm': 'Converts MP4, MOV and MKV videos to WebM with VP9 (or VP8) video and Opus sound, copying WebM streams as they are, and says so when a browser cannot write WebM.',
   'video-to-mov': 'Converts MP4, WebM and MKV videos to MOV, copying H.264 video and AAC sound as they are and re-encoding anything else.',
+  'video-to-avi': 'Converts MP4, MOV, WebM and MKV videos to AVI with H.264 or Motion JPEG video, re-encoded in your browser and not uploaded.',
   'trim-video': 'Trims a video to the start and end you pick (MP4, MOV, WebM or MKV) and saves the clip in the same format.',
   'mute-video': 'Removes the sound track from a video (MP4, MOV, WebM or MKV) and saves it in the same format, with the picture copied untouched.',
   'resize-video': 'Resizes a video, for example 4K to 1080p or 1080p to 720p, from MP4, MOV or WebM to MP4.',
