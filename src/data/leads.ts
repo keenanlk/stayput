@@ -124,6 +124,7 @@ const does: Record<string, string> = {
   'remove-object': 'Lets you paint over a person, a bin, a wire or a date stamp in a photo and fills the area in with an AI model.',
   'adjust-image': 'Brightens, adds contrast, changes colour, warmth and sharpness, or inverts a photo, with a live preview, for one image or a batch.',
   'emote-resizer': 'Resizes art or animated GIFs into Twitch emotes, sub badges, Discord emoji and stickers or Slack emoji, within each size limit.',
+  'compare-images': 'Compares two images pixel by pixel with a slider, a difference map or a fade, and shows the percentage of pixels that differ, saving the map as a PNG.',
   'pixel-art-converter': 'Turns any photo or drawing into pixel art, with a pixel width, colour count or retro palette, dithering and a grid.',
   'photo-to-sketch': 'Turns a photo into a pencil sketch, charcoal drawing or coloured pencil sketch at full resolution.',
   'add-border-to-image': 'Puts a white, black or coloured border around a picture and can round its corners, from a subtle frame to a circle.',
