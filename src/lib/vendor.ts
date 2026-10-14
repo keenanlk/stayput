@@ -59,7 +59,8 @@ export async function decodersFor(accept: string): Promise<VendorLib[]> {
   // The WMA decoder, likewise: nothing in a browser reads WMA. The MP3 encoder comes with it so the page works offline.
   const wma = /\.wma\b|x-ms-wma/.test(a) ? (['libav-wma', 'lame'] as const) : [];
   const flv = /\.flv\b|x-flv/.test(a) ? (['libavFlv'] as const) : [];
-  return [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi, ...flv, ...wma];
+  const gp = /\.3gpp?\b|\.3g2\b|video\/3gpp/.test(a) ? (['libav3gp'] as const) : [];
+  return [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi, ...flv, ...gp, ...wma];
 }
 
 interface WarmReply {

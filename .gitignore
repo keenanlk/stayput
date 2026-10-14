@@ -6,6 +6,8 @@ dist/
 !vendor-builds/libav-wma/dist/
 # the committed FLV reader build (see vendor-builds/libav-flv/README.md)
 !vendor-builds/libav-flv/dist/
+# the committed 3GP decoder build (see vendor-builds/libav-3gp/README.md)
+!vendor-builds/libav-3gp/dist/
 .astro/
 .vercel/
 test-results/
