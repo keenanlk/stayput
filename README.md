@@ -52,6 +52,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Video to MP4](https://stayput.dev/tools/video-to-mp4) (MOV, MKV, WebM; H.264 copied with no quality loss) | |
 | [Video to MOV](https://stayput.dev/tools/video-to-mov) (MP4, WebM, MKV; H.264 and AAC copied with no quality loss) | |
 | [Trim video](https://stayput.dev/tools/trim-video) (cut a clip without re-encoding) | |
+| [Video splitter](https://stayput.dev/tools/video-splitter) (cut one video into parts at times, every N seconds or into equal parts, in one zip) | |
 | [Mute video](https://stayput.dev/tools/mute-video) (remove the sound, picture copied untouched) | |
 | [Resize video](https://stayput.dev/tools/resize-video) (1080p, 720p, custom size) | |
 | [Rotate video](https://stayput.dev/tools/rotate-video) (90°, 180°, flip) | |
@@ -71,6 +72,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Remove object from photo](https://stayput.dev/tools/remove-object) (paint over it, MI-GAN fills it in on the device) | |
 | [Adjust photo](https://stayput.dev/tools/adjust-image) (brightness, contrast, saturation, warmth, sharpen, invert) | |
 | [Emote resizer](https://stayput.dev/tools/emote-resizer) (Twitch emotes and sub badges, Discord emoji and stickers, Slack emoji) | |
+| [Image to ASCII art](https://stayput.dev/tools/image-to-ascii) (width, character sets, invert, colour PNG, .txt) | |
 | [Pixel art converter](https://stayput.dev/tools/pixel-art-converter) (auto or retro palettes, dithering, grid) | |
 | [Photo to sketch](https://stayput.dev/tools/photo-to-sketch) (pencil, charcoal, coloured pencil) | |
 | [Add border to image](https://stayput.dev/tools/add-border-to-image) (border colour and width, rounded corners) | |

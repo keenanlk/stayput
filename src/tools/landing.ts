@@ -35,6 +35,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'compress-png': () => import('./compress-png'),
   'compress-gif': () => import('./compress-gif'),
   'trim-video': () => import('./trim-video'),
+  'video-splitter': () => import('./video-splitter'),
   'mute-video': () => import('./mute-video'),
   'resize-video': () => import('./resize-video'),
   'rotate-video': () => import('./rotate-video'),
