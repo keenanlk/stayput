@@ -62,6 +62,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'ocr-pdf': ['compress-pdf', 'pdf-to-word'],
   'document-scanner': ['ocr-pdf', 'merge-pdf'],
   'epub-to-pdf': ['compress-pdf', 'split-pdf'],
+  'text-to-pdf': ['compress-pdf', 'protect-pdf'],
   'pdf-to-epub': ['ocr-pdf', 'pdf-to-word'],
   'archive-extractor': ['create-zip', 'compress-pdf'],
   'file-checksum': ['archive-extractor', 'create-zip'],
