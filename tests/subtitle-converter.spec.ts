@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

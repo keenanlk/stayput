@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect } from '@playwright/test';
 
 // The mic test is driven with a controlled stream: an oscillator at a set gain
