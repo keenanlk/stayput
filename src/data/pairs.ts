@@ -80,7 +80,7 @@ export const pairs: Pair[] = [
     tagline: 'A lossless PNG copy of every iPhone photo, made on your device.',
     keywords: ['heic to png', 'heic to png converter', 'convert heic to png free', 'iphone photo to png'],
     intro: [
-      'HEIC is the format iPhones and iPads have used since iOS 11. It packs a photo into about half the space of a JPG, but a lot of software still refuses to open it. PNG is the safe choice when you need the picture to open everywhere and you do not want a second round of lossy compression, for example when the photo is going into a design tool, a document, or an archive.',
+      'HEIC is the format iPhones and iPads have used since iOS 11. It packs a photo into about half the space of a JPG, but a lot of software still refuses to open it. If a smaller JPG will do, use the [HEIC to JPG converter](/tools/heic-to-jpg). PNG is the safe choice when you need the picture to open everywhere and you do not want a second round of lossy compression, for example when the photo is going into a design tool, a document, or an archive.',
       'The decoder is libheif compiled to WebAssembly, running inside this tab. Your photo is decoded to pixels in memory and the browser writes the PNG. Expect the PNG to be much larger than the HEIC, often five to ten times, because PNG stores every pixel without loss.',
     ],
     faq: [
@@ -101,7 +101,7 @@ export const pairs: Pair[] = [
     tagline: 'Make a JPG copy of a .heif photo that opens on Windows, in editors and on any website, without uploading it.',
     keywords: ['heif to jpg', 'heif to jpg converter', 'convert heif to jpg', 'heif to jpg windows', 'heif file to jpg', 'heif to jpeg'],
     intro: [
-      'HEIF is the container format, and HEIC is the version Apple’s phones write, so a file ending in .heif and one ending in .heic hold the same kind of photo. You meet the .heif name in a folder exported from a Mac, on Android phones that shoot in HEIF and on camera cards. Windows shows a blank thumbnail for them until Microsoft’s HEIF image extension is installed, and most websites refuse to take them.',
+      'HEIF is the container format, and HEIC is the version Apple’s phones write, so a file ending in .heif and one ending in .heic hold the same kind of photo. You meet the .heif name in a folder exported from a Mac, on Android phones that shoot in HEIF and on camera cards. Windows shows a blank thumbnail for them until Microsoft’s HEIF image extension is installed, and most websites refuse to take them. For iPhone photos in .heic, the [HEIC to JPG converter](/tools/heic-to-jpg) does the same job with more options.',
       'Drop the files here and each one is decoded by libheif, compiled to WebAssembly and running in this tab, then saved as a JPG at the same pixel size. The quality slider starts at 90. The date, camera and location are left out unless you tick Keep EXIF metadata, so a JPG you are about to post does not carry where it was taken.',
       'Expect a JPG about twice the size of the HEIF, because HEIF stores the same picture in roughly half the space. A 2 MB photo of 4032 × 3024 pixels typically comes out near 4 MB. If the JPG has to be small for a form or an email, lower the quality here, or run it through Compress image afterwards and give it a file size.',
     ],
