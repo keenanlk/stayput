@@ -600,7 +600,7 @@ test('format-pair pages render, preset the converter and link a social image', a
     const res = await page.request.get(`/og/${slug}.png`);
     expect(res.status(), `og image for ${slug}`).toBe(200);
     const [, to] = slug.split('-to-');
-    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp', gif: 'image/gif', tiff: 'image/tiff' }[to!];
+    const expected = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', ico: 'image/x-icon', bmp: 'image/bmp', gif: 'image/gif', tiff: 'image/tiff', avif: 'image/avif' }[to!];
     await expect(page.locator('#format')).toHaveValue(expected!);
     expect(errors, slug).toEqual([]);
   }

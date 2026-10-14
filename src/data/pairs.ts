@@ -11,7 +11,7 @@ export interface Pair {
   from: string;
   to: string;
   /** Output MIME type preset in the converter. */
-  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/x-icon' | 'image/bmp' | 'image/gif' | 'image/tiff';
+  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif' | 'image/x-icon' | 'image/bmp' | 'image/gif' | 'image/tiff';
   accept: string;
   title: string;
   description: string;
@@ -41,6 +41,12 @@ const webpSteps = (from: string) => [
   `Drop your ${from} files onto the page, or tap to pick them. Batches are fine.`,
   'Pick a quality. 80 to 90 is a good range for photos; go higher for screenshots with text.',
   'Download each WebP, or all of them as one zip.',
+];
+
+const avifSteps = (from: string) => [
+  `Drop your ${from} files onto the page, or tap to pick them. Batches are fine, but each AVIF takes a while to encode.`,
+  'Pick a quality from 1 to 100 (60 is a good start), tick "Faster encode" to trade a little size for speed, or downscale the image.',
+  'Download each AVIF, or all of them as one zip.',
 ];
 
 const icoSteps = (from: string) => [
@@ -307,6 +313,98 @@ export const pairs: Pair[] = [
       { q: 'Is transparency preserved?', a: 'Yes. Transparent areas of the AVIF come through as transparent PNG.' },
       { q: 'Why is the PNG so big?', a: 'AVIF compresses very aggressively; PNG does not compress lossily at all. A 100 KB AVIF can become a multi-megabyte PNG. Use AVIF to JPG when size matters and transparency does not.' },
       { q: 'Which browsers can do this?', a: 'Any current version of Chrome, Edge, Firefox or Safari 16 and later. Decoding happens in the browser, so an old browser without AVIF support will show an error rather than upload the file anywhere.' },
+    ],
+  },
+  {
+    slug: 'jpg-to-avif',
+    from: 'JPG',
+    to: 'AVIF',
+    outputType: 'image/avif',
+    accept: 'image/jpeg,.jpg,.jpeg,.jpe',
+    title: 'JPG to AVIF Converter, Free, No Upload | Stayput',
+    description: 'Convert JPG photos to AVIF in your browser for much smaller files. Quality slider, faster-encode option, nothing uploaded.',
+    heading: 'Convert JPG to AVIF',
+    tagline: 'Photos 67% to 94% smaller than the JPG in our tests, encoded on your device.',
+    keywords: ['jpg to avif', 'jpeg to avif', 'convert jpg to avif', 'jpg to avif converter'],
+    intro: [
+      'AVIF is the image format built on the AV1 video codec, and it is a lot smaller than JPG. In our tests on two 12-megapixel photos at the default quality 60, the AVIF files were 67% to 94% smaller than the JPG, depending on the photo and on which encoder ran.',
+      'The first run downloads the AVIF encoder (about 3.5 MB) and your browser keeps it afterwards. Chrome has no AVIF encoder for web pages, so a WebAssembly one does the work in your tab; browsers that can write AVIF themselves (Safari’s engine does) use their own and skip the download. A large photo took about 3 to 5 seconds on a recent Mac and can take far longer on a phone. The quality scale is not JPG’s: an AVIF at 60 usually looks like a JPG at a much higher number, so judge by eye, not by the number. EXIF data, including location, is not kept.',
+    ],
+    faq: [
+      { q: 'How much smaller is AVIF than JPG?', a: 'In our tests on two 12-megapixel photos at the default quality 60, the AVIF files were 67% to 94% smaller than the JPG, depending on the photo and on which encoder ran. The saving depends on the picture and on how well the original JPG was compressed, so try the quality slider and look at the result. Blurred backgrounds shrink the most; sharp, detailed photos the least.' },
+      { q: 'Will every app open the AVIF?', a: 'Not every program does. The files this page writes opened in Chrome, in Safari’s engine and in the image tools built into macOS, and the page’s own AVIF to JPG and AVIF to PNG converters read them back. We have not tested Windows apps, Microsoft Office or photo editors, and older software may refuse AVIF. If a program will not open it, convert it back with AVIF to JPG on this site.' },
+      { q: 'Why does it take so long?', a: 'AVIF is expensive to compress: the encoder tries many ways to describe each block of the picture. Where you see “Faster encode (lower effort)”, tick it to make the encode noticeably quicker for a slightly larger file, or downscale the image first. You can cancel an encode at any point.' },
+      { q: 'Is the EXIF data kept?', a: 'No. The AVIF holds only the picture, so camera details and location are removed.' },
+    ],
+    sections: [
+      {
+        heading: 'Related converters',
+        bullets: [
+          '[AVIF to JPG](/avif-to-jpg) and [AVIF to PNG](/avif-to-png), to open an AVIF in software that does not know the format',
+          '[JPG to WebP](/jpg-to-webp) and [PNG to WebP](/png-to-webp), a smaller step up from JPG and PNG that more programs open'
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'png-to-avif',
+    from: 'PNG',
+    to: 'AVIF',
+    outputType: 'image/avif',
+    accept: 'image/png,.png',
+    title: 'PNG to AVIF Converter, Free, No Upload | Stayput',
+    description: 'Convert PNG images to AVIF in your browser, transparency kept. Quality slider, faster-encode option, nothing uploaded.',
+    heading: 'Convert PNG to AVIF',
+    tagline: 'Much smaller images with transparency kept, encoded on your device.',
+    keywords: ['png to avif', 'convert png to avif', 'png to avif converter', 'avif transparency'],
+    intro: [
+      'AVIF can hold transparency like PNG, but lossy, so the file is a fraction of the PNG’s size: a 12-megapixel photo saved as an 8.0 MB PNG came out at 83 KB to 185 KB here at quality 60, depending on which encoder ran.',
+      'The first run downloads the AVIF encoder (about 3.5 MB) and your browser keeps it afterwards. Chrome has no AVIF encoder for web pages, so a WebAssembly one does the work in your tab; browsers that can write AVIF themselves (Safari’s engine does) use their own and skip the download. A large image takes seconds on a recent Mac and can take far longer on a phone. Transparent areas stay transparent. The quality scale is not JPG’s, so judge by eye.',
+    ],
+    faq: [
+      { q: 'Is transparency preserved?', a: 'Yes. The alpha channel is encoded along with the colour, at the same quality you set.' },
+      { q: 'Is AVIF lossless?', a: 'This page writes lossy AVIF, so small differences from the PNG are expected. At quality 100 they are very hard to see, but the file is much larger. If you need an exact copy, keep the PNG.' },
+      { q: 'Will every app open the AVIF?', a: 'Not every program does. The files this page writes opened in Chrome, in Safari’s engine and in the image tools built into macOS, and the page’s own AVIF to JPG and AVIF to PNG converters read them back. We have not tested Windows apps, Microsoft Office or photo editors, and older software may refuse AVIF. If a program will not open it, convert it back with AVIF to JPG on this site.' },
+      { q: 'Why does it take so long?', a: 'AVIF is expensive to compress. Where you see “Faster encode (lower effort)”, tick it for a quicker, slightly larger file, or downscale the image first. You can cancel an encode at any point.' },
+    ],
+    sections: [
+      {
+        heading: 'Related converters',
+        bullets: [
+          '[AVIF to JPG](/avif-to-jpg) and [AVIF to PNG](/avif-to-png), to open an AVIF in software that does not know the format',
+          '[JPG to WebP](/jpg-to-webp) and [PNG to WebP](/png-to-webp), a smaller step up from JPG and PNG that more programs open'
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'avif-to-webp',
+    from: 'AVIF',
+    to: 'WebP',
+    outputType: 'image/webp',
+    accept: 'image/avif,.avif',
+    title: 'AVIF to WebP Converter, Free, No Upload | Stayput',
+    description: 'Convert AVIF images to WebP in your browser for wider support. Transparency kept, quality slider, nothing uploaded.',
+    heading: 'Convert AVIF to WebP',
+    tagline: 'A WebP copy of an AVIF image, made on your device.',
+    keywords: ['avif to webp', 'convert avif to webp', 'avif to webp converter'],
+    intro: [
+      'WebP is opened by more editors, CMS uploaders and older browsers than AVIF, and it keeps transparency. If a site saved an AVIF and your tool refuses it, WebP is a lighter step than JPG that stays small.',
+      'Your browser decodes the AVIF and writes the WebP at the quality you set, at the same pixel size. Both formats are lossy, so a little detail is lost in the re-encode. Safari cannot write WebP from a web page, so on Safari this page says so instead of producing a file.',
+    ],
+    faq: [
+      { q: 'Is transparency preserved?', a: 'Yes. Transparent areas of the AVIF stay transparent in the WebP.' },
+      { q: 'Why is WebP greyed out in Safari?', a: 'Safari can display WebP but cannot create it from a web page. Use AVIF to PNG or AVIF to JPG there, or try Chrome, Edge or Firefox.' },
+      { q: 'Will the WebP be bigger than the AVIF?', a: 'Usually yes: AVIF compresses harder than WebP at the same look.' },
+    ],
+    sections: [
+      {
+        heading: 'Related converters',
+        bullets: [
+          '[AVIF to JPG](/avif-to-jpg) and [AVIF to PNG](/avif-to-png), for software that opens neither AVIF nor WebP',
+          '[JPG to AVIF](/jpg-to-avif) and [PNG to AVIF](/png-to-avif), to go the other way',
+        ],
+      },
     ],
   },
   {
@@ -1076,7 +1174,7 @@ export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => 
 /** A Pair expressed as a Tool so it can use the shared tool layout. */
 export function pairAsTool(p: Pair): Tool {
   const src = p.sourceWord ?? p.from;
-  const steps = p.outputType === 'image/png' ? pngSteps(src) : p.outputType === 'image/webp' ? webpSteps(src) : p.outputType === 'image/x-icon' ? icoSteps(src) : p.outputType === 'image/bmp' ? bmpSteps(src) : p.outputType === 'image/gif' ? gifSteps(src) : p.outputType === 'image/tiff' ? tiffSteps(src) : jpgSteps(src);
+  const steps = p.outputType === 'image/png' ? pngSteps(src) : p.outputType === 'image/webp' ? webpSteps(src) : p.outputType === 'image/avif' ? avifSteps(src) : p.outputType === 'image/x-icon' ? icoSteps(src) : p.outputType === 'image/bmp' ? bmpSteps(src) : p.outputType === 'image/gif' ? gifSteps(src) : p.outputType === 'image/tiff' ? tiffSteps(src) : jpgSteps(src);
   return {
     slug: p.slug,
     path: `/${p.slug}`,

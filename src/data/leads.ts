@@ -157,6 +157,9 @@ const downloads: Record<string, Download> = {
   'sticker-maker': { what: 'cut-out model', size: '42 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 42 MB in all) to your browser, and after that the tool works offline.' },
   'passport-photo': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
   'profile-picture-maker': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
+  // Format-pair pages on the image converter that fetch the AVIF encoder when a conversion starts (keyed by page slug).
+  'jpg-to-avif': { what: 'AVIF encoder', size: '3.5 MB' },
+  'png-to-avif': { what: 'AVIF encoder', size: '3.5 MB' },
   'upscale-image': { what: 'upscaling model', size: '4.9 MB' },
   'remove-object': { what: 'object removal model', size: '28 MB' },
   'image-to-word': { what: 'text reader', size: '6 MB' },
@@ -196,12 +199,12 @@ const firstUseEngines = [
 ];
 
 /** The offline badge: after the first visit, or, for tools that fetch an engine on first run, after the first use. */
-export function offlineBadge(base: string): string {
-  return needsFirstUse(base) ? 'Works offline after first use' : 'Works offline after first visit';
+export function offlineBadge(base: string, slug: string = base): string {
+  return needsFirstUse(base, slug) ? 'Works offline after first use' : 'Works offline after first visit';
 }
 
 /** True for a tool that is offline-ready only after one run, because it fetches a model or engine when used. */
-export const needsFirstUse = (base: string): boolean => base in downloads || firstUseEngines.includes(base);
+export const needsFirstUse = (base: string, slug: string = base): boolean => slug in downloads || base in downloads || firstUseEngines.includes(base);
 
 /** Rewrites "after one visit" to "after your first run" for a tool that needs a first run. */
 export const offlineWhen = (base: string, text: string): string =>
@@ -271,7 +274,7 @@ export function leadFor(tool: Tool, base: string = tool.slug, kind: 'tool' | 'la
   if (tool.lead) return tool.lead;
   const first = kind === 'tool' ? does[tool.slug] : opening(tool.description);
   if (!first) throw new Error(`No lead sentence for ${tool.slug}`);
-  const dl = downloads[base];
+  const dl = downloads[tool.slug] ?? downloads[base];
   const third = dl ? (dl.text ?? `The first run downloads the ${dl.what} (about ${dl.size}) and the WebAssembly engine that runs it to your browser, and after that the tool works offline.`) : (facts[base] ?? (tool.sizeFact && /memory/i.test(tool.sizeFact) ? tool.sizeFact : memory));
   // Tools that fetch an engine on first run are not offline after the visit alone.
   const offline = firstUseEngines.includes(base) ? third.replace(/\bafter one visit( and a short wait)?\b/i, (m) => (m[0] === 'A' ? 'After' : 'after') + ' your first run') : third;

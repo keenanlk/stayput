@@ -1,4 +1,5 @@
 import { createShell, bindRange, num, str, bool, processEach, type ShellFile } from '../lib/shell';
+import { supportsNativeAvif } from '../lib/avif-encode';
 import { decodeImage, supportsWebpEncoding, thumbnail } from '../lib/image';
 import { writeAnimatedGif, writeImage } from '../lib/encoders';
 import { parseAnimatedWebp } from '../lib/webp-anim';
@@ -37,8 +38,26 @@ function caveat(f: OutputFormat): string | undefined {
   return undefined;
 }
 
+const qualityInput = document.getElementById('quality') as HTMLInputElement;
+/** The slider's JPG/WebP setting, kept while AVIF's own 1 to 100 scale (default 60) is showing. */
+let savedQuality: { value: string; min: string } | undefined;
+
 function syncFields() {
   const f = outputFormat(formatSel.value);
+  const avif = f.type === 'image/avif';
+  if (avif && !savedQuality) {
+    savedQuality = { value: qualityInput.value, min: qualityInput.min };
+    qualityInput.min = '1';
+    qualityInput.value = '60';
+    qualityInput.dispatchEvent(new Event('input', { bubbles: true }));
+  } else if (!avif && savedQuality) {
+    qualityInput.min = savedQuality.min;
+    qualityInput.value = savedQuality.value;
+    savedQuality = undefined;
+    qualityInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  document.getElementById('avif-field')!.hidden = !avif;
+  document.getElementById('avif-scale-field')!.hidden = !avif;
   document.getElementById('quality-field')!.hidden = !f.quality;
   document.getElementById('background-field')!.hidden = f.alpha;
   document.getElementById('exif-field')!.hidden = f.type !== 'image/jpeg';
@@ -235,6 +254,21 @@ async function describeFiles(files: ShellFile[]) {
   render();
 }
 
+// Where the browser writes AVIF itself there is no effort setting to turn down.
+void supportsNativeAvif().then((native) => {
+  if (native) document.getElementById('avif-fast-label')!.hidden = true;
+});
+
+const cancelField = document.getElementById('avif-cancel-field')!;
+let abortAvif = new AbortController();
+document.getElementById('avif-cancel')!.addEventListener('click', () => abortAvif.abort());
+
+function cancelledError(): Error {
+  const e = new Error('Cancelled. Nothing was converted.');
+  e.name = 'AbortError';
+  return e;
+}
+
 createShell({
   onFilesChanged: describeFiles,
   outputFormat: () => outputFormat(formatSel.value).ext,
@@ -244,12 +278,18 @@ createShell({
     const quality = num('quality', 90) / 100;
     const background = str('background', '#ffffff');
     const keepExif = bool('keep-exif') && type === 'image/jpeg';
-    return processEach(files, progress, 'Converting', async (entry) => {
+    // AVIF encodes can take tens of seconds, so they run where Cancel can end them.
+    abortAvif = new AbortController();
+    const avif = type === 'image/avif' ? { fast: bool('avif-fast'), scale: num('avif-scale', 1), signal: abortAvif.signal } : undefined;
+    if (avif) cancelField.hidden = false;
+    const verb = avif ? 'Encoding AVIF (this can take a while)' : 'Converting';
+    const result = await processEach(files, progress, verb, async (entry) => {
+      if (avif?.signal.aborted) throw cancelledError();
       if ((await detectKind(entry.file)) === 'pdf') throw new Error('This is a PDF, not an image. Use PDF to Image to turn its pages into pictures.');
       const decoded = await decodeImage(entry.file);
       // An animated WebP stays animated as a GIF; every other path keeps the first frame.
       const anim = type === 'image/gif' && (await detectKind(entry.file)) === 'webp' ? parseAnimatedWebp(new Uint8Array(await entry.file.arrayBuffer())) : undefined;
-      let blob = anim ? new Blob([(await writeAnimatedGif(anim)) as BlobPart], { type }) : await writeImage(decoded.bitmap, type, { quality, background });
+      let blob = anim ? new Blob([(await writeAnimatedGif(anim)) as BlobPart], { type }) : await writeImage(decoded.bitmap, type, { quality, background, avif });
       if (keepExif) {
         const tiff = extractExifTiff(new Uint8Array(await entry.file.arrayBuffer()));
         if (tiff) {
@@ -260,6 +300,10 @@ createShell({
       const out: OutputFile = { name: replaceExt(entry.file.name, f.ext), blob, originalSize: entry.file.size, previewUrl: await thumbnail(decoded.bitmap), ...(anim ? { note: `${anim.frames.length} frames, animated` } : {}) };
       decoded.bitmap.close();
       return out;
+    }).finally(() => {
+      cancelField.hidden = true;
     });
+    if (avif?.signal.aborted) throw cancelledError();
+    return result;
   },
 });
