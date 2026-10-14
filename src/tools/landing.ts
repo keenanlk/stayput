@@ -40,6 +40,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'crop-video': () => import('./crop-video'),
   'video-speed': () => import('./video-speed'),
   'merge-videos': () => import('./merge-videos'),
+  'repeat-video': () => import('./repeat-video'),
   'add-audio-to-video': () => import('./add-audio-to-video'),
   'reverse-video': () => import('./reverse-video'),
   'video-to-jpg': () => import('./video-to-jpg'),
