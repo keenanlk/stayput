@@ -56,10 +56,10 @@ export const tools: Tool[] = [
     slug: 'heic-to-jpg',
     icon: 'image',
     name: 'HEIC to JPG',
-    title: 'Online HEIC to JPG Converter: Free, Batch, No Upload | Stayput',
+    title: 'Online HEIC to JPG / JPEG Converter: Free, Batch | Stayput',
     description:
-      'Online HEIC to JPG converter: turn iPhone HEIC photos into JPG or PNG in your browser. Drop many at once, keep or drop location data. Nothing is uploaded; no watermark.',
-    heading: 'Convert HEIC to JPG online',
+      'Online HEIC to JPG / JPEG converter: turn iPhone HEIC photos into JPG or PNG in your browser. Drop many at once, keep or drop location data. Nothing is uploaded; no watermark.',
+    heading: 'Convert HEIC to JPG (JPEG) online',
     tagline:
       'Turn iPhone and iPad photos into JPG or PNG files that open anywhere. Your photos never leave this device.',
     category: 'images',
@@ -99,6 +99,10 @@ export const tools: Tool[] = [
       'Download each converted photo, or grab them all in one zip.',
     ],
     faq: [
+      {
+        q: 'Is a JPG the same as a JPEG?',
+        a: 'Yes. JPG and JPEG are the same format under two spellings; the short .jpg ending exists because old Windows file extensions were limited to three letters. The file this page makes is a standard JPEG that opens everywhere.',
+      },
       {
         q: 'Why do my iPhone photos end up as HEIC files?',
         a: 'Since iOS 11, iPhones save photos in HEIC (High Efficiency Image Container) because it stores the same picture in about half the space of JPG. Windows, many websites and older programs still cannot open HEIC, so people convert to JPG to share or upload them.',
