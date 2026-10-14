@@ -1,0 +1,14 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ImageToText from '../../components/options/ImageToText.astro';
+const tool = toolBySlug('image-to-word')!;
+---
+<ToolLayout tool={tool}>
+  <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Recognised text preview"></pre>
+  <Fragment slot="options"><ImageToText /></Fragment>
+</ToolLayout>
+<style is:global>
+  .text-preview { max-height: 260px; overflow: auto; white-space: pre-wrap; font: 14px/1.5 var(--font-body, inherit); padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); margin: 0; }
+</style>
+<script src="../../tools/image-to-word.ts"></script>
