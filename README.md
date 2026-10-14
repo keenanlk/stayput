@@ -59,6 +59,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Crop video](https://stayput.dev/tools/crop-video) (any box, 9:16, 1:1) | |
 | [Change video speed](https://stayput.dev/tools/video-speed) (0.25× to 8×, pitch kept) | |
 | [Merge videos](https://stayput.dev/tools/merge-videos) (join clips into one MP4) | |
+| [Side by side video](https://stayput.dev/tools/side-by-side-video) (two clips left and right or top and bottom in one MP4, with the sound you choose) | |
 | [Add audio to video](https://stayput.dev/tools/add-audio-to-video) (music or voice-over, picture copied untouched) | |
 | [Reverse video](https://stayput.dev/tools/reverse-video) (play a clip backwards) | |
 | [Video to JPG](https://stayput.dev/tools/video-to-jpg) (save frames as JPG or PNG) | |
