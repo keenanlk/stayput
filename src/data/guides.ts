@@ -328,7 +328,7 @@ export const guides: Guide[] = [
     heading: 'How to reduce an image\'s file size',
     dek: 'Two settings do almost all the work. Here are the numbers to use for email, forms, listings and websites.',
     keywords: ['reduce image file size', 'make image smaller for email', 'compress image for upload', 'image too large to upload', 'reduce photo size to 1mb', 'shrink photo size'],
-    updated: '2026-10-12',
+    updated: '2026-10-13',
     tools: ['compress-image', 'compress-jpg', 'resize-image', 'convert-image'],
     sections: [
       {
@@ -352,7 +352,7 @@ export const guides: Guide[] = [
       {
         h: 'Setting 3: the format',
         p: [
-          'Screenshots and graphics are usually PNG, which is lossless and often large. A screenshot of a web page converted to JPG at quality 85 is a fifth of the size and looks the same; the [PNG to JPG page](/png-to-jpg) does that. WebP is smaller than both at the same quality and is accepted by every current browser, but not by every form or email client. The [format guide](/guides/which-image-format-to-use) has the details.',
+          'Screenshots and graphics are usually PNG, which is lossless and often large. A screenshot of a web page converted to JPG at quality 85 is a fifth of the size and looks the same; the [PNG to JPG page](/png-to-jpg) does that. If the file is something else, such as WebP or HEIC, [Convert any image to JPG](/image-to-jpg) takes it too. WebP is smaller than both at the same quality and is accepted by every current browser, but not by every form or email client. The [format guide](/guides/which-image-format-to-use) has the details.',
         ],
       },
       {
@@ -501,7 +501,7 @@ export const guides: Guide[] = [
     heading: 'JPG, PNG, WebP or HEIC: which image format to use',
     dek: 'A practical rule for each job, and the conversion to get there.',
     keywords: ['jpg vs png', 'webp vs png', 'which image format to use', 'heic vs jpg', 'best image format for web', 'png or jpg for screenshots', 'what is a jfif file'],
-    updated: '2026-09-26',
+    updated: '2026-10-13',
     tools: ['convert-image', 'png-to-jpg', 'jpg-to-webp', 'heic-to-jpg', 'jfif-to-jpg', 'gif-to-png', 'svg-to-jpg'],
     sections: [
       {
@@ -518,7 +518,7 @@ export const guides: Guide[] = [
       {
         h: 'JPG: the photo format',
         p: [
-          'JPG compresses by discarding detail the eye does not notice, which works wonderfully for photographs and badly for text and flat colour, where it produces visible smudges around edges. Every device, site and printer opens it. It has no transparency. Each re-save loses a little more, so edit from an original and export once. Convert with [PNG to JPG](/png-to-jpg), [WebP to JPG](/webp-to-jpg) or [HEIC to JPG](/tools/heic-to-jpg).',
+          'JPG compresses by discarding detail the eye does not notice, which works wonderfully for photographs and badly for text and flat colour, where it produces visible smudges around edges. Every device, site and printer opens it. It has no transparency. Each re-save loses a little more, so edit from an original and export once. Convert with [PNG to JPG](/png-to-jpg), [WebP to JPG](/webp-to-jpg) or [HEIC to JPG](/tools/heic-to-jpg), or drop anything at [Convert any image to JPG](/image-to-jpg). A .jpeg file is the same format as .jpg: see [JPEG to JPG](/jpeg-to-jpg). For PNG, [Convert any image to PNG](/image-to-png) does the same.',
         ],
       },
       {
