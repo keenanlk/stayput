@@ -4,6 +4,7 @@ import { extOf, isHeicFile, readHead } from './files';
 import { decodePsd, isPsdFile } from './psd';
 import { decodeTiffPages, isTiffFile } from './tiff';
 import { svgFallbackSize } from './svg-size';
+import { vendorDir, vendorEntry } from './vendor';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
 
@@ -118,34 +119,58 @@ export interface EncodeOptions {
   background?: string;
 }
 
-let webpSupport: Promise<boolean> | undefined;
-export function supportsWebpEncoding(): Promise<boolean> {
-  if (!webpSupport) {
-    webpSupport = (async () => {
-      try {
-        const c = document.createElement('canvas');
-        c.width = c.height = 2;
-        const blob = await canvasToBlob(c, 'image/webp', 0.8);
-        return blob.type === 'image/webp';
-      } catch {
-        return false;
-      }
-    })();
+/**
+ * WebP encoder for browsers whose canvas cannot write WebP (Safari). Loaded on
+ * first use from this site's own /vendor/ directory, so Chrome and Firefox,
+ * which encode natively, never download it.
+ */
+interface WebpEncoderModule {
+  encode(data: Uint8ClampedArray, width: number, height: number, options: Record<string, number>): Uint8Array | null;
+}
+let webpEncoder: Promise<{ module: WebpEncoderModule; defaults: Record<string, number> }> | undefined;
+
+function loadWebpEncoder() {
+  if (!webpEncoder) {
+    const dir = vendorDir('webp');
+    webpEncoder = (async () => {
+      const [factory, utils, meta] = await Promise.all([
+        import(/* @vite-ignore */ vendorEntry('webp')),
+        import(/* @vite-ignore */ `${dir}utils.js`),
+        import(/* @vite-ignore */ `${dir}meta.js`),
+      ]);
+      const module: WebpEncoderModule = await utils.initEmscriptenModule(factory.default);
+      return { module, defaults: meta.defaultOptions as Record<string, number> };
+    })().catch((err) => {
+      webpEncoder = undefined;
+      throw new Error(`The WebP encoder could not be loaded (${err instanceof Error ? err.message : String(err)}). Check your connection and try again.`);
+    });
   }
-  return webpSupport;
+  return webpEncoder;
 }
 
-export function canvasToBlob(canvas: HTMLCanvasElement | OffscreenCanvas, type: string, quality?: number): Promise<Blob> {
+/** Encode a canvas as WebP with the WebAssembly encoder; `quality` is 0..1 like canvas.toBlob. */
+async function webpFromCanvas(canvas: HTMLCanvasElement | OffscreenCanvas, quality = 0.92): Promise<Blob> {
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const { module, defaults } = await loadWebpEncoder();
+  const out = module.encode(img.data, img.width, img.height, { ...defaults, quality: Math.round(Math.min(1, Math.max(0, quality)) * 100) });
+  if (!out) throw new Error('The browser could not encode this image.');
+  return new Blob([out as BlobPart], { type: 'image/webp' });
+}
+
+export async function canvasToBlob(canvas: HTMLCanvasElement | OffscreenCanvas, type: string, quality?: number): Promise<Blob> {
+  const blob = await nativeToBlob(canvas, type, quality);
+  // Browsers that cannot write WebP hand back a PNG instead (or fail); use the WebAssembly encoder.
+  if (type === 'image/webp' && blob?.type !== 'image/webp') return webpFromCanvas(canvas, quality);
+  if (!blob) throw new Error('The browser could not encode this image.');
+  return blob;
+}
+
+function nativeToBlob(canvas: HTMLCanvasElement | OffscreenCanvas, type: string, quality?: number): Promise<Blob | null> {
   if ('convertToBlob' in canvas) {
-    return canvas.convertToBlob({ type, quality });
+    return canvas.convertToBlob({ type, quality }).catch(() => null);
   }
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error('The browser could not encode this image.'))),
-      type,
-      quality,
-    );
-  });
+  return new Promise((resolve) => canvas.toBlob(resolve, type, quality));
 }
 
 export function makeCanvas(w: number, h: number): HTMLCanvasElement | OffscreenCanvas {
