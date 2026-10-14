@@ -255,6 +255,14 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser’s Web Audio API makes each sound in this tab: an oscillator at the pitch you chose, or a loop of pink noise, sent to the left channel, the right or both, through a volume control. The sweep moves the oscillator’s pitch smoothly from low to high.',
     versus: 'Nothing here needs a file, an account or a download: the sounds are made in your tab and go straight to your speakers.',
   },
+  'keyboard-tester': {
+    how: 'Your browser sends this page a keydown and a keyup event for each key it receives. The page reads the physical key’s code and the character it produced, lights the matching key on the drawn keyboard and adds a line to the log, all in this tab.',
+    versus: 'Nothing here needs a file, an account or a download: the key presses are read in your tab and drawn on the page, and they are not stored or sent.',
+  },
+  'tone-generator': {
+    how: 'Your browser’s Web Audio API runs one oscillator in this tab at the pitch and wave you chose, through a volume control that fades in and out so it does not click. Changing the pitch or the wave moves the same oscillator while it plays.',
+    versus: 'Nothing here needs a file, an account or a download: the tone is made in your tab and goes straight to your speakers.',
+  },
   'audio-to-video': {
     how: 'Your browser decodes the sound into plain samples, draws the picture once onto a canvas (fitted whole over a blurred copy, or the title on a plain colour), and its own WebCodecs encoders write that still frame once a second with the sound as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
     versus: 'Online MP3-to-video converters upload your music and cover art, add their logo to free videos, and cap the length. Unreleased tracks and private recordings stay private here: nothing leaves your device.',
@@ -402,6 +410,10 @@ export const engines: Record<string, Engine> = {
   'gif-to-animated-png': {
     how: 'Stayput reads the GIF byte by byte in your tab with gifuct-js (MIT), decompresses each frame and composites it the way browsers play GIFs, honouring disposal rules and transparency. Every finished picture is written as a full frame of an animated PNG: the PNG header, an animation control chunk with the frame count and the GIF’s loop setting, then each frame’s control chunk (its delay) and its pixels, deflated by your browser’s own CompressionStream. The file is assembled in memory.',
     versus: 'Online GIF to APNG converters upload the file to convert it on a server and may cap the size or keep a copy. Here the conversion runs on your device, so a private screen recording or a clip of your kids never leaves it, and the page keeps working offline after one visit and a short wait.',
+  },
+  'image-to-word': {
+    how: 'Your browser decodes each image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL), enlarges small screenshots so letters are big enough to read, and hands the pixels to Tesseract, the open-source OCR engine, compiled to WebAssembly by tesseract.js (Apache-2.0). The recognised lines are grouped into paragraphs and written into a .docx, a zip of Word XML parts, by a small writer built on fflate (MIT) in the same tab, with each image starting on a new page. Only the text is kept; layout, tables, fonts and pictures are not.',
+    versus: 'Online image to Word converters upload the picture to a server, and the images people convert are letters, forms and statements. Here the image never leaves your device, and after your first run the page keeps working with Wi-Fi off.',
   },
   'image-to-text': {
     how: 'Your browser decodes the image (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL), enlarges small screenshots so letters are big enough to read, and hands the pixels to Tesseract, the open-source OCR engine first built at HP and later developed by Google, compiled to WebAssembly by tesseract.js (Apache-2.0). Its neural network model for English is served by this site and loaded the first time you run it. The text is recognised line by line inside a worker in your tab.',

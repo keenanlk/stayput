@@ -110,6 +110,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Online tuner](https://stayput.dev/tools/tuner) (guitar, bass, ukulele, violin, chromatic; reference notes) | |
 | [Mic test](https://stayput.dev/tools/mic-test) (level meter, verdict, record and play back) | |
 | [Webcam test](https://stayput.dev/tools/webcam-test) (preview, real resolution and frame rate, snapshot) | |
+| [Keyboard test](https://stayput.dev/tools/keyboard-tester) (on-screen ANSI or ISO keyboard, key and code log) | |
 | [Speaker test](https://stayput.dev/tools/speaker-test) (left, right or both channels, tones, sweep, pink noise) | |
 | [Dead pixel test](https://stayput.dev/tools/dead-pixel-test) (full-screen black, white, red, green and blue; click or arrow keys, cycle mode) | |
 | [Audio to video](https://stayput.dev/tools/audio-to-video) (MP3 plus a cover picture to MP4; 16:9, square, 9:16) | |

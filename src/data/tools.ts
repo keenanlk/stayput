@@ -1006,6 +1006,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I convert an image or a scan to Word?',
+        a: 'Yes, with [Image to Word](/tools/image-to-word): it reads the text in JPG, PNG or WebP images with OCR and saves one .docx. For a scanned PDF, run it through OCR PDF first.',
+      },
+      {
         q: 'Does the Word file look like the PDF?',
         a: 'It keeps the text, the paragraph breaks and the headings, in reading order, as normal editable Word paragraphs. It does not reproduce the page layout: columns, tables, images, fonts and exact positions are not carried over. That is the honest limit of what runs in a browser, and it is what you need when the goal is to edit or reuse the words.',
       },
@@ -1229,6 +1233,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I get a Word document?',
+        a: 'Yes. [Image to Word](/tools/image-to-word) reads the images the same way and saves the text as one .docx, one page per image. Only the text comes across, not the layout.',
+      },
+      {
         q: 'Is my image uploaded?',
         a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page. The engine and its English model (about 6 MB) are downloaded from this site the first time you use it, and after that first use the tool works offline. Switch off Wi-Fi after the first run and it still reads images.',
       },
@@ -1247,6 +1255,49 @@ export const tools: Tool[] = [
       {
         q: 'Why is the first run slower?',
         a: 'The first time, your browser downloads the OCR engine and model from this site. They are cached, so after the first run it starts straight away, even offline. Reading a full page takes a few seconds on a laptop and a little longer on a phone.',
+      },
+    ],
+  },
+  {
+    slug: 'image-to-word',
+    icon: 'convert',
+    name: 'Image to Word',
+    title: 'Image to Word Converter (JPG, PNG to DOCX) | Stayput',
+    description:
+      'Turn JPG, PNG or WebP images into an editable Word document (.docx) in your browser. OCR reads the text, one page per image. Nothing is uploaded.',
+    heading: 'Convert image to Word',
+    tagline: 'Read the text in photos, screenshots or scans and save it as one Word document, one page per image. Only the text comes across, not the layout. Nothing is uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop images to turn into a Word document',
+    action: 'Convert to Word',
+    keywords: ['image to word', 'jpg to word', 'png to word', 'picture to word', 'photo to word', 'image to docx', 'convert image to word document', 'scan to word'],
+    steps: [
+      'Drop one or more images (JPG, PNG, WebP, HEIC, screenshots or scans), or tap to pick them. They are used in the order shown.',
+      'Keep line breaks as they are in the image, or join them into paragraphs.',
+      'Convert to Word. The recognised text of each image is previewed and one .docx downloads, with each image starting on a new page.',
+    ],
+    faq: [
+      {
+        q: 'Does the Word file look like my image?',
+        a: 'No. Only the text comes across. Layout, columns, tables, fonts, colours and pictures are not kept: the document holds the recognised words as plain editable paragraphs, one page per image. That is what you want when the goal is to edit or reuse the words. If you need the picture itself in a document, Image to PDF keeps the page exactly as it looks.',
+      },
+      {
+        q: 'Is my image uploaded?',
+        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page, and the .docx is built in the same tab. The engine and its English model (about 6 MB) are downloaded from this site on your first run, and after your first run the tool works offline.',
+      },
+      {
+        q: 'Which languages does it read?',
+        a: 'English, including accented Latin letters in names and places. It is the same reader as Image to text, so it gains languages when that does.',
+      },
+      {
+        q: 'How accurate is it?',
+        a: 'Very good on printed text that is sharp and straight: screenshots, documents and scans. It struggles with handwriting, curved or angled text and heavy shadows. Read the preview before you rely on numbers or names, and correct them in Word.',
+      },
+      {
+        q: 'Can I convert several images into one document?',
+        a: 'Yes. Drop them all and you get one .docx with the text of each image in the order they are listed, each starting on a new page. If you only want plain text, use Image to text; for a PDF with selectable text, use OCR PDF.',
       },
     ],
   },
@@ -2851,6 +2902,171 @@ export const tools: Tool[] = [
       {
         q: 'Does the speaker test work on a phone?',
         a: 'Try it. Open this page in your phone’s browser and press Play tone. If you hear nothing, check the volume and any silent or mute switch on the phone.',
+      },
+    ],
+  },
+  {
+    slug: 'keyboard-tester',
+    icon: 'keyboard',
+    name: 'Keyboard test',
+    title: 'Keyboard Test: Check Every Key Online | Stayput',
+    description:
+      'Test your keyboard online: press each key and watch it light up on an on-screen ANSI or ISO layout, with a log of every key and code. Free, and nothing you type is sent.',
+    heading: 'Keyboard Test',
+    tagline: 'A free key tester: press any key and it lights up on an on-screen keyboard, in an ANSI or ISO layout, and stays marked so you can see which keys you have not tried yet. What you type stays in this tab.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Test your keyboard',
+    action: 'Test',
+    lead:
+      'A keyboard test and key tester in one page: press a key and it lights up on an on-screen keyboard, and stays marked as tested, so you can find a key that has stopped working, a stuck key or a chattering one. It shows each key’s name and its code in a log, handles F-keys, the numpad and the arrows, and switches between ANSI and ISO layouts. It is free, and what you type is not uploaded: the keys are read by code in your browser and drawn on the page, and the page uses no file. After one visit and a short wait the page works offline.',
+    sections: [
+      {
+        heading: 'What this test does',
+        bullets: [
+          'Lights each key on the on-screen keyboard when you press it, and keeps it marked as tested after you let go.',
+          'Logs every key press with the key it produced and its code, so you can see which physical key was pressed even when the typing language changes the letter.',
+          'Covers the letters, numbers, modifier keys, F1 to F12, the arrows, the navigation block and the numpad.',
+          'Shows an ANSI layout (US) or an ISO layout (UK and European), and counts how many keys you have tested.',
+          'Has a Reset button that clears the marks and the log, so you can test again.',
+        ],
+      },
+      {
+        heading: 'What this test cannot tell you',
+        bullets: [
+          'The page only sees keys the browser passes on. Fn, most media, volume and brightness keys, and shortcuts the system keeps for itself, such as Cmd+Tab or the Windows key, never reach a web page.',
+          'A key that does not light up here may be broken, or it may be one the browser never sees. Try it in a text editor to tell the two apart.',
+          'It cannot measure typing speed or how a key feels, and it cannot say whether a keyboard is worn out.',
+        ],
+      },
+      {
+        heading: 'A key that does not light up? Check these first',
+        bullets: [
+          'Press it firmly and a few times, and check that the page is the active window.',
+          'Check whether it is a function or media key that needs Fn held, and try it with and without Fn.',
+          'Clean under the key with compressed air, and try the keyboard on another computer.',
+          'Check the keyboard layout and language in your system settings if letters show differently than the key tops.',
+        ],
+      },
+    ],
+    keywords: ['keyboard test', 'keyboard tester', 'online keyboard test', 'key tester', 'test my keyboard', 'keyboard key test', 'check keyboard keys', 'keyboard ghosting test'],
+    steps: [
+      'Choose the ANSI or ISO layout that matches your keyboard.',
+      'Press each key. It lights up on the on-screen keyboard and stays marked, and the log shows its key and code.',
+      'Press Reset to start again, and try any key that stayed unmarked in a text editor to see whether it is broken or just not visible to the browser.',
+    ],
+    faq: [
+      {
+        q: 'Is anything I type recorded or uploaded?',
+        a: 'No. The page reads each key press in your tab and shows it on the page, and the log lives only in the tab’s memory. Nothing about the keys you press is sent anywhere, and it is gone when you close the tab or press Reset.',
+      },
+      {
+        q: 'How do I test my keyboard online?',
+        a: 'Open this page and press each key in turn. The matching key on the on-screen keyboard lights up and stays marked as tested. Any key left unmarked after you have pressed it a few times is one the keyboard is not sending, or one the browser does not see.',
+      },
+      {
+        q: 'Why does a key not light up?',
+        a: 'Either the key does not work, or the browser never receives it. Fn, most media and brightness keys and some system shortcuts, such as Cmd+Tab on a Mac or the Windows key, are handled by the system or the keyboard itself before a web page can see them.',
+      },
+      {
+        q: 'Can I use this key tester for ghosting or rollover?',
+        a: 'Partly. Hold several keys at once and watch which ones light up as pressed. Keys that go missing while others are held point to ghosting or a low rollover limit, but the result depends on the keyboard, the connection and the operating system, so treat it as a hint.',
+      },
+      {
+        q: 'What is the difference between the key and the code in the log?',
+        a: 'The key is what the press produces, such as a lowercase a, a capital A or a symbol, and it changes with Shift and with your language. The code names the physical key, such as KeyA, and stays the same whatever the layout.',
+      },
+      {
+        q: 'What is the difference between ANSI and ISO?',
+        a: 'ANSI is the US layout, with a wide, flat Enter key and a long left Shift. ISO is common in the UK and Europe, with a tall Enter key and an extra key next to the left Shift. Pick the one that looks like your keyboard.',
+      },
+      {
+        q: 'Does it work on a laptop or a Mac?',
+        a: 'Yes. A laptop’s built-in keyboard is tested the same way. On a Mac the Command keys show as Win/Cmd, and Fn and the media row do not reach the browser.',
+      },
+      {
+        q: 'Does the tester work with a phone or tablet keyboard?',
+        a: 'It works with a hardware keyboard connected to the phone or tablet. The on-screen keyboard of a phone does not send physical key codes, so it will not light the keys here.',
+      },
+    ],
+  },
+  {
+    slug: 'tone-generator',
+    icon: 'volume',
+    name: 'Tone generator',
+    title: 'Online Tone Generator and Frequency Generator | Stayput',
+    description:
+      'Play a test tone online: sine, square, triangle or sawtooth from 20 Hz to 20 kHz, with presets for 440 Hz, 1 kHz and bass. It starts quiet, and nothing is uploaded.',
+    heading: 'Online tone generator',
+    tagline: 'Play a steady tone at any pitch from 20 Hz to 20 kHz, as a sine, square, triangle or sawtooth wave. It starts quiet, and nothing is uploaded.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Play a tone',
+    action: 'Play',
+    lead:
+      'Plays a steady test tone at the pitch you choose, from 20 Hz to 20 kHz, as a sine, square, triangle or sawtooth wave, so you can check speakers, headphones and subwoofers, or find a reference note. It is free, and your choices are not uploaded: the tone is made by code in your browser, and the page uses no file and no microphone. After one visit and a short wait the page works offline.',
+    sections: [
+      {
+        heading: 'What this tool does',
+        bullets: [
+          'Plays one steady tone with a sine, square, triangle or sawtooth wave.',
+          'Sets the pitch with a slider on a log scale from 20 Hz to 20 kHz, or with a number you type; the two stay in step.',
+          'Has presets for 440 Hz (the A above middle C), 1 kHz and a 50 Hz test bass.',
+          'Starts at a low level and fades in and out, so starting and stopping do not click.',
+        ],
+      },
+      {
+        heading: 'Take care with your hearing',
+        bullets: [
+          'Turn your device volume down first and raise it slowly. A steady tone is harsher than music at the same setting.',
+          'Take extra care with headphones, which sit close to your ear.',
+          'Very low and very high tones can be hard to hear and still be loud, so do not judge the volume by how it sounds. Stop if it hurts.',
+        ],
+      },
+      {
+        heading: 'What this tool cannot tell you',
+        bullets: [
+          'The page plays sound and you listen. It cannot hear your speakers, so it does not measure their quality, loudness or frequency response.',
+          'Small speakers play very low and very high tones weakly or not at all, and people differ in how high a sound they hear.',
+        ],
+      },
+    ],
+    keywords: ['tone generator', 'online tone generator', 'frequency generator', 'sine wave generator', 'test tone', 'hz tone generator', 'square wave generator', 'sound generator'],
+    steps: [
+      'Turn your device volume down, choose a wave, and set the pitch with the slider, by typing Hz or with a preset.',
+      'Press Play and raise the level slowly if you need to. Change the wave or the pitch while it plays.',
+      'Press Stop when you are done. The tone also stops when you leave the tab.',
+    ],
+    faq: [
+      {
+        q: 'Is anything recorded or uploaded?',
+        a: 'No. The tone is made by an oscillator in this page and played through your speakers. The page does not use your microphone and does not ask for any permission, and nothing about what you play is sent anywhere.',
+      },
+      {
+        q: 'Is this an online tone generator or a frequency generator?',
+        a: 'Both. It is an online tone generator that works as a frequency generator too: type any pitch from 20 Hz to 20 kHz, or drag the slider, and it plays that frequency as a steady tone you can use to test speakers or find a reference note.',
+      },
+      {
+        q: 'Which wave should I use?',
+        a: 'A sine is a single pure pitch, the cleanest for checking speakers. A square and a sawtooth are buzzier because they carry many harmonics, and a triangle sits between a sine and a square. Use them to hear how a speaker handles a richer sound.',
+      },
+      {
+        q: 'Is it safe for my ears and my speakers?',
+        a: 'It starts at a low level and the level slider tops out well below full scale, but your device volume is separate, so lower it first. Very low and very high tones can be hard to hear and still be loud, so raise the volume a little at a time and stop if it hurts. Avoid long, loud tones through small speakers.',
+      },
+      {
+        q: 'Why can I not hear the lowest or the highest tones?',
+        a: 'Small speakers, such as those in a phone or laptop, play very low notes weakly or not at all, and hearing for high pitches varies between people and fades with age. Many adults hear little above 15 kHz.',
+      },
+      {
+        q: 'What is 440 Hz?',
+        a: 'It is concert A, the A above middle C, which most modern music is tuned to. The 440 Hz preset gives you a reference note to tune against. For tuning by ear, the tuner on this site can also listen to your instrument.',
+      },
+      {
+        q: 'Can I check my speakers left and right?',
+        a: 'This page plays both sides together. To send a tone to the left or the right side only, use the speaker test.',
       },
     ],
   },

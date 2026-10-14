@@ -3,7 +3,7 @@
  * stayput-ops company/experiments.md). Two tools each, most likely first:
  * the job people typically do next with the same kind of file.
  */
-export const nextSteps: Record<string, [string, string]> = {
+export const nextSteps: Record<string, string[]> = {
   'heic-to-jpg': ['strip-exif', 'compress-image'],
   'convert-image': ['compress-image', 'strip-exif'],
   'compress-image': ['strip-exif', 'image-to-pdf'],
@@ -78,10 +78,11 @@ export const nextSteps: Record<string, [string, string]> = {
   'vocal-remover': ['pitch-changer', 'trim-audio'],
   'video-background-remover': ['compress-video', 'add-subtitles-to-video'],
   'metronome': ['tuner', 'voice-recorder'],
-  'tuner': ['metronome', 'pitch-changer'],
-  'mic-test': ['merge-audio', 'audio-converter'],
-  'webcam-test': ['mic-test', 'dead-pixel-test'],
-  'speaker-test': ['mic-test', 'dead-pixel-test'],
+  'tuner': ['tone-generator', 'metronome'],
+  'mic-test': ['webcam-test', 'keyboard-tester'],
+  'webcam-test': ['mic-test', 'keyboard-tester', 'dead-pixel-test'],
+  'speaker-test': ['tone-generator', 'keyboard-tester', 'dead-pixel-test'],
+  'tone-generator': ['speaker-test', 'tuner'],
   'dead-pixel-test': ['webcam-test', 'speaker-test'],
   'audio-to-video': ['compress-video', 'trim-video'],
   'photo-slideshow-maker': ['compress-video', 'add-audio-to-video'],
@@ -94,6 +95,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'blur-image': ['compress-image', 'crop-image'],
   'rotate-image': ['crop-image', 'compress-image'],
   'video-to-mp3': ['video-to-gif', 'compress-image'],
+  'image-to-word': ['image-to-text', 'image-to-pdf'],
   'image-to-text': ['blur-image', 'image-to-pdf'],
   'qr-code-generator': ['image-to-pdf', 'compress-png'],
   'barcode-generator': ['image-to-pdf', 'compress-png'],
