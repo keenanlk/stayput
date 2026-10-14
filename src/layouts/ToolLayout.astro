@@ -23,7 +23,12 @@ interface Props {
   /** Slug of the tool whose script runs this page (landing pages). */
   base?: string;
 }
-const { tool, intro = [], engineSlug, base } = Astro.props;
+const { tool, intro: introProp = [], engineSlug, base } = Astro.props;
+// The X to MP3 pages point at the general converter once, unless their own copy already does.
+const linksMp3Converter = [...introProp, ...tool.faq.map((f) => f.a)].some((t) => t.includes('/tools/video-to-mp3'));
+const intro = base === 'video-to-mp3' && tool.slug.endsWith('-to-mp3') && !linksMp3Converter
+  ? [...introProp, 'Have a different kind of file? The [MP3 converter](/tools/video-to-mp3) takes any video or audio file.']
+  : introProp;
 const path = toolPath(tool);
 // Video tools where iOS's own Photos picker prepares (transcodes or downloads) the clip before the page sees it.
 const iosPickerNote = ['add-subtitles-to-video', 'video-background-remover', 'compress-video', 'trim-video', 'video-to-mp3'].includes(base ?? tool.slug);

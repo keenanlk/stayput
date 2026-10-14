@@ -501,7 +501,7 @@ export const guides: Guide[] = [
     heading: 'JPG, PNG, WebP or HEIC: which image format to use',
     dek: 'A practical rule for each job, and the conversion to get there.',
     keywords: ['jpg vs png', 'webp vs png', 'which image format to use', 'heic vs jpg', 'best image format for web', 'png or jpg for screenshots', 'what is a jfif file'],
-    updated: '2026-09-26',
+    updated: '2026-10-13',
     tools: ['convert-image', 'png-to-jpg', 'jpg-to-webp', 'heic-to-jpg', 'jfif-to-jpg', 'gif-to-png', 'svg-to-jpg'],
     sections: [
       {
@@ -524,7 +524,7 @@ export const guides: Guide[] = [
       {
         h: 'PNG: the lossless format',
         p: [
-          'PNG stores every pixel exactly and supports transparency. That makes it right for screenshots, interface graphics, charts, logos and anything you will keep editing. It makes it wrong for photos, where the file is five to ten times the size of a JPG that looks the same. Convert with [JPG to PNG](/jpg-to-png) when a form or template insists on PNG, or [WebP to PNG](/webp-to-png) for an image saved from a website.',
+          'PNG stores every pixel exactly and supports transparency. That makes it right for screenshots, interface graphics, charts, logos and anything you will keep editing. It makes it wrong for photos, where the file is five to ten times the size of a JPG that looks the same. Convert with [JPG to PNG](/jpg-to-png) when a form or template insists on PNG, or [WebP to PNG](/webp-to-png) for an image saved from a website. To make a PNG with a transparent background from a photo, use the [background remover](/tools/remove-background).',
         ],
       },
       {
@@ -536,7 +536,7 @@ export const guides: Guide[] = [
       {
         h: 'HEIC: the iPhone format',
         p: [
-          'HEIC is what iPhones have saved photos as since 2017: about half the size of JPG at the same quality, with support for wide colour and live photos. Outside Apple devices it is poorly supported; Windows needs a paid extension and most web forms refuse it. Keep photos as HEIC on the phone and convert copies with [HEIC to JPG](/tools/heic-to-jpg) or [HEIC to PNG](/heic-to-png) when they need to go elsewhere. The [Windows guide](/guides/open-heic-files-on-windows) covers the options there.',
+          'HEIC is what iPhones have saved photos as since 2017: about half the size of JPG at the same quality, with support for wide colour and live photos. Outside Apple devices it is poorly supported; Windows needs a paid extension and most web forms refuse it. Keep photos as HEIC on the phone and convert copies with [HEIC to JPG converter](/tools/heic-to-jpg) or [HEIC to PNG](/heic-to-png) when they need to go elsewhere. The [Windows guide](/guides/open-heic-files-on-windows) covers the options there.',
         ],
       },
       {
