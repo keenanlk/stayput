@@ -6467,6 +6467,51 @@ export const tools: Tool[] = [
       },
     ],
   },
+  {
+    slug: 'animated-png-to-gif',
+    icon: 'film',
+    lead:
+      'Converts animated PNG (APNG) files to animated GIF, keeping every frame, its delay and the loop count, at the same size. GIF has 256 colours per frame and no soft transparency, so gradients dither and soft edges become hard ones. It is free, and your files are not uploaded: each frame is decoded and written by your browser.',
+    name: 'APNG to GIF',
+    title: 'Animated PNG (APNG) to GIF Converter, Free | Stayput',
+    description:
+      'Convert animated PNG (APNG) files to GIF in your browser. Keeps timing and looping, 256 colours per frame. Free, batch, no watermark, not uploaded.',
+    heading: 'Convert animated PNG to GIF',
+    tagline: 'Turn APNG files into animated GIFs that chat apps and upload forms accept. Converted on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/png,.png,.apng',
+    multiple: true,
+    dropLabel: 'Drop APNG files to convert to GIF',
+    action: 'Convert to GIF',
+    keywords: ['apng to gif', 'animated png to gif', 'convert apng to gif', 'apng to gif converter', 'apng to gif online'],
+    steps: [
+      'Drop one or more animated PNG files (.png or .apng), or tap to pick them.',
+      'Convert. Each one is decoded and written as a GIF in your browser.',
+      'Download the .gif file, or a zip when you converted several.',
+    ],
+    faq: [
+      {
+        q: 'Why does the GIF look worse than the APNG?',
+        a: 'GIF holds 256 colours per frame and its transparency is on or off, with no soft edges. An APNG has full colour and 8-bit transparency, so smooth gradients show banding or dithering in the GIF, and a soft shadow or anti-aliased edge becomes a hard edge. Each frame gets its own palette to keep the loss small.',
+      },
+      {
+        q: 'Will the GIF be smaller than the APNG?',
+        a: 'Usually only a little, and sometimes it grows. GIF drops colour information, but it stores each frame whole and compresses less well than PNG on photographic frames. For a much smaller file, run it through [Compress GIF](/tools/compress-gif) or turn it into video with [GIF to MP4](/tools/gif-to-mp4).',
+      },
+      {
+        q: 'Why would I want a GIF instead of an APNG?',
+        a: 'Many chat apps, social sites and upload forms only accept GIF, or flatten an APNG to its first frame. A GIF plays nearly everywhere.',
+      },
+      {
+        q: 'Does it keep the timing and the looping?',
+        a: 'Yes. Each frame keeps its delay (anything under 20 ms is raised to 20 ms, which browsers show at 100 ms anyway), and the loop count is carried over: forever stays forever, and an animation that plays once stays once.',
+      },
+      {
+        q: 'Is my file uploaded?',
+        a: 'No. The APNG is decoded by code in this page and the GIF is written in your browser’s memory. There is no server in the process, and after one visit and a short wait the page works with Wi-Fi off.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
