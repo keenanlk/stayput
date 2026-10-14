@@ -34,6 +34,7 @@ const pages = [
   '/press',
   '/licenses',
   '/avi-to-mp4',
+  '/wma-to-mp3',
   '/flv-to-mp4',
 ];
 

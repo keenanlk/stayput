@@ -1616,6 +1616,57 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'wma-to-mp3',
+    base: 'video-to-mp3',
+    name: 'WMA to MP3',
+    title: 'WMA to MP3 Converter, Free, No Upload | Stayput',
+    description: 'Convert WMA files to MP3 in your browser: old Windows Media Player rips and recordings become MP3s that play anywhere, with title and artist kept. Nothing is uploaded.',
+    lead:
+      'Converts WMA audio (Windows Media Audio versions 1 and 2) to MP3 at 128 kbps or the quality you choose, keeping the title and artist. It is free and needs no account, and your files are not uploaded: everything runs in your browser on your device, and after your first run the page works offline.',
+    heading: 'Convert WMA to MP3',
+    tagline: 'Turn WMA files from old PCs, CD rips and voice recorders into MP3s that play anywhere, without uploading them.',
+    keywords: ['wma to mp3', 'convert wma to mp3', 'wma to mp3 converter', 'wma to mp3 online', 'wma to mp3 free', 'windows media audio to mp3', 'wma to mp3 no upload'],
+    dropLabel: 'Drop WMA files to convert to MP3',
+    accept: 'audio/x-ms-wma,audio/wma,.wma,audio/*',
+    defaults: { bitrate: '128' },
+    intro: [
+      'WMA is Windows Media Audio, the format Windows Media Player used to rip CDs into by default, and what many old MP3 players, dictation recorders, downloaded albums and family PCs still hold. iPhones, Macs, most car stereos and Android music apps do not play it, and no browser can.',
+      'This page reads the WMA in your browser, decodes it, and writes an MP3 with the LAME encoder running in the page. The title and artist stored in the WMA are carried into the MP3. A track converts in a few seconds, and you can drop a whole folder at once.',
+      'The file never leaves your device. Recordings and personal music libraries are not something to hand to a stranger’s server just to change the format, and here there is no upload to wait for and no copy kept anywhere.',
+      'This page opens at 128 kbps, which is what most WMA files were made at, so the MP3 is about the same size. Because WMA and MP3 are both lossy, a higher bitrate does not bring back detail the WMA already dropped; pick 192 kbps or more only if you want a little headroom.',
+    ],
+    sections: [
+      {
+        heading: 'Which WMA files this converts',
+        bullets: [
+          'Standard WMA, versions 1 and 2: the files Windows Media Player and most MP3 players and recorders wrote from 1999 onward, including ones saved as .wma from a voice recorder.',
+          'Not converted: WMA Pro, WMA Lossless and WMA Voice. The page names the format it found, so you know what you have. Songs with Windows Media copy protection (DRM) cannot be opened either.',
+          'Surround sound is mixed down to stereo, and the sample rate is brought to 44.1 kHz, the rate MP3 players expect.',
+        ],
+      },
+      {
+        heading: 'What this page loads',
+        paragraphs: [
+          "Most video runs on your browser's WebCodecs through Mediabunny. For old formats the browser cannot read, the page loads a decoder built from FFmpeg's libraries (LGPL) only when you convert such a file.",
+          'For WMA that decoder is a file of under 1 MB from stayput.dev, not from anyone else’s server, and the licenses page links its exact source and how it was built.',
+        ],
+      },
+    ],
+    steps: [
+      'Drop one or more WMA files, or tap to pick them.',
+      'Keep 128 kbps, or raise it to 192 or 256 kbps. Choose mono for voice recordings.',
+      'Convert, and the MP3 downloads. Several files download together as a zip.',
+    ],
+    faq: [
+      { q: 'Why does it say the file uses WMA Pro?', a: 'WMA is a family of formats. This page opens standard WMA (versions 1 and 2), which is nearly every .wma file in the wild. A file written as WMA Pro, WMA Lossless or WMA Voice shows a message naming that format, and nothing is converted.' },
+      { q: 'Why will my downloaded songs not convert?', a: 'Music bought from old Windows Media stores often carries copy protection, which scrambles the sound until a licensed player unlocks it. The page says so when it sees the protection. Files you ripped or recorded yourself convert.' },
+      { q: 'Are the title and artist kept?', a: 'Yes. The title, artist and album stored in the WMA are written into the MP3 as an ID3 tag. Cover art is not carried over.' },
+      { q: 'Will the MP3 sound worse than the WMA?', a: 'Slightly, as with any conversion between two lossy formats. At 128 kbps or higher most people cannot tell the difference. Keep the WMA if you might want the best copy later.' },
+      { q: 'Is the WMA uploaded anywhere?', a: 'No. The file is read from your disk in slices by code running in a background worker in your tab, and the MP3 is written in memory. The decoder module downloads from stayput.dev when you first convert, and it carries none of your data.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'mov-to-mp3',
     base: 'video-to-mp3',
     name: 'MOV to MP3',
@@ -2248,6 +2299,33 @@ export const presets: Preset[] = [
     faq: [
       { q: 'How do I post a GIF on Instagram?', a: 'Instagram does not accept GIF uploads, but it does accept MP4. Convert the GIF here with the default length (at least 3 seconds), save the MP4 to your phone and post it as a reel, story or post like any other video.' },
       { q: 'Can I add music to the video?', a: 'Not on this page: the video has no sound track, since the GIF has none. Add music in the app you post from (Instagram, TikTok and CapCut all offer it), or in a video editor.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'gif-to-apng',
+    base: 'gif-to-animated-png',
+    name: 'GIF to APNG',
+    title: 'GIF to APNG Converter, Free, Not Uploaded | Stayput',
+    description: 'Convert a GIF to APNG, an animated PNG, in your browser. Each frame keeps its delay, the loop count and transparency. Free, not uploaded.',
+    heading: 'Convert GIF to APNG',
+    tagline: 'Make an animated PNG from a GIF, with its timing, looping and transparency, on your own device.',
+    keywords: ['gif to apng', 'convert gif to apng', 'gif to apng converter', 'gif to animated png', 'animated gif to apng', 'gif to apng online'],
+    dropLabel: 'Drop GIFs to turn into APNG',
+    intro: [
+      'APNG is an animated PNG: the same .png file extension, with extra chunks that tell a browser to play several frames. Unlike a GIF it holds full 24-bit colour and a proper 8-bit alpha channel, so gradients, shadows and soft edges stay smooth instead of dithering into 256 colours.',
+      'Drop a GIF and every frame is decoded, composited the way browsers play it, and written back as an APNG frame with its own delay. The loop count from the GIF is kept (a GIF with no loop setting plays once), and transparent areas stay transparent. Your browser does all of it; the GIF is not uploaded and there is no watermark.',
+      'Know what you are getting: an APNG is often larger than the GIF, especially for flat-colour animation, because every frame is stored whole. It plays in Safari, Chrome, Edge and Firefox, but some chat apps, social sites and upload forms flatten it to its first frame or only accept GIF. Test it where you plan to use it.',
+    ],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Convert. Each one becomes an animated PNG in your browser.',
+      'Download the .png, or a zip when you converted several.',
+    ],
+    faq: [
+      { q: 'Will the APNG be smaller than the GIF?', a: 'Often not. Every frame is stored whole in full colour, so flat-colour animation usually comes out larger. For a smaller file, try [GIF to MP4](/tools/gif-to-mp4) or [Compress GIF](/tools/compress-gif).' },
+      { q: 'Where does an APNG play?', a: 'In Safari, Chrome, Edge and Firefox. Some chat apps and social sites show only the first frame or reject the file, so check the place you will post it.' },
+      { q: 'Is the file uploaded?', a: 'No. It is decoded and written in your browser tab, and the page works offline after one visit.' },
       noUpload,
     ],
   },

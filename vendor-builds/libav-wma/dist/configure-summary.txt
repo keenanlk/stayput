@@ -1,0 +1,27 @@
+Enabled decoders:
+wmav1                   wmav2
+
+Enabled encoders:
+
+Enabled hwaccels:
+
+Enabled parsers:
+
+Enabled demuxers:
+asf
+
+Enabled muxers:
+
+Enabled protocols:
+data                    file
+
+Enabled filters:
+aresample
+
+Enabled bsfs:
+
+Enabled indevs:
+
+Enabled outdevs:
+
+License: LGPL version 2.1 or later
