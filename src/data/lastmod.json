@@ -1,7 +1,7 @@
 {
  "/": {
   "date": "2026-10-13",
-  "hash": "ed1a261563ca0c37"
+  "hash": "cafdec05b6580e2d"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -1235,6 +1235,10 @@
   "date": "2026-10-12",
   "hash": "1f620990920abf0e"
  },
+ "/reverse-audio": {
+  "date": "2026-10-13",
+  "hash": "efcba3008df486df"
+ },
  "/reverse-gif": {
   "date": "2026-10-13",
   "hash": "d439ade1605395c7"
@@ -1378,6 +1382,10 @@
  "/tools/audio-converter": {
   "date": "2026-10-12",
   "hash": "9a2745f0e06215ec"
+ },
+ "/tools/audio-reverser": {
+  "date": "2026-10-13",
+  "hash": "4e32b155a2a78acc"
  },
  "/tools/audio-splitter": {
   "date": "2026-10-13",
@@ -1846,6 +1854,10 @@
  "/wav-to-mp3": {
   "date": "2026-10-13",
   "hash": "78fba93941b43ca2"
+ },
+ "/wav-to-ogg": {
+  "date": "2026-10-13",
+  "hash": "993f4ab81761a80b"
  },
  "/webm-to-gif": {
   "date": "2026-10-12",
