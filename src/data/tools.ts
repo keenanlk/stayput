@@ -4860,6 +4860,14 @@ export const tools: Tool[] = [
       'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ZIP, 7z and RAR files when you have the password, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
     heading: 'Open ZIP, RAR and 7z files',
     tagline: 'The files inside an archive, unpacked on your own device, without installing WinRAR or 7-Zip.',
+    sections: [
+      {
+        heading: 'Related tools',
+        paragraphs: [
+          'After unpacking, [Rename files](/tools/rename-files) can give the whole batch new names with a prefix, numbering or find and replace.',
+        ],
+      },
+    ],
     category: 'pdf',
     accept: '.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.tbz2,.xz,.txz,.iso,.cab,application/zip,application/x-rar-compressed,application/vnd.rar,application/x-7z-compressed,application/x-tar,application/gzip',
     multiple: true,
@@ -4903,6 +4911,14 @@ export const tools: Tool[] = [
       'Zip files or whole folders into one ZIP in your browser, and lock it with an AES-256 password if you like. Nothing is uploaded, so private files stay on your device.',
     heading: 'Create a ZIP file',
     tagline: 'Files and folders packed into one ZIP on your own device, locked with a password when they are private.',
+    sections: [
+      {
+        heading: 'Related tools',
+        paragraphs: [
+          'Want the files to have tidier names first? [Rename files](/tools/rename-files) renames a batch with one pattern and hands back a ZIP.',
+        ],
+      },
+    ],
     category: 'pdf',
     accept: '',
     multiple: true,
@@ -4931,6 +4947,54 @@ export const tools: Tool[] = [
       {
         q: 'Are my files uploaded?',
         a: 'No. The ZIP is built in this tab with fflate, and the encryption runs here too, so neither the files nor the password leave your device.',
+      },
+    ],
+  },
+  {
+    slug: 'rename-files',
+    icon: 'merge',
+    name: 'Rename files',
+    title: 'Bulk Rename Files Online: Pattern, Numbers, ZIP | Stayput',
+    description:
+      'Bulk rename files in your browser: add a prefix or suffix, number them, find and replace, change case. Preview every new name, then download a ZIP. Nothing is uploaded.',
+    heading: 'Bulk rename files',
+    tagline: 'Rename a whole batch of files with one pattern and see every new name before you download. File names stay on your device.',
+    sections: [
+      {
+        heading: 'Why the result is a ZIP',
+        paragraphs: [
+          'A web page cannot rename files on your disk, so the renamed copies come back in one ZIP, in the order shown in the preview. Unzip it and the files have their new names; the contents are not changed. To pack files without renaming them, use [Create ZIP](/tools/create-zip), and the [archive opener](/tools/archive-extractor) unpacks a ZIP you were sent.',
+        ],
+      },
+    ],
+    category: 'pdf',
+    accept: '',
+    multiple: true,
+    dropLabel: 'Drop the files to rename',
+    action: 'Download renamed ZIP',
+    sizeFact: 'No watermark. A ZIP can be up to 4 GB, and phones hold less.',
+    keywords: ['bulk rename files', 'batch rename files', 'rename multiple files', 'rename files online', 'add numbers to file names', 'find and replace in file names'],
+    steps: [
+      'Drop the files you want to rename; use the arrows to set their order.',
+      'Set a prefix or suffix, numbering, find and replace, or letter case, and check the preview.',
+      'Press Download renamed ZIP; the ZIP holds your files under their new names.',
+    ],
+    faq: [
+      {
+        q: 'Why do I get a ZIP instead of renamed files?',
+        a: 'A web page is not allowed to change files on your disk, so the tool writes copies under the new names into a ZIP. Unzip it to get the renamed files; the originals are untouched.',
+      },
+      {
+        q: 'What happens if two files end up with the same name?',
+        a: 'The later one gets a counter before its extension, such as photo-2.jpg, and the preview marks it. Names are compared ignoring upper and lower case, because Windows and macOS treat them as the same file.',
+      },
+      {
+        q: 'Are the file extensions kept?',
+        a: 'Yes, by default the extension is kept as it was. Untick Keep the original file extension if you want the pattern to apply to the whole name, extension included.',
+      },
+      {
+        q: 'Are my files or their names uploaded?',
+        a: 'No. The names are read and changed in this tab and the ZIP is built here. Neither the files nor their names are sent anywhere or counted by analytics.',
       },
     ],
   },
