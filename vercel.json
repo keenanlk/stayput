@@ -412,6 +412,11 @@
       "permanent": true
     },
     {
+      "source": "/add-watermark-to-video",
+      "destination": "/tools/add-watermark-to-video",
+      "permanent": true
+    },
+    {
       "source": "/blur-face-video",
       "destination": "/tools/blur-face-video",
       "permanent": true
