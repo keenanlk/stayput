@@ -9,6 +9,7 @@ import { unzipSync, zipSync } from 'fflate';
 import { PDFDocument, PDFHexString, PDFName, PDFArray, PDFRawStream, decodePDFRawStream, degrees, StandardFonts } from 'pdf-lib';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
+import { tools as allTools } from '../src/data/tools';
 import { inspect, sniffFormat } from '../src/lib/exif';
 import { allowServiceWorker } from './allow-sw';
 
@@ -159,7 +160,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(112);
+  expect(await page.locator('.index .tool-card').count()).toBe(allTools.length);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });

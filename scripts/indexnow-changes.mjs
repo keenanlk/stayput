@@ -1,4 +1,4 @@
-// Which pages changed between two versions of src/data/lastmod.json (see scripts/lastmod.mjs).
+// Which pages changed between two versions of src/data/lastmod/ (see scripts/lastmod.mjs).
 // A page counts as changed when it is new or its date or content hash differs; removed pages
 // are not submitted. Returns absolute URLs, sorted.
 export function changedUrls(previous, next, site) {
