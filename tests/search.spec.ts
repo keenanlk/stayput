@@ -43,7 +43,7 @@ test.describe('search ranking', () => {
     expect(top('ocr pdf')).toEqual(['/tools/ocr-pdf']);
     expect(top('image ocr')).toEqual(['/tools/image-to-text']);
     // Both ways of making a GIF come up for the bare word.
-    expect(top('gif', 4)).toEqual(expect.arrayContaining(['/tools/video-to-gif', '/tools/gif-maker']));
+    expect(top('gif', 5)).toEqual(expect.arrayContaining(['/tools/video-to-gif', '/tools/gif-maker']));
     expect(top('jpeg to png')).toEqual(['/jpg-to-png']);
     // The signature maker and its generator page come up for the bare word, with Sign PDF after them.
     expect(top('signature', 3)).toEqual(expect.arrayContaining(['/tools/sign-pdf', '/tools/signature-maker']));

@@ -34,12 +34,12 @@ export interface Guide {
 export const guides: Guide[] = [
   {
     slug: 'is-it-safe-to-merge-pdfs-online',
-    title: 'Is It Safe to Merge PDFs Online? What Actually Happens to Your File',
+    title: 'Is It Safe to Merge PDFs Online? What Happens',
     description: 'Most online PDF mergers upload your files to a server. Here is what that means, how to tell whether a tool uploads, and how to merge PDFs without uploading at all.',
     heading: 'Is it safe to merge PDFs online?',
     dek: 'It depends on one thing: whether the file leaves your computer. Here is how to tell, and how to merge without it leaving.',
     keywords: ['is it safe to merge pdfs online', 'online pdf merger safe', 'merge pdf privacy', 'merge pdf without uploading', 'secure pdf merge'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['merge-pdf', 'combine-pdf', 'split-pdf'],
     sections: [
       {
@@ -88,12 +88,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'remove-location-data-from-photos',
-    title: 'How to Remove Location Data From Photos (iPhone, Android, Windows, Mac)',
+    title: 'How to Remove Location Data From Photos on Any Device',
     description: 'Your photos carry GPS coordinates. Here is how to remove location data on every platform, which apps strip it for you, and how to check that it is gone.',
     heading: 'How to remove location data from photos',
     dek: 'Every phone photo stores where it was taken. Here is how to remove it on each platform, and how to check.',
     keywords: ['remove location data from photos', 'remove gps from photos', 'how to remove location from photo iphone', 'remove geotag from photos', 'photo location metadata'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['remove-location-from-photos', 'strip-exif', 'heic-to-jpg'],
     sections: [
       {
@@ -219,12 +219,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'open-heic-files-on-windows',
-    title: 'How to Open HEIC Files on Windows 10 and 11 (and Convert Them to JPG)',
+    title: 'How to Open HEIC Files on Windows 10 and 11',
     description: 'Windows cannot open iPhone HEIC photos out of the box. Three ways to open them, the free way to convert them to JPG in bulk, and how to stop your iPhone making them.',
     heading: 'How to open HEIC files on Windows',
     dek: 'Why iPhone photos will not open, the three fixes, and the fastest free way to convert a whole batch to JPG.',
     keywords: ['open heic files windows', 'heic to jpg windows', 'how to open heic on windows 11', 'windows cannot open heic', 'heic viewer windows', 'convert heic to jpg windows 10'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['heic-to-jpg', 'heic-to-png', 'heic-to-pdf'],
     sections: [
       {
@@ -253,6 +253,10 @@ export const guides: Guide[] = [
         ],
       },
       {
+        h: 'How to open a HEIC file on a PC',
+        p: ['There are three ways to open a HEIC file on a PC: install the Windows image extensions, use a viewer that decodes HEIC itself, or convert the photos to JPG.'],
+      },
+      {
         h: 'Stop the iPhone making HEIC files',
         p: [
           'On the iPhone: Settings, Camera, Formats, choose **Most Compatible**. New photos are saved as JPG at the cost of roughly twice the storage. Separately, Settings, Photos, scroll to Transfer to Mac or PC, and choose **Automatic**: the phone converts HEIC to JPG when you copy photos over a cable, without changing what is stored on the phone.',
@@ -260,6 +264,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: 'What can open HEIC files?', a: 'Windows can open them once the HEIF and HEVC image extensions are installed, a viewer such as IrfanView or XnView with its plugin pack can open them, or convert them to JPG with the [HEIC to JPG tool](/tools/heic-to-jpg).' },
       { q: 'Is HEIC better than JPG?', a: 'For storage, yes: about half the size at the same quality, with support for 16-bit colour and live photos. For compatibility, no. Convert when the file has to open somewhere you do not control.' },
       { q: 'Does converting HEIC to JPG lose quality?', a: 'A little, because JPG is lossy, but at quality 90 or above the difference is invisible. Choose PNG for a lossless copy at a much larger size.' },
       { q: 'Can I convert hundreds of HEIC files at once?', a: 'Yes. The browser converter has no file limit; a few hundred photos take a minute or two on a laptop and download as a single zip.' },
@@ -381,12 +386,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'does-this-website-upload-my-files',
-    title: 'How to Tell Whether a Website Uploads Your Files: A Network Tab Guide',
+    title: 'How to Tell If a Website Uploads Your Files',
     description: 'A five-minute check anyone can do: open the browser\'s network panel, add a file to a tool, and see whether it leaves your computer.',
     heading: 'Does this website upload my files? How to check',
     dek: 'A five-minute check with tools already in your browser. No trust required.',
     keywords: ['does this website upload my files', 'check if website uploads files', 'browser network tab file upload', 'client side processing verify', 'is this online tool private'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['strip-exif', 'merge-pdf', 'heic-to-jpg', 'file-checksum'],
     sections: [
       {
@@ -614,12 +619,12 @@ export const guides: Guide[] = [
   },
   {
     slug: "how-to-view-photo-metadata",
-    title: "How to View Photo Metadata (EXIF) on iPhone, Android, Windows and Mac",
+    title: "How to View Photo Metadata (EXIF) on Any Device",
     description: "See a photo's hidden location, date and camera data. The built-in way on every phone and computer, what each hides, and how to check any photo without uploading it.",
     heading: "How to view photo metadata on iPhone, Android, Windows and Mac",
     dek: "Every phone and computer can show some of a photo's EXIF data. Here is where to look, what each one leaves out, and how to see all of it.",
     keywords: ["how to view photo metadata", "view photo metadata", "view photo metadata iphone", "how to view photo metadata on android", "exif viewer", "check photo location"],
-    updated: "2026-10-12",
+    updated: "2026-10-14",
     tools: ["exif-viewer", "strip-exif", "remove-location-from-photos"],
     sections: [
       {
@@ -639,7 +644,7 @@ export const guides: Guide[] = [
         p: ["Right-click the photo in File Explorer, choose **Properties** and open the **Details** tab. It lists the date taken, camera maker and model, exposure settings, and a **GPS** section with latitude and longitude when present. The **Remove Properties and Personal Information** link at the bottom can clear some of them.", "Explorer only lists fields it knows how to edit. Maker notes, serial numbers, XMP history and the embedded thumbnail are not shown, and for HEIC files you need the HEIF extension installed before any of it appears."],
       },
       {
-        h: "Mac",
+        h: "See EXIF data on a Mac",
         p: ["In **Preview**, open the photo and choose **Tools → Show Inspector** (Cmd-I), then the **ⓘ** tab. The **EXIF** and **GPS** sub-tabs show most fields, and the GPS tab has a **Remove Location Info** button. In **Finder**, **Get Info** (Cmd-I) shows the dimensions, the device and the date under **More Info**, but no location. In the **Photos** app, the ⓘ button shows the same summary as on an iPhone.", "For everything, the terminal command `mdls photo.jpg` lists what Spotlight indexed, and `sips -g all photo.jpg` prints the basic properties."],
       },
       {
@@ -653,6 +658,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: "How do I see the date a photo was taken?", a: "Open the photo's EXIF data and look for Date Taken. On an iPhone, swipe up on the photo in Photos; on a Mac, open it in Preview and choose Tools, then Show Inspector. To read it without uploading the photo, use the [EXIF viewer](/tools/exif-viewer)." },
       { q: "Is it safe to use an online EXIF viewer?", a: "Only if it reads the photo in your browser. Most EXIF viewer sites upload the photo to their server and read it there, which gives them the location and everything else you were checking for. The [Stayput viewer](/tools/exif-viewer) reads it in the tab; you can confirm by watching the network tab while you drop a photo." },
       { q: "Why does the photo I received show no location?", a: "Messaging apps like WhatsApp, Signal, iMessage for some settings, and most social networks remove EXIF when a photo is sent or posted. Email, cloud links, AirDrop and file transfers usually do not." },
       { q: "Can I see photo metadata from a link or a website?", a: "Only after downloading the file. Most sites that host images strip the metadata on upload, so a downloaded image from a social network is usually empty. Images on smaller sites, forums and cloud shares often keep it." },
@@ -661,12 +667,12 @@ export const guides: Guide[] = [
   },
   {
     slug: "strip-exif-without-re-encoding",
-    title: "Stripping EXIF Without Re-encoding the Image: How It Works, and the One Exception",
+    title: "Strip EXIF Without Re-encoding the Image: How It Works",
     description: "Remove EXIF, GPS and other metadata from JPEG, PNG and WebP by editing the file structure instead of re-saving the pixels: the segments, chunks, gotchas and code.",
     heading: "Stripping EXIF without re-encoding the JPEG",
     dek: "How Stayput removes location and camera data from photos in the browser by editing the file structure, in about 600 lines of TypeScript and no library, and the one case that still has to re-encode.",
     keywords: ["strip exif without re-encoding", "lossless exif removal", "remove exif javascript", "jpeg app1 segment", "remove metadata without losing quality", "exif remover how it works"],
-    updated: "2026-10-12",
+    updated: "2026-10-14",
     tools: ["strip-exif", "exif-viewer", "heic-to-jpg"],
     sections: [
       {
@@ -722,12 +728,12 @@ export const guides: Guide[] = [
 
   {
     slug: 'is-cloudconvert-safe',
-    title: 'Is CloudConvert Safe? What Happens to Your Files, and When to Keep Them Local',
+    title: 'Is CloudConvert Safe? What Happens to Your Files',
     description: 'As of October 2026, CloudConvert says it holds ISO 27001 certification and deletes files within 24 hours. What that covers, and how to convert without uploading.',
     heading: 'Is CloudConvert safe?',
     dek: 'For most files, yes: it is an established, certified service. The real question is whether a given file should leave your computer at all.',
     keywords: ['is cloudconvert safe', 'cloudconvert safe', 'cloudconvert privacy', 'is cloudconvert legit', 'cloudconvert security', 'cloudconvert alternative no upload'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['convert-image', 'video-to-mp3', 'heic-to-jpg', 'video-to-gif'],
     sections: [
       {
@@ -779,12 +785,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-freeconvert-safe',
-    title: 'Is FreeConvert Safe? Its File Policy Explained, and a No-Upload Option',
+    title: 'Is FreeConvert Safe? Its File Policy Explained',
     description: 'As of October 2026, FreeConvert says it stores uploads on AWS in Ireland and deletes them after 8 hours. What that means for private files, and how to convert common formats without uploading.',
     heading: 'Is FreeConvert safe?',
     dek: 'FreeConvert is a legitimate service with a clear deletion policy. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
     keywords: ['is freeconvert safe', 'freeconvert safe', 'is freeconvert.com safe', 'freeconvert privacy', 'is freeconvert legit', 'freeconvert virus'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
     sections: [
       {
@@ -835,12 +841,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-ilovepdf-safe',
-    title: 'Is iLovePDF Safe? How It Handles Your PDFs, and How to Keep Them Local',
+    title: 'Is iLovePDF Safe? How It Handles Your PDFs',
     description: 'As of October 2026, iLovePDF says it is ISO 27001 certified and deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
     heading: 'Is iLovePDF safe?',
     dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
     keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf'],
     sections: [
       {
@@ -946,12 +952,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-ezgif-safe',
-    title: 'Is Ezgif Safe? What Happens to Your Uploads, and a No-Upload GIF Maker',
+    title: 'Is Ezgif Safe? What Happens to Your Uploads',
     description: 'As of October 2026, ezgif says it deletes uploads an hour after last use. What its policy covers, and how to make GIFs without uploading.',
     heading: 'Is ezgif safe?',
     dek: 'Ezgif is a legitimate, popular GIF tool with a short deletion window. The file you are about to drop in decides whether uploading it is fine.',
     keywords: ['is ezgif safe', 'ezgif safe', 'is ezgif legit', 'is ezgif.com safe', 'ezgif privacy', 'ezgif virus', 'ezgif alternative'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['video-to-gif', 'gif-to-mp4', 'crop-image', 'compress-image'],
     sections: [
       {
@@ -1002,12 +1008,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-pdf24-safe',
-    title: 'Is PDF24 Safe? Online Tools vs PDF24 Creator, and a No-Install Option',
+    title: 'Is PDF24 Safe? Online Tools vs PDF24 Creator',
     description: 'As of October 2026, PDF24’s privacy policy says its online uploads are usually deleted one hour after upload. How its versions differ, and how to edit PDFs without uploading.',
     heading: 'Is PDF24 safe?',
     dek: 'PDF24 is a long-standing German project, and it tells you itself that its offline app is the more private option. Here is how to choose between the two, and a third way.',
     keywords: ['is pdf24 safe', 'pdf24 safe', 'is pdf24 legit', 'is pdf24 tools safe', 'pdf24 privacy', 'pdf24 creator safe'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'unlock-pdf'],
     sections: [
       {
@@ -1057,12 +1063,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-convertio-safe',
-    title: 'Is Convertio Safe? Its File Deletion Rules, and Converting Without Uploading',
+    title: 'Is Convertio Safe? Its File Deletion Rules Explained',
     description: 'As of October 2026, Convertio says it keeps files in the EU and deletes outputs within 24 hours. What that covers, and how to convert common formats locally.',
     heading: 'Is Convertio safe?',
     dek: 'Convertio is a well-known converter with a published deletion policy. For private files, the safer choice is a converter that never receives them.',
     keywords: ['is convertio safe', 'convertio safe', 'is convertio legit', 'is convertio.co safe', 'convertio privacy', 'convertio virus'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['convert-image', 'heic-to-jpg', 'video-to-mp3', 'image-to-pdf'],
     sections: [
       {
@@ -1114,12 +1120,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-zamzar-safe',
-    title: 'Is Zamzar Safe? How Long It Keeps Files, Email Links and a Local Alternative',
+    title: 'Is Zamzar Safe? How Long It Keeps Your Files',
     description: 'As of October 2026, Zamzar says it stores files for no longer than seven days. What that means for private files, and how to convert without uploading.',
     heading: 'Is Zamzar safe?',
     dek: 'Zamzar is one of the oldest online converters. Its storage window is longer than most, which is the detail worth knowing.',
     keywords: ['is zamzar safe', 'zamzar safe', 'is zamzar legit', 'is zamzar.com safe', 'zamzar privacy', 'zamzar virus'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['convert-image', 'compress-image', 'video-to-mp3', 'pdf-to-image'],
     sections: [
       {
@@ -1226,12 +1232,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'remove-background-from-a-photo',
-    title: 'How to Remove the Background From a Photo (iPhone, Android, Windows, Mac)',
+    title: 'How to Remove the Background From a Photo, Any Device',
     description: 'Every recent phone and computer can lift a subject out of a photo without installing anything. Here is how on iPhone, Android, Windows and Mac, and a free browser tool for full-resolution PNGs and batches.',
     heading: 'How to remove the background from a photo',
     dek: 'iPhone, Android, Windows and Mac can all do this without an app. Here is how on each, and where they fall short.',
     keywords: ['how to remove background from a photo', 'remove background from image', 'cut out background iphone', 'remove background from photo android', 'transparent background photo', 'background eraser'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
     sections: [
       {
@@ -1395,12 +1401,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-trim-a-video-without-an-app',
-    title: 'How to Trim a Video Without Installing an App (iPhone, Android, Windows, Mac)',
+    title: 'How to Trim a Video Without an App (Phone or Computer)',
     description: 'Every major phone and computer can cut the start and end off a video without installing anything. Here is how on each platform, and a browser tool for trimming without re-encoding.',
     heading: 'How to trim a video without installing an app',
     dek: 'iPhone, Android, Windows and Mac can all trim a video with what is already installed. Here is how on each.',
     keywords: ['how to trim a video without an app', 'trim video online', 'cut video without app', 'trim video iphone', 'cut a video windows'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['trim-video', 'cut-video', 'trim-mp4'],
     sections: [
       {
@@ -1503,12 +1509,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-remove-audio-from-a-video',
-    title: 'How to Remove Audio From a Video (Mute It) on iPhone, Android, Windows, Mac',
+    title: 'How to Remove Audio From a Video (Mute It) on Any Device',
     description: 'Muting a video for good, not just while you watch it, needs a real edit on most platforms. Here is how on iPhone, Android, Windows and Mac, and a browser tool that does it in one step.',
     heading: 'How to remove audio from a video',
     dek: 'The mute button on your phone only silences playback. Removing the audio for good needs an actual edit. Here is how, on each platform.',
     keywords: ['how to remove audio from a video', 'mute a video', 'remove sound from video', 'delete audio from video file', 'video without sound'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['mute-video', 'remove-audio-from-video'],
     sections: [
       {
@@ -1518,7 +1524,7 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'On an iPhone or iPad',
+        h: 'How to remove the audio from a video on iPhone',
         p: [
           'The Shortcuts app has a built-in **Remove Audio from Video** action: open Shortcuts, create a new shortcut, add **Select Photos** followed by **Remove Audio from Video**, then run it on your clip and save. It requires no other software and produces a silent copy of the video in Photos.',
         ],
@@ -1549,6 +1555,8 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: 'How do I share a video without sound?', a: 'Remove the audio track first so the file itself is silent, then send the new file; muting at playback does not change what you send.' },
+      { q: 'Can I remove the audio from a MOV?', a: 'Yes. A MOV from an iPhone or Mac works in the [remove audio tool](/remove-audio-from-video); the new file has no audio track.' },
       { q: 'Does muting my phone remove the sound from a video permanently?', a: 'No. Muting only silences what you hear while watching; the audio track stays in the file for anyone else who opens it.' },
       { q: 'Will removing audio make the video file smaller?', a: 'Yes, though usually only slightly, since audio is a small part of a video\'s total size compared to the picture.' },
       { q: 'Can I remove audio from just part of a video?', a: 'Removing the whole track is the simplest edit and what all the options above do. To silence only part of a clip, trim out that section first, or edit in an app that supports separate audio and video timelines.' },
@@ -2078,12 +2086,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-convert-a-video-to-mp3',
-    title: 'How to Convert a Video to MP3',
+    title: 'How to Convert a Video to MP3 on Any Device, Free',
     description: 'Pulling the audio out of a video and saving it as an MP3 is different from just muting the video, and most phones and computers have no built-in way to do it. Here is what actually works.',
     heading: 'How to convert a video to MP3',
     dek: 'This is different from muting a video: you want the sound saved as its own file. Most devices have no built-in way to do that.',
     keywords: ['how to convert a video to mp3', 'mp4 to mp3', 'extract audio from video', 'save video sound as mp3', 'video to audio converter'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['video-to-mp3'],
     sections: [
       {
@@ -2221,7 +2229,7 @@ export const guides: Guide[] = [
     heading: 'How to combine or merge videos into one on any device',
     dek: 'Most camera rolls can play clips one after another, not merge them into a single file. Here is what actually joins them.',
     keywords: ['how to merge videos', 'combine video clips into one', 'join videos together', 'merge mp4 files free', 'stitch videos into one file'],
-    updated: '2026-10-13',
+    updated: '2026-10-14',
     tools: ['merge-videos'],
     sections: [
       {
@@ -2249,6 +2257,10 @@ export const guides: Guide[] = [
         ],
       },
       {
+        h: 'Put two or three video clips together',
+        p: ['Whether it is two clips or a dozen, the steps are the same: put the clips in order, join them end to end and save one file. The routes above work on every device, and the combine videos tool below does the same in a browser tab.'],
+      },
+      {
         h: 'A tool built just for joining clips',
         p: [
           'Stayput\'s [combine videos](/combine-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
@@ -2256,6 +2268,9 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: 'How do I put two video clips together?', a: 'On an iPhone or a Mac, add both clips to a new iMovie project and export; on Windows, use Clipchamp, or join them in the browser with the [combine videos](/combine-videos) tool, no upload.' },
+      { q: 'How do I turn several videos into one?', a: 'The iPhone and Android camera rolls only play clips in sequence, so use iMovie or Clipchamp to export one file, or join them in the browser with the [combine videos](/combine-videos) tool, no upload.' },
+      { q: 'How do I put three or more videos together?', a: 'Add all the clips to one timeline in iMovie (iPhone or Mac) or Clipchamp (Windows) in order and export once, or join them in the browser with the [combine videos](/combine-videos) tool, no upload.' },
       { q: 'Can I merge videos without a full video editor?', a: 'Yes, a tool built specifically for joining clips end to end skips the timeline, transitions and other editing features a full app like iMovie or Clipchamp includes.' },
       { q: 'Can I merge videos in different formats together?', a: 'A capable merge tool can combine MP4, MOV, WebM and MKV clips in a single output; some simpler methods require all clips to already share the same format.' },
       { q: 'Does merging videos re-encode and lose quality?', a: 'Some quality loss is common since the clips need to be combined into a single continuous stream, though a well-built tool keeps this minimal at a matching resolution and bitrate.' },
@@ -2317,7 +2332,7 @@ export const guides: Guide[] = [
     heading: 'How to add a watermark to a photo',
     dek: 'Phone camera rolls have no built-in watermark feature. Here is what actually adds text to a photo before you share it.',
     keywords: ['how to add a watermark to a photo', 'add text to a photo', 'copyright watermark image', 'add watermark to picture free', 'photo watermark online'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['watermark-image'],
     sections: [
       {
@@ -2345,6 +2360,10 @@ export const guides: Guide[] = [
         ],
       },
       {
+        h: 'Add a copyright notice to a photo',
+        p: ['Type a line such as © and your name into the text box of the [watermark image](/tools/watermark-image) tool, pick a corner or a repeated pattern, and save the photo with the notice drawn on it. The notice is visible text on the picture; it is not a registration of copyright.'],
+      },
+      {
         h: 'A tool built for watermarking many photos at once',
         p: [
           'Stayput\'s [watermark image](/tools/watermark-image) tool is built for this specifically: set the text once (a name, copyright line or website), choose a corner, the centre, or a repeated pattern across the photo, adjust size, opacity and colour, and apply it to a batch of photos at once, all in the browser with nothing uploaded. This avoids repeating the Markup trick photo by photo.',
@@ -2352,6 +2371,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: 'How do I add copyright to a photo?', a: 'Use a text watermark such as © and your name. It is visible on the picture; it does not register or prove copyright.' },
       { q: 'Can I watermark several photos at once?', a: 'Yes, a dedicated watermarking tool applies the same text, position and style to a batch of photos in one step, unlike Markup-based methods which handle one photo at a time.' },
       { q: 'Does adding a watermark reduce the photo\'s resolution?', a: 'No, a well-built watermarking tool adds the text or logo at the photo\'s original resolution rather than resizing or recompressing the image itself.' },
       { q: 'Can I make the watermark harder to remove by repeating it across the image?', a: 'Yes, a repeated, semi-transparent watermark pattern across the whole photo is harder to crop or clone out than a single watermark in one corner.' },
@@ -2450,12 +2470,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-add-a-watermark-to-a-pdf',
-    title: 'How to Add a Watermark to a PDF (Confidential, Draft, or Copy Number)',
+    title: 'How to Add a Watermark to a PDF (Confidential, Draft)',
     description: 'Marking every page of a PDF as confidential, a draft or a numbered copy is not something built-in PDF viewers can do; it usually needs the original document or a dedicated tool. Here is how.',
     heading: 'How to add a watermark to a PDF',
     dek: 'Stamping "confidential" or "draft" across every page needs either the original document or a tool built for it. Here is how.',
     keywords: ['how to add a watermark to a pdf', 'stamp confidential on pdf', 'add draft watermark to pdf', 'pdf watermark free online', 'watermark every page of a pdf'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['watermark-pdf'],
     sections: [
       {
@@ -2492,12 +2512,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-convert-a-gif-to-mp4',
-    title: 'How to Convert a GIF to MP4',
+    title: 'How to Convert a GIF to MP4 on Any Device',
     description: 'A GIF is often far larger than the equivalent video, and some places do not accept it at all. Converting to MP4 shrinks the file and makes it playable everywhere. Here is how.',
     heading: 'How to convert a GIF to MP4',
     dek: 'A GIF of the same clip is usually much bigger than an MP4, and some platforms will not accept a GIF at all. Here is how to convert it.',
     keywords: ['how to convert a gif to mp4', 'gif to video converter', 'gif to mp4 free', 'shrink a gif file', 'convert animated gif to video'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['gif-to-mp4'],
     sections: [
       {
@@ -2534,12 +2554,12 @@ export const guides: Guide[] = [
   },
   {
     slug: 'how-to-reorder-pages-in-a-pdf',
-    title: 'How to Reorder Pages in a PDF',
+    title: 'How to Reorder Pages in a PDF (Free, No Upload)',
     description: 'Fixing the order of pages in a PDF, or deleting the ones you do not need, is easy on a Mac but missing from most other built-in PDF viewers. Here is what works everywhere.',
     heading: 'How to reorder pages in a PDF',
     dek: 'Rearranging pages is built into Preview on a Mac, but missing on Windows, iPhone and Android. Here is what works on Windows, Mac, iPhone and Android.',
     keywords: ['how to reorder pdf pages', 'rearrange pages in a pdf', 'delete pages from a pdf', 'change pdf page order free', 'move pages in a pdf document'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['reorder-pdf'],
     sections: [
       {
@@ -2581,7 +2601,7 @@ export const guides: Guide[] = [
     heading: 'How to add music to a video',
     dek: 'Adding a soundtrack to an existing video is not something most camera rolls support directly. Here is what does the job.',
     keywords: ['how to add music to a video', 'add audio to a video free', 'put a song on a video', 'add background music to video online', 'replace video sound with music'],
-    updated: '2026-09-29',
+    updated: '2026-10-14',
     tools: ['add-audio-to-video'],
     sections: [
       {
@@ -2609,7 +2629,7 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'A direct tool for adding or swapping sound',
+        h: 'Add an audio file or audio track to a video',
         p: [
           'Stayput\'s [add audio to video](/tools/add-audio-to-video) tool puts an MP3, WAV or M4A onto a video, or swaps in the audio from another clip, with options to mix or fully replace the original sound, loop a short track to match the video\'s length, and fade in or out, directly in the browser. The picture is copied over untouched, and nothing is uploaded.',
         ],
@@ -3441,7 +3461,7 @@ export const guides: Guide[] = [
     heading: 'How to resize an image to exact pixels',
     dek: 'Getting a photo to an exact width and height, not just smaller, needs a different setting than a normal resize. Here is how, with no software to install.',
     keywords: ['how to resize an image to exact pixels', 'resize image to exact pixels online', 'resize photo to exact dimensions', 'resize image to 1920x1080', 'resize image to 512x512'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['resize-image', 'resize-image-to-1920x1080', 'resize-image-to-1024x1024'],
     sections: [
       {
@@ -3468,13 +3488,14 @@ export const guides: Guide[] = [
         ],
       },
       {
-        h: 'Setting an exact size in the browser',
+        h: 'Resize an image to specific pixels',
         p: [
           'Stayput\'s [resize image](/resize-image) tool has an **Exact size** mode: type the width and height you need, and choose whether a mismatched photo is cropped to fill, fit with padding, or stretched. Ready-made pages cover the sizes people ask for most, such as [1920 by 1080](/resize-image-to-1920x1080) for a banner or wallpaper and [1024 by 1024](/resize-image-to-1024x1024) for an app icon, with the exact size already set. Everything happens in the browser, so a batch of photos resizes at once with nothing uploaded.',
         ],
       },
     ],
     faq: [
+      { q: 'How do I reduce an image\'s pixels?', a: 'Enter a smaller width and height in pixels than the picture has now and keep the aspect ratio locked so it is not stretched. The resize runs on your device and nothing is uploaded.' },
       { q: 'What is the difference between resizing and cropping to an exact size?', a: 'Resizing to a maximum keeps the photo\'s original shape and only makes it smaller; forcing an exact size (like 1920x1080) usually needs cropping, padding or stretching, since the source photo is rarely already that exact shape.' },
       { q: 'Will resizing to an exact size distort my photo?', a: 'Only if you choose Stretch. Crop to fill and Fit with padding both keep the photo\'s proportions intact; they just handle the leftover space differently, by cutting it off or by adding a border.' },
       { q: 'Can I resize many photos to the same exact size at once?', a: 'Yes, with a browser tool like Stayput\'s resize image, which applies the same exact-size setting to every photo you drop.' },
@@ -3824,7 +3845,7 @@ export const guides: Guide[] = [
     heading: 'How to record your screen',
     dek: 'A quick screen recording for a bug report, a tutorial or a demo does not need a downloaded app. Here is how to record it straight from your browser, free.',
     keywords: ['how to record your screen', 'screen recorder online free', 'record screen without downloading software', 'free screen recorder no watermark', 'record browser tab with audio'],
-    updated: '2026-10-12',
+    updated: '2026-10-14',
     tools: ['screen-recorder', 'screen-recorder-with-audio'],
     sections: [
       {
@@ -3847,6 +3868,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: 'How do I save a screen recording?', a: 'Press Stop, then save: the recording downloads to your device as MP4 or WebM. Nothing is uploaded.' },
       { q: 'Can I record my screen without installing anything?', a: 'Yes, a browser-based recorder like Stayput\'s uses the browser\'s built-in screen-sharing permission, so there is nothing to download or install.' },
       { q: 'Can I record my microphone along with the screen?', a: 'Yes, Stayput\'s screen recorder with audio option captures your microphone alongside the screen and its own sound for a narrated recording.' },
       { q: 'Is there a time limit on free screen recording?', a: 'Not with a browser-based tool like Stayput\'s: since nothing is uploaded or processed on a server, the limit is how much memory and storage your device has for the resulting file, and phones have less.' },
@@ -4250,12 +4272,12 @@ export const guides: Guide[] = [
   },
   {
     slug: "turn-off-location-tags-on-photos",
-    title: "How to Turn Off Location Tags on Photos (iPhone, Pixel and Samsung)",
+    title: "How to Turn Off Location Tags on Photos (iPhone, Pixel)",
     description: "Stop your phone saving GPS coordinates in photos: the setting on iPhone, Pixel and Samsung, what you lose by turning it off, and how to clean old photos.",
     heading: "How to stop your phone putting your location in photos",
     dek: "One setting in the camera decides whether every photo carries GPS coordinates. Here is where it is on iPhone, Pixel and Samsung.",
     keywords: ["turn off geotagging iphone", "how to turn off location tags on photos", "disable geotagging android", "stop photos saving location", "turn off location on camera"],
-    updated: "2026-10-12",
+    updated: "2026-10-14",
     tools: ["exif-viewer", "strip-exif", "remove-location-from-photos"],
     sections: [
       {
@@ -4296,12 +4318,12 @@ export const guides: Guide[] = [
   },
   {
     slug: "does-discord-reddit-or-instagram-remove-exif-data",
-    title: "Does Discord, Reddit or Instagram Remove EXIF Data? What's Documented",
+    title: "Do Discord, Reddit or Instagram Remove EXIF Data?",
     description: "Do social apps remove the metadata and GPS location from photos you post? What the platforms document as of October 2026, why the answer varies, and how to be sure.",
     heading: "Do Discord, Reddit and Instagram remove EXIF data from photos?",
     dek: "Nobody documents it well, and the answer can differ by file type and how you send the photo. Here is what we could verify, how to test it, and the safe way.",
     keywords: ["does discord remove exif data", "does reddit remove exif data", "does instagram remove exif data", "does whatsapp remove metadata from photos", "do social media sites remove metadata"],
-    updated: "2026-10-12",
+    updated: "2026-10-14",
     tools: ["strip-exif", "exif-viewer", "remove-location-from-photos"],
     sections: [
       {
@@ -4339,12 +4361,12 @@ export const guides: Guide[] = [
   },
   {
     slug: "how-to-add-text-to-a-photo",
-    title: "How to Add Text to a Photo or Image (Phone, Windows, Mac or Browser)",
+    title: "How to Add Text to a Photo (Phone, Windows, Mac)",
     description: "Put words on a photo or screenshot: the built-in way on iPhone, Android, Windows and Mac as of October 2026, and a browser tool that handles fonts, outlines and batches without uploading.",
     heading: "How to add text to a photo",
     dek: "Every phone and computer can do it, but the controls differ and the text is often hard to read on a busy picture. Here is each built-in way, and a private browser option.",
     keywords: ["how to add text to a photo", "add text to an image", "write on a picture", "put text on a photo online", "add caption to photo"],
-    updated: "2026-10-03",
+    updated: "2026-10-14",
     tools: ["add-text-to-image", "watermark-image", "resize-image"],
     sections: [
       {
@@ -4388,12 +4410,12 @@ export const guides: Guide[] = [
   },
   {
     slug: "how-to-crop-a-video",
-    title: "How to Crop a Video (Make It Square or Vertical, or Cut Away the Edges)",
+    title: "How to Crop a Video: Square, Vertical or Trim Edges",
     description: "Crop a video to square, 9:16 or any box: the built-in way on iPhone, Android and Windows as of October 2026, and a browser tool that crops on your device without uploading.",
     heading: "How to crop a video",
     dek: "Cropping cuts away the edges of the picture, which is different from trimming the length. Here is where each device does it, and a private browser option.",
     keywords: ["how to crop a video", "crop video online", "crop a video to square", "crop video to 9:16", "video cropper"],
-    updated: "2026-10-03",
+    updated: "2026-10-14",
     tools: ["crop-video", "trim-video", "resize-video"],
     sections: [
       {
