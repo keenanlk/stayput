@@ -173,6 +173,7 @@ const options = {
   'pitch-changer': PitchChanger,
   'audio-converter': AudioConverter,
   'image-to-text': ImageToText,
+  'image-to-word': ImageToText,
   'color-picker': ColorPicker,
   'remove-background': RemoveBackground,
   'passport-photo': PassportPhoto,
@@ -252,10 +253,10 @@ const Options = options[base as keyof typeof options];
   {base === 'split-image' && <GridStage slot="panel" />}
   {base === 'add-text-to-image' && <TextStage slot="panel" />}
   {base === 'color-picker' && <ColorStage slot="panel" />}
-  {base === 'pdf-to-word' && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
+  {(base === 'pdf-to-word' || base === 'image-to-word') && <pre slot="panel" id="text-preview" class="text-preview" hidden aria-label="Extracted text preview"></pre>}
   <Fragment slot="options">{Options && <Options defaults={defaults} />}</Fragment>
 </ToolLayout>
-{base === 'pdf-to-word' && (
+{(base === 'pdf-to-word' || base === 'image-to-word') && (
   <style is:global>
     .text-preview { max-height: 260px; overflow: auto; white-space: pre-wrap; font: 14px/1.5 var(--font-body, inherit); padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink-2); margin: 0; }
   </style>
