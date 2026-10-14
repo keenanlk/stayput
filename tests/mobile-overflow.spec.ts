@@ -29,6 +29,7 @@ const pages = [
   '/tools/speaker-test',
   '/tools/keyboard-tester',
   '/tools/tone-generator',
+  '/tools/dead-pixel-test',
   '/tools/bpm-key-finder',
   '/camelot-wheel',
   '/bpm-finder',
