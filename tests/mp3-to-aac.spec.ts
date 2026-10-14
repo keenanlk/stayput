@@ -35,3 +35,25 @@ test('MP3 to AAC writes an .m4a that decodes and has the same length', async ({ 
   expect(after).toBeGreaterThan(0);
   expect(Math.abs(after - before)).toBeLessThan(0.15);
 });
+
+test('with no AAC encoder the page says so up front, and a run fails with a clear message', async ({ page }) => {
+  await page.route('https://stats.keenankaufman.com/**', (r) => r.fulfill({ contentType: 'text/javascript', body: '' }));
+  // Stand in for Linux Chromium: the browser reports no AAC encoder.
+  await page.addInitScript(() => {
+    const real = window.AudioEncoder?.isConfigSupported?.bind(window.AudioEncoder);
+    if (!real) return;
+    AudioEncoder.isConfigSupported = async (config) => {
+      if (String(config.codec).startsWith('mp4a')) return { supported: false, config };
+      return real(config);
+    };
+  });
+  await page.goto('/mp3-to-aac');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#format-note')).toBeVisible();
+  await expect(page.locator('#format-note')).toContainText('cannot write M4A');
+
+  await page.locator('#file-input').setInputFiles(SONG);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('no AAC encoder');
+  await expect(page.locator('#results-list .result-item')).toHaveCount(0);
+});
