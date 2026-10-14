@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import PhotoSlideshow from '../../components/options/PhotoSlideshow.astro';
+import GifStage from '../../components/GifStage.astro';
+const tool = toolBySlug('photo-slideshow-maker')!;
+---
+<ToolLayout tool={tool}>
+  <GifStage slot="panel" />
+  <Fragment slot="options"><PhotoSlideshow /></Fragment>
+</ToolLayout>
+<script src="../../tools/photo-slideshow-maker.ts"></script>

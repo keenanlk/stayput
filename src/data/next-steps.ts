@@ -84,6 +84,7 @@ export const nextSteps: Record<string, [string, string]> = {
   'speaker-test': ['tone-generator', 'mic-test'],
   'tone-generator': ['speaker-test', 'tuner'],
   'audio-to-video': ['compress-video', 'trim-video'],
+  'photo-slideshow-maker': ['compress-video', 'add-audio-to-video'],
   'compress-audio': ['trim-audio', 'audio-converter'],
   'add-text-to-image': ['watermark-image', 'compress-image'],
   'split-image': ['crop-image', 'compress-image'],

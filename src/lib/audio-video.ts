@@ -44,11 +44,16 @@ export function placeImage(w: number, h: number, frame: { width: number; height:
 }
 
 /** Draw the still frame: the picture fitted whole over a blurred copy of itself (or a plain colour), or the title on a plain colour. */
-export function drawStill(ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D, frame: { width: number; height: number }, picture: ImageBitmap | null, backdrop: Backdrop, title: string) {
+export function drawStill(ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D, frame: { width: number; height: number }, picture: ImageBitmap | null, backdrop: Backdrop, title: string, fit: 'contain' | 'cover' = 'contain') {
   const { width, height } = frame;
   ctx.fillStyle = backdrop === 'white' ? '#ffffff' : '#000000';
   ctx.fillRect(0, 0, width, height);
   if (picture) {
+    if (fit === 'cover') {
+      const c = placeImage(picture.width, picture.height, frame, 'cover');
+      ctx.drawImage(picture, c.x, c.y, c.width, c.height);
+      return;
+    }
     if (backdrop === 'blur') {
       const c = placeImage(picture.width, picture.height, frame, 'cover');
       // Blurred by hand on a small copy, then scaled up: Safari has no canvas `filter`, and there a filter blur does nothing.
@@ -85,14 +90,14 @@ export function drawStill(ctx: OffscreenCanvasRenderingContext2D | CanvasRenderi
 }
 
 /** Errors a browser's encoders raise when they refuse to start or fail at once; another size or codec may still work. */
-const ENCODER_REFUSAL = new Set(['OperationError', 'EncodingError', 'InvalidStateError', 'NotSupportedError']);
+export const ENCODER_REFUSAL = new Set(['OperationError', 'EncodingError', 'InvalidStateError', 'NotSupportedError']);
 
 /**
  * What to try, in order. Android Chrome can say a 1080p H.264 or AAC encoder is supported and then fail
  * to create it ("Encoder creation error", an OperationError), so a refusal moves to a smaller frame
  * and, at the end, to the other codecs (VP9 and Opus in the same MP4).
  */
-const ATTEMPTS: { scale: number; video: VideoCodec[]; audio: ('aac' | 'opus')[] }[] = [
+export const ATTEMPTS: { scale: number; video: VideoCodec[]; audio: ('aac' | 'opus')[] }[] = [
   { scale: 1, video: VIDEO_CODECS, audio: ['aac', 'opus'] },
   { scale: 2 / 3, video: VIDEO_CODECS, audio: ['aac', 'opus'] },
   { scale: 4 / 9, video: ['vp9', 'avc', 'av1'], audio: ['opus', 'aac'] },
