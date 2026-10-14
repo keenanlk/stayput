@@ -1,0 +1,43 @@
+---
+/** Option controls for Video splitter: how to split, where, and whether the cuts are exact. */
+---
+<fieldset class="field vs-mode">
+  <legend>Split</legend>
+  <label class="check"><input type="radio" name="vs-mode" value="times" checked /> At times I type</label>
+  <label class="check"><input type="radio" name="vs-mode" value="every" /> Every so often</label>
+  <label class="check"><input type="radio" name="vs-mode" value="equal" /> Into equal parts</label>
+</fieldset>
+<div class="field" id="vs-times-field">
+  <label for="vs-times">Times where each new part starts</label>
+  <input type="text" id="vs-times" placeholder="1:30, 4:00" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" />
+  <p class="muted small">Minutes and seconds (1:30), hours too (1:02:45), or plain seconds (90), separated by commas.</p>
+</div>
+<div class="field" id="vs-every-field" hidden>
+  <label for="vs-every">Length of each part</label>
+  <div class="vs-every">
+    <input type="number" id="vs-every" min="0" step="any" value="30" inputmode="decimal" />
+    <select id="vs-unit" aria-label="Unit">
+      <option value="1" selected>seconds</option>
+      <option value="60">minutes</option>
+    </select>
+  </div>
+</div>
+<div class="field" id="vs-equal-field" hidden>
+  <label for="vs-equal">Number of parts (2 to 50)</label>
+  <input type="number" id="vs-equal" min="2" max="50" step="1" value="3" inputmode="numeric" />
+</div>
+<div class="field">
+  <label class="check"><input type="checkbox" id="exact" /> Exact cuts (slower, re-encodes)</label>
+  <p class="muted small">Off, each cut snaps to the key frame before it, so a part can start a moment early. On, every part starts on the frame you asked for.</p>
+</div>
+<p class="muted small vs-info" id="vs-info" aria-live="polite"></p>
+<ol class="vs-parts small" id="vs-parts" hidden></ol>
+<style is:global>
+  .vs-mode { border: 0; padding: 0; margin: 0; }
+  .vs-mode legend { padding: 0; font-weight: 600; }
+  .vs-every { display: flex; gap: 6px; }
+  .vs-every input { flex: 1 1 100px; min-width: 0; }
+  .vs-info { margin: 0; }
+  .vs-info.is-over { color: var(--warn); font-weight: 600; }
+  .vs-parts { margin: 0; padding-left: 1.6em; max-height: 14em; overflow: auto; overflow-wrap: anywhere; }
+</style>

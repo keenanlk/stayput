@@ -1,0 +1,25 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import ImageToAscii from '../../components/options/ImageToAscii.astro';
+const tool = toolBySlug('image-to-ascii')!;
+---
+<ToolLayout tool={tool}>
+  <div slot="panel" id="ascii-panel" class="ascii-panel" hidden>
+    <p class="muted small" id="ascii-info" role="status"></p>
+    <label class="visually-hidden" for="ascii-out">ASCII art</label>
+    <textarea id="ascii-out" readonly spellcheck="false" wrap="off" rows="20"></textarea>
+    <div class="ascii-actions">
+      <button type="button" class="btn btn-small" id="ascii-copy">Copy text</button>
+      <button type="button" class="btn btn-small" id="ascii-txt">Download .txt</button>
+      <button type="button" class="btn btn-small" id="ascii-png">Download PNG</button>
+    </div>
+  </div>
+  <Fragment slot="options"><ImageToAscii /></Fragment>
+</ToolLayout>
+<style is:global>
+  .ascii-panel { display: grid; gap: 10px; }
+  #ascii-out { width: 100%; box-sizing: border-box; font: 8px/1 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; white-space: pre; overflow: auto; resize: vertical; }
+  .ascii-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+</style>
+<script src="../../tools/image-to-ascii.ts"></script>

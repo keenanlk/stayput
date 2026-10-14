@@ -20,5 +20,9 @@
 - `h264-aac.flv`, `h264-mp3.flv`, `h264-mp3-22k.flv`, `spark-mp3.flv`, `vp6-mp3.flv`: 5 s of ffmpeg's `testsrc` test pattern (320x240, 10 fps) with a 440 Hz tone, made by `make-flv.sh` for the FLV to MP4 tests: H.264 with AAC or MP3 sound, and Sorenson Spark with MP3. `vp6-mp3.flv` is the Spark file with its video tags relabelled VP6 (ffmpeg has no VP6 encoder) to test the refusal. No third-party material.
 - `tiny.heic` and `tiny.webp`: a 96 x 64 colour gradient made for the any-image landing tests (no third-party material).
 - `flat-blue-tone.mp4` and `logo-red.png`: 3 s of a flat blue (#305fa8) at 320x240, 15 fps (H.264, BT.709, with a 440 Hz mono AAC tone), and a 96x48 solid red logo, both generated with ffmpeg and Pillow for the Add watermark to video tests; no third-party material.
+<<<<<<< HEAD
 - `loop-10s.mp4`: 10 s of ffmpeg `testsrc2` at 320x240, 15 fps (H.264 Main, key frame every second, with a 440 Hz mono AAC tone), for the Repeat video tests; no third-party material.
 - `loop-mp3-in-mov.mov`: 2 s of ffmpeg `testsrc2` at 320x240 (H.264, with a 440 Hz MP3 tone in a MOV, which a MOV copy cannot hold), so Repeat video takes its re-encode path; no third-party material.
+=======
+- `split-60s.mp4`: 60 s of ffmpeg's `smptebars` pattern (160x120, 10 fps, H.264 with a key frame every 2 s) with a 440 Hz mono AAC tone, generated for the Video splitter tests; no third-party material.
+>>>>>>> origin/main
