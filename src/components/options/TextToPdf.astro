@@ -1,0 +1,64 @@
+---
+/** Option controls for Text to PDF, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+// The page script switches A4 to US Letter for browsers set to the US, Canada, Mexico or the Philippines.
+const paper = defaults.paper ?? 'a4';
+const margin = defaults['tp-margin'] ?? '72';
+const font = defaults['tp-font'] ?? 'auto';
+const size = defaults['tp-size'] ?? 'auto';
+const numbers = defaults['tp-numbers'] !== 'false';
+const encoding = defaults['tp-encoding'] ?? 'auto';
+import OptionDetails from '../OptionDetails.astro';
+---
+<div class="field">
+  <label for="paper">Page size</label>
+  <select id="paper">
+    <option value="a4" selected={paper === 'a4'}>A4</option>
+    <option value="letter" selected={paper === 'letter'}>US Letter</option>
+  </select>
+</div>
+<div class="field">
+  <label for="tp-margin">Margins</label>
+  <select id="tp-margin">
+    <option value="36" selected={margin === '36'}>0.5 inch</option>
+    <option value="54" selected={margin === '54'}>0.75 inch</option>
+    <option value="72" selected={margin === '72'}>1 inch</option>
+  </select>
+</div>
+<div class="field">
+  <label>Font</label>
+  <div class="segmented" role="radiogroup" aria-label="Font">
+    <label><input type="radio" name="tp-font" value="auto" checked={font === 'auto'} /><span>Automatic</span></label>
+    <label><input type="radio" name="tp-font" value="sans" checked={font === 'sans'} /><span>Sans-serif</span></label>
+    <label><input type="radio" name="tp-font" value="mono" checked={font === 'mono'} /><span>Monospace</span></label>
+  </div>
+</div>
+<div class="field">
+  <label for="tp-size">Type size</label>
+  <select id="tp-size">
+    <option value="auto" selected={size === 'auto'}>Automatic (11 pt, or 9 pt monospace)</option>
+    {['8', '9', '10', '11', '12', '14'].map((s) => <option value={s} selected={size === s}>{s} pt</option>)}
+  </select>
+</div>
+<div class="field wide">
+  <label for="tp-title">Title (optional)</label>
+  <input type="text" id="tp-title" maxlength="120" autocomplete="off" placeholder="Printed at the top of page 1 and used as the file name" />
+</div>
+<div class="field wide">
+  <label class="check"><input type="checkbox" id="tp-numbers" checked={numbers} /> Add page numbers (“1 of 12”)</label>
+</div>
+<div class="field">
+  <label for="tp-encoding">Text encoding</label>
+  <select id="tp-encoding">
+    <option value="auto" selected={encoding === 'auto'}>Automatic</option>
+    <option value="utf-8" selected={encoding === 'utf-8'}>UTF-8</option>
+    <option value="utf-16" selected={encoding === 'utf-16'}>UTF-16</option>
+    <option value="windows-1252" selected={encoding === 'windows-1252'}>Western European (Windows-1252)</option>
+  </select>
+</div>
+<OptionDetails>
+  <p>Plain text only: Markdown is not formatted, a CSV is not turned into a table, and there are no pictures, bold or italics. Tabs become four spaces and a form-feed character starts a new page.</p>
+  <p>Monospace is picked automatically for .csv and .log files and for text with columns lined up with spaces. Pick Sans-serif or Monospace to override it.</p>
+  <p>Chinese, Japanese, Korean, Arabic, Hebrew, Thai, Indian scripts and emoji cannot be drawn. Each shows as � and the result says how many. Files up to 2 MB, about 300 pages.</p>
+</OptionDetails>

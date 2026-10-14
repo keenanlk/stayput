@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import TextToPdf from '../../components/options/TextToPdf.astro';
+import TextToPdfPaste from '../../components/TextToPdfPaste.astro';
+const tool = toolBySlug('text-to-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <TextToPdfPaste slot="panel" />
+  <Fragment slot="options"><TextToPdf /></Fragment>
+</ToolLayout>
+<script src="../../tools/text-to-pdf.ts"></script>

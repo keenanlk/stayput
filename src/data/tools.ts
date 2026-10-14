@@ -1245,50 +1245,6 @@ export const tools: Tool[] = [
     ],
   },
   {
-    slug: 'gif-to-animated-png',
-    lead:
-      'Converts animated GIFs to animated PNG (APNG), keeping every frame, its delay, the loop count and transparent areas, with full colour instead of the GIF’s 256. It is free, and your GIFs are not uploaded: each frame is decoded and written by your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
-    name: 'GIF to APNG',
-    title: 'GIF to Animated PNG (APNG) Converter, Free | Stayput',
-    description:
-      'Convert animated GIFs to animated PNG (APNG) in your browser. Keeps timing, looping and transparency. Free, batch, no watermark, not uploaded.',
-    heading: 'Convert GIF to animated PNG',
-    tagline: 'Turn animated GIFs into animated PNG (APNG) files with their timing, looping and transparency. Converted on this device, never uploaded.',
-    category: 'images',
-    accept: 'image/gif,.gif',
-    multiple: true,
-    dropLabel: 'Drop GIFs to convert to APNG',
-    action: 'Convert to APNG',
-    keywords: ['gif to apng', 'gif to animated png', 'convert gif to apng', 'gif to apng converter', 'animated gif to apng'],
-    steps: [
-      'Drop one or more animated GIFs, or tap to pick them.',
-      'Convert. Each GIF is decoded and written as an animated PNG in your browser.',
-      'Download the .png file, or a zip when you converted several.',
-    ],
-    faq: [
-      {
-        q: 'Is my GIF uploaded?',
-        a: 'No. The GIF is decoded by code in this page and the animated PNG is written in your browser’s memory. There is no server in the process, and after one visit and a short wait the page works with Wi-Fi off.',
-      },
-      {
-        q: 'Will the APNG be smaller than the GIF?',
-        a: 'Not necessarily. An APNG stores full colour for every frame, and for flat-colour animation such as logos and pixel art it is often larger than the GIF. Convert for the quality and the smooth transparency, not for the size. If size is the goal, [GIF to MP4](/tools/gif-to-mp4) is usually far smaller.',
-      },
-      {
-        q: 'Does it keep the timing, the looping and the transparency?',
-        a: 'Yes. Each frame keeps its own delay, the loop count from the GIF is written into the file (a GIF with no loop setting plays once), and see-through areas stay see-through, with soft edges where the GIF had hard ones. Frames with a delay of 0 or 1 hundredths of a second are given a tenth of a second, which is what every browser does with them too.',
-      },
-      {
-        q: 'Where does an APNG play?',
-        a: 'In Safari, Chrome, Edge and Firefox, and in many image viewers and editors. Some chat apps, social sites and upload forms flatten an APNG to its first frame, or refuse it, and some only accept GIF. Check where you will use it; the file is a normal .png, so a program that does not know APNG shows the first frame.',
-      },
-      {
-        q: 'Why is it a .png file and not .apng?',
-        a: 'An APNG is a PNG with extra animation chunks, so the usual extension is .png and programs that do not understand animation still open it as a still picture. The file you get is named after your GIF with .png.',
-      },
-    ],
-  },
-  {
     slug: 'compress-video',
     name: 'Compress video',
     title: 'Video Compressor, Compress MP4 Without Uploading | Stayput',
@@ -3898,6 +3854,78 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'text-to-pdf',
+    name: 'Text to PDF',
+    title: 'Text to PDF: Paste Text or Drop a TXT File | Stayput',
+    description: 'Turn pasted text, or a .txt, .md, .csv or .log file, into a PDF in your browser. Choose A4 or Letter, type size and margins. Not uploaded.',
+    heading: 'Convert text to PDF',
+    tagline: 'Type or paste text, or drop a text file, and get a PDF with the page size and margins you choose, made on your own device.',
+    category: 'pdf',
+    accept: '.txt,.md,.markdown,.csv,.tsv,.log,.text,text/plain,text/markdown,text/csv',
+    multiple: true,
+    dropLabel: 'Drop text files here',
+    action: 'Convert to PDF',
+    keywords: ['text to pdf', 'text to pdf converter', 'text file to pdf', 'convert text to pdf', 'paste text to pdf', 'text to pdf free', 'txt to pdf'],
+    sizeFact: 'No watermark. Up to 2 MB of text per file, about 300 pages',
+    lead: 'Turns typed or pasted text, or .txt, .md, .csv and .log files, into a PDF with the page size, margins and type size you choose. It is free, needs no account and adds no watermark, and your text is not uploaded: the PDF is laid out by code in this tab. Chinese, Japanese, Korean, Arabic, Hebrew, Thai and emoji cannot be drawn, and the result tells you when a file had them.',
+    steps: [
+      'Type or paste your text into the box, or drop one or more text files (.txt, .md, .csv, .log).',
+      'Choose A4 or US Letter, the margins and the type. Monospace keeps columns lined up.',
+      'Press Convert to PDF. Several files give one PDF each, and Download all zips them.',
+    ],
+    sections: [
+      {
+        heading: 'What goes into the PDF',
+        paragraphs: [
+          'The text is set as you wrote it: line breaks and blank lines are kept, indentation is kept, tabs become four spaces, and a form-feed character starts a new page. Long lines wrap at the margin, and a very long word or web address is broken at the margin instead of running off the page.',
+          'It is plain text in and plain text out. Markdown is not formatted, so # and * stay as typed; a CSV is not turned into a table; there are no pictures, bold or italics.',
+        ],
+      },
+      {
+        heading: 'A worked example: a log file',
+        paragraphs: [
+          'A server log has lines up to 80 characters, with columns lined up using spaces. Drop it and the page picks Monospace and 9 pt for you, because the file ends in .log. On US Letter with 1 inch margins that gives 86 characters to a line, so an 80-character line does not wrap and the columns stay lined up. On A4 it is 83 characters. If you switch to 11 pt Monospace, a Letter page holds 70 characters and the same lines wrap.',
+          'Set a title if you want one: it is printed at the top of page 1, saved as the PDF’s title and used for the file name. Page numbers read "1 of 12" at the bottom and are on by default.',
+        ],
+      },
+      {
+        heading: 'Languages and symbols',
+        bullets: [
+          'Latin letters with accents, Greek, Cyrillic and Vietnamese are drawn in Roboto.',
+          'Arrows, tick marks, box-drawing lines and common symbols are drawn in DejaVu Sans Mono.',
+          'Chinese, Japanese, Korean, Arabic, Hebrew, Thai, Indian scripts and emoji are not drawn. Each one shows as a � mark in the PDF, and the result tells you how many there were and which, so nothing disappears without a word.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'Is my text uploaded?',
+        a: 'No. The text is read, laid out and written as a PDF in this tab, so a note, a contract draft or a log file does not leave your device. After one visit and a short wait the page works offline.',
+      },
+      {
+        q: 'Which file types and encodings work?',
+        a: 'Plain text files such as .txt, .md, .csv and .log. UTF-8 and UTF-16 files are read correctly, and an older file that is not valid UTF-8 is read as Western European (Windows-1252), and the result says so. Word documents, PDFs and other binary files are refused with a message.',
+      },
+      {
+        q: 'Why is part of my text shown as a � mark?',
+        a: 'The built-in fonts cannot draw Chinese, Japanese, Korean, Arabic, Hebrew, Thai, Indian scripts or emoji. Those characters are replaced by � and counted in the result, so you can see what was affected. For a file that is mostly in one of those scripts, open it in your browser and use Print, then Save as PDF, which uses your device’s own fonts.',
+      },
+      {
+        q: 'Why do my columns not line up?',
+        a: 'Switch the font to Monospace. In a proportional font the letters have different widths, so columns made with spaces drift. Monospace is picked automatically for .csv and .log files and for text with aligned columns.',
+      },
+      {
+        q: 'Does it turn Markdown or a CSV into a formatted document or a table?',
+        a: 'No. The text is set as it is written, so headings keep their # signs and a CSV stays as lines of text with commas. Use Monospace for a readable CSV.',
+      },
+      {
+        q: 'How big a file can I convert?',
+        a: 'Up to 2 MB of text per file, which is about 300 pages. A PDF is laid out in your device’s memory, and larger files can make a tab run out of it, so split bigger files into parts. A phone may run out sooner.',
+      },
+      NOACCOUNT,
+    ],
+  },
+  {
     slug: 'pdf-to-epub',
     name: 'PDF to EPUB',
     title: 'PDF to EPUB Converter: Reflowable Ebook, Free, No Upload | Stayput',
@@ -5052,6 +5080,50 @@ export const tools: Tool[] = [
       { q: 'Can it split where the silence is?', a: 'Not on this page: you give the times. [Remove silence](/tools/remove-silence) cuts long pauses out of a recording, but it makes one file, not several.' },
       { q: 'Can I split the sound of a video?', a: 'Yes. Drop the video and its sound track is loaded; the parts are saved as audio only.' },
       { q: 'Can I split an audio file without uploading it?', a: 'Yes. Your browser decodes the sound, cuts it and writes each part with code running in this tab. Open the network tab, run a split, and your recording is not among the requests. After one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.' },
+    ],
+  },
+  {
+    slug: 'gif-to-animated-png',
+    lead:
+      'Converts animated GIFs to animated PNG (APNG), keeping every frame, its delay, the loop count and transparent areas, with full colour instead of the GIF’s 256. It is free, and your GIFs are not uploaded: each frame is decoded and written by your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
+    name: 'GIF to APNG',
+    title: 'GIF to Animated PNG (APNG) Converter, Free | Stayput',
+    description:
+      'Convert animated GIFs to animated PNG (APNG) in your browser. Keeps timing, looping and transparency. Free, batch, no watermark, not uploaded.',
+    heading: 'Convert GIF to animated PNG',
+    tagline: 'Turn animated GIFs into animated PNG (APNG) files with their timing, looping and transparency. Converted on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to convert to APNG',
+    action: 'Convert to APNG',
+    keywords: ['gif to apng', 'gif to animated png', 'convert gif to apng', 'gif to apng converter', 'animated gif to apng'],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Convert. Each GIF is decoded and written as an animated PNG in your browser.',
+      'Download the .png file, or a zip when you converted several.',
+    ],
+    faq: [
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded by code in this page and the animated PNG is written in your browser’s memory. There is no server in the process, and after one visit and a short wait the page works with Wi-Fi off.',
+      },
+      {
+        q: 'Will the APNG be smaller than the GIF?',
+        a: 'Not necessarily. An APNG stores full colour for every frame, and for flat-colour animation such as logos and pixel art it is often larger than the GIF. Convert for the quality and the smooth transparency, not for the size. If size is the goal, [GIF to MP4](/tools/gif-to-mp4) is usually far smaller.',
+      },
+      {
+        q: 'Does it keep the timing, the looping and the transparency?',
+        a: 'Yes. Each frame keeps its own delay, the loop count from the GIF is written into the file (a GIF with no loop setting plays once), and see-through areas stay see-through, with soft edges where the GIF had hard ones. Frames with a delay of 0 or 1 hundredths of a second are given a tenth of a second, which is what every browser does with them too.',
+      },
+      {
+        q: 'Where does an APNG play?',
+        a: 'In Safari, Chrome, Edge and Firefox, and in many image viewers and editors. Some chat apps, social sites and upload forms flatten an APNG to its first frame, or refuse it, and some only accept GIF. Check where you will use it; the file is a normal .png, so a program that does not know APNG shows the first frame.',
+      },
+      {
+        q: 'Why is it a .png file and not .apng?',
+        a: 'An APNG is a PNG with extra animation chunks, so the usual extension is .png and programs that do not understand animation still open it as a still picture. The file you get is named after your GIF with .png.',
+      },
     ],
   },
 ];
