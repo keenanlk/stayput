@@ -3467,6 +3467,10 @@ export const tools: Tool[] = [
         a: 'Yes. [Add text to GIF](/tools/add-text-to-gif) draws a caption on every frame and keeps each frame’s timing and the loop.',
       },
       {
+        q: 'Can I turn a GIF the other way up?',
+        a: 'Yes. [Rotate GIF](/rotate-gif) turns an animated GIF by 90, 180 or 270 degrees, or flips it, and keeps every frame’s timing.',
+      },
+      {
         q: 'Is my GIF uploaded?',
         a: 'No. The GIF is read and rewritten by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
@@ -3519,6 +3523,10 @@ export const tools: Tool[] = [
         a: 'Yes. [Add text to GIF](/tools/add-text-to-gif) draws a caption on every frame and keeps each frame’s timing and the loop. Crop first if you want the caption placed against the cropped edges.',
       },
       {
+        q: 'Can I rotate a GIF as well?',
+        a: 'Yes. [Rotate GIF](/rotate-gif) turns an animated GIF by 90, 180 or 270 degrees, or flips it, and keeps every frame’s timing.',
+      },
+      {
         q: 'Is my GIF uploaded?',
         a: 'No. The GIF is decoded and cropped by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
       },
@@ -3557,6 +3565,46 @@ export const tools: Tool[] = [
       {
         q: 'Can I speed up and reverse at once?',
         a: 'Yes. Pick a speed and tick Play it backwards in the same run. The file name says which you chose, such as -reversed-2x.',
+      },
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded and rewritten by code running in this page, with no server in the process, and the limit is your device’s memory (phones hold less). The page keeps working offline after one visit and a short wait.',
+      },
+    ],
+  },
+  {
+    slug: 'gif-rotate',
+    icon: 'rotate',
+    name: 'Rotate GIF',
+    title: 'Rotate or Flip a GIF: 90, 180, 270 Degrees, No Upload | Stayput',
+    description:
+      'Rotate an animated GIF by 90, 180 or 270 degrees, or flip it horizontally or vertically, in your browser. Timing and loop stay. Not uploaded; no watermark.',
+    heading: 'Rotate or flip a GIF',
+    tagline: 'Turn an animated GIF a quarter, half or three-quarter turn, or mirror it. Every frame keeps its timing, and the GIF stays on this device.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to rotate or flip',
+    action: 'Rotate',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or very large GIF may need a computer.',
+    keywords: ['rotate gif', 'rotate gif online', 'flip gif', 'rotate animated gif', 'mirror gif', 'turn gif sideways'],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Choose 90° right, 180° or 90° left, and tick a flip if you want one.',
+      'Press Rotate. Each GIF keeps its frames, timing and loop; one downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Does rotating a GIF keep it animated?',
+        a: 'Yes. Every frame is turned and written back with its own delay, and the loop setting is copied, so the result plays exactly as the original did, only turned.',
+      },
+      {
+        q: 'Why do the width and height swap?',
+        a: 'A quarter turn makes a landscape GIF portrait and the other way round, so a 400 by 300 GIF comes out 300 by 400. A half turn keeps the size.',
+      },
+      {
+        q: 'Is the turn clockwise?',
+        a: '90° right is clockwise and 90° left is counter-clockwise. The flip is applied after the turn: horizontal mirrors left to right, vertical mirrors top to bottom.',
       },
       {
         q: 'Is my GIF uploaded?',
