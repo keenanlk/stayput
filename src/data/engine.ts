@@ -255,6 +255,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser decodes the sound into plain samples, draws the picture once onto a canvas (fitted whole over a blurred copy, or the title on a plain colour), and its own WebCodecs encoders write that still frame once a second with the sound as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
     versus: 'Online MP3-to-video converters upload your music and cover art, add their logo to free videos, and cap the length. Unreleased tracks and private recordings stay private here: nothing leaves your device.',
   },
+  'photo-slideshow-maker': {
+    how: 'Your browser decodes each photo in the tab (libheif or the Squoosh decoders step in for HEIC, AVIF and JPEG XL) and draws it on a canvas the size of the video frame, whole over a blurred copy of itself or cropped to fill. Its own WebCodecs encoders write one frame a second while a photo holds, and a short run of frames for each crossfade, with the song as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
+    versus: 'Online slideshow makers upload your photos, put their logo on the free video, and ask you to sign in before you can download. Family photos stay on your device here, and the file you save carries no mark.',
+  },
   'compress-audio': {
     how: 'Your browser decodes the sound with its own audio decoders. When you set a size limit, the bitrate is worked out from the length of the sound so the file lands under it. The smaller file is then written in your tab, as MP3 by LAME compiled to WebAssembly or as OGG by the browser’s own Opus encoder (WebCodecs) with Mediabunny (MPL-2.0) writing the container.',
     versus: 'Online audio compressors upload the recording before they shrink it, which for a large WAV is the slowest part, and cap free files at 50 to 100 MB. Here nothing is uploaded, so the limit is your device’s memory (phones hold less) and private recordings stay on your device.',
