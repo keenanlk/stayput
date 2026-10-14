@@ -1,8 +1,11 @@
 // Per-page <lastmod> for the sitemap and dateModified in structured data.
 //
 // Vercel and CI build from shallow clones, so the build cannot ask git when a
-// page last changed. Instead src/data/lastmod.json (committed) maps every page
-// path to { date, hash }. The hash fingerprints the content the page renders
+// page last changed. Instead src/data/lastmod/ (committed) holds one small file
+// per page, { path, date, hash }, named from the path (/tools/x -> tools__x.json,
+// / -> _home.json). One file per page means a branch that adds a page only adds a
+// file, and an unchanged page's file never changes, so parallel branches don't
+// conflict. The hash fingerprints the content the page renders
 // from: its entry in src/data/tools.ts, pairs.ts, presets.ts or guides.ts, its
 // engine paragraph, and its .astro page file. The build only reads the dates.
 //
@@ -15,10 +18,34 @@
 //
 // Runs on Node 22.18+ (it imports the .ts data files directly).
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, unlinkSync, mkdirSync } from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
-export const mapFile = new URL('../src/data/lastmod.json', import.meta.url);
+export const mapDir = new URL('../src/data/lastmod/', import.meta.url);
+export const fileFor = (path) => (path === '/' ? '_home' : path.slice(1).replace(/\//g, '__')) + '.json';
+
+/** The committed per-page entries as { path: { date, hash } }. */
+export function readMap(dir = mapDir) {
+  const out = {};
+  if (!existsSync(dir)) return out;
+  for (const f of readdirSync(dir)) {
+    if (!f.endsWith('.json')) continue;
+    const { path, date, hash } = JSON.parse(readFileSync(new URL(f, dir), 'utf8'));
+    out[path] = { date, hash };
+  }
+  return out;
+}
+
+/** Write `next`, touching only files whose content changed and removing files of removed pages. */
+export function writeMap(next, dir = mapDir) {
+  mkdirSync(dir, { recursive: true });
+  const want = new Map(Object.entries(next).map(([path, e]) => [fileFor(path), JSON.stringify({ path, date: e.date, hash: e.hash }, null, 1) + '\n']));
+  for (const f of readdirSync(dir)) if (f.endsWith('.json') && !want.has(f)) unlinkSync(new URL(f, dir));
+  for (const [f, body] of want) {
+    const u = new URL(f, dir);
+    if (!existsSync(u) || readFileSync(u, 'utf8') !== body) writeFileSync(u, body);
+  }
+}
 const root0 = new URL('../', import.meta.url);
 
 const sha = (...parts) => createHash('sha256').update(parts.join('\u0000')).digest('hex').slice(0, 16);
@@ -44,9 +71,9 @@ export async function computeEntries(root = root0) {
     out[`/guides/${g.slug}`] = { hash: sha(json(rest)), date: updated };
   }
   const page = (path, file, ...extra) => (out[path] = { hash: sha(read(root, `src/pages/${file}.astro`), ...extra) });
-  page('/', 'index', ...tools.map((t) => t.slug));
-  page('/guides', 'guides/index', ...guides.map((g) => g.slug + g.heading + g.dek));
-  page('/conversions', 'conversions/index', ...pairs.map((p) => p.slug));
+  page('/', 'index');
+  page('/guides', 'guides/index');
+  page('/conversions', 'conversions/index');
   for (const name of ['about', 'press', 'privacy', 'terms', 'mcp']) page(`/${name}`, name);
   page('/licenses', 'licenses', read(root, 'src/data/licenses.json'));
   return out;
@@ -84,16 +111,16 @@ const today = () => new Date().toISOString().slice(0, 10);
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const check = process.argv.includes('--check');
   const date = process.argv.find((a) => a.startsWith('--date='))?.slice(7) ?? today();
-  const previous = existsSync(mapFile) ? JSON.parse(readFileSync(mapFile, 'utf8')) : {};
+  const previous = readMap();
   const { next, stale } = updateMap(previous, await computeEntries(), date);
   if (check) {
     if (stale.length) {
-      console.error(`src/data/lastmod.json is out of date:\n  ${stale.slice(0, 20).join('\n  ')}\nRun: node scripts/lastmod.mjs`);
+      console.error(`src/data/lastmod/ is out of date:\n  ${stale.slice(0, 20).join('\n  ')}\nRun: node scripts/lastmod.mjs`);
       process.exit(1);
     }
-    console.log('lastmod.json is up to date');
+    console.log('lastmod is up to date');
   } else {
-    writeFileSync(mapFile, JSON.stringify(next, null, 1) + '\n');
-    console.log(`lastmod.json: ${Object.keys(next).length} pages, ${stale.length} updated to ${date}`);
+    writeMap(next);
+    console.log(`lastmod: ${Object.keys(next).length} pages, ${stale.length} updated to ${date}`);
   }
 }

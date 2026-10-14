@@ -33,7 +33,7 @@ test('every sitemap URL has a real, valid lastmod, and they are not all one valu
   expect(new Set(entries.map((e) => e.lastmod)).size).toBeGreaterThan(5);
 });
 
-test('src/data/lastmod.json is up to date with the page content', () => {
+test('src/data/lastmod/ is up to date with the page content', () => {
   // Fails when a page's content changed without running `node scripts/lastmod.mjs`.
   expect(() => execFileSync('node', ['scripts/lastmod.mjs', '--check'], { stdio: 'pipe' })).not.toThrow();
 });
