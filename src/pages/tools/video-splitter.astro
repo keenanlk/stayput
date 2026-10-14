@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VideoSplitter from '../../components/options/VideoSplitter.astro';
+const tool = toolBySlug('video-splitter')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><VideoSplitter /></Fragment>
+</ToolLayout>
+<script src="../../tools/video-splitter.ts"></script>

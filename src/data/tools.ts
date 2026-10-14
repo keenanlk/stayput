@@ -1698,6 +1698,54 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-splitter',
+    icon: 'scissors',
+    name: 'Video splitter',
+    title: 'Video Splitter: Cut a Video into Parts, No Upload | Stayput',
+    description: 'Split a video into parts at times you type, every few seconds or into equal parts, and get them in one zip. MP4, MOV, WebM, MKV. Free, no upload.',
+    heading: 'Split a video into parts',
+    tagline: 'Cut one video into parts at the times you choose, every so often or into equal pieces, and save them in one zip. Done on this device, and the video is not uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop a video to split',
+    action: 'Split video',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): a long or large video may need a computer.',
+    keywords: ['video splitter', 'split video', 'split video into parts', 'video splitter online', 'split mp4', 'cut video into parts', 'split video into equal parts', 'split video every 30 seconds'],
+    lead: 'Lets you cut one video into parts, either at the times you type, every so many seconds or minutes, or into equal pieces, and saves the parts in one zip. It is free, needs no account and adds no watermark, and your video is not uploaded: your browser reads the MP4, MOV, WebM or MKV and cuts it inside this tab. By default the cuts copy the video without re-encoding, so they take seconds; an option makes every cut exact on the frame. The size limit is your device’s memory, and phones hold less; after one visit and a short wait the page works offline.',
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV), or tap to pick one.',
+      'Choose how to split: type the times where each new part should start, give a length such as every 30 seconds, or pick a number of equal parts. The page lists the parts and the total size before it starts.',
+      'Press Split video. The parts are saved as name-part-01.mp4 and so on, and Download all gives you them in one zip.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You have lecture.mp4, a 90-minute recording, and want it in three sittings. Choose Into equal parts and type 3: you get lecture-part-01 to lecture-part-03, each 30 minutes. Or choose At times I type and type 25:00, 52:30 to cut where the topics change.',
+          'Every part starts where the one before it ended, so together they cover the whole video. The default cut copies the video as it is, which is why a long file splits in seconds and looks exactly like the original.',
+        ],
+      },
+      {
+        heading: 'What this page does and does not do',
+        bullets: [
+          'It cuts one video into parts, end to end. To keep just one stretch, [Trim video](/tools/trim-video) (also at [Cut video](/cut-video) and [Trim MP4](/trim-mp4)) is the simpler page, and [Combine videos](/combine-videos) joins parts back into one.',
+          'It splits where you say. It does not find scene changes or chapters on its own.',
+          'It makes up to 50 parts in one run, and each part keeps the video’s own format: an MP4 gives MP4 parts, a MOV gives MOV parts, and WebM and MKV stay WebM and MKV.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I split a video into parts?', a: 'Drop the video, choose a way to split (times you type, every so many seconds or minutes, or a number of equal parts) and press Split video. The parts are separate files, and Download all gives you them as one zip.' },
+      { q: 'Why does a part start a little early?', a: 'A video is stored as key frames with changes in between, and a cut that copies the video without re-encoding can only start on a key frame. So each part begins at the key frame just before the time you asked for, often within a second or two. The end of the part before it moves with it, so nothing is lost or repeated. Tick Exact cuts if a part must start on the frame.' },
+      { q: 'Why are exact cuts slower?', a: 'To start between two key frames, the page has to decode the video and encode it again with your browser’s own video encoder, which takes about as long as playing the video through, and the result is close to the original but not identical. The default copies the packets instead, which takes seconds.' },
+      { q: 'How many parts can it make?', a: 'Up to 50 in one run. If your times or length would make more, the page says so; use fewer times or a longer length, or split a part again.' },
+      { q: 'How big a video can I split?', a: 'The size limit is your device’s memory, and phones hold less than computers: the parts are kept in memory until you save them, so about as much memory as the video is needed. A large video on a phone may fail; a computer will usually manage, or cut the video down first with [Trim video](/tools/trim-video).' },
+      { q: 'What format are the parts?', a: 'The same as the video you dropped: an MP4 gives MP4 parts, a MOV gives MOV parts, and WebM and MKV stay WebM and MKV. They are named like holiday-part-01.mp4.' },
+      { q: 'Can I split a video without uploading it?', a: 'Yes. The video is not uploaded: your browser reads the file from your device, cuts it with code running in this tab and zips the parts there. Open the network tab, run a split, and your video is not among the requests.' },
+    ],
+  },
+  {
     slug: 'mute-video',
     icon: 'mute',
     lead:
