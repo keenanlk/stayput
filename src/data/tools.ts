@@ -1281,7 +1281,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my image uploaded?',
-        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page, and the .docx is built in the same tab. The engine and its English model (about 6 MB) are downloaded from this site the first time you use it, and after that the tool works offline.',
+        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page, and the .docx is built in the same tab. The engine and its English model (about 6 MB) are downloaded from this site on your first run, and after your first run the tool works offline.',
       },
       {
         q: 'Which languages does it read?',
