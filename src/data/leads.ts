@@ -63,6 +63,7 @@ const does: Record<string, string> = {
   'add-watermark-to-video': 'Puts a text or logo watermark on every frame of a video (MP4, MOV, WebM or MKV), in a corner or the centre at a size and opacity you pick, and saves an MP4 with the sound kept.',
   'video-speed': 'Speeds a video up to 2×, 4× or 8× or slows it to 0.5× or 0.25×, keeps the pitch of the sound, and saves an MP4.',
   'merge-videos': 'Joins two or more videos (MP4, MOV, WebM, MKV) end to end into one MP4, in the order you set.',
+  'repeat-video': 'Repeats a video clip end to end 2 to 50 times, or to a length you set, copying the picture and sound as they are where it can, and saves one longer file.',
   'add-audio-to-video': 'Puts an MP3, WAV or M4A track on a video, or swaps in the sound of another clip, and saves a new video.',
   'reverse-video': 'Plays a video backwards, with the sound reversed or removed, from MP4, MOV, WebM or MKV to MP4.',
   'video-to-jpg': 'Saves frames from an MP4, MOV, WebM or MKV video as JPG or PNG images: one per second, spread across the clip, or every frame.',
