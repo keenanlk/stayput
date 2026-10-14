@@ -1368,7 +1368,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Which file sizes can I fit a video under?',
-        a: '8, 10, 16, 25, 50 or 100 MB. 10 MB is Discord’s free limit, 16 MB is WhatsApp’s and 25 MB is the attachment limit for Gmail and Outlook. Choose Fit a file size and the resolution is lowered automatically when a long video needs it.',
+        a: '8, 10, 16, 25, 50 or 100 MB. 10 MB is Discord’s free limit, 16 MB is WhatsApp’s and 25 MB is the attachment limit for Gmail and Outlook. Choose Fit a file size and the resolution is lowered automatically when a long video needs it. Add a name or logo first with [Add watermark to video](/tools/add-watermark-to-video), then compress.',
       },
       {
         q: 'Which formats can I compress?',
@@ -1652,7 +1652,54 @@ export const tools: Tool[] = [
       },
       {
         q: 'Can I crop just part of the video’s length?',
-        a: 'This crops the picture for the whole video. To keep only part of the time, use Trim video first or afterwards.',
+        a: 'This crops the picture for the whole video. To keep only part of the time, use Trim video first or afterwards. To put your name or logo on the cropped result, use [Add watermark to video](/tools/add-watermark-to-video).',
+      },
+    ],
+  },
+  {
+    slug: 'add-watermark-to-video',
+    icon: 'stamp',
+    name: 'Add watermark to video',
+    title: 'Add Watermark to Video Online, Text or Logo, No Upload | Stayput',
+    description:
+      'Add a text or logo watermark to a video in your browser: pick the corner or centre, size and opacity. MP4, MOV, WebM in, MP4 out. No upload, no sign-up.',
+    heading: 'Add a watermark to a video',
+    tagline: 'Put your name, a copyright line or your logo on every frame of a video, with the sound kept. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to watermark',
+    action: 'Add watermark',
+    keywords: ['add watermark to video', 'video watermark', 'watermark video online', 'add logo to video', 'add text to video', 'put a logo on a video', 'watermark mp4'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them. A frame from the first one shows the watermark as you set it up.',
+      'Choose Text and type it, or choose Image or logo and pick a PNG. Set the position, size and opacity.',
+      'Add watermark. Every frame is drawn with the mark and the video is written again as an MP4, with its sound kept.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes the video, this page draws the watermark on each frame, and the browser’s own video encoder writes the MP4, all in this tab. There is no upload, so unreleased footage and client work stay on your device, and nothing is added to the result except your mark.',
+      },
+      {
+        q: 'Can I use my logo?',
+        a: 'Yes. Choose Image or logo and pick a PNG, JPG or WebP. A PNG with a transparent background looks best because only the logo itself is drawn over the picture. The logo is read on your device and is not uploaded either.',
+      },
+      {
+        q: 'Where can the watermark go?',
+        a: 'In any of the four corners or in the centre, at a size from a small credit to a large mark, and at 5 to 100 per cent opacity. The mark is static: it sits in the same place for the whole video. Animated or timed watermarks are not supported.',
+      },
+      {
+        q: 'Does the sound stay?',
+        a: 'Yes. The sound is carried over as it is, unless you tick Remove the sound. The output is always an MP4, with H.264 video where your browser can write it.',
+      },
+      {
+        q: 'Does it lower the quality?',
+        a: 'The picture has to be encoded again to carry the watermark, which is done at high quality, so the result looks very close to the original. A very short or already heavily compressed clip can come out a little larger than it went in; run it through Compress video afterwards if you need it smaller.',
+      },
+      {
+        q: 'Can the watermark be removed?',
+        a: 'It is burned into the pixels of every frame, so it cannot be switched off like a subtitle track. A determined person with editing software can still cover or paint it out, as with any watermark, so use a larger or central position for footage you are worried about.',
       },
     ],
   },
@@ -3229,7 +3276,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Does it keep the sound?',
-        a: 'Yes, unless you tick Remove the sound. Voices, names said aloud and background noises can identify people too, so consider removing it for sensitive footage.',
+        a: 'Yes, unless you tick Remove the sound. Voices, names said aloud and background noises can identify people too, so consider removing it for sensitive footage. To mark the finished video with your name or logo, use [Add watermark to video](/tools/add-watermark-to-video).',
       },
       {
         q: 'How long does it take?',

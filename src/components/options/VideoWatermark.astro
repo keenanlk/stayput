@@ -1,0 +1,52 @@
+---
+/** Option controls for add watermark to video. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const kind = defaults.kind ?? 'text';
+const text = defaults.text ?? '© Your name';
+const place = defaults.place ?? 'bottom-right';
+const size = defaults.size ?? '4';
+const opacity = defaults.opacity ?? '70';
+const color = defaults.color ?? '#ffffff';
+const places = [
+  ['top-left', 'Top left'],
+  ['top-right', 'Top right'],
+  ['center', 'Centre'],
+  ['bottom-left', 'Bottom left'],
+  ['bottom-right', 'Bottom right'],
+] as const;
+---
+<div class="field wide">
+  <label>Watermark</label>
+  <div class="segmented" role="radiogroup" aria-label="Watermark type">
+    <label><input type="radio" name="kind" value="text" checked={kind === 'text'} /><span>Text</span></label>
+    <label><input type="radio" name="kind" value="image" checked={kind === 'image'} /><span>Image or logo</span></label>
+  </div>
+</div>
+<div class="field wide" id="wm-text-field">
+  <label for="wm-text">Watermark text</label>
+  <input type="text" id="wm-text" value={text} maxlength="120" autocomplete="off" />
+</div>
+<div class="field wide" id="wm-logo-field" hidden>
+  <label for="wm-logo">Logo image (PNG, JPG or WebP; transparent PNG works best)</label>
+  <input type="file" id="wm-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" />
+</div>
+<div class="field">
+  <label for="wm-place">Position</label>
+  <select id="wm-place">
+    {places.map(([v, l]) => <option value={v} selected={v === place}>{l}</option>)}
+  </select>
+</div>
+<div class="field">
+  <label for="wm-size">Size <output id="wm-size-out">{size}</output></label>
+  <input type="range" id="wm-size" min="1" max="10" value={size} />
+</div>
+<div class="field">
+  <label for="wm-opacity">Opacity <output id="wm-opacity-out">{opacity}</output>%</label>
+  <input type="range" id="wm-opacity" min="5" max="100" step="5" value={opacity} />
+</div>
+<div class="field" id="wm-color-field">
+  <label for="wm-color">Text colour</label>
+  <input type="color" id="wm-color" value={color} />
+</div>
+<label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
