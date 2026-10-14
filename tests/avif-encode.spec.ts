@@ -141,28 +141,3 @@ test('Cancel ends a running AVIF encode', async ({ page }) => {
   await expect(page.locator('#avif-cancel-field')).toBeHidden();
   await expect(page.locator('#run')).toBeEnabled();
 });
-
-test('AVIF to WebP: same size where the browser can write WebP, and the page says so where it cannot', async ({ page }) => {
-  test.setTimeout(120_000);
-  await setUp(page, 'avif-to-webp');
-  const canWebp = await page.evaluate(async () => {
-    const c = document.createElement('canvas');
-    c.width = c.height = 2;
-    const blob: Blob | null = await new Promise((r) => c.toBlob(r, 'image/webp'));
-    return blob?.type === 'image/webp';
-  });
-  if (!canWebp) {
-    // Safari: WebP is switched off in the picker rather than producing a file of another type.
-    await expect(page.locator('#format')).not.toHaveValue('image/webp');
-    return;
-  }
-  const out = await convert(page, fx('checker.avif'));
-  expect(out.subarray(0, 4).toString('latin1')).toBe('RIFF');
-  expect(out.subarray(8, 12).toString('latin1')).toBe('WEBP');
-  const size = await page.evaluate(async (b64) => {
-    const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    const bmp = await createImageBitmap(new Blob([bin], { type: 'image/webp' }));
-    return { width: bmp.width, height: bmp.height };
-  }, out.toString('base64'));
-  expect(size).toEqual({ width: 320, height: 240 });
-});

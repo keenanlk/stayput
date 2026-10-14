@@ -378,36 +378,6 @@ export const pairs: Pair[] = [
     ],
   },
   {
-    slug: 'avif-to-webp',
-    from: 'AVIF',
-    to: 'WebP',
-    outputType: 'image/webp',
-    accept: 'image/avif,.avif',
-    title: 'AVIF to WebP Converter, Free, No Upload | Stayput',
-    description: 'Convert AVIF images to WebP in your browser for wider support. Transparency kept, quality slider, nothing uploaded.',
-    heading: 'Convert AVIF to WebP',
-    tagline: 'A WebP copy of an AVIF image, made on your device.',
-    keywords: ['avif to webp', 'convert avif to webp', 'avif to webp converter'],
-    intro: [
-      'WebP is opened by more editors, CMS uploaders and older browsers than AVIF, and it keeps transparency. If a site saved an AVIF and your tool refuses it, WebP is a lighter step than JPG that stays small.',
-      'Your browser decodes the AVIF and writes the WebP at the quality you set, at the same pixel size. Both formats are lossy, so a little detail is lost in the re-encode. Safari cannot write WebP from a web page, so on Safari this page says so instead of producing a file.',
-    ],
-    faq: [
-      { q: 'Is transparency preserved?', a: 'Yes. Transparent areas of the AVIF stay transparent in the WebP.' },
-      { q: 'Why is WebP greyed out in Safari?', a: 'Safari can display WebP but cannot create it from a web page. Use AVIF to PNG or AVIF to JPG there, or try Chrome, Edge or Firefox.' },
-      { q: 'Will the WebP be bigger than the AVIF?', a: 'Usually yes: AVIF compresses harder than WebP at the same look.' },
-    ],
-    sections: [
-      {
-        heading: 'Related converters',
-        bullets: [
-          '[AVIF to JPG](/avif-to-jpg) and [AVIF to PNG](/avif-to-png), for software that opens neither AVIF nor WebP',
-          '[JPG to AVIF](/jpg-to-avif) and [PNG to AVIF](/png-to-avif), to go the other way',
-        ],
-      },
-    ],
-  },
-  {
     slug: 'svg-to-png',
     from: 'SVG',
     to: 'PNG',
