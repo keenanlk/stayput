@@ -21,6 +21,10 @@ export interface Pair {
   /** Two or three short paragraphs of real explanation. */
   intro: string[];
   faq: { q: string; a: string }[];
+  /** Named section headings under the tool, for pages that cover a whole family of formats. */
+  sections?: { heading: string; paragraphs?: string[]; bullets?: string[] }[];
+  /** Source word used in the steps and drop label when `from` is not a file type ("image"). */
+  sourceWord?: string;
 }
 
 const jpgSteps = (from: string) => [
@@ -848,13 +852,178 @@ export const pairs: Pair[] = [
       { q: 'Is anything uploaded?', a: 'No. The icon is decoded and the PNG is written in this browser tab. Your files are not uploaded.' },
     ],
   },
+  {
+    slug: 'image-to-jpg',
+    from: 'Any image',
+    to: 'JPG',
+    sourceWord: 'image',
+    outputType: 'image/jpeg',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    title: 'Convert Any Image to JPG: Free, Batch, No Upload | Stayput',
+    description: 'Convert PNG, WebP, HEIC, GIF, BMP, AVIF or any picture to JPG in your browser. Choose the quality, batch many files. Nothing is uploaded; no watermark.',
+    heading: 'Convert any image to JPG',
+    tagline: 'Drop pictures in almost any format and get JPG files back, made on your own device.',
+    keywords: ['convert to jpg', 'convert jpg to image file', 'image to jpg', 'convert image to jpg', 'how to convert a picture to jpeg format', 'convert to jpeg', 'convert images to jpg'],
+    intro: [
+      'JPG is the picture format that every phone, browser, email client, upload form and printer accepts. When a site rejects your file, or an app cannot open it, a JPG copy is usually the fix. This page takes whatever you have, a PNG screenshot, a WebP saved from a website, an iPhone HEIC, a GIF, a BMP or an AVIF, and writes a JPG for each one.',
+      'Each file is decoded by your browser (or by a WebAssembly decoder running in this tab for HEIC and JPEG XL) and written out again as a JPG by the browser’s own encoder. Your pictures are read from your disk and written back to it; they are not uploaded.',
+    ],
+    sections: [
+      {
+        heading: 'How to convert a picture to JPEG format',
+        bullets: [
+          '**Drop the pictures** onto the page, or tap it to pick them. Different formats can be mixed in one batch.',
+          '**Set the quality.** The slider starts at 90, which looks the same as the original for photos. Lower it for a smaller file.',
+          '**Download** each JPG, or all of them as one zip.',
+        ],
+      },
+      {
+        heading: 'JPG or JPEG: is there a difference?',
+        paragraphs: [
+          'No. JPG and JPEG are the same format with two spellings, and files with either extension open in the same programs. The files this page makes end in .jpg. If all you need is the other spelling of an existing JPEG file, see [JPEG to JPG](/jpeg-to-jpg).',
+        ],
+      },
+      {
+        heading: 'What happens to transparency?',
+        paragraphs: [
+          'JPG cannot store transparency. Transparent areas of a PNG, WebP or GIF are filled with the colour in the background field, white to begin with. Pick the colour of the page the picture will sit on if you want it to blend in.',
+          'Which formats can I drop? Anything the file picker lets through:',
+        ],
+        bullets: [
+          'PNG, WebP, GIF (the first frame), BMP and SVG',
+          'AVIF, and JPEG XL (decoded in the tab, so they work in every browser)',
+          'HEIC and HEIF photos from iPhones and iPads',
+          'JPG itself, which is written out again at the quality you choose',
+        ],
+      },
+      {
+        heading: 'Convert a specific format',
+        paragraphs: ['If you know what you have, its own page explains the details:'],
+        bullets: [
+          '[PNG to JPG](/png-to-jpg) and [WebP to JPG](/webp-to-jpg)',
+          '[HEIC to JPG converter](/tools/heic-to-jpg), for iPhone photos, and [HEIF to JPG](/heif-to-jpg)',
+          '[AVIF to JPG](/avif-to-jpg), [GIF to JPG](/gif-to-jpg) and [BMP to JPG](/bmp-to-jpg)',
+          '[TIFF to JPG](/tiff-to-jpg), [SVG to JPG](/svg-to-jpg) and [PDF to JPG](/pdf-to-jpg)',
+          '[PSD to JPG](/psd-to-jpg), [JFIF to JPG](/jfif-to-jpg) and [JXL to JPG](/jxl-to-jpg)',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What can I convert to JPG?', a: 'PNG, WebP, GIF, BMP, SVG, AVIF, JPEG XL, HEIC and HEIF, and JPG itself. The page reads the first bytes of each file to see what it really is, so a wrong file extension does not matter.' },
+      { q: 'Will converting lose quality?', a: 'JPG is a lossy format, so some detail is traded for a smaller file. At the default quality of 90 the difference is hard to see on a photo. Saving a JPG as a JPG again loses a little more each time, so convert from the original when you can.' },
+      { q: 'Are my images uploaded?', a: 'No. The pictures are decoded and written as JPG by code running in this tab, and nothing leaves your device. After one visit and a short wait the page works offline.' },
+      { q: 'Can I convert many at once?', a: 'Yes. Drop a whole folder or select many files, and download the results one by one or as one zip. A very large batch is limited by your device’s memory, so split it into groups on a phone.' },
+      { q: 'How do I make the file smaller?', a: 'Lower the quality slider before converting. To hit a specific size such as 200 KB, use [Compress image](/tools/compress-image), which fits the file under the size you give.' },
+    ],
+  },
+  {
+    slug: 'image-to-png',
+    from: 'Any image',
+    to: 'PNG',
+    sourceWord: 'image',
+    outputType: 'image/png',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    title: 'Convert Any Image to PNG: Free, Batch, No Upload | Stayput',
+    description: 'Convert JPG, WebP, HEIC, GIF, BMP, AVIF or any picture to PNG in your browser. Lossless output, batch many files. Nothing is uploaded.',
+    heading: 'Convert any image to PNG',
+    tagline: 'Drop pictures in almost any format and get PNG files back, made on your own device.',
+    keywords: ['convert to png', 'convert image to png', 'convert images to png', 'convert picture to png', 'change to png', 'pic to png', 'image to png', 'convert file to png'],
+    intro: [
+      'PNG keeps every pixel exactly and supports transparency, which is why design tools, slide decks and many upload forms ask for it. This page turns pictures in almost any format, JPG, WebP, HEIC, GIF, BMP or AVIF, into PNG files you can use there.',
+      'Each file is decoded by your browser (or by a WebAssembly decoder running in this tab for HEIC and JPEG XL) and written as a PNG without any further loss. The pictures are read from your disk and saved back to it; they are not uploaded.',
+    ],
+    sections: [
+      {
+        heading: 'How to convert a picture to PNG',
+        bullets: [
+          '**Drop the pictures** onto the page, or tap it to pick them. Different formats can be mixed in one batch.',
+          '**Check the result.** There are no settings: PNG is lossless, so the output matches the decoded picture pixel for pixel.',
+          '**Download** each PNG, or all of them as one zip.',
+        ],
+      },
+      {
+        heading: 'Will a PNG be bigger than a JPG?',
+        paragraphs: [
+          'Usually, yes. PNG stores every pixel without loss, so a photo that is 2 MB as a JPG is often 10 MB or more as a PNG. PNG pays off for screenshots, logos and graphics with flat colour and sharp edges, where it can even be smaller. For photos you only need to view or send, [Convert any image to JPG](/image-to-jpg) gives a much smaller file.',
+        ],
+      },
+      {
+        heading: 'What happens to transparency?',
+        paragraphs: [
+          'Transparency is kept in the PNG wherever the source has it, such as a WebP, GIF, SVG or another PNG. JPG and HEIC photos have no transparency to begin with, so their PNG is fully opaque. Converting a JPG to PNG does not bring back detail that the JPG already discarded.',
+        ],
+      },
+      {
+        heading: 'Convert a specific format',
+        paragraphs: ['If you know what you have, its own page explains the details:'],
+        bullets: [
+          '[JPG to PNG](/jpg-to-png) and [WebP to PNG](/webp-to-png)',
+          '[HEIC to PNG](/heic-to-png), [AVIF to PNG](/avif-to-png) and [GIF to PNG](/gif-to-png)',
+          '[BMP to PNG](/bmp-to-png), [SVG to PNG](/svg-to-png) and [TIFF to PNG](/tiff-to-png)',
+          '[PSD to PNG](/psd-to-png), [JFIF to PNG](/jfif-to-png) and [JXL to PNG](/jxl-to-png)',
+          '[ICO to PNG](/ico-to-png) and [PDF to PNG](/pdf-to-png)',
+          'Need JPG instead? [Convert any image to JPG](/image-to-jpg)',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What can I convert to PNG?', a: 'JPG, WebP, GIF, BMP, SVG, AVIF, JPEG XL, HEIC and HEIF, and PNG itself. The page reads the first bytes of each file to see what it really is, so a wrong file extension does not matter.' },
+      { q: 'Are my images uploaded?', a: 'No. The pictures are decoded and written as PNG by code running in this tab, and nothing leaves your device. After one visit and a short wait the page works offline.' },
+      { q: 'Is quality lost when converting to PNG?', a: 'No new loss is added, because PNG is lossless. The result is the decoded picture exactly. A JPG that was already compressed keeps its artefacts; PNG just does not add more.' },
+      { q: 'How do I make the PNG smaller?', a: 'Run it through [PNG compressor](/png-compressor), which reduces the colours or compresses it losslessly. For a photo, a JPG from [Convert any image to JPG](/image-to-jpg) is far smaller than any PNG.' },
+    ],
+  },
+  {
+    slug: 'jpeg-to-jpg',
+    from: 'JPEG',
+    to: 'JPG',
+    outputType: 'image/jpeg',
+    accept: 'image/jpeg,.jpg,.jpeg',
+    title: 'JPEG to JPG Converter: Free, No Upload | Stayput',
+    description: 'JPEG and JPG are the same format; only the extension differs. Convert or re-save JPEG files as .jpg in your browser, batch, no upload.',
+    heading: 'Convert JPEG to JPG',
+    tagline: 'Same format, shorter extension: get a .jpg copy of any .jpeg file on your own device.',
+    keywords: ['jpeg to jpg', 'convert jpeg to jpg', 'jpg to jpeg converter', 'convert jpg to jpeg', 'how to change jpeg to jpg', 'is jpeg the same as jpg'],
+    intro: [
+      'A .jpeg file and a .jpg file are the same kind of picture. Drop .jpeg files here and you get a .jpg copy of each one, and the same works the other way if you have a .jpg and want a name that ends in .jpeg.',
+    ],
+    sections: [
+      {
+        heading: 'Is JPEG the same as JPG?',
+        paragraphs: [
+          'Yes. Both names stand for the Joint Photographic Experts Group format, and a file ending in either one opens in the same programs with the same quality. The three-letter .jpg exists because early versions of Windows only allowed three-letter extensions; Macs and Linux kept .jpeg. Some upload forms accept only one spelling, which is the usual reason to change it.',
+        ],
+      },
+      {
+        heading: 'How to change JPEG to JPG',
+        paragraphs: [
+          'There are two ways, and the first is the lossless one. **Rename the extension:** change `.jpeg` to `.jpg` in the file name. Nothing inside the file changes, so there is no quality loss at all.',
+          '**Use this page:** it decodes the picture and encodes it again as a JPG at the quality you set (90 to begin with), and saves that as a new .jpg file. Because the picture is compressed a second time, a little quality is lost, and the file size can change. Use it when you have many files, or cannot rename them, but rename when you only need the extension changed.',
+        ],
+      },
+      {
+        heading: 'JPG to JPEG',
+        paragraphs: [
+          'This page covers the other direction too. To get .jpeg from a .jpg, rename the file; the contents are already a JPEG. Tools that insist on a .jpeg extension read it exactly the same.',
+          'Not sure which format you have? [Convert any image to JPG](/image-to-jpg) accepts PNG, WebP, HEIC and more as well.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'Is JPEG the same as JPG?', a: 'Yes. They are one format with two spellings of its name. The file contents are identical whichever extension is used.' },
+      { q: 'Will the quality change?', a: 'Renaming the file changes nothing. Using the converter on this page decodes and encodes the picture again, which loses a small amount of quality, so rename if you only need the extension changed.' },
+      { q: 'Are my files uploaded?', a: 'No. Each picture is decoded and written as a JPG by code running in this browser tab, and nothing leaves your device.' },
+      { q: 'Can I convert many files at once?', a: 'Yes. Drop a whole folder of .jpeg files, and download the JPGs one by one or as one zip. A very large batch is limited by your device’s memory.' },
+    ],
+  },
 ];
 
 export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => p.slug === slug);
 
 /** A Pair expressed as a Tool so it can use the shared tool layout. */
 export function pairAsTool(p: Pair): Tool {
-  const steps = p.outputType === 'image/png' ? pngSteps(p.from) : p.outputType === 'image/webp' ? webpSteps(p.from) : p.outputType === 'image/x-icon' ? icoSteps(p.from) : p.outputType === 'image/bmp' ? bmpSteps(p.from) : p.outputType === 'image/gif' ? gifSteps(p.from) : p.outputType === 'image/tiff' ? tiffSteps(p.from) : jpgSteps(p.from);
+  const src = p.sourceWord ?? p.from;
+  const steps = p.outputType === 'image/png' ? pngSteps(src) : p.outputType === 'image/webp' ? webpSteps(src) : p.outputType === 'image/x-icon' ? icoSteps(src) : p.outputType === 'image/bmp' ? bmpSteps(src) : p.outputType === 'image/gif' ? gifSteps(src) : p.outputType === 'image/tiff' ? tiffSteps(src) : jpgSteps(src);
   return {
     slug: p.slug,
     path: `/${p.slug}`,
@@ -866,10 +1035,11 @@ export function pairAsTool(p: Pair): Tool {
     category: 'images',
     accept: p.accept,
     multiple: true,
-    dropLabel: `Drop ${p.from} files here`,
+    dropLabel: `Drop ${src} files here`,
     action: 'Convert',
     keywords: p.keywords,
     steps,
     faq: p.faq,
+    ...(p.sections ? { sections: p.sections } : {}),
   };
 }

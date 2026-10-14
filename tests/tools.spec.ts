@@ -159,7 +159,7 @@ test('home page lists every tool and has no console errors', async ({ page }) =>
   await stubAnalytics(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('Your files stay put.');
-  expect(await page.locator('.index .tool-card').count()).toBe(110);
+  expect(await page.locator('.index .tool-card').count()).toBe(111);
   expect(await page.locator('.popular .tool-card').count()).toBe(6);
   expect(errors).toEqual([]);
 });
@@ -1054,20 +1054,20 @@ test('preset landing pages render, run their base tool with the preset options a
     }],
     ['video-to-subtitles', 'transcribe', async () => {
       await expect(page.locator('#format')).toHaveValue('srt');
-      await expect(page).toHaveTitle('Subtitle Generator: Auto SRT Subtitles from Video, Free, No Upload | Stayput');
+      await expect(page).toHaveTitle('Subtitle Generator: Auto SRT from Video, No Upload | Stayput');
       await expect(page.locator('h1')).toHaveText('Generate SRT subtitles from a video');
     }],
     ['mp3-to-text', 'transcribe', async () => expect(page.locator('#format')).toHaveValue('txt')],
     ['audio-to-text', 'transcribe', async () => {
       await expect(page.locator('#format')).toHaveValue('txt');
-      await expect(page).toHaveTitle('Audio to Text: Transcribe Any Audio File Privately, Free | Stayput');
+      await expect(page).toHaveTitle('Audio to Text: Transcribe Audio Privately | Stayput');
       const accept = await page.locator('#file-input').getAttribute('accept');
       for (const ext of ['.wav', '.ogg', '.flac', '.m4a', '.mp3']) expect(accept).toContain(ext);
       expect(accept).not.toContain('.mp4');
     }],
     ['video-to-text', 'transcribe', async () => {
       await expect(page.locator('#format')).toHaveValue('txt');
-      await expect(page).toHaveTitle('Video to Text: Transcribe an MP4 Privately, Free, No Upload | Stayput');
+      await expect(page).toHaveTitle('Video to Text: Transcribe an MP4 Privately | Stayput');
       const accept = await page.locator('#file-input').getAttribute('accept');
       for (const ext of ['video/*', '.mp4', '.mov', '.m4v', '.webm', '.mkv']) expect(accept).toContain(ext);
       expect(accept).not.toContain('.mp3');
@@ -1161,7 +1161,7 @@ test('the transcription pages carry their search titles and link to each other',
   await stubAnalytics(page);
   const titles: [string, string][] = [
     ['/tools/transcribe', 'Transcribe Video to Text: Free, Private, No Upload | Stayput'],
-    ['/tools/add-subtitles-to-video', 'Add Subtitles or Captions to a Video: Burned In, No Upload | Stayput'],
+    ['/tools/add-subtitles-to-video', 'Add Subtitles to a Video: Burned In, No Upload | Stayput'],
   ];
   for (const [path, title] of titles) {
     await page.goto(path);

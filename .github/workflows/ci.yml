@@ -17,8 +17,54 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  build-and-test:
+  # Typecheck and IndexNow script tests. Runs beside the build.
+  checks:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: IndexNow script tests (stubbed fetch, no network)
+        run: node --test scripts/indexnow.test.mjs
+      - run: npm ci
+      - run: npx tsc --noEmit -p tsconfig.json
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run check-links
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install pillow pillow-heif
+      - run: python3 tests/fixtures/make-fixtures.py && node tests/fixtures/make-pdf.mjs
+      - name: MCP server (mcp/)
+        working-directory: mcp
+        run: npm ci && npm run typecheck && npm test
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          include-hidden-files: true
+          compression-level: 1
+          retention-days: 1
+
+  playwright:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -28,21 +74,45 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: IndexNow script tests (stubbed fetch, no network)
-        run: node --test scripts/indexnow.test.mjs
       - run: npm ci
-      - run: npx tsc --noEmit -p tsconfig.json
-      - run: npm run build
-      - run: npm run check-links
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist
       - run: pip install pillow pillow-heif
       - run: python3 tests/fixtures/make-fixtures.py && node tests/fixtures/make-pdf.mjs
-      - name: MCP server (mcp/)
-        working-directory: mcp
-        run: npm ci && npm run typecheck && npm test
-      - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npm test
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache browsers
+        id: browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - name: Install browsers
+        if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Install browser system dependencies
+        if: steps.browsers.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium firefox webkit
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: test-results/
+
+  # The one check other systems (deploy gating) look for. It must run even when a
+  # shard fails, and it fails unless every job it needs succeeded.
+  build-and-test:
+    if: always()
+    needs: [checks, build, playwright]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every job to have succeeded
+        run: |
+          echo "checks=${{ needs.checks.result }} build=${{ needs.build.result }} playwright=${{ needs.playwright.result }}"
+          test "${{ needs.checks.result }}" = success
+          test "${{ needs.build.result }}" = success
+          test "${{ needs.playwright.result }}" = success

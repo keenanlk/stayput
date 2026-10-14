@@ -47,6 +47,11 @@ const neighbours = sameCategory.map((_, i) => sameCategory[(home + 1 + offset + 
 const baseTool = base ? tools.find((t) => t.slug === base) : undefined;
 const related = [...(baseTool ? [baseTool] : []), ...neighbours.filter((t) => t !== baseTool)].slice(0, 4);
 const isPair = path.startsWith('/') && !path.startsWith('/tools/');
+// A single-format X-to-JPG or X-to-PNG page points to the any-image page for the target, and the two
+// pages that start from JPG or PNG also point to JPEG to JPG for files that end in .jpeg.
+const anyImageTarget = isPair ? /^([a-z0-9]+)-to-(jpg|png)$/.exec(tool.slug) : null;
+const anyImage = anyImageTarget && !['image', 'jpeg'].includes(anyImageTarget[1]!) && pairs.some((p) => p.slug === `image-to-${anyImageTarget[2]}`) ? anyImageTarget[2]! : undefined;
+const jpegNote = ['jpg-to-png', 'png-to-jpg'].includes(tool.slug);
 // On a pair page, list the pairs sharing its source or target format first (JFIF to JPG shows JFIF to PNG).
 const [fromExt, toExt] = isPair ? tool.slug.split('-to-') : [];
 const shares = (slug: string) => Number(slug.startsWith(`${fromExt}-to-`)) + Number(slug.endsWith(`-to-${toExt}`));
@@ -202,6 +207,13 @@ const jsonLd = [
   {intro.length > 0 && (
     <section class="wrap section prose-wide">
       {intro.map((p) => (/\[|\*\*/.test(p) ? <p set:html={inline(p)} /> : <p>{p}</p>))}
+    </section>
+  )}
+
+  {(anyImage || jpegNote) && (
+    <section class="wrap section prose-wide">
+      {anyImage && <p>Have another type of picture? <a href={`/image-to-${anyImage}`}>Convert any image to {anyImage.toUpperCase()}</a> takes PNG, WebP, HEIC, GIF, BMP, AVIF and more.</p>}
+      {jpegNote && <p>Holding a .jpeg file? That is the same format as .jpg: see <a href="/jpeg-to-jpg">JPEG to JPG</a>.</p>}
     </section>
   )}
 

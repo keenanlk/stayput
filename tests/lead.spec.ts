@@ -27,7 +27,7 @@ function leadOf(path: string) {
 const chatgpt = ['/auto-caption-video', '/burn-subtitles-into-video', '/tools/unlock-pdf', '/tools/mute-video', '/video-to-subtitles', '/tools/gif-to-mp4'];
 
 test('every tool and landing page has its lead in the HTML, between the heading and the tool controls', () => {
-  expect(tools).toHaveLength(110);
+  expect(tools).toHaveLength(111);
   expect(pages.length).toBe(tools.length + pairs.length + presets.length);
   for (const { path, lead } of pages) {
     const { text, at, page } = leadOf(path);

@@ -229,10 +229,10 @@ export function createServer(): McpServer {
       inputSchema: {
         input: z.string().describe('Path to the PDF.'),
         template: z.string().default('{n}').describe('Text to print. Default "{n}".'),
-        position: z.enum(['bottom-center', 'bottom-left', 'bottom-right', 'top-center', 'top-left', 'top-right']).default('bottom-center'),
+        position: z.enum(['bottom-center', 'bottom-left', 'bottom-right', 'top-center', 'top-left', 'top-right']).default('bottom-center').describe('Where on each page the number goes: bottom or top, then left, center or right. The text sits 28 points (about 0.4 inch) in from the page edges. Default "bottom-center".'),
         start: z.number().int().default(1).describe('Number printed on the first numbered page.'),
         first_page: z.number().int().min(1).default(1).describe('First page (1-based) that gets a number; earlier pages, such as a cover, are left blank.'),
-        font_size: z.number().min(4).max(72).default(11),
+        font_size: z.number().min(4).max(72).default(11).describe('Font size in points, from 4 to 72. Default 11.'),
         output,
         password,
       },

@@ -1,0 +1,57 @@
+/guides/strip-exif-without-re-encoding	Strip EXIF Without Re-encoding the Image: How It Works
+/receipt-scanner	Receipt Scanner Online: Photo to Clean PDF | Stayput
+/guides/how-to-trim-a-video-without-an-app	How to Trim a Video Without an App (Phone or Computer)
+/guides/is-cloudconvert-safe	Is CloudConvert Safe? What Happens to Your Files
+/guides/is-convertio-safe	Is Convertio Safe? Its File Deletion Rules Explained
+/guides/is-zamzar-safe	Is Zamzar Safe? How Long It Keeps Your Files
+/video-to-subtitles	Subtitle Generator: Auto SRT from Video, No Upload | Stayput
+/guides/how-to-remove-audio-from-a-video	How to Remove Audio From a Video (Mute It) on Any Device
+/scan-to-pdf	Scan to PDF Without a Scanner, No Upload | Stayput
+/rar-extractor	RAR Extractor Online: Open RAR Files, No Upload | Stayput
+/guides/remove-background-from-a-photo	How to Remove the Background From a Photo, Any Device
+/make-pdf-searchable	Make a PDF Searchable (Ctrl+F), Free, No Upload | Stayput
+/tools/document-scanner	Document Scanner Online: Photo to Clean PDF | Stayput
+/tools/create-zip	Create a ZIP File Online, Optional Password | Stayput
+/guides/how-to-crop-a-video	How to Crop a Video: Square, Vertical or Trim Edges
+/guides/remove-location-data-from-photos	How to Remove Location Data From Photos on Any Device
+/image-to-pixel-art	Image to Pixel Art Pattern with Grid | Stayput
+/pdf-to-kindle	PDF to Kindle: Make a PDF Readable, No Upload | Stayput
+/resize-image-to-3000x3000	Resize an Image to 3000×3000, No Upload | Stayput
+/guides/is-ezgif-safe	Is Ezgif Safe? What Happens to Your Uploads
+/guides/is-freeconvert-safe	Is FreeConvert Safe? Its File Policy Explained
+/guides/is-ilovepdf-safe	Is iLovePDF Safe? How It Handles Your PDFs
+/jpg-to-svg	JPG to SVG Converter for Cricut, No Upload | Stayput
+/tools/adjust-image	Adjust Photo Brightness and Contrast, No Upload | Stayput
+/tools/archive-extractor	Open RAR, ZIP and 7z Files Online, No Upload | Stayput
+/tools/flatten-pdf	Flatten PDF Online: Lock Form Fields, No Upload | Stayput
+/tools/vocal-remover	Vocal Remover: Karaoke and Acapella, No Upload | Stayput
+/green-screen-video	Make a Green Screen Video, No Green Screen | Stayput
+/guides/does-discord-reddit-or-instagram-remove-exif-data	Do Discord, Reddit or Instagram Remove EXIF Data?
+/guides/does-this-website-upload-my-files	How to Tell If a Website Uploads Your Files
+/guides/how-to-add-a-watermark-to-a-pdf	How to Add a Watermark to a PDF (Confidential, Draft)
+/guides/how-to-view-photo-metadata	How to View Photo Metadata (EXIF) on Any Device
+/guides/is-pdf24-safe	Is PDF24 Safe? Online Tools vs PDF24 Creator
+/guides/open-heic-files-on-windows	How to Open HEIC Files on Windows 10 and 11
+/karaoke-maker	Karaoke Maker: Remove Vocals, Free, No Upload | Stayput
+/letter-to-a4	Letter to A4: Convert a PDF to A4, No Upload | Stayput
+/scanned-pdf-to-text	Scanned PDF to Text: Copy Text From a Scan | Stayput
+/video-to-text	Video to Text: Transcribe an MP4 Privately | Stayput
+/guides/how-to-add-text-to-a-photo	How to Add Text to a Photo (Phone, Windows, Mac)
+/password-protect-zip-file	Password Protect a ZIP File (AES-256), No Upload | Stayput
+/remove-background-noise-from-audio	Remove Background Noise from Audio, No Upload | Stayput
+/tools/add-subtitles-to-video	Add Subtitles to a Video: Burned In, No Upload | Stayput
+/acapella-extractor	Acapella Extractor: Isolate Vocals, No Upload | Stayput
+/burn-subtitles-into-video	Burn SRT Subtitles into Video, No Upload | Stayput
+/compress-video-for-discord	Compress Video for Discord: 8, 10, 25 or 50 MB | Stayput
+/guides/is-it-safe-to-merge-pdfs-online	Is It Safe to Merge PDFs Online? What Happens
+/guides/turn-off-location-tags-on-photos	How to Turn Off Location Tags on Photos (iPhone, Pixel)
+/a4-to-letter	A4 to Letter: Convert a PDF to US Letter | Stayput
+/audio-to-text	Audio to Text: Transcribe Audio Privately | Stayput
+/instagram-carousel-splitter	Seamless Instagram Carousel Splitter | Stayput
+/tools/compress-gif	GIF Compressor for Discord and Slack | Stayput
+/tools/image-to-svg	Image to SVG Converter: Vectorize PNG, JPG | Stayput
+/tools/ocr-pdf	OCR PDF Online: Make a Scanned PDF Searchable | Stayput
+/tools/pdf-to-epub	PDF to EPUB Converter: Free, No Upload | Stayput
+/guides/how-to-convert-a-gif-to-mp4	How to Convert a GIF to MP4 on Any Device
+/guides/how-to-convert-a-video-to-mp3	How to Convert a Video to MP3 on Any Device, Free
+/guides/how-to-reorder-pages-in-a-pdf	How to Reorder Pages in a PDF (Free, No Upload)

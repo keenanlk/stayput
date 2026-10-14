@@ -15,7 +15,7 @@ import { SPEECH_MODEL_SIZE } from './speech-size.ts';
 /** What each tool does, with its input and output formats. First sentence of the lead. */
 const does: Record<string, string> = {
   'heic-to-jpg': 'Converts iPhone and iPad HEIC or HEIF photos to JPG or PNG, one photo or a whole batch, and can keep or drop the location data.',
-  'convert-image': 'Converts images between JPG, PNG, WebP, GIF, BMP, TIFF, ICO and PDF, and reads HEIC, AVIF, JXL and SVG as input.',
+  'convert-image': 'Converts images between JPG, PNG, WebP, GIF, BMP, TIFF, ICO and PDF, and reads HEIC, AVIF, JXL and SVG as input, and has ready-made pages for turning any image into JPG or PNG.',
   'compress-image': 'Makes JPG, PNG and WebP images smaller: pick a quality, fit a file size such as 100 KB, or resize to exact pixels, for a single file or a batch.',
   'resize-gif': 'Changes the width and height of animated GIFs by percent or in exact pixels, keeping the animation, frame timing and loop.',
   'add-text-to-gif': 'Puts text on every frame of an animated GIF, with the font, colour and outline you choose, and saves a new GIF with the same timing.',
@@ -46,6 +46,7 @@ const does: Record<string, string> = {
   'video-to-mp3': 'Pulls the audio out of a video (MOV, MKV, WebM, MP4) or converts M4A, WAV and FLAC audio to MP3.',
   'video-to-gif': 'Turns an MP4, MOV or WebM clip into an animated GIF, with trimming, size and frame rate options.',
   'gif-to-mp4': 'Converts animated GIFs to MP4 video (H.264, with no sound track since GIFs have none), usually much smaller than the GIF.',
+  'gif-to-animated-png': 'Converts animated GIFs to animated PNG (APNG), keeping each frame’s timing, the loop count and transparency.',
   'compress-video': 'Makes MP4, MOV and WebM videos smaller, or fits them under a size such as 10 MB for Discord or 25 MB for email, and saves an MP4.',
   'video-to-mp4': 'Converts MOV, MKV and WebM videos to MP4.',
   'video-to-mov': 'Converts MP4, WebM and MKV videos to MOV, copying H.264 video and AAC sound as they are and re-encoding anything else.',
