@@ -188,6 +188,22 @@
       "BUILD-flv.md": "vendor-builds/libav-flv/README.md"
     }
   },
+  "libav3gp": {
+    "package": "libav.js",
+    "version": "6.10.9.0",
+    "local": "vendor-builds/libav-3gp/dist/",
+    "entry": "libav-6.10.9.0-3gp.mjs",
+    "files": {
+      "libav-6.10.9.0-3gp.mjs": "libav-6.10.9.0-3gp.mjs",
+      "libav-6.10.9.0-3gp.wasm.mjs": "libav-6.10.9.0-3gp.wasm.mjs",
+      "libav-6.10.9.0-3gp.wasm.wasm": "libav-6.10.9.0-3gp.wasm.wasm"
+    },
+    "licences": {
+      "LGPL-2.1.txt": "public/licenses/LGPL-2.1.txt",
+      "ffmpeg-config-3gp.txt": "vendor-builds/libav-3gp/dist/ffmpeg-config.txt",
+      "BUILD-3gp.md": "vendor-builds/libav-3gp/README.md"
+    }
+  },
   "zxing": {
     "package": "zxing-wasm",
     "version": "3.1.5",
