@@ -3131,6 +3131,33 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'split-video',
+    base: 'video-splitter',
+    name: 'Split video',
+    title: 'Split Video into Parts Online, Free, No Upload | Stayput',
+    description: 'Split a video into parts in your browser: at times you type, every few seconds or into equal parts. One zip of MP4, MOV, WebM or MKV files, no upload.',
+    heading: 'Split a video',
+    tagline: 'Cut one video into parts and save them in one zip, without uploading the video anywhere.',
+    keywords: ['split video', 'split video online', 'split video into parts', 'split video into equal parts', 'split mp4', 'split video every 30 seconds'],
+    dropLabel: 'Drop a video to split',
+    intro: [
+      'Cut one video into parts when a file is too long to send, too big for an upload limit, or holds several things that belong apart: a recording of three lectures, a match with its breaks, a screen capture you want in chapters. Drop the video, say where the parts begin and press Split video.',
+      'There are three ways to say it. Type the times where each new part starts (1:30, 4:00). Give a length and the video is cut every 30 seconds or every 5 minutes, with whatever is left as the last part. Or pick a number of equal parts, up to 50. The page lists every part and the total size before it starts.',
+      'By default the video is copied, not re-encoded, so a long video splits in seconds and every part looks like the original; the price is that a part can begin a moment before the time you gave, at the key frame. Tick Exact cuts and each part starts on the frame, at the cost of re-encoding. To keep one stretch only, use [Cut video](/cut-video) or [Trim MP4](/trim-mp4); to join parts again, use [Combine videos](/combine-videos).',
+    ],
+    steps: [
+      'Drop the video, or tap to pick it.',
+      'Type the times, a length, or a number of equal parts, and check the list of parts.',
+      'Press Split video, and download the parts as one zip.',
+    ],
+    faq: [
+      { q: 'Does it make one file or several?', a: 'Several: one file per part, named like clip-part-01.mp4, and Download all gives you them as one zip.' },
+      { q: 'Can I split a video every 30 seconds?', a: 'Yes. Choose Every so often, type 30 and keep the unit on seconds. A 95-second video gives four parts: 30, 30, 30 and 5 seconds.' },
+      { q: 'Is it the same as cutting out one clip?', a: 'No. This page cuts the whole video into parts end to end. To keep one stretch only, use [Cut video](/cut-video) or [Trim MP4](/trim-mp4).' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'pdf-to-tiff',
     base: 'pdf-to-image',
     name: 'PDF to TIFF',

@@ -52,6 +52,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Video to MP4](https://stayput.dev/tools/video-to-mp4) (MOV, MKV, WebM; H.264 copied with no quality loss) | |
 | [Video to MOV](https://stayput.dev/tools/video-to-mov) (MP4, WebM, MKV; H.264 and AAC copied with no quality loss) | |
 | [Trim video](https://stayput.dev/tools/trim-video) (cut a clip without re-encoding) | |
+| [Video splitter](https://stayput.dev/tools/video-splitter) (cut one video into parts at times, every N seconds or into equal parts, in one zip) | |
 | [Mute video](https://stayput.dev/tools/mute-video) (remove the sound, picture copied untouched) | |
 | [Resize video](https://stayput.dev/tools/resize-video) (1080p, 720p, custom size) | |
 | [Rotate video](https://stayput.dev/tools/rotate-video) (90°, 180°, flip) | |
