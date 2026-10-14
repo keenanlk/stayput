@@ -109,7 +109,7 @@ async function loudness(page: Page, bytes: Buffer): Promise<number> {
 }
 
 for (const file of GOOD) {
-  test(`3GP to MP4 converts ${file} to an H.264 + AAC MP4 with sound and the same length`, async ({ page }) => {
+  test(`3GP to MP4 converts ${file} to an H.264 MP4 with sound and the same length`, async ({ page }) => {
     test.setTimeout(180_000);
     await open(page);
     const requests = watch(page);
@@ -125,7 +125,9 @@ for (const file of GOOD) {
     expect(video?.displayWidth).toBe(176);
     expect(video?.displayHeight).toBe(144);
     expect(audio, 'the MP4 has a sound track').not.toBeNull();
-    expect(audio!.codec).toBe('aac');
+    // Copied AAC stays AAC. Decoded AMR is written as AAC, or as MP3 by the page's own encoder where the browser has no AAC encoder (Linux Chromium).
+    if (file.endsWith('-aac.3gp')) expect(audio!.codec).toBe('aac');
+    else expect(['aac', 'mp3']).toContain(audio!.codec);
     const duration = await input.computeDuration();
     expect(Math.abs(duration - SECONDS), `duration ${duration} vs ${SECONDS}`).toBeLessThan(0.2);
     if (file.startsWith('h264')) expect(o.note).toContain('H.264 copied, no quality loss');
@@ -207,6 +209,7 @@ test.describe('offline', () => {
       for (const name of await caches.keys()) for (const r of await (await caches.open(name)).keys()) out.push(new URL(r.url).pathname);
       return out;
     });
+    expect(cached.some((c) => /lame|mp3/i.test(c)), 'the MP3 encoder is cached').toBe(true);
     for (const f of ['libav-6.10.9.0-3gp.mjs', 'libav-6.10.9.0-3gp.wasm.mjs', 'libav-6.10.9.0-3gp.wasm.wasm']) {
       expect(cached, f).toContain(`/vendor/libav.js@6.10.9.0/${f}`);
     }

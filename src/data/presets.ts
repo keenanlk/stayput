@@ -3022,7 +3022,7 @@ export const presets: Preset[] = [
     title: '3GP to MP4 Converter, Free, No Upload | Stayput',
     description: 'Convert 3GP to MP4 in your browser: old phone videos with H.263, MPEG-4 or H.264 picture and AMR or AAC sound become MP4s that play anywhere. Nothing is uploaded.',
     lead:
-      'Converts 3GP and 3G2 phone videos (H.263, MPEG-4 or H.264 picture, with AMR or AAC sound) to MP4 with H.264 video and AAC sound. It is free and needs no account, and your videos are not uploaded: everything runs in your browser on your device, and after one visit and a short wait the page works offline.',
+      'Converts 3GP and 3G2 phone videos (H.263, MPEG-4 or H.264 picture, with AMR or AAC sound) to MP4 with H.264 video and AAC sound (MP3 in the few browsers that have no AAC encoder). It is free and needs no account, and your videos are not uploaded: everything runs in your browser on your device, and after one visit and a short wait the page works offline.',
     heading: 'Convert 3GP to MP4',
     tagline: 'Turn old phone 3GP files into MP4s that iPhones, Android phones, TVs and editors play, without uploading them.',
     keywords: ['3gp to mp4', 'convert 3gp to mp4', '3gp to mp4 converter', '3gp to mp4 online', '3gp to mp4 free', 'change 3gp to mp4', '3gp to mp4 no upload', '3g2 to mp4'],
@@ -3039,7 +3039,7 @@ export const presets: Preset[] = [
         heading: 'Which 3GP files this converts',
         bullets: [
           'Picture: H.263, MPEG-4 Part 2 and H.264. H.264 is copied into the MP4 as it is; the other two are decoded and written as H.264.',
-          'Sound: AMR (narrowband and wideband), the speech codec of every phone of that time, and AAC. AMR is converted to AAC at 48 kHz; AAC is copied as it is.',
+          'Sound: AMR (narrowband and wideband), the speech codec of every phone of that time, and AAC. AMR is converted to AAC at 48 kHz, or to MP3 in a browser with no AAC encoder (Chrome on Linux); AAC is copied as it is.',
           'Not converted: a 3GP whose picture or sound is another codec shows a message naming it, and nothing is converted. The page never leaves out the sound without saying so; tick Remove the sound to drop it on purpose.',
         ],
       },
