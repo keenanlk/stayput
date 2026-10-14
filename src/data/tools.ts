@@ -1006,6 +1006,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I convert an image or a scan to Word?',
+        a: 'Yes, with [Image to Word](/tools/image-to-word): it reads the text in JPG, PNG or WebP images with OCR and saves one .docx. For a scanned PDF, run it through OCR PDF first.',
+      },
+      {
         q: 'Does the Word file look like the PDF?',
         a: 'It keeps the text, the paragraph breaks and the headings, in reading order, as normal editable Word paragraphs. It does not reproduce the page layout: columns, tables, images, fonts and exact positions are not carried over. That is the honest limit of what runs in a browser, and it is what you need when the goal is to edit or reuse the words.',
       },
@@ -1229,6 +1233,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Can I get a Word document?',
+        a: 'Yes. [Image to Word](/tools/image-to-word) reads the images the same way and saves the text as one .docx, one page per image. Only the text comes across, not the layout.',
+      },
+      {
         q: 'Is my image uploaded?',
         a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page. The engine and its English model (about 6 MB) are downloaded from this site the first time you use it, and after that first use the tool works offline. Switch off Wi-Fi after the first run and it still reads images.',
       },
@@ -1247,6 +1255,49 @@ export const tools: Tool[] = [
       {
         q: 'Why is the first run slower?',
         a: 'The first time, your browser downloads the OCR engine and model from this site. They are cached, so after the first run it starts straight away, even offline. Reading a full page takes a few seconds on a laptop and a little longer on a phone.',
+      },
+    ],
+  },
+  {
+    slug: 'image-to-word',
+    icon: 'convert',
+    name: 'Image to Word',
+    title: 'Image to Word Converter (JPG, PNG to DOCX) | Stayput',
+    description:
+      'Turn JPG, PNG or WebP images into an editable Word document (.docx) in your browser. OCR reads the text, one page per image. Nothing is uploaded.',
+    heading: 'Convert image to Word',
+    tagline: 'Read the text in photos, screenshots or scans and save it as one Word document, one page per image. Only the text comes across, not the layout. Nothing is uploaded.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop images to turn into a Word document',
+    action: 'Convert to Word',
+    keywords: ['image to word', 'jpg to word', 'png to word', 'picture to word', 'photo to word', 'image to docx', 'convert image to word document', 'scan to word'],
+    steps: [
+      'Drop one or more images (JPG, PNG, WebP, HEIC, screenshots or scans), or tap to pick them. They are used in the order shown.',
+      'Keep line breaks as they are in the image, or join them into paragraphs.',
+      'Convert to Word. The recognised text of each image is previewed and one .docx downloads, with each image starting on a new page.',
+    ],
+    faq: [
+      {
+        q: 'Does the Word file look like my image?',
+        a: 'No. Only the text comes across. Layout, columns, tables, fonts, colours and pictures are not kept: the document holds the recognised words as plain editable paragraphs, one page per image. That is what you want when the goal is to edit or reuse the words. If you need the picture itself in a document, Image to PDF keeps the page exactly as it looks.',
+      },
+      {
+        q: 'Is my image uploaded?',
+        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page, and the .docx is built in the same tab. The engine and its English model (about 6 MB) are downloaded from this site on your first run, and after your first run the tool works offline.',
+      },
+      {
+        q: 'Which languages does it read?',
+        a: 'English, including accented Latin letters in names and places. It is the same reader as Image to text, so it gains languages when that does.',
+      },
+      {
+        q: 'How accurate is it?',
+        a: 'Very good on printed text that is sharp and straight: screenshots, documents and scans. It struggles with handwriting, curved or angled text and heavy shadows. Read the preview before you rely on numbers or names, and correct them in Word.',
+      },
+      {
+        q: 'Can I convert several images into one document?',
+        a: 'Yes. Drop them all and you get one .docx with the text of each image in the order they are listed, each starting on a new page. If you only want plain text, use Image to text; for a PDF with selectable text, use OCR PDF.',
       },
     ],
   },
