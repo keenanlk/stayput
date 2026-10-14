@@ -19,6 +19,8 @@ const pages = [
   '/tools/gif-speed',
   '/tools/merge-gifs',
   '/tools/add-text-to-gif',
+  '/tools/gif-to-animated-webp',
+  '/gif-to-webp',
   '/tools/barcode-generator',
   '/tools/qr-code-scanner',
   '/tools/signature-maker',

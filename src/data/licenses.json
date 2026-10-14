@@ -112,7 +112,7 @@
    ],
    "project": "https://github.com/jamsinclair/jSquash/tree/main/packages/webp",
    "source": "https://github.com/jamsinclair/jSquash/tree/main/packages/webp",
-   "shipped": "Encoder served from /vendor/jsquash-webp@1.5.0/ (JavaScript and WebAssembly), used only where the browser cannot save WebP itself",
+   "shipped": "Encoder served from /vendor/jsquash-webp@1.5.0/ (JavaScript and WebAssembly), used where the browser cannot save WebP itself, and to write the frames of animated WebP in GIF to WebP",
    "kind": "library"
   },
   {

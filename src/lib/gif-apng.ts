@@ -30,7 +30,18 @@ export interface GifToApngResult {
   poster: ImageBitmap;
 }
 
-export async function gifToApng(input: ArrayBuffer, onProgress?: (fraction: number) => void): Promise<GifToApngResult> {
+export interface GifPictures {
+  width: number;
+  height: number;
+  /** Each frame as the browser shows it, whole, with its delay (0 and 10 ms read as 100 ms). */
+  frames: { rgba: Uint8ClampedArray; delayMs: number }[];
+  /** 0 is forever; a GIF with no loop setting plays once. */
+  plays: number;
+  poster: ImageBitmap;
+}
+
+/** Decode a GIF into whole pictures. `onProgress` gets 0..1 over the decoding only. */
+export async function gifPictures(input: ArrayBuffer, onProgress?: (fraction: number) => void): Promise<GifPictures> {
   const { gif, frames } = readGif(input);
   const gw = gif.lsd.width;
   const gh = gif.lsd.height;
@@ -38,7 +49,7 @@ export async function gifToApng(input: ArrayBuffer, onProgress?: (fraction: numb
   const cctx = comp.getContext('2d', { willReadFrequently: true })!;
   const patch = new OffscreenCanvas(1, 1);
   const pctx = patch.getContext('2d')!;
-  const out: { rgba: Uint8ClampedArray; delayMs: number }[] = [];
+  const out: GifPictures['frames'] = [];
   let poster: ImageBitmap | undefined;
   for (const [i, frame] of frames.entries()) {
     const f = decompressFrame(frame, gif.gct, true);
@@ -57,13 +68,17 @@ export async function gifToApng(input: ArrayBuffer, onProgress?: (fraction: numb
     if (i === 0) poster = await createImageBitmap(comp);
     if (f.disposalType === 2) cctx.clearRect(left, top, fw, fh);
     else if (restore) cctx.putImageData(restore, 0, 0);
-    onProgress?.((i + 1) / (frames.length * 2));
+    onProgress?.((i + 1) / frames.length);
     if (i % 8 === 7) await new Promise((r) => setTimeout(r, 0));
   }
   const loops = loopCount(gif);
   // No loop extension means the GIF plays once.
-  const plays = loops === undefined ? 1 : loops;
+  return { width: gw, height: gh, frames: out, plays: loops === undefined ? 1 : loops, poster: poster! };
+}
+
+export async function gifToApng(input: ArrayBuffer, onProgress?: (fraction: number) => void): Promise<GifToApngResult> {
+  const { width: gw, height: gh, frames: out, plays, poster } = await gifPictures(input, (f) => onProgress?.(f / 2));
   const bytes = await encodeApng({ width: gw, height: gh, frames: out, plays });
   onProgress?.(1);
-  return { bytes, width: gw, height: gh, frames: out.length, plays, duration: out.reduce((a, b) => a + b.delayMs, 0), poster: poster! };
+  return { bytes, width: gw, height: gh, frames: out.length, plays, duration: out.reduce((a, b) => a + b.delayMs, 0), poster };
 }

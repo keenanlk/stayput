@@ -6506,7 +6506,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Will the APNG be smaller than the GIF?',
-        a: 'Not necessarily. An APNG stores full colour for every frame, and for flat-colour animation such as logos and pixel art it is often larger than the GIF. Convert for the quality and the smooth transparency, not for the size. If size is the goal, [GIF to MP4](/tools/gif-to-mp4) is usually far smaller.',
+        a: 'Not necessarily. An APNG stores full colour for every frame, and for flat-colour animation such as logos and pixel art it is often larger than the GIF. Convert for the quality and the smooth transparency, not for the size. If size is the goal, [GIF to WebP](/gif-to-webp) or [GIF to MP4](/tools/gif-to-mp4) is usually far smaller.',
       },
       {
         q: 'Does it keep the timing, the looping and the transparency?',
@@ -6519,6 +6519,59 @@ export const tools: Tool[] = [
       {
         q: 'Why is it a .png file and not .apng?',
         a: 'An APNG is a PNG with extra animation chunks, so the usual extension is .png and programs that do not understand animation still open it as a still picture. The file you get is named after your GIF with .png.',
+      },
+    ],
+  },
+  {
+    slug: 'gif-to-animated-webp',
+    icon: 'film',
+    lead:
+      'Converts animated GIFs to animated WebP, keeping every frame, its delay and the loop count, in full colour with soft transparency and usually a fraction of the GIF’s size. It is free, and your GIFs are not uploaded: each frame is decoded and encoded by your browser, in Safari too. The size limit is your device’s memory (phones hold less), and after your first run the page works offline.',
+    name: 'GIF to WebP',
+    title: 'GIF to Animated WebP Converter, Free, No Upload | Stayput',
+    description:
+      'Convert animated GIFs to animated WebP in your browser. Keeps timing and looping, lossy or lossless. Free, batch, no watermark, not uploaded.',
+    heading: 'Convert GIF to animated WebP',
+    tagline: 'Turn animated GIFs into animated WebP files that are far smaller, with their timing and looping. Converted on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to convert to WebP',
+    action: 'Convert to WebP',
+    keywords: ['gif to webp', 'gif to animated webp', 'convert gif to webp', 'gif to webp converter', 'animated gif to webp'],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Choose lossy and a quality, or lossless, then convert. Each GIF is decoded and encoded as an animated WebP in your browser.',
+      'Download the .webp file, or a zip when you converted several. The list shows how its size compares with the GIF.',
+    ],
+    faq: [
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded and the WebP is written by code running in this page; the WebP encoder is a small file served from this site, fetched the first time you press Convert. There is no server in the process, and after your first run the page works with Wi-Fi off.',
+      },
+      {
+        q: 'Will the WebP be smaller than the GIF?',
+        a: 'Usually, by a lot: lossy WebP is often a quarter to a tenth of the size of the same animation as a GIF. The result list shows the real change for each file. Lossless keeps every pixel exactly and is smaller than the GIF less reliably, mainly for photographic frames. Flat-colour GIFs with few colours can come out larger in lossless mode.',
+      },
+      {
+        q: 'Does it keep the timing and the looping?',
+        a: 'Yes. Each frame keeps its own delay and the loop count from the GIF is written into the file (a GIF with no loop setting plays once). Frames with a delay of 0 or 1 hundredths of a second are given a tenth of a second, which is what browsers do with them too.',
+      },
+      {
+        q: 'Does it work in Safari?',
+        a: 'Yes. Browsers cannot write animated WebP themselves, and Safari cannot write WebP at all, so this page carries its own WebP encoder (libwebp, compiled to WebAssembly) and writes the file container itself. The same code runs in every browser.',
+      },
+      {
+        q: 'Where does an animated WebP play?',
+        a: 'In Chrome, Edge, Firefox and Safari 16 or later, and in recent versions of most image viewers and editors. Some chat apps, social sites and upload forms still only accept GIF. Check where you will use it; if it is refused, [WebP to GIF](/webp-to-gif) turns it back.',
+      },
+      {
+        q: 'What is the difference between lossy and lossless?',
+        a: 'Lossy WebP stores each frame approximately, and a quality slider trades size against detail; 80 is a good start and looks like the GIF for most animations. Lossless stores every pixel exactly as the GIF showed it, with a larger file.',
+      },
+      {
+        q: 'Can I go the other way, or to another animated format?',
+        a: '[WebP to GIF](/webp-to-gif) makes a GIF from an animated WebP. [GIF to APNG](/gif-to-apng) writes an animated PNG, and [GIF to MP4](/tools/gif-to-mp4) is usually the smallest of all.',
       },
     ],
   },

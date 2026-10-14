@@ -30,6 +30,7 @@ export const nextSteps: Record<string, string[]> = {
   'gif-to-mp4': ['video-to-gif', 'video-to-mp3'],
   'animated-png-to-gif': ['compress-gif', 'gif-to-mp4'],
   'gif-to-animated-png': ['gif-to-mp4', 'compress-gif'],
+  'gif-to-animated-webp': ['gif-to-mp4', 'compress-gif'],
   'compress-video': ['video-to-mp3', 'video-to-gif'],
   'video-to-mp4': ['compress-video', 'video-to-webm'],
   'video-to-mov': ['compress-video', 'video-to-gif'],
