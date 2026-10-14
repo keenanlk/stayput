@@ -1,0 +1,7 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('gif-frame-splitter')!;
+---
+<ToolLayout tool={tool} />
+<script src="../../tools/gif-frame-splitter.ts"></script>

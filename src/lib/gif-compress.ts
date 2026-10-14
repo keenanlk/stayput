@@ -399,3 +399,42 @@ export function firstFrameCanvas(input: ArrayBuffer): OffscreenCanvas {
 export function gifFrameCount(input: ArrayBuffer): number {
   return parseGIF(input).frames.filter((f) => 'image' in f).length;
 }
+
+/**
+ * Every frame of a GIF as the browser shows it: each patch is composited on the logical screen in
+ * order, honouring the disposal rules. `each` gets the screen after the frame is drawn (the canvas is
+ * reused, so use it before returning) and the frame's delay in milliseconds (10 or less reads as 100, the way
+ * browsers play it). Frames are visited one at a time, so only one is held.
+ */
+export async function eachGifFrame(
+  input: ArrayBuffer,
+  each: (screen: OffscreenCanvas, info: { index: number; total: number; delay: number }) => Promise<void> | void,
+): Promise<{ width: number; height: number }> {
+  const head = new Uint8Array(input, 0, Math.min(6, input.byteLength));
+  if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new Error('This file is not a GIF.');
+  const gif = parseGIF(input);
+  const frames = gif.frames.filter((f): f is GifFrame => 'image' in f);
+  const gw = gif.lsd.width;
+  const gh = gif.lsd.height;
+  if (!frames.length || !gw || !gh) throw new Error('This GIF has no frames.');
+  const screen = new OffscreenCanvas(gw, gh);
+  const ctx = screen.getContext('2d', { willReadFrequently: true })!;
+  const patch = new OffscreenCanvas(1, 1);
+  const pctx = patch.getContext('2d')!;
+  for (const [index, frame] of frames.entries()) {
+    const f = decompressFrame(frame, gif.gct, true);
+    const { left, top, width: fw, height: fh } = f.dims;
+    const restore = f.disposalType === 3 ? ctx.getImageData(0, 0, gw, gh) : undefined;
+    if (fw > 0 && fh > 0) {
+      patch.width = fw;
+      patch.height = fh;
+      pctx.putImageData(new ImageData(new Uint8ClampedArray(f.patch), fw, fh), 0, 0);
+      ctx.drawImage(patch, left, top);
+    }
+    const stored = (frame as unknown as { gce?: { delay?: number } }).gce?.delay ?? 0;
+    await each(screen, { index, total: frames.length, delay: frameDelay(stored * 10) });
+    if (f.disposalType === 2) ctx.clearRect(left, top, fw, fh);
+    else if (restore) ctx.putImageData(restore, 0, 0);
+  }
+  return { width: gw, height: gh };
+}
