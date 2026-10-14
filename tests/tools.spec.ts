@@ -1362,8 +1362,9 @@ test('tool pages link to related guides and preset landing pages', async ({ page
   await page.goto('/tools/reorder-pdf');
   await expect(page.locator('a[href="/delete-pdf-pages"]').first()).toBeVisible();
   await page.goto('/jfif-to-jpg');
-  // Pair pages list the pairs sharing a format first, ahead of the footer.
-  await expect(page.locator('main a[href="/jfif-to-png"]').first()).toBeVisible();
+  // Pair pages list pairs sharing a format first, ahead of the footer. Ties rotate with the pair count,
+  // so assert on the group (same source or same target) rather than on one slug.
+  await expect(page.locator('main a[href^="/jfif-to-"]:not([href="/jfif-to-jpg"]), main a[href$="-to-jpg"]:not([href="/jfif-to-jpg"])').first()).toBeVisible();
 });
 
 /* ------------------------------------------------------------------ */
