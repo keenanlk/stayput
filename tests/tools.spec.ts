@@ -1132,6 +1132,12 @@ test('preset landing pages render, run their base tool with the preset options a
       await expect(page.locator('#mute')).not.toBeChecked();
       expect(await page.locator('#file-input').getAttribute('accept')).toContain('.mp4');
     }],
+    ...(['mp4', 'mov'] as const).map(
+      (ext): [string, string, () => Promise<void>] => [`${ext}-to-webm`, 'video-to-webm', async () => {
+        await expect(page.locator('#mute')).not.toBeChecked();
+        expect(await page.locator('#file-input').getAttribute('accept')).toContain(`.${ext}`);
+      }],
+    ),
     ['png-compressor', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['reduce-png-size', 'compress-png', async () => expect(page.locator('#colors')).toHaveValue('256')],
     ['cut-video', 'trim-video', async () => expect(page.locator('#exact')).not.toBeChecked()],

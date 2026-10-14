@@ -1,0 +1,9 @@
+---
+/** Option controls for video to WebM, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+---
+<div class="field">
+  <label class="check"><input type="checkbox" id="mute" checked={defaults.mute === 'true'} /> Remove the sound</label>
+  <p class="muted small">VP9 or VP8 video and Opus sound are copied as they are. Anything else is re-encoded to VP9 (or VP8) and Opus, which takes longer than a copy.</p>
+</div>
