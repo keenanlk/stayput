@@ -56,10 +56,10 @@ export const tools: Tool[] = [
     slug: 'heic-to-jpg',
     icon: 'image',
     name: 'HEIC to JPG',
-    title: 'HEIC to JPG Converter: Free, Batch, No Upload | Stayput',
+    title: 'Online HEIC to JPG Converter: Free, Batch, No Upload | Stayput',
     description:
-      'Convert iPhone HEIC photos to JPG or PNG in your browser. Drop many photos at once, keep or drop the location data. Nothing is uploaded; no watermark.',
-    heading: 'Convert HEIC to JPG',
+      'Online HEIC to JPG converter: turn iPhone HEIC photos into JPG or PNG in your browser. Drop many at once, keep or drop location data. Nothing is uploaded; no watermark.',
+    heading: 'Convert HEIC to JPG online',
     tagline:
       'Turn iPhone and iPad photos into JPG or PNG files that open anywhere. Your photos never leave this device.',
     category: 'images',
@@ -135,6 +135,10 @@ export const tools: Tool[] = [
         q: 'How do I open a HEIC file on Windows?',
         a: 'Install Microsoft’s HEIF image extension from the Microsoft Store, or convert the photo to JPG on this page and open that. Nothing is uploaded either way. The Windows guide linked above has the steps.',
       },
+      {
+        q: 'Is this an online converter, and do my photos get uploaded?',
+        a: 'It is online in the sense that it is a web page you open in your browser, but the conversion happens on your device. Your photos are read from your disk, converted in memory and saved back to your disk, so nothing is uploaded. After one visit and a short wait the page also works offline.',
+      },
       NOACCOUNT,
     ],
   },
@@ -161,7 +165,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Which formats can I convert from?',
-        a: 'Anything your browser can display: JPG, PNG, WebP, GIF (first frame), BMP, SVG and AVIF. HEIC and HEIF photos are decoded with a WebAssembly build of libheif, and JPEG XL (and AVIF in older browsers) with the Squoosh decoders compiled to WebAssembly, so they work everywhere.',
+        a: 'Anything your browser can display: JPG, PNG, WebP, GIF (first frame), BMP, SVG and AVIF. HEIC and HEIF photos are decoded with a WebAssembly build of libheif (for a dedicated page, see the [HEIC to JPG converter](/tools/heic-to-jpg)), and JPEG XL (and AVIF in older browsers) with the Squoosh decoders compiled to WebAssembly, so they work everywhere. To cut the background out of a photo, use the [background remover](/tools/remove-background).',
       },
       {
         q: 'Which formats can I convert to?',
@@ -1145,13 +1149,41 @@ export const tools: Tool[] = [
     slug: 'video-to-mp3',
     icon: 'audio',
     name: 'Video to MP3',
-    title: 'Video to MP3: Extract the Audio from a Video | Stayput',
+    title: 'MP3 Converter: Any Video or Audio to MP3, No Upload | Stayput',
     description:
-      'Pull the audio out of MOV, MKV, WebM or other video, or turn M4A, WAV and FLAC into MP3. Converted in your browser, nothing uploaded, no sign-up.',
-    heading: 'Convert video or audio to MP3',
+      'Free MP3 converter in your browser: turn MP4, MOV, WebM, M4A, WAV, FLAC or other audio and video into MP3. Pick 96 to 320 kbps. Nothing is uploaded; no sign-up.',
+    heading: 'MP3 converter: turn any video or audio file into MP3',
     tagline: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded.',
     taglineMd: 'Pull the sound out of a video, or turn any audio file into an MP3. Your files are converted on this device and never uploaded. Have an MP4? Use [MP4 to MP3](/mp4-to-mp3). To keep the sound of any video as MP3 or WAV, see [Extract audio from video](/extract-audio-from-video).',
     sizeFact: 'No sign-up, no watermark. The limit is your device’s memory (phones hold less).',
+    lead:
+      'Converts video or audio files (MP4, MOV, MKV, WebM, M4A, WAV, FLAC, OGG, AAC and more) to MP3 at 96 to 320 kbps, one file or a batch. The conversion runs in this tab with LAME compiled to WebAssembly, so your files are not uploaded. It is free, needs no account and adds no watermark. The limit is your device’s memory, and phones hold less.',
+    sections: [
+      {
+        heading: 'Convert any file into MP3',
+        bullets: [
+          'Drop one or more video or audio files on the page, or tap to pick them.',
+          'Keep MP3 and choose a quality, or leave it at 192 kbps. Choose mono for a voice recording.',
+          'Press Convert. One file downloads straight away; several download as a zip.',
+        ],
+      },
+      {
+        heading: 'Which MP3 quality?',
+        bullets: [
+          '96 kbps: speech, lectures and voice memos, smallest files.',
+          '128 kbps: podcasts and a small file that still sounds fine.',
+          '192 kbps: the default, good for most music.',
+          '320 kbps: the best MP3 quality, for a recording you will keep only as an MP3.',
+          'Mono halves the size of a voice recording.',
+        ],
+      },
+      {
+        heading: 'Convert by file type',
+        paragraphs: [
+          'For one kind of file, a dedicated page opens with the settings already chosen: [MP4 to MP3](/mp4-to-mp3), [MOV to MP3](/mov-to-mp3), [WAV to MP3](/wav-to-mp3), [M4A to MP3](/m4a-to-mp3), [FLAC to MP3](/flac-to-mp3), [AAC to MP3](/aac-to-mp3), [OGG to MP3](/ogg-to-mp3), [WebM to MP3](/webm-to-mp3), [MKV to MP3](/mkv-to-mp3), [Opus to MP3](/opus-to-mp3) and [AIFF to MP3](/aiff-to-mp3). To keep the sound of a video as MP3 or WAV, see [Extract audio from video](/extract-audio-from-video). For other formats such as FLAC or M4A, use the [audio converter](/tools/audio-converter).',
+        ],
+      },
+    ],
     category: 'media',
     accept: 'video/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp,.m4a,.aac,.mp3,.wav,.ogg,.oga,.opus,.flac,.caf',
     multiple: true,
@@ -1165,6 +1197,10 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
+        q: 'Is this MP3 converter free?',
+        a: 'Yes. Whether you look for an MP3 converter or an mp 3 converter, this one is free, needs no account and adds no watermark. There is no daily limit or paywall, because the conversion runs on your device; the only limit is its memory.',
+      },
+      {
         q: 'Is my video uploaded?',
         a: 'No. Your browser reads the sound track with its own decoders, and an MP3 encoder (LAME, compiled to WebAssembly) runs inside the page to write the file. There is no server in the process, so there is no upload to wait for. After your first run you can switch off Wi-Fi and it still works.',
       },
@@ -1175,6 +1211,14 @@ export const tools: Tool[] = [
       {
         q: 'What MP3 quality should I choose?',
         a: '192 kbps is transparent for most music and is the default. Use 320 kbps if the MP3 will be your only copy of a high-quality recording, 128 kbps for podcasts and lectures, and 96 kbps mono for a voice memo you want small. Converting to MP3 can never add quality the source did not have.',
+      },
+      {
+        q: 'Can I convert several files at once?',
+        a: 'Yes. Drop them together and they are converted one after another; one file downloads straight away, several download as one zip.',
+      },
+      {
+        q: 'What can I convert to MP3?',
+        a: 'Video such as MP4, MOV, MKV and WebM, and audio such as M4A, WAV, FLAC, OGG, AAC and Opus. The page uses your browser’s own decoders, so a file has to be one your browser can play.',
       },
       {
         q: 'Is there a length or size limit?',
@@ -1844,6 +1888,7 @@ export const tools: Tool[] = [
       'Convert audio between MP3, WAV, FLAC, M4A and OGG in your browser, or pull the sound out of a video. Batch, no upload, no sign-up.',
     heading: 'Audio converter',
     tagline: 'Turn any sound file into MP3, WAV, FLAC, M4A or OGG. Your files are converted on this device and never uploaded.',
+    taglineMd: 'Turn any sound file into MP3, WAV, FLAC, M4A or OGG. Your files are converted on this device and never uploaded. To MP3 only? Use the [MP3 converter](/tools/video-to-mp3).',
     category: 'media',
     accept: 'audio/*,video/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.mp4,.m4v,.mov,.webm,.mkv',
     multiple: true,
@@ -4190,10 +4235,10 @@ export const tools: Tool[] = [
     slug: 'remove-background',
     icon: 'cutout',
     name: 'Remove background',
-    title: 'Remove Background from Image, Free, No Upload | Stayput',
+    title: 'Background Remover: Free, No Upload, Full Resolution | Stayput',
     description:
-      'Remove the background from a photo in your browser: a transparent PNG, a white or coloured background, or blur it. Full resolution, nothing is uploaded, no watermark.',
-    heading: 'Remove the background from an image',
+      'Free background remover in your browser: transparent PNG, white or coloured background, or blur. Full resolution, no watermark. Your photo is never uploaded.',
+    heading: 'Free background remover for photos',
     tagline: 'Cut out people, pets and products at full resolution. The photo never leaves this device.',
     category: 'images',
     accept: 'image/*,.heic,.heif,.avif,.jxl',
@@ -4248,6 +4293,10 @@ export const tools: Tool[] = [
       {
         q: 'Does it work on iPhone HEIC photos?',
         a: 'Yes. The page accepts HEIC and HEIF as well as JPG, PNG, WebP, AVIF and JPEG XL, and the cut-out keeps the photo’s full resolution.',
+      },
+      {
+        q: 'Is this background remover free with no watermark?',
+        a: 'Yes. It is free, needs no account, and nothing is added to your photo, so there is no watermark. The cut-out is the same size as your photo, with no credits and no low-resolution preview tier.',
       },
       NOACCOUNT,
       {
