@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  # Typecheck, IndexNow script tests and the MCP server's own tests. Runs beside the build.
+  # Typecheck and IndexNow script tests. Runs beside the build.
   checks:
     runs-on: ubuntu-latest
     steps:
@@ -30,9 +30,6 @@ jobs:
         run: node --test scripts/indexnow.test.mjs
       - run: npm ci
       - run: npx tsc --noEmit -p tsconfig.json
-      - name: MCP server (mcp/)
-        working-directory: mcp
-        run: npm ci && npm run typecheck && npm test
 
   build:
     runs-on: ubuntu-latest
@@ -45,6 +42,9 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run check-links
+      - name: MCP server (mcp/)
+        working-directory: mcp
+        run: npm ci && npm run typecheck && npm test
       - uses: actions/upload-artifact@v7
         with:
           name: dist
