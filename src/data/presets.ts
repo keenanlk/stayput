@@ -3175,6 +3175,7 @@ export const presets: Preset[] = [
       'Cut one video into parts when a file is too long to send, too big for an upload limit, or holds several things that belong apart: a recording of three lectures, a match with its breaks, a screen capture you want in chapters. Drop the video, say where the parts begin and press Split video.',
       'There are three ways to say it. Type the times where each new part starts (1:30, 4:00). Give a length and the video is cut every 30 seconds or every 5 minutes, with whatever is left as the last part. Or pick a number of equal parts, up to 50. The page lists every part and the total size before it starts.',
       'By default the video is copied, not re-encoded, so a long video splits in seconds and every part looks like the original; the price is that a part can begin a moment before the time you gave, at the key frame. Tick Exact cuts and each part starts on the frame, at the cost of re-encoding. To keep one stretch only, use [Cut video](/cut-video) or [Trim MP4](/trim-mp4); to join parts again, use [Combine videos](/combine-videos).',
+      'Want two videos on one screen? Use [Side by side video](/tools/side-by-side-video).',
     ],
     steps: [
       'Drop the video, or tap to pick it.',

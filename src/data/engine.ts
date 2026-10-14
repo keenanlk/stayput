@@ -179,6 +179,10 @@ export const engines: Record<string, Engine> = {
     how: 'Mediabunny (MPL-2.0) reads each MP4, MOV, WebM or MKV clip in your tab. Your browser decodes the frames (WebCodecs), draws them one clip after another onto a picture the size of the first clip, and encodes the whole once into an MP4, H.264 where available and VP9 or AV1 otherwise. Each clip’s sound is decoded by your browser and laid end to end to match.',
     versus: 'Online video mergers upload every clip before they start, cap free files at a few hundred megabytes, and often stamp a watermark on the result. Here the clips never leave your device.',
   },
+  'side-by-side-video': {
+    how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV clips in your tab. For every frame of the result, your browser decodes the picture each clip shows at that moment (WebCodecs), draws the two side by side or stacked on a canvas, and encodes the canvas into an MP4, H.264 where available and VP9 or AV1 otherwise. The sound of the clip you chose, or a mix, is decoded by your browser and encoded as AAC.',
+    versus: 'Online split-screen makers upload both clips, cap free files at a few hundred megabytes and often put their watermark on the result. Here the clips never leave your device, and there is no watermark.',
+  },
   'add-audio-to-video': {
     how: 'Mediabunny (MPL-2.0) reads the MP4, MOV, WebM or MKV video in your tab and copies its picture packet by packet into a new file, with no re-encoding. The sound file is decoded by your browser, looped or cut and faded to the length of the video, mixed with the video’s own sound if you asked, and encoded as AAC (or Opus) by your browser (WebCodecs).',
     versus: 'Online editors upload the video and the song to a server, re-encode the whole picture, cap free exports and often add a watermark. Here nothing leaves your device and the picture is not touched.',

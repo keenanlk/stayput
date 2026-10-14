@@ -50,6 +50,7 @@ export const nextSteps: Record<string, string[]> = {
   'add-watermark-to-video': ['compress-video', 'trim-video'],
   'video-speed': ['compress-video', 'video-to-gif'],
   'merge-videos': ['add-audio-to-video', 'compress-video'],
+  'side-by-side-video': ['compress-video', 'trim-video'],
   'add-audio-to-video': ['compress-video', 'trim-video'],
   'reverse-video': ['merge-videos', 'video-to-gif'],
   'video-to-jpg': ['compress-image', 'image-to-pdf'],

@@ -1731,6 +1731,7 @@ export const tools: Tool[] = [
         bullets: [
           'It cuts one video into parts, end to end. To keep just one stretch, [Trim video](/tools/trim-video) (also at [Cut video](/cut-video) and [Trim MP4](/trim-mp4)) is the simpler page, and [Combine videos](/combine-videos) joins parts back into one.',
           'It splits where you say. It does not find scene changes or chapters on its own.',
+          'Want two videos on one screen? Use [Side by side video](/tools/side-by-side-video).',
           'It makes up to 50 parts in one run, and each part keeps the video’s own format: an MP4 gives MP4 parts, a MOV gives MOV parts, and WebM and MKV stay WebM and MKV.',
         ],
       },
@@ -2030,6 +2031,55 @@ export const tools: Tool[] = [
         q: 'Can I make a video from photos instead of clips?',
         a: 'Yes. The [Photo slideshow maker](/tools/photo-slideshow-maker) turns photos into an MP4 with a song; then join it with other clips here.',
       },
+    ],
+  },
+  {
+    slug: 'side-by-side-video',
+    icon: 'merge',
+    name: 'Side by side video',
+    title: 'Put Two Videos Side by Side, Free, No Upload | Stayput',
+    description: 'Put two videos side by side, or one above the other, in one MP4 in your browser. Choose the sound and the length. Free, no watermark, no upload.',
+    heading: 'Put two videos side by side',
+    tagline: 'Show two clips together in one frame, left and right or top and bottom. Done on this device, and nothing is uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop two videos to put side by side',
+    action: 'Put side by side',
+    sizeFact: 'No watermark. The limit is your device’s memory (phones hold less): two long HD clips may need a computer.',
+    keywords: ['side by side video', 'put two videos side by side', 'split screen video', 'side by side video online', 'combine two videos side by side', 'two videos in one frame', 'video side by side maker', 'before and after video'],
+    lead: 'Lets you put two videos next to each other in one frame, left and right or one above the other, and saves the result as one MP4. It is free, needs no account and adds no watermark, and your videos are not uploaded: your browser decodes both clips and draws them together inside this tab. You choose whose sound is kept (or both, or none) and whether the result ends with the shorter clip or holds its last frame. After one visit and a short wait the page works offline.',
+    steps: [
+      'Drop two videos (MP4, MOV, WebM or MKV), or pick one for slot A and one for slot B.',
+      'Choose Left | Right or Top | Bottom, how the clips fit, whose sound to keep and how long the result runs. The page shows the size, the length and the memory it needs.',
+      'Press Put side by side. The result is one MP4, saved as the name of video A with -side-by-side.',
+    ],
+    sections: [
+      {
+        heading: 'A worked example',
+        paragraphs: [
+          'You filmed the same dance twice, once yesterday (A) and once today (B), both 1280×720 and 10 seconds long. Left | Right gives a 2560×720 video, 10 seconds long, with A on the left and B on the right and A’s sound. Top | Bottom gives 1280×1440 instead, which suits a phone screen held upright.',
+          'If B is only 6 seconds long, the result ends at 6 seconds by default. Choose to run to the longer clip and B holds its last frame until A has finished.',
+        ],
+      },
+      {
+        heading: 'What this page does and does not do',
+        bullets: [
+          'It puts two videos together in one frame. It does not do three or more videos, or picture-in-picture with one clip small on top of another.',
+          'Want to cut one video into parts? Use [Video splitter](/tools/video-splitter).',
+          'To join clips one after the other instead, use [Merge videos](/tools/merge-videos).',
+          'The result is an MP4 at most 3,840 pixels wide, and every cell is an even number of pixels. Clips with different frame rates are brought to the faster one, up to 60 frames a second.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How do I put two videos side by side?', a: 'Drop both videos (the first is A, the second is B), choose Left | Right, and press Put side by side. You get one MP4 with the two clips next to each other, nothing uploaded. Swap A and B if they are the wrong way round.' },
+      { q: 'What if the two videos have different frame rates?', a: 'They are retimed to the output rate, which is the faster of the two (up to 60 frames a second). For every frame of the result, the page takes the picture each clip shows at that moment, so a 24 fps clip and a 30 fps clip stay in step: the same second of each sits in the same frame.' },
+      { q: 'What happens to the sound?', a: 'You choose: the sound of video A (the default), the sound of video B, both mixed, or none. A mix is lowered only if it would otherwise clip. A clip with no sound gives a silent result for that choice.' },
+      { q: 'What if the two videos are different lengths?', a: 'By default the result ends with the shorter video. Choose to run to the longer one and the shorter video holds its last frame until the end. Sound longer than the result is cut.' },
+      { q: 'Can I put three videos together, or one inside another?', a: 'No. This page puts exactly two videos in one frame, side by side or one above the other. It does not do three or more videos, picture-in-picture or other layouts.' },
+      { q: 'Will it work on my phone?', a: 'It can, but a phone has less memory than a computer and two HD streams are decoded at once. The page shows the memory estimate before you start. On a phone, more than about 200 MB of video in total is likely to fail, so trim the clips shorter first or use a computer. Jobs too big for the device are refused before any encoding starts.' },
+      { q: 'Are my videos uploaded?', a: 'No. Your browser reads both files from your device, decodes them with WebCodecs and encodes the result in this tab. Open the network tab, run it, and your videos are not among the requests.' },
     ],
   },
   {
