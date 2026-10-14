@@ -3559,6 +3559,69 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'mp3-to-midi',
+    icon: 'metronome',
+    name: 'MP3 to MIDI',
+    title: 'MP3 to MIDI Converter, Free, No Upload | Stayput',
+    description:
+      'Convert MP3 to MIDI: an AI model finds the notes in a recording and saves them as a .mid file. Free, no sign-up, and the audio is not uploaded. Best on one instrument.',
+    heading: 'Convert MP3 to MIDI',
+    tagline: 'Drop a recording of one instrument, a voice or a hummed tune and get its notes as a MIDI file. The audio is read on this device, up to five minutes.',
+    category: 'media',
+    accept: 'audio/*,.mp3,.wav,.wave,.m4a,.aac,.ogg,.oga,.opus,.flac,.caf,.aiff,.aif,.webm,.mp4,.mov',
+    multiple: false,
+    dropLabel: 'Drop an MP3 or other audio file to turn into MIDI',
+    action: 'Convert to MIDI',
+    sizeFact: 'Up to 5 minutes of audio, no account, no watermark',
+    keywords: ['mp3 to midi', 'mp3 to midi converter', 'convert mp3 to midi', 'audio to midi', 'wav to midi', 'audio to midi converter', 'mp3 to midi online', 'convert audio to midi', 'melody to midi'],
+    steps: [
+      'Drop an MP3, WAV, M4A, FLAC or Ogg file of up to five minutes. A recording of one instrument, a voice or a hummed tune works best.',
+      'Press Convert to MIDI. The first run downloads the note model and its engine once; the file is then read in short windows and the notes are found on your device.',
+      'Look over the piano roll, press Play to hear the notes, then download the .mid file and open it in your music software.',
+    ],
+    sections: [
+      {
+        heading: 'What this page does well and what it does not',
+        bullets: [
+          '**One instrument at a time.** A solo piano, guitar, flute or sung melody gives the cleanest result. The model can follow several notes at once, so chords are written as chords.',
+          '**Full mixes are rough.** A whole band, a dense orchestra or a song with drums gives many wrong, missing and extra notes, because the model was not built to pull one song apart. For a mix, split out the part you want first, for instance with the [vocal remover](/tools/vocal-remover).',
+          '**Expect to clean up.** Open the file in a DAW or notation program and fix the note starts, lengths and wrong notes by ear. Treat it as a head start on writing the notes down, not as a finished score.',
+          '**Tempo is a guess.** The MIDI file carries one steady tempo, estimated from the audio, or the one you type. A recording that speeds up or slows down will not line up with a fixed grid.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'How do I convert an MP3 to MIDI?',
+        a: 'Drop the MP3 on this page and press Convert to MIDI. The page decodes the audio in your browser, an AI model finds the notes in it, and you download a standard .mid file you can open in a DAW, a notation program or a MIDI player. It takes an MP3 up to five minutes long.',
+      },
+      {
+        q: 'Is my audio uploaded?',
+        a: 'No. The recording is decoded and the notes are found in this tab, and neither the audio nor its file name is sent anywhere. What gets downloaded is the note model and the engine that runs it, both from this site, the first time you use the page.',
+      },
+      {
+        q: 'What works best, and what does not?',
+        a: 'Recordings of one instrument at a time: piano, guitar, a sung or hummed melody. A full band mix and drums turn out poorly, since drums are not pitched notes and a dense mix hides the melody. Pull out the one part you want to transcribe first, and expect to fix some notes by hand.',
+      },
+      {
+        q: 'Why do I need to clean the result up in a DAW?',
+        a: 'The model estimates notes from the sound, and it makes mistakes: notes in the wrong octave, short extra notes, missed quiet ones, and note starts a little off the beat. Open the .mid in your DAW, snap the notes to a grid, delete strays and fix what you can hear is wrong.',
+      },
+      {
+        q: 'How big is the download, and how long does it take?',
+        a: 'The note model is 0.2 MB and the engine that runs it is about 14 MB (less on the wire, since it is compressed). They are fetched once and kept for later visits. After that, on a recent laptop, a 30-second clip takes about a second and a five-minute file about ten seconds; a phone is slower.',
+      },
+      {
+        q: 'Where does the tempo come from?',
+        a: 'It is estimated from the audio with the same beat finder as the [BPM and key finder](/tools/bpm-key-finder), and is only a guess: if the clip has no steady beat, 120 is used. Type your own tempo in the options if you know it. The notes keep their real timing either way; only the grid they sit on changes.',
+      },
+      {
+        q: 'Which model does it use?',
+        a: 'Basic Pitch, an open-source model from Spotify’s Audio Intelligence Lab, under the Apache-2.0 licence, run on your device with onnxruntime-web. The page is powered by Spotify’s Basic Pitch and is not made or endorsed by Spotify. See the [licences page](/licenses) for the details.',
+      },
+    ],
+  },
+  {
     slug: 'tuner',
     icon: 'tuner',
     name: 'Online tuner',

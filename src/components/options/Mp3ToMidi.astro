@@ -1,0 +1,11 @@
+---
+/** Option controls for MP3 to MIDI. */
+import OptionDetails from '../OptionDetails.astro';
+---
+<div class="field">
+  <label for="bpm">Tempo (BPM), or leave empty to estimate it</label>
+  <input id="bpm" type="number" inputmode="numeric" min="30" max="300" step="1" placeholder="Estimated from the audio" />
+</div>
+<OptionDetails>
+  <p>The first run downloads the note model (0.2 MB) and the engine that runs it (about 14 MB, less compressed) to this browser. The notes are found on the CPU; on a recent laptop a 30-second clip takes about a second and a five-minute file about ten. Files up to five minutes are read; for a longer one, cut the part you want with <a href="/tools/trim-audio">Trim audio</a> first.</p>
+</OptionDetails>

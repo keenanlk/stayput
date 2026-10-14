@@ -1,0 +1,23 @@
+---
+/**
+ * The piano-roll preview for MP3 to MIDI, filled in by src/tools/mp3-to-midi.ts
+ * after a run: the notes on a canvas, a Play button and what was found.
+ */
+---
+<div class="mm-stage" id="mm-panel" hidden>
+  <p class="mm-summary" id="mm-summary" aria-live="polite"></p>
+  <canvas id="mm-roll" class="mm-roll" width="900" height="260" role="img" aria-label="Piano roll of the notes found"></canvas>
+  <div class="mm-actions">
+    <button type="button" class="btn btn-sm" id="mm-play">Play</button>
+    <span class="mm-note" id="mm-tempo"></span>
+  </div>
+</div>
+<p class="mm-credit">Powered by <a href="https://github.com/spotify/basic-pitch" rel="noopener">Spotify’s Basic Pitch</a>, an open-source note-transcription model (Apache-2.0).</p>
+<style is:global>
+  .mm-stage { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); padding: 12px 14px; display: grid; gap: 10px; }
+  .mm-summary { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .mm-roll { width: 100%; height: auto; aspect-ratio: 900 / 260; border-radius: 6px; background: var(--bg, #fff); border: 1px solid var(--line); }
+  .mm-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .mm-note { font-size: 13px; color: var(--muted); }
+  .mm-credit { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+</style>

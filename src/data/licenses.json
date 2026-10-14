@@ -63,7 +63,7 @@
    ],
    "project": "https://github.com/microsoft/onnxruntime",
    "source": "https://github.com/microsoft/onnxruntime/tree/v1.30.0",
-   "shipped": "JavaScript bundled into the site; WebAssembly files served from /vendor/onnxruntime-web@1.30.0/ (background remover, upscaler, object remover, speech to text, vocal remover)",
+   "shipped": "JavaScript bundled into the site; WebAssembly files served from /vendor/onnxruntime-web@1.30.0/ (background remover, upscaler, object remover, speech to text, vocal remover, MP3 to MIDI)",
    "kind": "library"
   },
   {
@@ -1959,6 +1959,24 @@
    "shipped": "/models/uvr-mdx-net-inst-hq-3.onnx",
    "kind": "model",
    "note": "The Ultimate Vocal Remover README says its code is MIT and asks developers who use its models to honour the MIT licence and credit UVR and its developers. Credit is given on this page."
+  },
+  {
+   "id": "m-basic-pitch",
+   "name": "Basic Pitch (MP3 to MIDI)",
+   "version": "ICASSP 2022 model, unmodified ONNX file",
+   "npm": null,
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/spotify/basic-pitch",
+   "source": "https://github.com/spotify/basic-pitch/tree/dfb20ef559dff1792e11e022f3f0c7008c1dee6d/basic_pitch/saved_models/icassp_2022",
+   "shipped": "/models/nmp.onnx",
+   "kind": "model",
+   "copyright": "Copyright 2022 Spotify AB",
+   "note": "Basic Pitch. Copyright 2022 Spotify AB. This product includes software developed at Spotify AB (http://www.spotify.com/). Spotify releases the code and the bundled model files under Apache-2.0; no separate weights licence is stated. The model was trained on public research datasets (GuitarSet, MAESTRO, Slakh, MedleyDB and others, listed in the paper); Spotify states no restriction on the weights. The file is used as published. The full notice is at https://github.com/spotify/basic-pitch/blob/main/NOTICE."
   },
   {
    "id": "m-blaze",
