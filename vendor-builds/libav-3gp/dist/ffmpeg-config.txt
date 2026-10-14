@@ -1,0 +1,6 @@
+--enable-protocol=data --enable-protocol=file
+--enable-demuxer=mov
+--enable-parser=mpeg4video
+--enable-decoder=mpeg4
+--enable-decoder=amrnb
+--enable-decoder=amrwb
