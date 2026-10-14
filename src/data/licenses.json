@@ -100,6 +100,22 @@
    "kind": "library"
   },
   {
+   "id": "jsquash-webp",
+   "name": "jSquash WebP",
+   "version": "1.5.0",
+   "npm": "@jsquash/webp",
+   "licences": [
+    {
+     "name": "Apache-2.0",
+     "url": "https://spdx.org/licenses/Apache-2.0.html"
+    }
+   ],
+   "project": "https://github.com/jamsinclair/jSquash/tree/main/packages/webp",
+   "source": "https://github.com/jamsinclair/jSquash/tree/main/packages/webp",
+   "shipped": "Encoder served from /vendor/jsquash-webp@1.5.0/ (JavaScript and WebAssembly), used only where the browser cannot save WebP itself",
+   "kind": "library"
+  },
+  {
    "id": "jsquash-jxl",
    "name": "jSquash JPEG XL",
    "version": "1.3.0",
