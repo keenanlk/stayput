@@ -47,7 +47,7 @@ export const conversionGroups = conversionSplits.map(({ id, label, test }) => ({
 
 /** A capped, mixed set for the home page chips; the rest live on /conversions. */
 export const popularConversions = [
-  'heic-to-png', 'png-to-jpg', 'jpg-to-png', 'webp-to-jpg', 'webp-to-png', 'png-to-webp', 'svg-to-png', 'avif-to-jpg',
+  'heic-to-png', 'image-to-jpg', 'png-to-jpg', 'jpg-to-png', 'webp-to-jpg', 'webp-to-png', 'png-to-webp', 'svg-to-png', 'avif-to-jpg',
   'jpg-to-pdf', 'pdf-to-jpg', 'combine-pdf', 'heic-to-pdf', 'pdf-to-text', 'add-signature-to-pdf',
   'mp4-to-mp3', 'mov-to-mp4', 'mp4-to-gif', 'video-compressor', 'compress-video-for-discord', 'm4a-to-mp3', 'wav-to-mp3',
   'resize-image', 'compress-jpg', 'make-background-transparent',

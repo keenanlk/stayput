@@ -240,8 +240,8 @@
   "hash": "e3920b2264790628"
  },
  "/conversions": {
-  "date": "2026-10-11",
-  "hash": "b2d10709da742fc8"
+  "date": "2026-10-14",
+  "hash": "ccdb2e3f076e832d"
  },
  "/crop-image-to-circle": {
   "date": "2026-10-12",
@@ -744,8 +744,8 @@
   "hash": "59aebe9455c3f3f9"
  },
  "/guides/reduce-image-size-for-email-and-uploads": {
-  "date": "2026-10-12",
-  "hash": "f0630b0206532999"
+  "date": "2026-10-13",
+  "hash": "f3472fe0c6de052b"
  },
  "/guides/remove-background-from-a-photo": {
   "date": "2026-10-14",
@@ -796,8 +796,8 @@
   "hash": "5ea8da7df0dcfab4"
  },
  "/guides/which-image-format-to-use": {
-  "date": "2026-09-26",
-  "hash": "4d626e0dc9b00e4d"
+  "date": "2026-10-13",
+  "hash": "b96d2e8cfb53703a"
  },
  "/guides/zamzar-alternative": {
   "date": "2026-10-12",
@@ -827,9 +827,17 @@
   "date": "2026-10-12",
   "hash": "5ff4fabc3d04c996"
  },
+ "/image-to-jpg": {
+  "date": "2026-10-14",
+  "hash": "7bf270d0ed201c00"
+ },
  "/image-to-pixel-art": {
   "date": "2026-10-14",
   "hash": "868f8944508cad59"
+ },
+ "/image-to-png": {
+  "date": "2026-10-14",
+  "hash": "a8f962fdd276cb79"
  },
  "/images-to-gif": {
   "date": "2026-10-12",
@@ -870,6 +878,10 @@
  "/jfif-to-png": {
   "date": "2026-10-12",
   "hash": "7c54d340c490491e"
+ },
+ "/jpeg-to-jpg": {
+  "date": "2026-10-14",
+  "hash": "d92be5e144bffe25"
  },
  "/jpg-to-gif": {
   "date": "2026-10-12",
@@ -1452,8 +1464,8 @@
   "hash": "f131800cdd7b3596"
  },
  "/tools/convert-image": {
-  "date": "2026-10-12",
-  "hash": "24ab87209c1d8687"
+  "date": "2026-10-14",
+  "hash": "80c8c9891f4dd7b9"
  },
  "/tools/create-zip": {
   "date": "2026-10-14",
