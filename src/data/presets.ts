@@ -1588,7 +1588,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'How do I get a voice memo off my iPhone to convert it?', a: 'In Voice Memos, tap the memo, then the three dots, then Save to Files. Open this page in Safari, tap the drop zone and choose the memo from Files. The MP3 lands in your Downloads folder in Files.' },
       { q: 'Will protected iTunes files convert?', a: 'Only files without copy protection. Songs bought from iTunes before 2009 can carry FairPlay DRM (they end in .m4p), which browsers cannot decode. Everything recorded or ripped yourself converts.' },
-      { q: 'Is M4A better quality than MP3?', a: 'At the same bitrate, AAC in an M4A usually sounds a little better than MP3. Convert only when something needs an MP3, and pick a bitrate at least as high as the original to avoid an audible drop.' },
+      { q: 'Is M4A better quality than MP3?', a: 'At the same bitrate, AAC in an M4A usually sounds a little better than MP3. Convert only when something needs an MP3, and pick a bitrate at least as high as the original to avoid an audible drop. To go the other way, see [MP3 to AAC](/mp3-to-aac).' },
       noUpload,
     ],
   },
@@ -3553,7 +3553,7 @@ export const presets: Preset[] = [
     intro: [
       'A 2 × 2 inch photo (51 × 51 mm) is the size the US State Department asks for on passport and visa applications, and it is also used for green cards, naturalisation and a handful of other countries’ documents. The rules are specific: the head, measured from the bottom of the chin to the top of the hair, must be between 1 and 1 3/8 inches tall, and the eyes between 1 1/8 and 1 3/8 inches above the bottom edge.',
       'This page finds your eyes and mouth with a face detector and the top of your hair with a segmentation model, both running in your browser, then scales and crops the photo so your head is about 1 3/16 inches tall and your eyes sit in the middle of the allowed band. You get a 1200 × 1200 pixel file for online renewals, and a 4 × 6 inch sheet with two copies to print at a pharmacy or photo kiosk for a few cents.',
-      'The software does the measuring, but the photo itself still has to follow the rules: taken in the last six months, facing the camera with a neutral expression and both eyes open, no glasses, even lighting with no shadows, and a plain white or off-white background. Check the result against the State Department’s photo page before you send it.',
+      'The software does the measuring, but the photo itself still has to follow the rules: taken in the last six months, facing the camera with a neutral expression and both eyes open, no glasses, even lighting with no shadows, and a plain white or off-white background. Check the result against the State Department’s photo page before you send it. If the wall behind you was not plain, a [background remover](/tools/remove-background) can fix it first.',
     ],
     steps: [
       'Stand in front of a plain white or off-white wall and have someone take a photo from about 4 feet away, at eye level, with space above your head.',
@@ -3743,7 +3743,7 @@ export const presets: Preset[] = [
     defaults: { format: 'm4a', bitrate: '192' },
     intro: [
       'M4A is AAC audio in an MP4 container, the format of Apple Music, iTunes purchases and iPhone voice memos. Some Apple workflows want it rather than MP3: GarageBand ringtones start from an M4A, and some car and podcast apps prefer AAC.',
-      'This page decodes each MP3 in your browser and writes an M4A with the browser’s own AAC encoder, which Safari and Chrome or Edge on Windows and Mac include. Nothing is uploaded. Converting from MP3 cannot add quality, so 192 kbps is plenty to keep what the MP3 had.',
+      'This page decodes each MP3 in your browser and writes an M4A with the browser’s own AAC encoder, which Safari and Chrome or Edge on Windows and Mac include. Nothing is uploaded. Converting from MP3 cannot add quality, so 192 kbps is plenty to keep what the MP3 had. If you just want AAC audio and the file name does not matter, the same conversion is on the [MP3 to AAC](/mp3-to-aac) page.',
       'Before converting, check that you really need an M4A. iPhones, the Music app and iTunes all play MP3 already, so a song library does not have to change. The cases where M4A matters are narrower: a ringtone you are building in GarageBand, an app or car system that only lists AAC files, or a video editor that wants AAC audio. For those, convert just the files you need and keep the MP3s as your originals.',
       'Match the bitrate to the MP3 you start from. A 128 kbps MP3 gains nothing at 256 kbps; it only gets bigger. Pick 192 kbps for most music, or 128 kbps when the MP3 was already 128 kbps or is a podcast. Each conversion throws a little away, so never convert the M4A back to MP3 and then to M4A again. The M4A is written at 48 kHz, the rate AAC encoders in browsers work at.',
     ],
@@ -3757,6 +3757,37 @@ export const presets: Preset[] = [
       { q: 'Is M4A better than MP3?', a: 'A file made from an original recording sounds a little better as AAC than as MP3 at the same size. A file made from an MP3 keeps the MP3’s quality, never more.' },
       { q: 'Can I make an iPhone ringtone from the M4A?', a: 'Yes, with one more step. iPhone ringtones are 30 seconds at most. Cut the part you want first with the MP3 cutter, convert it here, then import the M4A into GarageBand on the iPhone and export it as a ringtone.' },
       { q: 'Are the song title, artist and cover art kept?', a: 'No. The M4A is a new file written from the decoded sound, so the tags from the MP3 are not copied across. If you are adding the files to the Music app, you can type the title and artist and paste cover art in the song\'s info window after importing.' },
+      noUpload,
+    ],
+  },
+  {
+    slug: 'mp3-to-aac',
+    base: 'audio-converter',
+    name: 'MP3 to AAC',
+    title: 'MP3 to AAC Converter (M4A), Free, No Upload | Stayput',
+    description: 'Convert MP3 to AAC in your browser. The result is an .m4a file at 128 to 256 kbps, batch supported, nothing uploaded.',
+    heading: 'Convert MP3 to AAC',
+    tagline: 'Re-encode MP3s as AAC audio in .m4a files, on your own device.',
+    keywords: ['mp3 to aac', 'convert mp3 to aac', 'mp3 to aac converter', 'mp3 to aac online', 'mp3 to aac free'],
+    dropLabel: 'Drop MP3 files to convert to AAC',
+    accept: 'audio/mpeg,.mp3,audio/*',
+    defaults: { format: 'm4a', bitrate: '192' },
+    intro: [
+      'AAC is the codec that succeeded MP3. At the same bitrate it usually sounds a little cleaner, and it is what Apple Music, YouTube, iPhone voice memos and most streaming services use. This page decodes each MP3 in your browser and re-encodes it as AAC-LC with the browser’s own encoder. Nothing is uploaded.',
+      'The file you get is an .m4a: AAC audio inside an MP4 container. That is the normal way to ship AAC as a file, and iPhones, the Music app, Android, Windows and VLC all play it. A bare .aac stream is rarer and many players and video editors handle it worse, so the page does not write one.',
+      'Converting from MP3 cannot add quality, because the detail the MP3 threw away is gone. 192 kbps AAC keeps what a 256 or 320 kbps MP3 had; for a 128 kbps MP3 or a podcast, 128 kbps AAC is enough and the file stays small. The output is written at 48 kHz, the rate browser AAC encoders work at.',
+      'If you only need the file for an iPhone or iTunes, the [MP3 to M4A](/mp3-to-m4a) page covers the same conversion with notes on ringtones and the Music app.',
+    ],
+    steps: [
+      'Drop one or more MP3 files, or tap to pick them.',
+      'AAC at 192 kbps is already chosen. Use 128 kbps for speech.',
+      'Convert. Each .m4a downloads when it is ready; several come as a zip.',
+    ],
+    faq: [
+      { q: 'Why is the file .m4a and not .aac?', a: 'AAC is the codec, and .m4a is the usual file for it: the same AAC audio wrapped in an MP4 container that carries a duration and seeks properly. You can rename .m4a to .m4b for an audiobook, but nearly every player treats it as the AAC file you wanted.' },
+      { q: 'Does it work in Firefox?', a: 'Browsers borrow the operating system’s AAC encoder, and Firefox, like Chrome on Linux, does not have one it can use. Open the page in Safari, or in Chrome or Edge on Windows or Mac.' },
+      { q: 'Is AAC better than MP3?', a: 'From an original recording, AAC sounds a little better than MP3 at the same bitrate. From an MP3 it keeps the MP3’s quality and never more, and each lossy conversion costs a little. Keep your MP3s as the originals.' },
+      { q: 'Are the title, artist and cover art kept?', a: 'No. The .m4a is written from the decoded sound, so the MP3’s tags are not copied across. Add them in your music app after importing.' },
       noUpload,
     ],
   },
@@ -3816,7 +3847,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'My browser says it cannot write M4A. What can I do with the WAV instead?', a: 'M4A needs an AAC encoder from the operating system, which Firefox and Chrome on Linux do not have. Switch to Safari, or to Chrome or Edge on Windows or Mac. If you only need the WAV smaller and do not need Apple\'s format, choose FLAC for a lossless copy at about half the size, or MP3 for a small file that plays everywhere.' },
-      { q: 'What bitrate should I choose for a WAV?', a: '256 kbps for music you want to keep and listen to on good headphones. 192 kbps if you need to fit more on a phone and cannot hear a difference. 128 kbps, with Mono chosen, for speech recorded with one microphone. Higher than 256 kbps rarely helps AAC; the 320 kbps option is there if you want to be sure.' },
+      { q: 'What bitrate should I choose for a WAV?', a: '256 kbps for music you want to keep and listen to on good headphones. 192 kbps if you need to fit more on a phone and cannot hear a difference. 128 kbps, with Mono chosen, for speech recorded with one microphone. Higher than 256 kbps rarely helps AAC; the 320 kbps option is there if you want to be sure. If your source is an MP3 rather than a WAV, use [MP3 to AAC](/mp3-to-aac).' },
       { q: 'How do I get the M4A into Apple Music on my iPhone?', a: 'On a Mac, drag the M4A files into the Music app and sync the phone, or turn on Sync Library to have them appear on every device signed in to your Apple Account. On Windows, add them to the Apple Music app or iTunes the same way. Files saved to the Files app play there, but they do not show up in the Music library.' },
       noUpload,
     ],
