@@ -110,7 +110,8 @@ document.addEventListener('keydown', (e) => {
     trackToolRun({ tool: root.dataset.slug ?? 'keyboard-tester', outcome: 'ok', firstOk: true, files: 0, inputBytes: 0, ms: 0 });
     root.dispatchEvent(new CustomEvent('stayput:done'));
   }
-});
+  // Capture phase, so the site's "/" shortcut for search sees the event already handled.
+}, true);
 
 document.addEventListener('keyup', (e) => {
   const code = e.code || e.key;

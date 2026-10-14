@@ -75,6 +75,13 @@ test('pressed keys light up on the ANSI layout, show key and code in the log, an
   expect(errors).toEqual([]);
 });
 
+test('the Slash key is tested here and does not open the site search', async ({ page }) => {
+  await open(page);
+  await page.keyboard.press('Slash');
+  await expect(key(page, 'Slash')).toHaveClass(/is-tested/);
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+});
+
 test('a key is shown as down while held', async ({ page }) => {
   await open(page);
   await page.keyboard.down('KeyG');
