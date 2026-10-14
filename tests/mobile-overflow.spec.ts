@@ -27,6 +27,7 @@ const pages = [
   '/itf-14-barcode-generator',
   '/tools/audio-splitter',
   '/tools/speaker-test',
+  '/tools/keyboard-tester',
   '/tools/bpm-key-finder',
   '/camelot-wheel',
   '/bpm-finder',

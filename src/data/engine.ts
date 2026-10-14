@@ -251,6 +251,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser’s Web Audio API makes each sound in this tab: an oscillator at the pitch you chose, or a loop of pink noise, sent to the left channel, the right or both, through a volume control. The sweep moves the oscillator’s pitch smoothly from low to high.',
     versus: 'Nothing here needs a file, an account or a download: the sounds are made in your tab and go straight to your speakers.',
   },
+  'keyboard-tester': {
+    how: 'Your browser sends this page a keydown and a keyup event for each key it receives. The page reads the physical key’s code and the character it produced, lights the matching key on the drawn keyboard and adds a line to the log, all in this tab.',
+    versus: 'Nothing here needs a file, an account or a download: the key presses are read in your tab and drawn on the page, and they are not stored or sent.',
+  },
   'audio-to-video': {
     how: 'Your browser decodes the sound into plain samples, draws the picture once onto a canvas (fitted whole over a blurred copy, or the title on a plain colour), and its own WebCodecs encoders write that still frame once a second with the sound as AAC or Opus. Mediabunny (MPL-2.0) packs them into an MP4.',
     versus: 'Online MP3-to-video converters upload your music and cover art, add their logo to free videos, and cap the length. Unreleased tracks and private recordings stay private here: nothing leaves your device.',
