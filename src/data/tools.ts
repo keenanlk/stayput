@@ -226,10 +226,10 @@ export const tools: Tool[] = [
   {
     slug: 'compress-gif',
     name: 'Compress GIF',
-    title: 'GIF Compressor for Discord and Slack: Make a GIF Smaller | Stayput',
+    title: 'GIF Compressor for Discord and Slack | Stayput',
     description:
       'Compress animated GIFs for Discord, Slack or email in your browser: keep only what changes between frames, use fewer colours, resize or drop frames. No upload.',
-    heading: 'Compress a GIF',
+    heading: 'Compress a GIF for Discord, Slack or email',
     tagline: 'Make an animated GIF small enough for Discord, Slack, email or a web page. It is compressed on this device and never uploaded.',
     category: 'images',
     accept: 'image/gif,.gif',
@@ -1031,7 +1031,7 @@ export const tools: Tool[] = [
     title: 'Color Picker from Image: HEX, RGB, Palette, No Upload | Stayput',
     description:
       'Pick any colour from an image and copy its HEX, RGB or HSL code, with a magnifier for exact pixels. Get the image’s main colours as a palette. Free, no upload.',
-    heading: 'Color picker from an image',
+    heading: 'Free color picker from an image',
     tagline: 'Point at any pixel to get its HEX, RGB and HSL code, and see the main colours of the picture. The image stays on this device.',
     category: 'images',
     accept: 'image/*,.heic,.heif,.avif,.jxl',
@@ -1332,6 +1332,10 @@ export const tools: Tool[] = [
       {
         q: 'What about iPhone videos in HEVC?',
         a: 'Browsers that can decode HEVC (Safari, and Chrome or Edge on a Mac or recent Windows) re-encode it to H.264, which plays everywhere. Elsewhere the HEVC stream is copied into the MP4 unchanged, which plays on iPhones, Macs, Android and Windows 10 or later with the free HEVC extension.',
+      },
+      {
+        q: 'Is there a file size limit when I convert WebM to MP4?',
+        a: 'We set no limit and nothing is uploaded; the limit is your device\'s memory, so a phone handles smaller files than a computer.',
       },
       {
         q: 'Which formats can I convert?',
@@ -3155,7 +3159,7 @@ export const tools: Tool[] = [
   {
     slug: 'image-to-svg',
     name: 'Image to SVG',
-    title: 'Image to SVG Converter: Vectorize PNG and JPG, No Upload | Stayput',
+    title: 'Image to SVG Converter: Vectorize PNG, JPG | Stayput',
     description:
       'Trace a PNG or JPG into a real vector SVG of filled shapes, in black and white, a few flat colours or full detail. Preview before you download. Nothing is uploaded.',
     heading: 'Convert an image to SVG',
@@ -3489,7 +3493,7 @@ export const tools: Tool[] = [
   {
     slug: 'flatten-pdf',
     name: 'Flatten PDF',
-    title: 'Flatten PDF Online: Lock Form Fields and Comments, No Upload | Stayput',
+    title: 'Flatten PDF Online: Lock Form Fields, No Upload | Stayput',
     description:
       'Flatten a filled-in PDF form, comments, stamps and signatures into the page so they show the same everywhere and cannot be edited. Text stays selectable. No upload.',
     heading: 'Flatten a PDF',
@@ -3611,7 +3615,7 @@ export const tools: Tool[] = [
   {
     slug: 'add-subtitles-to-video',
     name: 'Add subtitles to video',
-    title: 'Add Subtitles or Captions to a Video: Burned In, No Upload | Stayput',
+    title: 'Add Subtitles to a Video: Burned In, No Upload | Stayput',
     description:
       'Burn captions into an MP4, MOV or WebM: written from the speech by Whisper on your device, or from your own SRT or VTT file. Three looks, no watermark, no upload.',
     heading: 'Add subtitles to a video',
@@ -3654,7 +3658,7 @@ export const tools: Tool[] = [
   {
     slug: 'vocal-remover',
     name: 'Vocal remover',
-    title: 'Vocal Remover: Karaoke and Acapella from Any Song, No Upload | Stayput',
+    title: 'Vocal Remover: Karaoke and Acapella, No Upload | Stayput',
     description:
       'Remove vocals from a song for karaoke, or keep only the vocals for an acapella. An AI separation model runs on your device. MP3, WAV, M4A, FLAC or video in; no upload, no account.',
     heading: 'Vocal remover',
@@ -3742,7 +3746,7 @@ export const tools: Tool[] = [
   {
     slug: 'ocr-pdf',
     name: 'OCR PDF',
-    title: 'OCR PDF Online: Make a Scanned PDF Searchable, No Upload | Stayput',
+    title: 'OCR PDF Online: Make a Scanned PDF Searchable | Stayput',
     description:
       'Turn a scanned PDF into a searchable one: the text is read on your device and laid invisibly over each page, so you can search, select and copy it. Free, no upload, no page limit.',
     heading: 'Make a scanned PDF searchable',
@@ -3780,7 +3784,7 @@ export const tools: Tool[] = [
   {
     slug: 'document-scanner',
     name: 'Document scanner',
-    title: 'Document Scanner Online: Photo of Paper to Clean PDF, No Upload | Stayput',
+    title: 'Document Scanner Online: Photo to Clean PDF | Stayput',
     description:
       'Turn phone photos of documents into a clean, straight PDF: the page is found, flattened and the shadows lifted, on your device. Free, no app, no account, no upload.',
     heading: 'Scan documents with your phone camera',
@@ -3928,7 +3932,7 @@ export const tools: Tool[] = [
   {
     slug: 'pdf-to-epub',
     name: 'PDF to EPUB',
-    title: 'PDF to EPUB Converter: Reflowable Ebook, Free, No Upload | Stayput',
+    title: 'PDF to EPUB Converter: Free, No Upload | Stayput',
     description:
       'Convert a PDF into an EPUB ebook whose text reflows to fit a phone, Kindle or Kobo screen, with chapters and a table of contents. Runs in your browser; the PDF is never uploaded.',
     heading: 'Convert PDF to EPUB',
@@ -3966,7 +3970,7 @@ export const tools: Tool[] = [
   {
     slug: 'archive-extractor',
     name: 'Open ZIP, RAR and 7z',
-    title: 'Open RAR, ZIP and 7z Files Online: Extract Without Uploading | Stayput',
+    title: 'Open RAR, ZIP and 7z Files Online, No Upload | Stayput',
     description:
       'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ZIP, 7z and RAR files when you have the password, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
     heading: 'Open ZIP, RAR and 7z files',
@@ -4008,7 +4012,7 @@ export const tools: Tool[] = [
   {
     slug: 'create-zip',
     name: 'Create ZIP',
-    title: 'Create a ZIP File Online, With an Optional Password, No Upload | Stayput',
+    title: 'Create a ZIP File Online, Optional Password | Stayput',
     description:
       'Zip files or whole folders into one ZIP in your browser, and lock it with an AES-256 password if you like. Nothing is uploaded, so private files stay on your device.',
     heading: 'Create a ZIP file',
@@ -4539,7 +4543,7 @@ export const tools: Tool[] = [
   {
     slug: 'adjust-image',
     name: 'Adjust photo',
-    title: 'Adjust Brightness, Contrast and Colour of a Photo, No Upload | Stayput',
+    title: 'Adjust Photo Brightness and Contrast, No Upload | Stayput',
     description:
       'Brighten a dark photo, add contrast, boost or mute colour, warm it up, sharpen it or invert it, with a live preview. Batches of images, all in your browser.',
     heading: 'Adjust brightness, contrast and colour',
