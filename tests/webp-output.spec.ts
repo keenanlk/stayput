@@ -68,11 +68,21 @@ async function decodedSize(page: Page, bytes: Buffer) {
   }, [...bytes]);
 }
 
-function checkNetwork(requests: string[], browserName: string, origin: string) {
+/** Whether this browser's canvas writes WebP itself (Chrome, Firefox, Linux WebKit); Safari on a Mac does not. */
+async function nativeWebp(page: Page) {
+  return page.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 2;
+    const blob = await new Promise<Blob | null>((ok) => c.toBlob(ok, 'image/webp', 0.8));
+    return blob?.type === 'image/webp';
+  });
+}
+
+async function checkNetwork(page: Page, requests: string[], origin: string) {
   const wasm = requests.filter((u) => u.includes('/vendor/jsquash-webp@'));
   const foreign = requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:') && !u.startsWith('blob:') && !u.startsWith('about:') && !u.includes('stats.keenankaufman.com'));
   expect(foreign, 'only our own origin').toEqual([]);
-  if (browserName === 'chromium') expect(wasm, 'native encoder, no jsquash download').toEqual([]);
+  if (await nativeWebp(page)) expect(wasm, 'native encoder, no jsquash download').toEqual([]);
   else expect(wasm.some((u) => u.endsWith('webp_enc.wasm')), 'WebAssembly encoder fetched from our origin').toBe(true);
 }
 
@@ -80,7 +90,7 @@ for (const [slug, type, ext] of [
   ['png-to-webp', 'image/png', 'png'],
   ['jpg-to-webp', 'image/jpeg', 'jpg'],
 ] as const) {
-  test(`${slug} writes a valid WebP at the source size`, async ({ page, browserName }) => {
+  test(`${slug} writes a valid WebP at the source size`, async ({ page }) => {
     const { requests, errors } = await open(page, slug);
     await expect(page.locator('#format option[value="image/webp"]')).toBeEnabled();
     const src = await picture(page, type, 321, 203);
@@ -88,7 +98,7 @@ for (const [slug, type, ext] of [
     expect(out.name).toBe('photo.webp');
     expectWebp(out.bytes);
     expect(await decodedSize(page, out.bytes)).toEqual({ w: 321, h: 203 });
-    checkNetwork(requests, browserName, new URL(page.url()).origin);
+    await checkNetwork(page, requests, new URL(page.url()).origin);
     expect(errors).toEqual([]);
   });
 }
