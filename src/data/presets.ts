@@ -412,6 +412,7 @@ export const presets: Preset[] = [
     intro: [
       'The blank page a scanner added, the cover sheet of a fax, the page of bank details a form did not need: removing a page from a PDF is a one-minute job that Acrobat charges for and most free sites do by uploading the whole document. Here every page is drawn as a thumbnail by pdf.js in your browser, you click × on the pages to drop, and pdf-lib writes a new PDF with only the pages you kept. The file never leaves your device.',
       'Kept pages are copied unchanged, so text stays selectable and nothing is re-compressed. You can also type the pages to keep, like 1-4, 6, 9-12, which is quicker for long documents, and drag the remaining pages into a new order before saving. The original file on your disk is not touched.',
+      'Want to mark up the pages you keep as well? [Edit PDF](/tools/edit-pdf) adds text, highlights, drawings and images and can delete, rotate and reorder pages in the same pass.',
     ],
     steps: [
       'Drop a PDF, or tap to pick one. Every page appears as a thumbnail.',

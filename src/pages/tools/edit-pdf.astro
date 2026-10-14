@@ -1,0 +1,11 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import EditPdfStage from '../../components/EditPdfStage.astro';
+import { toolBySlug } from '../../data/tools';
+const tool = toolBySlug('edit-pdf')!;
+---
+<ToolLayout tool={tool}>
+  <EditPdfStage slot="panel" />
+  <Fragment slot="options"></Fragment>
+</ToolLayout>
+<script src="../../tools/edit-pdf.ts"></script>

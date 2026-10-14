@@ -35,6 +35,7 @@ const does: Record<string, string> = {
   'image-to-pdf': 'Combines JPG, PNG, WebP or HEIC images into one PDF, with the page size and margins you choose.',
   'pdf-to-image': 'Turns PDF pages into JPG or PNG images at the resolution you pick, for all pages or a range.',
   'reorder-pdf': 'Lets you drag the pages of a PDF into a new order, delete pages you do not need, and saves a new PDF.',
+  'edit-pdf': 'Adds text, cover boxes, highlights, drawings and images on top of a PDF and lets you rotate, delete or reorder its pages, but it cannot change the text already in the file.',
   'sign-pdf': 'Lets you draw or type a signature, place it on any page of a PDF and download the signed PDF.',
   'pdf-page-numbers': 'Stamps page numbers on every page of a PDF, in the position, format and starting number you choose.',
   'pdf-to-word': 'Converts a PDF to an editable Word document (.docx) or plain text, rebuilding paragraphs and headings from the text layer.',
