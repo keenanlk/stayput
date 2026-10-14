@@ -1,12 +1,7 @@
 {
  "/": {
-<<<<<<< HEAD
-  "date": "2026-10-13",
-  "hash": "4e704d447e64b183"
-=======
   "date": "2026-10-14",
-  "hash": "483cf5be281c1fab"
->>>>>>> 3de802ab20a5b339eff388fab1b2937d07e406dd
+  "hash": "4b58f9513caf71b3"
  },
  "/2x2-photo": {
   "date": "2026-10-13",
@@ -1321,7 +1316,7 @@
   "hash": "0f6ea3b7af73ded2"
  },
  "/srt-to-vtt": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "37b54941e9d8ae6f"
  },
  "/stitch-screenshots": {
@@ -1720,15 +1715,13 @@
   "date": "2026-10-12",
   "hash": "69b0d095adebeb6f"
  },
-<<<<<<< HEAD
  "/tools/subtitle-converter": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "f477250bbdfb92b8"
-=======
+ },
  "/tools/text-to-pdf": {
   "date": "2026-10-14",
   "hash": "368b21a6b061988a"
->>>>>>> 3de802ab20a5b339eff388fab1b2937d07e406dd
  },
  "/tools/transcribe": {
   "date": "2026-10-13",
@@ -1863,7 +1856,7 @@
   "hash": "2e6045d4783af4fa"
  },
  "/vtt-to-srt": {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "hash": "f085e59fd801d8fd"
  },
  "/watermark-id-copy": {
