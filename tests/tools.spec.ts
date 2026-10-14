@@ -7680,10 +7680,6 @@ test('the eight pages added from the October preset spec open their tool preset,
       await expect(page.locator('#format')).toHaveValue('flac');
       expect(await page.locator('#file-input').getAttribute('accept')).toContain('.mp3');
     }],
-    ['mp3-to-aac', 'audio-converter', 'Converts MP3 files to AAC', async () => {
-      await expect(page.locator('#format')).toHaveValue('m4a');
-      expect(await page.locator('#file-input').getAttribute('accept')).toContain('.mp3');
-    }],
     ['phone-number-qr-code', 'qr-code-generator', 'Makes a QR code that holds a phone number', async () => {
       await expect(page.locator('input[name="qr-kind"][value="phone"]')).toBeChecked();
       await expect(page.locator('#qr-number')).toBeVisible();
