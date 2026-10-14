@@ -2252,6 +2252,33 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: 'gif-to-apng',
+    base: 'gif-to-animated-png',
+    name: 'GIF to APNG',
+    title: 'GIF to APNG Converter, Free, Not Uploaded | Stayput',
+    description: 'Convert a GIF to APNG, an animated PNG, in your browser. Each frame keeps its delay, the loop count and transparency. Free, not uploaded.',
+    heading: 'Convert GIF to APNG',
+    tagline: 'Make an animated PNG from a GIF, with its timing, looping and transparency, on your own device.',
+    keywords: ['gif to apng', 'convert gif to apng', 'gif to apng converter', 'gif to animated png', 'animated gif to apng', 'gif to apng online'],
+    dropLabel: 'Drop GIFs to turn into APNG',
+    intro: [
+      'APNG is an animated PNG: the same .png file extension, with extra chunks that tell a browser to play several frames. Unlike a GIF it holds full 24-bit colour and a proper 8-bit alpha channel, so gradients, shadows and soft edges stay smooth instead of dithering into 256 colours.',
+      'Drop a GIF and every frame is decoded, composited the way browsers play it, and written back as an APNG frame with its own delay. The loop count from the GIF is kept (a GIF with no loop setting plays once), and transparent areas stay transparent. Your browser does all of it; the GIF is not uploaded and there is no watermark.',
+      'Know what you are getting: an APNG is often larger than the GIF, especially for flat-colour animation, because every frame is stored whole. It plays in Safari, Chrome, Edge and Firefox, but some chat apps, social sites and upload forms flatten it to its first frame or only accept GIF. Test it where you plan to use it.',
+    ],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Convert. Each one becomes an animated PNG in your browser.',
+      'Download the .png, or a zip when you converted several.',
+    ],
+    faq: [
+      { q: 'Will the APNG be smaller than the GIF?', a: 'Often not. Every frame is stored whole in full colour, so flat-colour animation usually comes out larger. For a smaller file, try [GIF to MP4](/tools/gif-to-mp4) or [Compress GIF](/tools/compress-gif).' },
+      { q: 'Where does an APNG play?', a: 'In Safari, Chrome, Edge and Firefox. Some chat apps and social sites show only the first frame or reject the file, so check the place you will post it.' },
+      { q: 'Is the file uploaded?', a: 'No. It is decoded and written in your browser tab, and the page works offline after one visit.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'animated-gif-to-mp4',
     base: 'gif-to-mp4',
     name: 'Animated GIF to MP4',

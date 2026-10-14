@@ -5082,6 +5082,50 @@ export const tools: Tool[] = [
       { q: 'Can I split an audio file without uploading it?', a: 'Yes. Your browser decodes the sound, cuts it and writes each part with code running in this tab. Open the network tab, run a split, and your recording is not among the requests. After one visit and a short wait the page works offline, and MP3 output needs one MP3 run first.' },
     ],
   },
+  {
+    slug: 'gif-to-animated-png',
+    lead:
+      'Converts animated GIFs to animated PNG (APNG), keeping every frame, its delay, the loop count and transparent areas, with full colour instead of the GIF’s 256. It is free, and your GIFs are not uploaded: each frame is decoded and written by your browser. The size limit is your device’s memory (phones hold less), and after one visit and a short wait the page works offline.',
+    name: 'GIF to APNG',
+    title: 'GIF to Animated PNG (APNG) Converter, Free | Stayput',
+    description:
+      'Convert animated GIFs to animated PNG (APNG) in your browser. Keeps timing, looping and transparency. Free, batch, no watermark, not uploaded.',
+    heading: 'Convert GIF to animated PNG',
+    tagline: 'Turn animated GIFs into animated PNG (APNG) files with their timing, looping and transparency. Converted on this device, never uploaded.',
+    category: 'images',
+    accept: 'image/gif,.gif',
+    multiple: true,
+    dropLabel: 'Drop GIFs to convert to APNG',
+    action: 'Convert to APNG',
+    keywords: ['gif to apng', 'gif to animated png', 'convert gif to apng', 'gif to apng converter', 'animated gif to apng'],
+    steps: [
+      'Drop one or more animated GIFs, or tap to pick them.',
+      'Convert. Each GIF is decoded and written as an animated PNG in your browser.',
+      'Download the .png file, or a zip when you converted several.',
+    ],
+    faq: [
+      {
+        q: 'Is my GIF uploaded?',
+        a: 'No. The GIF is decoded by code in this page and the animated PNG is written in your browser’s memory. There is no server in the process, and after one visit and a short wait the page works with Wi-Fi off.',
+      },
+      {
+        q: 'Will the APNG be smaller than the GIF?',
+        a: 'Not necessarily. An APNG stores full colour for every frame, and for flat-colour animation such as logos and pixel art it is often larger than the GIF. Convert for the quality and the smooth transparency, not for the size. If size is the goal, [GIF to MP4](/tools/gif-to-mp4) is usually far smaller.',
+      },
+      {
+        q: 'Does it keep the timing, the looping and the transparency?',
+        a: 'Yes. Each frame keeps its own delay, the loop count from the GIF is written into the file (a GIF with no loop setting plays once), and see-through areas stay see-through, with soft edges where the GIF had hard ones. Frames with a delay of 0 or 1 hundredths of a second are given a tenth of a second, which is what every browser does with them too.',
+      },
+      {
+        q: 'Where does an APNG play?',
+        a: 'In Safari, Chrome, Edge and Firefox, and in many image viewers and editors. Some chat apps, social sites and upload forms flatten an APNG to its first frame, or refuse it, and some only accept GIF. Check where you will use it; the file is a normal .png, so a program that does not know APNG shows the first frame.',
+      },
+      {
+        q: 'Why is it a .png file and not .apng?',
+        a: 'An APNG is a PNG with extra animation chunks, so the usual extension is .png and programs that do not understand animation still open it as a still picture. The file you get is named after your GIF with .png.',
+      },
+    ],
+  },
 ];
 
 export const toolBySlug = (slug: string): Tool | undefined => tools.find((t) => t.slug === slug);
