@@ -2065,7 +2065,7 @@ export const tools: Tool[] = [
     name: 'Trim audio',
     title: 'Trim Audio Online: Cut MP3, WAV or M4A, No Upload | Stayput',
     description:
-      'Cut the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, in your browser. See the waveform, add fades, save as MP3 or WAV. No upload.',
+      'Cut the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, in your browser. See the waveform, add fades, save as MP3, WAV or M4R. No upload.',
     heading: 'Trim audio',
     tagline: 'Cut a song, a voice memo or a podcast down to the part you want, with fades if you like. Done on this device, never uploaded.',
     category: 'media',
@@ -2077,7 +2077,7 @@ export const tools: Tool[] = [
     steps: [
       'Drop a sound file (MP3, WAV, M4A, OGG, FLAC) or a video, or tap to pick one.',
       'Play it or click the waveform, and set the start and end. Add a fade in or out if you want.',
-      'Trim. The part you chose is saved as an MP3 or a WAV.',
+      'Trim. The part you chose is saved as an MP3, a WAV or an M4R.',
     ],
     faq: [
       {
@@ -2086,7 +2086,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Which format should I save as?',
-        a: 'MP3 at 192 kbps plays on every phone, car and computer and is about a tenth the size of WAV. Choose WAV to keep the sound exactly as decoded, for example to edit it further.',
+        a: 'MP3 at 192 kbps plays on every phone, car and computer and is about a tenth the size of WAV. Choose WAV to keep the sound exactly as decoded, for example to edit it further. Choose M4R for an iPhone ringtone.',
       },
       {
         q: 'Can I cut the sound out of a video?',

@@ -188,7 +188,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Online frame extractors upload the whole video to grab a few images, cap free videos by size or length, and some watermark the frames. Here the video never leaves your device.',
   },
   'trim-audio': {
-    how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. The part you chose is copied, faded if asked, and written as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
+    how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. The part you chose is copied, faded if asked, and written as MP3 by LAME compiled to WebAssembly, as a 16-bit WAV, or as AAC in an M4R file by the browser’s own AAC encoder through Mediabunny.',
     versus: 'Online audio cutters upload your file to a server, surround the download with ads, and some keep the file. Voice memos, interviews and unreleased tracks are private. Here the sound never leaves your device.',
   },
   'audio-splitter': {
