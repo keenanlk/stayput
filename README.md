@@ -111,6 +111,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Mic test](https://stayput.dev/tools/mic-test) (level meter, verdict, record and play back) | |
 | [Webcam test](https://stayput.dev/tools/webcam-test) (preview, real resolution and frame rate, snapshot) | |
 | [Speaker test](https://stayput.dev/tools/speaker-test) (left, right or both channels, tones, sweep, pink noise) | |
+| [Dead pixel test](https://stayput.dev/tools/dead-pixel-test) (full-screen black, white, red, green and blue; click or arrow keys, cycle mode) | |
 | [Audio to video](https://stayput.dev/tools/audio-to-video) (MP3 plus a cover picture to MP4; 16:9, square, 9:16) | |
 
 Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [WebP to PNG](https://stayput.dev/webp-to-png), [AVIF to JPG](https://stayput.dev/avif-to-jpg) and [JXL to PNG](https://stayput.dev/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.dev/jpg-to-pdf), [PDF to JPG](https://stayput.dev/pdf-to-jpg), [Combine PDF](https://stayput.dev/combine-pdf), [Resize image](https://stayput.dev/resize-image), [Crop to circle](https://stayput.dev/crop-image-to-circle) and [Remove location from photos](https://stayput.dev/remove-location-from-photos); and [guides](https://stayput.dev/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
