@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import MidiStage from '../../components/MidiStage.astro';
+import Mp3ToMidi from '../../components/options/Mp3ToMidi.astro';
+const tool = toolBySlug('mp3-to-midi')!;
+---
+<ToolLayout tool={tool}>
+  <MidiStage slot="panel" />
+  <Fragment slot="options"><Mp3ToMidi /></Fragment>
+</ToolLayout>
+<script src="../../tools/mp3-to-midi.ts"></script>

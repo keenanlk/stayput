@@ -45,6 +45,18 @@ the instrumental; UVR scales that by 1.022. The vocal remover loads it on the
 first song and runs it in a web worker through onnxruntime-web, on WebGPU
 when the browser has it and WebAssembly otherwise, both served from /vendor/.
 
+`nmp.onnx` is Basic Pitch, Spotify's note-transcription model (ICASSP 2022),
+released by Spotify AB (https://github.com/spotify/basic-pitch, Apache License
+2.0). It is the unmodified file as published at
+https://github.com/spotify/basic-pitch/blob/dfb20ef559dff1792e11e022f3f0c7008c1dee6d/basic_pitch/saved_models/icassp_2022/nmp.onnx
+(repository path `basic_pitch/saved_models/icassp_2022/nmp.onnx`, commit
+dfb20ef559dff1792e11e022f3f0c7008c1dee6d), 230,444 bytes, SHA-256
+2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec. It reads
+43,844 samples of 22,050 Hz mono audio and returns, per 2-second window, 172
+frames of contour (264), note (88) and onset (88) activations. The MP3 to MIDI
+tool loads it on the first file and runs it in a web worker through
+onnxruntime-web on WebAssembly (the CPU), served from /vendor/.
+
 `selfie_segmenter.tflite` and `selfie_segmenter_landscape.tflite` are Google's
 MediaPipe selfie segmenter (binary person mask, float16, 0.25 MB each, Apache
 License 2.0; see the MediaPipe image segmenter model card), from

@@ -104,6 +104,7 @@ const does: Record<string, string> = {
   'resize-pdf': 'Changes the page size of a PDF to A4, US Letter, Legal, A3, A5 or Tabloid, scaling and centring the content.',
   'transcribe': 'Turns speech in an audio or video file (MP3, WAV, M4A, MP4, MOV) into text, SRT subtitles or WebVTT captions with Whisper, in 16 or more languages.',
   'add-subtitles-to-video': 'Burns captions into an MP4, MOV or WebM and saves an MP4, either written from the speech by Whisper or taken from your own SRT or VTT file.',
+  'mp3-to-midi': 'Turns a recording of one instrument, a voice or a hummed tune (MP3, WAV, M4A, FLAC) of up to five minutes into a MIDI file of its notes, with an AI model.',
   'vocal-remover': 'Removes the vocals from a song for karaoke, or keeps only the vocals, using an AI separation model (MP3, WAV, M4A, FLAC or video in).',
   'video-background-remover': 'Removes the background behind the person in a video: blur it, fill it with a colour or green screen, or put a picture behind them.',
   'ocr-pdf': 'Turns a scanned PDF into a searchable PDF by reading the text and laying it invisibly over each page.',
@@ -160,6 +161,11 @@ const downloads: Record<string, Download> = {
   'ocr-pdf': { what: 'text reader', size: '6 MB' },
   'transcribe': { what: 'speech model', size: SPEECH_MODEL_SIZE },
   'vocal-remover': { what: 'separation model', size: '67 MB' },
+  'mp3-to-midi': {
+    what: 'note model',
+    size: '0.2 MB',
+    text: 'The first run downloads the note model (0.2 MB, from this site) and the engine that runs it (about 14 MB, less compressed) to your browser, and after that the tool works offline.',
+  },
   'video-background-remover': {
     what: 'person finder',
     size: '28 MB',
