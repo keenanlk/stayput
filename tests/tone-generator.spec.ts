@@ -8,7 +8,7 @@ import { sliderToHz, hzToSlider, clampHz, levelToGain, DEFAULT_LEVEL, MAX_LEVEL,
 
 declare global {
   interface Window {
-    __events: { n: string; d: Record<string, unknown> }[];
+    __events: { n: string; d: Record<string, string> }[];
     __tone: () => { hz: number; peak: number; count: number };
   }
 }
