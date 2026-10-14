@@ -67,6 +67,10 @@ export const engines: Record<string, Engine> = {
     how: 'pdf.js renders a thumbnail of every page so you can see what you are moving. When you save, pdf-lib copies the pages you kept, in your order, into a new document. The page contents are not re-rendered or recompressed, so text stays text and images keep their quality.',
     versus: 'Reordering pages is a five-second job that upload-based tools turn into an upload, a queue and a download page, often behind a login or a daily cap. Here the thumbnails appear as fast as your device can draw them and the result is written in your tab.',
   },
+  'edit-pdf': {
+    how: 'pdf.js draws each page in your tab so you can see where to click. Your additions are drawn onto the original pages with pdf-lib: typed text with the standard PDF fonts as real text, boxes and pen strokes as vector shapes, images as pictures. Page changes copy the pages you kept into the new file in your order. Nothing already on the page is rewritten, which is why existing text cannot be changed.',
+    versus: 'Online PDF editors upload the document, then keep text editing, extra downloads or a watermark behind an account or a plan. This one has no server: the marks you add are written on your device, and the file you download has none of ours.',
+  },
   'sign-pdf': {
     how: 'Your signature is captured as strokes on a canvas (or typed with an embedded handwriting font), turned into a transparent PNG in memory, and drawn onto the page with pdf-lib at the exact spot and size you chose on the pdf.js preview. The signed PDF is assembled in your tab and handed to your browser’s download.',
     versus: 'E-signature sites keep a copy of your contract, your signature and your email address, and most limit free users to a few documents a month. This tool has no server, so there is nothing to keep, nothing to count and nothing to leak.',
