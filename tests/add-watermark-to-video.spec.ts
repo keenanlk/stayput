@@ -29,7 +29,7 @@ interface Look {
   duration: number;
   hasAudio: boolean;
   /** Per sampled time: pixels in each quadrant that differ strongly from the blue, and how far the plain middle strip is from it. */
-  frames: { t: number; marked: Record<string, number>; drift: number }[];
+  frames: { t: number; marked: { tl: number; tr: number; bl: number; br: number; mid: number }; drift: number }[];
 }
 
 /** Decode the output in the page and measure the sampled frames. */
@@ -65,7 +65,7 @@ async function look(page: Page, bytes: Buffer, times: number[], mark: 'white' | 
         const ctx = c.getContext('2d', { willReadFrequently: true })!;
         ctx.drawImage(v, 0, 0);
         const { data: px } = ctx.getImageData(0, 0, c.width, c.height);
-        const marked: Record<string, number> = { tl: 0, tr: 0, bl: 0, br: 0, mid: 0 };
+        const marked: Record<'tl' | 'tr' | 'bl' | 'br' | 'mid', number> = { tl: 0, tr: 0, bl: 0, br: 0, mid: 0 };
         let drift = 0;
         let n = 0;
         for (let y = 0; y < c.height; y++) {
@@ -74,8 +74,8 @@ async function look(page: Page, bytes: Buffer, times: number[], mark: 'white' | 
             const r = px[i]!, g = px[i + 1]!, b = px[i + 2]!;
             const inMiddle = x > c.width * 0.4 && x < c.width * 0.6 && y > c.height * 0.35 && y < c.height * 0.65;
             if (isMark(r, g, b)) {
-              const key = inMiddle ? 'mid' : (y < c.height / 2 ? 't' : 'b') + (x < c.width / 2 ? 'l' : 'r');
-              marked[key]!++;
+              const key = (inMiddle ? 'mid' : (y < c.height / 2 ? 't' : 'b') + (x < c.width / 2 ? 'l' : 'r')) as keyof typeof marked;
+              marked[key]++;
             } else if (y > c.height * 0.4 && y < c.height * 0.6 && x < c.width * 0.3) {
               // A strip the watermarks never reach: the plain picture, to check for a colour cast.
               drift += Math.abs(r - blue[0]!) + Math.abs(g - blue[1]!) + Math.abs(b - blue[2]!);
