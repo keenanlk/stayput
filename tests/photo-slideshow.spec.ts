@@ -7,7 +7,6 @@ import { ALL_FORMATS, BlobSource, Input } from 'mediabunny';
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
 const PHOTOS = ['face.jpg', 'frenchie.jpg', 'checker.avif'].map(fx);
 
-/** Whether this browser can encode AAC; Linux CI Chromium cannot, but the MP3-in-MP4 fallback still gives sound. */
 async function setUp(page: Page, opts: { seconds?: string; fade?: boolean } = {}) {
   const requests: string[] = [];
   page.on('request', (r) => requests.push(r.url()));
@@ -69,8 +68,11 @@ async function inspect(page: Page, mp4: Buffer) {
   }, mp4.toString('base64'));
 }
 
-/** Whether the MP4 has a sound track: an `mp4a` or `.mp3` sample entry in its header boxes. */
-const hasAudio = (mp4: Buffer) => mp4.includes('mp4a') || mp4.includes('.mp3');
+/** The codec of the MP4's sound track (AAC, Opus or MP3 depending on the browser's encoders), or null without one. */
+async function audioCodec(mp4: Buffer) {
+  const track = await new Input({ source: new BlobSource(new Blob([new Uint8Array(mp4)])), formats: ALL_FORMATS }).getPrimaryAudioTrack();
+  return track?.codec ?? null;
+}
 
 test('Three photos and a song make a 1920×1080 MP4 of about six seconds with sound', async ({ page }) => {
   test.setTimeout(240_000);
@@ -83,7 +85,7 @@ test('Three photos and a song make a 1920×1080 MP4 of about six seconds with so
   expect(m.duration).toBeGreaterThan(5.5);
   expect(m.duration).toBeLessThan(6.5);
   expect(m.canPlay).not.toBe('');
-  expect(hasAudio(out), 'audio track').toBe(true);
+  expect(await audioCodec(out), 'audio track').not.toBeNull();
   expect(requests.filter((u) => u.startsWith('http') && !u.startsWith(origin))).toEqual([]);
   await expect(page.locator('#results-list')).toContainText('slideshow.mp4');
 });
@@ -109,7 +111,7 @@ test('A slideshow with no song has no sound track', async ({ page }) => {
   const m = await inspect(page, out);
   expect(m.duration).toBeGreaterThan(5.5);
   expect(m.duration).toBeLessThan(6.5);
-  expect(hasAudio(out)).toBe(false);
+  expect(await audioCodec(out)).toBeNull();
 });
 
 test('One photo and 101 photos get clear messages and no download', async ({ page }) => {
