@@ -50,6 +50,7 @@ const does: Record<string, string> = {
   'video-to-mp3': 'Pulls the audio out of a video (MOV, MKV, WebM, MP4) or converts M4A, WAV and FLAC audio to MP3.',
   'video-to-gif': 'Turns an MP4, MOV or WebM clip into an animated GIF, with trimming, size and frame rate options.',
   'gif-to-mp4': 'Converts animated GIFs to MP4 video (H.264, with no sound track since GIFs have none), usually much smaller than the GIF.',
+  'animated-png-to-gif': 'Converts animated PNG (APNG) files to animated GIF at the same size, keeping each frame’s timing and the loop count, with 256 colours per frame and hard-edged transparency.',
   'gif-to-animated-png': 'Converts animated GIFs to animated PNG (APNG), keeping each frame’s timing, the loop count and transparency.',
   'compress-video': 'Makes MP4, MOV and WebM videos smaller, or fits them under a size such as 10 MB for Discord or 25 MB for email, and saves an MP4.',
   'video-to-mp4': 'Converts MOV, MKV and WebM videos to MP4.',

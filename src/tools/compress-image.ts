@@ -1,16 +1,10 @@
 import { createShell, bindRange, num, str, radio, processEach } from '../lib/shell';
-import { canvasToBlob, decodeImage, drawExact, drawScaled, extForType, fitSize, supportsWebpEncoding, thumbnail, type EncodeType, type Fit } from '../lib/image';
+import { canvasToBlob, decodeImage, drawExact, drawScaled, extForType, fitSize, thumbnail, type EncodeType, type Fit } from '../lib/image';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { fitBytes } from '../lib/fit-bytes';
 
 bindRange('quality', 'quality-out');
 bindRange('percent', 'percent-out', (v) => `${v}%`);
-
-void supportsWebpEncoding().then((ok) => {
-  if (ok) return;
-  const opt = document.querySelector<HTMLOptionElement>('#format option[value="image/webp"]');
-  if (opt) opt.disabled = true;
-});
 
 const syncMode = () => {
   const mode = radio('resize-mode', 'max');
