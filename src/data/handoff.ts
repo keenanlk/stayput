@@ -28,6 +28,7 @@ export const handoffs: Record<string, string[]> = {
   'resize-video': ['compress-video', 'trim-video'],
   'rotate-video': ['trim-video', 'compress-video'],
   'crop-video': ['resize-video', 'compress-video'],
+  'add-watermark-to-video': ['compress-video', 'trim-video'],
   'video-speed': ['compress-video', 'video-to-gif'],
   'reverse-video': ['video-to-gif'],
   'blur-face-video': ['compress-video', 'trim-video'],

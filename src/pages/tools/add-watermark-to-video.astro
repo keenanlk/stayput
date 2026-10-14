@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import VideoWatermark from '../../components/options/VideoWatermark.astro';
+import WatermarkStage from '../../components/WatermarkStage.astro';
+const tool = toolBySlug('add-watermark-to-video')!;
+---
+<ToolLayout tool={tool}>
+  <WatermarkStage slot="panel" />
+  <Fragment slot="options"><VideoWatermark /></Fragment>
+</ToolLayout>
+<script src="../../tools/add-watermark-to-video.ts"></script>

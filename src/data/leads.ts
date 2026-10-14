@@ -57,6 +57,7 @@ const does: Record<string, string> = {
   'resize-video': 'Resizes a video, for example 4K to 1080p or 1080p to 720p, from MP4, MOV or WebM to MP4.',
   'rotate-video': 'Rotates a video by 90° or 180° or flips it, from MP4, MOV or WebM to MP4.',
   'crop-video': 'Crops a video to a box you draw or to 9:16, 1:1 or 4:5, from MP4, MOV or WebM to MP4.',
+  'add-watermark-to-video': 'Puts a text or logo watermark on every frame of a video (MP4, MOV, WebM or MKV), in a corner or the centre at a size and opacity you pick, and saves an MP4 with the sound kept.',
   'video-speed': 'Speeds a video up to 2×, 4× or 8× or slows it to 0.5× or 0.25×, keeps the pitch of the sound, and saves an MP4.',
   'merge-videos': 'Joins two or more videos (MP4, MOV, WebM, MKV) end to end into one MP4, in the order you set.',
   'add-audio-to-video': 'Puts an MP3, WAV or M4A track on a video, or swaps in the sound of another clip, and saves a new video.',
