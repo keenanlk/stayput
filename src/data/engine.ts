@@ -207,6 +207,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser records the microphone with its built-in recorder (MediaRecorder), with its own noise and echo reduction if you leave it on. When you stop, the sound is decoded and written in your tab: MP3 by LAME compiled to WebAssembly, WAV by a few lines of code, or M4A by the browser’s AAC encoder.',
     versus: 'Online voice recorders upload the recording to their servers to convert it, show ads around the download, and some keep your recordings in an account. Voice memos, interviews and dictation are private. Here the sound never leaves your device.',
   },
+  'audio-reverser': {
+    how: 'Your browser decodes the sound with its own audio decoders into plain samples in your tab. Each channel is then copied from its last sample to its first, so left and right stay in step. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site (at the original sample rate), M4A and OGG by the browser’s own encoders.',
+    versus: 'Online audio reversers upload the recording, cap the length, and keep the file for a while. Here the reversing happens on your device and nothing leaves it.',
+  },
   'volume-booster': {
     how: 'Your browser decodes the sound with its own audio decoders. Every sample is multiplied by the gain you chose (or the gain that brings the gated loudness to about −14 LUFS), then a look-ahead peak limiter turns down only the moments that would pass −1 dBFS, easing in over 5 ms and out over 150 ms. The file is written again in your tab: MP3 by LAME in WebAssembly, WAV and FLAC by code in this site, M4A and OGG by the browser’s own encoders. For a video, Mediabunny (MPL-2.0) copies the picture packets unchanged and adds the new sound.',
     versus: 'Online volume boosters upload the recording or video, cap the file size, and often just multiply the samples so loud parts clip and crackle. Here nothing leaves your device and the limiter keeps boosted sound clean.',
@@ -326,6 +330,10 @@ export const engines: Record<string, Engine> = {
   'epub-to-pdf': {
     how: 'An EPUB is a zip file. fflate (MIT) unzips it in your tab and the browser’s own parser reads the package file for the reading order, title and author, then each chapter’s XHTML. Headings, paragraphs with their bold and italic runs, lists, quotations and pictures are turned into a document description, and pdfmake (MIT, built on PDFKit) sets it in the Roboto font (Apache-2.0), breaking lines and pages in a background worker. Each chapter starts on a new page, and the first heading of each goes into the contents page.',
     versus: 'Online EPUB converters upload the whole book, many queue it on a server and some email you a download link. Here the book stays on your device, the size limit is your device’s memory (phones hold less), and it works offline after one visit and a short wait.',
+  },
+  'text-to-pdf': {
+    how: 'Your browser reads the text, works out its encoding (UTF-8, UTF-16 or Western European), expands tabs and splits it into lines. pdfmake (MIT, built on PDFKit) breaks the lines into pages in a background worker and embeds the Roboto font and a subset of DejaVu Sans Mono for monospace text and symbols. The PDF is written in your tab.',
+    versus: 'Your text goes from the box straight into a PDF made on this device, so a note, a draft or a log file is not sent to a server, and nothing is added to the page.',
   },
   'pdf-to-epub': {
     how: 'pdf.js (Apache-2.0) reads the positioned text of every page in your tab. The same rebuilding as PDF to Word groups it into lines and paragraphs and spots headings by their size. Text that sits at the top or bottom of many pages and differs only in its numbers is treated as a running header or footer and dropped, bare page numbers too, and a paragraph that stops mid-sentence at a page break is joined to its continuation. The main headings start chapters. Each chapter is written as XHTML with a small stylesheet, with an EPUB 3 navigation file and an NCX contents list for older readers, and fflate (MIT) zips them with the uncompressed mimetype first, as the EPUB specification requires.',

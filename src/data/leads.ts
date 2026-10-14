@@ -67,6 +67,7 @@ const does: Record<string, string> = {
   'signature-maker': 'Makes a signature image you can draw, type in a script font or take from a photo of your handwriting, and saves it as a transparent PNG, or an SVG when you draw it.',
   'screen-recorder': 'Records your screen, a window or a browser tab, with sound and your microphone if you choose, and saves the video.',
   'voice-recorder': 'Records your voice with your microphone and saves it as MP3, WAV or M4A.',
+  'audio-reverser': 'Plays an audio file backwards, from MP3, WAV, M4A, FLAC or OGG, and saves it in the same or another format.',
   'volume-booster': 'Makes an MP3, voice memo or video louder or quieter, or normalizes a batch to the same loudness.',
   'remove-noise': 'Cleans hiss, hum, fan and room noise out of a voice recording or video and keeps its format.',
   'merge-audio': 'Joins two or more audio files into one MP3 or WAV, in the order you choose, with silence or a crossfade between them.',
@@ -97,6 +98,7 @@ const does: Record<string, string> = {
   'ocr-pdf': 'Turns a scanned PDF into a searchable PDF by reading the text and laying it invisibly over each page.',
   'document-scanner': 'Turns phone photos of documents into a clean, straightened PDF by finding the page, flattening it and lifting shadows.',
   'epub-to-pdf': 'Converts an EPUB ebook to a PDF with chapters on new pages, pictures and a contents page.',
+  'text-to-pdf': 'Turns typed or pasted text, or .txt, .md, .csv and .log files, into a PDF with the page size, margins and type size you choose.',
   'pdf-to-epub': 'Converts a PDF into an EPUB ebook whose text reflows to fit a phone or e-reader screen, with chapters and a table of contents.',
   'archive-extractor': 'Extracts ZIP, RAR, 7z and TAR archives, including password-protected ZIP files, and downloads the files inside.',
   'create-zip': 'Zips files or whole folders into one ZIP and can lock it with an AES-256 password.',
@@ -166,7 +168,7 @@ const downloads: Record<string, Download> = {
  * on the first visit (pages, scripts and the image decoders).
  */
 const firstUseEngines = [
-  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-splitter', 'audio-converter', 'compress-audio', 'volume-booster',
+  'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-splitter', 'audio-converter', 'compress-audio', 'volume-booster', 'audio-reverser',
   'pitch-changer', 'remove-silence', 'voice-recorder', 'remove-noise', 'file-checksum',
   'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image', 'qr-code-scanner',
 ];
@@ -204,6 +206,7 @@ const facts: Record<string, string> = {
   'video-to-gif': 'A GIF is capped at 600 frames, and the video itself is limited by your device’s memory (phones hold less); give the page a short while after one visit to save itself for offline use, and then it works offline.',
   'create-zip': 'A ZIP can be up to 4 GB, and phones hold less; give the page a short while after one visit to save itself for offline use, and then it works offline.',
   'bpm-key-finder': 'Files longer than 15 minutes are not analysed, and after one visit and a short wait the page works offline.',
+  'text-to-pdf': 'Files up to 2 MB are accepted, and Chinese, Japanese, Korean, Arabic, Hebrew, Thai and emoji cannot be drawn by the built-in fonts. After one visit and a short wait the page works offline.',
   'blur-image': 'Finding faces downloads a small face detector (about 4 MB) the first time you use that button; marking areas by hand needs no download. After one visit and a short wait the page works offline.',
 };
 
@@ -217,6 +220,7 @@ const free: Record<string, string> = {
   'qr-code-generator': freeLine('what you type is'),
   'barcode-generator': freeLine('what you type is'),
   'json-to-csv': freeLine('what you paste and the files you drop are'),
+  'text-to-pdf': freeLine('what you type is'),
   'signature-maker': freeLine('what you draw, type or photograph is'),
   'screen-recorder': freeLine('your recordings are'),
   'voice-recorder': freeLine('your recordings are'),
