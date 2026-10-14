@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import SubtitleConverter from '../../components/options/SubtitleConverter.astro';
+const tool = toolBySlug('subtitle-converter')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><SubtitleConverter /></Fragment>
+</ToolLayout>
+<script src="../../tools/subtitle-converter.ts"></script>

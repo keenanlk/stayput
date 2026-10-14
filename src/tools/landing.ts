@@ -94,6 +94,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'sticker-maker': () => import('./sticker-maker'),
   'profile-picture-maker': () => import('./profile-picture'),
   'json-to-csv': () => import('./json-to-csv'),
+  'subtitle-converter': () => import('./subtitle-converter'),
 };
 
 const base = document.getElementById('tool')?.dataset.base ?? '';

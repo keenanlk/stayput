@@ -1,0 +1,18 @@
+---
+/** Option controls for the subtitle converter, shared by the tool page and its presets. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const format = defaults.format ?? 'auto';
+const formats = [
+  ['auto', 'Switch format (SRT to VTT, VTT to SRT)'],
+  ['srt', 'SRT'],
+  ['vtt', 'WebVTT'],
+  ['txt', 'Plain text'],
+] as const;
+---
+<div class="field">
+  <label for="sub-format">Convert to</label>
+  <select id="sub-format">
+    {formats.map(([v, l]) => <option value={v} selected={v === format}>{l}</option>)}
+  </select>
+</div>
