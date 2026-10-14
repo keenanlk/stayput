@@ -43,6 +43,9 @@ test('lists every tool with a description and an input schema', async () => {
   for (const t of tools) {
     assert.ok(t.description && t.description.length > 30, `${t.name} has a description`);
     assert.equal(t.inputSchema.type, 'object');
+    for (const [name, schema] of Object.entries(t.inputSchema.properties ?? {})) {
+      assert.ok(typeof schema.description === 'string' && schema.description.trim().length > 0, `${t.name}.${name} has a description`);
+    }
   }
 });
 

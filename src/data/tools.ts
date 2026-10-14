@@ -168,6 +168,14 @@ export const tools: Tool[] = [
         a: 'JPG, PNG, WebP, PDF (one page per image), ICO (a favicon or Windows icon with every size from 16 to 256 pixels), GIF (a still image, 256 colours), BMP and TIFF. Formats that cannot hold transparency fill it with the background colour you pick.',
       },
       {
+        q: 'Just need JPG or PNG?',
+        a: 'Use [Convert any image to JPG](/image-to-jpg) or [Convert any image to PNG](/image-to-png). They run this same converter with the output already chosen and explain what each format does to quality and transparency.',
+      },
+      {
+        q: 'Is JPEG the same as JPG?',
+        a: 'Yes, they are one format with two spellings. Renaming a .jpeg file to .jpg changes nothing inside it; converting here saves a re-encoded copy. [JPEG to JPG](/jpeg-to-jpg) has the details.',
+      },
+      {
         q: 'How does it know what format my file is?',
         a: 'It reads the first bytes of the file, where every image format writes its own signature, instead of trusting the name. A photo called .jpg that is really HEIC, or a download called .png that is really WebP, is shown as what it is and converted correctly.',
       },
