@@ -8,6 +8,7 @@
 import { ALL_FORMATS, AudioSampleSource, BlobSource, BufferTarget, Input, Mp4OutputFormat, OggOutputFormat, Output, canEncodeAudio } from 'mediabunny';
 import { SAMPLE_RATE as MP3_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, type Bitrate } from './audio';
 import { encodeFlac } from './flac';
+export { patchBrand } from './m4r';
 import { SAMPLE_RATE as OPUS_RATE, pcmFeeder } from './pcm';
 
 export type AudioFormat = 'mp3' | 'wav' | 'flac' | 'm4a' | 'ogg';
@@ -85,13 +86,26 @@ export async function convertAudio(
         : 'This browser has no Opus encoder, so it cannot write OGG. Chrome, Edge and Firefox can.',
     );
   }
+  const blob = await writeMp4(format === 'm4a' ? 'aac' : 'opus', chans, OPUS_RATE, kbps, onProgress);
+  return { ...base, blob };
+}
+
+const AAC_ERROR = 'This browser has no AAC encoder, so it cannot save M4R files. Safari, and Chrome or Edge on Windows and Mac, can. Save an MP3 instead: an iPhone can use it as a ringtone through the Files app or GarageBand, and an Android phone can use it directly.';
+
+/** AAC-LC in MP4 at the given rate, written by the browser's own encoder through Mediabunny. */
+export async function encodeAac(chans: Float32Array[], rate: number, kbps: number, onProgress?: (f: number) => void): Promise<Blob> {
+  if (!(await canWrite('m4a', chans.length))) throw new Error(AAC_ERROR);
+  return writeMp4('aac', chans, rate, kbps, onProgress);
+}
+
+async function writeMp4(codec: 'aac' | 'opus', chans: Float32Array[], rate: number, kbps: number, onProgress?: (f: number) => void): Promise<Blob> {
   const target = new BufferTarget();
-  const output = new Output({ format: format === 'm4a' ? new Mp4OutputFormat({ fastStart: 'in-memory' }) : new OggOutputFormat(), target });
-  const source = new AudioSampleSource({ codec: format === 'm4a' ? 'aac' : 'opus', bitrate: kbps * 1000 });
+  const output = new Output({ format: codec === 'aac' ? new Mp4OutputFormat({ fastStart: 'in-memory' }) : new OggOutputFormat(), target });
+  const source = new AudioSampleSource({ codec, bitrate: kbps * 1000 });
   output.addAudioTrack(source);
   await output.start();
-  const feed = pcmFeeder(source, chans);
-  const seconds = feed.length / OPUS_RATE;
+  const feed = pcmFeeder(source, chans, rate);
+  const seconds = feed.length / rate;
   const step = 5;
   for (let t = step; t < seconds + step; t += step) {
     await feed.until(Math.min(t, seconds));
@@ -99,6 +113,5 @@ export async function convertAudio(
   }
   source.close();
   await output.finalize();
-  const type = format === 'm4a' ? 'audio/mp4' : 'audio/ogg';
-  return { ...base, blob: new Blob([target.buffer!], { type }) };
+  return new Blob([target.buffer!], { type: codec === 'aac' ? 'audio/mp4' : 'audio/ogg' });
 }

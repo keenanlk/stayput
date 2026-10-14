@@ -66,7 +66,7 @@ const does: Record<string, string> = {
   'add-audio-to-video': 'Puts an MP3, WAV or M4A track on a video, or swaps in the sound of another clip, and saves a new video.',
   'reverse-video': 'Plays a video backwards, with the sound reversed or removed, from MP4, MOV, WebM or MKV to MP4.',
   'video-to-jpg': 'Saves frames from an MP4, MOV, WebM or MKV video as JPG or PNG images: one per second, spread across the clip, or every frame.',
-  'trim-audio': 'Cuts the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, with fades, and saves MP3 or WAV.',
+  'trim-audio': 'Cuts the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, with fades, and saves MP3, WAV or M4R.',
   'audio-converter': 'Converts audio between MP3, WAV, FLAC, M4A and OGG, or pulls the sound out of a video, for one file or a batch.',
   'qr-code-generator': 'Makes a QR code for a link, Wi-Fi network, contact card, email or phone number, and saves it as PNG or SVG.',
   'qr-code-scanner': 'Reads QR codes and barcodes from an image, a screenshot or your camera and shows what they hold, without opening anything for you.',

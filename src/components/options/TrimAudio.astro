@@ -3,8 +3,10 @@
 interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
 const format = defaults.format ?? 'mp3';
+const forPhone = defaults['rt-for'];
+const maxSeconds = defaults['max-seconds'];
 ---
-<div class="field-row wide au-trim">
+<div class="field-row wide au-trim" data-max-seconds={maxSeconds}>
   <div class="field">
     <label for="au-start">Start (seconds)</label>
     <div class="au-time"><input type="number" id="au-start" min="0" step="0.1" value="0" inputmode="decimal" /><button class="btn btn-sm btn-ghost" type="button" id="au-set-start">Set start</button></div>
@@ -14,6 +16,15 @@ const format = defaults.format ?? 'mp3';
     <div class="au-time"><input type="number" id="au-end" min="0" step="0.1" value="0" inputmode="decimal" /><button class="btn btn-sm btn-ghost" type="button" id="au-set-end">Set end</button></div>
   </div>
 </div>
+{forPhone && (
+  <div class="field">
+    <label>For</label>
+    <div class="segmented" role="radiogroup" aria-label="For">
+      <label><input type="radio" name="rt-for" value="iphone" checked={forPhone === 'iphone'} /><span>iPhone</span></label>
+      <label><input type="radio" name="rt-for" value="android" checked={forPhone === 'android'} /><span>Android</span></label>
+    </div>
+  </div>
+)}
 <div class="field">
   <label class="check"><input type="checkbox" id="fade-in" checked={defaults['fade-in'] === 'true'} /> Fade in at the start</label>
   <label class="check"><input type="checkbox" id="fade-out" checked={defaults['fade-out'] === 'true'} /> Fade out at the end</label>
@@ -22,9 +33,11 @@ const format = defaults.format ?? 'mp3';
   <label for="format">Save as</label>
   <select id="format">
     <option value="mp3" selected={format === 'mp3'}>MP3 (plays everywhere)</option>
+    <option value="m4r" selected={format === 'm4r'}>M4R (iPhone ringtone)</option>
     <option value="wav" selected={format === 'wav'}>WAV (no quality loss, larger)</option>
   </select>
 </div>
+<p class="muted small" id="format-note" hidden></p>
 <p class="muted small au-estimate" id="au-estimate" aria-live="polite"></p>
 <style is:global>
   .au-trim { align-items: end; }
