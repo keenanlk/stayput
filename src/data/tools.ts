@@ -4860,6 +4860,14 @@ export const tools: Tool[] = [
       'Extract ZIP, RAR, 7z and TAR archives in your browser, including password-protected ZIP, 7z and RAR files when you have the password, and download the files inside one by one or all at once. Nothing to install; nothing is uploaded.',
     heading: 'Open ZIP, RAR and 7z files',
     tagline: 'The files inside an archive, unpacked on your own device, without installing WinRAR or 7-Zip.',
+    sections: [
+      {
+        heading: 'Related tools',
+        paragraphs: [
+          'After unpacking, [Rename files](/tools/rename-files) can give the whole batch new names with a prefix, numbering or find and replace.',
+        ],
+      },
+    ],
     category: 'pdf',
     accept: '.zip,.rar,.7z,.tar,.gz,.tgz,.bz2,.tbz2,.xz,.txz,.iso,.cab,application/zip,application/x-rar-compressed,application/vnd.rar,application/x-7z-compressed,application/x-tar,application/gzip',
     multiple: true,
@@ -4903,6 +4911,14 @@ export const tools: Tool[] = [
       'Zip files or whole folders into one ZIP in your browser, and lock it with an AES-256 password if you like. Nothing is uploaded, so private files stay on your device.',
     heading: 'Create a ZIP file',
     tagline: 'Files and folders packed into one ZIP on your own device, locked with a password when they are private.',
+    sections: [
+      {
+        heading: 'Related tools',
+        paragraphs: [
+          'Want the files to have tidier names first? [Rename files](/tools/rename-files) renames a batch with one pattern and hands back a ZIP.',
+        ],
+      },
+    ],
     category: 'pdf',
     accept: '',
     multiple: true,
@@ -4931,6 +4947,54 @@ export const tools: Tool[] = [
       {
         q: 'Are my files uploaded?',
         a: 'No. The ZIP is built in this tab with fflate, and the encryption runs here too, so neither the files nor the password leave your device.',
+      },
+    ],
+  },
+  {
+    slug: 'rename-files',
+    icon: 'merge',
+    name: 'Rename files',
+    title: 'Bulk Rename Files Online: Pattern, Numbers, ZIP | Stayput',
+    description:
+      'Bulk rename files in your browser: add a prefix or suffix, number them, find and replace, change case. Preview every new name, then download a ZIP. Nothing is uploaded.',
+    heading: 'Bulk rename files',
+    tagline: 'Rename a whole batch of files with one pattern and see every new name before you download. File names stay on your device.',
+    sections: [
+      {
+        heading: 'Why the result is a ZIP',
+        paragraphs: [
+          'A web page cannot rename files on your disk, so the renamed copies come back in one ZIP, in the order shown in the preview. Unzip it and the files have their new names; the contents are not changed. To pack files without renaming them, use [Create ZIP](/tools/create-zip), and the [archive opener](/tools/archive-extractor) unpacks a ZIP you were sent.',
+        ],
+      },
+    ],
+    category: 'pdf',
+    accept: '',
+    multiple: true,
+    dropLabel: 'Drop the files to rename',
+    action: 'Download renamed ZIP',
+    sizeFact: 'No watermark. A ZIP can be up to 4 GB, and phones hold less.',
+    keywords: ['bulk rename files', 'batch rename files', 'rename multiple files', 'rename files online', 'add numbers to file names', 'find and replace in file names'],
+    steps: [
+      'Drop the files you want to rename; use the arrows to set their order.',
+      'Set a prefix or suffix, numbering, find and replace, or letter case, and check the preview.',
+      'Press Download renamed ZIP; the ZIP holds your files under their new names.',
+    ],
+    faq: [
+      {
+        q: 'Why do I get a ZIP instead of renamed files?',
+        a: 'A web page is not allowed to change files on your disk, so the tool writes copies under the new names into a ZIP. Unzip it to get the renamed files; the originals are untouched.',
+      },
+      {
+        q: 'What happens if two files end up with the same name?',
+        a: 'The later one gets a counter before its extension, such as photo-2.jpg, and the preview marks it. Names are compared ignoring upper and lower case, because Windows and macOS treat them as the same file.',
+      },
+      {
+        q: 'Are the file extensions kept?',
+        a: 'Yes, by default the extension is kept as it was. Untick Keep the original file extension if you want the pattern to apply to the whole name, extension included.',
+      },
+      {
+        q: 'Are my files or their names uploaded?',
+        a: 'No. The names are read and changed in this tab and the ZIP is built here. Neither the files nor their names are sent anywhere or counted by analytics.',
       },
     ],
   },
@@ -5574,6 +5638,49 @@ export const tools: Tool[] = [
       {
         q: 'Is my artwork uploaded?',
         a: 'No. The image is decoded, trimmed, resized and saved as PNG on a canvas in your tab. Commissioned emotes and unreleased sub badges stay on your device, and the page works offline after one visit and a short wait.',
+      },
+    ],
+  },
+  {
+    slug: 'compare-images',
+    icon: 'sliders',
+    name: 'Compare images',
+    title: 'Compare Two Images: Find the Differences, No Upload | Stayput',
+    description:
+      'Compare two images side by side: drag a slider, see the changed pixels highlighted, or fade between them. Shows the percent that differ. Nothing is uploaded.',
+    heading: 'Compare two images',
+    tagline: 'Find what changed between two pictures with a slider, a difference map or a fade, all on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl,.svg',
+    multiple: true,
+    dropLabel: 'Drop two images to compare',
+    action: 'Save difference map',
+    keywords: ['compare images', 'compare two images', 'image difference', 'image diff', 'spot the difference', 'compare photos', 'visual diff'],
+    steps: [
+      'Drop two images, or choose one for A and one for B.',
+      'Pick Slider, Difference or Fade, and set the sensitivity threshold.',
+      'Read the percentage of pixels that differ, and save the difference map as a PNG if you want it.',
+    ],
+    faq: [
+      {
+        q: 'What does it compare?',
+        a: 'Pixels, not meaning. Each pixel in A is checked against the pixel in the same place in B. A photo shifted by a few pixels, or the same scene taken twice, shows as mostly different even though a person would call them alike. It cannot tell whether two photos show the same scene.',
+      },
+      {
+        q: 'Why do two JPEGs of the same picture show small differences?',
+        a: 'JPEG changes colours slightly every time it is saved, which leaves faint noise around edges. Raise the sensitivity threshold until the noise disappears and only real changes are left. At 0 any change counts.',
+      },
+      {
+        q: 'What happens when the images are different sizes?',
+        a: 'With “Fit B to A’s size” on, B is scaled to A’s width and height before comparing, and a warning appears when the two have different aspect ratios because B is then stretched. Turn it off to compare at B’s own size, with anything outside it counted as different.',
+      },
+      {
+        q: 'Is there a size limit?',
+        a: 'Very large pictures are compared at no more than 4,096 pixels on the long side, and the page says when that happened, so a 24 megapixel pair does not freeze a phone. The difference map you save is that size too.',
+      },
+      {
+        q: 'Are my images uploaded?',
+        a: 'No. Both images are decoded and compared on a canvas in your browser tab, and the difference map is saved from there. Your files are not uploaded, and it works offline after one visit and a short wait.',
       },
     ],
   },

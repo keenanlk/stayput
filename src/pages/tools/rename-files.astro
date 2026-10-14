@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import RenameFiles from '../../components/options/RenameFiles.astro';
+const tool = toolBySlug('rename-files')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><RenameFiles /></Fragment>
+</ToolLayout>
+<script src="../../tools/rename-files.ts"></script>

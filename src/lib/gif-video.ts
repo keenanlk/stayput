@@ -9,6 +9,7 @@
 import { parseGIF, decompressFrame, type ParsedGif } from 'gifuct-js';
 import { EncoderStall, watchEncode } from './encoder-watchdog';
 import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
+import { parseAnimatedWebp, renderWebpFrames } from './webp-anim';
 
 type GifFrame = Parameters<typeof decompressFrame>[0];
 
@@ -74,8 +75,10 @@ export async function supportedCodecs(width: number, height: number, bitrate: nu
     throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
   }
   const found: { config: VideoEncoderConfig; candidate: Candidate }[] = [];
+  // Safari's encoder in quality mode takes eight frames and then never answers; real-time mode does.
+  const latencyMode = /apple/i.test(navigator.vendor ?? '') ? 'realtime' : 'quality';
   for (const candidate of CANDIDATES) {
-    const config: VideoEncoderConfig = { codec: candidate.codec, width, height, bitrate, framerate, bitrateMode: 'variable', latencyMode: 'quality' };
+    const config: VideoEncoderConfig = { codec: candidate.codec, width, height, bitrate, framerate, bitrateMode: 'variable', latencyMode };
     if (candidate.mux === 'avc') config.avc = { format: 'avc' };
     try {
       const { supported } = await VideoEncoder.isConfigSupported(config);
@@ -117,7 +120,63 @@ export async function gifToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promi
   // Generous for GIF content: flat colours compress very well at any rate.
   const bitrate = Math.round(Math.min(16e6, Math.max(8e5, width * height * fps * 0.2)));
   const codecs = await supportedCodecs(width, height, bitrate, fps);
-  const job: Job = { gif, frames, delays, plays, width, height, fps, crisp: scale > 1, background: opts.background, onProgress: opts.onProgress };
+  const job: Job = { source: gifSource(gif, frames, gw, gh, delays), count: frames.length, delays, plays, width, height, fps, crisp: scale > 1, background: opts.background, onProgress: opts.onProgress };
+  return encodeWithFallback(codecs, job);
+}
+
+/** Why a WebP could not be made into a video, with what to try next. The page shows `link` after the message. */
+export class WebpError extends Error {
+  link?: { href: string; text: string };
+  constructor(name: string, message: string, link?: { href: string; text: string }) {
+    super(message);
+    this.name = name;
+    this.link = link;
+  }
+}
+
+const stillWebp = () => new WebpError('WebpNotAnimated', 'This WebP has one frame, so there is no animation to turn into a video. Use WebP to PNG or JPG for a still image:', { href: '/webp-to-png', text: 'WebP to PNG' });
+
+/** True when the bytes are a WebP file (animated or not). */
+export const isWebp = (b: Uint8Array) => b.length >= 12 && String.fromCharCode(...b.subarray(0, 4)) === 'RIFF' && String.fromCharCode(...b.subarray(8, 12)) === 'WEBP';
+
+/**
+ * Animated WebP to MP4, straight from the WebP's own frames (never through a
+ * GIF, whose 256-colour palette would degrade them). The video keeps the
+ * canvas size, rounded to even, and each frame's own duration; transparency
+ * becomes `background`.
+ */
+export async function webpToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promise<GifToMp4Result> {
+  const u8 = new Uint8Array(bytes);
+  if (!isWebp(u8)) throw new WebpError('NotAWebp', 'This file is not a WebP image. Some apps save animations as GIF or video under a .webp name. Save the animation again from the original app.');
+  let anim;
+  try {
+    anim = parseAnimatedWebp(u8);
+  } catch {
+    throw new WebpError('DamagedWebp', 'This WebP could not be read. It may be damaged or cut short: download or save it again, then try once more.');
+  }
+  if (!anim || anim.frames.length < 2) throw stillWebp();
+  const delays = anim.frames.map((f) => frameDelay(f.duration));
+  const loopMs = delays.reduce((a, b) => a + b, 0);
+  const plays = opts.repeat === 'auto' ? Math.max(1, Math.ceil((MIN_SECONDS * 1000) / loopMs)) : Math.max(1, opts.repeat);
+  const long = Math.max(anim.width, anim.height);
+  const scale = Math.min(1, (opts.maxSide ?? 1920) / long);
+  const width = even(anim.width * scale);
+  const height = even(anim.height * scale);
+  const fps = Math.min(60, Math.max(1, Math.round((1000 * anim.frames.length) / loopMs)));
+  const bitrate = Math.round(Math.min(16e6, Math.max(8e5, width * height * fps * 0.2)));
+  const codecs = await supportedCodecs(width, height, bitrate, fps);
+  const source: FrameSource = async (emit) => {
+    const tmp = new OffscreenCanvas(anim.width, anim.height);
+    const tctx = tmp.getContext('2d')!;
+    await renderWebpFrames(anim, async (rgba, _ms, i) => {
+      tctx.putImageData(rgba, 0, 0);
+      await emit(tmp, delays[i]!);
+    });
+  };
+  return encodeWithFallback(codecs, { source, count: anim.frames.length, delays, plays, width, height, fps, crisp: false, background: opts.background, onProgress: opts.onProgress });
+}
+
+async function encodeWithFallback(codecs: Awaited<ReturnType<typeof supportedCodecs>>, job: Job): Promise<GifToMp4Result> {
   // A hardware encoder can accept a config and still fail on the first frame; fall back to the next codec.
   let lastError: unknown;
   for (const { config, candidate } of codecs) {
@@ -133,9 +192,13 @@ export async function gifToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promi
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
+/** Draws one play of the animation, calling `emit` with each composited frame and how long it shows (ms). */
+type FrameSource = (emit: (image: CanvasImageSource, duration: number) => Promise<void>) => Promise<void>;
+
 interface Job {
-  gif: ParsedGif;
-  frames: GifFrame[];
+  source: FrameSource;
+  /** Frames in one play. */
+  count: number;
   delays: number[];
   plays: number;
   width: number;
@@ -146,10 +209,35 @@ interface Job {
   onProgress?: (fraction: number) => void;
 }
 
+/** Composite a GIF's frames in order, following each frame's disposal rule. */
+function gifSource(gif: ParsedGif, frames: GifFrame[], gw: number, gh: number, delays: number[]): FrameSource {
+  return async (emit) => {
+    const comp = new OffscreenCanvas(gw, gh);
+    const cctx = comp.getContext('2d', { willReadFrequently: true })!;
+    const patch = new OffscreenCanvas(1, 1);
+    const pctx = patch.getContext('2d')!;
+    for (const [i, frame] of frames.entries()) {
+      const f = decompressFrame(frame, gif.gct, true);
+      const { left, top, width: fw, height: fh } = f.dims;
+      // Disposal 3 puts back whatever was there before this frame once it has been shown.
+      const restore = f.disposalType === 3 ? cctx.getImageData(0, 0, gw, gh) : undefined;
+      if (fw > 0 && fh > 0) {
+        if (patch.width !== fw || patch.height !== fh) {
+          patch.width = fw;
+          patch.height = fh;
+        }
+        pctx.putImageData(new ImageData(new Uint8ClampedArray(f.patch), fw, fh), 0, 0);
+        cctx.drawImage(patch, left, top);
+      }
+      await emit(comp, delays[i]!);
+      if (f.disposalType === 2) cctx.clearRect(left, top, fw, fh);
+      else if (restore) cctx.putImageData(restore, 0, 0);
+    }
+  };
+}
+
 async function encode(job: Job, config: VideoEncoderConfig, candidate: Candidate): Promise<GifToMp4Result> {
-  const { gif, frames, delays, plays, width, height, fps } = job;
-  const gw = gif.lsd.width;
-  const gh = gif.lsd.height;
+  const { count, plays, width, height, fps } = job;
   const muxer = new Muxer({
     target: new ArrayBufferTarget(),
     video: { codec: candidate.mux, width, height, frameRate: fps },
@@ -157,66 +245,64 @@ async function encode(job: Job, config: VideoEncoderConfig, candidate: Candidate
     firstTimestampBehavior: 'offset',
   });
   let failure: unknown;
+  let outputs = 0;
   const encoder = new VideoEncoder({
-    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+    output: (chunk, meta) => {
+      outputs++;
+      muxer.addVideoChunk(chunk, meta);
+    },
     error: (e) => (failure ??= e),
   });
   encoder.configure(config);
 
-  // The GIF's own canvas, with the frame patches composited in order.
-  const comp = new OffscreenCanvas(gw, gh);
-  const cctx = comp.getContext('2d', { willReadFrequently: true })!;
-  const patch = new OffscreenCanvas(1, 1);
-  const pctx = patch.getContext('2d')!;
   // The video frame: the composite over the background, scaled to size.
   const out = new OffscreenCanvas(width, height);
   const octx = out.getContext('2d')!;
   octx.imageSmoothingEnabled = !job.crisp;
   octx.imageSmoothingQuality = 'high';
 
-  const total = frames.length * plays;
+  const total = count * plays;
   const keyEvery = Math.max(1, fps * 2);
   let poster: ImageBitmap | undefined;
   let t = 0; // microseconds
   let n = 0;
+  let needKey = false;
   try {
     await watchEncode(
       async (progress) => {
         for (let play = 0; play < plays; play++) {
-          cctx.clearRect(0, 0, gw, gh);
-          for (const [i, frame] of frames.entries()) {
+          await job.source(async (image, ms) => {
             if (failure) throw failure;
-            const f = decompressFrame(frame, gif.gct, true);
-            const { left, top, width: fw, height: fh } = f.dims;
-            // Disposal 3 puts back whatever was there before this frame once it has been shown.
-            const restore = f.disposalType === 3 ? cctx.getImageData(0, 0, gw, gh) : undefined;
-            if (fw > 0 && fh > 0) {
-              if (patch.width !== fw || patch.height !== fh) {
-                patch.width = fw;
-                patch.height = fh;
-              }
-              pctx.putImageData(new ImageData(new Uint8ClampedArray(f.patch), fw, fh), 0, 0);
-              cctx.drawImage(patch, left, top);
-            }
             octx.fillStyle = job.background;
             octx.fillRect(0, 0, width, height);
-            octx.drawImage(comp, 0, 0, width, height);
+            octx.drawImage(image, 0, 0, width, height);
             poster ??= await createImageBitmap(out);
 
-            const duration = delays[i]! * 1000;
+            const duration = ms * 1000;
             const vf = new VideoFrame(out, { timestamp: t, duration });
-            encoder.encode(vf, { keyFrame: n % keyEvery === 0 });
+            encoder.encode(vf, { keyFrame: needKey || n % keyEvery === 0 });
+            needKey = false;
             vf.close();
             t += duration;
             n++;
-            if (f.disposalType === 2) cctx.clearRect(left, top, fw, fh);
-            else if (restore) cctx.putImageData(restore, 0, 0);
 
             // Let the encoder catch up rather than queueing hundreds of frames in memory.
-            while (encoder.encodeQueueSize > 8 && !failure) await new Promise((r) => setTimeout(r, 4));
+            // Some encoders (Safari's) hold frames back to look ahead and release nothing until
+            // flushed; if the queue stops draining, flush rather than waiting forever.
+            let idle = 0;
+            let seen = outputs;
+            while (encoder.encodeQueueSize > 8 && !failure) {
+              await new Promise((r) => setTimeout(r, 4));
+              if (outputs !== seen) [seen, idle] = [outputs, 0];
+              else if (++idle > 25) {
+                await encoder.flush();
+                needKey = true;
+                break;
+              }
+            }
             progress(n / total);
             job.onProgress?.(n / total);
-          }
+          });
         }
         await encoder.flush();
         if (failure) throw failure;
@@ -231,5 +317,5 @@ async function encode(job: Job, config: VideoEncoderConfig, candidate: Candidate
   }
   muxer.finalize();
   const blob = new Blob([muxer.target.buffer], { type: 'video/mp4' });
-  return { blob, codec: candidate.name, width, height, frames: frames.length, plays, duration: t / 1000, poster: poster! };
+  return { blob, codec: candidate.name, width, height, frames: count, plays, duration: t / 1000, poster: poster! };
 }
