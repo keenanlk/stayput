@@ -1,0 +1,65 @@
+---
+/**
+ * The dead pixel test: a start button, a colour to begin on and an optional
+ * automatic cycle. The test itself is a full-window layer filled with one
+ * colour. It replaces the drop zone. Driven by src/tools/dead-pixel-test.ts.
+ */
+---
+<div id="dpx-panel" class="dpx-panel">
+  <p class="dpx-mode" id="dpx-mode" aria-live="polite">Press Start and the whole screen fills with black, then white, red, green and blue.</p>
+  <div class="dpx-controls">
+    <button type="button" class="btn btn-primary btn-lg" id="dpx-start">Start the test</button>
+  </div>
+  <fieldset class="dpx-colours">
+    <legend>Or begin on one colour</legend>
+    <button type="button" class="dpx-swatch" data-colour="black" style="background:#000">Black</button>
+    <button type="button" class="dpx-swatch" data-colour="white" style="background:#fff;color:#000">White</button>
+    <button type="button" class="dpx-swatch" data-colour="red" style="background:#f00">Red</button>
+    <button type="button" class="dpx-swatch" data-colour="green" style="background:#0f0;color:#000">Green</button>
+    <button type="button" class="dpx-swatch" data-colour="blue" style="background:#00f">Blue</button>
+  </fieldset>
+  <div class="dpx-options">
+    <label class="dpx-check"><input type="checkbox" id="dpx-cycle" /> Change colour by itself</label>
+    <div class="field">
+      <label for="dpx-seconds">Every</label>
+      <select id="dpx-seconds">
+        <option value="2">2 seconds</option>
+        <option value="3" selected>3 seconds</option>
+        <option value="5">5 seconds</option>
+        <option value="10">10 seconds</option>
+      </select>
+    </div>
+  </div>
+  <p class="hint">Click or tap the screen, or use the arrow keys, to change colour. Press Esc to leave.</p>
+</div>
+<div id="dpx-screen" class="dpx-screen" data-colour="black" hidden role="application" aria-label="Dead pixel test. Click or press an arrow key to change colour, Esc to exit.">
+  <p class="dpx-hint" id="dpx-hint">Click or arrow keys: next colour. Esc: exit.</p>
+  <button type="button" class="dpx-exit" id="dpx-exit" aria-label="Exit the test">&times;</button>
+</div>
+<style is:global>
+  .tool-panel:has(#dpx-panel) #drop,
+  .tool-panel:has(#dpx-panel) #file-list,
+  .tool-panel:has(#dpx-panel) .run-dock { display: none; }
+  .dpx-panel { display: grid; gap: 16px; }
+  .dpx-mode { margin: 0; padding: 16px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius); font-weight: 600; }
+  .dpx-controls .btn { width: 100%; }
+  .dpx-colours { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .dpx-colours legend { padding: 0; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+  .dpx-swatch { flex: 1 1 90px; padding: 14px 10px; border: 1px solid var(--line-strong); border-radius: var(--radius); font-weight: 700; color: #fff; cursor: pointer; }
+  .dpx-options { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; }
+  .dpx-check { font-weight: 600; }
+  .dpx-panel .hint { margin: 0; }
+  .dpx-screen { position: fixed; inset: 0; z-index: 2147483000; cursor: none; width: 100vw; height: 100dvh; margin: 0; }
+  .dpx-screen[hidden] { display: none; }
+  .dpx-screen[data-colour='black'] { background: #000; }
+  .dpx-screen[data-colour='white'] { background: #fff; }
+  .dpx-screen[data-colour='red'] { background: #f00; }
+  .dpx-screen[data-colour='green'] { background: #0f0; }
+  .dpx-screen[data-colour='blue'] { background: #00f; }
+  .dpx-hint, .dpx-exit { position: absolute; top: 12px; font: 14px/1.3 system-ui, sans-serif; background: rgba(128,128,128,.7); color: #fff; border: 0; border-radius: 6px; padding: 6px 10px; transition: opacity .6s; pointer-events: none; }
+  .dpx-hint { left: 12px; }
+  .dpx-exit { right: 12px; font-size: 22px; line-height: 1; pointer-events: auto; cursor: pointer; opacity: 0; }
+  .dpx-screen[data-mode='window'] .dpx-exit { opacity: .5; }
+  .dpx-screen.dpx-quiet .dpx-hint { opacity: 0; }
+  .dpx-screen.dpx-quiet .dpx-exit { opacity: 0; }
+</style>

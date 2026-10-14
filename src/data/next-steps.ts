@@ -3,7 +3,7 @@
  * stayput-ops company/experiments.md). Two tools each, most likely first:
  * the job people typically do next with the same kind of file.
  */
-export const nextSteps: Record<string, [string, string]> = {
+export const nextSteps: Record<string, string[]> = {
   'heic-to-jpg': ['strip-exif', 'compress-image'],
   'convert-image': ['compress-image', 'strip-exif'],
   'compress-image': ['strip-exif', 'image-to-pdf'],
@@ -81,9 +81,10 @@ export const nextSteps: Record<string, [string, string]> = {
   'metronome': ['tuner', 'voice-recorder'],
   'tuner': ['tone-generator', 'metronome'],
   'mic-test': ['webcam-test', 'keyboard-tester'],
-  'webcam-test': ['mic-test', 'keyboard-tester'],
-  'speaker-test': ['tone-generator', 'keyboard-tester'],
+  'webcam-test': ['mic-test', 'keyboard-tester', 'dead-pixel-test'],
+  'speaker-test': ['tone-generator', 'keyboard-tester', 'dead-pixel-test'],
   'tone-generator': ['speaker-test', 'tuner'],
+  'dead-pixel-test': ['webcam-test', 'speaker-test'],
   'audio-to-video': ['compress-video', 'trim-video'],
   'photo-slideshow-maker': ['compress-video', 'add-audio-to-video'],
   'compress-audio': ['trim-audio', 'audio-converter'],

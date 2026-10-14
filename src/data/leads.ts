@@ -80,6 +80,7 @@ const does: Record<string, string> = {
   'merge-audio': 'Joins two or more audio files into one MP3 or WAV, in the order you choose, with silence or a crossfade between them.',
   'mic-test': 'Tests your microphone with a live level meter, a plain verdict, and a 5-second recording you can play back.',
   'webcam-test': 'Tests your webcam with a live preview, its real resolution and frame rate, a mirror view and a snapshot.',
+  'dead-pixel-test': 'Fills your whole screen with black, white, red, green and blue, one at a time, so you can spot dead or stuck pixels.',
   'speaker-test': 'Plays a tone through the left speaker, the right speaker or both, a frequency sweep or pink noise, so you can hear whether each side works.',
   'keyboard-tester': 'Lights each key on an on-screen keyboard as you press it, in an ANSI or ISO layout, and logs the key and code of every press.',
   'audio-to-video': 'Makes a video from a song, podcast or voice note and a cover picture, in 16:9, square or 9:16.',

@@ -247,6 +247,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser opens the camera (getUserMedia) and shows it in a video element on this page. The resolution comes from the picture itself, the frame rate is counted from the frames that actually arrive, and a snapshot is drawn to a canvas and saved as JPG by your browser.',
     versus: 'Many online webcam tests send your picture to their servers to take a photo or record a clip, and run ads and trackers around the test. Here the picture goes from your camera to this tab and nowhere else.',
   },
+  'dead-pixel-test': {
+    how: 'Your browser draws a plain block of one colour over the whole page and asks for full screen so no browser bars are left. Each press of a key or click moves to the next colour: black, white, red, green, then blue.',
+    versus: 'Nothing here needs a file, an account or a download: the colours are made in your tab, and nothing about your screen leaves it.',
+  },
   'speaker-test': {
     how: 'Your browser’s Web Audio API makes each sound in this tab: an oscillator at the pitch you chose, or a loop of pink noise, sent to the left channel, the right or both, through a volume control. The sweep moves the oscillator’s pitch smoothly from low to high.',
     versus: 'Nothing here needs a file, an account or a download: the sounds are made in your tab and go straight to your speakers.',
