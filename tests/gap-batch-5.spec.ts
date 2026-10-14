@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
 import { detectPitch, instrumentById, nearestString, noteFor, noteLabel } from '../src/lib/tuner';
