@@ -2855,6 +2855,85 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'tone-generator',
+    icon: 'volume',
+    name: 'Tone generator',
+    title: 'Online Tone Generator and Frequency Generator | Stayput',
+    description:
+      'Play a test tone online: sine, square, triangle or sawtooth from 20 Hz to 20 kHz, with presets for 440 Hz, 1 kHz and bass. It starts quiet, and nothing is uploaded.',
+    heading: 'Online tone generator',
+    tagline: 'Play a steady tone at any pitch from 20 Hz to 20 kHz, as a sine, square, triangle or sawtooth wave. It starts quiet, and nothing is uploaded.',
+    category: 'media',
+    accept: '.txt',
+    multiple: false,
+    dropLabel: 'Play a tone',
+    action: 'Play',
+    lead:
+      'Plays a steady test tone at the pitch you choose, from 20 Hz to 20 kHz, as a sine, square, triangle or sawtooth wave, so you can check speakers, headphones and subwoofers, or find a reference note. It is free, and your choices are not uploaded: the tone is made by code in your browser, and the page uses no file and no microphone. After one visit and a short wait the page works offline.',
+    sections: [
+      {
+        heading: 'What this tool does',
+        bullets: [
+          'Plays one steady tone with a sine, square, triangle or sawtooth wave.',
+          'Sets the pitch with a slider on a log scale from 20 Hz to 20 kHz, or with a number you type; the two stay in step.',
+          'Has presets for 440 Hz (the A above middle C), 1 kHz and a 50 Hz test bass.',
+          'Starts at a low level and fades in and out, so starting and stopping do not click.',
+        ],
+      },
+      {
+        heading: 'Take care with your hearing',
+        bullets: [
+          'Turn your device volume down first and raise it slowly. A steady tone is harsher than music at the same setting.',
+          'Take extra care with headphones, which sit close to your ear.',
+          'Very low and very high tones can be hard to hear and still be loud, so do not judge the volume by how it sounds. Stop if it hurts.',
+        ],
+      },
+      {
+        heading: 'What this tool cannot tell you',
+        bullets: [
+          'The page plays sound and you listen. It cannot hear your speakers, so it does not measure their quality, loudness or frequency response.',
+          'Small speakers play very low and very high tones weakly or not at all, and people differ in how high a sound they hear.',
+        ],
+      },
+    ],
+    keywords: ['tone generator', 'online tone generator', 'frequency generator', 'sine wave generator', 'test tone', 'hz tone generator', 'square wave generator', 'sound generator'],
+    steps: [
+      'Turn your device volume down, choose a wave, and set the pitch with the slider, by typing Hz or with a preset.',
+      'Press Play and raise the level slowly if you need to. Change the wave or the pitch while it plays.',
+      'Press Stop when you are done. The tone also stops when you leave the tab.',
+    ],
+    faq: [
+      {
+        q: 'Is anything recorded or uploaded?',
+        a: 'No. The tone is made by an oscillator in this page and played through your speakers. The page does not use your microphone and does not ask for any permission, and nothing about what you play is sent anywhere.',
+      },
+      {
+        q: 'Is this an online tone generator or a frequency generator?',
+        a: 'Both. It is an online tone generator that works as a frequency generator too: type any pitch from 20 Hz to 20 kHz, or drag the slider, and it plays that frequency as a steady tone you can use to test speakers or find a reference note.',
+      },
+      {
+        q: 'Which wave should I use?',
+        a: 'A sine is a single pure pitch, the cleanest for checking speakers. A square and a sawtooth are buzzier because they carry many harmonics, and a triangle sits between a sine and a square. Use them to hear how a speaker handles a richer sound.',
+      },
+      {
+        q: 'Is it safe for my ears and my speakers?',
+        a: 'It starts at a low level and the level slider tops out well below full scale, but your device volume is separate, so lower it first. Very low and very high tones can be hard to hear and still be loud, so raise the volume a little at a time and stop if it hurts. Avoid long, loud tones through small speakers.',
+      },
+      {
+        q: 'Why can I not hear the lowest or the highest tones?',
+        a: 'Small speakers, such as those in a phone or laptop, play very low notes weakly or not at all, and hearing for high pitches varies between people and fades with age. Many adults hear little above 15 kHz.',
+      },
+      {
+        q: 'What is 440 Hz?',
+        a: 'It is concert A, the A above middle C, which most modern music is tuned to. The 440 Hz preset gives you a reference note to tune against. For tuning by ear, the tuner on this site can also listen to your instrument.',
+      },
+      {
+        q: 'Can I check my speakers left and right?',
+        a: 'This page plays both sides together. To send a tone to the left or the right side only, use the speaker test.',
+      },
+    ],
+  },
+  {
     slug: 'audio-to-video',
     icon: 'film',
     name: 'Audio to video',
