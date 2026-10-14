@@ -1,13 +1,14 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
-import { gifToMp4 } from '../lib/gif-video';
+import { gifToMp4, webpToMp4, isWebp } from '../lib/gif-video';
 
 /**
  * GIF to MP4. Each GIF is decoded and re-encoded as video in the page (see
  * src/lib/gif-video.ts); nothing leaves the tab.
  */
 
+const onWebpPage = location.pathname.replace(/\/$/, '') === '/webp-to-mp4';
 const seconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
 
 createShell({
@@ -20,7 +21,9 @@ createShell({
       const share = (f: number) => (index + f) / files.length;
       progress.set(`Reading ${entry.file.name}…`, share(0.02));
       const bytes = await entry.file.arrayBuffer();
-      const r = await gifToMp4(bytes, {
+      // The WebP to MP4 page has no GIF in mind, so anything else gets the WebP wording.
+      const convert = isWebp(new Uint8Array(bytes, 0, Math.min(12, bytes.byteLength))) || onWebpPage ? webpToMp4 : gifToMp4;
+      const r = await convert(bytes, {
         repeat,
         background,
         onProgress: (f) => progress.set(`Encoding ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.05 + f * 0.95)),
