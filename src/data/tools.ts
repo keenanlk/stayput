@@ -2083,6 +2083,53 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'repeat-video',
+    icon: 'rotate',
+    name: 'Repeat video',
+    title: 'Repeat a Video N Times: Make a Clip Longer, Free | Stayput',
+    description:
+      'Repeat a video clip 2 to 50 times, or until it reaches a length you set, and save one longer file. MP4, MOV, WebM, MKV. Sound repeats too. No upload.',
+    heading: 'Repeat a video',
+    tagline: 'Save a clip repeated end to end as one longer file, by count or by length. Done on this device, never uploaded.',
+    category: 'media',
+    accept: 'video/*,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: false,
+    dropLabel: 'Drop the video to repeat',
+    action: 'Repeat video',
+    keywords: ['repeat video', 'loop video', 'repeat a video', 'make a video longer', 'repeat clip', 'loop a clip', 'video repeater'],
+    steps: [
+      'Drop a video (MP4, MOV, WebM or MKV), or tap to pick one.',
+      'Choose how many times to repeat it, or how long the result should be. The size of the file is shown before you run.',
+      'Press Repeat video and save the longer file. The clip is copied as it is when it can be, so it is quick.',
+    ],
+    faq: [
+      {
+        q: 'Does this make a looping player, or a longer file?',
+        a: 'A longer file. The clip is written into a new video N times, one after another, so it keeps repeating in any player, on a TV or when posted. To watch a clip on repeat without saving anything, use the loop button of your video player.',
+      },
+      {
+        q: 'How long will a repeated clip be?',
+        a: 'The clip’s length times the number of repeats: a 10-second clip repeated 60 times is 10 minutes. With a target length, the clip is repeated until it is at least that long, and the last repeat is whole.',
+      },
+      {
+        q: 'Why is there a size limit?',
+        a: 'The new file is built in your browser’s memory, and it grows with every repeat. The page estimates it from the clip’s size before it starts and refuses anything over 2 GB, or over about 200 MB on a phone, instead of crashing halfway.',
+      },
+      {
+        q: 'Is the video re-encoded?',
+        a: 'Not when it can be avoided. H.264 or HEVC video with AAC sound in an MP4 or MOV (and VP9 or AV1 in WebM or MKV) is copied packet by packet, so there is no quality loss and the time taken is about the size of the output. Other clips are decoded and encoded once into an MP4, which takes longer.',
+      },
+      {
+        q: 'Why can I hear or see a jump where the clip repeats?',
+        a: 'The end of the clip is joined to its own start. If the picture or sound does not match there (a person mid-gesture, a note cut off), the seam shows. Trim the clip so it ends where it begins first with [Trim video](/tools/trim-video).',
+      },
+      {
+        q: 'Are my videos uploaded?',
+        a: 'No. The clip is read and written in this tab. There is no upload and no watermark.',
+      },
+    ],
+  },
+  {
     slug: 'add-audio-to-video',
     icon: 'audio',
     name: 'Add audio to video',
