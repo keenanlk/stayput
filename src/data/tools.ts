@@ -1624,6 +1624,31 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-to-avi',
+    icon: 'video',
+    name: 'Video to AVI',
+    title: 'Convert Video to AVI: MP4 to AVI, No Upload | Stayput',
+    description:
+      'Convert MP4, MOV, WebM and MKV videos to AVI in your browser, as Motion JPEG or smaller H.264. Batch, free, not uploaded.',
+    heading: 'Convert video to AVI',
+    tagline: 'Turn MP4, MOV, WebM and MKV files into AVI files. Converted on this device, not uploaded.',
+    category: 'media',
+    accept: 'video/mp4,video/quicktime,video/webm,video/x-matroska,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to convert to AVI',
+    action: 'Convert to AVI',
+    keywords: ['video to avi', 'convert video to avi', 'mov to avi', 'webm to avi', 'mkv to avi', 'avi converter'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Leave Maximum compatibility ticked (Motion JPEG, larger file) for the widest player support, or untick it for smaller H.264. Tick Remove the sound for a silent video.',
+      'Convert. The picture is re-encoded in your browser. One AVI downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      { q: 'Is my video uploaded?', a: 'No. The file is read, re-encoded and written by code in this page, with your browser’s own video encoder. There is no server in the process. After one visit and a short wait the page works offline.' },
+      { q: 'Which formats can I convert?', a: 'MP4, MOV, WebM and MKV. Video your browser cannot decode is refused with a message instead of producing a broken file. For the other direction, use [AVI to MP4](/avi-to-mp4): the two are separate jobs.' },
+    ],
+  },
+  {
     slug: 'video-to-webm',
     icon: 'video',
     name: 'Video to WebM',
