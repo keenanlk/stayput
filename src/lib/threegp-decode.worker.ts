@@ -165,7 +165,7 @@ async function convert(job: ThreeGpJob): Promise<void> {
   let videoSource: VideoSampleSource | EncodedVideoPacketSource;
   let videoCodec = 'avc';
   let vdec: { c: number; pkt: number; frame: number } | undefined;
-  let avcC = new Uint8Array(0);
+  let avcC: Uint8Array = new Uint8Array(0);
   let avc: ReturnType<typeof readAvcConfig> = null;
   if (copyVideo) {
     avcC = await extradata(vs);
