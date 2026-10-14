@@ -26,6 +26,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'gif-to-animated-png': () => import('./gif-to-apng'),
   'gif-speed': () => import('./gif-speed'),
   'gif-rotate': () => import('./gif-rotate'),
+  'gif-frame-splitter': () => import('./gif-frame-splitter'),
   'compress-video': () => import('./compress-video'),
   'video-to-mp4': () => import('./video-to-mp4'),
   'video-to-mov': () => import('./video-to-mov'),
