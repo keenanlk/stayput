@@ -1,6 +1,6 @@
 // Tell IndexNow engines (Bing, Yandex, Seznam, Naver) that pages changed.
 // By default it submits only the pages whose lastmod changed between two commits
-// (src/data/lastmod.json at --from, default HEAD~1, against --to, default HEAD),
+// (src/data/lastmod/ at --from, default HEAD~1, against --to, default HEAD),
 // and at most MAX_URLS of them per ping.
 // Explicit URLs submit just those. With --all --force it submits every URL in the live
 // sitemap; --all on its own is refused, so a stray flag can't resubmit the whole site.
@@ -67,10 +67,31 @@ export async function checkLive(urls, { doFetch, attempts = LIVE_CHECK_ATTEMPTS,
   return { ok: urls.filter((u) => ok.has(u)), dropped: pending.map((u) => ({ url: u, reason: problems.get(u) })) };
 }
 
-// The lastmod map as committed at `rev`; null when that commit has none (or does not exist).
+// The lastmod map as committed at `rev` (one file per page in src/data/lastmod/, or the older single
+// src/data/lastmod.json); null when that commit has neither (or does not exist).
 function gitMapAt(rev) {
+  const git = (args, input) => execFileSync('git', args, { encoding: 'utf8', input, stdio: ['pipe', 'pipe', 'ignore'], maxBuffer: 1 << 26 });
   try {
-    return JSON.parse(execFileSync('git', ['show', `${rev}:src/data/lastmod.json`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
+    const entries = git(['ls-tree', '-r', rev, '--', 'src/data/lastmod/']).split('\n').filter((l) => l.endsWith('.json'));
+    if (entries.length) {
+      const shas = entries.map((l) => l.split(/\s+/)[2]);
+      // `cat-file --batch` prints "<sha> blob <size>\n<content>\n" per object.
+      const out = git(['cat-file', '--batch'], shas.join('\n') + '\n');
+      const map = {};
+      let i = 0;
+      while (i < out.length) {
+        const nl = out.indexOf('\n', i);
+        const size = Number(out.slice(i, nl).split(' ')[2]);
+        const body = out.slice(nl + 1, nl + 1 + size);
+        const { path, date, hash } = JSON.parse(body);
+        map[path] = { date, hash };
+        i = nl + 1 + size + 1;
+      }
+      return map;
+    }
+  } catch {}
+  try {
+    return JSON.parse(git(['show', `${rev}:src/data/lastmod.json`]));
   } catch {
     return null;
   }
@@ -126,7 +147,7 @@ export async function main(argv, deps = {}) {
   if (urls.length === 0 && !all) {
     const [from, to] = [arg('from', 'HEAD~1'), arg('to', 'HEAD')];
     const next = mapAt(to);
-    if (!next) throw new Error(`No src/data/lastmod.json at ${to}`);
+    if (!next) throw new Error(`No src/data/lastmod/ at ${to}`);
     const previous = mapAt(from);
     if (!previous) log(`No lastmod map at ${from}; treating every page as changed`);
     urls = changedUrls(previous, next, site);
