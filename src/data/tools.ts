@@ -1620,6 +1620,45 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'video-to-webm',
+    icon: 'video',
+    name: 'Video to WebM',
+    title: 'Convert Video to WebM: MP4 to WebM, No Upload | Stayput',
+    description:
+      'Convert MP4, MOV and MKV videos to WebM in your browser, with VP9 or VP8 video and Opus sound. Batch, free, not uploaded, no watermark.',
+    heading: 'Convert video to WebM',
+    tagline: 'Turn MP4, MOV and MKV files into WebM with VP9 video and Opus sound. Converted on this device, not uploaded.',
+    category: 'media',
+    accept: 'video/mp4,video/quicktime,video/webm,video/x-matroska,.mp4,.m4v,.mov,.webm,.mkv',
+    multiple: true,
+    dropLabel: 'Drop videos to convert to WebM',
+    action: 'Convert to WebM',
+    keywords: ['video to webm', 'convert video to webm', 'mp4 to webm', 'mov to webm', 'mkv to webm', 'webm converter'],
+    steps: [
+      'Drop one or more videos (MP4, MOV, WebM or MKV), or tap to pick them.',
+      'Tick Remove the sound if you want a silent video. There is nothing else to set.',
+      'Convert. Your browser re-encodes the picture to VP9 (or VP8) and the sound to Opus. One downloads straight away, several download as a zip.',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The file is read and written by code in this page, and the encoding is done by your browser’s own video encoder. There is no server in the process. After one visit and a short wait the page works offline.',
+      },
+      {
+        q: 'Should I expect VP9 or VP8?',
+        a: 'VP9 where your browser can write it, because it makes smaller files at the same quality. VP8 is the fallback for browsers that can only write that one. The line under the result says which one you got. Both play in Chrome, Edge and Firefox, and in current Safari.',
+      },
+      {
+        q: 'Why can some browsers not write WebM?',
+        a: 'WebM needs the browser to have a VP8 or VP9 video encoder and an Opus sound encoder, and each browser ships a different set. Safari only added them recently: Safari’s engine (WebKit 26.6 on a Mac) writes VP9 video and Opus sound here, but older versions, and some Linux builds of Chrome, may not. When yours is missing one, the page says so and writes no file, rather than producing something broken. Chrome or Edge on a computer write WebM.',
+      },
+      {
+        q: 'Why did it take longer than converting to MP4?',
+        a: 'An MP4 holding H.264 can often be copied into a MOV or another MP4 as it is, but H.264 cannot go into a WebM, so every frame is decoded and encoded again. Files that are already WebM (VP8, VP9 or AV1 with Opus) are copied as they are.',
+      },
+    ],
+  },
+  {
     slug: 'trim-video',
     icon: 'scissors',
     name: 'Trim video',
@@ -2065,7 +2104,7 @@ export const tools: Tool[] = [
     name: 'Trim audio',
     title: 'Trim Audio Online: Cut MP3, WAV or M4A, No Upload | Stayput',
     description:
-      'Cut the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, in your browser. See the waveform, add fades, save as MP3 or WAV. No upload.',
+      'Cut the part you want from an MP3, WAV, M4A, OGG or FLAC file, or from a video’s sound, in your browser. See the waveform, add fades, save as MP3, WAV or M4R. No upload.',
     heading: 'Trim audio',
     tagline: 'Cut a song, a voice memo or a podcast down to the part you want, with fades if you like. Done on this device, never uploaded.',
     category: 'media',
@@ -2077,7 +2116,7 @@ export const tools: Tool[] = [
     steps: [
       'Drop a sound file (MP3, WAV, M4A, OGG, FLAC) or a video, or tap to pick one.',
       'Play it or click the waveform, and set the start and end. Add a fade in or out if you want.',
-      'Trim. The part you chose is saved as an MP3 or a WAV.',
+      'Trim. The part you chose is saved as an MP3, a WAV or an M4R.',
     ],
     faq: [
       {
@@ -2086,7 +2125,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Which format should I save as?',
-        a: 'MP3 at 192 kbps plays on every phone, car and computer and is about a tenth the size of WAV. Choose WAV to keep the sound exactly as decoded, for example to edit it further.',
+        a: 'MP3 at 192 kbps plays on every phone, car and computer and is about a tenth the size of WAV. Choose WAV to keep the sound exactly as decoded, for example to edit it further. Choose M4R for an iPhone ringtone.',
       },
       {
         q: 'Can I cut the sound out of a video?',

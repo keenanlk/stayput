@@ -188,7 +188,7 @@ export const engines: Record<string, Engine> = {
     versus: 'Online frame extractors upload the whole video to grab a few images, cap free videos by size or length, and some watermark the frames. Here the video never leaves your device.',
   },
   'trim-audio': {
-    how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. The part you chose is copied, faded if asked, and written as MP3 by LAME compiled to WebAssembly, or as a 16-bit WAV.',
+    how: 'Your browser’s own audio decoders read the file (MP3, AAC in M4A or MP4, Opus or Vorbis in WebM and OGG, FLAC, WAV) into plain samples in your tab. The part you chose is copied, faded if asked, and written as MP3 by LAME compiled to WebAssembly, as a 16-bit WAV, or as AAC in an M4R file by the browser’s own AAC encoder through Mediabunny.',
     versus: 'Online audio cutters upload your file to a server, surround the download with ads, and some keep the file. Voice memos, interviews and unreleased tracks are private. Here the sound never leaves your device.',
   },
   'audio-splitter': {
@@ -398,6 +398,10 @@ export const engines: Record<string, Engine> = {
   'video-to-mov': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, WebM or MKV container in your tab and writes a QuickTime MOV. H.264 video and AAC sound are copied across as they are. Anything else is decoded and re-encoded by your browser’s own encoders (WebCodecs) to H.264 and AAC, and where the browser cannot write those it says so instead of writing a file QuickTime may not play.',
     versus: 'The video is read from your disk and the MOV is written in memory on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
+  },
+  'video-to-webm': {
+    how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, MOV, MKV or WebM container in your tab and writes a WebM. VP8, VP9 or AV1 video and Opus or Vorbis sound already in the file are copied across as they are. Anything else is decoded and re-encoded by your browser’s own encoders (WebCodecs), VP9 where the browser can write it and VP8 otherwise, with the sound as Opus. A browser with no VP8 or VP9 encoder says so instead of writing a broken file.',
+    versus: 'The video is read from your disk and the WebM is written in memory on your device, so there is no upload to wait for and the only limit is how much memory your device has.',
   },
   'compress-video': {
     how: 'Mediabunny (MPL-2.0), a media toolkit written in TypeScript, reads the MP4, MOV, WebM or MKV container in your tab. Your browser’s own hardware-backed video decoder and encoder (WebCodecs) re-encode the picture at the bitrate and size you chose, H.264 where available and VP9 or AV1 otherwise, and the sound as AAC or Opus. Mediabunny then writes a new MP4 in memory. For a target size, the bitrate is worked out from the length of the video, and the resolution is lowered when a long video would otherwise turn to mush.',

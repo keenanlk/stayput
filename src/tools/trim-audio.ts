@@ -1,12 +1,12 @@
-import { bool, createShell, num, str } from '../lib/shell';
+import { bool, createShell, num, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../lib/audio';
 import { cutChannels, peaks } from '../lib/audio-trim';
 
 /**
  * Trim audio. The file is decoded in the page to draw its waveform and play
- * it from a blob: URL; the chosen part is cut, faded and written as MP3 or
- * WAV. Nothing leaves the tab.
+ * it from a blob: URL; the chosen part is cut, faded and written as MP3, WAV or
+ * M4R (AAC in MP4). Nothing leaves the tab.
  */
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -19,6 +19,12 @@ const endInput = $<HTMLInputElement>('au-end');
 const estimate = $('au-estimate');
 
 const FADE = 1.5;
+const AAC_MESSAGE = 'This browser has no AAC encoder, so it cannot save M4R files. Safari, and Chrome or Edge on Windows and Mac, can. Save an MP3 instead: an iPhone can use it as a ringtone through the Files app or GarageBand, and an Android phone can use it directly.';
+const formatSelect = $<HTMLSelectElement>('format');
+const formatNote = $('format-note');
+const trimOptions = document.querySelector<HTMLElement>('.au-trim')!;
+const maxSeconds = Number(trimOptions.dataset.maxSeconds);
+let aacOk = true;
 let url: string | undefined;
 let buffer: AudioBuffer | undefined;
 let bars: Float32Array | undefined;
@@ -31,6 +37,12 @@ const clock = (s: number) => {
   const sec = s - m * 60;
   return `${m}:${sec.toFixed(1).padStart(4, '0')}`;
 };
+
+/** The longest cut allowed: set on the ringtone pages, and only while "For" is iPhone. */
+function cap(): number {
+  if (!(maxSeconds > 0)) return Infinity;
+  return radio('rt-for', 'iphone') === 'android' ? Infinity : maxSeconds;
+}
 
 function range(): { start: number; end: number } {
   const start = Math.min(duration, Math.max(0, num('au-start', 0)));
@@ -89,7 +101,7 @@ async function load(file: File) {
   wave.width = 0;
   for (const el of [startInput, endInput]) el.max = String(round1(duration));
   startInput.value = '0';
-  endInput.value = String(round1(duration));
+  endInput.value = String(round1(Math.min(duration, cap())));
   info.textContent = `${clock(duration)} long. Play or click the waveform to find a moment, then use "Set start" and "Set end".`;
   panel.dataset.duration = String(round1(duration));
   update();
@@ -99,8 +111,19 @@ function update() {
   if (!duration) return;
   const { start, end } = range();
   const bad = end <= start;
+  let clamped = false;
+  if (end - start > cap()) {
+    endInput.value = String(Math.min(duration, round1(start + cap())));
+    clamped = true;
+  }
+  const kept = range();
   estimate.classList.toggle('is-over', bad);
-  estimate.textContent = bad ? 'The end must come after the start.' : `Keeps ${clock(end - start)}, from ${clock(start)} to ${clock(end)}.`;
+  const limit = Number.isFinite(cap()) ? ' iPhone ringtones can be up to 30 seconds.' : '';
+  estimate.textContent = bad
+    ? 'The end must come after the start.'
+    : clamped
+      ? `That is longer than 30 seconds, which is the most an iPhone ringtone can be, so the end was moved to ${clock(kept.end)}. Move the start to choose a different part.`
+      : `Keeps ${clock(kept.end - kept.start)}, from ${clock(kept.start)} to ${clock(kept.end)}.${limit}`;
   draw();
 }
 
@@ -129,7 +152,40 @@ startInput.addEventListener('change', () => {
   if (duration) player.currentTime = range().start;
 });
 
-const format = () => (str('format', 'mp3') === 'wav' ? 'wav' : 'mp3');
+const format = () => {
+  const f = str('format', 'mp3');
+  return f === 'wav' ? 'wav' : f === 'm4r' && aacOk ? 'm4r' : 'mp3';
+};
+
+/** M4R needs the browser's AAC encoder; without one the option is disabled and MP3 is chosen. */
+async function checkAac() {
+  const { canWrite } = await import('../lib/audio-convert');
+  aacOk = await canWrite('m4a');
+  const m4r = formatSelect.querySelector<HTMLOptionElement>('option[value="m4r"]')!;
+  m4r.disabled = !aacOk;
+  if (!aacOk) {
+    if (formatSelect.value === 'm4r') formatSelect.value = 'mp3';
+    formatNote.textContent = AAC_MESSAGE;
+    formatNote.hidden = false;
+  }
+}
+const aacChecked = checkAac();
+
+document.querySelectorAll<HTMLInputElement>('input[name="rt-for"]').forEach((r) =>
+  r.addEventListener('change', async () => {
+    await aacChecked;
+    const iphone = radio('rt-for', 'iphone') === 'iphone';
+    if (iphone && aacOk) formatSelect.value = 'm4r';
+    else if (!iphone && formatSelect.value === 'm4r') formatSelect.value = 'mp3';
+    if (duration) {
+      if (iphone) update();
+      else {
+        endInput.value = String(round1(duration));
+        update();
+      }
+    }
+  }),
+);
 
 const shell = createShell({
   outputFormat: format,
@@ -155,15 +211,22 @@ const shell = createShell({
       fadeIn: bool('fade-in') ? FADE : 0,
       fadeOut: bool('fade-out') ? FADE : 0,
     });
+    await aacChecked;
     const fmt = format();
-    const blob =
-      fmt === 'wav' ? encodeWav(chans) : await encodeMp3(chans, 192, (f) => progress.set(`Encoding MP3: ${Math.round(f * 100)}%`, f));
+    let blob: Blob;
+    if (fmt === 'm4r') {
+      const { encodeAac, patchBrand } = await import('../lib/audio-convert');
+      const aac = await encodeAac(chans, SAMPLE_RATE, 128, (f) => progress.set(`Encoding AAC: ${Math.round(f * 100)}%`, f));
+      blob = new Blob([patchBrand(new Uint8Array(await aac.arrayBuffer()))], { type: 'audio/mp4' });
+    } else {
+      blob = fmt === 'wav' ? encodeWav(chans) : await encodeMp3(chans, 192, (f) => progress.set(`Encoding MP3: ${Math.round(f * 100)}%`, f));
+    }
     const fades = [bool('fade-in') && 'fade in', bool('fade-out') && 'fade out'].filter(Boolean);
     const out: OutputFile = {
-      name: suffixName(entry.file.name, '-trimmed', fmt),
+      name: suffixName(entry.file.name, fmt === 'm4r' ? '-ringtone' : '-trimmed', fmt),
       blob,
       originalSize: entry.file.size,
-      note: [`${clock(start)} to ${clock(end)}`, fmt === 'wav' ? '16-bit WAV' : '192 kbps MP3', ...fades].join(', '),
+      note: [`${clock(start)} to ${clock(end)}`, fmt === 'wav' ? '16-bit WAV' : fmt === 'm4r' ? 'AAC 128 kbps, M4R' : '192 kbps MP3', ...fades].join(', '),
     };
     return [out];
   },

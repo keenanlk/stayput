@@ -27,19 +27,19 @@ export function stereo(chans: Float32Array[]): Float32Array[] {
 }
 
 /** Hands PCM to an audio source in 4096-sample pieces, up to a given time. */
-export function pcmFeeder(source: AudioSampleSource | null, chans: Float32Array[] | null) {
+export function pcmFeeder(source: AudioSampleSource | null, chans: Float32Array[] | null, rate = SAMPLE_RATE) {
   let at = 0;
   const len = chans?.[0]?.length ?? 0;
   return {
     length: len,
     async until(seconds: number) {
       if (!source || !chans) return;
-      const end = Math.min(len, Math.round(seconds * SAMPLE_RATE));
+      const end = Math.min(len, Math.round(seconds * rate));
       while (at < end) {
         const n = Math.min(4096, end - at);
         const data = new Float32Array(n * chans.length);
         chans.forEach((ch, c) => data.set(ch.subarray(at, at + n), c * n));
-        const sample = new AudioSample({ data, format: 'f32-planar', numberOfChannels: chans.length, sampleRate: SAMPLE_RATE, timestamp: at / SAMPLE_RATE });
+        const sample = new AudioSample({ data, format: 'f32-planar', numberOfChannels: chans.length, sampleRate: rate, timestamp: at / rate });
         await source.add(sample);
         sample.close();
         at += n;
