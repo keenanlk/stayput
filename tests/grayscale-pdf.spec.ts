@@ -466,11 +466,16 @@ test('the converted page renders gray, not just labelled gray', async ({ page })
   await page.goto('/tools/crop-pdf');
   await page.locator('#file-input').setInputFiles([file]);
   await expect(page.locator('#crop-panel')).toBeVisible();
+  // The panel is shown before the first page is drawn (and the page label has its text from the start), so
+  // poll until the canvas has opaque pixels instead of reading the blank canvas.
+  const sample = () =>
+    page.locator('#page-canvas').evaluate((c: HTMLCanvasElement) => {
+      const d = c.getContext('2d')!.getImageData(Math.round(c.width * 0.25), Math.round(c.height * (1 - 180 / 300)), 1, 1).data;
+      return [d[0]!, d[1]!, d[2]!, d[3]!];
+    });
   // The green box (0, 0.6, 0) sits at the lower left of the 300 x 300 page.
-  const px = await page.locator('#page-canvas').evaluate((c: HTMLCanvasElement) => {
-    const d = c.getContext('2d')!.getImageData(Math.round(c.width * 0.25), Math.round(c.height * (1 - 180 / 300)), 1, 1).data;
-    return [d[0]!, d[1]!, d[2]!];
-  });
+  await expect.poll(async () => (await sample())[3]).toBe(255);
+  const px = (await sample()).slice(0, 3);
   expect(Math.max(...px) - Math.min(...px)).toBeLessThan(4);
   // 0.587 * 0.6 = 0.352 -> about 90.
   expect(Math.abs(px[0]! - 90)).toBeLessThan(12);
