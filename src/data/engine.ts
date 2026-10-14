@@ -123,6 +123,10 @@ export const engines: Record<string, Engine> = {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, so partial frames and disposal rules are resolved into whole pictures. The frames are put in the new order, each frame’s delay is multiplied by the speed and rounded to whole hundredths of a second, and gifenc’s (MIT) colour quantizer and LZW coder write them back with the loop setting. The new GIF is assembled in memory.',
     versus: 'Here the GIF is re-timed in this tab: the file is not uploaded, the limit is your device’s memory (phones hold less), and no watermark is added.',
   },
+  'gif-frame-splitter': {
+    how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab. Each frame’s piece is drawn on a canvas over the frames before it and the disposal rules are applied, the way browsers play a GIF, so every frame is a whole picture. Your browser then encodes each one as a PNG. The files are assembled in memory.',
+    versus: 'Online GIF splitters upload the GIF to a server, and many show frames behind ads or a watermark. Here the file is not uploaded, the limit is your device’s memory (phones hold less), and the PNGs carry no mark.',
+  },
   'gif-rotate': {
     how: 'gifuct-js (MIT) reads the GIF byte by byte in your tab and every frame is composited the way browsers play it, so partial frames and disposal rules are resolved into whole pictures. Each frame is turned and mirrored on a canvas by your browser, and gifenc’s (MIT) colour quantizer and LZW coder write the frames back with their delays and the loop setting. The new GIF is assembled in memory.',
     versus: 'Here the GIF is turned in this tab: the file is not uploaded, the limit is your device’s memory (phones hold less), and no watermark is added.',
