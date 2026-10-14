@@ -117,6 +117,7 @@ export const nextSteps: Record<string, string[]> = {
   'adjust-image': ['compress-image', 'crop-image'],
   'emote-resizer': ['remove-background', 'upscale-image'],
   'compare-images': ['compress-image', 'adjust-image'],
+  'image-to-ascii': ['pixel-art-converter', 'image-to-text'],
   'pixel-art-converter': ['emote-resizer', 'upscale-image'],
   'photo-to-sketch': ['add-border-to-image', 'image-to-pdf'],
   'add-border-to-image': ['compress-image', 'collage-maker'],

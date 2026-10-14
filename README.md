@@ -71,6 +71,7 @@ That is the whole pitch, and you can check it in three ways:
 | [Remove object from photo](https://stayput.dev/tools/remove-object) (paint over it, MI-GAN fills it in on the device) | |
 | [Adjust photo](https://stayput.dev/tools/adjust-image) (brightness, contrast, saturation, warmth, sharpen, invert) | |
 | [Emote resizer](https://stayput.dev/tools/emote-resizer) (Twitch emotes and sub badges, Discord emoji and stickers, Slack emoji) | |
+| [Image to ASCII art](https://stayput.dev/tools/image-to-ascii) (width, character sets, invert, colour PNG, .txt) | |
 | [Pixel art converter](https://stayput.dev/tools/pixel-art-converter) (auto or retro palettes, dithering, grid) | |
 | [Photo to sketch](https://stayput.dev/tools/photo-to-sketch) (pencil, charcoal, coloured pencil) | |
 | [Add border to image](https://stayput.dev/tools/add-border-to-image) (border colour and width, rounded corners) | |
