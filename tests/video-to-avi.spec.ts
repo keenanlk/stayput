@@ -274,3 +274,17 @@ test('no file bytes or names leave the tab during a conversion', async ({ page, 
     expect(s.body ?? '').not.toContain('clip-720p-10s');
   }
 });
+
+test('MOV to AVI preset writes an AVI with the MOV’s duration and size', async ({ page, browserName }) => {
+  skipOnLinuxWebkit(browserName);
+  test.setTimeout(300_000);
+  await open(page, '/mov-to-avi');
+  await expect(page.locator('#tool')).toHaveAttribute('data-base', 'video-to-avi');
+  const r = await convert(page, fixture('iphone-portrait.mov'), 'mov');
+  expect(r.name).toBe('iphone-portrait.avi');
+  const avi = readAvi(r.bytes);
+  expect(avi.videoFourcc).toBe('MJPG');
+  expect(Math.abs(avi.duration - 4)).toBeLessThan(0.3);
+  // The clip is 1280x720 with a 90-degree turn flag; either orientation is the right picture.
+  expect(avi.width * avi.height).toBe(1280 * 720);
+});
