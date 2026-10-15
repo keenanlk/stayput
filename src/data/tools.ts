@@ -764,6 +764,10 @@ export const tools: Tool[] = [
         q: 'Are the pages rendered on a server?',
         a: 'No. Pages are rendered with pdf.js, the same engine Firefox uses to display PDFs, running inside your browser.',
       },
+      {
+        q: 'Can I get vectors instead of pixels?',
+        a: 'Yes. [PDF to SVG](/tools/pdf-to-svg) writes each page as an SVG with the shapes as vectors and the text selectable, so it stays sharp at any size.',
+      },
     ],
   },
   {
@@ -3680,7 +3684,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why did it find no images?',
-        a: 'Some PDFs have no stored pictures: charts and logos are often drawn as vector shapes, and some scanners store each page as one image. For a scan you get one picture per page. For vector drawings, use PDF to Image to save the page instead.',
+        a: 'Some PDFs have no stored pictures: charts and logos are often drawn as vector shapes, and some scanners store each page as one image. For a scan you get one picture per page. For vector drawings, use PDF to Image to save the page as a picture, or [PDF to SVG](/tools/pdf-to-svg) to keep the shapes as vectors.',
       },
       {
         q: 'What about password-protected PDFs?',
@@ -3689,6 +3693,64 @@ export const tools: Tool[] = [
       {
         q: 'Is my PDF uploaded?',
         a: 'No. The file is read by pdf.js running in this tab and the pictures are saved from memory. Your files are not uploaded, and the page keeps working with the network off after one visit and a short wait.',
+      },
+    ],
+  },
+  {
+    slug: 'pdf-to-svg',
+    icon: 'image',
+    name: 'PDF to SVG',
+    title: 'PDF to SVG Converter, Free, No Upload | Stayput',
+    description:
+      'Convert PDF pages to SVG in your browser. Shapes stay vectors, text stays selectable, one SVG per page and a zip for many. Free; the PDF is not uploaded.',
+    heading: 'Convert PDF to SVG',
+    tagline: 'Each page as a scalable SVG, with vector shapes and selectable text, made on your device without uploading the PDF.',
+    category: 'pdf',
+    accept: 'application/pdf,.pdf',
+    multiple: false,
+    dropLabel: 'Drop a PDF here',
+    action: 'Convert to SVG',
+    keywords: ['pdf to svg', 'convert pdf to svg', 'pdf to svg online', 'pdf to svg converter', 'pdf to vector', 'pdf page to svg', 'save pdf as svg', 'pdf to svg free'],
+    steps: [
+      'Drop a PDF.',
+      'Choose all pages or a range, and whether to put a white page behind the drawing.',
+      'Convert. Each page downloads as its own SVG; several come as a zip.',
+    ],
+    sections: [
+      {
+        heading: 'What stays vector, and what does not',
+        bullets: [
+          '**Stays vector:** lines, shapes, fills, dashes, transparency, clipping, and linear and radial gradients are written as SVG paths and gradients, so they stay sharp at any size.',
+          '**Text:** every letter is drawn from the font stored in the PDF, so the page looks the same on any device, and a transparent text layer on top keeps it selectable and searchable.',
+          '**Pictures:** photos and scanned pages are placed inside the SVG as images. They are not traced into vectors, so a scan stays a picture.',
+          '**Saved as a picture instead:** a page that uses blend modes, soft masks, tiling patterns, mesh gradients or Type 3 fonts is saved as one picture inside the SVG, with its text still selectable, and the result says so for that page.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        q: 'Is the text still text?',
+        a: 'Yes. Each page has the letters drawn as outlines from the font inside the PDF, so it looks right even where that font is not installed, plus an invisible text layer so you can select, copy and search it. A font the PDF does not store is written as live text in the closest font on the viewer’s device.',
+      },
+      {
+        q: 'Does it trace a scanned PDF into vectors?',
+        a: 'No. A scanned page is one picture, and the SVG holds that picture. To get selectable text from a scan, run it through [OCR PDF](/tools/ocr-pdf) first, then convert the searchable copy. To save the pictures themselves, use [Extract Images from PDF](/tools/extract-pdf-images).',
+      },
+      {
+        q: 'Why was one page saved as a picture?',
+        a: 'SVG cannot say some things the way PDF does: blend modes, soft masks, tiling patterns, mesh gradients, Type 3 fonts and vertical text. Rather than draw them wrongly, the tool saves that page as a picture inside the SVG and names the reason next to the file. The other pages are still vector.',
+      },
+      {
+        q: 'How do I get several pages?',
+        a: 'Each page is its own SVG, because that is how SVG works. A document of many pages downloads as a zip with one file per page. To convert only some, choose pages such as 1-3, 5.',
+      },
+      {
+        q: 'How is this different from PDF to Image?',
+        a: '[PDF to Image](/tools/pdf-to-image) turns each page into a PNG or JPG at a fixed resolution. This tool writes SVG, which is drawn from shapes and outlines, so it scales to any size, opens in Illustrator, Inkscape and Figma, and keeps the text selectable.',
+      },
+      {
+        q: 'Is my PDF uploaded?',
+        a: 'No. pdf.js reads the file in this tab and the SVG is written from memory. Your files are not uploaded, and the page keeps working with the network off after one visit and a short wait.',
       },
     ],
   },

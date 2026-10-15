@@ -34,6 +34,7 @@ const pages = [
   '/tools/keyboard-tester',
   '/tools/tone-generator',
   '/tools/dead-pixel-test',
+  '/tools/pdf-to-svg',
   '/tools/bpm-key-finder',
   '/camelot-wheel',
   '/bpm-finder',

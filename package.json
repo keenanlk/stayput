@@ -48,6 +48,7 @@
     "mp4-muxer": "5.2.2",
     "music-tempo": "1.0.3",
     "onnxruntime-web": "1.30.0",
+    "opentype.js": "2.0.0",
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.3.289",
     "pdfmake": "0.3.11",
