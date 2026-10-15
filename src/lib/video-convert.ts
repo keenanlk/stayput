@@ -62,7 +62,10 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
   if (await isAvi(file)) return convertAvi(file, opts);
   // So has FLV: a separate reader module, loaded only for an FLV.
   const { isFlv, convertFlv } = await import('./flv-convert');
-  return (await isFlv(file)) ? convertFlv(file, opts) : convertVideo(file, opts, 'mp4');
+  if (await isFlv(file)) return convertFlv(file, opts);
+  // 3GP is MP4's phone cousin: its H.263, MPEG-4 and AMR have no WebCodecs decoder, so it has its own reader module.
+  const { isThreeGp, convertThreeGp } = await import('./threegp-convert');
+  return (await isThreeGp(file)) ? convertThreeGp(file, opts) : convertVideo(file, opts, 'mp4');
 }
 export const convertToMov = (file: File, opts: ConvertOptions) => convertVideo(file, opts, 'mov');
 

@@ -1295,7 +1295,7 @@
   },
   {
    "id": "libavjs",
-   "name": "libav.js (custom builds for AVI and FLV)",
+   "name": "libav.js (custom builds for AVI, FLV and 3GP)",
    "version": "6.10.9.0",
    "npm": "libav.js",
    "licences": [
@@ -1306,12 +1306,12 @@
    ],
    "project": "https://github.com/Yahweasel/libav.js",
    "source": "https://github.com/Yahweasel/libav.js/tree/v6.10.9.0",
-   "shipped": "Served as two sets of three separate files in /vendor/libav.js@6.10.9.0/: libav-6.10.9.0-avi.mjs, libav-6.10.9.0-avi.wasm.mjs and libav-6.10.9.0-avi.wasm.wasm, fetched only when you convert an AVI file, and libav-6.10.9.0-flv.mjs, libav-6.10.9.0-flv.wasm.mjs and libav-6.10.9.0-flv.wasm.wasm, fetched only when you convert an FLV file. The builds use libav.js's own configuration tool; the exact component lists, build scripts and instructions are in the repository under vendor-builds/libav-avi/ and vendor-builds/libav-flv/, next to a copy of the built files.",
+   "shipped": "Served as three sets of three separate files in /vendor/libav.js@6.10.9.0/: libav-6.10.9.0-avi.mjs, libav-6.10.9.0-avi.wasm.mjs and libav-6.10.9.0-avi.wasm.wasm, fetched only when you convert an AVI file, and libav-6.10.9.0-flv.mjs, libav-6.10.9.0-flv.wasm.mjs and libav-6.10.9.0-flv.wasm.wasm, fetched only when you convert an FLV file, and libav-6.10.9.0-3gp.mjs, libav-6.10.9.0-3gp.wasm.mjs and libav-6.10.9.0-3gp.wasm.wasm, fetched only when you convert a 3GP file. The builds use libav.js's own configuration tool; the exact component lists, build scripts and instructions are in the repository under vendor-builds/libav-avi/, vendor-builds/libav-flv/ and vendor-builds/libav-3gp/, next to a copy of the built files.",
    "kind": "wasm",
    "copyleft": "lgpl",
    "copyright": "Copyright (C) 2019-2025 Yahweasel and contributors",
    "replace": "/vendor/libav.js@6.10.9.0/libav-6.10.9.0-avi.wasm.wasm",
-   "note": "To rebuild: run vendor-builds/libav-avi/build.sh or vendor-builds/libav-flv/build.sh (needs Docker; it uses the emscripten/emsdk:6.0.5 image and the libav.js 6.10.9 npm package, which carries the FFmpeg sources). Source tarballs: the FFmpeg 9.0 release (https://ffmpeg.org/releases/ffmpeg-9.0.tar.xz) and the libav.js 6.10.9 npm package, which contains both it and the libav.js source (https://registry.npmjs.org/libav.js/-/libav.js-6.10.9.tgz, in sources/)."
+   "note": "To rebuild: run vendor-builds/libav-avi/build.sh, vendor-builds/libav-flv/build.sh or vendor-builds/libav-3gp/build.sh (needs Docker; it uses the emscripten/emsdk:6.0.5 image and the libav.js 6.10.9 npm package, which carries the FFmpeg sources). Source tarballs: the FFmpeg 9.0 release (https://ffmpeg.org/releases/ffmpeg-9.0.tar.xz) and the libav.js 6.10.9 npm package, which contains both it and the libav.js source (https://registry.npmjs.org/libav.js/-/libav.js-6.10.9.tgz, in sources/)."
   },
   {
    "id": "ffmpeg-libs",
@@ -1326,13 +1326,13 @@
    ],
    "project": "https://ffmpeg.org",
    "source": "https://github.com/FFmpeg/FFmpeg/tree/refs/tags/n9.0",
-   "shipped": "Compiled to WebAssembly inside /vendor/libav.js@6.10.9.0/libav-6.10.9.0-avi.wasm.wasm and libav-6.10.9.0-flv.wasm.wasm. The AVI build has only the AVI demuxer and the decoders for MPEG-4 Part 2 video (Xvid, DivX 4 and later), Motion JPEG, MP3, MP2, AC-3 and PCM. The FLV build has only the FLV demuxer and the MP3 decoder (the picture and AAC sound are copied, not decoded). No GPL or non-free parts, no H.264, AAC, Windows Media, VC-1 or VP6 decoder in either.",
+   "shipped": "Compiled to WebAssembly inside /vendor/libav.js@6.10.9.0/libav-6.10.9.0-avi.wasm.wasm, libav-6.10.9.0-flv.wasm.wasm and libav-6.10.9.0-3gp.wasm.wasm. The AVI build has only the AVI demuxer and the decoders for MPEG-4 Part 2 video (Xvid, DivX 4 and later), Motion JPEG, MP3, MP2, AC-3 and PCM. The FLV build has only the FLV demuxer and the MP3 decoder (the picture and AAC sound are copied, not decoded). The 3GP build has only the MOV demuxer and the decoders for MPEG-4 Part 2 and H.263 video and AMR-NB and AMR-WB sound (FFmpeg's own implementations). No GPL or non-free parts, no H.264, AAC, Windows Media, VC-1 or VP6 decoder in any of them.",
    "kind": "wasm",
    "via": "libavjs",
    "copyleft": "lgpl",
    "copyright": "Copyright (c) 2000-2024 Fabrice Bellard, et al.",
    "replace": "/vendor/libav.js@6.10.9.0/libav-6.10.9.0-avi.wasm.wasm",
-   "note": "Configured with --disable-everything and the flags in vendor-builds/libav-avi/dist/ffmpeg-config.txt and vendor-builds/libav-flv/dist/ffmpeg-config.txt, so no other component is present. Source tarballs: the FFmpeg 9.0 release (https://ffmpeg.org/releases/ffmpeg-9.0.tar.xz) and the libav.js 6.10.9 npm package, which contains both it and the libav.js source (https://registry.npmjs.org/libav.js/-/libav.js-6.10.9.tgz, in sources/)."
+   "note": "Configured with --disable-everything and the flags in vendor-builds/libav-avi/dist/ffmpeg-config.txt and vendor-builds/libav-flv/dist/ffmpeg-config.txt and vendor-builds/libav-3gp/dist/ffmpeg-config.txt, so no other component is present. Source tarballs: the FFmpeg 9.0 release (https://ffmpeg.org/releases/ffmpeg-9.0.tar.xz) and the libav.js 6.10.9 npm package, which contains both it and the libav.js source (https://registry.npmjs.org/libav.js/-/libav.js-6.10.9.tgz, in sources/)."
   },
   {
    "id": "ijg-jrevdct",

@@ -3074,6 +3074,57 @@ export const presets: Preset[] = [
     ],
   },
   {
+    slug: '3gp-to-mp4',
+    base: 'video-to-mp4',
+    name: '3GP to MP4',
+    title: '3GP to MP4 Converter, Free, No Upload | Stayput',
+    description: 'Convert 3GP to MP4 in your browser: old phone videos with H.263, MPEG-4 or H.264 picture and AMR or AAC sound become MP4s that play anywhere. Nothing is uploaded.',
+    lead:
+      'Converts 3GP and 3G2 phone videos (H.263, MPEG-4 or H.264 picture, with AMR or AAC sound) to MP4 with H.264 video and AAC sound (MP3 in the few browsers that have no AAC encoder). It is free and needs no account, and your videos are not uploaded: everything runs in your browser on your device, and after one visit and a short wait the page works offline.',
+    heading: 'Convert 3GP to MP4',
+    tagline: 'Turn old phone 3GP files into MP4s that iPhones, Android phones, TVs and editors play, without uploading them.',
+    keywords: ['3gp to mp4', 'convert 3gp to mp4', '3gp to mp4 converter', '3gp to mp4 online', '3gp to mp4 free', 'change 3gp to mp4', '3gp to mp4 no upload', '3g2 to mp4'],
+    dropLabel: 'Drop 3GP files to convert to MP4',
+    accept: 'video/3gpp,video/3gpp2,.3gp,.3gpp,.3g2,video/*',
+    intro: [
+      '3GP is the video format of pre-smartphone mobile phones. Anything recorded on a feature phone or sent by MMS in the 2000s was saved as a small .3gp file, and many of those clips are still sitting on old memory cards and backups. Current phones, computers and web forms often refuse to open them.',
+      'This page reads the 3GP in your browser, decodes the picture and sound, and writes a new MP4 with H.264 video and AAC sound, the combination that plays everywhere. The video inside a 3GP from that era (H.263 or MPEG-4) and its AMR speech sound are not formats a browser plays, so they always have to be re-encoded. Clips are small, so a conversion takes seconds.',
+      'The file never leaves your device. Family clips from an old phone are exactly what you should not hand to a stranger’s server just to change the wrapper, and here there is no upload to wait for and no copy kept anywhere.',
+      'A 3GP picture is tiny, often 176 × 144 or 320 × 240, so the MP4 is the same size and looks just as soft: converting cannot add detail that was never recorded. The MP4 can come out larger than the 3GP, because the picture is re-encoded at a high quality setting.',
+    ],
+    sections: [
+      {
+        heading: 'Which 3GP files this converts',
+        bullets: [
+          'Picture: H.263, MPEG-4 Part 2 and H.264. H.264 is copied into the MP4 as it is; the other two are decoded and written as H.264.',
+          'Sound: AMR (narrowband and wideband), the speech codec of every phone of that time, and AAC. AMR is converted to AAC at 48 kHz, or to MP3 in a browser with no AAC encoder (Chrome on Linux); AAC is copied as it is.',
+          'Not converted: a 3GP whose picture or sound is another codec shows a message naming it, and nothing is converted. The page never leaves out the sound without saying so; tick Remove the sound to drop it on purpose.',
+        ],
+      },
+      {
+        heading: 'What this page loads',
+        paragraphs: [
+          "Most video runs on your browser's WebCodecs through Mediabunny. For old formats the browser cannot read, the page loads a decoder built from FFmpeg's libraries (LGPL) only when you convert such a file.",
+          'For 3GP that module is about 1 MB (a few hundred KB compressed) and comes from stayput.dev, not from anyone else’s server. The licenses page links its exact source and how it was built.',
+        ],
+      },
+    ],
+    steps: [
+      'Drop one or more 3GP files, or tap to pick them.',
+      'Tick Remove the sound if you only need the picture.',
+      'Convert, then open or share the MP4. Several files download together as a zip.',
+    ],
+    faq: [
+      { q: 'How do I convert 3GP to MP4?', a: 'Drop the .3gp file on this page and press Convert. Your browser decodes it and writes an MP4 with the same name and a .mp4 ending. Nothing needs installing, and you can drop several files at once.' },
+      { q: 'Will the sound be kept?', a: 'Yes. AMR sound, which is what most 3GP files hold, is converted to AAC, and AAC sound is copied. If a file’s sound is in a format this page cannot read, it says so and nothing is converted; tick Remove the sound to convert the picture alone.' },
+      { q: 'Why is my MP4 so small and blurry?', a: 'Phones of that era recorded at 176 × 144 or 320 × 240 pixels with strong compression. The MP4 keeps that size and cannot add detail that was never captured.' },
+      { q: 'Why does it say the picture is not supported?', a: 'A 3GP is only a wrapper. This page opens files with H.263, MPEG-4 or H.264 picture, and names any other codec it finds instead of failing without a reason.' },
+      { q: 'Does a portrait phone video stay upright?', a: 'Yes. If the 3GP records that it should be turned, the MP4 carries the same turn flag, so players show it the right way up.' },
+      { q: 'Is the 3GP uploaded anywhere?', a: 'No. The file is read from your disk in slices by code running in a background worker in your tab, and the MP4 is written in memory. The decoder module downloads from stayput.dev when you first convert, and it carries none of your data.' },
+      noUpload,
+    ],
+  },
+  {
     slug: 'mp4-to-webm',
     base: 'video-to-webm',
     name: 'MP4 to WebM',
