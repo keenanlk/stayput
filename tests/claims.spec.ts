@@ -100,7 +100,7 @@ function claimsIn(page: string, firstUse = false): string[] {
 
 test('no page makes an unqualified size-limit or bare offline claim about Stayput', () => {
   expect(pages.length).toBe(tools.length + pairs.length + presets.length + guides.length);
-  const bad = pages.flatMap(({ path, base }) => claimsIn(html(path), !!base && needsFirstUse(base)).map((c) => `${path} ${c}`));
+  const bad = pages.flatMap(({ path, base }) => claimsIn(html(path), !!base && needsFirstUse(base, path.slice(1))).map((c) => `${path} ${c}`));
   expect(bad).toEqual([]);
 });
 
@@ -161,7 +161,7 @@ test('every tool page badge row names its offline condition and has a real size 
     expect(row, path).toBeTruthy();
     const items = [...row!.matchAll(/<li>[\s\S]*?<\/svg>\s*([^<]*)<\/li>/g)].map((m) => m[1]!.trim());
     expect(items, path).toHaveLength(4);
-    expect(items[1], path).toBe(offlineBadge(base));
+    expect(items[1], path).toBe(offlineBadge(base, path.slice(1)));
     expect(items[1], path).toMatch(/^Works offline after first (visit|use)$/);
     expect(items[3], path).toBe(sizeFact ?? defaultSizeBadge);
     expect(items[3], `${path} (${kind})`).not.toMatch(/no size|unlimited|caps?\b(?!.*memory)/i);

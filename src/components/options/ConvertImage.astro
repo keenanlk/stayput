@@ -37,6 +37,22 @@ const format = defaults.format ?? 'image/jpeg';
   <label for="quality">Quality <output id="quality-out">90</output></label>
   <input type="range" id="quality" min="40" max="100" value="90" />
 </div>
+<div class="field" id="avif-field" hidden>
+  <label class="check" id="avif-fast-label"><input type="checkbox" id="avif-fast" /> Faster encode (lower effort)</label>
+  <p class="picker-note">AVIF quality numbers are not comparable to JPG's: 60 here looks about like a much higher JPG quality.</p>
+</div>
+<div class="field" id="avif-scale-field" hidden>
+  <label for="avif-scale">Downscale</label>
+  <select id="avif-scale">
+    <option value="1" selected>Keep the original size</option>
+    <option value="0.75">75% of the size</option>
+    <option value="0.5">50% of the size</option>
+    <option value="0.25">25% of the size</option>
+  </select>
+</div>
+<div class="field" id="avif-cancel-field" hidden>
+  <button type="button" class="btn" id="avif-cancel">Cancel encode</button>
+</div>
 <div class="field" id="background-field">
   <label for="background">Background for transparent areas</label>
   <input type="color" id="background" value="#ffffff" />

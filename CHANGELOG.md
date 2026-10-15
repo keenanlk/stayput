@@ -7,6 +7,7 @@ site will render this file.
 ## Unreleased
 
 ### Added
+- JPG to AVIF and PNG to AVIF: new converter pages. AVIF output uses the browser's own encoder where it has one (Safari's engine does) and otherwise the jSquash AVIF encoder (Apache-2.0, libavif and libaom compiled to WebAssembly), which loads only when you convert and can be cancelled. Quality 1 to 100, a faster-encode option and a downscale option; transparency is kept.
 - WMA to MP3: converts Windows Media Audio (versions 1 and 2) files to MP3 in the tab, keeping the title and artist. WMA Pro, WMA Lossless and WMA Voice are refused by name. The decoder is built from FFmpeg's libraries (LGPL) with only the ASF demuxer and the two WMA decoders, and loads only when you convert a WMA.
 - FLV to MP4: converts FLV files that hold H.264 picture with AAC or MP3 sound in the tab, copying the picture without re-encoding. FLVs with VP6 or Sorenson Spark video get a message naming the codec. The reader is built from FFmpeg's libraries (LGPL) and loads only when you convert an FLV; /licenses links its source and build.
 - AVI to MP4: converts Xvid, DivX 4+ and Motion JPEG AVI files in the tab. The decoder is built from FFmpeg's libraries (LGPL) and loads only when you convert an AVI; /licenses links its source and build.
