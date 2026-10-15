@@ -39,7 +39,12 @@ test('a failure that names no class is recorded under the step that failed, not 
   expect(encodeMemoryError(bare).name).toBe('RedrawFailed');
   expect(phoneSpeechMemoryError(bare).name).toBe('CaptionStepFailed');
   // A browser's own class still wins, and a memory failure is still memory.
-  expect(encodeFailedError(new TypeError('x')).name).toBe('TypeError');
+  expect(encodeFailedError(new TypeError('x')).name).toBe('RedrawFailed');
+  // A bare TypeError is never recorded as such: the step that failed names it.
+  expect(unknownCaptionError(new TypeError('Failed to fetch')).name).toBe('CaptionStepFailed');
+  expect(plainCaptionError(new TypeError('x')).name).toBe('CaptionStepFailed');
+  expect(phoneSpeechMemoryError(new TypeError('x')).name).toBe('CaptionStepFailed');
+  expect(audioDecodeError('x', new TypeError('x')).name).toBe('AudioDecodeError');
   expect(encodeMemoryError(new Error('Array buffer allocation failed')).name).toBe('OutOfMemoryError');
 });
 

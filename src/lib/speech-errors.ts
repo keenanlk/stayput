@@ -28,7 +28,8 @@ export const modelLoadError = () =>
 export const outOfMemoryError = () =>
   make('OutOfMemoryError', "This device ran out of memory while writing captions. Close other tabs and apps and try again, use a shorter recording, or use a desktop browser.");
 /** Errors that only say a decoder or the container reader would not take the sound: what AudioDecodeError already means. */
-const REFUSALS = ['Error', 'EncodingError', 'NotSupportedError', 'DataError', 'UnsupportedInputFormatError'];
+// A bare TypeError names nothing either (a failed fetch or a bad argument), so it is the step's name that is recorded.
+const REFUSALS = ['Error', 'TypeError', 'EncodingError', 'NotSupportedError', 'DataError', 'UnsupportedInputFormatError'];
 
 /**
  * No sound could be read. `cause` is whatever failed underneath: when it has a class name of its own (a
@@ -107,9 +108,9 @@ export function unknownCaptionError(e: unknown): Error {
   return err;
 }
 
-/** An error's class name when it looks like one, else 'Error': the only part of a failure that is recorded. */
+/** An error's class name when it looks like a specific one, else the fallback (a bare Error or TypeError says nothing): the only part of a failure that is recorded. */
 function classNameOf(e: unknown, fallback = 'Error'): string {
-  return e instanceof Error && e.name !== 'Error' && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(e.name) ? e.name : fallback;
+  return e instanceof Error && e.name !== 'Error' && e.name !== 'TypeError' && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(e.name) ? e.name : fallback;
 }
 
 /** The error to show for a failed caption step: our own named errors pass through, the rest become plain ones. */
