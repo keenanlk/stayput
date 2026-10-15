@@ -8,6 +8,7 @@
  */
 import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
+import { workerFailure } from './worker-error';
 
 export const MODEL_URL = '/models/realesr-general-x4v3.onnx';
 export const SCALE = 4;
@@ -19,7 +20,7 @@ export type Reply =
   | { id: number; type: 'loading'; fraction: number }
   | { id: number; type: 'progress'; fraction: number }
   | { id: number; type: 'done'; rgba: Uint8ClampedArray; width: number; height: number }
-  | { id: number; type: 'error'; message: string };
+  | { id: number; type: 'error'; name: string; message: string };
 
 let session: Promise<ort.InferenceSession> | undefined;
 
@@ -113,6 +114,6 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     const result = await upscale(s, rgba, width, height, (fraction) => post({ id, type: 'progress', fraction }));
     post({ id, type: 'done', rgba: result, width: width * SCALE, height: height * SCALE }, [result.buffer]);
   } catch (err) {
-    post({ id, type: 'error', message: err instanceof Error ? err.message : String(err) });
+    post({ id, type: 'error', ...workerFailure(err) });
   }
 };

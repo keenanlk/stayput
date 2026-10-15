@@ -8,6 +8,7 @@
 import { ALL_FORMATS, AudioSampleSource, BlobSource, BufferTarget, Input, Mp4OutputFormat, OggOutputFormat, Output, canEncodeAudio } from 'mediabunny';
 import { SAMPLE_RATE as MP3_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, type Bitrate } from './audio';
 import { encodeFlac } from './flac';
+import { NamedError } from './input-error';
 export { patchBrand } from './m4r';
 import { SAMPLE_RATE as OPUS_RATE, pcmFeeder } from './pcm';
 
@@ -80,7 +81,8 @@ export async function convertAudio(
   if (format === 'flac') return { ...base, blob: await encodeFlac(chans, rate, onProgress) };
 
   if (!(await canWrite(format, chans.length))) {
-    throw new Error(
+    throw new NamedError(
+      'AudioEncodeUnsupported',
       format === 'm4a'
         ? 'This browser has no AAC encoder, so it cannot write M4A. Safari, and Chrome or Edge on Windows and Mac, can. Or choose MP3, which plays in the same places.'
         : 'This browser has no Opus encoder, so it cannot write OGG. Chrome, Edge and Firefox can.',
@@ -94,7 +96,7 @@ const AAC_ERROR = 'This browser has no AAC encoder, so it cannot save M4R files.
 
 /** AAC-LC in MP4 at the given rate, written by the browser's own encoder through Mediabunny. */
 export async function encodeAac(chans: Float32Array[], rate: number, kbps: number, onProgress?: (f: number) => void): Promise<Blob> {
-  if (!(await canWrite('m4a', chans.length))) throw new Error(AAC_ERROR);
+  if (!(await canWrite('m4a', chans.length))) throw new NamedError('AudioEncodeUnsupported', AAC_ERROR);
   return writeMp4('aac', chans, rate, kbps, onProgress);
 }
 

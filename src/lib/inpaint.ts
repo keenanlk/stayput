@@ -6,6 +6,7 @@
  * picture is copied through untouched.
  */
 import { fromWorkerFailure } from './worker-error';
+import { NamedError } from './input-error';
 
 let worker: Worker | undefined;
 let nextId = 0;
@@ -37,7 +38,7 @@ export function inpaint(rgba: Uint8ClampedArray, hole: Uint8Array, width: number
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       worker = undefined;
-      reject(new Error(e.message || 'The object remover could not start in this browser.'));
+      reject(new NamedError('ObjectModelStartError', e.message || 'The object remover could not start in this browser.'));
     };
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);

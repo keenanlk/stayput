@@ -2,6 +2,7 @@ import { bindRange, createShell, num, processEach, radio, str } from '../lib/she
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { blurBackground, coverage, cutout, findSubject } from '../lib/background';
+import { InputError, NamedError } from '../lib/input-error';
 
 const colorField = document.getElementById('bg-color-field')!;
 const strengthField = document.getElementById('strength-field')!;
@@ -42,11 +43,11 @@ createShell({
           progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 * f)),
           Number(radio('keep', '0')),
         );
-        if (coverage(mask) < 0.005) throw new Error('No subject was found in this photo. It works best on a clear person, animal or object against its background.');
+        if (coverage(mask) < 0.005) throw new InputError('No subject was found in this photo. It works best on a clear person, animal or object against its background.');
         progress.set(`Saving ${entry.file.name}…`, share(0.9));
         const canvas = blurred ? blurBackground(bitmap, mask, strength) : cutout(bitmap, mask, { background: fill });
         const blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : 0.92);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${type.replace('image/', '').toUpperCase()} images. Choose PNG.`);
+        if (blob.type !== type) throw new NamedError('ImageEncodeUnsupported', `This browser cannot save ${type.replace('image/', '').toUpperCase()} images. Choose PNG.`);
         const preview = await createImageBitmap(canvas);
         const out: OutputFile = {
           name: suffixName(entry.file.name, blurred ? '-blurred-bg' : '-no-bg', extForType(type)),

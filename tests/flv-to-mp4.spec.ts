@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { ALL_FORMATS, BlobSource, EncodedPacketSink, Input } from 'mediabunny';
 import { allowServiceWorker } from './allow-sw';
+import { siteHost } from './allowed-host';
 
 // FLV to MP4: real FLVs made by tests/fixtures/make-flv.sh (320x240, 10 fps, 5 s, with a tone).
 const dist = fileURLToPath(new URL('../vendor-builds/libav-flv/dist/', import.meta.url));
@@ -162,7 +163,7 @@ for (const file of GOOD) {
     for (const r of external) {
       const url = new URL(r.url);
       if (url.hostname === 'stats.keenankaufman.com') continue;
-      expect(url.hostname, `unexpected host: ${r.url}`).toBe('localhost');
+      expect(url.hostname, `unexpected host: ${r.url}`).toBe(siteHost());
       expect(r.method, r.url).toBe('GET');
       expect(r.body, r.url).toBeNull();
       expect(decodeURIComponent(r.url), r.url).not.toContain(file.replace(/\.flv$/, ''));

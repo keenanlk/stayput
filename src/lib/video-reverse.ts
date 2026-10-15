@@ -26,6 +26,7 @@ import {
 } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
+import { InputError, NamedError, UnreadableFile } from './input-error';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -78,8 +79,8 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    if (!(await video.canDecode())) throw new Error(unplayable());
+    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    if (!(await video.canDecode())) throw new UnreadableFile(unplayable());
     const first = await video.getFirstTimestamp();
     let end = first;
     let packets = 0;
@@ -90,11 +91,11 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
       packets++;
     }
     const total = end - first;
-    if (!(total > 0)) throw new Error('This video has no frames to reverse.');
+    if (!(total > 0)) throw new InputError('This video has no frames to reverse.');
     const width = video.codedWidth;
     const height = video.codedHeight;
     const videoCodec = await pickVideoCodec({ width: width + (width % 2), height: height + (height % 2), bitrate: QUALITY_HIGH });
-    if (!videoCodec) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
+    if (!videoCodec) throw new NamedError('VideoEncodeUnsupported', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
 
     let sound: Float32Array[] | null = null;
     if (!opts.mute && (await input.getPrimaryAudioTrack())) {
@@ -172,7 +173,7 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
       () => output.cancel(),
     );
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoWriteError', 'The video could not be written.');
     opts.onProgress?.(1);
     const quarter = video.rotation === 90 || video.rotation === 270;
     return {

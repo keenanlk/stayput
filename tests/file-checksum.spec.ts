@@ -3,6 +3,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { mkdtempSync, writeFileSync, createWriteStream } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { siteHost } from './allowed-host';
 
 const KNOWN = {
   // The classic test vector: the three digests of the three bytes "abc".
@@ -155,10 +156,10 @@ test('nothing sent carries the file, its name or its digests, and analytics stay
   const secrets = ['abc-secret-name', ...Object.values(KNOWN)];
   for (const r of seen) {
     if (r.url.startsWith('blob:') || r.url.startsWith('data:')) continue;
-    expect(new URL(r.url).hostname, `unexpected host for ${r.url}`).toMatch(/^(localhost|stats\.keenankaufman\.com)$/);
+    expect(new URL(r.url).hostname, `unexpected host for ${r.url}`).toMatch(new RegExp(`^(${siteHost().replace(/\./g, '\\.')}|stats\\.keenankaufman\\.com)$`));
     const haystack = `${decodeURIComponent(r.url)} ${r.body ?? ''}`.toLowerCase();
     for (const s of secrets) expect(haystack, `${r.method} ${r.url}`).not.toContain(s.toLowerCase());
-    if (new URL(r.url).hostname === 'localhost') {
+    if (new URL(r.url).hostname === siteHost()) {
       expect(r.method, r.url).toBe('GET');
       expect(r.body, r.url).toBeNull();
     }

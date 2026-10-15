@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseMidi, writeMidi } from '../src/lib/midi';
 import { silentWav8, wav } from './music-synth';
+import { siteHost } from './allowed-host';
 
 const dir = mkdtempSync(join(tmpdir(), 'mp3-to-midi-'));
 const clip = join(dir, 'secret-melody-name.wav');
@@ -82,7 +83,7 @@ test('turns a ten-note clip into a MIDI file with the right notes, and sends not
       expect(r.body ?? '').not.toContain('secret-melody-name');
       continue;
     }
-    expect(host, `unexpected host ${host}`).toBe('localhost');
+    expect(host, `unexpected host ${host}`).toBe(siteHost());
     expect(r.method, r.url).toBe('GET');
     expect(r.body, r.url).toBeNull();
   }

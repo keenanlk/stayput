@@ -3,6 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
+import { siteHost } from './allowed-host';
 
 /**
  * Password-protected 7z and RAR in the archive extractor (7-Zip as WebAssembly, loaded only for them).
@@ -66,7 +67,7 @@ for (const fixture of ['enc-content.7z', 'enc-header.7z', 'enc-rar4.rar', 'enc-r
       if (r.url.startsWith('blob:') || r.url.startsWith('data:')) continue;
       const host = new URL(r.url).hostname;
       if (host === 'stats.keenankaufman.com') continue;
-      expect(host, `unexpected host ${host}`).toBe('localhost');
+      expect(host, `unexpected host ${host}`).toBe(siteHost());
       expect(r.method, `${r.url} must be a plain GET`).toBe('GET');
       expect(r.body, `${r.url} must carry no body`).toBeNull();
     }

@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { ALL_FORMATS, BlobSource, Input } from 'mediabunny';
 import { allowServiceWorker } from './allow-sw';
+import { siteHost } from './allowed-host';
 
 // AVI to MP4: real AVIs made by tests/fixtures/make-avi.sh (320x240, 10 fps, 5 s, with a tone).
 const fixture = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
@@ -137,7 +138,7 @@ for (const file of GOOD) {
     for (const r of external) {
       const url = new URL(r.url);
       if (url.hostname === 'stats.keenankaufman.com') continue;
-      expect(url.hostname, `unexpected host: ${r.url}`).toBe('localhost');
+      expect(url.hostname, `unexpected host: ${r.url}`).toBe(siteHost());
       expect(r.method, r.url).toBe('GET');
       expect(r.body, r.url).toBeNull();
       expect(decodeURIComponent(r.url), r.url).not.toContain(file.replace(/\.avi$/, ''));

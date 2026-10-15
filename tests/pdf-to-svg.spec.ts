@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
 import { buildFixtures } from '../scripts/make-pdf-svg-fixtures.mjs';
+import { siteHost } from './allowed-host';
 
 /**
  * PDF to SVG: each page of each generated test PDF is converted by the real tool page, then the SVG,
@@ -315,7 +316,7 @@ test('nothing is fetched before Run, and no request carries file data or the fil
       expect(r.body ?? '').not.toContain('text-fonts');
       continue;
     }
-    expect(host, `unexpected host ${host}`).toBe('localhost');
+    expect(host, `unexpected host ${host}`).toBe(siteHost());
     expect(r.method, `${r.url} must be a plain GET`).toBe('GET');
     expect(r.body, `${r.url} must carry no body`).toBeNull();
     expect(decodeURIComponent(r.url), 'the file name must not appear in a URL').not.toContain('text-fonts.pdf');

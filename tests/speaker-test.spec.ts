@@ -1,6 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { channelGains, levelToGain, pinkNoise, sweepFrequency, SWEEP_FROM, SWEEP_TO, SWEEP_SECONDS, DEFAULT_LEVEL, MAX_LEVEL } from '../src/lib/speaker-test';
+import { siteHost } from './allowed-host';
 
 // Runs in Chromium and WebKit. The page's output is measured the way a listener's ears would hear
 // it: whatever is connected to the AudioContext destination is also split into two analysers, one
@@ -214,7 +215,7 @@ test('one usage event with no tone, channel or level in it, and nothing is fetch
   expect(data).not.toHaveProperty('format');
   const text = JSON.stringify(window_events(await page.evaluate(() => window.__events)));
   expect(text).not.toMatch(/4000|4 kHz|\bleft\b|\bright\b|sweep|noise|tone|level/i);
-  expect(requests.filter((r) => !r.startsWith('GET http://localhost') && !r.includes('stats.keenankaufman.com'))).toEqual([]);
+  expect(requests.filter((r) => new URL(r.slice(r.indexOf(' ') + 1)).hostname !== siteHost() && !r.includes('stats.keenankaufman.com'))).toEqual([]);
   expect(requests.filter((r) => r.startsWith('POST'))).toEqual([]);
   expect(errors).toEqual([]);
 });

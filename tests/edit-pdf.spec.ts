@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { PDFDocument, PDFName, StandardFonts, degrees, rgb } from 'pdf-lib';
 import { getDocument, Util } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
+import { siteHost } from './allowed-host';
 
 // Edit PDF: annotate-and-arrange. Fixtures are built inline so the spec needs no generated files.
 
@@ -186,7 +187,7 @@ test('adds text, a cover, a highlight, a pen stroke and an image, turns page 3, 
 
   for (const r of requests) {
     if (r.url.startsWith('blob:') || r.url.startsWith('data:')) continue;
-    expect(new URL(r.url).hostname, r.url).toBe('localhost');
+    expect(new URL(r.url).hostname, r.url).toBe(siteHost());
     expect(r.body ?? '', r.url).not.toContain('%PDF');
   }
   expect(errors).toEqual([]);

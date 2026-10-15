@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { ALL_FORMATS, BlobSource, EncodedPacketSink, Input } from 'mediabunny';
 import { allowServiceWorker } from './allow-sw';
+import { siteHost } from './allowed-host';
 
 // 3GP to MP4: real 3GP files made by tests/fixtures/make-3gp.sh (176x144, 15 fps, 4 s, with a 440 Hz tone).
 const dist = fileURLToPath(new URL('../vendor-builds/libav-3gp/dist/', import.meta.url));
@@ -152,7 +153,7 @@ for (const file of GOOD) {
     for (const r of external) {
       const url = new URL(r.url);
       if (url.hostname === 'stats.keenankaufman.com') continue;
-      expect(url.hostname, `unexpected host: ${r.url}`).toBe('localhost');
+      expect(url.hostname, `unexpected host: ${r.url}`).toBe(siteHost());
       expect(r.method, r.url).toBe('GET');
       expect(r.body, r.url).toBeNull();
       expect(decodeURIComponent(r.url), r.url).not.toContain(file.replace(/\.3gp$/, ''));

@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CSV_HEADER } from '../src/lib/bpm-key';
 import { chords, clickTrack, mix, silentWav8, wav } from './music-synth';
+import { siteHost } from './allowed-host';
 
 const dir = mkdtempSync(join(tmpdir(), 'bpm-key-'));
 const song = join(dir, 'secret-demo-name.wav');
@@ -65,7 +66,7 @@ test('finds the tempo and key of a song, writes the CSV, and sends nothing', asy
       expect(r.body ?? '').not.toContain('secret-demo-name');
       continue;
     }
-    expect(host, `unexpected host ${host}`).toBe('localhost');
+    expect(host, `unexpected host ${host}`).toBe(siteHost());
     expect(r.method, r.url).toBe('GET');
     expect(r.body, r.url).toBeNull();
   }

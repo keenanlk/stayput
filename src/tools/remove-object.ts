@@ -2,7 +2,7 @@ import { createShell, bindRange, num, str } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { inpaint } from '../lib/inpaint';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -304,7 +304,7 @@ const shell = createShell({
       ctx.drawImage(work!, 0, 0);
     }
     const blob = await canvasToBlob(out, type, type === 'image/png' ? undefined : quality);
-    if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+    if (blob.type !== type) throw new NamedError('ImageEncodeUnsupported', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
     const preview = await createImageBitmap(out);
     const outs: OutputFile[] = [
       {

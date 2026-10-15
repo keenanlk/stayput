@@ -6,6 +6,7 @@
  * with the video's own sound if asked, and encoded as AAC or Opus. Nothing
  * leaves the tab.
  */
+import { NamedError } from './input-error';
 import {
   AudioSampleSource,
   BlobSource,
@@ -141,7 +142,7 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     audioSource.close();
     await output.finalize();
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoWriteError', 'The video could not be written.');
     opts.onProgress?.(1);
     return {
       blob: new Blob([buffer], { type: format.mimeType }),
