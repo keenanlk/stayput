@@ -1,0 +1,21 @@
+---
+/** Option controls for GIF to animated WebP, shared by the tool page and its landing pages. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const webpMode = defaults.mode ?? 'lossy';
+import OptionDetails from '../OptionDetails.astro';
+---
+<div class="field">
+  <label for="webp-mode">Compression</label>
+  <select id="webp-mode">
+    <option value="lossy" selected={webpMode === 'lossy'}>Lossy (smaller file)</option>
+    <option value="lossless" selected={webpMode === 'lossless'}>Lossless (pixels unchanged)</option>
+  </select>
+</div>
+<div class="field" id="quality-field">
+  <label for="quality">Quality <output id="quality-out">80</output></label>
+  <input type="range" id="quality" min="1" max="100" value="80" />
+</div>
+<OptionDetails>
+  <p>Lossy is much smaller and fine for most animations; lower the quality for a smaller file. Lossless keeps every pixel exactly and makes a larger file. Each frame’s timing and the loop count are kept either way.</p>
+</OptionDetails>

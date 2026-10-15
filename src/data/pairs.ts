@@ -838,6 +838,7 @@ export const pairs: Pair[] = [
       { q: 'Why is the GIF bigger than the WebP?', a: 'WebP compresses animation far better than GIF, which dates from 1987. A GIF of the same clip is usually two to five times the size. For long or large clips, check your destination’s size limit; many chat apps stop at 8 or 10 MB for GIFs.' },
       { q: 'The colours look slightly grainy. Can I fix that?', a: 'That is the 256-colour limit of GIF at work, and it shows mostly on gradients and filmed footage. Cartoon stickers and flat graphics come through cleanly. If the destination accepts WebP or MP4, keep the original instead.' },
       { q: 'What about a still WebP?', a: 'It becomes a single-frame GIF. For still images, PNG or JPG are usually better choices: [WebP to PNG](/webp-to-png) keeps full colour and transparency.' },
+      { q: 'Can I turn a GIF into an animated WebP?', a: 'Yes. [GIF to WebP](/gif-to-webp) writes an animated WebP from a GIF, keeping each frame’s delay and the loop count, and the file is usually far smaller.' },
       { q: 'How do I save a WhatsApp or Telegram sticker as a WebP first?', a: 'On desktop, stickers are saved as .webp when you right-click and save them, or when you export the chat media. Drop that file here. Stickers in Telegram’s .tgs or .webm formats are a different kind of animation and are not supported.' },
       { q: 'Is anything uploaded?', a: 'No. The file is read, decoded and re-encoded in this browser tab. Your files are not uploaded.' },
     ],

@@ -1,0 +1,10 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import GifToWebp from '../../components/options/GifToWebp.astro';
+const tool = toolBySlug('gif-to-animated-webp')!;
+---
+<ToolLayout tool={tool}>
+  <Fragment slot="options"><GifToWebp /></Fragment>
+</ToolLayout>
+<script src="../../tools/gif-to-webp.ts"></script>
