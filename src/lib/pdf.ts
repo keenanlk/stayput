@@ -2,7 +2,7 @@
  * PDF helpers. pdf-lib edits document structure; pdf.js renders pages.
  * Both are loaded on demand so tool pages stay light until a file is dropped.
  */
-import { UnreadableFile } from './input-error';
+import { NamedError, UnreadableFile } from './input-error';
 import type * as PdfLib from 'pdf-lib';
 import type * as PdfJs from 'pdfjs-dist';
 import type { TextContent } from 'pdfjs-dist/types/src/display/api';
@@ -79,7 +79,7 @@ export async function renderPage(doc: PdfJs.PDFDocumentProxy, pageNumber: number
   canvas.width = Math.max(1, Math.round(viewport.width));
   canvas.height = Math.max(1, Math.round(viewport.height));
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas is not available in this browser.');
+  if (!ctx) throw new NamedError('CanvasUnavailable', 'Canvas is not available in this browser.');
   await page.render({ canvas, canvasContext: ctx, viewport }).promise;
   page.cleanup();
   return { canvas, widthPt: base.width, heightPt: base.height };

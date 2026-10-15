@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { siteHost } from './allowed-host';
 
 const dir = mkdtempSync(join(tmpdir(), 'json-csv-'));
 const SECRET = 'Ada-Secret-Customer-9137';
@@ -174,7 +175,7 @@ test('nothing leaves the tab: no request carries the data, and the usage ping ho
       for (const needle of [SECRET, 'orders-private-name', 'people-private-name', 'ada@example.com']) expect(r.body ?? '', r.url).not.toContain(needle);
       continue;
     }
-    expect(host, r.url).toBe('localhost');
+    expect(host, r.url).toBe(siteHost());
     expect(r.method, r.url).toBe('GET');
     expect(r.body, r.url).toBeNull();
     expect(r.url).not.toContain(SECRET);

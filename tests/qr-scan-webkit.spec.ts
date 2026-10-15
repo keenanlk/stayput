@@ -2,6 +2,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { siteHost } from './allowed-host';
 
 // The scanner's image route in the engine Safari uses: the reader's wasm decodes a
 // photo and a three-code picture, and nothing leaves the page but requests to this site.
@@ -28,6 +29,6 @@ test('the QR scanner reads a photo and several codes, with every request going t
   await page.locator('#file-input').setInputFiles(fx('09_three_codes.png'));
   await expect(page.locator('#qs-results .qs-card')).toHaveCount(3, { timeout: 30_000 });
   expect(wasm.map((u) => new URL(u).pathname)).toContain('/vendor/zxing-wasm@3.1.5/zxing_reader.wasm');
-  expect([...hosts].filter((h) => h !== 'localhost' && h !== 'stats.keenankaufman.com')).toEqual([]);
+  expect([...hosts].filter((h) => h !== siteHost() && h !== 'stats.keenankaufman.com')).toEqual([]);
   expect(errors).toEqual([]);
 });

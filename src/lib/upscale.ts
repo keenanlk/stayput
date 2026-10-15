@@ -8,6 +8,8 @@
  * back, since the network only sees colour.
  */
 import { makeCanvas } from './image';
+import { NamedError } from './input-error';
+import { fromWorkerFailure } from './worker-error';
 
 export const MODEL_SCALE = 4;
 /** The largest picture every browser can hold in one canvas (iOS Safari's limit). */
@@ -33,20 +35,20 @@ function run(rgba: Uint8ClampedArray, width: number, height: number, onLoading?:
   const w = getWorker();
   return new Promise((resolve, reject) => {
     const onMessage = (e: MessageEvent) => {
-      const msg = e.data as { id: number; type: string; fraction?: number; rgba?: Uint8ClampedArray; width?: number; height?: number; message?: string };
+      const msg = e.data as { id: number; type: string; fraction?: number; rgba?: Uint8ClampedArray; width?: number; height?: number; name?: string; message?: string };
       if (msg.id !== id) return;
       if (msg.type === 'loading') return onLoading?.(msg.fraction ?? 0);
       if (msg.type === 'progress') return onProgress?.(msg.fraction ?? 0);
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       if (msg.type === 'done') resolve({ rgba: msg.rgba!, width: msg.width!, height: msg.height! });
-      else reject(new Error(msg.message ?? 'Upscaling failed.'));
+      else reject(fromWorkerFailure(msg.name, msg.message ?? 'Upscaling failed.'));
     };
     const onError = (e: ErrorEvent) => {
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       worker = undefined;
-      reject(new Error(e.message || 'The upscaler could not start in this browser.'));
+      reject(new NamedError('UpscalerStartError', e.message || 'The upscaler could not start in this browser.'));
     };
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);

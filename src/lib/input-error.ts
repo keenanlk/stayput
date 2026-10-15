@@ -34,3 +34,14 @@ export class StageError extends Error {
     this.name = stage;
   }
 }
+
+/**
+ * A failure with a message of its own and a fixed name for the counts (letters and digits only):
+ * for throw sites that have no caught error to hand to StageError.
+ */
+export class NamedError extends Error {
+  constructor(name: string, message: string) {
+    super(message);
+    this.name = name;
+  }
+}

@@ -3,6 +3,7 @@ import { closePdfJs, openWithPdfJs } from '../lib/pdf';
 import { extractDocumentText } from '../lib/pdftext';
 import { buildEpub, flowText, toChapters } from '../lib/epub-build';
 import { baseName, type OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 /**
  * PDF to EPUB: the PDF's text is read with pdf.js and rebuilt into
@@ -21,7 +22,7 @@ createShell({
         const pages = await extractDocumentText(doc, (p, total) => progress.set(`${entry.file.name}: reading page ${p} of ${total}`, (i + (p - 1) / total) / files.length));
         const paras = flowText(pages);
         if (paras.length === 0) {
-          throw new Error('This PDF has no text layer, so there is no text to put in a book. It is probably a scan: run it through OCR PDF first, then convert the searchable copy.');
+          throw new InputError('This PDF has no text layer, so there is no text to put in a book. It is probably a scan: run it through OCR PDF first, then convert the searchable copy.');
         }
         const chapters = toChapters(paras);
         const info = (await doc.getMetadata().catch(() => undefined))?.info as { Title?: string; Author?: string } | undefined;

@@ -13,6 +13,7 @@ import { tools as allTools } from '../src/data/tools';
 import { pairs as allPairs } from '../src/data/pairs';
 import { inspect, sniffFormat } from '../src/lib/exif';
 import { allowServiceWorker } from './allow-sw';
+import { siteHost } from './allowed-host';
 
 const fixtures = fileURLToPath(new URL('./fixtures/generated/', import.meta.url));
 const fx = (name: string) => fixtures + name;
@@ -40,7 +41,7 @@ function watchNetwork(page: Page) {
           for (const n of fixtureNames) expect(r.body ?? '', 'usage ping must not name the file').not.toContain(n);
           continue;
         }
-        expect(host, `unexpected host ${host}`).toBe('localhost');
+        expect(host, `unexpected host ${host}`).toBe(siteHost());
         expect(r.method, `${r.url} must be a plain GET`).toBe('GET');
         expect(r.body, `${r.url} must carry no body`).toBeNull();
       }
@@ -1336,6 +1337,8 @@ test('Remove location page reports GPS and strips it losslessly', async ({ page 
 });
 
 test('guide pages render with article structured data, a social image and tool links', async ({ page }) => {
+  // Live, every guide page is a real network round trip: give the run room beyond the 90 s default.
+  if (siteHost() !== 'localhost') test.setTimeout(300_000);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await stubAnalytics(page);

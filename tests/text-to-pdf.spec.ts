@@ -6,6 +6,7 @@ import { unzipSync } from 'fflate';
 import { PDFDocument } from 'pdf-lib';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
+import { siteHost } from './allowed-host';
 
 // Runs in Chromium and WebKit (see playwright.config.ts): the worker, the font fetch and the PDF must work in both.
 
@@ -77,7 +78,7 @@ test('typed text becomes text.pdf with its lines, a tab expanded and no bytes le
   expect(text).toContain('indented line');
   await expect(page.locator('#results-list')).toContainText('1 page, Roboto');
   for (const r of requests) {
-    expect(new URL(r.url).hostname === 'localhost' || r.url.startsWith('blob:') || r.url.startsWith('data:') || new URL(r.url).hostname === 'stats.keenankaufman.com', r.url).toBe(true);
+    expect(new URL(r.url).hostname === siteHost() || r.url.startsWith('blob:') || r.url.startsWith('data:') || new URL(r.url).hostname === 'stats.keenankaufman.com', r.url).toBe(true);
     expect(r.body ?? '', r.url).not.toContain('indented');
   }
   expect(errors).toEqual([]);

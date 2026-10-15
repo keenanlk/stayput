@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { events, gumCalls, launch, liveTracks, prepare, qrVideo, url } from './qr-camera-helpers';
+import { siteHost } from './allowed-host';
 
 // The scanner's camera route with a QR code in front of the camera.
 
@@ -40,7 +41,7 @@ test.describe('with a QR code in front of the camera', () => {
         expect(r.body ?? '').not.toContain('stayput.dev/tools');
         continue;
       }
-      expect(host, r.url).toBe('localhost');
+      expect(host, r.url).toBe(siteHost());
       expect(r.method, r.url).toBe('GET');
       expect(r.body, r.url).toBeNull();
     }

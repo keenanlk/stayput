@@ -9,6 +9,8 @@
 import { makeCanvas } from './image';
 import { blur as boxBlur } from './blur';
 import { refineMask } from './mask';
+import { NamedError } from './input-error';
+import { fromWorkerFailure } from './worker-error';
 
 const SIZE = 1024;
 /** ISNet expects RGB scaled to 0..1 with the ImageNet mean subtracted (std 1). */
@@ -49,19 +51,19 @@ export function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) 
   const w = getWorker();
   return new Promise((resolve, reject) => {
     const onMessage = (e: MessageEvent) => {
-      const msg = e.data as { id: number; type: string; fraction?: number; mask?: Uint8ClampedArray; message?: string };
+      const msg = e.data as { id: number; type: string; fraction?: number; mask?: Uint8ClampedArray; name?: string; message?: string };
       if (msg.id !== id) return;
       if (msg.type === 'loading') return onLoading?.(msg.fraction ?? 0);
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       if (msg.type === 'mask') resolve(refineMask(msg.mask!, SIZE, keep));
-      else reject(new Error(msg.message ?? 'Background removal failed.'));
+      else reject(fromWorkerFailure(msg.name, msg.message ?? 'Background removal failed.'));
     };
     const onError = (e: ErrorEvent) => {
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       worker = undefined;
-      reject(new Error(e.message || 'The background remover could not start in this browser.'));
+      reject(new NamedError('BackgroundModelStartError', e.message || 'The background remover could not start in this browser.'));
     };
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);

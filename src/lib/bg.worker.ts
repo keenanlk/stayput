@@ -7,6 +7,7 @@
  */
 import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
+import { workerFailure } from './worker-error';
 
 export const MODEL_URL = '/models/isnet-general-use-int8w.onnx';
 export const SIZE = 1024;
@@ -15,7 +16,7 @@ export type Request = { id: number; type: 'mask'; pixels: Float32Array };
 export type Reply =
   | { id: number; type: 'loading'; fraction: number }
   | { id: number; type: 'mask'; mask: Uint8ClampedArray }
-  | { id: number; type: 'error'; message: string };
+  | { id: number; type: 'error'; name: string; message: string };
 
 let session: Promise<ort.InferenceSession> | undefined;
 
@@ -75,6 +76,6 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     for (let i = 0; i < data.length; i++) mask[i] = ((data[i]! - lo) / span) * 255;
     post({ id, type: 'mask', mask }, [mask.buffer]);
   } catch (err) {
-    post({ id, type: 'error', message: err instanceof Error ? err.message : String(err) });
+    post({ id, type: 'error', ...workerFailure(err) });
   }
 };

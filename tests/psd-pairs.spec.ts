@@ -2,6 +2,7 @@
 import { test, expect, type Page, type Download, type Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { siteHost } from './allowed-host';
 
 // /psd-to-jpg and /psd-to-png read the flattened image saved in a Photoshop file (ag-psd) and write
 // a JPG or PNG. The fixtures are layered PSDs written by tests/fixtures/make-psd.mjs; their composite
@@ -28,7 +29,7 @@ function watchRequests(page: Page) {
         expect(r.postData() ?? '').not.toMatch(/\.psd|layered|transparent/);
         continue;
       }
-      expect(u.hostname, r.url()).toBe('localhost');
+      expect(u.hostname, r.url()).toBe(siteHost());
       expect(r.method(), r.url()).toBe('GET');
       expect(r.postData(), r.url()).toBeNull();
     }
