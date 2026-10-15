@@ -316,6 +316,27 @@ export const pairs: Pair[] = [
     ],
   },
   {
+    slug: 'avif-to-webp',
+    from: 'AVIF',
+    to: 'WebP',
+    outputType: 'image/webp',
+    accept: 'image/avif,.avif',
+    title: 'AVIF to WebP Converter, Free, No Upload | Stayput',
+    description: 'Convert AVIF images to WebP in your browser, with transparency kept. Quality slider, batch conversion, nothing uploaded.',
+    heading: 'Convert AVIF to WebP',
+    tagline: 'An AVIF image as a WebP that more software can open, made on your device.',
+    keywords: ['avif to webp', 'convert avif to webp', 'avif to webp converter', 'avif converter'],
+    intro: [
+      'WebP is the older, more widely supported sibling of AVIF. Browsers and image editors that open WebP often still cannot open AVIF, so converting is the quick way to use an AVIF picture in a tool that does not know the format yet.',
+      'Your browser decodes the AVIF and writes the WebP itself, with transparency preserved. Safari cannot write WebP on its own, so it fetches a small WebP encoder from this site the first time you save one; the picture is still encoded on your device and never uploaded.',
+    ],
+    faq: [
+      { q: 'Is transparency preserved?', a: 'Yes. WebP supports an alpha channel, and transparent areas of the AVIF stay transparent.' },
+      { q: 'Does AVIF to WebP lose quality?', a: 'Both formats are lossy, so the re-encode discards a little detail. At quality 85 to 90 it is hard to see in normal viewing. Keep the original AVIF if you may need it again.' },
+      { q: 'Does it work in Safari?', a: 'Yes. Safari 16 and later decode AVIF, and the page loads a small WebP encoder from this site the first time you save a WebP. Nothing is uploaded.' },
+    ],
+  },
+  {
     slug: 'jpg-to-avif',
     from: 'JPG',
     to: 'AVIF',
