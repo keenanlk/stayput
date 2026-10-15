@@ -8,6 +8,8 @@
 import { gifPictures } from './gif-apng';
 import { loadWebpEncoder } from './image';
 import { muxAnimatedWebp } from './webp-mux';
+import { DamagedGif, explain } from './gif-errors';
+import { NamedError } from './input-error';
 
 export interface GifToWebpOptions {
   lossless: boolean;
@@ -29,16 +31,22 @@ export interface GifToWebpResult {
 
 export async function gifToWebp(input: ArrayBuffer, opts: GifToWebpOptions): Promise<GifToWebpResult> {
   // Decoding is the cheap half; the encoder is fetched only after the GIF is known to be readable.
-  const pics = await gifPictures(input, (f) => opts.onProgress?.(f * 0.1));
+  // A GIF the parser chokes on (cut short, bad block) is a damaged GIF; out-of-memory kinds are GifTooLarge.
+  const pics = await gifPictures(input, (f) => opts.onProgress?.(f * 0.1)).catch((e) => {
+    const x = explain(e);
+    throw x instanceof Error && x.name !== 'Error' && x.name !== 'TypeError' ? x : new DamagedGif();
+  });
   try {
-    const { module, defaults } = await loadWebpEncoder();
+    const { module, defaults } = await loadWebpEncoder().catch((e) => {
+      throw new NamedError('WebpEncoderLoadError', e instanceof Error ? e.message : 'The WebP encoder could not be loaded. Check your connection and try again.');
+    });
     const options = opts.lossless
       ? { ...defaults, lossless: 1, exact: 1, quality: 75, method: 4 }
       : { ...defaults, lossless: 0, quality: Math.round(Math.min(100, Math.max(0, opts.quality))) };
     const frames: { webp: Uint8Array; delayMs: number }[] = [];
     for (const [i, f] of pics.frames.entries()) {
       const webp = module.encode(f.rgba, pics.width, pics.height, options);
-      if (!webp) throw new Error('The browser could not encode a frame.');
+      if (!webp) throw new NamedError('WebpFrameEncodeError', 'The browser could not encode a frame.');
       // The encoder's output lives in WebAssembly memory it may reuse; keep our own copy.
       frames.push({ webp: webp.slice(), delayMs: f.delayMs });
       opts.onProgress?.(0.1 + (0.9 * (i + 1)) / pics.frames.length);

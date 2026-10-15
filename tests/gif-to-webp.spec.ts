@@ -172,3 +172,34 @@ test('a GIF with no loop setting plays once, and a file that is not a GIF is ref
   await expect(page.locator('#error')).toContainText('This file is not a GIF.');
   expect(requests.filter((u) => /jsquash-webp/.test(u))).toEqual([]);
 });
+
+test('a one-frame GIF gives a valid WebP the browser can decode', async ({ page }) => {
+  const g = await gifFrom({ w: W, h: H, frames: [{ rgba: frame(COLOURS[0], 0) }], delays: [100], repeat: -1 });
+  const file = join(dir, 'still.gif');
+  writeFileSync(file, g);
+  const r = await convert(page, file, 'lossless');
+  const b = r.bytes;
+  expect(String.fromCharCode(...b.subarray(0, 4))).toBe('RIFF');
+  expect(String.fromCharCode(...b.subarray(8, 12))).toBe('WEBP');
+  expect(new DataView(b.buffer, b.byteOffset).getUint32(4, true) + 8).toBe(b.length);
+  const anim = parseAnimatedWebp(b)!;
+  expect(anim.frames).toHaveLength(1);
+  const size = await page.evaluate(async (s) => {
+    const bmp = await createImageBitmap(new Blob([new Uint8Array(s)], { type: 'image/webp' }));
+    return [bmp.width, bmp.height];
+  }, [...new Uint8Array(await frameAsWebp(anim.frames[0]!).arrayBuffer())]);
+  expect(size).toEqual([W, H]);
+});
+
+test('a cut-short GIF is refused with the damaged-file message and no encoder fetch', async ({ page }) => {
+  const g = await gifFrom({ w: W, h: H, frames: COLOURS.slice(0, 3).map((c, i) => ({ rgba: frame(c, i) })), delays: [100, 100, 100], repeat: 0 });
+  const requests: string[] = [];
+  page.on('request', (q) => requests.push(q.url()));
+  await page.goto('/gif-to-webp');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'cut.gif', mimeType: 'image/gif', buffer: Buffer.from(g.subarray(0, 40)) });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/);
+  await expect(page.locator('#error')).toContainText(/could not be read|damaged/);
+  expect(requests.filter((u) => /jsquash-webp/.test(u))).toEqual([]);
+});
