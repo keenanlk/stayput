@@ -220,6 +220,30 @@ for (const slug of SPEECH_TOOLS) {
     expect(crashed.data).toMatchObject({ outcome: 'error', error_class: 'WorkerCrashError' });
     expect(JSON.stringify(sent)).not.toContain('secret-worker-message');
   });
+
+  test(`${slug}: a worker that cannot be handed the sound reports WorkerCrashError, not TypeError, after one more try`, async ({ page, baseURL }) => {
+    test.setTimeout(120_000);
+    const sent = await captureAnalytics(page, baseURL!);
+    await page.addInitScript(() => {
+      const w = window as unknown as { __handed: number };
+      w.__handed = 0;
+      const real = Worker.prototype.postMessage;
+      Worker.prototype.postMessage = function (this: Worker, msg: unknown, ...rest: unknown[]) {
+        // Only the speech request carries samples; other messages go through.
+        if (msg && typeof msg === 'object' && 'audio' in msg) {
+          w.__handed++;
+          throw new TypeError('secret-post-message-failure');
+        }
+        return (real as (...a: unknown[]) => void).call(this, msg, ...rest);
+      } as typeof Worker.prototype.postMessage;
+    });
+    const failed = await failedCaptionRun(page, baseURL!, slug, sent);
+    expect(failed.data).toMatchObject({ outcome: 'error', error_class: 'WorkerCrashError' });
+    expect(failed.shown).toContain('stopped unexpectedly');
+    // The first request, then one fresh worker, and no more.
+    expect(await page.evaluate(() => (window as unknown as { __handed: number }).__handed)).toBe(2);
+    expect(JSON.stringify(sent)).not.toContain('secret-post-message-failure');
+  });
 }
 
 /** The caption tools send one tool_start when Run is pressed, with details tool_run also sends and nothing else. */
