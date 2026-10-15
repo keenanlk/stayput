@@ -19,7 +19,9 @@ const cents = (a: number, b: number) => 1200 * Math.log2(a / b);
 /** Stand in for the microphone with a sine tone whose frequency the test can change. */
 async function fakeTone(page: Page, hz: number) {
   await page.addInitScript((f) => {
-    navigator.mediaDevices.getUserMedia = async () => {
+    // On the prototype, not on navigator.mediaDevices: WebKit can drop a property set on that wrapper object after a
+    // garbage collection, which on the slower live page turned the stub back into the real microphone prompt.
+    MediaDevices.prototype.getUserMedia = async () => {
       const ac = new AudioContext();
       const osc = ac.createOscillator();
       osc.frequency.value = f;
