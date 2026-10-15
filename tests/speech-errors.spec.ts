@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { audioDecodeError, looksLikeMemory, plainCaptionError, phoneSpeechMemoryError } from '../src/lib/speech-errors';
+import { audioDecodeError, encodeFailedError, encodeMemoryError, looksLikeMemory, plainCaptionError, phoneSpeechMemoryError, restartsOnce, unknownCaptionError } from '../src/lib/speech-errors';
 
 test('a RangeError counts as memory only when its message says so', () => {
   const alloc = new RangeError('Array buffer allocation failed');
@@ -30,4 +30,20 @@ test('an audio decode failure is recorded under the underlying class, and stays 
   expect(audioDecodeError('x', new DOMException('Unable to decode audio data', 'EncodingError')).name).toBe('AudioDecodeError');
   expect(audioDecodeError('x', new RangeError('Invalid typed array length')).name).toBe('RangeError');
   expect(audioDecodeError('x').name).toBe('AudioDecodeError');
+});
+
+test('a failure that names no class is recorded under the step that failed, not as a bare Error', () => {
+  const bare = new Error('whatever');
+  expect(encodeFailedError(bare).name).toBe('RedrawFailed');
+  expect(unknownCaptionError(bare).name).toBe('CaptionStepFailed');
+  expect(encodeMemoryError(bare).name).toBe('RedrawFailed');
+  expect(phoneSpeechMemoryError(bare).name).toBe('CaptionStepFailed');
+  // A browser's own class still wins, and a memory failure is still memory.
+  expect(encodeFailedError(new TypeError('x')).name).toBe('TypeError');
+  expect(encodeMemoryError(new Error('Array buffer allocation failed')).name).toBe('OutOfMemoryError');
+});
+
+test('only a start-up that a fresh worker may get past is tried again', () => {
+  for (const name of ['ModelLoadError', 'OutOfMemoryError', 'WorkerCrashError']) expect(restartsOnce({ name })).toBe(true);
+  for (const name of ['ModelDownloadError', 'AudioDecodeError', 'NoSpeechFound', 'SpeechModelError']) expect(restartsOnce({ name })).toBe(false);
 });

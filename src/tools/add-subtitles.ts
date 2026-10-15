@@ -9,6 +9,8 @@ import { describeEdit } from './video-edit-shell';
 import { MODEL_DOWNLOAD_NOTE, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
 import { InputError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
+import { pageRecoveryHooks } from '../lib/recovery-hooks';
+import { withRecovery } from '../lib/edit-recovery';
 
 /**
  * Add subtitles to a video, burned into the picture. The captions come from
@@ -83,11 +85,13 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
   const place = radio('place', 'bottom') as Place;
   const language = str('language', 'auto');
   const saveSrt = bool('save-srt');
-  const { editVideo } = await import('../lib/video-edit');
+  const { assertReadable, editVideo } = await import('../lib/video-edit');
   // Find out now, in a second or two, that this browser cannot encode, not after minutes of transcribing.
   progress.set('Checking this browser can write the video…', 0);
   if (!hasVideoEncoder()) throw new CaptionsUnavailable("Burned-in captions don't work in this browser yet, because it has no video encoder. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.");
   if (!(await ensureH264Encoder())) throw new CaptionsUnavailable();
+  // A video this browser cannot decode (HEVC on some phones, say) is said so now, not after the speech model's download and minutes of transcribing.
+  for (const v of videos) await assertReadable(v.file);
   const outputs: OutputFile[] = [];
   for (const [index, entry] of videos.entries()) {
     const file = entry.file;
@@ -100,13 +104,26 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       const speechModule = await import('../lib/speech');
       releaseSpeechModel = speechModule.releaseSpeechModel;
       // Writing the captions is roughly the first 40% of the work, encoding the rest.
-      const speech = await speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
-        const plain = plainCaptionError(e);
-        // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.
-        const unnamed = !(plain instanceof SpeechError) || ['WorkerCrashError', 'SpeechModelError'].includes(plain.name);
-        if (overPhoneLimit(file.size) && unnamed) throw asMemory(phoneSpeechMemoryError(e));
-        throw plain.name === 'OutOfMemoryError' || plain.name === 'WorkerCrashError' ? asMemory(plain) : plain;
-      });
+      // A phone that was backgrounded while the sound was read or transcribed starts this step again once, when the page is back.
+      const page = pageRecoveryHooks((message) => progress.set(`${file.name}: ${message}`, share(0.01)));
+      let speech;
+      try {
+        speech = await withRecovery(
+          () =>
+            speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
+              const plain = plainCaptionError(e);
+              // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.
+              const unnamed = !(plain instanceof SpeechError) || ['WorkerCrashError', 'SpeechModelError'].includes(plain.name);
+              if (overPhoneLimit(file.size) && unnamed) throw asMemory(phoneSpeechMemoryError(e));
+              throw plain.name === 'OutOfMemoryError' || plain.name === 'WorkerCrashError' ? asMemory(plain) : plain;
+            }),
+          // There is no picture to make smaller in this step.
+          () => 0,
+          page.hooks,
+        );
+      } finally {
+        page.dispose();
+      }
       // The model is no longer needed; free its memory before the video is redrawn.
       speechModule.releaseSpeechModel();
       segments = speech.segments;
@@ -120,6 +137,8 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
     let shown = 0;
     let last: Segment | undefined;
     const r = await editVideo(file, {
+      // After the page was hidden, or an encoder that stopped, the redraw starts again by itself: say so.
+      onNotice: (message) => progress.set(`${file.name}: ${message}`, share(start)),
       readsBack: false,
       paint(ctx, t) {
         const { width, height } = ctx.canvas;
@@ -153,7 +172,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       name: suffixName(file.name, '-subtitled', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
+      note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? " (made at a smaller size, because the device's video encoder stopped at the full size)" : ''}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
     });
     if (saveSrt) outputs.push(srtOutput(file, segments));
   }

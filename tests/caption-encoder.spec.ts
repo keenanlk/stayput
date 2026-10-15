@@ -251,6 +251,7 @@ test.describe('on a phone, with a video over the phone limit', () => {
     await page.locator('#file-input').setInputFiles(talk);
     await page.locator('#run').click();
     await expect(page.locator('#error')).toContainText('Trim the video', { timeout: 90_000 });
-    await expect.poll(() => workers(page)).toEqual({ created: 1, terminated: 1 });
+    // A worker that dies as the model starts is replaced once (a second one that dies too is the answer); both are stopped.
+    await expect.poll(() => workers(page)).toEqual({ created: 2, terminated: 2 });
   });
 });

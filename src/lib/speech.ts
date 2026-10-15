@@ -1,7 +1,7 @@
 import { formatDuration } from './audio';
 import { SPEECH_RATE, speechSamples } from './speech-audio';
 import { clean, cutPoints, type Segment } from './captions';
-import { fromWorker, noSpeechFound, workerCrashError } from './speech-errors';
+import { fromWorker, noSpeechFound, restartsOnce, workerCrashError } from './speech-errors';
 import { SPEECH_MODEL_MB } from '../data/speech-size';
 import { rememberWebgpuFailure, wantsWebgpu } from './speech-path';
 import type { Reply, Request } from './transcribe.worker';
@@ -153,10 +153,14 @@ export async function transcribeFile(
     try {
       found = await recognise(piece.slice(), spoken, opts.task, loading);
     } catch (err) {
-      // A kept model that would not start was dropped by the worker: a fresh worker downloads it again, once.
-      if (modelReady || retriedModel || !(err instanceof Error) || err.name !== 'ModelLoadError') throw err;
+      // Before any piece has been recognised, a model that would not start (a kept copy the worker dropped, or a start-up
+      // that ran out of memory or killed the worker) gets one more try in a fresh worker: a download again, or the model
+      // from the store. Once a piece has been done, a failure is the recording's and is not retried.
+      if (modelReady || retriedModel || !(err instanceof Error) || !restartsOnce(err)) throw err;
       retriedModel = true;
       releaseSpeechModel();
+      // A stopped worker gives its memory back a moment later.
+      await new Promise((done) => setTimeout(done, 1000));
       found = await recognise(piece, spoken, opts.task, loading);
     }
     modelReady = true;
