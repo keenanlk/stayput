@@ -124,12 +124,12 @@ export interface EncodeOptions {
  * first use from this site's own /vendor/ directory, so Chrome and Firefox,
  * which encode natively, never download it.
  */
-interface WebpEncoderModule {
+export interface WebpEncoderModule {
   encode(data: Uint8ClampedArray, width: number, height: number, options: Record<string, number>): Uint8Array | null;
 }
 let webpEncoder: Promise<{ module: WebpEncoderModule; defaults: Record<string, number> }> | undefined;
 
-function loadWebpEncoder() {
+export function loadWebpEncoder() {
   if (!webpEncoder) {
     const dir = vendorDir('webp');
     webpEncoder = (async () => {

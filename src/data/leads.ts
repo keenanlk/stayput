@@ -52,6 +52,7 @@ const does: Record<string, string> = {
   'gif-to-mp4': 'Converts animated GIFs to MP4 video (H.264, with no sound track since GIFs have none), usually much smaller than the GIF.',
   'animated-png-to-gif': 'Converts animated PNG (APNG) files to animated GIF at the same size, keeping each frame’s timing and the loop count, with 256 colours per frame and hard-edged transparency.',
   'gif-to-animated-png': 'Converts animated GIFs to animated PNG (APNG), keeping each frame’s timing, the loop count and transparency.',
+  'gif-to-animated-webp': 'Converts animated GIFs to animated WebP, keeping each frame’s timing and the loop count, as lossy or lossless WebP that is usually far smaller.',
   'compress-video': 'Makes MP4, MOV and WebM videos smaller, or fits them under a size such as 10 MB for Discord or 25 MB for email, and saves an MP4.',
   'video-to-mp4': 'Converts MOV, MKV and WebM videos to MP4.',
   'video-to-webm': 'Converts MP4, MOV and MKV videos to WebM with VP9 (or VP8) video and Opus sound, copying WebM streams as they are, and says so when a browser cannot write WebM.',
@@ -201,6 +202,7 @@ const firstUseEngines = [
   'video-to-mp3', 'merge-audio', 'trim-audio', 'audio-splitter', 'audio-converter', 'compress-audio', 'volume-booster', 'audio-reverser',
   'pitch-changer', 'remove-silence', 'voice-recorder', 'remove-noise', 'file-checksum',
   'archive-extractor', 'unlock-pdf', 'protect-pdf', 'blur-image', 'qr-code-scanner',
+  'gif-to-animated-webp',
 ];
 
 /** The offline badge: after the first visit, or, for tools that fetch an engine on first run, after the first use. */
