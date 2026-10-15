@@ -63,7 +63,11 @@ const MIN_BPP = 0.05;
 
 const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 
-export function unplayable(): string {
+export function unplayable(nav: Pick<Navigator, 'userAgent'> | undefined = typeof navigator === 'undefined' ? undefined : navigator): string {
+  // "Try Safari" does not help on an Android phone, where the clip is usually HEVC or HDR from the camera.
+  if (nav && /Android/i.test(nav.userAgent)) {
+    return 'This phone cannot decode this video. Clips recorded as HEVC (H.265) or HDR often cannot be read in the browser here: in the camera settings turn off "High efficiency video" (HEVC) or HDR, record again or convert the clip to H.264, then add it again.';
+  }
   return 'This browser cannot decode this video. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux cannot read: try Safari, or set the iPhone camera to "Most Compatible".';
 }
 

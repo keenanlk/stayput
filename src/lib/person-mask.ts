@@ -65,6 +65,14 @@ const GPU_RECHECK_FRAMES = 60;
 const GPU_SUSTAINED_SLOW_MS = 250;
 /** One frame taking longer than this, measured when it returns, is a failure of the path it ran on. */
 const FRAME_STALL_MS = 5_000;
+/**
+ * A frame that crosses a hidden page proves nothing: the browser slows a background tab, and a phone stops it. Every time
+ * the page is hidden this goes up, so a frame can tell whether it was interrupted.
+ */
+let hiddenCount = 0;
+if (typeof document !== 'undefined') document.addEventListener('visibilitychange', () => document.hidden && hiddenCount++);
+/** Slow frames in a row, on the processor, before the run is given up: one slow frame is a hiccup, not a verdict. */
+const STALL_FRAMES = 3;
 /** Set once the graphics chip could not run the model; the CPU is used from then on. */
 let gpuFailed = false;
 
@@ -198,6 +206,8 @@ export class Matte {
   /** The chip stopped or was dropped for slowness part way, so the rest ran on the processor. */
   private switched = false;
   private sinceCheck = 0;
+  /** Frames in a row on the processor that took over FRAME_STALL_MS. */
+  private slowStreak = 0;
 
   /** A plain sentence on which path found the people in this video, for the result line. */
   pathNote(): string {
@@ -231,6 +241,7 @@ export class Matte {
     clock += 33;
     let result;
     let began = performance.now();
+    const hiddenBefore = hiddenCount;
     try {
       result = seg.segmentForVideo(this.small, clock);
       // A lost context does not make the engine throw: it returns masks that are wrong. Rerun the frame on the CPU.
@@ -279,15 +290,19 @@ export class Matte {
         drop();
       }
     }
-    if (frameMs > FRAME_STALL_MS) {
+    const interrupted = document.hidden || hiddenCount !== hiddenBefore;
+    if (frameMs <= FRAME_STALL_MS || interrupted) this.slowStreak = 0;
+    if (frameMs > FRAME_STALL_MS && !interrupted) {
       // The frame came back, so it is used; but this path is no good for the rest of the run.
-      if (!onChip) {
-        throw new StageError('PersonFinderStalled', new Error('Finding the person in one frame took more than 5 seconds on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
+      if (!onChip && ++this.slowStreak >= STALL_FRAMES) {
+        throw new StageError('PersonFinderStalled', new Error('Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
       }
-      console.warn('One frame took over 5 seconds on the graphics chip, using the CPU');
-      gpuFailed = true;
-      this.switched = true;
-      drop();
+      if (onChip) {
+        console.warn('One frame took over 5 seconds on the graphics chip, using the CPU');
+        gpuFailed = true;
+        this.switched = true;
+        drop();
+      }
     } else if (onChip && segmenter?.gpu && ++this.sinceCheck >= GPU_RECHECK_FRAMES) {
       this.sinceCheck = 0;
       const recent = this.chipMs.slice(-GPU_RECHECK_FRAMES).sort((a, b) => a - b);

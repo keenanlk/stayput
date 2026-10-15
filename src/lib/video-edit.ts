@@ -32,6 +32,8 @@ import { pickVideoCodec } from './video-codec';
 import { UnreadableFile } from './input-error';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
+import { forgetPageHidden, looksReclaimed } from './wake-lock';
+import { withRecovery, type Attempt } from './edit-recovery';
 
 export interface EditOptions {
   mute?: boolean;
@@ -62,6 +64,8 @@ export interface EditOptions {
   width?: number;
   height?: number;
   onProgress?: (fraction: number) => void;
+  /** Said when the job starts over after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface EditResult {
@@ -80,6 +84,8 @@ export interface EditResult {
   audioDropped: boolean;
   /** For a painted edit: frames done, and milliseconds in `paint` and in all of the frame loop (page-local, never sent). */
   timing?: { frames: number; paintMs: number; loopMs: number };
+  /** Set when the first try failed and this is the second: after the page was hidden, or at a smaller size. */
+  retry?: 'resumed' | 'smaller';
 }
 
 /**
@@ -148,7 +154,66 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
   }
 }
 
+/**
+ * Fails now, with the same message the run would end with, when this browser cannot decode the video: so a tool can say
+ * so before it downloads a model. Anything else is left for the run to report.
+ */
+export async function assertReadable(file: File): Promise<void> {
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  try {
+    const video = await input.getPrimaryVideoTrack().catch(() => null);
+    if (video && !(await video.canDecode().catch(() => true))) throw new UnreadableFile(unplayable());
+  } finally {
+    input.dispose?.();
+  }
+}
+
+/**
+ * Edit a video. A phone that took its codecs back while the page was hidden, or whose encoder gave up (or ran out of
+ * memory) at full size, gets one more try (see edit-recovery.ts) before the failure is shown.
+ */
 export async function editVideo(file: File, opts: EditOptions): Promise<EditResult> {
+  if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) return editVideoOnce(file, opts, {});
+  let hidden = typeof document !== 'undefined' && document.hidden;
+  const note = () => {
+    if (document.hidden) hidden = true;
+  };
+  document.addEventListener('visibilitychange', note);
+  let made = 0;
+  try {
+    return await withRecovery(
+      async (attempt) => {
+        const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
+        return attempt.retry ? { ...r, retry: attempt.retry } : r;
+      },
+      () => made,
+      {
+        wasHidden: () => hidden,
+        forgetHidden: () => {
+          hidden = false;
+          forgetPageHidden();
+        },
+        whenVisible: () =>
+          document.hidden
+            ? new Promise<void>((done) => {
+                const back = () => {
+                  if (document.hidden) return;
+                  document.removeEventListener('visibilitychange', back);
+                  done();
+                };
+                document.addEventListener('visibilitychange', back);
+              })
+            : Promise.resolve(),
+        reclaimed: looksReclaimed,
+        onNotice: opts.onNotice,
+      },
+    );
+  } finally {
+    document.removeEventListener('visibilitychange', note);
+  }
+}
+
+async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const format = await input.getFormat().catch(() => null);
@@ -221,8 +286,15 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       width = (opts.height * baseW) / baseH;
     }
     // Encoders want even sides; H.264 in most browsers also refuses odd ones.
+    // A retry after the encoder gave up asks for a smaller picture than the first try's.
+    if (attempt.maxSide && Math.max(width, height) > attempt.maxSide) {
+      const k = attempt.maxSide / Math.max(width, height);
+      width *= k;
+      height *= k;
+    }
     width = even(width);
     height = even(height);
+    sized?.(Math.max(width, height));
 
     let bitrate: Quality = QUALITY_HIGH;
     if (opts.matchSourceBitrate && duration > 0) {

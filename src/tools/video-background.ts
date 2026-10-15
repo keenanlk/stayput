@@ -136,7 +136,9 @@ createShell({
     progress.set('Checking this browser can write the video…', 0);
     if (!hasVideoEncoder()) throw new EncoderUnavailable();
     await requireH264Encoder();
-    const { editVideo, videoSize } = await import('../lib/video-edit');
+    const { assertReadable, editVideo, videoSize } = await import('../lib/video-edit');
+    // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
+    for (const v of videos) await assertReadable(v.file);
     const which = finder();
     progress.set(`Loading the person finder, once (about ${which === 'fast' ? '12' : '28'} MB)…`, 0.01);
     const { Matte, loadPersonMask } = await import('../lib/person-mask');
@@ -153,6 +155,8 @@ createShell({
       // The first figures of a slow start run long (2 to 3 times too long on a phone), so wait for 8% and 10 s of real work.
       const timeLeft = new TimeLeft(undefined, { minFraction: 0.08, minSeconds: 10 });
       const r = await editVideo(file, {
+        // After the page was hidden, or an encoder that stopped, the run starts again by itself: say so.
+        onNotice: (message) => progress.set(`${file.name}: ${message}`, share(0.03)),
         // The frame is only drawn on and copied from; the person finder reads its own small canvas.
         readsBack: false,
         // Not bigger than it went in: the default quality writes about 70% more bits than a phone does.
@@ -179,7 +183,7 @@ createShell({
         name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
         blob: r.blob,
         originalSize: file.size,
-        note: `${describeEdit(r)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
+        note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? ' (made at a smaller size, because the device\'s video encoder stopped at the full size)' : ''}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
       });
     }
     return outputs;

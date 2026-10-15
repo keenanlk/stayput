@@ -15,6 +15,8 @@ import { SpeechError } from './speech-errors';
 export interface RunGuard {
   /** The page was hidden at any point since the guard started. */
   wasHidden(): boolean;
+  /** Forget that the page was hidden, once a run has been started over from the beginning. */
+  forget(): void;
   /** Give the screen back and stop listening. Safe to call more than once. */
   release(): void;
 }
@@ -28,6 +30,9 @@ let active: RunGuard | undefined;
 
 /** Whether the page went hidden during the run in progress (false when none is). */
 export const pageHiddenDuringRun = (): boolean => active?.wasHidden() ?? false;
+
+/** A run that started over after the page came back is no longer one that was hidden. */
+export const forgetPageHidden = (): void => active?.forget();
 
 export function guardRun(doc: Document = document, nav: Navigator = navigator): RunGuard {
   let hidden = doc.visibilityState === 'hidden';
@@ -60,6 +65,9 @@ export function guardRun(doc: Document = document, nav: Navigator = navigator): 
 
   const guard: RunGuard = {
     wasHidden: () => hidden,
+    forget() {
+      hidden = doc.visibilityState === 'hidden';
+    },
     release() {
       if (done) return;
       done = true;
