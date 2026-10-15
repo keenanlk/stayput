@@ -96,7 +96,7 @@
    ],
    "project": "https://github.com/jamsinclair/jSquash/tree/main/packages/avif",
    "source": "https://github.com/jamsinclair/jSquash/tree/b7fa9ac9ec02f224847ad23d19d115f9e296a368/packages/avif",
-   "shipped": "Decoder served from /vendor/jsquash-avif@2.1.1/ (JavaScript and WebAssembly)",
+   "shipped": "Decoder and encoder served from /vendor/jsquash-avif@2.1.1/ (JavaScript and WebAssembly)",
    "kind": "library"
   },
   {
@@ -1366,14 +1366,14 @@
    ],
    "project": "https://github.com/AOMediaCodec/libavif",
    "source": "https://github.com/AOMediaCodec/libavif/tree/v1.0.1",
-   "shipped": "Compiled to WebAssembly inside avif_dec.wasm",
+   "shipped": "Compiled to WebAssembly inside avif_dec.wasm and avif_enc.wasm",
    "kind": "wasm",
    "via": "jsquash-avif",
    "copyright": "Copyright 2019 Joe Drago"
   },
   {
    "id": "libaom",
-   "name": "libaom (AV1 decoder)",
+   "name": "libaom (AV1 decoder and encoder)",
    "version": "3.7.0",
    "npm": null,
    "licences": [
@@ -1384,7 +1384,7 @@
    ],
    "project": "https://aomedia.googlesource.com/aom/",
    "source": "https://aomedia.googlesource.com/aom/+/refs/tags/v3.7.0",
-   "shipped": "Compiled to WebAssembly inside avif_dec.wasm",
+   "shipped": "Compiled to WebAssembly inside avif_dec.wasm and avif_enc.wasm",
    "kind": "wasm",
    "via": "jsquash-avif",
    "note": "Also covered by the AOMedia Patent License 1.0 in the same repository."
@@ -1402,7 +1402,7 @@
    ],
    "project": "https://chromium.googlesource.com/webm/libwebp/",
    "source": "https://chromium.googlesource.com/webm/libwebp/+/e2c85878f6a33f29948b43d3492d9cdaf801aa54",
-   "shipped": "Compiled to WebAssembly inside avif_dec.wasm",
+   "shipped": "Compiled to WebAssembly inside avif_dec.wasm and avif_enc.wasm",
    "kind": "wasm",
    "via": "jsquash-avif"
   },

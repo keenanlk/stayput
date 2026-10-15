@@ -29,6 +29,18 @@
       "LICENSE": "LICENSE"
     }
   },
+  "avifEnc": {
+    "package": "@jsquash/avif",
+    "version": "2.1.1",
+    "entry": "codec/enc/avif_enc.js",
+    "files": {
+      "meta.js": "meta.js",
+      "utils.js": "utils.js",
+      "codec/enc/avif_enc.js": "codec/enc/avif_enc.js",
+      "codec/enc/avif_enc.wasm": "codec/enc/avif_enc.wasm",
+      "LICENSE": "LICENSE"
+    }
+  },
   "webp": {
     "package": "@jsquash/webp",
     "version": "1.5.0",

@@ -8,6 +8,7 @@ export type OutputType =
   | 'image/jpeg'
   | 'image/png'
   | 'image/webp'
+  | 'image/avif'
   | 'image/gif'
   | 'image/bmp'
   | 'image/tiff'
@@ -37,6 +38,7 @@ export const OUTPUT_FORMATS: OutputFormat[] = [
   { type: 'image/jpeg', label: 'JPG', ext: 'jpg', group: 'Everyday', blurb: 'Opens everywhere. Best for photos you send or upload.', aliases: ['jpeg', 'jfif', 'jpe', 'photo'], alpha: false, quality: true, kind: 'jpeg' },
   { type: 'image/png', label: 'PNG', ext: 'png', group: 'Everyday', blurb: 'Lossless, keeps transparency. Best for screenshots and graphics.', aliases: ['lossless', 'transparent', 'screenshot'], alpha: true, quality: false, kind: 'png' },
   { type: 'image/webp', label: 'WebP', ext: 'webp', group: 'Everyday', blurb: 'About a third smaller than JPG, with transparency. Good for websites.', aliases: ['web', 'google'], alpha: true, quality: true, kind: 'webp' },
+  { type: 'image/avif', label: 'AVIF', ext: 'avif', group: 'Everyday', blurb: 'Smaller than JPG or WebP at the same look, with transparency. Encoding is slow and not every app opens it.', aliases: ['av1', 'next-gen'], alpha: true, quality: true, kind: 'avif' },
   { type: 'application/pdf', label: 'PDF', ext: 'pdf', group: 'Everyday', blurb: 'One page per image, sized to the picture. Good for forms and printing.', aliases: ['document', 'print', 'acrobat'], alpha: false, quality: true, kind: 'pdf' },
   { type: 'image/gif', label: 'GIF', ext: 'gif', group: 'Special purpose', blurb: 'Limited to 256 colours. Animated WebPs stay animated. For chat apps, forums and email signatures.', aliases: ['graphics interchange'], alpha: true, quality: false, kind: 'gif' },
   { type: 'image/x-icon', label: 'ICO', ext: 'ico', group: 'Special purpose', blurb: 'A Windows icon or favicon with sizes from 16 to 256 pixels, padded square.', aliases: ['icon', 'favicon', 'windows icon', 'cur'], alpha: true, quality: false, kind: 'ico' },
