@@ -32,7 +32,7 @@ import { pickVideoCodec } from './video-codec';
 import { UnreadableFile } from './input-error';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
-import { forgetPageHidden, looksReclaimed } from './wake-lock';
+import { pageRecoveryHooks } from './recovery-hooks';
 import { withRecovery, type Attempt } from './edit-recovery';
 
 export interface EditOptions {
@@ -174,11 +174,7 @@ export async function assertReadable(file: File): Promise<void> {
  */
 export async function editVideo(file: File, opts: EditOptions): Promise<EditResult> {
   if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) return editVideoOnce(file, opts, {});
-  let hidden = typeof document !== 'undefined' && document.hidden;
-  const note = () => {
-    if (document.hidden) hidden = true;
-  };
-  document.addEventListener('visibilitychange', note);
+  const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
   try {
     return await withRecovery(
@@ -187,29 +183,10 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
         return attempt.retry ? { ...r, retry: attempt.retry } : r;
       },
       () => made,
-      {
-        wasHidden: () => hidden,
-        forgetHidden: () => {
-          hidden = false;
-          forgetPageHidden();
-        },
-        whenVisible: () =>
-          document.hidden
-            ? new Promise<void>((done) => {
-                const back = () => {
-                  if (document.hidden) return;
-                  document.removeEventListener('visibilitychange', back);
-                  done();
-                };
-                document.addEventListener('visibilitychange', back);
-              })
-            : Promise.resolve(),
-        reclaimed: looksReclaimed,
-        onNotice: opts.onNotice,
-      },
+      page.hooks,
     );
   } finally {
-    document.removeEventListener('visibilitychange', note);
+    page.dispose();
   }
 }
 
