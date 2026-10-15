@@ -8,12 +8,15 @@ import { renderWebpFrames, type WebpAnimation } from './webp-anim';
 import { canvasToBlob, drawScaled, encodeBitmap, fitSize, makeCanvas } from './image';
 import { imagesToPdf } from './pdf';
 import type { OutputType } from './formats';
+import { writeAvif } from './avif-encode';
 
 export interface WriteOptions {
   /** 0..1 */
   quality: number;
   /** Fill for formats without transparency. */
   background: string;
+  /** AVIF only: the "faster encode" setting, the output scale, and a signal that stops the encode. */
+  avif?: { fast?: boolean; scale?: number; signal?: AbortSignal };
 }
 
 function pixels(bitmap: ImageBitmap, width = bitmap.width, height = bitmap.height, background?: string): ImageData {
@@ -188,6 +191,8 @@ export async function writeImage(bitmap: ImageBitmap, type: OutputType, opts: Wr
     case 'image/webp':
       // Only JPG needs the fill; PNG and WebP keep transparent pixels transparent.
       return encodeBitmap(bitmap, { type, quality: opts.quality, background: type === 'image/jpeg' ? opts.background : undefined });
+    case 'image/avif':
+      return writeAvif(bitmap, { quality: opts.quality, ...opts.avif });
     case 'image/bmp':
       return blob(writeBmp(pixels(bitmap, undefined, undefined, opts.background)));
     case 'image/tiff':
