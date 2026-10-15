@@ -5,6 +5,7 @@
  * pictures.
  */
 import { AudioSample, type AudioSampleSource } from 'mediabunny';
+import { isNotReadable } from './read-failure';
 
 export const SAMPLE_RATE = 48_000;
 
@@ -14,10 +15,15 @@ export async function decodePcm(file: Blob): Promise<Float32Array[] | null> {
   try {
     const buffer = await ctx.decodeAudioData(await file.arrayBuffer());
     return Array.from({ length: Math.min(2, buffer.numberOfChannels) }, (_, i) => buffer.getChannelData(i));
-  } catch {
+  } catch (e) {
+    // A file the browser cannot read is not one it cannot decode: say so, as the demuxer would only fail the same way.
+    if (isNotReadable(e)) throw e;
     // Safari refuses a QuickTime .mov whole; its sound track is read through the demuxer instead.
     const { demuxedFileSound } = await import('./demux-audio');
-    return demuxedFileSound(file, SAMPLE_RATE, false).catch(() => null);
+    return demuxedFileSound(file, SAMPLE_RATE, false).catch((err) => {
+      if (isNotReadable(err)) throw err;
+      return null;
+    });
   }
 }
 

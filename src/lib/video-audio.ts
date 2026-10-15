@@ -28,6 +28,7 @@ import { CODEC_NAMES } from './video-compress';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { NoAudioEncoder, registerMp3Fallback } from './mp3-fallback';
 import { UnreadableFile } from './input-error';
+import { isNotReadable } from './read-failure';
 
 export interface AddAudioOptions {
   /** Replace the video's sound, or play both together. */
@@ -55,10 +56,16 @@ const FADE = 1.5;
 const MIX_LEVEL = 0.5;
 
 /** True when the file holds a picture Mediabunny can read. */
+/** A failure to read the file stays that; any other failure to find a track means there is none. */
+function unlessUnreadable(e: unknown): null {
+  if (isNotReadable(e)) throw e;
+  return null;
+}
+
 export async function hasVideo(file: File): Promise<boolean> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    return !!(await input.getPrimaryVideoTrack().catch(() => null));
+    return !!(await input.getPrimaryVideoTrack().catch(unlessUnreadable));
   } finally {
     input.dispose?.();
   }
@@ -67,7 +74,7 @@ export async function hasVideo(file: File): Promise<boolean> {
 export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioOptions): Promise<AddAudioResult> {
   const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
+    const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
     if (!video || !video.codec) throw new UnreadableFile(`${videoFile.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
     const decoderConfig = await video.getDecoderConfig();
     if (!decoderConfig) throw new UnreadableFile(`${videoFile.name} uses a video format this browser cannot copy.`);
