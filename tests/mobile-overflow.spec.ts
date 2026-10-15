@@ -45,6 +45,7 @@ const pages = [
   '/wma-to-mp3',
   '/flv-to-mp4',
   '/3gp-to-mp4',
+  '/avif-to-webp',
 ];
 
 for (const path of pages) {
