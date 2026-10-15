@@ -75,7 +75,15 @@ function ask(audio: Float32Array, language: string | null, task: Request['task']
     };
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);
-    w.postMessage({ id, audio, language, task } satisfies Request, [audio.buffer]);
+    try {
+      w.postMessage({ id, audio, language, task } satisfies Request, [audio.buffer]);
+    } catch {
+      // A worker that cannot be handed the sound (already gone) is a worker that stopped.
+      done();
+      worker = undefined;
+      w.terminate();
+      reject(workerCrashError());
+    }
   });
 }
 
