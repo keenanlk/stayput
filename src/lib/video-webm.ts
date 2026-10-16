@@ -26,6 +26,7 @@ import {
 import { executeWatched } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import type { ConvertOptions, ConvertResult } from './video-convert';
+import { UnreadableFile, NamedError } from './input-error';
 
 const WEBM_VIDEO: string[] = ['vp8', 'vp9', 'av1'];
 const WEBM_AUDIO: string[] = ['opus', 'vorbis'];
@@ -34,7 +35,7 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     const sourceVideo = video.codec;
     const width = video.displayWidth;
     const height = video.displayHeight;
@@ -45,10 +46,10 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
     let copyVideo = !!sourceVideo && WEBM_VIDEO.includes(sourceVideo);
     let best: VideoCodec | null = null;
     if (!copyVideo) {
-      if (!(await video.canDecode())) throw new Error(unplayable());
+      if (!(await video.canDecode())) throw new NamedError('VideoWebmFailed', unplayable());
       best = await getFirstEncodableVideoCodec(['vp9', 'vp8'], { width: evenW, height: evenH, bitrate: QUALITY_HIGH });
       if (!best) {
-        throw new Error('This browser cannot write WebM video (it has no VP8 or VP9 encoder). Use a recent Chrome, Edge or Firefox on a computer.');
+        throw new NamedError('VideoWebmFailed', 'This browser cannot write WebM video (it has no VP8 or VP9 encoder). Use a recent Chrome, Edge or Firefox on a computer.');
       }
     }
     const videoCodec = copyVideo ? sourceVideo! : best!;
@@ -62,7 +63,7 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
         audioCodec = await getFirstEncodableAudioCodec(['opus'], config);
       }
       if (!audioCodec) {
-        throw new Error('This browser cannot convert this file’s sound to Opus, which a WebM needs. Tick Remove the sound to convert the picture alone, or use a recent Chrome, Edge or Firefox.');
+        throw new NamedError('VideoWebmFailed', 'This browser cannot convert this file’s sound to Opus, which a WebM needs. Tick Remove the sound to convert the picture alone, or use a recent Chrome, Edge or Firefox.');
       }
     }
 
@@ -78,14 +79,14 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+      throw new NamedError('VideoWebmFailed', reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
     }
     if (audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack())) {
-      throw new Error('This browser cannot read this file’s sound. Tick Remove the sound to convert the picture alone, or use a recent Chrome, Edge or Firefox.');
+      throw new NamedError('VideoWebmFailed', 'This browser cannot read this file’s sound. Tick Remove the sound to convert the picture alone, or use a recent Chrome, Edge or Firefox.');
     }
     await executeWatched(conversion, opts.onProgress);
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoWebmFailed', 'The video could not be written.');
     return {
       blob: new Blob([buffer], { type: 'video/webm' }),
       width,

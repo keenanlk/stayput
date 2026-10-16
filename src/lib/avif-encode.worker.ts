@@ -8,6 +8,7 @@
  */
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
+import { NamedError } from './input-error';
 
 export interface AvifSettings {
   /** 1..100 */
@@ -48,7 +49,7 @@ self.onmessage = async (e: MessageEvent<Request>) => {
   try {
     const { module, defaults } = await load();
     const out = module.encode(new Uint8Array(rgba.buffer, rgba.byteOffset, rgba.byteLength), width, height, { ...defaults, quality, qualityAlpha, speed });
-    if (!out) throw new Error('The AVIF encoder returned no data.');
+    if (!out) throw new NamedError('AvifEncodeWorkerFailed', 'The AVIF encoder returned no data.');
     // Copy out of the WebAssembly heap before it is reused.
     const bytes = new Uint8Array(out);
     (self as unknown as Worker).postMessage({ id, type: 'done', bytes } satisfies Reply, [bytes.buffer]);

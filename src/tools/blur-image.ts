@@ -3,6 +3,7 @@ import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } fro
 import { suffixName, type OutputFile } from '../lib/files';
 import { apply, effectSize, firstGrapheme, type Effect, type Rect } from '../lib/blur';
 import { findFaces } from '../lib/faces';
+import { InputError, NamedError } from '../lib/input-error';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -294,7 +295,7 @@ const shell = createShell({
     const entry = files[0]!;
     if (!bitmap || !srcW) await showImage(entry.file);
     if (!whole() && areas.length === 0) {
-      throw new Error('Mark at least one area first: drag across the part of the image to hide, or choose "Whole image".');
+      throw new InputError('Mark at least one area first: drag across the part of the image to hide, or choose "Whole image".');
     }
     const type = outputType(entry.file, str('format', 'keep'));
     const quality = num('quality', 92) / 100;
@@ -307,7 +308,7 @@ const shell = createShell({
     render(ctx, 1, whole() ? [{ x: 0, y: 0, w: srcW, h: srcH }] : areas, type === 'image/jpeg' ? '#ffffff' : undefined);
     progress.set('Saving…', 0.8);
     const blob = await canvasToBlob(out, type, type === 'image/png' ? undefined : quality);
-    if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+    if (blob.type !== type) throw new NamedError('BlurImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
     const preview = await createImageBitmap(out);
     const n = whole() ? 'whole image' : `${areas.length} ${areas.length === 1 ? 'area' : 'areas'}`;
     const outs: OutputFile[] = [

@@ -8,6 +8,7 @@ import { vendorEntry } from './vendor';
 import { fromWorkerFailure } from './worker-error';
 import { ProtectedWma } from './wma-errors';
 import type { WmaJob, WmaMessage, WmaTags } from './wma-decode.worker';
+import { NamedError } from './input-error';
 
 /** The ASF header object's GUID (75B22630-668E-11CF-A6D9-00AA0062CE6C), which every WMA, WMV and ASF file starts with. */
 const ASF_HEADER = [0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c];
@@ -48,7 +49,7 @@ export async function decodeWma(file: File, rate: number): Promise<AudioBuffer> 
         if (m.type === 'done') resolve(m);
         else if (m.type === 'error') reject(fromWorkerFailure(m.name, m.message));
       };
-      worker.onerror = (e) => reject(new Error(e.message || 'The WMA decoder stopped unexpectedly.'));
+      worker.onerror = (e) => reject(new NamedError('WmaConvertFailed', e.message || 'The WMA decoder stopped unexpectedly.'));
       const job: WmaJob = { file, entry: vendorEntry('libav-wma'), rate };
       worker.postMessage(job);
     });

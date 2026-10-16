@@ -14,7 +14,7 @@
  * once; the outputs are written without encryption.
  */
 import { vendorDir } from './vendor';
-import { InputError, UnreadableFile } from './input-error';
+import { InputError, UnreadableFile, NamedError } from './input-error';
 
 interface QpdfModule {
   FS: {
@@ -46,12 +46,12 @@ function loadFactory(): Promise<QpdfFactory> {
         // The bundle declares a global `var Module`, which cannot be deleted; clear it instead.
         window.Module = undefined;
         script.remove();
-        if (typeof factory !== 'function') reject(new Error('The PDF unlock engine did not initialise.'));
+        if (typeof factory !== 'function') reject(new NamedError('UnlockFailed', 'The PDF unlock engine did not initialise.'));
         else resolve(factory);
       };
       script.onerror = () => {
         script.remove();
-        reject(new Error('The PDF unlock engine could not be loaded. Check your connection and try again.'));
+        reject(new NamedError('UnlockFailed', 'The PDF unlock engine could not be loaded. Check your connection and try again.'));
       };
       document.head.append(script);
     }).catch((err) => {

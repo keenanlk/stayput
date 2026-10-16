@@ -2,6 +2,7 @@ import { createShell, num, radio, str } from '../lib/shell';
 import { type OutputFile } from '../lib/files';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../lib/audio';
 import { cutPart, parseTimes, partName, planAtTimes, planEvery, SplitError, type Part } from '../lib/audio-split';
+import { NamedError } from '../lib/input-error';
 
 /**
  * Audio splitter. The file is decoded in the page, cut into parts at the times
@@ -96,7 +97,7 @@ const shell = createShell({
     const entry = files[0]!;
     await loading;
     if (!buffer) await load(entry.file);
-    if (!buffer || !buffer.length) throw new Error('No sound could be read from this file.');
+    if (!buffer || !buffer.length) throw new NamedError('AudioSplitterFailed', 'No sound could be read from this file.');
     const parts = plan();
     const chans = channelsOf(buffer, false);
     const fmt = format();

@@ -1,6 +1,7 @@
 import { bool, createShell, processEach, radio } from '../lib/shell';
 import { ocrPdf } from '../lib/ocr-pdf';
 import { suffixName, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 /**
  * OCR a scanned PDF into a searchable one (src/lib/ocr-pdf.ts). Tesseract
@@ -17,7 +18,7 @@ createShell({
       const r = await ocrPdf(new Uint8Array(await entry.file.arrayBuffer()), { redo }, (message, f) =>
         progress.set(`${entry.file.name}: ${message}`, (i + f) / files.length),
       );
-      if (r.read === 0) throw new Error(`All ${plural(r.pages, 'page')} already have text you can search and select, so there was nothing to read. Choose Every page to read them again.`);
+      if (r.read === 0) throw new NamedError('OcrPdfFailed', `All ${plural(r.pages, 'page')} already have text you can search and select, so there was nothing to read. Choose Every page to read them again.`);
       const note = [
         `${plural(r.words, 'word')} found on ${plural(r.read, 'page')}`,
         r.skipped ? `${plural(r.skipped, 'page')} already had text and ${r.skipped === 1 ? 'was' : 'were'} left as ${r.skipped === 1 ? 'it was' : 'they were'}` : '',

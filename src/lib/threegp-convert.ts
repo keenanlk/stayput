@@ -9,6 +9,7 @@ import { fromWorkerFailure } from './worker-error';
 import { watchEncode } from './encoder-watchdog';
 import type { ThreeGpJob, ThreeGpMessage } from './threegp-decode.worker';
 import type { ConvertOptions, ConvertResult } from './video-convert';
+import { NamedError } from './input-error';
 
 /** True when the file is an ISO media file ("ftyp" box) whose major brand is 3GPP or 3GPP2 ("3gp4", "3g2a" and the like), whatever its name says. */
 export async function isThreeGp(file: Blob): Promise<boolean> {
@@ -41,7 +42,7 @@ export async function convertThreeGp(file: File, opts: ConvertOptions): Promise<
               });
             } else reject(fromWorkerFailure(m.name, m.message));
           };
-          worker.onerror = (e) => reject(new Error(e.message || 'The 3GP decoder stopped unexpectedly.'));
+          worker.onerror = (e) => reject(new NamedError('ThreegpConvertFailed', e.message || 'The 3GP decoder stopped unexpectedly.'));
           const job: ThreeGpJob = { file, mute: opts.mute, entry: vendorEntry('libav3gp'), audioEncoder: typeof AudioEncoder !== 'undefined' };
           worker.postMessage(job);
         }),

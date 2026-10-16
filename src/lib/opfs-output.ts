@@ -14,6 +14,7 @@
  */
 import type { StreamTarget, StreamTargetChunk } from 'mediabunny';
 import type { OpfsReply, OpfsRequest } from './opfs-output.worker';
+import { NamedError } from './input-error';
 
 const DIR = 'stayput-outputs';
 const PREFIX = 'stayput-';
@@ -61,8 +62,8 @@ async function hasRoomFor(bytes: number): Promise<boolean> {
 
 function call(worker: Worker, message: OpfsRequest): Promise<void> {
   return new Promise((resolve, reject) => {
-    worker.onmessage = (e: MessageEvent<OpfsReply>) => (e.data.ok ? resolve() : reject(new Error(e.data.error)));
-    worker.onerror = (e) => reject(new Error(e.message || 'Worker error'));
+    worker.onmessage = (e: MessageEvent<OpfsReply>) => (e.data.ok ? resolve() : reject(new NamedError('OpfsOutputFailed', e.data.error)));
+    worker.onerror = (e) => reject(new NamedError('OpfsOutputFailed', e.message || 'Worker error'));
     worker.postMessage(message);
   });
 }

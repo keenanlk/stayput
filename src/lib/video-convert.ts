@@ -31,6 +31,7 @@ import { H264Unavailable } from './encoder-probe';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
+import { UnreadableFile, NamedError } from './input-error';
 
 export interface ConvertOptions {
   mute: boolean;
@@ -74,7 +75,7 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     const sourceVideo = video.codec;
     const width = video.displayWidth;
     const height = video.displayHeight;
@@ -93,11 +94,11 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       // iPhone HEVC in a browser that cannot decode it: MP4 can hold HEVC as it is,
       // which plays on Apple devices, Android and recent Windows.
       if (sourceVideo === 'hevc') copyVideo = true;
-      else throw new Error(unplayable());
+      else throw new NamedError('VideoConvertFailed', unplayable());
     }
     if (!copyVideo && silent) throw silent;
-    if (!copyVideo && !best && mov) throw new Error('This browser cannot write H.264 video, which a MOV needs to play in QuickTime. Use a recent Safari, Chrome or Edge.');
-    if (!copyVideo && !best) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
+    if (!copyVideo && !best && mov) throw new NamedError('VideoConvertFailed', 'This browser cannot write H.264 video, which a MOV needs to play in QuickTime. Use a recent Safari, Chrome or Edge.');
+    if (!copyVideo && !best) throw new NamedError('VideoConvertFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const videoCodec = copyVideo ? sourceVideo! : best!;
     const duration = await input.computeDuration();
 
@@ -124,7 +125,7 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     }
 
     if (mov && sound && !audioCodec) {
-      throw new Error('This browser cannot convert this file’s sound to AAC, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
+      throw new NamedError('VideoConvertFailed', 'This browser cannot convert this file’s sound to AAC, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
     }
 
     const output = new Output({ format: mov ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
@@ -147,12 +148,12 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+      throw new NamedError('VideoConvertFailed', reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
     }
     // The sound track can still be discarded when this browser cannot decode it.
     const soundLost = !!audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack());
     if (soundLost && mov) {
-      throw new Error('This browser cannot read this file’s sound, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
+      throw new NamedError('VideoConvertFailed', 'This browser cannot read this file’s sound, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
     }
     let feeding: Promise<void> | null = null;
     if (pcm) {
@@ -166,7 +167,7 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     await Promise.all([executeWatched(conversion, opts.onProgress), feeding]);
     if (pcm) await output.finalize();
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoConvertFailed', 'The video could not be written.');
     return {
       blob: new Blob([buffer], { type: mov ? 'video/quicktime' : 'video/mp4' }),
       width,

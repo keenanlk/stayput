@@ -3,6 +3,7 @@
  * is parsed. It reads the file itself and sends back the result as a Blob, plus a short preview.
  */
 import { convert, DataError, stripBom, type Converted, type Job } from './csv-json';
+import { NamedError } from './input-error';
 
 export type Request = { id: number; file: File; job: Job; bom: boolean };
 export type Reply =
@@ -20,7 +21,7 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     const type = job.direction === 'json-to-csv' ? 'text/csv;charset=utf-8' : 'application/json';
     post({ id, type: 'done', blob: new Blob(withBom ? [BOM, text] : [text], { type }), summary });
   } catch (err) {
-    const e2 = err instanceof Error ? err : new Error(String(err));
+    const e2 = err instanceof Error ? err : new NamedError('CsvJsonWorkerFailed', String(err));
     post({ id, type: 'error', name: e2.name, message: e2.message, arrays: err instanceof DataError ? err.arrays : undefined });
   }
 };

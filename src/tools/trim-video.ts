@@ -1,5 +1,6 @@
 import { bool, createShell, num } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { NamedError, InputError } from '../lib/input-error';
 
 /**
  * Trim video. The clip plays in the page from a blob: URL so the user can pick
@@ -34,8 +35,8 @@ function once(event: string, timeoutMs: number): Promise<void> {
       fn();
     };
     const ok = () => done(resolve);
-    const bad = () => done(() => reject(new Error('This browser cannot play this video. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux cannot decode: try Safari.')));
-    const timer = setTimeout(() => done(() => reject(new Error(`Timed out waiting for the video (${event}).`))), timeoutMs);
+    const bad = () => done(() => reject(new NamedError('TrimVideoFailed', 'This browser cannot play this video. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux cannot decode: try Safari.')));
+    const timer = setTimeout(() => done(() => reject(new NamedError('TrimVideoFailed', `Timed out waiting for the video (${event}).`))), timeoutMs);
     player.addEventListener(event, ok);
     player.addEventListener('error', bad);
   });
@@ -130,9 +131,9 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     if (!url || !duration) await load(entry.file);
-    if (!duration) throw new Error('Could not tell how long this video is.');
+    if (!duration) throw new InputError('Could not tell how long this video is.');
     const { start, end } = range();
-    if (end <= start) throw new Error('The end time must come after the start time.');
+    if (end <= start) throw new InputError('The end time must come after the start time.');
     player.pause();
     progress.set('Opening the video…', 0);
     const { trimVideo } = await import('../lib/video-trim');

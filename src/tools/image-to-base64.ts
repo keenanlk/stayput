@@ -1,5 +1,6 @@
 import { createShell, processEach } from '../lib/shell';
 import { baseName, formatBytes, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 const results = document.getElementById('b64-results')!;
 
@@ -21,7 +22,7 @@ function mimeOf(file: File): string {
 function readBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onerror = () => reject(reader.error ?? new Error('Could not read the file'));
+    reader.onerror = () => reject(reader.error ?? new NamedError('ImageToBase64Failed', 'Could not read the file'));
     reader.onload = () => {
       const url = String(reader.result);
       resolve(url.slice(url.indexOf(',') + 1));

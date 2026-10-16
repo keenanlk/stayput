@@ -7,6 +7,7 @@ import { detectKind, kindFromName, KIND_LABEL, type ImageKind } from '../lib/det
 import { GROUPS, outputFormat, searchFormats, type OutputFormat, type OutputType } from '../lib/formats';
 import { extractExifTiff, jpegWithExif, withNormalOrientation } from '../lib/exif';
 import { extOf, replaceExt, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 bindRange('quality', 'quality-out');
 
@@ -248,7 +249,7 @@ let abortAvif = new AbortController();
 document.getElementById('avif-cancel')!.addEventListener('click', () => abortAvif.abort());
 
 function cancelledError(): Error {
-  const e = new Error('Cancelled. Nothing was converted.');
+  const e = new NamedError('ConvertImageFailed', 'Cancelled. Nothing was converted.');
   e.name = 'AbortError';
   return e;
 }
@@ -269,7 +270,7 @@ createShell({
     const verb = avif ? 'Encoding AVIF (this can take a while)' : 'Converting';
     const result = await processEach(files, progress, verb, async (entry) => {
       if (avif?.signal.aborted) throw cancelledError();
-      if ((await detectKind(entry.file)) === 'pdf') throw new Error('This is a PDF, not an image. Use PDF to Image to turn its pages into pictures.');
+      if ((await detectKind(entry.file)) === 'pdf') throw new NamedError('ConvertImageFailed', 'This is a PDF, not an image. Use PDF to Image to turn its pages into pictures.');
       const decoded = await decodeImage(entry.file);
       // An animated WebP stays animated as a GIF; every other path keeps the first frame.
       const anim = type === 'image/gif' && (await detectKind(entry.file)) === 'webp' ? parseAnimatedWebp(new Uint8Array(await entry.file.arrayBuffer())) : undefined;

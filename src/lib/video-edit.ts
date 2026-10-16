@@ -29,7 +29,7 @@ import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
-import { UnreadableFile } from './input-error';
+import { UnreadableFile, NamedError } from './input-error';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
@@ -93,7 +93,7 @@ export interface EditResult {
  * whole video), otherwise a buffer in memory as before.
  */
 /** An error with its own class name, so a failed run records which step it was (never the message). */
-const failure = (name: string, message: string) => Object.assign(new Error(message), { name });
+const failure = (name: string, message: string) => Object.assign(new NamedError('VideoEditFailed', message), { name });
 
 async function outputTarget(inputBytes: number) {
   const disk = await openOpfsOutput(inputBytes);

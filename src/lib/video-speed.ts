@@ -27,7 +27,7 @@ import { pickVideoCodec } from './video-codec';
 import { timeStretch } from './stretch';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError } from './input-error';
+import { InputError, UnreadableFile, NamedError } from './input-error';
 
 export interface SpeedOptions {
   /** 2 plays twice as fast, 0.5 at half speed. */
@@ -54,13 +54,13 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    if (!(await video.canDecode())) throw new Error(unplayable());
+    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    if (!(await video.canDecode())) throw new NamedError('VideoSpeedFailed', unplayable());
     const duration = await input.computeDuration();
     const width = video.codedWidth;
     const height = video.codedHeight;
     const videoCodec = await pickVideoCodec({ width: width + (width % 2), height: height + (height % 2), bitrate: QUALITY_HIGH });
-    if (!videoCodec) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
+    if (!videoCodec) throw new NamedError('VideoSpeedFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
 
     // The sound, stretched to the new length at the same pitch.
     let sound: Float32Array[] | null = null;
@@ -122,7 +122,7 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
       () => output.cancel(),
     );
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoSpeedFailed', 'The video could not be written.');
     opts.onProgress?.(1);
     const quarter = video.rotation === 90 || video.rotation === 270;
     return {

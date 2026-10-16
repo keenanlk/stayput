@@ -13,6 +13,7 @@ import { workerFailure } from './worker-error';
 import { fetchResumable, wholeOrNull } from './model-fetch';
 import { KEPT_FRAMES, PITCHES, WINDOW_FRAMES, WINDOW_SAMPLES, framesFor, notesFromActivations, windowAt, windowCount } from './basic-pitch';
 import type { MidiNote } from './midi';
+import { NamedError } from './input-error';
 
 export const MODEL_URL = '/models/nmp.onnx';
 const MODEL_BYTES = 230_444;
@@ -30,11 +31,11 @@ let loaded: Promise<Loaded> | undefined;
 
 async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
   const res = await fetchResumable((i, o) => fetch(i, o), MODEL_URL, undefined, (got, total) => total && onProgress(Math.min(1, got / total)));
-  if (!res.ok) throw new Error(`The note model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
+  if (!res.ok) throw new NamedError('ModelDownloadError', `The note model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
   const whole = await wholeOrNull(res);
-  if (!whole) throw new Error('The note model download stopped short. Check your connection and try again.');
+  if (!whole) throw new NamedError('BasicPitchWorkerFailed', 'The note model download stopped short. Check your connection and try again.');
   const bytes = new Uint8Array(await whole.arrayBuffer());
-  if (bytes.length !== MODEL_BYTES) throw new Error('The note model file is not the expected size. Reload the page and try again.');
+  if (bytes.length !== MODEL_BYTES) throw new NamedError('BasicPitchWorkerFailed', 'The note model file is not the expected size. Reload the page and try again.');
   return bytes;
 }
 
@@ -58,7 +59,7 @@ self.onmessage = async (e: MessageEvent<Request>) => {
   try {
     const { ort, session } = await load((fraction) => post({ id, type: 'loading', fraction }));
     // The file's outputs are, in order, the contour (264 values a frame), the note activation and the onset (88 each).
-    if (session.outputNames.length !== 3) throw new Error('The note model has an unexpected shape.');
+    if (session.outputNames.length !== 3) throw new NamedError('BasicPitchWorkerFailed', 'The note model has an unexpected shape.');
     const count = windowCount(audio.length);
     const nFrames = Math.min(framesFor(audio.length), count * KEPT_FRAMES);
     const frames = new Float32Array(count * KEPT_FRAMES * PITCHES);

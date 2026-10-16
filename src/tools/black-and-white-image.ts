@@ -2,6 +2,7 @@ import { createShell, processEach, bindRange, num, str, radio } from '../lib/she
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { toMono, type MonoMode } from '../lib/mono';
+import { NamedError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('mono-panel');
@@ -80,7 +81,7 @@ const shell = createShell({
       try {
         const { canvas: c } = render(decoded.bitmap, m, 1, type === 'image/jpeg' ? '#ffffff' : undefined);
         const blob = await canvasToBlob(c, type, type === 'image/png' ? undefined : quality);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+        if (blob.type !== type) throw new NamedError('BlackAndWhiteImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         const bmp = await createImageBitmap(c);
         const out: OutputFile = {
           name: suffixName(entry.file.name, suffix, extForType(type)),

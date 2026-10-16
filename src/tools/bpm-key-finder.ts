@@ -1,6 +1,7 @@
 import { createShell, type ShellFile, type Skipped } from '../lib/shell';
 import { channelsOf, decodeAudio, formatDuration } from '../lib/audio';
-import { InputError, UnreadableFile } from '../lib/input-error';
+import { InputError, UnreadableFile, NamedError } from '../lib/input-error';
+import { fromWorkerFailure } from '../lib/worker-error';
 import { tempoName } from '../lib/metronome';
 import { alsoReadAs, confidenceLabel, keyName, relativeOf, camelot, resultsCsv, type KeyResult, type ResultRow, type TempoResult } from '../lib/bpm-key';
 import type { Reply } from '../lib/bpm-key.worker';
@@ -137,14 +138,14 @@ function analyseInWorker(mono: Float32Array): Promise<{ tempo: TempoResult | nul
       if (event.data.id !== id) return;
       w.removeEventListener('message', done);
       w.removeEventListener('error', failed);
-      if ('error' in event.data) reject(new Error(event.data.error));
+      if ('error' in event.data) reject(fromWorkerFailure(event.data.name, event.data.error));
       else resolve({ tempo: event.data.tempo, key: event.data.key });
     };
     const failed = () => {
       w.removeEventListener('message', done);
       w.removeEventListener('error', failed);
       worker = undefined;
-      reject(new Error('The analysis stopped unexpectedly. Reload the page and try again, or use a shorter file.'));
+      reject(new NamedError('BpmKeyFinderFailed', 'The analysis stopped unexpectedly. Reload the page and try again, or use a shorter file.'));
     };
     w.addEventListener('message', done);
     w.addEventListener('error', failed);

@@ -2,7 +2,7 @@ import { createShell, str } from '../lib/shell';
 import type { OutputFile } from '../lib/files';
 import { SAMPLE_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, formatDuration, type Bitrate } from '../lib/audio';
 import { joinParts, parseBetween } from '../lib/audio-merge';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 
 /**
  * Merge audio. Each file is decoded by the browser at 44.1 kHz, the sounds are
@@ -29,7 +29,7 @@ createShell({
       try {
         parts.push(channelsOf(await decodeAudio(entry.file, SAMPLE_RATE), false));
       } catch (e) {
-        throw new Error(`${entry.file.name}: ${e instanceof Error ? e.message : String(e)}`);
+        throw new NamedError('MergeAudioFailed', `${entry.file.name}: ${e instanceof Error ? e.message : String(e)}`);
       }
     }
     progress.set('Joining…', 0.42);

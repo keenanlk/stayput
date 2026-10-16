@@ -33,6 +33,7 @@ import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { overPhoneLimit, PHONE_SAFE_BYTES, TRIM_LINK } from './phone-limit';
 import { AVI_LIMIT_BYTES, AviTooLarge, avcConfig, avcToAnnexB, writeAvi, type AviAudio, type AviFrame } from './avi-write';
+import { NamedError, UnreadableFile } from './input-error';
 
 export interface AviOptions {
   mute: boolean;
@@ -94,7 +95,7 @@ function oversize(bytes: number): AviTooLarge {
 }
 
 function phoneRefusal(bytes: number): Error {
-  const e = new Error(
+  const e = new NamedError('VideoToAviFailed', 
     `This job is about ${(bytes / 1e6).toFixed(0)} MB. A phone can run out of memory converting more than about ${PHONE_SAFE_BYTES / 1e6} MB to AVI. Trim the video first, or use a computer.`,
   ) as Error & { link?: typeof TRIM_LINK };
   e.link = TRIM_LINK;
@@ -105,8 +106,8 @@ export async function convertToAvi(file: File, opts: AviOptions): Promise<AviRes
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
-    if (!(await video.canDecode())) throw new Error(unplayable());
+    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    if (!(await video.canDecode())) throw new NamedError('VideoToAviFailed', unplayable());
     const width = even(video.displayWidth);
     const height = even(video.displayHeight);
     const duration = await input.computeDuration();
@@ -286,7 +287,7 @@ async function jpegFrames(
       stop = true;
     },
   );
-  if (!frames.length) throw new Error('No picture could be read from this video.');
+  if (!frames.length) throw new NamedError('VideoToAviFailed', 'No picture could be read from this video.');
   return frames;
 }
 
@@ -295,7 +296,7 @@ async function canvasJpeg(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<
     'convertToBlob' in canvas
       ? await canvas.convertToBlob({ type: 'image/jpeg', quality: JPEG_QUALITY })
       : await new Promise<Blob | null>((resolve) => (canvas as HTMLCanvasElement).toBlob(resolve, 'image/jpeg', JPEG_QUALITY));
-  if (!blob || blob.type !== 'image/jpeg') throw new Error('This browser cannot write JPEG pictures.');
+  if (!blob || blob.type !== 'image/jpeg') throw new NamedError('VideoToAviFailed', 'This browser cannot write JPEG pictures.');
   return new Uint8Array(await blob.arrayBuffer());
 }
 
@@ -322,7 +323,7 @@ async function h264Frames(o: {
     return null;
   });
   if (silent) throw silent;
-  if (!codec) throw new Error('This browser cannot write H.264 video. Tick Maximum compatibility to write Motion JPEG instead, or use a recent Safari, Chrome or Edge.');
+  if (!codec) throw new NamedError('VideoToAviFailed', 'This browser cannot write H.264 video. Tick Maximum compatibility to write Motion JPEG instead, or use a recent Safari, Chrome or Edge.');
 
   // Sound: MP3 from the page's own encoder. A decoder-less browser (iOS 18 and earlier) has the page's decoder feed it instead.
   let wantSound = false;
@@ -351,7 +352,7 @@ async function h264Frames(o: {
   });
   if (!conversion.isValid) {
     const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-    throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+    throw new NamedError('VideoToAviFailed', reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
   }
   let feeding: Promise<void> | null = null;
   if (pcm) {
@@ -365,22 +366,22 @@ async function h264Frames(o: {
   await Promise.all([executeWatched(conversion, (f) => o.onProgress(f * 0.9)), feeding]);
   if (pcm) await output.finalize();
   const buffer = output.target.buffer;
-  if (!buffer) throw new Error('The video could not be written.');
+  if (!buffer) throw new NamedError('VideoToAviFailed', 'The video could not be written.');
 
   // Read the new MP4 back, packet by packet.
   const temp = new Input({ source: new BufferSource(buffer), formats: [MP4] });
   try {
     const vTrack = await temp.getPrimaryVideoTrack();
-    if (!vTrack) throw new Error('The video could not be written.');
+    if (!vTrack) throw new NamedError('VideoToAviFailed', 'The video could not be written.');
     const config = await vTrack.getDecoderConfig();
     const description = config?.description;
-    if (!description) throw new Error('This browser wrote H.264 video this page cannot read back.');
+    if (!description) throw new NamedError('VideoToAviFailed', 'This browser wrote H.264 video this page cannot read back.');
     const desc = ArrayBuffer.isView(description) ? new Uint8Array(description.buffer, description.byteOffset, description.byteLength) : new Uint8Array(description);
     const { lengthSize, parameterSets } = avcConfig(desc);
     const frames: AviFrame[] = [];
     let lastTs = -Infinity;
     for await (const packet of new EncodedPacketSink(vTrack).packets()) {
-      if (packet.timestamp < lastTs) throw new Error('This browser wrote H.264 video with reordered frames, which AVI cannot hold. Tick Maximum compatibility to write Motion JPEG instead.');
+      if (packet.timestamp < lastTs) throw new NamedError('VideoToAviFailed', 'This browser wrote H.264 video with reordered frames, which AVI cannot hold. Tick Maximum compatibility to write Motion JPEG instead.');
       lastTs = packet.timestamp;
       const key = packet.type === 'key';
       frames.push({ data: avcToAnnexB(packet.data, lengthSize, key ? parameterSets : null), key });

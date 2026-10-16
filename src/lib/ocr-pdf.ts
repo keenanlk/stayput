@@ -9,6 +9,7 @@ import type * as PdfLib from 'pdf-lib';
 import { closePdfJs, getTextContent, loadDocument, loadPdfLib, openWithPdfJs } from './pdf';
 import { readWords } from './ocr';
 import { placeWords, winAnsi } from './ocr-layer';
+import { NamedError } from './input-error';
 
 export interface OcrPdfOptions {
   /** Read pages that already have text too, instead of leaving them as they are. */
@@ -71,7 +72,7 @@ export async function ocrPdf(
       canvas.width = Math.max(1, Math.round(viewport.width));
       canvas.height = Math.max(1, Math.round(viewport.height));
       const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Canvas is not available in this browser.');
+      if (!ctx) throw new NamedError('OcrPdfFailed', 'Canvas is not available in this browser.');
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       await page.render({ canvas, canvasContext: ctx, viewport }).promise;

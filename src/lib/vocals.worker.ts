@@ -11,6 +11,7 @@ import type { InferenceSession, Tensor } from 'onnxruntime-web';
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
 import { INST_HQ_3, Mdx, separate } from './mdx';
+import { NamedError } from './input-error';
 
 export const MODEL_URL = '/models/uvr-mdx-net-inst-hq-3.onnx';
 /** The model's instrumental comes out slightly quiet; UVR scales it by this. */
@@ -29,7 +30,7 @@ let loaded: Promise<Loaded> | undefined;
 
 async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
   const res = await fetch(MODEL_URL);
-  if (!res.ok || !res.body) throw new Error(`The separation model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
+  if (!res.ok || !res.body) throw new NamedError('ModelDownloadError', `The separation model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
   const total = Number(res.headers.get('content-length')) || 0;
   const reader = res.body.getReader();
   const parts: Uint8Array[] = [];

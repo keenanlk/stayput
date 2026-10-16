@@ -3,7 +3,7 @@ import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } fro
 import { suffixName, type OutputFile } from '../lib/files';
 import { drawText, loadFont } from '../lib/image-text';
 import { createTextStage } from '../lib/text-stage';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 
 bindRange('quality', 'quality-out');
 const stage = createTextStage();
@@ -55,7 +55,7 @@ const shell = createShell({
       ctx.drawImage(decoded.bitmap, 0, 0);
       drawText(ctx, c.width, c.height, list, s);
       const blob = await canvasToBlob(c, type, type === 'image/png' ? undefined : quality);
-      if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+      if (blob.type !== type) throw new NamedError('AddTextToImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
       const bmp = await createImageBitmap(c);
       const out: OutputFile = {
         name: suffixName(entry.file.name, '-text', extForType(type)),

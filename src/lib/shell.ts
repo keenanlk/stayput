@@ -15,6 +15,7 @@ import { takeHandoff } from './handoff';
 import { releaseOutput } from './opfs-output';
 import { guardRun, interruptedError, KEEP_SCREEN_ON_HINT } from './wake-lock';
 import { isIosBrowser, isPhoneBrowser } from './phone-limit';
+import { NamedError } from './input-error';
 
 export interface ShellFile {
   id: number;
@@ -59,7 +60,7 @@ export interface ShellOptions {
 
 const $ = <T extends HTMLElement>(id: string): T => {
   const el = document.getElementById(id);
-  if (!el) throw new Error(`Missing element #${id}`);
+  if (!el) throw new NamedError('ShellFailed', `Missing element #${id}`);
   return el as T;
 };
 
@@ -109,7 +110,7 @@ export function describeError(file: File, e: unknown): string {
 
 /** The same message tools have always shown (prefixed with the file name), carrying the original error's class name so analytics can tell failures apart. */
 function rewrap(file: File, e: unknown): Error {
-  const out = new Error(describeError(file, e));
+  const out = new NamedError('ShellFailed', describeError(file, e));
   if (e instanceof Error && e.name) out.name = e.name;
   const link = (e as { link?: { href: string; text: string } } | null)?.link;
   if (link) (out as Error & { link?: typeof link }).link = link;
@@ -488,7 +489,7 @@ export function createShell(opts: ShellOptions) {
       const result = await opts.process(files, progressApi);
       const outs = Array.isArray(result) ? result : result.outputs;
       const skipped = Array.isArray(result) ? [] : result.skipped;
-      if (outs.length === 0) throw new Error('Nothing was produced. Check the options and try again.');
+      if (outs.length === 0) throw new NamedError('ShellFailed', 'Nothing was produced. Check the options and try again.');
       showResults(outs);
       const firstOk = !!attempt && !attempt.ok;
       if (attempt) attempt.ok = true;
@@ -508,7 +509,7 @@ export function createShell(opts: ShellOptions) {
       // Work finished before the failure (captions written before the video could be redrawn) stays downloadable.
       const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
       if (salvage?.length) showResults(salvage, false);
-      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e) });
+      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e, tool) });
     } finally {
       mine?.release();
       setBusy(false);

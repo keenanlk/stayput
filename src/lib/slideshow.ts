@@ -8,7 +8,7 @@ import { AudioSample, AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, 
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
 import { pickVideoCodec } from './video-codec';
-import { InputError, UnreadableFile } from './input-error';
+import { InputError, UnreadableFile, NamedError } from './input-error';
 import { EncoderRefused, EncoderUnavailable } from './encoder-probe';
 import { SAMPLE_RATE, decodePcm, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
@@ -181,7 +181,7 @@ async function encode(
   }
   release();
   const buffer = output.target.buffer;
-  if (!buffer) throw new Error('The video could not be written.');
+  if (!buffer) throw new NamedError('SlideshowFailed', 'The video could not be written.');
   opts.onProgress?.(1);
   return { blob: new Blob([buffer], { type: 'video/mp4' }), ...frame, duration: total, videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec };
 }

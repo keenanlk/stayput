@@ -30,7 +30,7 @@ import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError } from './input-error';
+import { InputError, NamedError } from './input-error';
 import { copyClipSound, pictureLength } from './video-merge';
 import { estimateMemory, memoryVerdict, outputFps, outputSeconds, planSideBySide, type Plan, type SbsFit, type SbsLayout, type SbsLength, type SbsSound } from './side-by-side-plan';
 
@@ -73,7 +73,7 @@ async function openClip(file: File): Promise<Clip> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   const track = await input.getPrimaryVideoTrack().catch(() => null);
   if (!track) throw new InputError(`${file.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
-  if (!(await track.canDecode())) throw new Error(`${file.name}: ${unplayable()}`);
+  if (!(await track.canDecode())) throw new NamedError('VideoSideBySideFailed', `${file.name}: ${unplayable()}`);
   const { first, length } = await pictureLength(track);
   if (length <= 0) throw new InputError(`${file.name} has no picture to show.`);
   const stats = await track.computePacketStats(120).catch(() => null);
@@ -121,7 +121,7 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
     if (refusal) throw new InputError(refusal);
 
     const videoCodec = await pickVideoCodec({ width: plan.width, height: plan.height, bitrate: QUALITY_HIGH });
-    if (!videoCodec) throw new Error('This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
+    if (!videoCodec) throw new NamedError('VideoSideBySideFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
     // Sound: A's, B's, or both mixed, cut or padded with silence to the output's length.
     let audioNote = '';
@@ -232,7 +232,7 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
       () => output.cancel(),
     );
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoSideBySideFailed', 'The video could not be written.');
     opts.onProgress?.(1);
     return {
       blob: new Blob([buffer], { type: 'video/mp4' }),

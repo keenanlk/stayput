@@ -17,7 +17,7 @@
  */
 import type { ImageSegmenter } from '@mediapipe/tasks-vision';
 import { vendorDir } from './vendor';
-import { StageError } from './input-error';
+import { StageError, NamedError } from './input-error';
 
 /** Roll-back switch: false puts every finder back on the CPU delegate. */
 const GPU_FOR_EDGES = true;
@@ -143,7 +143,7 @@ function load(model: string): Promise<ImageSegmenter> {
   return mine.ready.catch((e) => {
     if (isAbort(e)) throw new MemoryError();
     // Whatever stopped the person finder from starting is one kind, and the message stays as it was.
-    const failed = new Error(e instanceof Error && e.message ? e.message : 'The person finder could not be started in this browser.');
+    const failed = new NamedError('PersonMaskFailed', e instanceof Error && e.message ? e.message : 'The person finder could not be started in this browser.');
     failed.name = 'ModelLoadError';
     throw failed;
   });
@@ -154,7 +154,7 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
     const webgl = probeWebGL();
-    if (!webgl.any) throw new Error('The person finder needs WebGL, which this browser does not provide. Turn on hardware acceleration in the browser settings, or use an up-to-date Chrome, Edge, Firefox or Safari.');
+    if (!webgl.any) throw new NamedError('PersonMaskFailed', 'The person finder needs WebGL, which this browser does not provide. Turn on hardware acceleration in the browser settings, or use an up-to-date Chrome, Edge, Firefox or Safari.');
     const make = async (delegate: 'CPU' | 'GPU') => {
       const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
       return ImageSegmenter.createFromOptions(fileset, {
@@ -168,7 +168,7 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
       try {
         // A chip whose graphics cannot be set up may never answer, rather than fail: give it a while, then move on.
         let timer: ReturnType<typeof setTimeout> | undefined;
-        const late = new Promise<never>((_, no) => (timer = setTimeout(() => no(new Error('The graphics chip did not start the person finder in time')), GPU_START_MS)));
+        const late = new Promise<never>((_, no) => (timer = setTimeout(() => no(new NamedError('PersonMaskFailed', 'The graphics chip did not start the person finder in time')), GPU_START_MS)));
         const seg = await Promise.race([make('GPU'), late]).finally(() => clearTimeout(timer));
         holder.gpu = true;
         holder.frameMs = [];
@@ -266,7 +266,7 @@ export class Matte {
       result = seg.segmentForVideo(this.small, clock);
     }
     const found = result.confidenceMasks?.[0];
-    if (!found) throw new Error('The person finder returned no mask.');
+    if (!found) throw new NamedError('PersonMaskFailed', 'The person finder returned no mask.');
     const conf = found.getAsFloat32Array();
     const frameMs = performance.now() - began;
     const onChip = !!segmenter?.gpu;
@@ -295,7 +295,7 @@ export class Matte {
     if (frameMs > FRAME_STALL_MS && !interrupted) {
       // The frame came back, so it is used; but this path is no good for the rest of the run.
       if (!onChip && ++this.slowStreak >= STALL_FRAMES) {
-        throw new StageError('PersonFinderStalled', new Error('Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
+        throw new StageError('PersonFinderStalled', new NamedError('PersonMaskFailed', 'Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
       }
       if (onChip) {
         console.warn('One frame took over 5 seconds on the graphics chip, using the CPU');

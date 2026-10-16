@@ -40,8 +40,17 @@ export class StageError extends Error {
  * for throw sites that have no caught error to hand to StageError.
  */
 export class NamedError extends Error {
-  constructor(name: string, message: string) {
-    super(message);
+  constructor(name: string, message: string, options?: ErrorOptions) {
+    super(message, options);
     this.name = name;
   }
+}
+
+/**
+ * True for an error that does not yet say what went wrong: a plain Error, or a NamedError that only carries
+ * its file's default name (those end in "Failed"). Code that wraps a step's failure in the step's own name
+ * uses this to decide whether the error already has a better one.
+ */
+export function isUnspecific(e: unknown): boolean {
+  return e instanceof Error && (e.name === 'Error' || (e instanceof NamedError && /Failed$/.test(e.name)));
 }

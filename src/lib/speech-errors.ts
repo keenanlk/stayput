@@ -4,6 +4,7 @@
  * message that says what to try next. Shared by the main thread and the
  * Whisper worker, so a name survives the trip across postMessage.
  */
+import { NamedError, isUnspecific } from './input-error';
 
 export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound'] as const;
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
@@ -65,7 +66,7 @@ export const phoneSpeechMemoryError = (cause?: unknown) => {
 };
 /** The redraw failed for a reason no one named, after the captions were written: say so, and that the subtitles are ready. */
 export function encodeFailedError(cause: unknown): Error {
-  const err = new Error('The video could not be redrawn with captions. Your subtitles are ready: download the .srt below, then try a shorter video or another file.');
+  const err = new NamedError('RedrawFailed', 'The video could not be redrawn with captions. Your subtitles are ready: download the .srt below, then try a shorter video or another file.');
   // A bare `Error` from the encoder or demuxer says nothing, so the step is the name.
   err.name = classNameOf(cause, 'RedrawFailed');
   err.cause = cause;
@@ -102,7 +103,7 @@ export function fromWorker(name: string, message: string): SpeechError {
  * a failed run still records what went wrong; the original message is not shown.
  */
 export function unknownCaptionError(e: unknown): Error {
-  const err = new Error('Something went wrong while writing the captions. Reload the page and try again, or try a shorter video or another file.');
+  const err = new NamedError('CaptionStepFailed', 'Something went wrong while writing the captions. Reload the page and try again, or try a shorter video or another file.');
   err.name = classNameOf(e, 'CaptionStepFailed');
   err.cause = e;
   return err;
@@ -110,7 +111,7 @@ export function unknownCaptionError(e: unknown): Error {
 
 /** An error's class name when it looks like a specific one, else the fallback (a bare Error or TypeError says nothing): the only part of a failure that is recorded. */
 function classNameOf(e: unknown, fallback = 'Error'): string {
-  return e instanceof Error && e.name !== 'Error' && e.name !== 'TypeError' && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(e.name) ? e.name : fallback;
+  return e instanceof Error && !isUnspecific(e) && e.name !== 'TypeError' && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(e.name) ? e.name : fallback;
 }
 
 /** The error to show for a failed caption step: our own named errors pass through, the rest become plain ones. */

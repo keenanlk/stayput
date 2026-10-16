@@ -3,10 +3,11 @@
  * array of samples at 44,100 Hz (transferred, so the page no longer has it) and
  * returns two small result objects; it never sees the file or its name.
  */
+import { workerFailure } from './worker-error';
 import { analyse, type KeyResult, type TempoResult } from './bpm-key';
 
 export type Request = { id: number; mono: Float32Array };
-export type Reply = { id: number; tempo: TempoResult | null; key: KeyResult | null } | { id: number; error: string };
+export type Reply = { id: number; tempo: TempoResult | null; key: KeyResult | null } | { id: number; error: string; name?: string };
 
 self.onmessage = (event: MessageEvent<Request>) => {
   const { id, mono } = event.data;
@@ -14,6 +15,6 @@ self.onmessage = (event: MessageEvent<Request>) => {
     const { tempo, key } = analyse(mono);
     (self as unknown as Worker).postMessage({ id, tempo, key } satisfies Reply);
   } catch (e) {
-    (self as unknown as Worker).postMessage({ id, error: e instanceof Error ? e.message : String(e) } satisfies Reply);
+    (self as unknown as Worker).postMessage({ id, error: e instanceof Error ? e.message : String(e), name: workerFailure(e).name } satisfies Reply);
   }
 };

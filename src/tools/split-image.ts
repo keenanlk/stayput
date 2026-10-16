@@ -2,7 +2,7 @@ import { createShell, processEach, bindRange, num, str, radio } from '../lib/she
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { baseName, type OutputFile } from '../lib/files';
 import { planGrid, type TileShape } from '../lib/image-grid';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('grid-panel');
@@ -127,7 +127,7 @@ const shell = createShell({
         }
         ctx.drawImage(bmp, t.x, t.y, t.w, t.h, 0, 0, t.w, t.h);
         const blob = await canvasToBlob(tile, type, type === 'image/png' ? undefined : quality);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+        if (blob.type !== type) throw new NamedError('SplitImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         const thumb = await createImageBitmap(tile);
         outs.push({
           name: `${baseName(entry.file.name)}-${String(n).padStart(pad, '0')}.${extForType(type)}`,

@@ -2,6 +2,7 @@ import { createShell, processEach, bindRange, num, str, radio } from '../lib/she
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { upscaleImage } from '../lib/upscale';
+import { NamedError } from '../lib/input-error';
 
 bindRange('quality', 'quality-out');
 
@@ -31,7 +32,7 @@ createShell({
         });
         progress.set(`Saving ${entry.file.name}…`, share(0.95));
         const blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : quality);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+        if (blob.type !== type) throw new NamedError('UpscaleImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         const bmp = await createImageBitmap(canvas);
         const capped = made < factor - 0.01 ? `, held to ${fmt(made)} (the largest a browser can hold)` : '';
         const out: OutputFile = {

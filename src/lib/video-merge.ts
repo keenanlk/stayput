@@ -32,7 +32,7 @@ import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError } from './input-error';
+import { InputError, NamedError } from './input-error';
 
 export interface MergeOptions {
   mute: boolean;
@@ -94,15 +94,15 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
     const clips: { track: InputVideoTrack; first: number; length: number; name: string }[] = [];
     for (const [i, input] of inputs.entries()) {
       const track = await input.getPrimaryVideoTrack().catch(() => null);
-      if (!track) throw new Error(`${files[i]!.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
-      if (!(await track.canDecode())) throw new Error(`${files[i]!.name}: ${unplayable()}`);
+      if (!track) throw new NamedError('VideoMergeFailed', `${files[i]!.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
+      if (!(await track.canDecode())) throw new NamedError('VideoMergeFailed', `${files[i]!.name}: ${unplayable()}`);
       clips.push({ track, ...(await pictureLength(track)), name: files[i]!.name });
     }
     const width = even(clips[0]!.track.displayWidth);
     const height = even(clips[0]!.track.displayHeight);
     const total = clips.reduce((s, c) => s + c.length, 0);
     const videoCodec = await pickVideoCodec({ width, height, bitrate: QUALITY_HIGH });
-    if (!videoCodec) throw new Error('This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
+    if (!videoCodec) throw new NamedError('VideoMergeFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
     // Where the browser cannot encode sound (iPhone Safari) but every clip carries the same
     // AAC, the clips' own packets are laid end to end instead, with no decoding or encoding.
@@ -183,7 +183,7 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
       () => output.cancel(),
     );
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoMergeFailed', 'The video could not be written.');
     opts.onProgress?.(1);
     return {
       blob: new Blob([buffer], { type: 'video/mp4' }),
