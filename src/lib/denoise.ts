@@ -11,6 +11,7 @@
  * here so the cleaned sound stays in sync with a video's picture.
  */
 import { vendorEntry } from './vendor';
+import { NamedError } from './input-error';
 import { isNotReadable, notReadable } from './read-failure';
 
 export const DENOISE_RATE = 48_000;
@@ -25,13 +26,15 @@ interface Rnnoise {
 }
 
 let loading: Promise<Rnnoise> | undefined;
-export function loadRnnoise(): Promise<Rnnoise> {
-  loading ??= (import(/* @vite-ignore */ vendorEntry('rnnoise')) as Promise<{ Rnnoise: { load(): Promise<Rnnoise> } }>)
-    .then((m) => m.Rnnoise.load())
+// A module that failed to import is remembered by its address, so the second try asks for a different one.
+const loadOnce = (again = false) => (import(/* @vite-ignore */ vendorEntry('rnnoise') + (again ? '?again' : '')) as Promise<{ Rnnoise: { load(): Promise<Rnnoise> } }>).then((m) => m.Rnnoise.load());
+/** Loads the noise remover; a failed load (a dropped connection, a phone short of memory) is tried once more after a pause. */
+export function loadRnnoise(pause = 1500): Promise<Rnnoise> {
+  loading ??= loadOnce()
+    .catch(() => new Promise((r) => setTimeout(r, pause)).then(() => loadOnce(true)))
     .catch((err) => {
       loading = undefined;
-      const out = new Error('The noise remover could not load. Check your connection and try again.');
-      out.name = 'NoiseModelLoadError';
+      const out = new NamedError('NoiseModelLoadError', 'The noise remover could not load. Check your connection, or close other tabs and apps, and try again.');
       out.cause = err;
       throw out;
     });
@@ -126,7 +129,8 @@ export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseW
   const memory = /memory|allocation|bad_alloc/i.test(text) || (e instanceof RangeError && /array|buffer|length/i.test(text));
   // Any other error with a name of its own keeps it; a RangeError that reads as running out of memory says so below.
   if (e instanceof Error && e.name !== 'Error' && !(memory && e instanceof RangeError)) return e;
-  const out = new Error(
+  const out = new NamedError(
+    memory ? 'OutOfMemoryError' : stage,
     memory
       ? 'This device ran out of memory cleaning this video. Trim the video to a shorter length first, or use a computer.'
       : stage === 'NoiseDecodeError'
@@ -135,7 +139,6 @@ export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseW
           ? 'The noise could not be removed from this sound. Reload the page and try again, or try a shorter clip.'
           : 'The cleaned video could not be written. Reload the page and try again, or try a shorter clip.',
   );
-  out.name = memory ? 'OutOfMemoryError' : stage;
   out.cause = e;
   return out;
 }
