@@ -10,6 +10,7 @@ import { parseGIF, decompressFrame, type ParsedGif } from 'gifuct-js';
 import { EncoderStall, watchEncode } from './encoder-watchdog';
 import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 import { parseAnimatedWebp, renderWebpFrames } from './webp-anim';
+import { NamedError, UnreadableFile } from './input-error';
 
 type GifFrame = Parameters<typeof decompressFrame>[0];
 
@@ -72,7 +73,7 @@ const CANDIDATES: Candidate[] = [
 /** The encoder configs this browser says it can do at this size, best first. */
 export async function supportedCodecs(width: number, height: number, bitrate: number, framerate: number): Promise<{ config: VideoEncoderConfig; candidate: Candidate }[]> {
   if (typeof VideoEncoder === 'undefined') {
-    throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
+    throw new NamedError('GifVideoFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
   }
   const found: { config: VideoEncoderConfig; candidate: Candidate }[] = [];
   // Safari's encoder in quality mode takes eight frames and then never answers; real-time mode does.
@@ -87,17 +88,17 @@ export async function supportedCodecs(width: number, height: number, bitrate: nu
       // An unknown codec string throws in some browsers; try the next one.
     }
   }
-  if (!found.length) throw new Error('This browser has no video encoder for this size. Try a recent version of Chrome, Edge or Safari.');
+  if (!found.length) throw new NamedError('GifVideoFailed', 'This browser has no video encoder for this size. Try a recent version of Chrome, Edge or Safari.');
   return found;
 }
 
 /** Parse the GIF, or explain what is wrong with the file. */
 export function readGif(bytes: ArrayBuffer): { gif: ParsedGif; frames: GifFrame[] } {
   const head = new Uint8Array(bytes, 0, Math.min(6, bytes.byteLength));
-  if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new Error('This file is not a GIF.');
+  if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new UnreadableFile('This file is not a GIF.');
   const gif = parseGIF(bytes);
   const frames = gif.frames.filter((f): f is GifFrame => 'image' in f);
-  if (!frames.length || !gif.lsd.width || !gif.lsd.height) throw new Error('This GIF has no frames to convert.');
+  if (!frames.length || !gif.lsd.width || !gif.lsd.height) throw new UnreadableFile('This GIF has no frames to convert.');
   return { gif, frames };
 }
 
@@ -189,7 +190,7 @@ async function encodeWithFallback(codecs: Awaited<ReturnType<typeof supportedCod
       lastError = e;
     }
   }
-  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+  throw lastError instanceof Error ? lastError : new NamedError('GifVideoFailed', String(lastError));
 }
 
 /** Draws one play of the animation, calling `emit` with each composited frame and how long it shows (ms). */

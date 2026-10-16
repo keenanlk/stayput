@@ -2,6 +2,7 @@ import { createShell, bool, processEach, type ShellFile } from '../lib/shell';
 import { findRawPreview, fileReader, MIN_PREVIEW_EDGE, RawError, type RawPreview } from '../lib/raw-preview';
 import { overPhoneLimit, PHONE_SAFE_BYTES } from '../lib/phone-limit';
 import { formatBytes, suffixName, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 const results = document.getElementById('raw-results')!;
 
@@ -67,7 +68,7 @@ createShell({
     const upright = bool('upright');
     return processEach(files, progress, 'Reading', async (entry) => {
       const s = await scan(entry.file);
-      if ('problem' in s) throw new Error(s.problem);
+      if ('problem' in s) throw new NamedError('RawPreviewFailed', s.problem);
       const p = s.preview;
       const bytes = await fileReader(entry.file)(p.offset, p.length);
       let blob = new Blob([bytes as BlobPart], { type: 'image/jpeg' });
@@ -105,6 +106,6 @@ async function rotated(jpeg: Blob, orientation: number): Promise<Blob> {
   ctx.drawImage(bitmap, 0, 0);
   bitmap.close();
   const out = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.95));
-  if (!out) throw new Error('This browser could not save the rotated JPEG.');
+  if (!out) throw new NamedError('RawPreviewFailed', 'This browser could not save the rotated JPEG.');
   return out;
 }

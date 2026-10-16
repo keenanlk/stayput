@@ -2,7 +2,7 @@ import { createShell, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { SAMPLE_RATE, decodeAudio, encodeMp3, encodeWav, formatDuration } from '../lib/audio';
 import type { Reply, Request } from '../lib/vocals.worker';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 import { fromWorkerFailure } from '../lib/worker-error';
 
 /**
@@ -34,7 +34,7 @@ function split(left: Float32Array, right: Float32Array, onLoading: (f: number) =
       done();
       worker = undefined;
       w.terminate();
-      reject(new Error(e.message || 'The separation model stopped unexpectedly. The song may be too long for this device’s memory.'));
+      reject(new NamedError('VocalRemoverFailed', e.message || 'The separation model stopped unexpectedly. The song may be too long for this device’s memory.'));
     };
     const done = () => {
       w.removeEventListener('message', onMessage);

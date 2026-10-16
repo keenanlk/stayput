@@ -5,6 +5,7 @@
  * smaller and tried again, if the caller allows it.
  */
 import { canvasToBlob, type EncodeType } from './image';
+import { NamedError } from './input-error';
 
 type AnyCanvas = HTMLCanvasElement | OffscreenCanvas;
 
@@ -23,7 +24,7 @@ const HIGH = 0.95;
 
 async function encode(canvas: AnyCanvas, type: EncodeType, quality?: number): Promise<Blob> {
   const blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : quality);
-  if (blob.type !== type) throw new Error(`This browser cannot save ${type.replace('image/', '').toUpperCase()} images.`);
+  if (blob.type !== type) throw new NamedError('FitBytesFailed', `This browser cannot save ${type.replace('image/', '').toUpperCase()} images.`);
   return blob;
 }
 

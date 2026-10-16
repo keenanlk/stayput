@@ -9,7 +9,7 @@ import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH,
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
 import { VIDEO_CODECS, pickVideoCodec } from './video-codec';
-import { InputError, UnreadableFile } from './input-error';
+import { InputError, UnreadableFile, NamedError } from './input-error';
 import { EncoderRefused, EncoderUnavailable } from './encoder-probe';
 import { blur as boxBlur } from './blur';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
@@ -185,7 +185,7 @@ async function encodeStill(
     throw e;
   }
   const buffer = output.target.buffer;
-  if (!buffer) throw new Error('The video could not be written.');
+  if (!buffer) throw new NamedError('AudioVideoFailed', 'The video could not be written.');
   opts.onProgress?.(1);
   return { blob: new Blob([buffer], { type: 'video/mp4' }), ...frame, duration, videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec };
 }

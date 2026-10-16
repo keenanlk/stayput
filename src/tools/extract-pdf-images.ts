@@ -4,6 +4,7 @@ import { extractImages } from '../lib/pdf-images';
 import { canvasToBlob } from '../lib/image';
 import { parsePageRange } from '../lib/ranges';
 import { baseName, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 const info = document.getElementById('page-info')!;
 const pagesInputs = document.querySelectorAll<HTMLInputElement>('input[name="pages"]');
@@ -37,7 +38,7 @@ createShell({
       });
       if (!images.length) {
         const left = skippedSmall + skippedRepeats;
-        throw new Error(
+        throw new NamedError('ExtractPdfImagesFailed', 
           left
             ? `Only ${left} small or repeated image${left === 1 ? ' was' : 's were'} found. Untick the options to include ${left === 1 ? 'it' : 'them'}.`
             : 'No pictures are stored in these pages. If the PDF is a scan or the pictures are drawings, use PDF to Image to save whole pages instead.',

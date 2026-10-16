@@ -4,6 +4,7 @@ import { baseName, type OutputFile } from '../lib/files';
 import { readText, unwrap } from '../lib/ocr';
 import { buildDocx } from '../lib/docx';
 import type { PageText } from '../lib/pdftext';
+import { UnreadableFile } from '../lib/input-error';
 
 const preview = document.getElementById('text-preview')!;
 
@@ -37,7 +38,7 @@ createShell({
     preview.hidden = false;
     const withText = pages.filter((p) => p.paragraphs.length > 0).length;
     if (withText === 0) {
-      throw new Error('No clear text found. This works best on screenshots, scans and photos where the text fills most of the frame; try cropping to the text.');
+      throw new UnreadableFile('No clear text found. This works best on screenshots, scans and photos where the text fills most of the frame; try cropping to the text.');
     }
     const words = pages.reduce((n, p) => n + p.paragraphs.reduce((m, q) => m + q.text.split(/\s+/).length, 0), 0);
     const base = files.length === 1 ? baseName(files[0]!.file.name) : 'images';

@@ -9,6 +9,7 @@
  */
 import { deflateSync, zipSync, type Zippable } from 'fflate';
 import { ecb } from '@noble/ciphers/aes.js';
+import { InputError, NamedError } from './input-error';
 
 export interface ZipEntry {
   /** Path inside the ZIP, folders separated by "/". */
@@ -91,8 +92,8 @@ function dosTime(d: Date): { time: number; date: number } {
 
 /** A ZIP whose files are encrypted with AES-256 (WinZip AE-2). */
 export async function encryptedZip(entries: ZipEntry[], password: string, onFile?: (done: number) => void): Promise<Uint8Array> {
-  if (!password) throw new Error('A password is needed to encrypt the ZIP.');
-  if (entries.length > 65535) throw new Error('A ZIP can hold at most 65,535 files. Split them into several ZIPs.');
+  if (!password) throw new InputError('A password is needed to encrypt the ZIP.');
+  if (entries.length > 65535) throw new InputError('A ZIP can hold at most 65,535 files. Split them into several ZIPs.');
   const enc = new TextEncoder();
   const locals: Uint8Array[] = [];
   const central: Uint8Array[] = [];
@@ -106,7 +107,7 @@ export async function encryptedZip(entries: ZipEntry[], password: string, onFile
     const cipher = aesCtrLE(keys.enc, plain);
     const auth = (await hmacSha1(keys.mac, cipher)).subarray(0, 10);
     const size = salt.length + 2 + cipher.length + 10;
-    if (offset + size > 0xfffffff0) throw new Error('This ZIP would be over 4 GB, which needs a format most openers cannot read with a password. Split the files into several ZIPs.');
+    if (offset + size > 0xfffffff0) throw new NamedError('ZipWriteFailed', 'This ZIP would be over 4 GB, which needs a format most openers cannot read with a password. Split the files into several ZIPs.');
     const name = enc.encode(e.path);
     // AES extra field: AE-2, vendor "AE", strength 3 (256-bit), then the real compression method.
     const extra = new Uint8Array([0x01, 0x99, 7, 0, 2, 0, 0x41, 0x45, 3, method, 0]);

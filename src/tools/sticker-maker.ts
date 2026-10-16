@@ -3,6 +3,7 @@ import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } fro
 import { suffixName, type OutputFile } from '../lib/files';
 import { coverage, cutout, findSubject } from '../lib/background';
 import { makeSticker, subjectBox } from '../lib/sticker';
+import { UnreadableFile, NamedError } from '../lib/input-error';
 
 const OUTLINE: Record<string, number> = { none: 0, thin: 0.018, thick: 0.04 };
 
@@ -20,11 +21,11 @@ createShell({
         const mask = await findSubject(bitmap, (f) =>
           progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 * f)),
         );
-        if (coverage(mask) < 0.005) throw new Error('No subject was found in this photo. Stickers work best with one clear person, pet or object.');
+        if (coverage(mask) < 0.005) throw new UnreadableFile('No subject was found in this photo. Stickers work best with one clear person, pet or object.');
         const box = subjectBox(mask, bitmap.width, bitmap.height)!;
         const sticker = makeSticker(cutout(bitmap, mask), box, { outline, color, square });
         let blob = await canvasToBlob(sticker, type, type === 'image/webp' ? 0.9 : undefined);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+        if (blob.type !== type) throw new NamedError('StickerMakerFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         // WhatsApp refuses stickers over 100 KB; step the quality down until it fits.
         if (square && type === 'image/webp') {
           for (let q = 0.8; blob.size > 100_000 && q >= 0.4; q -= 0.1) blob = await canvasToBlob(sticker, type, q);

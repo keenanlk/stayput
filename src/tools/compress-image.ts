@@ -2,6 +2,7 @@ import { createShell, bindRange, num, str, radio, processEach } from '../lib/she
 import { canvasToBlob, decodeImage, drawExact, drawScaled, extForType, fitSize, thumbnail, type EncodeType, type Fit } from '../lib/image';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { fitBytes } from '../lib/fit-bytes';
+import { NamedError } from '../lib/input-error';
 
 bindRange('quality', 'quality-out');
 bindRange('percent', 'percent-out', (v) => `${v}%`);
@@ -64,7 +65,7 @@ createShell({
           else notes.push(`under ${limitLabel}${r.quality !== undefined ? ` at quality ${Math.round(r.quality * 100)}` : ''}`);
         } else {
           blob = await canvasToBlob(draw(width, height), type, type === 'image/png' ? undefined : quality);
-          if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+          if (blob.type !== type) throw new NamedError('CompressImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         }
         if (exact && (exactW > decoded.width * 1.5 || exactH > decoded.height * 1.5)) notes.push('enlarged; the AI upscaler gives a sharper result');
         const out: OutputFile = {

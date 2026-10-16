@@ -4,13 +4,14 @@
  * handed to the worker, which registers it as "Mono".
  */
 import { TEXT_ERRORS } from './text-pdf';
+import { NamedError } from './input-error';
 
 const MONO_FONT_URL = '/fonts/DejaVuSansMono-subset.ttf';
 
 let monoFont: Promise<ArrayBuffer> | undefined;
 function loadMonoFont(): Promise<ArrayBuffer> {
   monoFont ??= fetch(MONO_FONT_URL).then((r) => {
-    if (!r.ok) throw new Error(TEXT_ERRORS.workerFailed);
+    if (!r.ok) throw new NamedError('TextPdfRenderFailed', TEXT_ERRORS.workerFailed);
     return r.arrayBuffer();
   });
   monoFont.catch(() => (monoFont = undefined));
@@ -25,7 +26,7 @@ export async function renderTextPdf(def: Record<string, unknown>, opts: { usesMo
     const fail = (detail: unknown) => {
       worker.terminate();
       console.warn('Text to PDF:', detail);
-      reject(new Error(TEXT_ERRORS.workerFailed));
+      reject(new NamedError('TextPdfRenderFailed', TEXT_ERRORS.workerFailed));
     };
     worker.onmessage = (e: MessageEvent<{ type: 'done'; bytes: Uint8Array } | { type: 'error'; message: string }>) => {
       const m = e.data;

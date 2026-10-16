@@ -3,6 +3,7 @@ import { closePdfJs, loadPdfJs, openWithPdfJs } from '../lib/pdf';
 import { parsePageRange } from '../lib/ranges';
 import { baseName, formatBytes, type OutputFile } from '../lib/files';
 import { isPhoneBrowser } from '../lib/phone-limit';
+import { InputError } from '../lib/input-error';
 
 const info = document.getElementById('page-info')!;
 const pagesInputs = document.querySelectorAll<HTMLInputElement>('input[name="pages"]');
@@ -35,7 +36,7 @@ createShell({
     try {
       const pages = radio('pages', 'all') === 'all' ? Array.from({ length: doc.numPages }, (_, i) => i) : parsePageRange(str('range'), doc.numPages);
       if (phone && pages.length > PHONE_MAX_PAGES) {
-        throw new Error(`This PDF has ${pages.length} pages. A phone can run out of memory converting more than ${PHONE_MAX_PAGES} at once. Choose pages (for example 1-${PHONE_MAX_PAGES}) and run it again for the rest, or use a computer.`);
+        throw new InputError(`This PDF has ${pages.length} pages. A phone can run out of memory converting more than ${PHONE_MAX_PAGES} at once. Choose pages (for example 1-${PHONE_MAX_PAGES}) and run it again for the rest, or use a computer.`);
       }
       const opts = { ...(phone ? PHONE_OPTIONS : DESKTOP_OPTIONS), background: bool('background') };
       const layers = await doc.getOptionalContentConfig();

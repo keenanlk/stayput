@@ -2,6 +2,7 @@ import { createShell, bindRange, num, str, radio } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { cropBox } from '../lib/crop-box';
+import { NamedError } from '../lib/input-error';
 
 bindRange('quality', 'quality-out');
 
@@ -68,7 +69,7 @@ const shell = createShell({
     }
     ctx.drawImage(bitmap!, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
     const blob = await canvasToBlob(out, type, type === 'image/png' ? undefined : quality);
-    if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+    if (blob.type !== type) throw new NamedError('CropImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
     const preview = await createImageBitmap(out);
     const outs: OutputFile[] = [
       {

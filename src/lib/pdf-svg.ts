@@ -14,6 +14,7 @@
 import type * as PdfJs from 'pdfjs-dist';
 import * as opentype from 'opentype.js';
 import { toCanvas } from './pdf-images';
+import { NamedError } from './input-error';
 
 type Matrix = [number, number, number, number, number, number];
 const IDENTITY: Matrix = [1, 0, 0, 1, 0, 0];
@@ -1094,7 +1095,7 @@ export async function pageToSvg(
       canvas.width = Math.max(1, Math.round(width * scale));
       canvas.height = Math.max(1, Math.round(height * scale));
       const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Canvas is not available in this browser.');
+      if (!ctx) throw new NamedError('PdfSvgFailed', 'Canvas is not available in this browser.');
       await page.render({ canvas, canvasContext: ctx, viewport: page.getViewport({ scale }) }).promise;
       const uri = await canvasDataUri(canvas, 'image/png');
       canvas.width = canvas.height = 0;

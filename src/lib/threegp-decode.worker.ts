@@ -34,6 +34,7 @@ import { toFloatPlanes, type LibavAudioFrame } from './libav-audio';
 import { readAvcConfig } from './h264-sps';
 import { ThreeGpDecoderLoadError, UnsupportedThreeGpCodec } from './threegp-errors';
 import { workerFailure } from './worker-error';
+import { NamedError } from './input-error';
 
 export interface ThreeGpJob {
   file: File;
@@ -363,7 +364,7 @@ async function convert(job: ThreeGpJob): Promise<void> {
   if (frames === 0) throw new UnreadableFile('No pictures could be read from this 3GP. The file may be damaged or cut short.');
   await output.finalize();
   const buffer = (output.target as BufferTarget).buffer;
-  if (!buffer) throw new Error('The video could not be written.');
+  if (!buffer) throw new NamedError('ThreegpDecodeWorkerFailed', 'The video could not be written.');
   post(
     { type: 'done', buffer, width: copyVideo ? avc!.width : width, height: copyVideo ? avc!.height : height, duration: Math.max(endTime, 0), videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec, videoCopied: copyVideo, audio: !!audioSource, audioCopied },
     [buffer],

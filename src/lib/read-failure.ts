@@ -1,3 +1,4 @@
+import { NamedError } from './input-error';
 /**
  * A file the browser could not read from disk (NotReadableError): on Android this is a big video, one the
  * phone moved or is still preparing, or a cloud file it let go of. It is the file or the phone, not the tool,
@@ -16,7 +17,7 @@ export function isNotReadable(e: unknown): boolean {
 
 /** The error to show for a file that could not be read. Its name stays NotReadableError, which is what a failed run records. */
 export function notReadable(cause?: unknown): Error {
-  const out = new Error('This file could not be read. Pick the video again, or copy it to the phone first, and try again.');
+  const out = new NamedError('ReadFailureFailed', 'This file could not be read. Pick the video again, or copy it to the phone first, and try again.');
   out.name = 'NotReadableError';
   out.cause = cause;
   return out;

@@ -5,6 +5,7 @@ import { decodePsd, isPsdFile } from './psd';
 import { decodeTiffPages, isTiffFile } from './tiff';
 import { svgFallbackSize } from './svg-size';
 import { vendorDir, vendorEntry } from './vendor';
+import { NamedError } from './input-error';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
 
@@ -32,7 +33,7 @@ async function loadViaImageElement(file: Blob): Promise<ImageBitmap> {
         canvas.width = w;
         canvas.height = h;
         const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error('Canvas is not available in this browser.');
+        if (!ctx) throw new NamedError('ImageFailed', 'Canvas is not available in this browser.');
         ctx.drawImage(img, 0, 0, w, h);
         resolve(await createImageBitmap(canvas));
       } catch (e) {
@@ -43,7 +44,7 @@ async function loadViaImageElement(file: Blob): Promise<ImageBitmap> {
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error('This file could not be decoded as an image.'));
+      reject(new NamedError('ImageFailed', 'This file could not be decoded as an image.'));
     };
     img.src = url;
   });
@@ -142,7 +143,7 @@ export function loadWebpEncoder() {
       return { module, defaults: meta.defaultOptions as Record<string, number> };
     })().catch((err) => {
       webpEncoder = undefined;
-      throw new Error(`The WebP encoder could not be loaded (${err instanceof Error ? err.message : String(err)}). Check your connection and try again.`);
+      throw new NamedError('ImageFailed', `The WebP encoder could not be loaded (${err instanceof Error ? err.message : String(err)}). Check your connection and try again.`);
     });
   }
   return webpEncoder;
@@ -154,7 +155,7 @@ async function webpFromCanvas(canvas: HTMLCanvasElement | OffscreenCanvas, quali
   const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const { module, defaults } = await loadWebpEncoder();
   const out = module.encode(img.data, img.width, img.height, { ...defaults, quality: Math.round(Math.min(1, Math.max(0, quality)) * 100) });
-  if (!out) throw new Error('The browser could not encode this image.');
+  if (!out) throw new NamedError('ImageFailed', 'The browser could not encode this image.');
   return new Blob([out as BlobPart], { type: 'image/webp' });
 }
 
@@ -162,7 +163,7 @@ export async function canvasToBlob(canvas: HTMLCanvasElement | OffscreenCanvas, 
   const blob = await nativeToBlob(canvas, type, quality);
   // Browsers that cannot write WebP hand back a PNG instead (or fail); use the WebAssembly encoder.
   if (type === 'image/webp' && blob?.type !== 'image/webp') return webpFromCanvas(canvas, quality);
-  if (!blob) throw new Error('The browser could not encode this image.');
+  if (!blob) throw new NamedError('ImageFailed', 'The browser could not encode this image.');
   return blob;
 }
 
@@ -220,7 +221,7 @@ export async function encodeBitmap(bitmap: ImageBitmap, opts: EncodeOptions): Pr
   const canvas = drawScaled(bitmap, width, height, background);
   const blob = await canvasToBlob(canvas, opts.type, opts.type === 'image/png' ? undefined : opts.quality);
   if (blob.type !== opts.type) {
-    throw new Error(`This browser cannot save ${opts.type.replace('image/', '').toUpperCase()} images.`);
+    throw new NamedError('ImageFailed', `This browser cannot save ${opts.type.replace('image/', '').toUpperCase()} images.`);
   }
   return blob;
 }

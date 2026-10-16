@@ -31,7 +31,7 @@ import { executeWatched } from './encoder-watchdog';
 import { requireH264Encoder } from './encoder-probe';
 import { aacSafeSampleRate } from './video-codec';
 import { unplayable } from './video-compress';
-import { UnsupportedCodec } from './input-error';
+import { UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -54,9 +54,9 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const format = await input.getFormat().catch(() => null);
-    if (!format) throw new Error('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
-    if (!video) throw new Error('This file has no video track.');
+    if (!video) throw new UnreadableFile('This file has no video track.');
     if (opts.exact && !(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     if (opts.exact) await requireH264Encoder();
     const outFormat =
@@ -104,7 +104,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new Error('This browser cannot cut this video.');
+      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoTrimFailed', 'This browser cannot cut this video.');
     }
     if (keepSound) {
       let sink: Conversion | null = null;
@@ -124,7 +124,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
       await executeWatched(conversion, opts.onProgress);
     }
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoTrimFailed', 'The video could not be written.');
     return { blob: new Blob([buffer], { type: outFormat.mimeType }), ext: outFormat.fileExtension.replace(/^\./, ''), duration: opts.end - opts.start };
   } finally {
     input.dispose?.();
