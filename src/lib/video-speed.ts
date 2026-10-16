@@ -27,7 +27,7 @@ import { pickVideoCodec } from './video-codec';
 import { timeStretch } from './stretch';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError } from './input-error';
+import { InputError, UnsupportedCodec } from './input-error';
 
 export interface SpeedOptions {
   /** 2 plays twice as fast, 0.5 at half speed. */
@@ -55,7 +55,7 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    if (!(await video.canDecode())) throw new Error(unplayable());
+    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const duration = await input.computeDuration();
     const width = video.codedWidth;
     const height = video.codedHeight;
