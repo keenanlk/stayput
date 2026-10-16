@@ -9,6 +9,7 @@ import { canvasToBlob, drawScaled, encodeBitmap, fitSize, makeCanvas } from './i
 import { imagesToPdf } from './pdf';
 import type { OutputType } from './formats';
 import { writeAvif } from './avif-encode';
+import { buildIconFile, CUR_REFERENCE_SIZE, CUR_SIZES, hotspotFor, type HotspotSpec } from './ico-file';
 
 export interface WriteOptions {
   /** 0..1 */
@@ -17,6 +18,8 @@ export interface WriteOptions {
   background: string;
   /** AVIF only: the "faster encode" setting, the output scale, and a signal that stops the encode. */
   avif?: { fast?: boolean; scale?: number; signal?: AbortSignal };
+  /** CUR only: where the pointer clicks. */
+  hotspot?: HotspotSpec;
 }
 
 function pixels(bitmap: ImageBitmap, width = bitmap.width, height = bitmap.height, background?: string): ImageData {
@@ -118,6 +121,19 @@ export const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 export async function writeIco(bitmap: ImageBitmap, only?: number[]): Promise<Uint8Array> {
   const largest = Math.max(bitmap.width, bitmap.height);
   const sizes = only ?? ICO_SIZES.filter((s) => s <= Math.max(16, largest));
+  return buildIconFile(await squarePngs(bitmap, sizes), sizes);
+}
+
+/** Windows cursor (.cur): the ICO layout with the hotspot in each entry. Sizes are never larger than the source (32 at least). */
+export async function writeCur(bitmap: ImageBitmap, spec: HotspotSpec, only?: number[]): Promise<Uint8Array> {
+  const largest = Math.max(bitmap.width, bitmap.height);
+  const sizes = only ?? CUR_SIZES.filter((s) => s <= Math.max(CUR_REFERENCE_SIZE, largest));
+  return buildIconFile(await squarePngs(bitmap, sizes), sizes, sizes.map((s) => hotspotFor(spec, s)));
+}
+
+/** The bitmap centred on a transparent square at each size, as PNG bytes. */
+async function squarePngs(bitmap: ImageBitmap, sizes: number[]): Promise<Uint8Array[]> {
+  const largest = Math.max(bitmap.width, bitmap.height);
   const pngs: Uint8Array[] = [];
   for (const s of sizes) {
     const fit = fitSize(bitmap.width, bitmap.height, { maxWidth: s, maxHeight: s, scale: largest < s ? s / largest : 1 });
@@ -126,25 +142,7 @@ export async function writeIco(bitmap: ImageBitmap, only?: number[]): Promise<Ui
     (square.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D).drawImage(inner, Math.floor((s - inner.width) / 2), Math.floor((s - inner.height) / 2));
     pngs.push(new Uint8Array(await (await canvasToBlob(square, 'image/png')).arrayBuffer()));
   }
-  const header = 6 + 16 * pngs.length;
-  const out = new Uint8Array(header + pngs.reduce((n, p) => n + p.length, 0));
-  const v = new DataView(out.buffer);
-  v.setUint16(2, 1, true);
-  v.setUint16(4, pngs.length, true);
-  let offset = header;
-  pngs.forEach((png, i) => {
-    const p = 6 + i * 16;
-    const s = sizes[i]!;
-    out[p] = s >= 256 ? 0 : s;
-    out[p + 1] = s >= 256 ? 0 : s;
-    v.setUint16(p + 4, 1, true);
-    v.setUint16(p + 6, 32, true);
-    v.setUint32(p + 8, png.length, true);
-    v.setUint32(p + 12, offset, true);
-    out.set(png, offset);
-    offset += png.length;
-  });
-  return out;
+  return pngs;
 }
 
 /** Single-frame GIF, 256 colours; pixels under half opacity become transparent. */
@@ -201,6 +199,8 @@ export async function writeImage(bitmap: ImageBitmap, type: OutputType, opts: Wr
       return blob(writeGif(pixels(bitmap)));
     case 'image/x-icon':
       return blob(await writeIco(bitmap));
+    case 'image/x-win-bitmap':
+      return blob(await writeCur(bitmap, opts.hotspot ?? { kind: 'top-left' }));
     case 'application/pdf': {
       const jpg = await encodeBitmap(bitmap, { type: 'image/jpeg', quality: opts.quality, background: opts.background });
       const bytes = await imagesToPdf([{ kind: 'jpg', bytes: new Uint8Array(await jpg.arrayBuffer()) }], { pageSize: 'fit', orientation: 'auto', margin: 0 });

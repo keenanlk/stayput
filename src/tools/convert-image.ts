@@ -1,6 +1,7 @@
 import { createShell, bindRange, num, str, bool, processEach, type ShellFile } from '../lib/shell';
 import { supportsNativeAvif } from '../lib/avif-encode';
 import { decodeImage, thumbnail } from '../lib/image';
+import { CUR_REFERENCE_SIZE, hotspotFor, type HotspotSpec } from '../lib/ico-file';
 import { writeAnimatedGif, writeImage } from '../lib/encoders';
 import { parseAnimatedWebp } from '../lib/webp-anim';
 import { detectKind, kindFromName, KIND_LABEL, type ImageKind } from '../lib/detect';
@@ -45,10 +46,77 @@ function syncFields() {
   document.getElementById('avif-field')!.hidden = !avif;
   document.getElementById('avif-scale-field')!.hidden = !avif;
   document.getElementById('quality-field')!.hidden = !f.quality;
+  document.getElementById('cur-field')!.hidden = f.type !== 'image/x-win-bitmap';
+  void loadCurPicture();
   document.getElementById('background-field')!.hidden = f.alpha;
   document.getElementById('exif-field')!.hidden = f.type !== 'image/jpeg';
   document.getElementById('format-note')!.textContent = [f.blurb, caveat(f)].filter(Boolean).join(' ');
 }
+
+/* ---------- CUR hotspot ---------- */
+
+const hotspotSel = document.getElementById('hotspot') as HTMLSelectElement;
+const hotspotX = document.getElementById('hotspot-x') as HTMLInputElement;
+const hotspotY = document.getElementById('hotspot-y') as HTMLInputElement;
+const curPreview = document.getElementById('cur-preview') as HTMLCanvasElement;
+let curPicture: ImageBitmap | undefined;
+
+function hotspotSpec(): HotspotSpec {
+  const kind = hotspotSel.value;
+  if (kind === 'centre') return { kind };
+  if (kind === 'custom') return { kind, x: num('hotspot-x', 0), y: num('hotspot-y', 0) };
+  return { kind: 'top-left' };
+}
+
+/** The first picture at 32 pixels, magnified, with a cross over the hotspot. */
+function drawCurPreview() {
+  const scale = curPreview.width / CUR_REFERENCE_SIZE;
+  const g = curPreview.getContext('2d')!;
+  g.clearRect(0, 0, curPreview.width, curPreview.height);
+  curPreview.hidden = !curPicture;
+  if (!curPicture) return;
+  const fit = Math.min(CUR_REFERENCE_SIZE / curPicture.width, CUR_REFERENCE_SIZE / curPicture.height);
+  const w = Math.max(1, Math.round(curPicture.width * fit));
+  const h = Math.max(1, Math.round(curPicture.height * fit));
+  const small = document.createElement('canvas');
+  small.width = small.height = CUR_REFERENCE_SIZE;
+  small.getContext('2d')!.drawImage(curPicture, Math.floor((CUR_REFERENCE_SIZE - w) / 2), Math.floor((CUR_REFERENCE_SIZE - h) / 2), w, h);
+  g.imageSmoothingEnabled = false;
+  g.drawImage(small, 0, 0, curPreview.width, curPreview.height);
+  const hs = hotspotFor(hotspotSpec(), CUR_REFERENCE_SIZE);
+  const cx = (hs.x + 0.5) * scale;
+  const cy = (hs.y + 0.5) * scale;
+  for (const [colour, width] of [['#fff', 4], ['#d00', 2]] as const) {
+    g.strokeStyle = colour;
+    g.lineWidth = width;
+    g.beginPath();
+    g.moveTo(cx - 8, cy);
+    g.lineTo(cx + 8, cy);
+    g.moveTo(cx, cy - 8);
+    g.lineTo(cx, cy + 8);
+    g.stroke();
+  }
+}
+
+let curFile: File | undefined;
+let curLoadedFor: File | undefined;
+
+/** Decodes the first file for the hotspot preview, only while CUR is the chosen format. */
+async function loadCurPicture() {
+  const wanted = outputFormat(formatSel.value).type === 'image/x-win-bitmap' ? curFile : undefined;
+  if (wanted !== curLoadedFor) {
+    curLoadedFor = wanted;
+    curPicture?.close();
+    curPicture = wanted ? await decodeImage(wanted).then((d) => d.bitmap, () => undefined) : undefined;
+  }
+  drawCurPreview();
+}
+
+function onHotspotChange() {
+  document.getElementById('cur-xy')!.hidden = hotspotSel.value !== 'custom';
+  drawCurPreview();
+}
+for (const el of [hotspotSel, hotspotX, hotspotY]) el.addEventListener('input', onHotspotChange);
 
 function setFormat(type: OutputType) {
   if (formatSel.value === type) return;
@@ -206,6 +274,8 @@ render();
 /* ---------- Detection ---------- */
 
 async function describeFiles(files: ShellFile[]) {
+  curFile = files[0]?.file;
+  await loadCurPicture();
   detected = await Promise.all(
     files.map(async ({ file }) => {
       const kind = await detectKind(file).catch(() => undefined);
@@ -264,6 +334,7 @@ createShell({
     const keepExif = bool('keep-exif') && type === 'image/jpeg';
     // AVIF encodes can take tens of seconds, so they run where Cancel can end them.
     abortAvif = new AbortController();
+    const hotspot = type === 'image/x-win-bitmap' ? hotspotSpec() : undefined;
     const avif = type === 'image/avif' ? { fast: bool('avif-fast'), scale: num('avif-scale', 1), signal: abortAvif.signal } : undefined;
     if (avif) cancelField.hidden = false;
     const verb = avif ? 'Encoding AVIF (this can take a while)' : 'Converting';
@@ -273,7 +344,7 @@ createShell({
       const decoded = await decodeImage(entry.file);
       // An animated WebP stays animated as a GIF; every other path keeps the first frame.
       const anim = type === 'image/gif' && (await detectKind(entry.file)) === 'webp' ? parseAnimatedWebp(new Uint8Array(await entry.file.arrayBuffer())) : undefined;
-      let blob = anim ? new Blob([(await writeAnimatedGif(anim)) as BlobPart], { type }) : await writeImage(decoded.bitmap, type, { quality, background, avif });
+      let blob = anim ? new Blob([(await writeAnimatedGif(anim)) as BlobPart], { type }) : await writeImage(decoded.bitmap, type, { quality, background, avif, hotspot });
       if (keepExif) {
         const tiff = extractExifTiff(new Uint8Array(await entry.file.arrayBuffer()));
         if (tiff) {

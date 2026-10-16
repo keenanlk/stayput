@@ -11,7 +11,7 @@ export interface Pair {
   from: string;
   to: string;
   /** Output MIME type preset in the converter. */
-  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif' | 'image/x-icon' | 'image/bmp' | 'image/gif' | 'image/tiff';
+  outputType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif' | 'image/x-icon' | 'image/x-win-bitmap' | 'image/bmp' | 'image/gif' | 'image/tiff';
   accept: string;
   title: string;
   description: string;
@@ -53,6 +53,12 @@ const icoSteps = (from: string) => [
   `Drop your ${from} files onto the page, or tap to pick them. Square images give the cleanest icons.`,
   'Nothing to set: every ICO gets the standard sizes from 16 to 256 pixels, up to the size of your image.',
   'Download each .ico file, or all of them as one zip.',
+];
+
+const curSteps = (from: string) => [
+  `Drop your ${from} files onto the page, or tap to pick them. A transparent ${from} of 128 pixels or more gives the sharpest pointer.`,
+  'Choose the hotspot: top left for an arrow, centre for a crosshair, or exact pixels on the 32 pixel size. The preview marks where the click will land.',
+  'Download each .cur file, or all of them as one zip.',
 ];
 
 const bmpSteps = (from: string) => [
@@ -593,6 +599,32 @@ export const pairs: Pair[] = [
       { q: 'Will the transparent background stay transparent?', a: 'Yes. Each size is stored as a 32-bit PNG inside the ICO, alpha channel included, which Windows and browsers draw without a box around the icon.' },
       { q: 'Is a renamed .png the same as a real .ico?', a: 'No. Some programs sniff the bytes and cope, but Windows Explorer, the shortcut icon picker and older browsers expect the ICO header and directory of sizes. A real ICO also lets each size be drawn separately, which is what keeps the small versions crisp.' },
       { q: 'How do I use the .ico as a folder or shortcut icon in Windows?', a: 'Right-click the shortcut or folder, open Properties, then Change Icon (for a folder, the Customize tab first), browse to the .ico and pick it. Keep the file somewhere permanent: Windows reads it from that path every time it draws the icon.' },
+    ],
+  },
+  {
+    slug: 'png-to-cur',
+    from: 'PNG',
+    to: 'CUR',
+    outputType: 'image/x-win-bitmap',
+    accept: 'image/png,.png',
+    title: 'PNG to CUR Converter: Make a Windows Cursor, No Upload | Stayput',
+    description: 'Turn a PNG into a Windows .cur mouse pointer with the hotspot where you want it. Transparency kept, sizes 32 to 128 px. Free, in your browser, no upload.',
+    heading: 'Convert PNG to CUR',
+    tagline: 'Make a custom Windows mouse pointer from a transparent PNG, with the click point you choose, on your own device.',
+    keywords: ['png to cur', 'png to cur converter', 'convert png to cur', 'png to cursor', 'make a cursor from an image', 'png to windows cursor'],
+    intro: [
+      'A .cur file is a Windows mouse pointer. It looks like an icon file, with the same bundle of sizes, but it also records the hotspot: the one pixel of the picture that does the clicking. Renaming a .png to .cur does not work, because Windows looks for that header and the hotspot and refuses a file that has neither.',
+      'This page reads your PNG, scales it to 32, 48, 64 and 128 pixels (never larger than the original, and not 256, because very large pointers are rarely wanted) and writes each size as a PNG entry inside one .cur. The transparent parts stay transparent, so the pointer has no box around it. A rectangular PNG is centred on a clear square instead of being stretched.',
+      'Pick the hotspot before you convert. Top left is the arrow convention, where the tip of the arrow is the corner of the picture. Centre suits a crosshair or a target. For anything else, choose Exact pixels and type the position on the 32 pixel version; the larger sizes are scaled to match. The preview shows the picture at 32 pixels with the hotspot marked.',
+      'To use the file in Windows, open Settings, then Mouse, then Additional mouse options, and the Pointers tab. Pick a pointer in the list, press Browse, choose your .cur and press Open. Keep the file somewhere permanent, because Windows reads it from that path. Animated cursors (.ani) are not made here, and macOS does not use .cur files.',
+      'Need an icon rather than a pointer? [PNG to ICO](/png-to-ico) makes a multi-size .ico, [ICO to PNG](/ico-to-png) reads icons and cursors back into a PNG, and the [favicon generator](/tools/favicon-generator) builds the icon set for a website.',
+    ],
+    faq: [
+      { q: 'What is the hotspot?', a: 'It is the pixel of the pointer that counts as the click. For an arrow it is the tip, in the top left corner of the picture. If it is in the wrong place, you will click slightly beside what the pointer seems to touch.' },
+      { q: 'What size should the PNG be?', a: 'Square and transparent, at least 128 by 128 pixels. Smaller PNGs still convert, but the .cur only contains sizes up to the original (and always 32), so a small picture looks soft at the larger Windows pointer sizes.' },
+      { q: 'Can I make an animated cursor?', a: 'No. This page writes still .cur files. Animated cursors are .ani files, which this site does not make.' },
+      { q: 'Is a renamed .png the same as a real .cur?', a: 'No. Windows needs the cursor header and a hotspot for each size. A renamed PNG is refused or shows as a blank pointer.' },
+      { q: 'Will it work on a Mac or in Linux?', a: 'macOS does not use .cur files for its pointer. Some Linux desktops and many web pages can read .cur, but the file is made for Windows.' },
     ],
   },
   {
@@ -1166,7 +1198,7 @@ export const pairBySlug = (slug: string): Pair | undefined => pairs.find((p) => 
 /** A Pair expressed as a Tool so it can use the shared tool layout. */
 export function pairAsTool(p: Pair): Tool {
   const src = p.sourceWord ?? p.from;
-  const steps = p.outputType === 'image/png' ? pngSteps(src) : p.outputType === 'image/webp' ? webpSteps(src) : p.outputType === 'image/avif' ? avifSteps(src) : p.outputType === 'image/x-icon' ? icoSteps(src) : p.outputType === 'image/bmp' ? bmpSteps(src) : p.outputType === 'image/gif' ? gifSteps(src) : p.outputType === 'image/tiff' ? tiffSteps(src) : jpgSteps(src);
+  const steps = p.outputType === 'image/png' ? pngSteps(src) : p.outputType === 'image/webp' ? webpSteps(src) : p.outputType === 'image/avif' ? avifSteps(src) : p.outputType === 'image/x-icon' ? icoSteps(src) : p.outputType === 'image/x-win-bitmap' ? curSteps(src) : p.outputType === 'image/bmp' ? bmpSteps(src) : p.outputType === 'image/gif' ? gifSteps(src) : p.outputType === 'image/tiff' ? tiffSteps(src) : jpgSteps(src);
   return {
     slug: p.slug,
     path: `/${p.slug}`,
