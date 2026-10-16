@@ -27,7 +27,7 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
-import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
+import { EncoderUnavailable, hasVideoEncoder, useRealtimeH264 } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile, UnsupportedCodec } from './input-error';
 import { isNotReadable, notReadable } from './read-failure';
@@ -86,7 +86,7 @@ export interface EditResult {
   /** For a painted edit: frames done, and milliseconds in `paint` and in all of the frame loop (page-local, never sent). */
   timing?: { frames: number; paintMs: number; loopMs: number };
   /** Set when the first try failed and this is the second: after the page was hidden, or at a smaller size. */
-  retry?: 'resumed' | 'smaller';
+  retry?: 'resumed' | 'smaller' | 'again';
 }
 
 /**
@@ -153,7 +153,7 @@ export function shownSize(video: InputVideoTrack): { width: number; height: numb
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
+    const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
     return { ...shownSize(video), duration: await input.computeDuration() };
   } finally {
@@ -287,6 +287,8 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       const wanted = matchedBitrate(sourceBps, video.codec, shown.width * shown.height, width * height);
       if (wanted) bitrate = new Quality({ bitrate: wanted });
     }
+    // A run started again after the encoder failed asks for the encoder mode that does not stall.
+    if (attempt.retry === 'smaller' || attempt.retry === 'again') useRealtimeH264();
     const videoCodec = await pickVideoCodec({ width, height, bitrate });
     if (!videoCodec) {
       throw hasVideoEncoder() ? new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.') : new EncoderUnavailable();

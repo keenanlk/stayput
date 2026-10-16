@@ -11,6 +11,7 @@ import { InputError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
 import { withRecovery } from '../lib/edit-recovery';
+import { isNotReadable, notReadable, probeReadable, retryUnreadable } from '../lib/read-failure';
 
 /**
  * Add subtitles to a video, burned into the picture. The captions come from
@@ -77,7 +78,8 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
   if (videos.length === 0) throw new InputError('Add the video too: the subtitle file only says what to write.');
   if (subsFiles.length > 1) throw new InputError('Add one subtitle file at a time, with the video it belongs to.');
   if (subsFiles.length === 1 && videos.length > 1) throw new InputError('A subtitle file fits one video. Add just that video with it.');
-  const given = subsFiles[0] ? parseSubtitles(await subsFiles[0].file.text()) : undefined;
+  // A subtitle file the phone cannot read is said so, not reported as one with no captions in it.
+  const given = subsFiles[0] ? parseSubtitles(await subsFiles[0].file.text().catch((e) => Promise.reject(isNotReadable(e) ? notReadable(e) : e))) : undefined;
   if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
 
   const look = radio('look', 'outline') as Look;
@@ -91,7 +93,10 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
   if (!hasVideoEncoder()) throw new CaptionsUnavailable("Burned-in captions don't work in this browser yet, because it has no video encoder. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.");
   if (!(await ensureH264Encoder())) throw new CaptionsUnavailable();
   // A video this browser cannot decode (HEVC on some phones, say) is said so now, not after the speech model's download and minutes of transcribing.
-  for (const v of videos) await assertReadable(v.file);
+  for (const v of videos) {
+    // A video the phone cannot reach is said so now, after one more look, not after the model download.
+    await retryUnreadable(v.file, async () => (await probeReadable(v.file), assertReadable(v.file)), (message) => progress.set(`${v.file.name}: ${message}`, 0));
+  }
   const outputs: OutputFile[] = [];
   for (const [index, entry] of videos.entries()) {
     const file = entry.file;
@@ -110,13 +115,20 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       try {
         speech = await withRecovery(
           () =>
-            speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
-              const plain = plainCaptionError(e);
-              // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.
-              const unnamed = !(plain instanceof SpeechError) || ['WorkerCrashError', 'SpeechModelError'].includes(plain.name);
-              if (overPhoneLimit(file.size) && unnamed) throw asMemory(phoneSpeechMemoryError(e));
-              throw plain.name === 'OutOfMemoryError' || plain.name === 'WorkerCrashError' ? asMemory(plain) : plain;
-            }),
+            // A file the phone failed to read is read once more, and never reported as a memory or sound problem.
+            retryUnreadable(
+              file,
+              () =>
+                speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
+                  if (isNotReadable(e)) throw notReadable(e);
+                  const plain = plainCaptionError(e);
+                  // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.
+                  const unnamed = !(plain instanceof SpeechError) || ['WorkerCrashError', 'SpeechModelError'].includes(plain.name);
+                  if (overPhoneLimit(file.size) && unnamed) throw asMemory(phoneSpeechMemoryError(e));
+                  throw plain.name === 'OutOfMemoryError' || plain.name === 'WorkerCrashError' ? asMemory(plain) : plain;
+                }),
+              (message) => progress.set(`${file.name}: ${message}`, share(0.01)),
+            ),
           // There is no picture to make smaller in this step.
           () => 0,
           page.hooks,
@@ -136,9 +148,17 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
     let fitted: Segment[] | undefined;
     let shown = 0;
     let last: Segment | undefined;
-    const r = await editVideo(file, {
+    // A redraw that starts again counts the captions from the start.
+    const redraw = () => {
+      shown = 0;
+      last = undefined;
+      return editVideo(file, {
       // After the page was hidden, or an encoder that stopped, the redraw starts again by itself: say so.
-      onNotice: (message) => progress.set(`${file.name}: ${message}`, share(start)),
+      onNotice: (message) => {
+        shown = 0;
+        last = undefined;
+        progress.set(`${file.name}: ${message}`, share(start));
+      },
       readsBack: false,
       paint(ctx, t) {
         const { width, height } = ctx.canvas;
@@ -156,9 +176,17 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
         last = cap;
       },
       onProgress: (f) => progress.set(`Adding subtitles to ${file.name}: ${Math.round(f * 100)}%`, share(start + f * (1 - start))),
-    }).catch((e) => {
+      });
+    };
+    const r = await retryUnreadable(file, redraw, (message) => progress.set(`${file.name}: ${message}`, share(start))).catch((e) => {
       // A stall part way through: the same plain message and link as the early check.
       if (e instanceof EncoderStall) throw new CaptionsUnavailable();
+      // A file the phone could not read is not an encoder or memory failure; its name stays NotReadableError.
+      if (isNotReadable(e)) {
+        const unread = notReadable(e) as Error & { salvage?: OutputFile[] };
+        if (!given) unread.salvage = [srtOutput(file, segments)];
+        throw unread;
+      }
       // Any other failure while redrawing: the captions written from speech already exist, so hand them over with the message.
       // Out of memory, or an unnamed failure on a phone with a video this big (Safari's EncodingError "Unknown error"), says so.
       // A RangeError whose message names no memory (a bad buffer length) is not blamed on the phone's size.
@@ -172,7 +200,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       name: suffixName(file.name, '-subtitled', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? " (made at a smaller size, because the device's video encoder stopped at the full size)" : ''}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
+      note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? " (made at a smaller size, because the device's video encoder stopped at the full size)" : r.retry === 'again' ? ' (made on a second try, after the device\'s video encoder stopped responding)' : ''}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
     });
     if (saveSrt) outputs.push(srtOutput(file, segments));
   }
