@@ -27,7 +27,7 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
-import { InputError, UnreadableFile, NamedError } from './input-error';
+import { InputError, UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
 
 export interface LoopOptions {
   repeats: number;
@@ -83,7 +83,7 @@ export async function loopVideo(file: File, opts: LoopOptions): Promise<LoopResu
 
     if (!videoOk || !soundOk) {
       // Not copyable: join the clip to itself through the merge path, which re-encodes once.
-      if (!(await video.canDecode())) throw new NamedError('VideoLoopFailed', unplayable());
+      if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
       const { mergeVideos } = await import('./video-merge');
       const r = await mergeVideos(Array.from({ length: opts.repeats }, () => file), { mute: opts.mute, onProgress: opts.onProgress });
       return { blob: r.blob, ext: 'mp4', width: r.width, height: r.height, duration: r.duration, videoCodec: r.videoCodec, copied: false, audio: r.audio, audioDropped: r.audioDropped };

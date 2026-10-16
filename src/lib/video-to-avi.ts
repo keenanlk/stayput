@@ -29,11 +29,11 @@ import { executeWatched, watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { H264Unavailable } from './encoder-probe';
 import { unplayable } from './video-compress';
+import { UnsupportedCodec, NamedError, UnreadableFile } from './input-error';
 import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { overPhoneLimit, PHONE_SAFE_BYTES, TRIM_LINK } from './phone-limit';
 import { AVI_LIMIT_BYTES, AviTooLarge, avcConfig, avcToAnnexB, writeAvi, type AviAudio, type AviFrame } from './avi-write';
-import { NamedError, UnreadableFile } from './input-error';
 
 export interface AviOptions {
   mute: boolean;
@@ -107,7 +107,7 @@ export async function convertToAvi(file: File, opts: AviOptions): Promise<AviRes
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
-    if (!(await video.canDecode())) throw new NamedError('VideoToAviFailed', unplayable());
+    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const width = even(video.displayWidth);
     const height = even(video.displayHeight);
     const duration = await input.computeDuration();
@@ -352,7 +352,7 @@ async function h264Frames(o: {
   });
   if (!conversion.isValid) {
     const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-    throw new NamedError('VideoToAviFailed', reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+    throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoToAviFailed', 'This browser cannot convert this video.');
   }
   let feeding: Promise<void> | null = null;
   if (pcm) {

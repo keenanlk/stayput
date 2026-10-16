@@ -54,3 +54,14 @@ export class NamedError extends Error {
 export function isUnspecific(e: unknown): boolean {
   return e instanceof Error && (e.name === 'Error' || (e instanceof NamedError && /Failed$/.test(e.name)));
 }
+
+/**
+ * A video whose codec this browser cannot decode (HEVC or HDR from a phone camera, say). Its own name keeps these
+ * apart from damaged files in the counts; the message says how to get a copy that opens.
+ */
+export class UnsupportedCodec extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnsupportedCodec';
+  }
+}

@@ -94,7 +94,7 @@ export function looksReclaimed(e: unknown): boolean {
 }
 
 /** Failures that say what the visitor gave or asked for, whatever the page was doing. */
-const NOT_INTERRUPTION = ['InputError', 'UnreadableFile', 'NoSpeechFound', 'AudioDecodeError'];
+const NOT_INTERRUPTION = ['InputError', 'UnreadableFile', 'UnsupportedCodec', 'NoSpeechFound', 'AudioDecodeError'];
 
 /**
  * The error to show when a run failed after the page went hidden, or with a

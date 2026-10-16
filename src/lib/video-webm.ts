@@ -25,8 +25,8 @@ import {
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
+import { UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
 import type { ConvertOptions, ConvertResult } from './video-convert';
-import { UnreadableFile, NamedError } from './input-error';
 
 const WEBM_VIDEO: string[] = ['vp8', 'vp9', 'av1'];
 const WEBM_AUDIO: string[] = ['opus', 'vorbis'];
@@ -46,7 +46,7 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
     let copyVideo = !!sourceVideo && WEBM_VIDEO.includes(sourceVideo);
     let best: VideoCodec | null = null;
     if (!copyVideo) {
-      if (!(await video.canDecode())) throw new NamedError('VideoWebmFailed', unplayable());
+      if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
       best = await getFirstEncodableVideoCodec(['vp9', 'vp8'], { width: evenW, height: evenH, bitrate: QUALITY_HIGH });
       if (!best) {
         throw new NamedError('VideoWebmFailed', 'This browser cannot write WebM video (it has no VP8 or VP9 encoder). Use a recent Chrome, Edge or Firefox on a computer.');
@@ -79,7 +79,7 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw new NamedError('VideoWebmFailed', reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoWebmFailed', 'This browser cannot convert this video.');
     }
     if (audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack())) {
       throw new NamedError('VideoWebmFailed', 'This browser cannot read this file’s sound. Tick Remove the sound to convert the picture alone, or use a recent Chrome, Edge or Firefox.');

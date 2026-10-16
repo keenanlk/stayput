@@ -5,6 +5,7 @@
  * preferred because every phone and site plays it; VP9 or AV1 with Opus are
  * the fallback where a browser lacks those encoders. Nothing leaves the tab.
  */
+import { UnsupportedCodec, UnreadableFile, InputError, NamedError } from './input-error';
 import {
   BlobSource,
   BufferTarget,
@@ -25,7 +26,6 @@ import {
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
 import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
-import { UnreadableFile, InputError, NamedError } from './input-error';
 
 export type CompressMode = 'balanced' | 'small' | 'high' | 'size';
 
@@ -67,7 +67,7 @@ const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 export function unplayable(nav: Pick<Navigator, 'userAgent'> | undefined = typeof navigator === 'undefined' ? undefined : navigator): string {
   // "Try Safari" does not help on an Android phone, where the clip is usually HEVC or HDR from the camera.
   if (nav && /Android/i.test(nav.userAgent)) {
-    return 'This phone cannot decode this video. Clips recorded as HEVC (H.265) or HDR often cannot be read in the browser here: in the camera settings turn off "High efficiency video" (HEVC) or HDR, record again or convert the clip to H.264, then add it again.';
+    return 'This phone cannot decode this video. Clips recorded as HEVC (H.265) or HDR often cannot be read in the browser here: in the camera settings choose "Most compatible" (H.264) or turn HDR video off, record again, then add the new clip. Nothing was uploaded.';
   }
   return 'This browser cannot decode this video. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux cannot read: try Safari, or set the iPhone camera to "Most Compatible".';
 }
@@ -91,7 +91,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
-    if (!(await video.canDecode())) throw new NamedError('VideoCompressFailed', unplayable());
+    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     const soundOk = sound ? await sound.canDecode() : false;
     const duration = await input.computeDuration();
@@ -119,7 +119,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       videoBitrate = bits;
       if (bits < 120_000) {
         const most = Math.floor((target * 8 * 0.9) / (184_000 * 60));
-        throw new InputError(`This video is too long to fit in ${opts.targetMB} MB and still be watchable. Trim it to under ${most} minute${most === 1 ? '' : 's'}, or choose a larger size.`);
+        throw new NamedError('VideoCompressFailed', `This video is too long to fit in ${opts.targetMB} MB and still be watchable. Trim it to under ${most} minute${most === 1 ? '' : 's'}, or choose a larger size.`);
       }
       // Pick the largest picture that the bitrate can fill with enough detail.
       const fps = 30;
@@ -163,7 +163,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       });
       if (!conversion.isValid) {
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-        throw new NamedError('VideoCompressFailed', reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+        throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoCompressFailed', 'This browser cannot convert this video.');
       }
       await executeWatched(conversion, onProgress);
       const buffer = output.target.buffer;

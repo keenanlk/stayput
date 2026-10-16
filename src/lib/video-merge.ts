@@ -32,7 +32,7 @@ import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError, NamedError } from './input-error';
+import { InputError, UnsupportedCodec, NamedError } from './input-error';
 
 export interface MergeOptions {
   mute: boolean;
@@ -95,7 +95,7 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
     for (const [i, input] of inputs.entries()) {
       const track = await input.getPrimaryVideoTrack().catch(() => null);
       if (!track) throw new NamedError('VideoMergeFailed', `${files[i]!.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
-      if (!(await track.canDecode())) throw new NamedError('VideoMergeFailed', `${files[i]!.name}: ${unplayable()}`);
+      if (!(await track.canDecode())) throw new UnsupportedCodec(`${files[i]!.name}: ${unplayable()}`);
       clips.push({ track, ...(await pictureLength(track)), name: files[i]!.name });
     }
     const width = even(clips[0]!.track.displayWidth);
