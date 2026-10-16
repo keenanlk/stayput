@@ -72,6 +72,7 @@ export const nextSteps: Record<string, string[]> = {
   'remove-noise': ['volume-booster', 'remove-silence'],
   'image-to-svg': ['remove-background', 'favicon-generator'],
   'gif-maker': ['compress-gif', 'gif-to-mp4'],
+  'sprite-sheet-maker': ['gif-maker', 'gif-frame-splitter'],
   'flatten-pdf': ['merge-pdf', 'compress-pdf'],
   'ocr-pdf': ['compress-pdf', 'pdf-to-word'],
   'document-scanner': ['ocr-pdf', 'merge-pdf'],

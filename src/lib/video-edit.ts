@@ -93,14 +93,14 @@ export interface EditResult {
  * Where to write the output: a file on this device where the browser allows it (the tab then never holds the
  * whole video), otherwise a buffer in memory as before.
  */
-/** For a read that falls back to null on any failure: a file the browser could not read stays that, it is not "no video here". */
-const unlessUnreadable = (e: unknown): null => {
-  if (isNotReadable(e)) throw notReadable(e);
-  return null;
-};
-
 /** An error with its own class name, so a failed run records which step it was (never the message). */
 const failure = (name: string, message: string) => Object.assign(new Error(message), { name });
+
+/** A file the phone could not read is not "not a video": it keeps its own name, so the job can read it once more. */
+function readOrNull(e: unknown): null {
+  if (isNotReadable(e)) throw notReadable(e);
+  return null;
+}
 
 async function outputTarget(inputBytes: number) {
   const disk = await openOpfsOutput(inputBytes);
@@ -153,7 +153,7 @@ export function shownSize(video: InputVideoTrack): { width: number; height: numb
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
+    const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
     return { ...shownSize(video), duration: await input.computeDuration() };
   } finally {
@@ -168,7 +168,7 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
 export async function assertReadable(file: File): Promise<void> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
+    const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (video && !(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
   } finally {
     input.dispose?.();
@@ -200,7 +200,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
 async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const format = await input.getFormat().catch(unlessUnreadable);
+    const format = await input.getFormat().catch(readOrNull);
     if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new UnreadableFile('This file has no video track.');

@@ -1,0 +1,12 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { toolBySlug } from '../../data/tools';
+import SpriteSheet from '../../components/options/SpriteSheet.astro';
+import SpriteStage from '../../components/SpriteStage.astro';
+const tool = toolBySlug('sprite-sheet-maker')!;
+---
+<ToolLayout tool={tool}>
+  <SpriteStage slot="panel" />
+  <Fragment slot="options"><SpriteSheet /></Fragment>
+</ToolLayout>
+<script src="../../tools/sprite-sheet-maker.ts"></script>

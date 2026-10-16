@@ -1,0 +1,13 @@
+---
+/** Live preview for the sprite sheet maker's GIF mode: the sheet's frames played as the GIF will play. Driven by src/tools/sprite-sheet-maker.ts. */
+---
+<div id="ss-panel" class="ss-panel" hidden>
+  <div class="ss-stage"><canvas id="ss-canvas" aria-label="Preview of the animation"></canvas></div>
+  <p class="muted small ss-hint" id="ss-hint"></p>
+</div>
+<style is:global>
+  .ss-panel { display: grid; gap: 8px; }
+  .ss-stage { line-height: 0; justify-self: start; max-width: 100%; background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .ss-stage canvas { display: block; max-width: 100%; max-height: 55vh; width: auto; height: auto; image-rendering: pixelated; }
+  .ss-hint { margin: 0; }
+</style>

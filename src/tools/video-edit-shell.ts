@@ -1,5 +1,7 @@
 import { createShell, processEach } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { nameBare } from '../lib/bare-error';
+import { retryUnreadable } from '../lib/read-failure';
 import type { EditOptions, EditResult } from '../lib/video-edit';
 
 /**
@@ -39,15 +41,26 @@ export function videoEditShell(config: {
       return processEach(files, progress, config.verb, async (entry, index) => {
         const share = (f: number) => (index + f) / files.length;
         progress.set(`Reading ${entry.file.name}…`, share(0.01));
-        const r = await editVideo(entry.file, {
-          ...(await config.options(entry.file)),
-          onProgress: (f) => progress.set(`${config.verb} ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
+        const options = await config.options(entry.file);
+        // A phone that could not read the file once (Android's NotReadableError) reads it once more before the failure is shown.
+        const r = await retryUnreadable(
+          entry.file,
+          () =>
+            editVideo(entry.file, {
+              ...options,
+              onNotice: (message) => progress.set(`${entry.file.name}: ${message}`, share(0.02)),
+              onProgress: (f) => progress.set(`${config.verb} ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
+            }),
+          (message) => progress.set(`${entry.file.name}: ${message}`, share(0.02)),
+          // A failure with no name of its own is recorded as the step: the video edit.
+        ).catch((e) => {
+          throw nameBare('VideoEditFailed', e);
         });
         const out: OutputFile = {
           name: suffixName(entry.file.name, config.suffix, r.ext),
           blob: r.blob,
           originalSize: entry.file.size,
-          note: [describeEdit(r), config.note?.()].filter(Boolean).join(', '),
+          note: [describeEdit(r) + (r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? " (made at a smaller size, because the device's video encoder stopped at the full size)" : ''), config.note?.()].filter(Boolean).join(', '),
         };
         return out;
       });

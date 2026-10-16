@@ -24,12 +24,11 @@ export const SPEECH_RATE = 16000;
 export async function speechSamples(file: File, onProgress?: (fraction: number) => void): Promise<Float32Array> {
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   try {
+    // A file the browser cannot read is neither a video without sound nor a sound it cannot decode: it goes up to be read again.
+    const hasVideo = !!(await input.getPrimaryVideoTrack().catch(unlessUnreadable));
     // The first thing that went wrong on the way, kept so a failed run is named for it (a class name, never the message).
     let cause: unknown;
-    const hasVideo = !!(await input.getPrimaryVideoTrack().catch((e) => (isNotReadable(e) && (cause ??= e), null)));
-    const track = await input.getPrimaryAudioTrack().catch((e) => ((cause ??= e), null));
-    // A file the phone failed to read is not a file without sound: say so, and let the job read it once more.
-    if (isNotReadable(cause)) throw notReadable(cause);
+    const track = await input.getPrimaryAudioTrack().catch((e) => (unlessUnreadable(e), (cause ??= e), null));
     if (hasVideo && !track) {
       // A video with no sound track is its own kind of failure to the stats, unless the reader failed with an error of its own.
       const none = audioDecodeError(NO_SOUND, cause);
@@ -44,8 +43,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         const mono = await demuxedSound(input, SPEECH_RATE, true, onProgress);
         if (mono) return mono[0]!;
       } catch (e) {
-        if (looksLikeMemory(e) || (e instanceof SpeechError && e.message === NO_SOUND)) throw e;
-        if (isNotReadable(e)) throw notReadable(e);
+        if (looksLikeMemory(e) || isNotReadable(e) || (e instanceof SpeechError && e.message === NO_SOUND)) throw e;
         cause ??= e;
         failed = true;
       }
@@ -54,8 +52,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
       try {
         return await wholeFile(file);
       } catch (e) {
-        if (looksLikeMemory(e)) throw e;
-        if (isNotReadable(e)) throw notReadable(e);
+        if (looksLikeMemory(e) || isNotReadable(e)) throw e;
         cause ??= e;
       }
     }
@@ -64,8 +61,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         const samples = await decodedByCodecs(track, SPEECH_RATE, onProgress);
         if (samples) return samples;
       } catch (e) {
-        if (looksLikeMemory(e)) throw e;
-        if (isNotReadable(e)) throw notReadable(e);
+        if (looksLikeMemory(e) || isNotReadable(e)) throw e;
         cause ??= e;
       }
     }
@@ -75,6 +71,12 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
   } finally {
     input.dispose?.();
   }
+}
+
+/** Rethrows a read failure; any other error is the caller's to handle (null for a missing track). */
+function unlessUnreadable(e: unknown): null {
+  if (isNotReadable(e)) throw e;
+  return null;
 }
 
 /** Anything a decode throws, as one of the page's own errors. */

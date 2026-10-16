@@ -5,7 +5,7 @@
  * Whisper worker, so a name survives the trip across postMessage.
  */
 
-import { isNotReadable, notReadable } from './read-failure';
+import { isNotReadable } from './read-failure';
 
 export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound'] as const;
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
@@ -118,8 +118,8 @@ function classNameOf(e: unknown, fallback = 'Error'): string {
 /** The error to show for a failed caption step: our own named errors pass through, the rest become plain ones. */
 export function plainCaptionError(e: unknown): Error {
   if (e instanceof SpeechError) return e;
-  // A file the device could not read keeps its own plain message and its name.
-  if (isNotReadable(e)) return notReadable(e);
+  // A file the browser would not read keeps its own name and message: it is not the sound's fault.
+  if (isNotReadable(e) && e instanceof Error) return e;
   if (looksLikeMemory(e)) return outOfMemoryError();
   return unknownCaptionError(e);
 }

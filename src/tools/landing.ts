@@ -90,6 +90,7 @@ const modules: Record<string, () => Promise<unknown>> = {
   'add-border-to-image': () => import('./add-border-to-image'),
   'image-to-svg': () => import('./image-to-svg'),
   'gif-maker': () => import('./gif-maker'),
+  'sprite-sheet-maker': () => import('./sprite-sheet-maker'),
   'resize-pdf': () => import('./resize-pdf'),
   'transcribe': () => import('./transcribe'),
   'add-subtitles-to-video': () => import('./add-subtitles'),
