@@ -31,6 +31,7 @@ import { executeWatched } from './encoder-watchdog';
 import { requireH264Encoder } from './encoder-probe';
 import { aacSafeSampleRate } from './video-codec';
 import { unplayable } from './video-compress';
+import { UnsupportedCodec } from './input-error';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -56,7 +57,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
     if (!format) throw new Error('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new Error('This file has no video track.');
-    if (opts.exact && !(await video.canDecode())) throw new Error(unplayable());
+    if (opts.exact && !(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     if (opts.exact) await requireH264Encoder();
     const outFormat =
       format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
@@ -103,7 +104,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot cut this video.');
+      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new Error('This browser cannot cut this video.');
     }
     if (keepSound) {
       let sink: Conversion | null = null;

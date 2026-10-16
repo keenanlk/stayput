@@ -26,7 +26,7 @@ import {
 } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
-import { InputError, NamedError, UnreadableFile } from './input-error';
+import { InputError, NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -80,7 +80,7 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    if (!(await video.canDecode())) throw new UnreadableFile(unplayable());
+    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const first = await video.getFirstTimestamp();
     let end = first;
     let packets = 0;
