@@ -29,6 +29,7 @@ import { executeWatched } from './encoder-watchdog';
 import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
 import { H264Unavailable } from './encoder-probe';
 import { CODEC_NAMES, unplayable } from './video-compress';
+import { UnsupportedCodec } from './input-error';
 import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -93,7 +94,7 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       // iPhone HEVC in a browser that cannot decode it: MP4 can hold HEVC as it is,
       // which plays on Apple devices, Android and recent Windows.
       if (sourceVideo === 'hevc') copyVideo = true;
-      else throw new Error(unplayable());
+      else throw new UnsupportedCodec(unplayable());
     }
     if (!copyVideo && silent) throw silent;
     if (!copyVideo && !best && mov) throw new Error('This browser cannot write H.264 video, which a MOV needs to play in QuickTime. Use a recent Safari, Chrome or Edge.');
@@ -147,7 +148,7 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw new Error(reason === 'undecodable_source_codec' ? unplayable() : 'This browser cannot convert this video.');
+      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new Error('This browser cannot convert this video.');
     }
     // The sound track can still be discarded when this browser cannot decode it.
     const soundLost = !!audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack());
