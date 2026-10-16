@@ -4,6 +4,7 @@ import { clean, cutPoints, type Segment } from './captions';
 import { fromWorker, noSpeechFound, restartsOnce, workerCrashError } from './speech-errors';
 import { SPEECH_MODEL_MB } from '../data/speech-size';
 import { rememberWebgpuFailure, wantsWebgpu } from './speech-path';
+import { retryUnreadable } from './read-failure';
 import type { Reply, Request } from './transcribe.worker';
 
 /**
@@ -138,7 +139,12 @@ export async function transcribeFile(
 ): Promise<Speech> {
   const { onProgress } = opts;
   onProgress(`Reading the sound from ${file.name}…`, 0.02);
-  const samples = await speechSamples(file, (f) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f));
+  // A file the browser could not read from disk is read once more before anything is said about its sound.
+  const samples = await retryUnreadable(
+    file,
+    () => speechSamples(file, (f) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f)),
+    (message) => onProgress(message, 0.02),
+  );
   const total = samples.length / RATE;
   if (total < 0.5) throw noSpeechFound('The recording is too short to hold any speech.');
   const cuts = [0, ...cutPoints(samples, RATE), samples.length];
@@ -146,6 +152,8 @@ export async function transcribeFile(
   // Detected once, from the first piece, then kept for the rest of the recording.
   let spoken: string | null = opts.language === 'auto' ? null : opts.language;
   let retriedModel = false;
+  // Pieces done in this run: the module's `modelReady` outlives a worker that died between runs, and its replacement starts the model from scratch.
+  let recognised = 0;
   let onChip = 0;
   let onCpu = 0;
   for (let i = 1; i < cuts.length; i++) {
@@ -163,8 +171,8 @@ export async function transcribeFile(
     } catch (err) {
       // Before any piece has been recognised, a model that would not start (a kept copy the worker dropped, or a start-up
       // that ran out of memory or killed the worker) gets one more try in a fresh worker: a download again, or the model
-      // from the store. Once a piece has been done, a failure is the recording's and is not retried.
-      if (modelReady || retriedModel || !(err instanceof Error) || !restartsOnce(err)) throw err;
+      // from the store. Once a piece of this run has been done, a failure is the recording's and is not retried.
+      if (recognised > 0 || retriedModel || !(err instanceof Error) || !restartsOnce(err)) throw err;
       retriedModel = true;
       releaseSpeechModel();
       // A stopped worker gives its memory back a moment later.
@@ -172,6 +180,7 @@ export async function transcribeFile(
       found = await recognise(piece, spoken, opts.task, loading);
     }
     modelReady = true;
+    recognised++;
     if (onGpu) onChip++;
     else onCpu++;
     spoken = found.language;
