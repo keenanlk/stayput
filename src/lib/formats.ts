@@ -13,6 +13,7 @@ export type OutputType =
   | 'image/bmp'
   | 'image/tiff'
   | 'image/x-icon'
+  | 'image/x-win-bitmap'
   | 'application/pdf';
 
 export type OutputGroup = 'Everyday' | 'Special purpose';
@@ -41,7 +42,8 @@ export const OUTPUT_FORMATS: OutputFormat[] = [
   { type: 'image/avif', label: 'AVIF', ext: 'avif', group: 'Everyday', blurb: 'Smaller than JPG or WebP at the same look, with transparency. Encoding is slow and not every app opens it.', aliases: ['av1', 'next-gen'], alpha: true, quality: true, kind: 'avif' },
   { type: 'application/pdf', label: 'PDF', ext: 'pdf', group: 'Everyday', blurb: 'One page per image, sized to the picture. Good for forms and printing.', aliases: ['document', 'print', 'acrobat'], alpha: false, quality: true, kind: 'pdf' },
   { type: 'image/gif', label: 'GIF', ext: 'gif', group: 'Special purpose', blurb: 'Limited to 256 colours. Animated WebPs stay animated. For chat apps, forums and email signatures.', aliases: ['graphics interchange'], alpha: true, quality: false, kind: 'gif' },
-  { type: 'image/x-icon', label: 'ICO', ext: 'ico', group: 'Special purpose', blurb: 'A Windows icon or favicon with sizes from 16 to 256 pixels, padded square.', aliases: ['icon', 'favicon', 'windows icon', 'cur'], alpha: true, quality: false, kind: 'ico' },
+  { type: 'image/x-icon', label: 'ICO', ext: 'ico', group: 'Special purpose', blurb: 'A Windows icon or favicon with sizes from 16 to 256 pixels, padded square.', aliases: ['icon', 'favicon', 'windows icon'], alpha: true, quality: false, kind: 'ico' },
+  { type: 'image/x-win-bitmap', label: 'CUR', ext: 'cur', group: 'Special purpose', blurb: 'A Windows mouse pointer at 32 to 128 pixels, with a hotspot you choose.', aliases: ['cursor', 'pointer', 'mouse', 'windows cursor'], alpha: true, quality: false },
   { type: 'image/bmp', label: 'BMP', ext: 'bmp', group: 'Special purpose', blurb: 'Uncompressed bitmap for old Windows software. Files are large.', aliases: ['bitmap', 'dib', 'windows'], alpha: false, quality: false, kind: 'bmp' },
   { type: 'image/tiff', label: 'TIFF', ext: 'tiff', group: 'Special purpose', blurb: 'Uncompressed, keeps transparency. For print shops, scanning and archives.', aliases: ['tif', 'print', 'archive', 'scan'], alpha: true, quality: false, kind: 'tiff' },
 ];
