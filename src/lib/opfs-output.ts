@@ -61,8 +61,8 @@ async function hasRoomFor(bytes: number): Promise<boolean> {
 
 function call(worker: Worker, message: OpfsRequest): Promise<void> {
   return new Promise((resolve, reject) => {
-    worker.onmessage = (e: MessageEvent<OpfsReply>) => (e.data.ok ? resolve() : reject(new Error(e.data.error)));
-    worker.onerror = (e) => reject(new Error(e.message || 'Worker error'));
+    worker.onmessage = (e: MessageEvent<OpfsReply>) => (e.data.ok ? resolve() : reject(Object.assign(new Error(e.data.error), { name: 'OutputFileError' })));
+    worker.onerror = (e) => reject(Object.assign(new Error(e.message || 'Worker error'), { name: 'OutputWorkerError' }));
     worker.postMessage(message);
   });
 }

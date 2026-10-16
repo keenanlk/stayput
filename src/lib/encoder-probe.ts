@@ -36,7 +36,24 @@ const DEFAULT_CODEC = 'avc1.640016';
 
 function configFor(v: Variant, base: VideoEncoderConfig): VideoEncoderConfig {
   const codec = v.baseline ? `avc1.4200${base.codec.slice(-2)}` : base.codec;
-  return { ...base, codec, latencyMode: v.latencyMode };
+  return { ...base, codec, latencyMode: realtimeOnly ? 'realtime' : v.latencyMode };
+}
+
+/** Set by useRealtimeH264: every H.264 encoder made after it runs in real-time mode, which does not stall where quality mode can. */
+let realtimeOnly = false;
+let registered = false;
+
+/**
+ * For a run started again after the encoder stalled or failed: the H.264 encoder Mediabunny makes next uses real-time
+ * latency (WebKit's quality mode can take a few frames and then stop answering). Call it before the new Conversion is made.
+ */
+export function useRealtimeH264(): void {
+  if (typeof VideoEncoder === 'undefined') return;
+  realtimeOnly = true;
+  if (!registered) {
+    registered = true;
+    registerEncoder(encoderClass(VARIANTS[1]!));
+  }
 }
 
 /** Whether an encoder with this config hands back at least one packet and finishes, is silent, or is not offered at all. */
@@ -139,7 +156,10 @@ export function ensureH264Encoder(): Promise<boolean> {
     for (const variant of VARIANTS) {
       const result = await answers(configFor(variant, base), PROBE_MS);
       if (result === 'yes') {
-        if (variant !== VARIANTS[0] || isWebKit()) registerEncoder(encoderClass(variant));
+        if (variant !== VARIANTS[0] || isWebKit()) {
+          registered = true;
+          registerEncoder(encoderClass(variant));
+        }
         return true;
       }
       if (result === 'silent') offered = true;

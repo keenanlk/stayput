@@ -15,6 +15,7 @@
 import { ALL_FORMATS, AudioBufferSink, BlobSource, Input, type InputAudioTrack } from 'mediabunny';
 import { demuxedSound, grown, NO_SOUND, plannedSamples } from './demux-audio';
 import { decodeAudio, channelsOf } from './audio';
+import { isNotReadable, notReadable } from './read-failure';
 import { audioDecodeError, looksLikeMemory, outOfMemoryError, SpeechError } from './speech-errors';
 
 export const SPEECH_RATE = 16000;
@@ -23,10 +24,12 @@ export const SPEECH_RATE = 16000;
 export async function speechSamples(file: File, onProgress?: (fraction: number) => void): Promise<Float32Array> {
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   try {
-    const hasVideo = !!(await input.getPrimaryVideoTrack().catch(() => null));
     // The first thing that went wrong on the way, kept so a failed run is named for it (a class name, never the message).
     let cause: unknown;
+    const hasVideo = !!(await input.getPrimaryVideoTrack().catch((e) => (isNotReadable(e) && (cause ??= e), null)));
     const track = await input.getPrimaryAudioTrack().catch((e) => ((cause ??= e), null));
+    // A file the phone failed to read is not a file without sound: say so, and let the job read it once more.
+    if (isNotReadable(cause)) throw notReadable(cause);
     if (hasVideo && !track) {
       // A video with no sound track is its own kind of failure to the stats, unless the reader failed with an error of its own.
       const none = audioDecodeError(NO_SOUND, cause);
@@ -42,6 +45,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         if (mono) return mono[0]!;
       } catch (e) {
         if (looksLikeMemory(e) || (e instanceof SpeechError && e.message === NO_SOUND)) throw e;
+        if (isNotReadable(e)) throw notReadable(e);
         cause ??= e;
         failed = true;
       }
@@ -51,6 +55,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         return await wholeFile(file);
       } catch (e) {
         if (looksLikeMemory(e)) throw e;
+        if (isNotReadable(e)) throw notReadable(e);
         cause ??= e;
       }
     }
@@ -60,6 +65,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
         if (samples) return samples;
       } catch (e) {
         if (looksLikeMemory(e)) throw e;
+        if (isNotReadable(e)) throw notReadable(e);
         cause ??= e;
       }
     }
@@ -73,6 +79,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
 
 /** Anything a decode throws, as one of the page's own errors. */
 function asSpeechError(e: unknown): Error {
+  if (isNotReadable(e)) return notReadable(e);
   if (e instanceof SpeechError && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.kind)) return e;
   if (e instanceof Error && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.name)) return e;
   return looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError(undefined, e);

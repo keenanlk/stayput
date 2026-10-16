@@ -183,7 +183,7 @@ createShell({
         name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
         blob: r.blob,
         originalSize: file.size,
-        note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? ' (made at a smaller size, because the device\'s video encoder stopped at the full size)' : ''}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
+        note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? ' (made at a smaller size, because the device\'s video encoder stopped at the full size)' : r.retry === 'again' ? ' (made on a second try, after the device\'s video encoder stopped responding)' : ''}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
       });
     }
     return outputs;

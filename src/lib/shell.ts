@@ -488,7 +488,7 @@ export function createShell(opts: ShellOptions) {
       const result = await opts.process(files, progressApi);
       const outs = Array.isArray(result) ? result : result.outputs;
       const skipped = Array.isArray(result) ? [] : result.skipped;
-      if (outs.length === 0) throw new Error('Nothing was produced. Check the options and try again.');
+      if (outs.length === 0) throw Object.assign(new Error('Nothing was produced. Check the options and try again.'), { name: 'NothingProduced' });
       showResults(outs);
       const firstOk = !!attempt && !attempt.ok;
       if (attempt) attempt.ok = true;

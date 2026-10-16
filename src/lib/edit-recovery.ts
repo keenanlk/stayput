@@ -42,7 +42,7 @@ export interface Attempt {
   /** Longest side of the output this try must stay within, when a retry asked for a smaller one. */
   maxSide?: number;
   /** Which kind of retry this is, if it is one. */
-  retry?: 'resumed' | 'smaller';
+  retry?: 'resumed' | 'smaller' | 'again';
 }
 
 const nameOf = (e: unknown) => (typeof e === 'object' && e ? ((e as { name?: string }).name ?? '') : '');
@@ -70,7 +70,14 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
         continue;
       }
       const next = SHRINKABLE.has(name) && !shrunk ? smallerSide(longestSide()) : undefined;
-      if (next === undefined) throw e;
+      if (next === undefined) {
+        // A stalled encoder on a picture already as small as a retry goes still gets one more try, in real-time mode, at the same size.
+        if (name !== 'EncoderStall' || shrunk) throw e;
+        shrunk = true;
+        hooks.onNotice?.("This device's video encoder stopped responding. Trying once more.");
+        attempt = { retry: 'again' };
+        continue;
+      }
       shrunk = true;
       hooks.onNotice?.(`This device's video encoder stopped at the full size. Trying again at a smaller size (${next} pixels on the longest side).`);
       attempt = { maxSide: next, retry: 'smaller' };

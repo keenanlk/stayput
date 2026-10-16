@@ -27,9 +27,10 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
-import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
+import { EncoderUnavailable, hasVideoEncoder, useRealtimeH264 } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile } from './input-error';
+import { isNotReadable, notReadable } from './read-failure';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
@@ -85,13 +86,19 @@ export interface EditResult {
   /** For a painted edit: frames done, and milliseconds in `paint` and in all of the frame loop (page-local, never sent). */
   timing?: { frames: number; paintMs: number; loopMs: number };
   /** Set when the first try failed and this is the second: after the page was hidden, or at a smaller size. */
-  retry?: 'resumed' | 'smaller';
+  retry?: 'resumed' | 'smaller' | 'again';
 }
 
 /**
  * Where to write the output: a file on this device where the browser allows it (the tab then never holds the
  * whole video), otherwise a buffer in memory as before.
  */
+/** For a read that falls back to null on any failure: a file the browser could not read stays that, it is not "no video here". */
+const unlessUnreadable = (e: unknown): null => {
+  if (isNotReadable(e)) throw notReadable(e);
+  return null;
+};
+
 /** An error with its own class name, so a failed run records which step it was (never the message). */
 const failure = (name: string, message: string) => Object.assign(new Error(message), { name });
 
@@ -146,7 +153,7 @@ export function shownSize(video: InputVideoTrack): { width: number; height: numb
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
+    const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
     return { ...shownSize(video), duration: await input.computeDuration() };
   } finally {
@@ -161,7 +168,7 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
 export async function assertReadable(file: File): Promise<void> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
+    const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
     if (video && !(await video.canDecode().catch(() => true))) throw new UnreadableFile(unplayable());
   } finally {
     input.dispose?.();
@@ -193,7 +200,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
 async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const format = await input.getFormat().catch(() => null);
+    const format = await input.getFormat().catch(unlessUnreadable);
     if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new UnreadableFile('This file has no video track.');
@@ -280,6 +287,8 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       const wanted = matchedBitrate(sourceBps, video.codec, shown.width * shown.height, width * height);
       if (wanted) bitrate = new Quality({ bitrate: wanted });
     }
+    // A run started again after the encoder failed asks for the encoder mode that does not stall.
+    if (attempt.retry === 'smaller' || attempt.retry === 'again') useRealtimeH264();
     const videoCodec = await pickVideoCodec({ width, height, bitrate });
     if (!videoCodec) {
       throw hasVideoEncoder() ? new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.') : new EncoderUnavailable();
