@@ -1,6 +1,7 @@
 import { bindRange, bool, num, radio, str } from '../lib/shell';
 import { videoEditShell } from './video-edit-shell';
 import { apply, effectSize, firstGrapheme, type Effect } from '../lib/blur';
+import { nameBare } from '../lib/bare-error';
 import { grow, updateTracks, type Track } from '../lib/face-track';
 
 /**
@@ -47,8 +48,15 @@ videoEditShell({
         if (t - last >= SCAN || t < last) {
           last = t;
           // The detector lives with the photo tool; it downloads once (about 4 MB) and is cached.
-          const { findFaces } = await import('../lib/faces');
-          tracks = updateTracks(tracks, await findFaces(ctx.canvas, undefined, [0.5]), t, HOLD);
+          // A failure with no name of its own says which step it was: getting the detector, or reading a frame with it.
+          let step = 'FaceModelFailed';
+          try {
+            const { findFaces } = await import('../lib/faces');
+            const found = await findFaces(ctx.canvas, (stage) => (step = stage === 'scanning' ? 'FaceScanFailed' : 'FaceModelFailed'), [0.5]);
+            tracks = updateTracks(tracks, found, t, HOLD);
+          } catch (e) {
+            throw nameBare(step, e);
+          }
         } else tracks = tracks.filter((tr) => t - tr.seen <= HOLD);
         const size = effectSize(strength, width, height);
         for (const tr of tracks) apply(ctx, kind, grow(tr.rect, MARGIN, width, height), size, char);
