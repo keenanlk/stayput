@@ -13,6 +13,7 @@
  * start) openOpfsOutput resolves undefined and the caller keeps the output in memory, as before.
  */
 import type { StreamTarget, StreamTargetChunk } from 'mediabunny';
+import { NamedError } from './input-error';
 import type { OpfsReply, OpfsRequest } from './opfs-output.worker';
 
 const DIR = 'stayput-outputs';
@@ -61,8 +62,8 @@ async function hasRoomFor(bytes: number): Promise<boolean> {
 
 function call(worker: Worker, message: OpfsRequest): Promise<void> {
   return new Promise((resolve, reject) => {
-    worker.onmessage = (e: MessageEvent<OpfsReply>) => (e.data.ok ? resolve() : reject(new Error(e.data.error)));
-    worker.onerror = (e) => reject(new Error(e.message || 'Worker error'));
+    worker.onmessage = (e: MessageEvent<OpfsReply>) => (e.data.ok ? resolve() : reject(new NamedError('OpfsWriteFailed', e.data.error)));
+    worker.onerror = (e) => reject(new NamedError('OpfsWorkerFailed', e.message || 'Worker error'));
     worker.postMessage(message);
   });
 }
