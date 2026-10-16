@@ -32,6 +32,25 @@ export interface Skipped {
 }
 
 /** What `process` returns: plain outputs, or outputs plus the files that were skipped. */
+const EXT_TYPE: Record<string, string> = { txt: 'text', srt: 'text', vtt: 'text', json: 'application', csv: 'text', md: 'text', pdf: 'application', svg: 'image' };
+
+/** The top-level media type of a file ("image", "audio", "video", "text"…), from its type or else its extension; '' when unknown. */
+function topType(f: Blob & { name?: string }): string {
+  if (f.type) {
+    // JSON, like SRT and VTT, is text-like output when it comes from media.
+    return f.type === 'application/json' ? 'text' : f.type.split('/')[0]!;
+  }
+  const ext = f.name?.split('.').pop()?.toLowerCase() ?? '';
+  const t = EXT_TYPE[ext] ?? '';
+  return t === 'application' && ext === 'json' ? 'text' : t;
+}
+
+/** True when the output is a different kind of thing than every input (audio to text, video to image…), so a size comparison means nothing. Unknown types keep the comparison. */
+function changesKind(out: Blob & { name?: string }, inputKinds: Set<string>): boolean {
+  const kind = topType(out);
+  return kind !== '' && inputKinds.size > 0 && !inputKinds.has(kind);
+}
+
 export type ProcessResult = OutputFile[] | { outputs: OutputFile[]; skipped: Skipped[] };
 
 export interface ShellOptions {
@@ -376,6 +395,7 @@ export function createShell(opts: ShellOptions) {
     resultsTitle.textContent = opts.resultsTitle?.(outs) ?? (outs.length === 1 ? 'Done' : `Done: ${outs.length} files`);
     let totalIn = 0;
     let totalOut = 0;
+    const inputKinds = new Set(files.map((f) => topType(f.file)).filter(Boolean));
     for (const o of outs) {
       const row = document.createElement('div');
       row.className = 'result-item';
@@ -392,7 +412,7 @@ export function createShell(opts: ShellOptions) {
       const meta = document.createElement('div');
       meta.className = 'meta';
       meta.textContent = formatBytes(o.blob.size);
-      if (o.originalSize !== undefined && o.originalSize > 0) {
+      if (o.originalSize !== undefined && o.originalSize > 0 && !changesKind(o.blob, inputKinds)) {
         totalIn += o.originalSize;
         totalOut += o.blob.size;
         const pct = Math.round((1 - o.blob.size / o.originalSize) * 100);
