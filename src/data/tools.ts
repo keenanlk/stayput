@@ -4600,6 +4600,50 @@ export const tools: Tool[] = [
     ],
   },
   {
+    slug: 'sprite-sheet-maker',
+    icon: 'grid',
+    name: 'Sprite sheet maker',
+    title: 'Sprite Sheet Maker: GIF or Frames to a Sheet, No Upload | Stayput',
+    description:
+      'Turn a GIF or a set of images into one sprite sheet PNG with a JSON of each frame, or cut a sprite sheet back into an animated GIF. Runs in your browser; no upload.',
+    heading: 'Make a sprite sheet',
+    tagline: 'A GIF or a set of pictures laid out as one PNG grid, with a JSON of every frame’s position and delay, or a sheet cut back into a GIF. It stays on this device.',
+    category: 'images',
+    accept: 'image/*,.heic,.heif,.avif,.jxl',
+    multiple: true,
+    dropLabel: 'Drop a GIF or the frames for your sheet',
+    action: 'Make sprite sheet',
+    sizeFact: 'No watermark. Sheets are capped at 8,192 px a side, and the page says so before it draws.',
+    keywords: ['sprite sheet maker', 'gif to sprite sheet', 'sprite sheet to gif', 'make a sprite sheet', 'sprite sheet generator', 'images to sprite sheet', 'sprite sheet creator', 'sprite sheet slicer'],
+    steps: [
+      'Choose Make a sprite sheet, then drop a GIF or several images (they are used in the order listed).',
+      'Set the columns, the padding between frames, the background and the frame step, and tick the JSON box if you want the frame positions.',
+      'Press Make sprite sheet and save the PNG and JSON. To go the other way, choose Sprite sheet to GIF, drop the sheet, enter its columns and rows and check the preview before you save the GIF.',
+    ],
+    faq: [
+      {
+        q: 'Is transparency kept?',
+        a: 'In the PNG sheet, yes: the background is transparent unless you pick white or black, and every frame keeps its own transparent pixels. A GIF can only be transparent or not, with nothing in between, so a sheet cut back into a GIF turns soft edges into hard ones.',
+      },
+      {
+        q: 'How many frames fit on a sheet?',
+        a: 'Frame count times frame size must fit within 8,192 px a side and about 33 million pixels in all (half that on a phone). A 64 px sprite takes 1,000 frames; at 512 px you get about 120. Past 256 frames, frames bigger than 256 px make a sheet over 4,096 px, which some game engines and older phones cannot load as one texture. When a sheet would go over, the page tells you before drawing and suggests a smaller frame size or a bigger frame step.',
+      },
+      {
+        q: 'What is in the JSON?',
+        a: 'The sheet’s width and height, then a list with one entry per frame: x, y, w, h (in pixels from the top left) and delay in milliseconds. It is a plain list, not the format of any one game engine, so you read it with a few lines of your own code.',
+      },
+      {
+        q: 'Are my files uploaded, and does the order leave the page?',
+        a: 'No. The frames are decoded and drawn by code running in this tab, and no server is involved. File names and the order of your frames are never sent anywhere.',
+      },
+      {
+        q: 'What if I only have the frames, or want them back apart?',
+        a: 'Drop the pictures here to make a sheet. To save a GIF’s frames as separate PNGs use the [GIF frame splitter](/tools/gif-frame-splitter) or [Split GIF](/split-gif), and to build an animated GIF from pictures use the [GIF maker](/tools/gif-maker).',
+      },
+    ],
+  },
+  {
     slug: 'flatten-pdf',
     icon: 'pdf',
     name: 'Flatten PDF',
