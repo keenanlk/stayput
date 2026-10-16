@@ -168,18 +168,59 @@ const gifRepeat = (plays: number) => (plays === 0 ? 0 : plays === 1 ? -1 : plays
  * so transparent areas never show the previous frame through.
  */
 export async function writeAnimatedGif(anim: WebpAnimation, onProgress?: (done: number, total: number) => void): Promise<Uint8Array> {
-  const gif = GIFEncoder();
+  const writer = gifWriter(anim.loops);
   await renderWebpFrames(anim, (img, duration, i) => {
-    const rgba = new Uint8Array(img.data.buffer, img.data.byteOffset, img.data.byteLength);
-    const palette = quantize(rgba, 256, { format: 'rgba4444', oneBitAlpha: true });
-    const index = applyPalette(rgba, palette, 'rgba4444');
-    const transparentIndex = palette.findIndex((c) => c[3] === 0);
-    // Browsers play delays under 20 ms at 100 ms, so floor them at 20.
-    gif.writeFrame(index, img.width, img.height, { palette, delay: Math.max(20, duration), repeat: gifRepeat(anim.loops), dispose: 2, transparent: transparentIndex >= 0, transparentIndex: Math.max(0, transparentIndex) });
+    writer.add(img, duration);
     onProgress?.(i + 1, anim.frames.length);
   });
-  gif.finish();
-  return gif.bytes();
+  return writer.finish();
+}
+
+/**
+ * Writes an animated GIF a frame at a time (the same frames as writeAnimatedGif). `loops` is the total
+ * number of plays, 0 for forever. With `exact`, a frame of 256 colours or fewer keeps those colours as
+ * they are instead of being reduced to 4 bits a channel first.
+ */
+export function gifWriter(loops: number, opts: { exact?: boolean } = {}) {
+  const gif = GIFEncoder();
+  return {
+    add(img: ImageData, duration: number) {
+      const rgba = new Uint8Array(img.data.buffer, img.data.byteOffset, img.data.byteLength);
+      const exact = opts.exact ? exactPalette(rgba) : undefined;
+      const palette = exact?.palette ?? quantize(rgba, 256, { format: 'rgba4444', oneBitAlpha: true });
+      const index = exact?.index ?? applyPalette(rgba, palette, 'rgba4444');
+      const transparentIndex = palette.findIndex((c) => c[3] === 0);
+      // Browsers play delays under 20 ms at 100 ms, so floor them at 20.
+      gif.writeFrame(index, img.width, img.height, { palette, delay: Math.max(20, duration), repeat: gifRepeat(loops), dispose: 2, transparent: transparentIndex >= 0, transparentIndex: Math.max(0, transparentIndex) });
+    },
+    finish(): Uint8Array {
+      gif.finish();
+      return gif.bytes();
+    },
+  };
+}
+
+/** The frame's own colours as a palette with each pixel's index when there are 256 or fewer (every transparent pixel counts as one colour); otherwise undefined. */
+function exactPalette(rgba: Uint8Array): { palette: number[][]; index: Uint8Array } | undefined {
+  const seen = new Map<number, number>();
+  const palette: number[][] = [];
+  const view = new Uint32Array(rgba.buffer, rgba.byteOffset, rgba.byteLength >> 2);
+  const index = new Uint8Array(view.length);
+  for (let i = 0; i < view.length; i++) {
+    const o = i * 4;
+    const clear = rgba[o + 3]! < 128;
+    // Transparent pixels all share one key, so their hidden colour does not use up palette entries.
+    const key = clear ? -1 : view[i]!;
+    let at = seen.get(key);
+    if (at === undefined) {
+      if (palette.length === 256) return undefined;
+      at = palette.length;
+      seen.set(key, at);
+      palette.push(clear ? [0, 0, 0, 0] : [rgba[o]!, rgba[o + 1]!, rgba[o + 2]!, 255]);
+    }
+    index[i] = at;
+  }
+  return { palette, index };
 }
 
 /** Encode a decoded image into any output format. */

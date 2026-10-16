@@ -92,6 +92,8 @@ import EffectStage from '../components/EffectStage.astro';
 import AdjustStage from '../components/AdjustStage.astro';
 import ImageToSvg from '../components/options/ImageToSvg.astro';
 import GifMaker from '../components/options/GifMaker.astro';
+import SpriteSheet from '../components/options/SpriteSheet.astro';
+import SpriteStage from '../components/SpriteStage.astro';
 import ResizePdf from '../components/options/ResizePdf.astro';
 import Transcribe from '../components/options/Transcribe.astro';
 import AddSubtitles from '../components/options/AddSubtitles.astro';
@@ -212,6 +214,7 @@ const options = {
   'add-border-to-image': AddBorder,
   'image-to-svg': ImageToSvg,
   'gif-maker': GifMaker,
+  'sprite-sheet-maker': SpriteSheet,
   'resize-pdf': ResizePdf,
   'transcribe': Transcribe,
   'add-subtitles-to-video': AddSubtitles,
@@ -263,6 +266,7 @@ const Options = options[base as keyof typeof options];
   {base === 'black-and-white-image' && <MonoStage slot="panel" />}
   {base === 'image-to-svg' && <SvgStage slot="panel" />}
   {base === 'gif-maker' && <GifStage slot="panel" />}
+  {base === 'sprite-sheet-maker' && <SpriteStage slot="panel" />}
   {base === 'tuner' && <TunerStage slot="panel" defaults={defaults} />}
   {base === 'metronome' && <MetronomeStage slot="panel" defaults={defaults} />}
   {(base === 'watermark-image' || base === 'watermark-pdf') && <WatermarkStage slot="panel" />}
