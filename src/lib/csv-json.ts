@@ -7,7 +7,7 @@ import { UnreadableFile } from './input-error';
 
 export type Delimiter = ',' | ';' | '\t' | '|';
 export const DELIMITERS: Delimiter[] = [',', ';', '\t', '|'];
-export type Direction = 'json-to-csv' | 'csv-to-json';
+export type Direction = 'json-to-csv' | 'csv-to-json' | 'delimited';
 
 /** A table: an optional header row, then rows of text cells. */
 export interface Table {
@@ -461,6 +461,122 @@ export function csvToJson(text: string, job: CsvToJsonJob): CsvToJsonResult {
   return { text: out, delimiter, rows: records.length, columns: width, padded, header };
 }
 
+
+/** What separates cells in delimited text: a character, a run of 2+ spaces, or any run of spaces and tabs. */
+export type InDelimiter = Delimiter | 'spaces' | 'whitespace';
+/** What separates cells in the result: a character, or columns padded with spaces to line up. */
+export type OutDelimiter = Delimiter | 'padded';
+
+export interface DelimitedJob {
+  /** Undefined detects it from the text. */
+  from?: InDelimiter;
+  to: OutDelimiter;
+  eol: '\r\n' | '\n';
+}
+
+const isBreak = (c: number) => c === 10 || c === 13;
+
+/**
+ * Parse text whose columns are separated by runs of spaces. A cell may be quoted like in CSV to hold
+ * spaces, a quote or a line break. With `spaces` a single space stays inside a cell and 2+ spaces
+ * start the next one; with `whitespace` every run of spaces or tabs does. Blank lines are skipped.
+ */
+export function parseSpaced(input: string, mode: 'spaces' | 'whitespace'): string[][] {
+  const text = stripBom(input);
+  const n = text.length;
+  const rows: string[][] = [];
+  const blank = (c: number) => c === 32 || (mode === 'whitespace' && c === 9);
+  // Where the run of blanks starting at `from` ends.
+  const skip = (from: number) => {
+    let k = from;
+    while (k < n && blank(text.charCodeAt(k))) k++;
+    return k;
+  };
+  /** The end of an unquoted cell starting at `from`. */
+  const cellEnd = (from: number) => {
+    let end = from;
+    while (end < n && !isBreak(text.charCodeAt(end))) {
+      if (!blank(text.charCodeAt(end))) {
+        end++;
+        continue;
+      }
+      const k = skip(end);
+      if (k >= n || isBreak(text.charCodeAt(k)) || mode === 'whitespace' || k - end >= 2) break;
+      end = k;
+    }
+    return end;
+  };
+  let i = 0;
+  while (i < n && (isBreak(text.charCodeAt(i)) || blank(text.charCodeAt(i)))) i++;
+  while (i < n) {
+    const row: string[] = [];
+    for (;;) {
+      let value: string;
+      if (text.charCodeAt(i) === 34) {
+        const opened = i;
+        let out = '';
+        let from = i + 1;
+        for (;;) {
+          const q = text.indexOf('"', from);
+          if (q === -1) {
+            const at = locate(text, opened);
+            throw new DataError(`Line ${at.line}, column ${at.column}: a quoted value is never closed. Add the closing quote, or remove the opening one.`);
+          }
+          out += text.slice(from, q);
+          if (text.charCodeAt(q + 1) === 34) {
+            out += '"';
+            from = q + 2;
+          } else {
+            i = q + 1;
+            break;
+          }
+        }
+        const end = cellEnd(i);
+        value = out + text.slice(i, end);
+        i = end;
+      } else {
+        const end = cellEnd(i);
+        value = text.slice(i, end);
+        i = end;
+      }
+      row.push(value);
+      i = skip(i);
+      if (i >= n || isBreak(text.charCodeAt(i))) break;
+    }
+    rows.push(row);
+    // Past the line break, and any blank lines after it.
+    while (i < n && (isBreak(text.charCodeAt(i)) || blank(text.charCodeAt(i)))) i++;
+  }
+  return rows;
+}
+
+/** Write rows with columns padded to line up, two spaces apart; a cell that would not read back as one is quoted. */
+export function toPadded(rows: readonly (readonly string[])[], eol: '\r\n' | '\n'): string {
+  const needs = (cell: string) => cell === '' || cell.includes('"') || /[\r\n\t]|^ | $| {2}/.test(cell);
+  const cells = rows.map((row) => row.map((cell) => (needs(cell) ? `"${cell.replace(/"/g, '""')}"` : cell)));
+  const widths: number[] = [];
+  for (const row of cells) row.forEach((cell, c) => (widths[c] = Math.max(widths[c] ?? 0, cell.length)));
+  const lines = cells.map((row) => row.map((cell, c) => (c === row.length - 1 ? cell : cell.padEnd(widths[c]! + 2))).join(''));
+  return lines.length === 0 ? '' : lines.join(eol) + eol;
+}
+
+/** Whether the text holds a NUL byte near its start, which no text file has. */
+const looksBinary = (text: string) => text.slice(0, 8192).includes('\0');
+
+/** A plain-English name for the delimiter that was found, for "Looks tab-separated". */
+export const DELIMITER_NAME: Record<InDelimiter, string> = { ',': 'comma', ';': 'semicolon', '\t': 'tab', '|': 'pipe', spaces: 'space', whitespace: 'space' };
+
+/** Delimited text to delimited text: read the cells with one delimiter and write them with another. */
+export function delimitedToDelimited(text: string, job: DelimitedJob): { text: string; rows: string[][]; from: InDelimiter } {
+  if (looksBinary(text)) throw new UnreadableFile('This file is not text: it holds binary data. Drop a .txt, .csv or .tsv file, or paste the text.');
+  if (text.trim() === '') throw new DataError('There is nothing to convert: the text is empty.');
+  const from = job.from ?? detectDelimiter(text);
+  const rows = from === 'spaces' || from === 'whitespace' ? parseSpaced(text, from) : parseCsv(text, from);
+  if (rows.length === 0) throw new DataError('There is nothing to convert: the text has no rows.');
+  const out = job.to === 'padded' ? toPadded(rows, job.eol) : toCsv(rows, { delimiter: job.to, eol: job.eol });
+  return { text: out, rows, from };
+}
+
 /** The result of a conversion in either direction, shaped for the page. */
 export interface Converted {
   direction: Direction;
@@ -482,7 +598,8 @@ export const PREVIEW_LINES = 40;
 
 export type Job =
   | ({ direction: 'json-to-csv' } & JsonToCsvJob)
-  | ({ direction: 'csv-to-json' } & CsvToJsonJob);
+  | ({ direction: 'csv-to-json' } & CsvToJsonJob)
+  | ({ direction: 'delimited' } & DelimitedJob);
 
 /** Run one conversion on the whole text. */
 export function convert(text: string, job: Job): Converted {
@@ -498,6 +615,21 @@ export function convert(text: string, job: Job): Converted {
       delimiter: job.delimiter,
       hasHeader: table.header !== null,
       previewRows: all.slice(0, PREVIEW_ROWS + (table.header ? 1 : 0)),
+      previewLines: [],
+    };
+  }
+  if (job.direction === 'delimited') {
+    const r = delimitedToDelimited(text, job);
+    const width = r.rows.reduce((m, row) => Math.max(m, row.length), 0);
+    return {
+      direction: job.direction,
+      text: r.text,
+      rows: r.rows.length,
+      columns: width,
+      padded: 0,
+      delimiter: r.from === 'spaces' || r.from === 'whitespace' ? ',' : r.from,
+      hasHeader: false,
+      previewRows: r.rows.slice(0, PREVIEW_ROWS),
       previewLines: [],
     };
   }
