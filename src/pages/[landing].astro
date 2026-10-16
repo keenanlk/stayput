@@ -126,7 +126,7 @@ import MetronomeStage from '../components/MetronomeStage.astro';
 
 export function getStaticPaths() {
   return [
-    ...pairs.map((p) => ({ params: { landing: p.slug }, props: { tool: pairAsTool(p), base: 'convert-image', engine: p.outputType === 'image/x-icon' ? 'to-ico' : 'convert-image', intro: p.intro, defaults: { format: p.outputType } } })),
+    ...pairs.map((p) => ({ params: { landing: p.slug }, props: { tool: pairAsTool(p), base: 'convert-image', engine: p.outputType === 'image/x-icon' ? 'to-ico' : p.outputType === 'image/x-win-bitmap' ? 'to-cur' : 'convert-image', intro: p.intro, defaults: { format: p.outputType } } })),
     ...presets.map((p) => ({ params: { landing: p.slug }, props: { tool: presetAsTool(p), base: p.base, intro: p.intro, defaults: p.defaults ?? {} } })),
   ];
 }

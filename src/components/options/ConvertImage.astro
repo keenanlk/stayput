@@ -53,6 +53,20 @@ const format = defaults.format ?? 'image/jpeg';
 <div class="field" id="avif-cancel-field" hidden>
   <button type="button" class="btn" id="avif-cancel">Cancel encode</button>
 </div>
+<div class="field" id="cur-field" hidden>
+  <label for="hotspot">Hotspot (the pixel that clicks)</label>
+  <select id="hotspot">
+    <option value="top-left" selected>Top left (an arrow)</option>
+    <option value="centre">Centre (a crosshair)</option>
+    <option value="custom">Exact pixels</option>
+  </select>
+  <div class="cur-xy" id="cur-xy" hidden>
+    <label for="hotspot-x">X <input type="number" id="hotspot-x" min="0" max="31" value="0" inputmode="numeric" /></label>
+    <label for="hotspot-y">Y <input type="number" id="hotspot-y" min="0" max="31" value="0" inputmode="numeric" /></label>
+    <span class="picker-note">on the 32 pixel size, 0 to 31</span>
+  </div>
+  <canvas id="cur-preview" width="128" height="128" aria-label="The pointer at 32 pixels with the hotspot marked" hidden></canvas>
+</div>
 <div class="field" id="background-field">
   <label for="background">Background for transparent areas</label>
   <input type="color" id="background" value="#ffffff" />
@@ -62,6 +76,9 @@ const format = defaults.format ?? 'image/jpeg';
 </div>
 
 <style>
+  .cur-xy { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 8px; }
+  .cur-xy input { width: 5em; }
+  #cur-preview { margin-top: 8px; width: 128px; height: 128px; image-rendering: pixelated; border: 1px solid var(--line); border-radius: var(--radius-sm); background: repeating-conic-gradient(var(--line) 0% 25%, var(--surface) 0% 50%) 0 0 / 16px 16px; }
   .detected {
     grid-column: 1 / -1;
     margin: 0;

@@ -91,6 +91,10 @@ export const engines: Record<string, Engine> = {
     how: 'Your browser decodes the picture, then Stayput draws it on a transparent square canvas once for every icon size, halving the resolution step by step so the small sizes stay crisp. Each size is saved as a PNG and a small encoder in the page writes the ICO header and size directory around them. The whole file is assembled in memory in your tab.',
     versus: 'Icon converters that upload your image often hand back a single 32 pixel frame or a blurry resize, and keep a copy of your logo on their server. Here every size is drawn locally from your original, and nothing leaves the device.',
   },
+  'to-cur': {
+    how: 'Your browser decodes the picture, then Stayput draws it on a transparent square canvas once for every pointer size and saves each size as a PNG. A small encoder in the page writes the cursor header around them, with the hotspot you chose stored in each size’s directory entry (scaled from the 32 pixel position). The whole file is assembled in memory in your tab.',
+    versus: 'Cursor converters that upload your image often hand back one blurry size with the click point left in the corner, and keep a copy of your artwork on their server. Here every size is drawn locally from your original, you set the hotspot yourself, and nothing leaves the device.',
+  },
   'video-to-gif': {
     how: 'Your browser opens the video with its own built-in decoder, the same one that plays it in the player above. Stayput seeks to each moment you asked for, copies that frame onto a canvas at the width you chose, and gifenc (MIT) picks the best 256 colours for it and compresses it. The GIF is assembled frame by frame in memory in your tab.',
     versus: 'Online GIF makers upload the whole video to trim a few seconds of it, cap the file size, and often stamp a watermark on the result. Personal clips of family, pets or a screen with your inbox on it are exactly what should not sit on a stranger’s server. Here the video never leaves your device, whatever its size.',
