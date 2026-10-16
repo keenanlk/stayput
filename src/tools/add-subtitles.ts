@@ -127,7 +127,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       // The model is no longer needed; free its memory before the video is redrawn.
       speechModule.releaseSpeechModel();
       segments = speech.segments;
-      path = ` ${speech.pathNote}`;
+      path = speech.pathNote ? ` ${speech.pathNote}` : '';
       if (segments.length === 0) throw noSpeechFound(`No speech was found in ${file.name}, so there are no subtitles to add.`);
       const spoken = new Intl.DisplayNames(['en'], { type: 'language' }).of(speech.language) ?? speech.language;
       from = bool('translate') ? `translated to English from ${spoken} speech` : `written from ${spoken} speech`;
