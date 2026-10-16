@@ -12,7 +12,7 @@
  */
 
 /** Errors that say what the file is, or what the person gave: a retry cannot change them. */
-const FINAL = new Set(['InputError', 'UnreadableFile', 'AudioDecodeError', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound']);
+const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'AudioDecodeError', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound']);
 
 /** Encoder and memory failures that a smaller picture can get past. */
 const SHRINKABLE = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'OutOfMemoryError', 'EncoderRefused']);

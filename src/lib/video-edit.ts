@@ -29,7 +29,7 @@ import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder, useRealtimeH264 } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
-import { UnreadableFile } from './input-error';
+import { UnreadableFile, UnsupportedCodec } from './input-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
@@ -169,7 +169,7 @@ export async function assertReadable(file: File): Promise<void> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
-    if (video && !(await video.canDecode().catch(() => true))) throw new UnreadableFile(unplayable());
+    if (video && !(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
   } finally {
     input.dispose?.();
   }
@@ -246,7 +246,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       };
     }
 
-    if (!(await video.canDecode())) throw new UnreadableFile(unplayable());
+    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const crop = opts.crop
       ? {
           left: Math.max(0, Math.round(opts.crop.left)),
@@ -357,7 +357,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       });
       if (!conversion.isValid) {
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-        throw reason === 'undecodable_source_codec' ? new UnreadableFile(unplayable()) : failure('EditUnsupported', 'This browser cannot edit this video.');
+        throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : failure('EditUnsupported', 'This browser cannot edit this video.');
       }
       await executeWatched(conversion, opts.onProgress);
       blob = await finishOutput(out, 'video/mp4');
