@@ -1,0 +1,101 @@
+---
+/** Option controls for the sprite sheet maker, shared by the tool page and its landing pages. A page whose defaults name a mode shows only that mode's controls. */
+interface Props { defaults?: Record<string, string> }
+const { defaults = {} } = Astro.props;
+const locked = defaults.mode === 'sheet' || defaults.mode === 'gif';
+const mode = defaults.mode === 'gif' ? 'gif' : 'sheet';
+const bg = defaults.background ?? 'transparent';
+const step = defaults.step ?? '1';
+const by = defaults.by ?? 'grid';
+---
+<div class="field wide" hidden={locked}>
+  <label id="ss-mode-label">What to make</label>
+  <div class="segmented" role="radiogroup" aria-labelledby="ss-mode-label">
+    <label><input type="radio" name="mode" value="sheet" checked={mode === 'sheet'} /><span>Make a sprite sheet</span></label>
+    <label><input type="radio" name="mode" value="gif" checked={mode === 'gif'} /><span>Sprite sheet to GIF</span></label>
+  </div>
+</div>
+
+<div id="ss-a" class="ss-group" hidden={mode !== 'sheet'}>
+  <div class="field">
+    <label for="ss-columns">Columns</label>
+    <input type="number" id="ss-columns" min="1" max="1000" step="1" inputmode="numeric" placeholder="Auto (near square)" value={defaults.columns ?? ''} />
+  </div>
+  <div class="field">
+    <label for="ss-padding">Padding (0 to 16 px)</label>
+    <input type="number" id="ss-padding" min="0" max="16" step="1" inputmode="numeric" value={defaults.padding ?? '0'} />
+  </div>
+  <div class="field">
+    <label for="ss-bg">Background</label>
+    <select id="ss-bg">
+      <option value="transparent" selected={bg === 'transparent'}>Transparent</option>
+      <option value="#ffffff" selected={bg === '#ffffff'}>White</option>
+      <option value="#000000" selected={bg === '#000000'}>Black</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="ss-step">Frame step</label>
+    <select id="ss-step">
+      <option value="1" selected={step === '1'}>Every frame</option>
+      <option value="2" selected={step === '2'}>Every 2nd frame</option>
+      <option value="3" selected={step === '3'}>Every 3rd frame</option>
+      <option value="4" selected={step === '4'}>Every 4th frame</option>
+      <option value="5" selected={step === '5'}>Every 5th frame</option>
+      <option value="10" selected={step === '10'}>Every 10th frame</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="ss-scale">Frame size</label>
+    <select id="ss-scale">
+      <option value="1" selected>Full size</option>
+      <option value="0.75">75%</option>
+      <option value="0.5">50%</option>
+      <option value="0.25">25%</option>
+    </select>
+  </div>
+  <div class="field wide">
+    <label class="check"><input type="checkbox" id="ss-json" checked /> Also save a JSON file with each frame’s x, y, w, h and delay</label>
+  </div>
+</div>
+
+<div id="ss-b" class="ss-group" hidden={mode !== 'gif'}>
+  <div class="field">
+    <label for="ss-by">Cut the sheet by</label>
+    <select id="ss-by">
+      <option value="grid" selected={by === 'grid'}>Columns and rows</option>
+      <option value="size" selected={by === 'size'}>Cell size</option>
+    </select>
+  </div>
+  <div class="field ss-grid">
+    <label for="ss-cols">Columns</label>
+    <input type="number" id="ss-cols" min="1" max="1000" step="1" inputmode="numeric" value={defaults.cols ?? '4'} />
+  </div>
+  <div class="field ss-grid">
+    <label for="ss-rows">Rows</label>
+    <input type="number" id="ss-rows" min="1" max="1000" step="1" inputmode="numeric" value={defaults.rows ?? '4'} />
+  </div>
+  <div class="field ss-size" hidden>
+    <label for="ss-cw">Cell width (px)</label>
+    <input type="number" id="ss-cw" min="1" step="1" inputmode="numeric" value={defaults.cw ?? '64'} />
+  </div>
+  <div class="field ss-size" hidden>
+    <label for="ss-ch">Cell height (px)</label>
+    <input type="number" id="ss-ch" min="1" step="1" inputmode="numeric" value={defaults.ch ?? '64'} />
+  </div>
+  <div class="field">
+    <label for="ss-gap">Gap between frames (0 to 16 px)</label>
+    <input type="number" id="ss-gap" min="0" max="16" step="1" inputmode="numeric" value="0" />
+  </div>
+  <div class="field">
+    <label for="ss-delay">Delay per frame (ms)</label>
+    <input type="number" id="ss-delay" min="20" max="10000" step="10" inputmode="numeric" value={defaults.delay ?? '100'} />
+  </div>
+  <div class="field wide">
+    <label class="check"><input type="checkbox" id="ss-loop" checked /> Loop forever</label>
+    <label class="check"><input type="checkbox" id="ss-trim" checked /> Leave out empty cells at the end</label>
+  </div>
+</div>
+<style>
+  .ss-group { display: contents; }
+  .ss-group[hidden], .field[hidden] { display: none; }
+</style>

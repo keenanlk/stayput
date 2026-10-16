@@ -30,6 +30,7 @@ import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile, UnsupportedCodec, NamedError } from './input-error';
+import { isNotReadable, notReadable } from './read-failure';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
@@ -94,6 +95,12 @@ export interface EditResult {
  */
 /** An error with its own class name, so a failed run records which step it was (never the message). */
 const failure = (name: string, message: string) => Object.assign(new NamedError('VideoEditFailed', message), { name });
+
+/** A file the phone could not read is not "not a video": it keeps its own name, so the job can read it once more. */
+function readOrNull(e: unknown): null {
+  if (isNotReadable(e)) throw notReadable(e);
+  return null;
+}
 
 async function outputTarget(inputBytes: number) {
   const disk = await openOpfsOutput(inputBytes);
@@ -161,7 +168,7 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
 export async function assertReadable(file: File): Promise<void> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
+    const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (video && !(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
   } finally {
     input.dispose?.();
@@ -193,7 +200,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
 async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const format = await input.getFormat().catch(() => null);
+    const format = await input.getFormat().catch(readOrNull);
     if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new UnreadableFile('This file has no video track.');
