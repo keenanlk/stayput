@@ -5,6 +5,8 @@
  * that retry on those names still see them. Kept free of browser imports so a spec can drive it directly.
  */
 
+import { NamedError } from './input-error';
+
 const BARE = new Set(['', 'Error', 'TypeError', 'RangeError', 'SyntaxError', 'ReferenceError']);
 
 /** Whether `e` carries no name beyond the generic ones. A RangeError that says memory is memory, and counts as named. */
@@ -17,8 +19,7 @@ export function isBare(e: unknown): boolean {
 /** `e` itself when it has a name; otherwise an error named `step` (letters and digits only), keeping `e` as its cause. */
 export function nameBare(step: string, e: unknown): Error {
   if (!isBare(e)) return e as Error;
-  const err = new Error(e instanceof Error && e.message ? e.message : 'Something went wrong.');
-  err.name = step;
+  const err = new NamedError(step, e instanceof Error && e.message ? e.message : 'Something went wrong.');
   err.cause = e;
   return err;
 }

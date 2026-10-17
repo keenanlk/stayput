@@ -28,6 +28,7 @@ import { toLimitedBt709 } from './yuv-convert';
 import { AviDecoderLoadError, UnsupportedAviCodec } from './avi-errors';
 import { workerFailure } from './worker-error';
 import { toFloatPlanes } from './libav-audio';
+import { NamedError } from './input-error';
 
 export interface AviJob {
   file: File;
@@ -274,7 +275,7 @@ async function convert(job: AviJob): Promise<void> {
   if (frames === 0) throw new UnsupportedAviCodec(String(await libav.avcodec_get_name(vs.codec_id)), 'video');
   await output.finalize();
   const buffer = (output.target as BufferTarget).buffer;
-  if (!buffer) throw new Error('The video could not be written.');
+  if (!buffer) throw new NamedError('AviDecodeWorkerFailed', 'The video could not be written.');
   post(
     { type: 'done', buffer, width, height, duration: Math.max(lastV + 1 / fps, 0), videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec, audio: !!audioSource, audioCopied },
     [buffer],

@@ -8,6 +8,7 @@
  * decoder program; the image itself is decoded in this tab and never leaves it.
  */
 import { vendorEntry } from './vendor';
+import { NamedError } from './input-error';
 
 export type WasmCodec = 'jxl' | 'avif';
 
@@ -22,7 +23,7 @@ export function loadDecoder(codec: WasmCodec): Promise<DecoderModule> {
   if (!p) {
     p = import(/* @vite-ignore */ vendorEntry(codec)).catch((err) => {
       modules.delete(codec);
-      throw new Error(
+      throw new NamedError('CodecsFailed', 
         `The ${codec.toUpperCase()} decoder could not be loaded (${err instanceof Error ? err.message : String(err)}). Check your connection and try again.`,
       );
     });
@@ -38,7 +39,7 @@ export async function decodeWithWasm(file: Blob, codec: WasmCodec): Promise<Imag
   try {
     data = await mod.default(await file.arrayBuffer());
   } catch (e) {
-    throw new Error(`This file could not be decoded as ${codec === 'jxl' ? 'JPEG XL' : 'AVIF'}${e instanceof Error && e.message ? ` (${e.message})` : ''}.`);
+    throw new NamedError('CodecsFailed', `This file could not be decoded as ${codec === 'jxl' ? 'JPEG XL' : 'AVIF'}${e instanceof Error && e.message ? ` (${e.message})` : ''}.`);
   }
   return createImageBitmap(data);
 }

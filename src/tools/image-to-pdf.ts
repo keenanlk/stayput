@@ -4,6 +4,7 @@ import { decodeTiffPages, isTiffFile } from '../lib/tiff';
 import { imagesToPdf, type EmbeddableImage, type PageSize } from '../lib/pdf';
 import { extractExifTiff, parseTiff, sniffFormat } from '../lib/exif';
 import type { OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 const MM_TO_PT = 72 / 25.4;
 
@@ -28,7 +29,7 @@ createShell({
         skipped.push({ name: entry.file.name, reason: e instanceof Error ? e.message : String(e) });
       }
     }
-    if (images.length === 0) throw new Error(describeError(files[0]!.file, firstError ?? 'no images'));
+    if (images.length === 0) throw new NamedError('ImageToPdfFailed', describeError(files[0]!.file, firstError ?? 'no images'));
     const pageSize = str('page-size', 'fit') as PageSize;
     const orientation = str('orientation', 'auto') as 'auto' | 'portrait' | 'landscape';
     const margin = num('margin', 0) * MM_TO_PT;

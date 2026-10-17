@@ -1,7 +1,7 @@
 import { createShell, bool, radio, str } from '../lib/shell';
 import { formatBytes, replaceExt } from '../lib/files';
 import { detectDirection, detectDelimiter, DataError, convert, DELIMITER_NAME, type Converted, type Delimiter, type Direction, type InDelimiter, type Job, type OutDelimiter } from '../lib/csv-json';
-import { InputError, UnreadableFile } from '../lib/input-error';
+import { InputError, UnreadableFile, NamedError } from '../lib/input-error';
 import type { Reply } from '../lib/csv-json.worker';
 
 /** Above this a notice says it can take a while; above the second the page stops with a message. */
@@ -129,12 +129,12 @@ async function run(file: File, j: Job, bom: boolean): Promise<Done> {
       if (r.arrays) reject(new DataError(r.message, r.arrays));
       else if (r.name === 'InputError') reject(new InputError(r.message));
       else if (r.name === 'UnreadableFile') reject(new UnreadableFile(r.message));
-      else reject(Object.assign(new Error(r.message), { name: r.name }));
+      else reject(Object.assign(new NamedError('JsonToCsvFailed', r.message), { name: r.name }));
     };
     const onError = () => {
       done();
       worker = undefined;
-      reject(new Error('The conversion ran out of memory or stopped. A phone may not have room for a file this large; split it and convert the pieces.'));
+      reject(new NamedError('JsonToCsvFailed', 'The conversion ran out of memory or stopped. A phone may not have room for a file this large; split it and convert the pieces.'));
     };
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);

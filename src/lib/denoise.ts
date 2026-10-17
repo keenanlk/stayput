@@ -12,6 +12,7 @@
  */
 import { vendorEntry } from './vendor';
 import { isNotReadable, notReadable } from './read-failure';
+import { NamedError, isUnspecific } from './input-error';
 
 export const DENOISE_RATE = 48_000;
 
@@ -30,7 +31,7 @@ export function loadRnnoise(): Promise<Rnnoise> {
     .then((m) => m.Rnnoise.load())
     .catch((err) => {
       loading = undefined;
-      const out = new Error('The noise remover could not load. Check your connection and try again.');
+      const out = new NamedError('DenoiseFailed', 'The noise remover could not load. Check your connection and try again.');
       out.name = 'NoiseModelLoadError';
       out.cause = err;
       throw out;
@@ -125,8 +126,8 @@ export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseW
   const text = e instanceof Error ? e.message : String(e);
   const memory = /memory|allocation|bad_alloc/i.test(text) || (e instanceof RangeError && /array|buffer|length/i.test(text));
   // Any other error with a name of its own keeps it; a RangeError that reads as running out of memory says so below.
-  if (e instanceof Error && e.name !== 'Error' && !(memory && e instanceof RangeError)) return e;
-  const out = new Error(
+  if (e instanceof Error && !isUnspecific(e) && !(memory && e instanceof RangeError)) return e;
+  const out = new NamedError('DenoiseFailed', 
     memory
       ? 'This device ran out of memory cleaning this video. Trim the video to a shorter length first, or use a computer.'
       : stage === 'NoiseDecodeError'

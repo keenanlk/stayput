@@ -1,5 +1,6 @@
 import { createShell, processEach, str } from '../lib/shell';
 import { vendorDir } from '../lib/vendor';
+import { UnreadableFile } from '../lib/input-error';
 import type { OutputFile } from '../lib/files';
 import { extractWithSevenZip, sniffArchive } from '../lib/sevenzip';
 
@@ -62,7 +63,7 @@ async function viaLibarchive(file: File, password: string, status: (files: numbe
       if (!(f instanceof File)) continue;
       out.push({ name: `${path}${f.name}`, blob: f });
     }
-    if (!out.length) throw new Error(NO_FILES);
+    if (!out.length) throw new UnreadableFile(NO_FILES);
     return out;
   } finally {
     await archive.close().catch(() => undefined);
@@ -77,7 +78,7 @@ createShell({
       const status = (n: number) => progress.set(`${entry.file.name}: ${plural(n, 'file')} extracted`, (i + 0.5) / files.length);
       const viaSevenZip = async (pw: string): Promise<OutputFile[]> => {
         const list = await extractWithSevenZip(entry.file, pw, status);
-        if (!list.length) throw new Error(NO_FILES);
+        if (!list.length) throw new UnreadableFile(NO_FILES);
         return list.map(({ path, blob }) => ({ name: path, blob }));
       };
       const kind = await sniffArchive(entry.file);

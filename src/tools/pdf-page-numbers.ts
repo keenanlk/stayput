@@ -1,6 +1,7 @@
 import { createShell, bindRange, num, str } from '../lib/shell';
 import { addPageNumbers, closePdfJs, loadDocument, openWithPdfJs, pageThumbnail, type NumberFont, type NumberPosition } from '../lib/pdf';
 import { suffixName, type OutputFile } from '../lib/files';
+import { InputError } from '../lib/input-error';
 
 bindRange('font-size', 'font-size-out');
 bindRange('margin', 'margin-out');
@@ -95,7 +96,7 @@ createShell({
     const source = bytes ?? new Uint8Array(await entry.file.arrayBuffer());
     if (total === 0) await loadDocument(source);
     const o = options();
-    if (o.firstPage >= total) throw new Error(`First page to number must be between 1 and ${total}.`);
+    if (o.firstPage >= total) throw new InputError(`First page to number must be between 1 and ${total}.`);
     progress.set('Numbering pages', 0.1);
     const { bytes: out, numbered } = await addPageNumbers(source, o, (done, all) => progress.set(`Numbering page ${done} of ${all}`, 0.1 + (0.8 * done) / all));
     progress.set('Done', 1);

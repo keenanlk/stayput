@@ -124,10 +124,13 @@ function context(): Record<string, string> {
 }
 
 /** Coarse error category for tool_run failures: the error's own name, never its message or stack. */
-export function classifyError(e: unknown): string {
+export function classifyError(e: unknown, tool?: string): string {
   const name = e instanceof Error ? e.name : '';
   // A class name only: letters and digits, short. Anything else (a name someone set to a sentence) is just "Error".
-  if (/^[A-Za-z][A-Za-z0-9]{0,39}$/.test(name)) return name;
+  if (/^[A-Za-z][A-Za-z0-9]{0,39}$/.test(name) && name !== 'Error') return name;
+  // Safety net: an error nobody named still says which tool it came from, so it never lands in one bare "Error" bucket.
+  const stem = (tool ?? '').split('-').map((w) => w.replace(/[^A-Za-z0-9]/g, '')).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('').slice(0, 27);
+  if (stem && e instanceof Error) return `${/^[0-9]/.test(stem) ? 'T' : ''}${stem}UnnamedError`;
   return e instanceof Error ? 'Error' : 'Unknown';
 }
 

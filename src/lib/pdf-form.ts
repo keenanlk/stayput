@@ -5,6 +5,7 @@
  */
 import type * as PdfLib from 'pdf-lib';
 import { loadDocument, loadPdfLib } from './pdf';
+import { NamedError } from './input-error';
 
 export type FieldKind = 'text' | 'multiline' | 'checkbox' | 'radio' | 'dropdown' | 'list' | 'signature' | 'button';
 
@@ -147,7 +148,7 @@ export async function fillForm(source: Uint8Array, values: Record<string, string
     // answers are still saved, and PDF readers draw them in their own font.
     const bad = e instanceof Error && /cannot encode/i.test(e.message);
     if (!bad) throw e;
-    if (flatten) throw new Error('Some answers use letters the built-in PDF font cannot draw (for example Greek, Cyrillic, Chinese or emoji), so the form cannot be flattened. Untick “Lock the answers” to save it as a fillable form instead.');
+    if (flatten) throw new NamedError('PdfFormFailed', 'Some answers use letters the built-in PDF font cannot draw (for example Greek, Cyrillic, Chinese or emoji), so the form cannot be flattened. Untick “Lock the answers” to save it as a fillable form instead.');
     form.acroForm.dict.set(lib.PDFName.of('NeedAppearances'), lib.PDFBool.True);
     const bytes = await doc.save({ updateFieldAppearances: false });
     return { bytes, answered, flattened: false };

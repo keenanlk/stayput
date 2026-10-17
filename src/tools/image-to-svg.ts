@@ -4,6 +4,8 @@ import { formatBytes, replaceExt, type OutputFile } from '../lib/files';
 import { toMono } from '../lib/mono';
 import type { Pixels, TraceMode, TraceOptions, TraceResult } from '../lib/trace';
 import type { TraceReply, TraceRequest } from '../lib/trace.worker';
+import { UnreadableFile, NamedError } from '../lib/input-error';
+import { fromWorkerFailure } from '../lib/worker-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('svg-panel');
@@ -31,13 +33,13 @@ function trace(image: Pixels, options: TraceOptions): Promise<TraceResult> {
       if (e.data.id !== id) return;
       done();
       if (e.data.result) resolve(e.data.result);
-      else reject(new Error(e.data.error ?? 'Tracing failed.'));
+      else reject(fromWorkerFailure(e.data.name, e.data.error ?? 'Tracing failed.'));
     };
     const onError = (e: ErrorEvent) => {
       done();
       worker = undefined;
       w.terminate();
-      reject(new Error(e.message || 'Tracing failed.'));
+      reject(new NamedError('ImageToSvgFailed', e.message || 'Tracing failed.'));
     };
     const done = () => {
       w.removeEventListener('message', onMessage);
@@ -140,7 +142,7 @@ const shell = createShell({
       const decoded = await decodeImage(entry.file);
       try {
         const r = await toSvg(decoded.bitmap, m, dropWhite, maxSide(m));
-        if (r.paths === 0) throw new Error('Nothing was left to trace. The image may be blank, or all white with “Leave out white” ticked.');
+        if (r.paths === 0) throw new UnreadableFile('Nothing was left to trace. The image may be blank, or all white with “Leave out white” ticked.');
         const blob = new Blob([r.svg], { type: 'image/svg+xml' });
         const out: OutputFile = {
           name: replaceExt(entry.file.name, 'svg'),

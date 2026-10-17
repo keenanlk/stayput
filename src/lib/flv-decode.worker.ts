@@ -26,6 +26,7 @@ import { toFloatPlanes, type LibavAudioFrame } from './libav-audio';
 import { readAvcConfig } from './h264-sps';
 import { FlvDecoderLoadError, UnsupportedFlvCodec } from './flv-errors';
 import { workerFailure } from './worker-error';
+import { NamedError } from './input-error';
 
 export interface FlvJob {
   file: File;
@@ -286,7 +287,7 @@ async function convert(job: FlvJob): Promise<void> {
   if (frames === 0) throw new UnreadableFile('No pictures could be read from this FLV. The file may be damaged or cut short.');
   await output.finalize();
   const buffer = (output.target as BufferTarget).buffer;
-  if (!buffer) throw new Error('The video could not be written.');
+  if (!buffer) throw new NamedError('FlvDecodeWorkerFailed', 'The video could not be written.');
   post({ type: 'done', buffer, width: avc.width, height: avc.height, duration: Math.max(endTime, 0), audio: !!audioSource, audioCopied }, [buffer]);
 }
 

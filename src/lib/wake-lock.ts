@@ -1,5 +1,6 @@
 import { isPhoneBrowser } from './phone-limit';
 import { SpeechError } from './speech-errors';
+import { NamedError } from './input-error';
 
 /**
  * Keeps the screen on while a long video job runs, and notes whether the page
@@ -110,7 +111,7 @@ export function interruptedError(e: unknown, wasHidden: boolean, action: string,
   const lead = phone
     ? 'The screen locked or you switched apps, so your phone paused the conversion.'
     : 'You switched tabs or the screen locked, so the browser paused the conversion.';
-  const out = new Error(
+  const out = new NamedError('WakeLockFailed', 
     [
       lead,
       salvage?.length ? 'Your subtitles are ready: download the .srt below.' : '',

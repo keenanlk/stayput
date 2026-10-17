@@ -1,7 +1,7 @@
 import { createShell, num } from '../lib/shell';
 import { replaceExt } from '../lib/files';
 import { channelsOf, decodeAudio, formatDuration } from '../lib/audio';
-import { InputError, UnreadableFile } from '../lib/input-error';
+import { InputError, UnreadableFile, NamedError } from '../lib/input-error';
 import { fromWorkerFailure } from '../lib/worker-error';
 import { halve, type TempoResult } from '../lib/bpm-key';
 import { noteName } from '../lib/basic-pitch';
@@ -158,7 +158,7 @@ function transcribe(audio: Float32Array, onLoading: (f: number) => void, onWindo
     const onError = (e: ErrorEvent) => {
       done();
       noteWorker = undefined;
-      reject(new Error(e.message || 'The note model stopped unexpectedly. The file may be too long for this device’s memory.'));
+      reject(new NamedError('Mp3ToMidiFailed', e.message || 'The note model stopped unexpectedly. The file may be too long for this device’s memory.'));
     };
     const done = () => {
       w.removeEventListener('message', onMessage);

@@ -12,11 +12,11 @@ export function parsePageRange(input: string, pageCount: number): number[] {
     const part = rawPart.trim();
     if (!part) continue;
     const m = /^(\d+)(?:\s*-\s*(\d+))?$/.exec(part);
-    if (!m) throw new Error(`"${part}" is not a page number or range.`);
+    if (!m) throw new InputError(`"${part}" is not a page number or range.`);
     const a = Number(m[1]);
     const b = m[2] !== undefined ? Number(m[2]) : a;
     if (a < 1 || b < 1 || a > pageCount || b > pageCount) {
-      throw new Error(`Page ${a > pageCount ? a : b} is out of range. This document has ${pageCount} page${pageCount === 1 ? '' : 's'}.`);
+      throw new InputError(`Page ${a > pageCount ? a : b} is out of range. This document has ${pageCount} page${pageCount === 1 ? '' : 's'}.`);
     }
     const step = a <= b ? 1 : -1;
     for (let p = a; step > 0 ? p <= b : p >= b; p += step) out.push(p - 1);
@@ -27,7 +27,7 @@ export function parsePageRange(input: string, pageCount: number): number[] {
 
 /** Split [0..pageCount) into consecutive chunks of size n. */
 export function chunkPages(pageCount: number, n: number): number[][] {
-  if (n < 1) throw new Error('Pages per file must be at least 1.');
+  if (n < 1) throw new InputError('Pages per file must be at least 1.');
   const chunks: number[][] = [];
   for (let start = 0; start < pageCount; start += n) {
     const chunk: number[] = [];

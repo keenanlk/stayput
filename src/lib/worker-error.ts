@@ -4,17 +4,17 @@
  * classifyError); the message is only ever shown on the page, never sent.
  */
 
+import { NamedError } from './input-error';
+
 const CLASS_NAME = /^[A-Za-z][A-Za-z0-9]{0,39}$/;
 
-/** What the worker posts for a failure: the error's own name when it looks like a class name, else "Error". */
+/** What the worker posts for a failure: the error's own name when it looks like a class name, else "WorkerFailed". */
 export function workerFailure(err: unknown): { name: string; message: string } {
   const name = err instanceof Error || (typeof err === 'object' && err !== null && typeof (err as { name?: unknown }).name === 'string') ? (err as { name: string }).name : '';
-  return { name: CLASS_NAME.test(name) ? name : 'Error', message: err instanceof Error ? err.message : String(err) };
+  return { name: CLASS_NAME.test(name) && name !== 'Error' ? name : 'WorkerFailed', message: err instanceof Error ? err.message : String(err) };
 }
 
 /** Rebuild the error on the page with the name it had in the worker. */
 export function fromWorkerFailure(name: string | undefined, message: string): Error {
-  const err = new Error(message);
-  if (name && CLASS_NAME.test(name)) err.name = name;
-  return err;
+  return new NamedError(name && CLASS_NAME.test(name) && name !== 'Error' ? name : 'WorkerFailed', message);
 }

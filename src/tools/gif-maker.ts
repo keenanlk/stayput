@@ -128,7 +128,7 @@ const shell = createShell({
   },
   async process(files, progress) {
     if (files.length < 2) throw new InputError('Add at least two pictures to make an animated GIF.');
-    if (files.length > MAX_FRAMES) throw new Error(`That is ${files.length} pictures; the limit is ${MAX_FRAMES}. A GIF that long would be too large to share.`);
+    if (files.length > MAX_FRAMES) throw new InputError(`That is ${files.length} pictures; the limit is ${MAX_FRAMES}. A GIF that long would be too large to share.`);
     const s = settings();
     const frames: ImageBitmap[] = [];
     try {

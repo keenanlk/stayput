@@ -2,6 +2,7 @@ import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import { createShell, num, str, radio } from '../lib/shell';
 import { thumbnail } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
+import { NamedError, UnreadableFile, InputError } from '../lib/input-error';
 
 /**
  * Video to GIF. The browser's own decoder plays the file from a blob: URL;
@@ -41,8 +42,8 @@ function once(el: HTMLMediaElement, event: string, timeoutMs: number): Promise<v
       fn();
     };
     const ok = () => done(resolve);
-    const bad = () => done(() => reject(new Error(unplayable())));
-    const timer = setTimeout(() => done(() => reject(new Error(`Timed out waiting for the video (${event}).`))), timeoutMs);
+    const bad = () => done(() => reject(new NamedError('VideoToGifFailed', unplayable())));
+    const timer = setTimeout(() => done(() => reject(new NamedError('VideoToGifFailed', `Timed out waiting for the video (${event}).`))), timeoutMs);
     el.addEventListener(event, ok);
     el.addEventListener('error', bad);
   });
@@ -66,7 +67,7 @@ async function loadInto(v: HTMLVideoElement, src: string): Promise<void> {
   const wait = once(v, 'loadeddata', 20_000);
   v.src = src;
   await wait;
-  if (!v.videoWidth || !v.videoHeight) throw new Error('This file has no picture this browser can show.');
+  if (!v.videoWidth || !v.videoHeight) throw new UnreadableFile('This file has no picture this browser can show.');
 }
 
 /**
@@ -189,10 +190,10 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     if (!url || !duration) await load(entry.file);
-    if (!duration) throw new Error('Could not tell how long this video is.');
+    if (!duration) throw new InputError('Could not tell how long this video is.');
     const p = plan();
-    if (p.end <= p.start) throw new Error('The end time must come after the start time.');
-    if (p.frames > MAX_FRAMES) throw new Error(`That clip needs ${p.frames} frames; the limit is ${MAX_FRAMES}. Shorten the clip or lower the frame rate.`);
+    if (p.end <= p.start) throw new InputError('The end time must come after the start time.');
+    if (p.frames > MAX_FRAMES) throw new NamedError('VideoToGifFailed', `That clip needs ${p.frames} frames; the limit is ${MAX_FRAMES}. Shorten the clip or lower the frame rate.`);
     player.pause();
 
     progress.set('Opening the video…', 0);
