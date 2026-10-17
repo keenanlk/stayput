@@ -14,11 +14,11 @@ const tripPath = (y: number) => `M64 ${y}C94 ${y} 94 170 124 170H236C266 170 266
       <path class="cm-wire" d={`M236 170C266 170 266 ${y} 296 ${y}`} />
     </>
   ))}
-  {rows.map((y, i) => [[0, from[i]], [296, to[i]]].map(([x, label]) => (
+  {rows.map((y, i) => ([[0, from[i]], [296, to[i]]] as [number, string][]).map(([x, label]) => (
     <g class="cm-file">
-      <path d={`M${+x + 0.75} ${y - 21.25}h51.5l11 11v31.5h-62.5z`} />
-      <path class="cm-fold" d={`M${+x + 52.25} ${y - 21.25}v11h11`} />
-      <text x={+x + 30} y={y + 5}>{label}</text>
+      <path d={`M${x + 0.75} ${y - 21.25}h51.5l11 11v31.5h-62.5z`} />
+      <path class="cm-fold" d={`M${x + 52.25} ${y - 21.25}v11h11`} />
+      <text x={x + 30} y={y + 5}>{label}</text>
     </g>
   )))}
   <g class="cm-tab">
