@@ -6,6 +6,7 @@
  * beside it. The request only fetches the decoder script itself.
  */
 import { vendorEntry } from './vendor';
+import { NamedError } from './input-error';
 
 interface HeicModule {
   isHeic(file: Blob): Promise<boolean>;
@@ -19,7 +20,7 @@ export function loadHeic(): Promise<HeicModule> {
   if (!modulePromise) {
     modulePromise = import(/* @vite-ignore */ vendorEntry('heic')).catch((err) => {
       modulePromise = undefined;
-      throw new Error(
+      throw new NamedError('HeicFailed', 
         `The HEIC decoder could not be loaded (${err instanceof Error ? err.message : String(err)}). Check your connection and try again.`,
       );
     });

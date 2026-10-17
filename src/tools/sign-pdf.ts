@@ -2,7 +2,7 @@ import { createShell, radio, str } from '../lib/shell';
 import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, renderPage, stampPdf, type Stamp } from '../lib/pdf';
 import type * as PdfJs from 'pdfjs-dist';
 import { suffixName, type OutputFile } from '../lib/files';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 import { takeHandoff } from '../lib/handoff';
 import { hasTransparency, inkAlpha, trimAlpha } from '../lib/signature';
 
@@ -144,7 +144,7 @@ async function padToPng(): Promise<{ png: Uint8Array; aspect: number } | undefin
 
 function canvasPng(c: HTMLCanvasElement): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
-    c.toBlob(async (b) => (b ? resolve(new Uint8Array(await b.arrayBuffer())) : reject(new Error('Could not encode the signature.'))), 'image/png');
+    c.toBlob(async (b) => (b ? resolve(new Uint8Array(await b.arrayBuffer())) : reject(new NamedError('SignPdfFailed', 'Could not encode the signature.'))), 'image/png');
   });
 }
 

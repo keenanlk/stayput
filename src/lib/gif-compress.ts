@@ -19,6 +19,7 @@
 import { parseGIF, decompressFrame, type ParsedGif } from 'gifuct-js';
 import { quantize, applyPalette, type Palette } from 'gifenc';
 import lzwEncode from 'gifenc/src/lzwEncode.js';
+import { UnreadableFile, InputError } from './input-error';
 
 type GifFrame = Parameters<typeof decompressFrame>[0];
 
@@ -116,27 +117,27 @@ function loopCount(gif: ParsedGif): number | undefined {
 
 export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions): Promise<GifCompressResult> {
   const head = new Uint8Array(input, 0, Math.min(6, input.byteLength));
-  if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new Error('This file is not a GIF.');
+  if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new UnreadableFile('This file is not a GIF.');
   const gif = parseGIF(input);
   const frames = gif.frames.filter((f): f is GifFrame => 'image' in f);
   const gw = gif.lsd.width;
   const gh = gif.lsd.height;
-  if (!frames.length || !gw || !gh) throw new Error('This GIF has no frames.');
+  if (!frames.length || !gw || !gh) throw new UnreadableFile('This GIF has no frames.');
   const more = opts.append ?? [];
-  if (more.length && (!opts.box || opts.crop)) throw new Error('Merging GIFs needs a box and no crop.');
+  if (more.length && (!opts.box || opts.crop)) throw new InputError('Merging GIFs needs a box and no crop.');
   const { colors, fuzz } = LEVELS[opts.level];
   const scale = Math.min(1, Math.max(0.05, opts.scale));
   const box = opts.box;
   const crop = opts.crop;
-  if (crop && box) throw new Error('A crop and a box cannot be used together.');
+  if (crop && box) throw new InputError('A crop and a box cannot be used together.');
   if (crop) {
     const whole = [crop.x, crop.y, crop.width, crop.height].every(Number.isInteger);
     if (!whole || crop.x < 0 || crop.y < 0 || crop.width < 1 || crop.height < 1 || crop.x + crop.width > gw || crop.y + crop.height > gh) {
-      throw new Error('The crop rectangle is not inside the GIF.');
+      throw new InputError('The crop rectangle is not inside the GIF.');
     }
   }
   const turn = opts.transform;
-  if (turn && (box || crop || more.length)) throw new Error('A rotation cannot be used with a box, a crop or a merge.');
+  if (turn && (box || crop || more.length)) throw new InputError('A rotation cannot be used with a box, a crop or a merge.');
   const sideways = turn?.rotate === 90 || turn?.rotate === 270;
   const width = box ? box.width : crop ? Math.max(1, Math.round(crop.width * scale)) : Math.max(1, Math.round((sideways ? gh : gw) * scale));
   const height = box ? box.height : crop ? Math.max(1, Math.round(crop.height * scale)) : Math.max(1, Math.round((sideways ? gw : gh) * scale));
@@ -171,10 +172,10 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
   const sources: { gif: ParsedGif; frames: GifFrame[]; gw: number; gh: number }[] = [{ gif, frames, gw, gh }];
   for (const buf of more) {
     const head = new Uint8Array(buf, 0, Math.min(6, buf.byteLength));
-    if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new Error('This file is not a GIF.');
+    if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new UnreadableFile('This file is not a GIF.');
     const g = parseGIF(buf);
     const fs = g.frames.filter((f): f is GifFrame => 'image' in f);
-    if (!fs.length || !g.lsd.width || !g.lsd.height) throw new Error('This GIF has no frames.');
+    if (!fs.length || !g.lsd.width || !g.lsd.height) throw new UnreadableFile('This GIF has no frames.');
     sources.push({ gif: g, frames: fs, gw: g.lsd.width, gh: g.lsd.height });
   }
   const framesIn = sources.reduce((n, s) => n + s.frames.length, 0);
@@ -237,7 +238,7 @@ export async function compressGif(input: ArrayBuffer, opts: GifCompressOptions):
   if (opts.pingPong && full.length > 2) full.push(...full.slice(1, -1).reverse());
   const speed = opts.speed ?? 1;
   if (speed !== 1) {
-    if (!(speed > 0)) throw new Error('The speed must be above zero.');
+    if (!(speed > 0)) throw new InputError('The speed must be above zero.');
     for (const f of full) f.delay = Math.max(20, Math.round(f.delay / speed / 10) * 10);
   }
 
@@ -393,7 +394,7 @@ export function firstFrameCanvas(input: ArrayBuffer): OffscreenCanvas {
   const frame = gif.frames.find((f): f is GifFrame => 'image' in f);
   const gw = gif.lsd.width;
   const gh = gif.lsd.height;
-  if (!frame || !gw || !gh) throw new Error('This GIF has no frames.');
+  if (!frame || !gw || !gh) throw new UnreadableFile('This GIF has no frames.');
   const canvas = new OffscreenCanvas(gw, gh);
   const f = decompressFrame(frame, gif.gct, true);
   const { left, top, width, height } = f.dims;
@@ -419,12 +420,12 @@ export async function eachGifFrame(
   each: (screen: OffscreenCanvas, info: { index: number; total: number; delay: number }) => Promise<void> | void,
 ): Promise<{ width: number; height: number }> {
   const head = new Uint8Array(input, 0, Math.min(6, input.byteLength));
-  if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new Error('This file is not a GIF.');
+  if (String.fromCharCode(...head).slice(0, 3) !== 'GIF') throw new UnreadableFile('This file is not a GIF.');
   const gif = parseGIF(input);
   const frames = gif.frames.filter((f): f is GifFrame => 'image' in f);
   const gw = gif.lsd.width;
   const gh = gif.lsd.height;
-  if (!frames.length || !gw || !gh) throw new Error('This GIF has no frames.');
+  if (!frames.length || !gw || !gh) throw new UnreadableFile('This GIF has no frames.');
   const screen = new OffscreenCanvas(gw, gh);
   const ctx = screen.getContext('2d', { willReadFrequently: true })!;
   const patch = new OffscreenCanvas(1, 1);

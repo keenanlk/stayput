@@ -4,6 +4,7 @@
  * arrives, so nothing is fetched from anywhere else.
  */
 import { extOf, readHead } from './files';
+import { UnreadableFile } from './input-error';
 
 /** True when the file is a TIFF by name, type or signature. */
 export async function isTiffFile(file: Blob & { name?: string }): Promise<boolean> {
@@ -21,12 +22,12 @@ export async function decodeTiffPages(file: Blob, maxPages = Infinity): Promise<
   const UTIF = (await import('utif2')).default;
   const buf = await file.arrayBuffer();
   const pages = UTIF.decode(buf).filter((ifd) => ifd['t256'] !== undefined && !((Number((ifd['t254'] as number[] | undefined)?.[0] ?? 0) & 1)));
-  if (pages.length === 0) throw new Error('This TIFF has no image in it.');
+  if (pages.length === 0) throw new UnreadableFile('This TIFF has no image in it.');
   const out: ImageBitmap[] = [];
   for (const ifd of pages.slice(0, maxPages)) {
     UTIF.decodeImage(buf, ifd);
     const rgba = UTIF.toRGBA8(ifd);
-    if (!ifd.width || !ifd.height || rgba.length < ifd.width * ifd.height * 4) throw new Error('This TIFF uses an encoding the decoder cannot read.');
+    if (!ifd.width || !ifd.height || rgba.length < ifd.width * ifd.height * 4) throw new UnreadableFile('This TIFF uses an encoding the decoder cannot read.');
     out.push(await createImageBitmap(new ImageData(new Uint8ClampedArray(rgba.buffer as ArrayBuffer, rgba.byteOffset, ifd.width * ifd.height * 4), ifd.width, ifd.height)));
   }
   return out;

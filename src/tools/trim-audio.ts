@@ -2,6 +2,7 @@ import { bool, createShell, num, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../lib/audio';
 import { cutChannels, peaks } from '../lib/audio-trim';
+import { NamedError, InputError } from '../lib/input-error';
 
 /**
  * Trim audio. The file is decoded in the page to draw its waveform and play
@@ -201,9 +202,9 @@ const shell = createShell({
     const entry = files[0]!;
     await loading;
     if (!buffer) await load(entry.file);
-    if (!buffer || !duration) throw new Error('No sound could be read from this file.');
+    if (!buffer || !duration) throw new NamedError('TrimAudioFailed', 'No sound could be read from this file.');
     const { start, end } = range();
-    if (end <= start) throw new Error('The end time must come after the start time.');
+    if (end <= start) throw new InputError('The end time must come after the start time.');
     player.pause();
     const chans = cutChannels(channelsOf(buffer, false), SAMPLE_RATE, {
       start,

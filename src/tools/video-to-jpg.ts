@@ -2,6 +2,7 @@ import { createShell, str } from '../lib/shell';
 import { baseName, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
 import type { FrameEvery } from '../lib/video-frames';
+import { NamedError } from '../lib/input-error';
 
 /**
  * Video to JPG. Frames are decoded and saved as images in the page (see
@@ -45,7 +46,7 @@ createShell({
         progress.set(`Saving frame ${i + 1} of about ${estimate}`, Math.min(0.99, (i + 1) / Math.max(1, estimate)));
       },
     });
-    if (!outs.length) throw new Error('No frames could be read from this video.');
+    if (!outs.length) throw new NamedError('VideoToJpgFailed', 'No frames could be read from this video.');
     if (info.capped) outs[outs.length - 1]!.note += `, stopped at ${LIMIT} frames: pick fewer frames a second to cover the whole video`;
     return outs;
   },

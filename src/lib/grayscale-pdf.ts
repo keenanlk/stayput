@@ -24,6 +24,7 @@ import type * as PdfLib from 'pdf-lib';
 import { loadDocument, loadPdfLib, visibleBox } from './pdf';
 import { cmykToGray, rgbToGray, rewriteContent, type ColorSpace, type ContentEnv } from './gray-content';
 import { encodeGrayJpeg } from './gray-jpeg';
+import { UnreadableFile, NamedError } from './input-error';
 
 export interface GrayscaleResult {
   bytes: Uint8Array;
@@ -182,7 +183,7 @@ class Job {
       } else if (n === 'ASCII85Decode' || n === 'A85') data = this.pdfLibDecode(data, 'ASCII85Decode');
       else if (n === 'ASCIIHexDecode' || n === 'AHx') data = this.pdfLibDecode(data, 'ASCIIHexDecode');
       else if (n === 'RunLengthDecode' || n === 'RL') data = this.pdfLibDecode(data, 'RunLengthDecode');
-      else throw new Error(`unsupported filter ${n}`);
+      else throw new UnreadableFile(`unsupported filter ${n}`);
     }
     return { data };
   }
@@ -203,7 +204,7 @@ class Job {
     const bpp = Math.max(1, Math.ceil((colors * bpc) / 8));
     const rowBytes = Math.ceil((colors * bpc * columns) / 8);
     if (predictor === 2) {
-      if (bpc !== 8) throw new Error('unsupported TIFF predictor');
+      if (bpc !== 8) throw new UnreadableFile('unsupported TIFF predictor');
       const out = data.slice();
       for (let r = 0; r + rowBytes <= out.length; r += rowBytes) for (let i = bpp; i < rowBytes; i++) out[r + i] = (out[r + i]! + out[r + i - bpp]!) & 255;
       return out;
@@ -673,7 +674,7 @@ class Job {
       try {
         for (const p of parts) {
           const dec = this.decode(p);
-          if (dec.rest) throw new Error('image filter in content');
+          if (dec.rest) throw new NamedError('GrayscalePdfFailed', 'image filter in content');
           chunks.push(dec.data, new Uint8Array([10]));
         }
       } catch {

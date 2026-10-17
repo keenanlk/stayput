@@ -3,6 +3,7 @@ import { closePdfJs, loadDocument, openWithPdfJs } from '../lib/pdf';
 import { fillForm, readForm, type FormField } from '../lib/pdf-form';
 import { suffixName, type OutputFile } from '../lib/files';
 import type * as PdfJs from 'pdfjs-dist';
+import { UnreadableFile } from '../lib/input-error';
 
 /**
  * Fill PDF form. pdf.js draws each page; the form's fields, read with pdf-lib,
@@ -185,7 +186,7 @@ createShell({
   },
   async process(files, progress) {
     const entry = files[0]!;
-    if (!fillable().length) throw new Error('This PDF has no fillable fields. Use Sign PDF to type text anywhere on its pages.');
+    if (!fillable().length) throw new UnreadableFile('This PDF has no fillable fields. Use Sign PDF to type text anywhere on its pages.');
     progress.set('Writing your answers into the form', 0.3);
     const changed: Record<string, string> = {};
     for (const f of fillable()) if (values[f.name] !== original[f.name]) changed[f.name] = values[f.name] ?? '';

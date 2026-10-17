@@ -5,6 +5,7 @@ import { coverage, cutout, findSubject } from '../lib/background';
 import { findPortraitFaces } from '../lib/faces';
 import { subjectBox } from '../lib/sticker';
 import { faceFrame, renderAvatar, subjectFrame } from '../lib/avatar';
+import { UnreadableFile } from '../lib/input-error';
 
 const colorInput = document.getElementById('bg-color') as HTMLInputElement | null;
 // Picking a colour in the custom well selects the custom swatch.
@@ -31,7 +32,7 @@ createShell({
         const mask = await findSubject(bitmap, (f) =>
           progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),
         );
-        if (coverage(mask) < 0.005) throw new Error('No person, pet or object was found in this photo. Try one with a clear subject.');
+        if (coverage(mask) < 0.005) throw new UnreadableFile('No person, pet or object was found in this photo. Try one with a clear subject.');
         const face = faces[0];
         const frame = face ? faceFrame(face, bitmap.height) : subjectFrame(subjectBox(mask, bitmap.width, bitmap.height)!, bitmap.height);
         const avatar = renderAvatar(cutout(bitmap, mask), frame, { size: 1024, background, shape });

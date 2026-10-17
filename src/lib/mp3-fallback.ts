@@ -8,6 +8,7 @@
 import { CustomAudioEncoder, EncodedPacket, getFirstEncodableAudioCodec, registerEncoder, type AudioCodec, type AudioSample, type Quality } from 'mediabunny';
 import { vendorDir } from './vendor';
 import { splitMp3Frames } from './mp3-frames';
+import { NamedError } from './input-error';
 
 type Mp3Encoder = {
   configure(o: { channels: 1 | 2; sampleRate: number; bitrate: number }): void;
@@ -29,7 +30,7 @@ class Mp3AudioEncoder extends CustomAudioEncoder {
       const { createEncoder } = await import('wasm-media-encoders');
       this.enc = (await createEncoder('audio/mpeg', `${vendorDir('lame')}mp3.wasm`)) as Mp3Encoder;
     } catch (cause) {
-      const err = new Error('The sound encoder could not load. Check your connection and try again.');
+      const err = new NamedError('Mp3FallbackFailed', 'The sound encoder could not load. Check your connection and try again.');
       err.name = 'AudioEncoderLoadError';
       err.cause = cause;
       throw err;

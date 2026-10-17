@@ -5,7 +5,7 @@
  * preferred because every phone and site plays it; VP9 or AV1 with Opus are
  * the fallback where a browser lacks those encoders. Nothing leaves the tab.
  */
-import { UnsupportedCodec } from './input-error';
+import { UnsupportedCodec, UnreadableFile, InputError, NamedError } from './input-error';
 import {
   BlobSource,
   BufferTarget,
@@ -90,7 +90,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     const soundOk = sound ? await sound.canDecode() : false;
@@ -100,7 +100,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
     const canEncodeSound =
       !!sound && (await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: 128_000 })) !== null;
     const copySound = !!sound && !(soundOk && canEncodeSound) && !!sound.codec && new Mp4OutputFormat().getSupportedAudioCodecs().includes(sound.codec);
-    if (!(duration > 0)) throw new Error('This video has no length to compress.');
+    if (!(duration > 0)) throw new InputError('This video has no length to compress.');
     const srcW = video.displayWidth;
     const srcH = video.displayHeight;
 
@@ -119,7 +119,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       videoBitrate = bits;
       if (bits < 120_000) {
         const most = Math.floor((target * 8 * 0.9) / (184_000 * 60));
-        throw new Error(`This video is too long to fit in ${opts.targetMB} MB and still be watchable. Trim it to under ${most} minute${most === 1 ? '' : 's'}, or choose a larger size.`);
+        throw new NamedError('VideoCompressFailed', `This video is too long to fit in ${opts.targetMB} MB and still be watchable. Trim it to under ${most} minute${most === 1 ? '' : 's'}, or choose a larger size.`);
       }
       // Pick the largest picture that the bitrate can fill with enough detail.
       const fps = 30;
@@ -131,7 +131,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
     }
 
     const videoCodec = await pickVideoCodec({ width, height, bitrate: videoBitrate });
-    if (!videoCodec) throw new Error('This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
+    if (!videoCodec) throw new NamedError('VideoCompressFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const audioCodec =
       sound && soundOk && !copySound
         ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: audioBitrate })
@@ -163,11 +163,11 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       });
       if (!conversion.isValid) {
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-        throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new Error('This browser cannot convert this video.');
+        throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoCompressFailed', 'This browser cannot convert this video.');
       }
       await executeWatched(conversion, onProgress);
       const buffer = output.target.buffer;
-      if (!buffer) throw new Error('The video could not be written.');
+      if (!buffer) throw new NamedError('VideoCompressFailed', 'The video could not be written.');
       return buffer;
     };
 

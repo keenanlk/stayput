@@ -1,3 +1,4 @@
+import { NamedError } from './input-error';
 /**
  * A file the browser could not read from disk (NotReadableError): on Android this is a big video, one the
  * phone moved or is still preparing, or a cloud file it let go of. It is the file or the phone, not the tool,
@@ -16,7 +17,7 @@ export function isNotReadable(e: unknown): boolean {
 
 /** The error to show for a file that could not be read. Its name stays NotReadableError, which is what a failed run records. */
 export function notReadable(cause?: unknown): Error {
-  const out = new Error('This file could not be read. Pick the video again, or copy it to the phone first, and try again.');
+  const out = new NamedError('ReadFailureFailed', 'This file could not be read. If it is in Google Photos, Drive or another cloud app, save it to the phone first, then pick it from the Files app (or the Downloads or Movies folder) and try again.');
   out.name = 'NotReadableError';
   out.cause = cause;
   return out;
@@ -47,4 +48,35 @@ export async function retryUnreadable<T>(file: Blob, job: () => Promise<T>, onNo
     onNotice?.('The file could not be read the first time. Trying once more.');
     return await job();
   }
+}
+
+/** Videos up to this size are copied into memory. A larger one is only checked: a copy would hold it in memory twice, and for a big file the failure is usually the size of the read itself, which a copy cannot fix. */
+export const SNAPSHOT_LIMIT = 50 * 1024 * 1024;
+const CHUNK = 8 * 1024 * 1024;
+
+/**
+ * Copies `file` into memory in one go, while the browser still lets us at it. On Android a picked file can stop being
+ * readable a moment later (a content:// file from Photos or Drive, read late or twice), so a tool takes this copy first
+ * and works from it. Each piece is tried a few times; a file that never reads ends with NotReadableError after about a
+ * second. A file over `limit` is only checked, and returned as it was. Nothing leaves the device.
+ */
+export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIMIT, pauses = [250, 750]): Promise<File> {
+  if (file.size === 0 || file.size > limit) {
+    await probeReadable(file);
+    return file;
+  }
+  const parts: ArrayBuffer[] = [];
+  for (let at = 0; at < file.size; at += CHUNK) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        parts.push(await file.slice(at, Math.min(file.size, at + CHUNK)).arrayBuffer());
+        break;
+      } catch (e) {
+        if (!isNotReadable(e)) throw e;
+        if (attempt >= pauses.length) throw notReadable(e);
+        await new Promise((r) => setTimeout(r, pauses[attempt]));
+      }
+    }
+  }
+  return new File(parts, file.name, { type: file.type, lastModified: file.lastModified });
 }

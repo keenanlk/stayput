@@ -1,5 +1,5 @@
 import { bindRange, bool, createShell, num, radio, str } from '../lib/shell';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 import { drawVideoWatermark, hasMark, isPlace, type VideoWatermark } from '../lib/video-watermark';
 import { videoEditShell } from './video-edit-shell';
 
@@ -84,9 +84,9 @@ async function firstFrame(file: File): Promise<ImageBitmap> {
     v.playsInline = true;
     v.preload = 'auto';
     await new Promise<void>((ok, bad) => {
-      const timer = setTimeout(() => bad(new Error('Timed out opening the video.')), 20_000);
+      const timer = setTimeout(() => bad(new NamedError('AddWatermarkToVideoFailed', 'Timed out opening the video.')), 20_000);
       v.onloadeddata = () => (clearTimeout(timer), ok());
-      v.onerror = () => (clearTimeout(timer), bad(new Error('This browser cannot play this video, so there is no preview. The watermark can still be added if its decoder can read it.')));
+      v.onerror = () => (clearTimeout(timer), bad(new NamedError('AddWatermarkToVideoFailed', 'This browser cannot play this video, so there is no preview. The watermark can still be added if its decoder can read it.')));
       v.src = url;
     });
     const at = Number.isFinite(v.duration) ? Math.min(1, v.duration / 3) : 0;

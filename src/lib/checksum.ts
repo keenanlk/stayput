@@ -4,6 +4,7 @@
  * through hash-wasm (MIT), served from /vendor/, one slice at a time.
  */
 import { vendorEntry } from './vendor';
+import { NamedError } from './input-error';
 
 export const ALGORITHMS = [
   { id: 'md5', label: 'MD5', hexLength: 32 },
@@ -31,7 +32,7 @@ let loading: Promise<HashWasm> | undefined;
 function library(): Promise<HashWasm> {
   loading ??= (import(/* @vite-ignore */ vendorEntry('hash')) as Promise<HashWasm>).catch((e) => {
     loading = undefined;
-    throw new Error('The hashing code could not be loaded. Check your connection and try again.', { cause: e });
+    throw new NamedError('ChecksumFailed', 'The hashing code could not be loaded. Check your connection and try again.', { cause: e });
   });
   return loading;
 }
@@ -41,12 +42,12 @@ export function describeHashError(e: unknown): Error {
   const name = e instanceof Error ? e.name : '';
   const text = e instanceof Error ? e.message : String(e);
   if (name === 'NotFoundError' || name === 'NotReadableError' || name === 'SecurityError') {
-    return new Error('The file could not be read. It may have been moved, renamed or changed while it was being checked, or it is on a drive that is no longer connected. Drop it again to retry.');
+    return new NamedError('ChecksumFailed', 'The file could not be read. It may have been moved, renamed or changed while it was being checked, or it is on a drive that is no longer connected. Drop it again to retry.');
   }
   if (e instanceof RangeError || /memory|abort|allocation/i.test(text)) {
-    return new Error('This device ran out of memory while checking the file. Close other tabs and try again, or use a computer with more memory. On Windows, certutil -hashfile or Get-FileHash can check it without the browser.');
+    return new NamedError('ChecksumFailed', 'This device ran out of memory while checking the file. Close other tabs and try again, or use a computer with more memory. On Windows, certutil -hashfile or Get-FileHash can check it without the browser.');
   }
-  return e instanceof Error ? e : new Error(text);
+  return e instanceof Error ? e : new NamedError('ChecksumFailed', text);
 }
 
 /** Hashes the file in CHUNK_BYTES slices. `onProgress` gets the fraction read so far. */
@@ -58,7 +59,7 @@ export async function hashFile(file: File, onProgress: (fraction: number) => voi
     let read = 0;
     while (read < file.size) {
       const chunk = new Uint8Array(await file.slice(read, read + CHUNK_BYTES).arrayBuffer());
-      if (chunk.length === 0) throw new Error('The file ended earlier than expected. It may have changed while it was being checked. Drop it again to retry.');
+      if (chunk.length === 0) throw new NamedError('ChecksumFailed', 'The file ended earlier than expected. It may have changed while it was being checked. Drop it again to retry.');
       for (const h of hashers) h.update(chunk);
       read += chunk.length;
       onProgress(read / file.size);

@@ -8,6 +8,7 @@
 import { canvasToBlob, drawScaled } from './image';
 import { fromWorkerFailure } from './worker-error';
 import type { AvifSettings, Reply } from './avif-encode.worker';
+import { NamedError } from './input-error';
 
 /** Encoder speed for the normal and the "faster encode" setting (libaom's 0 to 10 scale). */
 export const AVIF_SPEED = 6;
@@ -32,7 +33,7 @@ let worker: Worker | undefined;
 let nextId = 0;
 
 function cancelled(): Error {
-  const e = new Error('Cancelled.');
+  const e = new NamedError('AvifEncodeFailed', 'Cancelled.');
   e.name = 'AbortError';
   return e;
 }
@@ -58,7 +59,7 @@ export function encodeAvifWasm(img: ImageData, settings: AvifSettings, signal?: 
       done();
       w.terminate();
       if (worker === w) worker = undefined;
-      reject(new Error(e.message || 'The AVIF encoder could not start in this browser. Check your connection and try again.'));
+      reject(new NamedError('AvifEncodeFailed', e.message || 'The AVIF encoder could not start in this browser. Check your connection and try again.'));
     };
     const onAbort = () => {
       done();

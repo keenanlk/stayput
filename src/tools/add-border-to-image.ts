@@ -2,6 +2,7 @@ import { createShell, processEach, bindRange, num, str } from '../lib/shell';
 import { canvasToBlob, decodeImage, drawScaled, extForType, makeCanvas, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { effectPreview } from '../lib/effect-preview';
+import { NamedError } from '../lib/input-error';
 
 type Ctx = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
@@ -61,7 +62,7 @@ const shell = createShell({
       try {
         const { canvas, b, R } = render(decoded.bitmap, undefined, type === 'image/jpeg');
         const blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : 0.92);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+        if (blob.type !== type) throw new NamedError('AddBorderToImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         const bmp = await createImageBitmap(canvas);
         const notes = [`${canvas.width}×${canvas.height}`];
         if (b) notes.push(`${b} px border`);

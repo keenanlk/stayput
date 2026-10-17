@@ -1,7 +1,7 @@
 import { createShell, processEach, bindRange, num, str, radio, bool } from '../lib/shell';
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('rotate-panel');
@@ -124,7 +124,7 @@ const shell = createShell({
       const type = outputType(entry.file, choice);
       const c = transformed(decoded.bitmap, deg, h, v, 1, type === 'image/jpeg' ? '#ffffff' : undefined);
       const blob = await canvasToBlob(c, type, type === 'image/png' ? undefined : quality);
-      if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+      if (blob.type !== type) throw new NamedError('RotateImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
       const bmp = await createImageBitmap(c);
       const out: OutputFile = {
         name: suffixName(entry.file.name, suffix, extForType(type)),
