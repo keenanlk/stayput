@@ -1,12 +1,12 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
-import { formatDuration } from '../lib/audio';
+import { encodeWav, formatDuration } from '../lib/audio';
 import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioFormat } from '../lib/audio-convert';
 import { DENOISE_RATE, denoise, inStage, loadRnnoise, resample } from '../lib/denoise';
 import { SAMPLE_RATE, decodePcm } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
 import { audioDecodeError } from '../lib/speech-errors';
-import { probeReadable, retryUnreadable } from '../lib/read-failure';
+import { retryUnreadable, snapshotFile } from '../lib/read-failure';
 
 const BITRATES = [96, 128, 160, 192, 256, 320];
 const STRENGTH: Record<string, number> = { strong: 1, medium: 0.85, light: 0.65 };
@@ -24,8 +24,9 @@ createShell({
   async process(files, progress) {
     const strength = STRENGTH[radio('strength', 'strong')] ?? 1;
     const choice = str('format', 'same');
-    // A file the browser cannot reach says so now, before the noise remover is downloaded.
-    for (const entry of files) await probeReadable(entry.file);
+    // Copy each file into memory right away: on Android a picked file can become unreadable by the time the noise remover
+    // has downloaded. A file the browser cannot reach says so now, before the download.
+    files = await Promise.all(files.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file) })));
     progress.set('Loading the noise remover…', 0.02);
     const rnnoise = await loadRnnoise();
     const cleanFile = async (entry: (typeof files)[number], index: number): Promise<OutputFile> => {
@@ -49,8 +50,8 @@ createShell({
           throw inStage('NoiseDecodeError', e);
         });
         if (!pcm || !pcm[0]?.length) throw audioDecodeError(`${file.name} has no sound to clean.`);
-        // The cleaned sound goes straight to the video: no WAV is written and read back.
-        const r = await addAudio(file, await clean(pcm, SAMPLE_RATE), { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.7 + f * 0.3)) }).catch((e) => {
+        const wav = new File([encodeWav(await clean(pcm, SAMPLE_RATE), SAMPLE_RATE)], 'sound.wav', { type: 'audio/wav' });
+        const r = await addAudio(file, wav, { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.7 + f * 0.3)) }).catch((e) => {
           throw inStage('NoiseWriteError', e);
         });
         const out: OutputFile = { name: suffixName(file.name, '-clean', r.ext), blob: r.blob, originalSize: file.size, note: `${voiceNote(voice)}, picture copied, ${formatDuration(r.duration)}` };

@@ -6,7 +6,6 @@
  * the small writer below.
  */
 import { vendorDir } from './vendor';
-import { foldToStereo } from './fold-channels';
 import { audioDecodeError } from './speech-errors';
 import { decodeWma, isAsf } from './wma-convert';
 
@@ -86,16 +85,6 @@ export function channelsOf(buffer: AudioBuffer, mono: boolean): Float32Array[] {
   const out = new Float32Array(buffer.length);
   const [l, r] = chans as [Float32Array, Float32Array];
   for (let i = 0; i < out.length; i++) out[i] = (l[i]! + r[i]!) / 2;
-  return [out];
-}
-
-/** Like `channelsOf`, but a surround sound is folded to stereo instead of cut to its first two channels. */
-export function foldedChannelsOf(buffer: AudioBuffer, mono: boolean): Float32Array[] {
-  if (buffer.numberOfChannels <= 2) return channelsOf(buffer, mono);
-  const stereo = foldToStereo(Array.from({ length: buffer.numberOfChannels }, (_, i) => buffer.getChannelData(i)));
-  if (!mono) return stereo;
-  const out = new Float32Array(buffer.length);
-  for (let i = 0; i < out.length; i++) out[i] = (stereo[0]![i]! + stereo[1]![i]!) / 2;
   return [out];
 }
 

@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { isNotReadable, notReadable, probeReadable, retryUnreadable } from '../src/lib/read-failure';
+import { SNAPSHOT_LIMIT, isNotReadable, notReadable, probeReadable, retryUnreadable, snapshotFile } from '../src/lib/read-failure';
 
 // Remove background noise from a video on a phone whose browser fails to read the file part way through (Android
 // Chrome says NotReadableError). The read is forced to fail in the page once the noise removal has started: once,
@@ -37,6 +37,37 @@ test.describe('read-failure rules', () => {
     let calls = 0;
     await expect(retryUnreadable(new Blob(['abc']), async () => (++calls, Promise.reject(named('EncodingError'))), undefined, 0)).rejects.toMatchObject({ name: 'EncodingError' });
     expect(calls).toBe(1);
+  });
+
+  test('a snapshot copies the file; a read that fails once is tried again; one that never reads is named', async () => {
+    const file = new File(['abcdef'], 'a.mp4', { type: 'video/mp4', lastModified: 5 });
+    const copy = await snapshotFile(file);
+    expect(copy).not.toBe(file);
+    expect([copy.name, copy.type, copy.lastModified, await copy.text()]).toEqual(['a.mp4', 'video/mp4', 5, 'abcdef']);
+    const flaky = new File(['abcdef'], 'b.mp4');
+    const slice = flaky.slice.bind(flaky);
+    let fails = 1;
+    flaky.slice = (...a: Parameters<Blob['slice']>) => (fails-- > 0 ? ({ arrayBuffer: () => Promise.reject(named('NotReadableError')) } as unknown as Blob) : slice(...a));
+    expect(await (await snapshotFile(flaky, undefined, [0, 0])).text()).toBe('abcdef');
+    const never = new File(['abcdef'], 'c.mp4');
+    never.slice = () => ({ arrayBuffer: () => Promise.reject(named('NotReadableError')) }) as unknown as Blob;
+    await expect(snapshotFile(never, undefined, [0, 0])).rejects.toMatchObject({ name: 'NotReadableError', message: expect.stringContaining('save it to the phone') });
+  });
+
+  test('a file over the snapshot limit is only checked, never copied into memory', async () => {
+    expect(SNAPSHOT_LIMIT).toBe(50 * 1024 * 1024);
+    const big = new File(['abc'], 'big.mp4');
+    Object.defineProperty(big, 'size', { value: SNAPSHOT_LIMIT + 1 });
+    const reads: number[] = [];
+    big.slice = (start = 0, end = SNAPSHOT_LIMIT + 1) => (reads.push(end - start), { arrayBuffer: () => Promise.resolve(new ArrayBuffer(1)) }) as unknown as Blob;
+    expect(await snapshotFile(big)).toBe(big);
+    expect(Math.max(...reads)).toBe(1);
+    const small = new File(['abc'], 'small.mp4');
+    Object.defineProperty(small, 'size', { value: SNAPSHOT_LIMIT });
+    reads.length = 0;
+    small.slice = (start = 0, end = SNAPSHOT_LIMIT) => (reads.push(end - start), { arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)) }) as unknown as Blob;
+    expect(await snapshotFile(small)).not.toBe(small);
+    expect(Math.max(...reads)).toBeGreaterThan(1);
   });
 
   test('a file that cannot be reached is named before any work', async () => {
@@ -115,6 +146,82 @@ for (const [label, reads, ok] of [
     for (const e of all) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `${e.n} carries unexpected key ${k}`).toBe(true);
   });
 }
+
+// An Android File from a cloud app: the picker's own File stops being readable once the page has done something else
+// (here: once the noise remover starts downloading), or never reads at all. The tool must read it early, into memory.
+async function lazyPage(page: Page, mode: 'late' | 'never') {
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
+  await page.addInitScript((m) => {
+    const w = window as unknown as { __late: boolean; __failed: number };
+    w.__late = m === 'never';
+    w.__failed = 0;
+    const RealFile = window.File;
+    const copies = new WeakSet<object>();
+    // Files the page builds itself are copies; the one the picker made is the original.
+    window.File = new Proxy(RealFile, {
+      construct(t, args) {
+        const f = Reflect.construct(t, args) as File;
+        copies.add(f);
+        return f;
+      },
+    });
+    const originals = new WeakSet<object>();
+    const bad = (b: Blob) => w.__late && (originals.has(b) || (b instanceof RealFile && !copies.has(b)));
+    const fail = () => {
+      w.__failed++;
+      return new DOMException('The requested file could not be read.', 'NotReadableError');
+    };
+    const { slice, arrayBuffer, stream } = Blob.prototype;
+    Blob.prototype.slice = function (...a: [number?, number?, string?]) {
+      const out = slice.apply(this, a);
+      if (bad(this)) originals.add(out);
+      return out;
+    };
+    Blob.prototype.arrayBuffer = function () {
+      return bad(this) ? Promise.reject(fail()) : arrayBuffer.call(this);
+    };
+    Blob.prototype.stream = function () {
+      return bad(this) ? new ReadableStream({ pull: (c) => c.error(fail()) }) : stream.call(this);
+    };
+    if (m === 'late')
+      addEventListener('DOMContentLoaded', () => {
+        const text = document.querySelector('#progress-text')!;
+        new MutationObserver(() => {
+          if (/Loading the noise remover/.test(text.textContent ?? '')) w.__late = true;
+        }).observe(text, { childList: true, characterData: true, subtree: true });
+      });
+  }, mode);
+  await page.route('https://stats.keenankaufman.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: `window.umami={track:(n,d)=>{const k='__ev';const a=JSON.parse(sessionStorage.getItem(k)||'[]');a.push({n,d});sessionStorage.setItem(k,JSON.stringify(a));}};`,
+    }),
+  );
+  await page.goto('/remove-background-noise-from-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+}
+
+test('a file that stops being readable after it was picked is cleaned from the early copy', async ({ page }, info) => {
+  test.setTimeout(150_000);
+  await lazyPage(page, 'late');
+  await page.locator('#file-input').setInputFiles(clip(info.project.name === 'webkit' ? 'speech.mov' : 'talk.webm'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+  expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'ok' });
+});
+
+test('a file that never reads ends quickly, saying what to do', async ({ page }, info) => {
+  test.setTimeout(60_000);
+  await lazyPage(page, 'never');
+  await page.locator('#file-input').setInputFiles(clip(info.project.name === 'webkit' ? 'speech.mov' : 'talk.webm'));
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 10_000 });
+  await expect(page.locator('#error')).toContainText('save it to the phone');
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+  expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+});
 
 // The noise remover is a WebAssembly module fetched on the first run. A failed fetch is tried once more; two in a row say so.
 for (const [label, blocked, ok] of [

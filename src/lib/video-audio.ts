@@ -29,7 +29,6 @@ import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { NoAudioEncoder, registerMp3Fallback } from './mp3-fallback';
 import { UnreadableFile } from './input-error';
 import { isNotReadable } from './read-failure';
-import { openOpfsOutput } from './opfs-output';
 
 export interface AddAudioOptions {
   /** Replace the video's sound, or play both together. */
@@ -72,14 +71,8 @@ export async function hasVideo(file: File): Promise<boolean> {
   }
 }
 
-/**
- * Replace or mix the video's sound. `sound` is a file to decode, or PCM channels at 48 kHz that are already decoded
- * (what the noise remover and volume booster hand over, with no WAV written and read back). Channels passed in are
- * used in place and may be cut or faded in place.
- */
-export async function addAudio(videoFile: File, sound: File | Float32Array[], opts: AddAudioOptions): Promise<AddAudioResult> {
+export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioOptions): Promise<AddAudioResult> {
   const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA] });
-  let disk: Awaited<ReturnType<typeof openOpfsOutput>>;
   try {
     const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
     if (!video || !video.codec) throw new UnreadableFile(`${videoFile.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
@@ -93,33 +86,25 @@ export async function addAudio(videoFile: File, sound: File | Float32Array[], op
     const duration = Math.max(0, end - first) || (await input.computeDuration());
     const len = Math.max(1, Math.round(duration * SAMPLE_RATE));
 
-    const added = sound instanceof File ? await decodePcm(sound) : sound;
-    if (!added || !added[0]?.length) throw new UnreadableFile(`${sound instanceof File ? sound.name : videoFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
+    const added = await decodePcm(soundFile);
+    if (!added || !added[0]?.length) throw new UnreadableFile(`${soundFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
     const [inL, inR] = stereo(added);
     const soundLength = inL!.length / SAMPLE_RATE;
     const looped = opts.loop && inL!.length < len;
     const cut = inL!.length > len;
-    // Sound that fits (or is cut) is used as it is; only a loop, or a sound shorter than the picture, needs a new array.
-    let mixed: Float32Array[];
-    if (!opts.loop && cut && inL !== inR) {
-      mixed = [inL!.subarray(0, len), inR!.subarray(0, len)];
-    } else if (!opts.loop && inL!.length === len && inL !== inR) {
-      mixed = [inL!, inR!];
-    } else {
-      mixed = [new Float32Array(len), new Float32Array(len)];
-      for (let at = 0; at < len; at += inL!.length) {
-        const n = Math.min(inL!.length, len - at);
-        mixed[0]!.set(inL!.subarray(0, n), at);
-        mixed[1]!.set(inR!.subarray(0, n), at);
-        if (!opts.loop) break;
-      }
+    const sound = [new Float32Array(len), new Float32Array(len)];
+    for (let at = 0; at < len; at += inL!.length) {
+      const n = Math.min(inL!.length, len - at);
+      sound[0]!.set(inL!.subarray(0, n), at);
+      sound[1]!.set(inR!.subarray(0, n), at);
+      if (!opts.loop) break;
     }
     if (opts.fade && (cut || looped)) {
       const f = Math.min(len, Math.round(FADE * SAMPLE_RATE));
       for (let i = 0; i < f; i++) {
         const g = i / f;
-        mixed[0]![len - 1 - i]! *= g;
-        mixed[1]![len - 1 - i]! *= g;
+        sound[0]![len - 1 - i]! *= g;
+        sound[1]![len - 1 - i]! *= g;
       }
     }
     if (opts.mode === 'mix' && (await input.getPrimaryAudioTrack())) {
@@ -127,16 +112,14 @@ export async function addAudio(videoFile: File, sound: File | Float32Array[], op
       if (own) {
         const [l, r] = stereo(own);
         for (const [c, ch] of [l!, r!].entries()) {
-          const out = mixed[c]!;
+          const out = sound[c]!;
           for (let i = 0; i < len; i++) out[i] = Math.max(-1, Math.min(1, out[i]! * MIX_LEVEL + (ch[i] ?? 0)));
         }
       }
     }
 
     // MP4 plays everywhere, but VP8 in MP4 does not play in Safari; keep VP8 in WebM.
-    // On disk the metadata is written after the pictures; in memory it goes in front.
-    disk = await openOpfsOutput(videoFile.size);
-    const format = video.codec === 'vp8' ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: disk ? false : 'in-memory' });
+    const format = video.codec === 'vp8' ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: 'in-memory' });
     // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
     registerMp3Fallback();
     const audioCodec = await getFirstEncodableAudioCodec(
@@ -145,14 +128,13 @@ export async function addAudio(videoFile: File, sound: File | Float32Array[], op
     );
     if (!audioCodec) throw new NoAudioEncoder("This browser cannot write the new sound into a video. On an iPhone, update iOS or use a computer; elsewhere, use a recent Chrome, Edge, Safari or Firefox.");
 
-    const buffer = disk ? undefined : new BufferTarget();
-    const output = new Output({ format, target: disk ? disk.target : buffer! });
+    const output = new Output({ format, target: new BufferTarget() });
     const videoSource = new EncodedVideoPacketSource(video.codec);
     output.addVideoTrack(videoSource, { rotation: video.rotation });
     const audioSource = new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH });
     output.addAudioTrack(audioSource);
     await output.start();
-    const feed = pcmFeeder(audioSource, mixed);
+    const feed = pcmFeeder(audioSource, sound);
 
     let firstPacket = true;
     for await (const packet of new EncodedPacketSink(video).packets()) {
@@ -166,12 +148,11 @@ export async function addAudio(videoFile: File, sound: File | Float32Array[], op
     videoSource.close();
     audioSource.close();
     await output.finalize();
-    const bytes = buffer?.buffer;
-    if (!disk && !bytes) throw new NamedError('VideoWriteError', 'The video could not be written.');
-    const blob = disk ? await disk.finish(format.mimeType) : new Blob([bytes!], { type: format.mimeType });
+    const buffer = output.target.buffer;
+    if (!buffer) throw new NamedError('VideoWriteError', 'The video could not be written.');
     opts.onProgress?.(1);
     return {
-      blob,
+      blob: new Blob([buffer], { type: format.mimeType }),
       ext: format.fileExtension.replace(/^\./, ''),
       duration,
       videoCodec: CODEC_NAMES[video.codec] ?? video.codec,
@@ -179,10 +160,6 @@ export async function addAudio(videoFile: File, sound: File | Float32Array[], op
       looped,
       cut,
     };
-  } catch (e) {
-    // The temporary output file is no use to anyone now.
-    await disk?.abort();
-    throw e;
   } finally {
     input.dispose?.();
   }

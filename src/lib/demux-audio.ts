@@ -7,7 +7,7 @@
  * decoding a whole phone video at once can run the tab out of memory.
  */
 import { ALL_FORMATS, BlobSource, Input, EncodedAudioPacketSource, EncodedPacketSink, BufferTarget, Mp4OutputFormat, Output, type EncodedPacket } from 'mediabunny';
-import { foldedChannelsOf } from './audio';
+import { channelsOf } from './audio';
 import { audioDecodeError } from './speech-errors';
 
 /** Seconds of sound decoded in one go. */
@@ -115,5 +115,5 @@ async function decodeStretch(preRoll: EncodedPacket[], packets: EncodedPacket[],
   const ctx = new OfflineAudioContext(2, 1, rate);
   const decoded = await ctx.decodeAudioData(bytes);
   const skip = Math.round((packets[0]!.timestamp - t0) * rate);
-  return foldedChannelsOf(decoded, mono).map((ch) => ch.subarray(Math.min(skip, ch.length)));
+  return channelsOf(decoded, mono).map((ch) => ch.subarray(Math.min(skip, ch.length)));
 }
