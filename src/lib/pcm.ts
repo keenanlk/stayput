@@ -4,26 +4,91 @@
  * decoders, and feed PCM into a Mediabunny audio source in step with the
  * pictures.
  */
-import { AudioSample, type AudioSampleSource } from 'mediabunny';
+import { ALL_FORMATS, AudioBufferSink, AudioSample, BlobSource, Input, type AudioSampleSource, type InputAudioTrack } from 'mediabunny';
+import { foldToStereo } from './audio';
+import { grown, plannedSamples } from './demux-audio';
+import { NamedError } from './input-error';
 import { isNotReadable } from './read-failure';
 
 export const SAMPLE_RATE = 48_000;
 
-/** The file's sound as one or two channels at 48 kHz, or null when it has none the browser can read. */
+/** The largest file handed to the browser's decoder whole: it reads the file into memory, and a phone gives a tab far less than a desktop. */
+const WHOLE_FILE_LIMIT = 150 * 1024 * 1024;
+
+const MEMORY_TEXT = /out of memory|bad_alloc|allocation failed|array buffer allocation|invalid (typed )?array length/i;
+
+/** The error for a sound too big for this device's memory. Its name is what a failed run records. */
+export const soundTooBig = (cause?: unknown) => {
+  const out = new NamedError('OutOfMemoryError', 'This device ran out of memory reading the sound of this video. Trim the video to a shorter length first, or use a computer.');
+  out.cause = cause;
+  return out;
+};
+
+/** A read failure and a failed allocation are the page's to report; anything else just means this way of decoding did not work. */
+function unlessFatal(e: unknown): void {
+  if (isNotReadable(e)) throw e;
+  if (e instanceof RangeError || (e instanceof Error && MEMORY_TEXT.test(e.message))) throw soundTooBig(e);
+}
+
+/**
+ * Decode with the page's WebCodecs decoder, buffer by buffer, folding surround to stereo and resampling to `rate`
+ * as each arrives. Null when this browser has no decoder for the track or it holds no sound.
+ */
+async function decodedByCodecs(track: InputAudioTrack, rate: number): Promise<Float32Array[] | null> {
+  if (!track.codec || !(await track.canDecode())) return null;
+  const seconds = await track.computeDuration();
+  let out: Float32Array<ArrayBuffer>[] | null = null;
+  let end = 0;
+  for await (const { buffer, timestamp } of new AudioBufferSink(track).buffers()) {
+    const chans = foldToStereo(Array.from({ length: buffer.numberOfChannels }, (_, c) => buffer.getChannelData(c)));
+    const step = buffer.sampleRate / rate;
+    const at = Math.max(0, Math.round(timestamp * rate));
+    const n = Math.floor(buffer.length / step);
+    out = out ? out.map((ch) => grown(ch, at + n)) : chans.map(() => new Float32Array(plannedSamples(seconds, rate)));
+    for (const [c, ch] of chans.entries()) {
+      const dst = out[Math.min(c, out.length - 1)]!;
+      for (let j = 0; j < n; j++) {
+        const pos = j * step;
+        const i = Math.floor(pos);
+        const next = ch[Math.min(buffer.length - 1, i + 1)]!;
+        dst[at + j] = ch[i]! + (next - ch[i]!) * (pos - i);
+      }
+    }
+    end = Math.max(end, at + n);
+  }
+  return out && end > 0 ? out.map((ch) => ch.subarray(0, end)) : null;
+}
+
+/**
+ * The file's sound as one or two channels at 48 kHz (surround folded to stereo, the centre kept), or null when it has
+ * none the browser can read. The file is read in slices through the demuxer, never whole: a phone video of several
+ * hundred MB read at once fails the allocation, which Chrome reports as NotReadableError. Only a small sound file
+ * the demuxer cannot place is handed to the browser's decoder whole.
+ */
 export async function decodePcm(file: Blob): Promise<Float32Array[] | null> {
+  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  try {
+    const track = await input.getPrimaryAudioTrack().catch((e) => (unlessFatal(e), null));
+    if (track) {
+      // AAC and MP3: stretches wrapped in a small MP4 and decoded by the browser (also what Safari needs for a .mov).
+      const { demuxedSound } = await import('./demux-audio');
+      const wrapped = await demuxedSound(input, SAMPLE_RATE, false).catch((e) => (unlessFatal(e), null));
+      if (wrapped) return wrapped;
+      // Opus, Vorbis, FLAC, PCM, AC-3: the page's own decoder, buffer by buffer.
+      const decoded = await decodedByCodecs(track, SAMPLE_RATE).catch((e) => (unlessFatal(e), null));
+      if (decoded) return decoded;
+    }
+  } finally {
+    input.dispose?.();
+  }
+  if (file.size > WHOLE_FILE_LIMIT) return null;
   const ctx = new OfflineAudioContext(2, 1, SAMPLE_RATE);
   try {
     const buffer = await ctx.decodeAudioData(await file.arrayBuffer());
-    return Array.from({ length: Math.min(2, buffer.numberOfChannels) }, (_, i) => buffer.getChannelData(i));
+    return foldToStereo(Array.from({ length: buffer.numberOfChannels }, (_, i) => buffer.getChannelData(i)));
   } catch (e) {
-    // A file the browser cannot read is not one it cannot decode: say so, as the demuxer would only fail the same way.
-    if (isNotReadable(e)) throw e;
-    // Safari refuses a QuickTime .mov whole; its sound track is read through the demuxer instead.
-    const { demuxedFileSound } = await import('./demux-audio');
-    return demuxedFileSound(file, SAMPLE_RATE, false).catch((err) => {
-      if (isNotReadable(err)) throw err;
-      return null;
-    });
+    unlessFatal(e);
+    return null;
   }
 }
 

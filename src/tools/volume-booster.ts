@@ -1,6 +1,6 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
-import { encodeWav, formatDuration } from '../lib/audio';
+import { formatDuration } from '../lib/audio';
 import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioFormat } from '../lib/audio-convert';
 import { applyGain, dbToGain, gainFor, type VolumeMode } from '../lib/audio-gain';
 import { SAMPLE_RATE, decodePcm } from '../lib/pcm';
@@ -53,8 +53,7 @@ createShell({
       if (await hasVideo(file)) {
         const pcm = await decodePcm(file);
         if (!pcm || !pcm[0]?.length) throw audioDecodeError(`${file.name} has no sound to change.`);
-        const wav = new File([encodeWav(change(pcm, SAMPLE_RATE), SAMPLE_RATE)], 'sound.wav', { type: 'audio/wav' });
-        const r = await addAudio(file, wav, { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.2 + f * 0.8)) });
+        const r = await addAudio(file, change(pcm, SAMPLE_RATE), { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.2 + f * 0.8)) });
         const out: OutputFile = { name: suffixName(file.name, suffix(m, db), r.ext), blob: r.blob, originalSize: file.size, note: `${tail()}, picture copied, ${formatDuration(r.duration)}` };
         return out;
       }

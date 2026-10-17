@@ -51,34 +51,3 @@ export async function retryUnreadable<T>(file: Blob, job: () => Promise<T>, onNo
     return await job();
   }
 }
-
-/** Videos up to this size are copied into memory; a larger one is only checked, because a phone cannot hold it twice. */
-export const SNAPSHOT_LIMIT = 600 * 1024 * 1024;
-const CHUNK = 8 * 1024 * 1024;
-
-/**
- * Copies `file` into memory in one go, while the browser still lets us at it. On Android a picked file can stop being
- * readable a moment later (a content:// file from Photos or Drive, read late or twice), so a tool takes this copy first
- * and works from it. Each piece is tried a few times; a file that never reads ends with NotReadableError after about a
- * second. A file over `limit` is only checked, and returned as it was. Nothing leaves the device.
- */
-export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIMIT, pauses = [250, 750]): Promise<File> {
-  if (file.size === 0 || file.size > limit) {
-    await probeReadable(file);
-    return file;
-  }
-  const parts: ArrayBuffer[] = [];
-  for (let at = 0; at < file.size; at += CHUNK) {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        parts.push(await file.slice(at, Math.min(file.size, at + CHUNK)).arrayBuffer());
-        break;
-      } catch (e) {
-        if (!isNotReadable(e)) throw e;
-        if (attempt >= pauses.length) throw notReadable(e);
-        await new Promise((r) => setTimeout(r, pauses[attempt]));
-      }
-    }
-  }
-  return new File(parts, file.name, { type: file.type, lastModified: file.lastModified });
-}
