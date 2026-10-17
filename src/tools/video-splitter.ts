@@ -1,8 +1,8 @@
 import { bool, createShell, num, radio, str } from '../lib/shell';
 import { formatBytes, type OutputFile } from '../lib/files';
 import { overPhoneLimit } from '../lib/phone-limit';
-import { planAtTimes, planEqual, planEvery, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
-import { NamedError } from '../lib/input-error';
+import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
+import { InputError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
 import { retryUnreadable } from '../lib/read-failure';
 
@@ -35,11 +35,36 @@ const mode = () => {
 
 /** The parts the current settings make; throws a named error that says what to fix. */
 function plan(): VideoPart[] {
-  if (!duration) throw new NamedError('SplitNoLength', 'This video has no length this page can read.');
-  if (mode() === 'every') return planEvery(num('vs-every', 0) * num('vs-unit', 1), duration);
-  if (mode() === 'equal') return planEqual(num('vs-equal', 0), duration);
-  return planAtTimes(str('vs-times'), duration);
+  return planFor({ mode: mode(), times: str('vs-times'), everySeconds: num('vs-every', 0) * num('vs-unit', 1), parts: num('vs-equal', 0) }, duration);
 }
+
+const runButton = $<HTMLButtonElement>('run');
+let guarding = false;
+
+/**
+ * Keeps Run off while the cut list is bad, so a run never starts on a bad plan. A video whose length could not be read
+ * is not held back: Run reads it again and a failure is recorded under its own name.
+ */
+function guardRun() {
+  let good = true;
+  if (duration > 0) {
+    try {
+      plan();
+    } catch {
+      good = false;
+    }
+  }
+  if (!good) {
+    if (!runButton.disabled) runButton.disabled = true;
+    guarding = true;
+  } else if (guarding) {
+    guarding = false;
+    // The shell keeps Run off while it is working and while no file is chosen.
+    runButton.disabled = $('tool').classList.contains('is-busy') || $('tool').dataset.count === '0';
+  }
+}
+// The shell turns Run on again when a run ends or files change: put the guard back at once.
+new MutationObserver(guardRun).observe(runButton, { attributes: true, attributeFilter: ['disabled'] });
 
 function update() {
   timesField.hidden = mode() !== 'times';
@@ -49,6 +74,7 @@ function update() {
   list.textContent = '';
   info.classList.remove('is-over');
   delete $('tool').dataset.parts;
+  guardRun();
   if (!duration) {
     info.textContent = '';
     return;
@@ -118,7 +144,13 @@ const shell = createShell({
         throw nameBare('VideoReadFailed', e);
       }
     }
-    const parts = plan();
+    let parts: VideoPart[];
+    try {
+      parts = plan();
+    } catch (e) {
+      // Run is kept off for a bad list, so this is only a press that got past that: the person's input, not a failure.
+      throw new InputError(e instanceof Error ? e.message : 'Check the times and try again.');
+    }
     const exact = bool('exact');
     const { trimVideo } = await import('../lib/video-trim');
     const outs: OutputFile[] = [];
@@ -142,7 +174,7 @@ const shell = createShell({
       outs.push({
         name: videoPartName(entry.file.name, i, parts.length, r.ext),
         blob: r.blob,
-        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : 'fast cut'}`,
+        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : r.keyframeCopy ? 'copied from the key frame at or before the start' : 'fast cut'}`,
       });
     }
     return outs;

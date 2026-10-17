@@ -54,7 +54,12 @@ export interface TrimResult {
   ext: string;
   /** Seconds in the output. */
   duration: number;
+  /** Set when the encoder failed and the part was copied from the key frame at or before its start instead. */
+  keyframeCopy?: boolean;
 }
+
+/** Names an encoder gives up with; a fast cut that meets one falls back to copying from the key frame. */
+const ENCODER_FAILURES = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'EncoderRefused', 'EncoderUnavailable', 'OutOfMemoryError']);
 
 /**
  * Cuts the part. A failure that comes from the device and not the file (page hidden, encoder or memory gave up) gets one
@@ -70,7 +75,17 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
         try {
           return await trimOnce(file, opts, attempt, (side) => (made = side));
         } catch (e) {
-          throw isNotReadable(e) ? notReadable(e) : nameBare('CutFailed', e);
+          if (isNotReadable(e)) throw notReadable(e);
+          // A fast cut re-encodes a part whose start is far from a key frame. When the encoder fails, copy from the key frame.
+          const name = (e as { name?: string } | null)?.name ?? '';
+          if (!opts.exact && !attempt.maxSide && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
+            try {
+              return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true)), keyframeCopy: true };
+            } catch (again) {
+              throw isNotReadable(again) ? notReadable(again) : nameBare('CutFailed', again);
+            }
+          }
+          throw nameBare('CutFailed', e);
         }
       },
       () => made,
@@ -81,7 +96,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   }
 }
 
-async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<TrimResult> {
+async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false): Promise<TrimResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const format = await input.getFormat().catch((e) => {
@@ -135,7 +150,7 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
       output,
       tracks: 'primary',
       trim,
-      copy: opts.exact || smaller < 1 ? false : { boundaryTolerance: 0.5 },
+      copy: keyframes ? { mode: 'forced' } : opts.exact || smaller < 1 ? false : { boundaryTolerance: 0.5 },
       // With the sound handled here, the output is started and finished here too.
       composable: !!keepSound,
       video: {

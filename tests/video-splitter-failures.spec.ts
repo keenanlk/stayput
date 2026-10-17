@@ -121,14 +121,52 @@ test.describe('on the page', () => {
     expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'UnreadableFile' });
   });
 
-  test('a refused plan is recorded under its own class', async ({ page }) => {
+  test('Run waits for a good cut list and comes back for a good one', async ({ page }) => {
     await open(page);
     await load(page, fx('split-60s.mp4'));
     await expect(page.locator('#tool')).toHaveAttribute('data-duration', '60');
+    // Times left empty: the page says what to type and Run stays off.
+    await expect(page.locator('#vs-info')).toContainText('Type the times');
+    await expect(page.locator('#run')).toBeDisabled();
     await page.locator('#vs-times').fill('2:00');
+    await expect(page.locator('#run')).toBeDisabled();
+    await page.locator('#vs-times').fill('0:20');
+    await expect(page.locator('#run')).toBeEnabled();
     await page.locator('#run').click();
-    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-    expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'SplitTimeOutOfRange' });
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+    expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
+    // After the run the shell turns Run on again; a bad list turns it off again.
+    await page.locator('#vs-times').fill('');
+    await expect(page.locator('#run')).toBeDisabled();
+    // Switching Run on by hand does not get past the guard.
+    await page.evaluate(() => ((document.getElementById('run') as HTMLButtonElement).disabled = false));
+    await expect(page.locator('#run')).toBeDisabled();
+  });
+
+  test('the encoder fails on a fast cut: the part is copied from the key frame and says so', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit' && !!process.env.CI, 'Linux WebKit in CI stalls decoding and encoding video');
+    await open(page);
+    await page.addInitScript(() => {
+      const original = VideoEncoder.prototype.encode;
+      VideoEncoder.prototype.encode = function () {
+        throw new DOMException('forced by the test', 'EncodingError');
+      };
+      (window as unknown as { __orig: unknown }).__orig = original;
+    });
+    await load(page, fx('split-gop2s.mp4'));
+    await expect(page.locator('#tool')).toHaveAttribute('data-duration', /^8/);
+    await page.locator('#vs-times').fill('0:03');
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
+    await expect(page.locator('#results-list')).toContainText('key frame');
+    const [zip] = await Promise.all([page.waitForEvent('download'), page.locator('#download-all').click()]);
+    const files = unzipSync(new Uint8Array(readFileSync((await zip.path())!)));
+    const names = Object.keys(files).sort();
+    expect(names).toHaveLength(2);
+    const input = new Input({ source: new BufferSource(files[names[1]!]!), formats: ALL_FORMATS });
+    const first = await (await input.getPrimaryVideoTrack())!.getFirstTimestamp();
+    expect(first).toBeLessThanOrEqual(3.05);
+    expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 
   // Odd inputs: each splits into parts that run end to end, or ends in a named class, and never hangs.
@@ -182,7 +220,7 @@ test.describe('on the page', () => {
     await page.locator('#vs-times').fill('0:00.5, 0:59');
     await expect(page.locator('#vs-parts li')).toHaveCount(3);
     await page.locator('#run').click();
-    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 240_000 });
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 });

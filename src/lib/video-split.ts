@@ -81,6 +81,27 @@ export function planEqual(count: number, duration: number): VideoPart[] {
   return tooShort(Array.from({ length: count }, (_, i) => ({ start: (duration * i) / count, end: (duration * (i + 1)) / count })));
 }
 
+export interface SplitSettings {
+  mode: 'times' | 'every' | 'equal';
+  /** The times box, for 'times'. */
+  times: string;
+  /** Seconds per part, for 'every'. */
+  everySeconds: number;
+  /** Number of parts, for 'equal'. */
+  parts: number;
+}
+
+/**
+ * The parts these settings make for a video of `duration` seconds, or a named error that says what to fix. The one
+ * check of a cut list: the page calls it to keep Run off while the list is bad, and again when Run is pressed.
+ */
+export function planFor(settings: SplitSettings, duration: number): VideoPart[] {
+  if (!(duration > 0)) throw plan('SplitNoLength', 'This video has no length this page can read.');
+  if (settings.mode === 'every') return planEvery(settings.everySeconds, duration);
+  if (settings.mode === 'equal') return planEqual(settings.parts, duration);
+  return planAtTimes(settings.times, duration);
+}
+
 /** `holiday-part-01.mp4`: two digits at least, so the parts sort. */
 export function videoPartName(name: string, index: number, count: number, ext: string): string {
   const width = Math.max(2, String(count).length);
