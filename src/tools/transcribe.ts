@@ -50,7 +50,7 @@ const shell = createShell({
         name: suffixName(file.name, task === 'translate' ? '-english' : '', EXT[format]),
         blob: new Blob([body], { type: `${TYPE[format]};charset=utf-8` }),
         originalSize: file.size,
-        note: `${formatDuration(total)} of ${NAMES.of(spoken) ?? spoken} speech, ${amount}${format === 'txt' ? '' : ` in ${tidy.length} caption${tidy.length === 1 ? '' : 's'}`}. ${pathNote}`,
+        note: `${formatDuration(total)} of ${NAMES.of(spoken) ?? spoken} speech, ${amount}${format === 'txt' ? '' : ` in ${tidy.length} caption${tidy.length === 1 ? '' : 's'}`}.${pathNote ? ` ${pathNote}` : ''}`,
         text: body,
       };
       return out;

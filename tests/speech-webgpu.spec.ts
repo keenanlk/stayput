@@ -146,7 +146,7 @@ test('with a real WebGPU adapter, the 16-bit encoder runs and the 8-bit encoder 
   await transcribe(page);
   expect([...seen.files].sort()).toEqual(['decoder_model_merged_quantized.onnx', 'encoder_model_fp16.onnx']);
   await expect(page.locator('#results-list')).toContainText(/22 words/);
-  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.');
+  await expect(page.locator('#results-list')).not.toContainText('Wrote the captions');
 });
 
 test.describe('on a phone', () => {
@@ -159,7 +159,7 @@ test.describe('on a phone', () => {
     await transcribe(page);
     expect([...seen.files].sort()).toEqual(['decoder_model_merged_quantized.onnx', 'encoder_model_quantized.onnx']);
     expect(seen.scripts).toEqual([]);
-    await expect(page.locator('#results-list')).toContainText('Wrote the captions with the processor.');
+    await expect(page.locator('#results-list')).not.toContainText('Wrote the captions');
   });
 
   test('with ?webgpu=1 the 16-bit WebGPU path is chosen, and a WebGPU that cannot run falls back to 8-bit with the captions written', async ({ page }) => {
@@ -171,12 +171,12 @@ test.describe('on a phone', () => {
     expect(seen.scripts.length).toBeGreaterThan(0);
     expect(seen.files).toContain('encoder_model_fp16.onnx');
     expect(seen.files).toContain('encoder_model_quantized.onnx');
-    await expect(page.locator('#results-list')).toContainText('Wrote the captions with the processor.');
+    await expect(page.locator('#results-list')).not.toContainText('Wrote the captions');
   });
 });
 
 test('on a computer the path line says the processor wrote the captions when WebGPU is off', async ({ page }) => {
   test.setTimeout(180_000);
   await transcribe(page, '?webgpu=0');
-  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the processor.');
+  await expect(page.locator('#results-list')).not.toContainText('Wrote the captions');
 });

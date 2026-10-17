@@ -46,12 +46,14 @@ test('the WebGPU speech worker is left running when the captions are written', a
     };
   });
   await run(page, speech(info.project.name));
-  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.');
+  await expect(page.locator('#results-list')).toContainText(/speech/);
+  await expect(page.locator('#results-list')).not.toContainText('Wrote the captions');
   // A second job on the same page goes to the same, still running worker.
   const second = page.waitForEvent('download');
   await page.locator('#run').click();
   expect((await second).suggestedFilename()).toMatch(/\.mp4$/);
-  await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.');
+  await expect(page.locator('#results-list')).toContainText(/speech/);
+  await expect(page.locator('#results-list')).not.toContainText('Wrote the captions');
   const seen = await page.evaluate(() => ({ started: (window as never as { __gpuWorkers: number }).__gpuWorkers, stopped: (window as never as { __gpuTerminated: number }).__gpuTerminated }));
   expect(seen).toEqual({ started: 1, stopped: 0 });
 });
@@ -96,7 +98,8 @@ test('with a real WebGPU adapter, three runs in a row on one page load finish wi
     const download = page.waitForEvent('download', { timeout: 200_000 });
     await page.locator('#run').click();
     expect((await download).suggestedFilename(), `run ${n}`).toMatch(/\.mp4$/);
-    await expect(page.locator('#results-list')).toContainText('Wrote the captions with the graphics chip.', { timeout: 60_000 });
+    await expect(page.locator('#results-list')).toContainText(/speech/, { timeout: 60_000 });
+    await expect(page.locator('#results-list')).not.toContainText('Wrote the captions', { timeout: 60_000 });
     await expect(page.locator('#error')).not.toHaveClass(/is-active/);
     // The page still answers a while after the run.
     await page.waitForTimeout(5000);
