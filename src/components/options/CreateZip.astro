@@ -6,7 +6,7 @@ const lock = defaults.lock === 'true';
 ---
 <div class="field wide">
   <button type="button" class="btn btn-sm" id="add-folder" style="justify-self: start">Add a folder</button>
-  <input type="file" id="folder-input" webkitdirectory multiple hidden />
+  <input type="file" id="folder-input" {...{ webkitdirectory: true }} multiple hidden />
   <p class="muted small">Or drop a folder on the page. Its subfolders are kept inside the ZIP.</p>
 </div>
 <div class="field">

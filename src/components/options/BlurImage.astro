@@ -37,7 +37,7 @@ const formats = [
   <div class="emoji-row">
     <input type="text" id="emoji" value={emoji} maxlength="16" autocomplete="off" spellcheck="false" aria-label="Emoji to cover each area with" />
     <div class="emoji-picks" role="group" aria-label="Common emoji">
-      {picks.map((e) => <button type="button" class="emoji-pick" data-emoji={e} aria-label={`Use ${e}`} aria-pressed={String(e === emoji)}>{e}</button>)}
+      {picks.map((e) => <button type="button" class="emoji-pick" data-emoji={e} aria-label={`Use ${e}`} aria-pressed={e === emoji ? 'true' : 'false'}>{e}</button>)}
     </div>
   </div>
 </div>
