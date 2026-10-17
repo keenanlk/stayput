@@ -17,8 +17,9 @@ self.onmessage = async (e: MessageEvent<Request>) => {
   const post = (msg: Reply) => (self as unknown as Worker).postMessage(msg);
   try {
     const { text, ...summary } = convert(stripBom(await file.text()), job);
-    const withBom = bom && job.direction === 'json-to-csv';
-    const type = job.direction === 'json-to-csv' ? 'text/csv;charset=utf-8' : 'application/json';
+    const csvOut = job.direction === 'json-to-csv' || (job.direction === 'delimited' && job.to === ',');
+    const withBom = bom && job.direction !== 'csv-to-json';
+    const type = csvOut ? 'text/csv;charset=utf-8' : job.direction === 'delimited' ? 'text/plain;charset=utf-8' : 'application/json';
     post({ id, type: 'done', blob: new Blob(withBom ? [BOM, text] : [text], { type }), summary });
   } catch (err) {
     const e2 = err instanceof Error ? err : new NamedError('CsvJsonWorkerFailed', String(err));

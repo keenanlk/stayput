@@ -1,6 +1,6 @@
 import { createShell, bool, radio, str } from '../lib/shell';
 import { formatBytes, replaceExt } from '../lib/files';
-import { detectDirection, DataError, convert, type Converted, type Delimiter, type Direction, type Job } from '../lib/csv-json';
+import { detectDirection, detectDelimiter, DataError, convert, DELIMITER_NAME, type Converted, type Delimiter, type Direction, type InDelimiter, type Job, type OutDelimiter } from '../lib/csv-json';
 import { InputError, UnreadableFile, NamedError } from '../lib/input-error';
 import type { Reply } from '../lib/csv-json.worker';
 
@@ -14,30 +14,35 @@ const textarea = $<HTMLTextAreaElement>('jc-text');
 const detected = $('jc-detected');
 const toCsv = $('jc-to-csv');
 const toJson = $('jc-to-json');
+const delimitedGroup = $('jc-delimited');
 const whichField = $('jc-which-field');
 const which = $<HTMLSelectElement>('jc-which');
 
 /** The file made from pasted text, while it is the one in the list. */
 let pasted: File | undefined;
-/** The direction shown before any data is given; a preset can start on CSV to JSON. */
-const startDirection: Direction = toCsv.dataset.start === 'csv-to-json' ? 'csv-to-json' : 'json-to-csv';
+/** The direction shown before any data is given; a preset can start on CSV to JSON or on Change delimiter. */
+const startDirection: Direction = toCsv.dataset.start === 'csv-to-json' ? 'csv-to-json' : toCsv.dataset.start === 'delimited' ? 'delimited' : 'json-to-csv';
 /** The direction detected from the file in the list. */
 let detectedDirection: Direction = startDirection;
 let lastResult: Blob | undefined;
 /** The direction of the run in progress or last run. */
 let ranDirection: Direction = 'json-to-csv';
+/** The delimiter written by a Change delimiter run: a comma makes a .csv, anything else a .txt. */
+let ranTo: OutDelimiter = ',';
+const outputName = (to: OutDelimiter) => (to === ',' ? 'CSV' : 'text');
 
-const DIRECTION_NAME: Record<Direction, string> = { 'json-to-csv': 'JSON to CSV', 'csv-to-json': 'CSV to JSON' };
+const DIRECTION_NAME: Record<Direction, string> = { 'json-to-csv': 'JSON to CSV', 'csv-to-json': 'CSV to JSON', delimited: 'Change delimiter' };
 
 const chosen = (): Direction => {
   const v = radio('direction', 'auto');
-  return v === 'json-to-csv' || v === 'csv-to-json' ? v : detectedDirection;
+  return v === 'json-to-csv' || v === 'csv-to-json' || v === 'delimited' ? v : detectedDirection;
 };
 
 function syncGroups() {
   const d = chosen();
   toCsv.hidden = d !== 'json-to-csv';
   toJson.hidden = d !== 'csv-to-json';
+  delimitedGroup.hidden = d !== 'delimited';
 }
 
 async function head(file: File): Promise<string> {
@@ -51,9 +56,16 @@ async function detect(file: File | undefined) {
     syncGroups();
     return;
   }
-  detectedDirection = detectDirection(await head(file));
+  const sample = await head(file);
+  detectedDirection = startDirection === 'delimited' ? 'delimited' : detectDirection(sample);
   detected.hidden = false;
-  detected.textContent = `Looks like ${detectedDirection === 'json-to-csv' ? 'JSON' : 'CSV'}, so the direction is ${DIRECTION_NAME[detectedDirection]}. Change it under Direction if that is wrong.`;
+  if (detectedDirection === 'delimited') {
+    const found = detectDelimiter(sample);
+    const looks = sample.includes(found) ? `Looks ${DELIMITER_NAME[found]}-separated.` : 'No comma, semicolon, tab or pipe found, so it will be read as one column.';
+    detected.textContent = `${looks} Change the delimiter under Options if that is wrong.`;
+  } else {
+    detected.textContent = `Looks like ${detectedDirection === 'json-to-csv' ? 'JSON' : 'CSV'}, so the direction is ${DIRECTION_NAME[detectedDirection]}. Change it under Direction if that is wrong.`;
+  }
   syncGroups();
 }
 
@@ -66,6 +78,15 @@ function job(direction: Direction): Job {
       flatten: bool('jc-flatten'),
       joinArrays: bool('jc-join'),
       which: whichField.hidden ? undefined : which.value,
+    };
+  }
+  if (direction === 'delimited') {
+    const from = str('jc-d-from', 'auto');
+    return {
+      direction,
+      from: from === 'auto' ? undefined : (from as InDelimiter),
+      to: str('jc-d-to', ',') as OutDelimiter,
+      eol: str('jc-d-eol', 'crlf') === 'lf' ? '\n' : '\r\n',
     };
   }
   const delimiter = str('jc-in-delimiter', 'auto');
@@ -91,7 +112,7 @@ async function run(file: File, j: Job, bom: boolean): Promise<Done> {
     w = worker;
   } catch {
     const { text, ...summary } = convert((await file.text()).replace(/^﻿/, ''), j);
-    const withBom = bom && j.direction === 'json-to-csv';
+    const withBom = bom && j.direction !== 'csv-to-json';
     return { blob: new Blob(withBom ? ['﻿', text] : [text]), summary };
   }
   const id = ++nextId;
@@ -136,12 +157,12 @@ function renderResult(name: string, summary: Done['summary'], size: number) {
   const stats = document.createElement('span');
   stats.className = 'jc-stats';
   const n = (v: number, word: string) => `${v.toLocaleString('en-US')} ${word}${v === 1 ? '' : 's'}`;
-  stats.textContent = `${n(summary.rows, 'row')}, ${n(summary.columns, summary.direction === 'json-to-csv' ? 'column' : 'key')} · ${formatBytes(size)}`;
+  stats.textContent = `${n(summary.rows, 'row')}, ${n(summary.columns, summary.direction === 'csv-to-json' ? 'key' : 'column')} · ${formatBytes(size)}`;
   const copy = document.createElement('button');
   copy.type = 'button';
   copy.className = 'btn btn-sm btn-primary';
   copy.textContent = 'Copy';
-  copy.setAttribute('aria-label', `Copy the ${summary.direction === 'json-to-csv' ? 'CSV' : 'JSON'}`);
+  copy.setAttribute('aria-label', `Copy the ${summary.direction === 'csv-to-json' ? 'JSON' : summary.direction === 'delimited' ? outputName(ranTo) : 'CSV'}`);
   copy.addEventListener('click', async () => {
     try {
       const text = (await lastResult!.text()).replace(/^﻿/, '');
@@ -160,7 +181,7 @@ function renderResult(name: string, summary: Done['summary'], size: number) {
   scroll.tabIndex = 0;
   scroll.setAttribute('role', 'region');
   scroll.setAttribute('aria-label', `Preview of ${name}`);
-  if (summary.direction === 'json-to-csv') {
+  if (summary.direction !== 'csv-to-json') {
     const table = document.createElement('table');
     table.className = 'jc-table';
     const [first, ...rest] = summary.previewRows;
@@ -190,9 +211,9 @@ function renderResult(name: string, summary: Done['summary'], size: number) {
 
   const notes: string[] = [];
   const shown = summary.previewRows.length - (summary.hasHeader ? 1 : 0);
-  if (summary.direction === 'json-to-csv') {
+  if (summary.direction !== 'csv-to-json') {
     if (summary.rows > shown) notes.push(`Showing the first ${shown} rows.`);
-    notes.push('Cells starting with = + - @ may run as formulas in Excel.');
+    if (summary.direction === 'json-to-csv' || ranTo === ',') notes.push('Cells starting with = + - @ may run as formulas in Excel.');
   } else {
     if (summary.previewLines.length >= 40) notes.push('Showing the first 40 lines.');
     if (summary.padded > 0) notes.push(`${n(summary.padded, 'row')} had a different number of values than the widest row; short rows were filled with empty text.`);
@@ -209,7 +230,7 @@ function renderResult(name: string, summary: Done['summary'], size: number) {
 const shell = createShell({
   autoDownloadSingle: false,
   resultsTitle: () => 'Converted',
-  outputFormat: () => (ranDirection === 'json-to-csv' ? 'csv' : 'json'),
+  outputFormat: () => (ranDirection === 'csv-to-json' ? 'json' : ranDirection === 'delimited' && ranTo !== ',' ? 'txt' : 'csv'),
   async onFilesChanged(files) {
     const entry = files[0];
     if (entry?.file !== pasted) {
@@ -223,18 +244,21 @@ const shell = createShell({
     const file = files[0]!.file;
     if (file.size > MAX_BYTES) throw new InputError('This file is too large for a browser tab. Split it first, then convert the pieces.');
     const picked = radio('direction', 'auto');
-    const direction: Direction = picked === 'json-to-csv' || picked === 'csv-to-json' ? picked : detectDirection(await head(file));
+    const direction: Direction = picked === 'json-to-csv' || picked === 'csv-to-json' || picked === 'delimited' ? picked : startDirection === 'delimited' ? 'delimited' : detectDirection(await head(file));
     ranDirection = direction;
+    const j = job(direction);
+    if (j.direction === 'delimited') ranTo = j.to;
     if (file.size > LARGE_BYTES) progress.set('Large file, this can take a while', 0);
-    else progress.set(direction === 'json-to-csv' ? 'Reading the JSON' : 'Reading the CSV', 0);
+    else progress.set(direction === 'json-to-csv' ? 'Reading the JSON' : direction === 'delimited' ? 'Reading the text' : 'Reading the CSV', 0);
     try {
-      const { blob, summary } = await run(file, job(direction), bool('jc-bom'));
+      const { blob, summary } = await run(file, j, bool(direction === 'delimited' ? 'jc-d-bom' : 'jc-bom'));
       lastResult = blob;
       progress.set('Done', 1);
-      const name = replaceExt(pasted === file ? 'data' : file.name, direction === 'json-to-csv' ? 'csv' : 'json');
+      const ext = direction === 'csv-to-json' ? 'json' : direction === 'delimited' && ranTo !== ',' ? 'txt' : 'csv';
+      const name = replaceExt(pasted === file ? 'data' : file.name, ext);
       renderResult(name, summary, blob.size);
       const note = `${summary.rows.toLocaleString('en-US')} row${summary.rows === 1 ? '' : 's'}`;
-      return [{ name, blob, badge: direction === 'json-to-csv' ? 'CSV' : 'JSON', note }];
+      return [{ name, blob, badge: ext.toUpperCase(), note }];
     } catch (e) {
       if (e instanceof DataError && e.arrays) showLists(e.arrays);
       throw e;

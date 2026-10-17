@@ -5,7 +5,9 @@
  */
 interface Props { defaults?: Record<string, string> }
 const { defaults = {} } = Astro.props;
-const start = defaults.start === 'csv-to-json' ? 'csv-to-json' : 'json-to-csv';
+// 'txt-to-csv' and 'csv-to-txt' start on Change delimiter with their own input and output delimiter.
+const start = defaults.start === 'csv-to-json' ? 'csv-to-json' : defaults.start === 'txt-to-csv' || defaults.start === 'csv-to-txt' ? 'delimited' : 'json-to-csv';
+const toTxt = defaults.start === 'csv-to-txt';
 ---
 <div class="field wide">
   <label>Direction</label>
@@ -13,9 +15,10 @@ const start = defaults.start === 'csv-to-json' ? 'csv-to-json' : 'json-to-csv';
     <label><input type="radio" name="direction" value="auto" checked /><span>Pick from my data</span></label>
     <label><input type="radio" name="direction" value="json-to-csv" /><span>JSON to CSV</span></label>
     <label><input type="radio" name="direction" value="csv-to-json" /><span>CSV to JSON</span></label>
+    <label><input type="radio" name="direction" value="delimited" /><span>Change delimiter</span></label>
   </div>
 </div>
-<div class="jc-group" id="jc-to-csv" data-start={start} hidden={start === 'csv-to-json'}>
+<div class="jc-group" id="jc-to-csv" data-start={start} hidden={start !== 'json-to-csv'}>
   <div class="field">
     <label for="jc-out-delimiter">Delimiter</label>
     <select id="jc-out-delimiter">
@@ -63,5 +66,39 @@ const start = defaults.start === 'csv-to-json' ? 'csv-to-json' : 'json-to-csv';
   <div class="field wide">
     <label class="check"><input type="checkbox" id="jc-headers" checked /> First row is headers (off gives an array of arrays)</label>
     <label class="check"><input type="checkbox" id="jc-types" /> Detect types (numbers, true, false, null)</label>
+  </div>
+</div>
+<div class="jc-group" id="jc-delimited" hidden={start !== 'delimited'}>
+  <div class="field">
+    <label for="jc-d-from">Cells in your text are separated by</label>
+    <select id="jc-d-from">
+      <option value="auto" selected>Detect it</option>
+      <option value="&#9;">Tab</option>
+      <option value=";">Semicolon</option>
+      <option value="|">Pipe</option>
+      <option value=",">Comma</option>
+      <option value="spaces">Runs of 2 or more spaces</option>
+      <option value="whitespace">Any spaces or tabs</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="jc-d-to">Write the cells separated by</label>
+    <select id="jc-d-to">
+      <option value="," selected={!toTxt}>Comma (.csv)</option>
+      <option value="&#9;" selected={toTxt}>Tab (.txt)</option>
+      <option value="|">Pipe (.txt)</option>
+      <option value=";">Semicolon (.txt)</option>
+      <option value="padded">Spaces, padded to line up (.txt)</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="jc-d-eol">Line ending</label>
+    <select id="jc-d-eol">
+      <option value="crlf" selected>CRLF (Windows, Excel)</option>
+      <option value="lf">LF (Mac, Linux)</option>
+    </select>
+  </div>
+  <div class="field wide">
+    <label class="check"><input type="checkbox" id="jc-d-bom" checked={!toTxt} /> UTF-8 with BOM (for Excel)</label>
   </div>
 </div>
