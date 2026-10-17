@@ -37,6 +37,8 @@ interface Sample {
   opaque?: boolean;
   /** The video has no sound track; a tool that needs sound must refuse it as NoSoundTrack, the name the caption tools already use. */
   noSound?: boolean;
+  /** Browsers that skip this file. */
+  skip?: { browser: 'chromium' | 'webkit'; why: string };
   known?: Known;
 }
 interface ToolSpec {
@@ -68,10 +70,16 @@ const VIDEO: Sample[] = [
   { file: 'hdr10-hevc.mp4', want: 'any', opaque: true },
   { file: 'audio-only-named.mp4', want: 'any' },
   { file: 'zero.mp4', want: 'refusal' },
+  { file: 'zeros.mp4', want: 'refusal' },
+  { file: 'sample.ts', want: 'any' },
+  { file: 'odd-853x481.webm', want: 'any', noSound: true },
+  { file: 'mjpeg.mov', want: 'any' },
+  { file: 'ac3-51.mkv', want: 'any' },
+  { file: 'truncated-moov-end.mp4', want: 'any' },
   { file: 'truncated-half.mp4', want: 'any' },
   { file: 'corrupt-header.mp4', want: 'refusal' },
   { file: 'text-named.mp4', want: 'refusal' },
-  { file: stat('uhd-flat.mp4'), want: 'any', noSound: true },
+  { file: stat('uhd-flat.mp4'), want: 'any', noSound: true, skip: { browser: 'webkit', why: 'software 4K H.264 decoding in Linux WebKit takes minutes on a CI runner, which says nothing about the tool' } },
 ];
 const AUDIO: Sample[] = [
   { file: 'good.mp3', want: 'output', seconds: 2 },
@@ -89,6 +97,8 @@ const AUDIO: Sample[] = [
   { file: 'corrupt-header.wav', want: 'refusal' },
   { file: 'wav-length-lies.wav', want: 'any' },
   { file: 'text-named.mp3', want: 'refusal' },
+  { file: 'alac.m4a', want: 'any' },
+  { file: 'rf64.wav', want: 'any' },
 ];
 const IMAGE: Sample[] = [
   { file: 'good.png', want: 'output' },
@@ -111,6 +121,7 @@ const IMAGE: Sample[] = [
   { file: 'corrupt-header.png', want: 'refusal' },
   { file: 'corrupt-header.jpg', want: 'refusal' },
   { file: 'text-named.png', want: 'refusal' },
+  { file: 'garbage.jpg', want: 'refusal' },
 ];
 const PDF: Sample[] = [
   { file: 'good.pdf', want: 'output' },
@@ -162,15 +173,17 @@ const TOOLS: ToolSpec[] = [
  * Cases that fail today. Each runs under test.fail(): CI stays green while the failure is on record, and the case turns red
  * the day the fix lands (remove its entry then). Every entry names the hardening item; see the README's table.
  */
-const NO_SOUND_NAME: Known = { item: 'H1: a video with no sound track is refused as AudioDecodeError; name it NoSoundTrack as the caption tools do (copy is already clear)' };
-const BAD_PICTURE_NAME: Known = { item: 'H2: a picture that does not decode is refused as a bare Error; give it a class (UnreadableFile)' };
-const HUGE_PICTURE: Known = { browser: 'chromium', item: "H3: a 400 MP picture shows the browser's raw 'createImageBitmap ... could not be allocated' text and records no failed run; refuse early as TooLarge/OutOfMemoryError with plain copy" };
-const KNOWN: Record<string, Known> = {};
+const NO_SOUND_NAME: Known = { item: 'C1: a video with no sound track is refused as AudioDecodeError; name it NoSoundTrack as the caption tools do (copy is already clear)' };
+const BAD_PICTURE_NAME: Known = { item: 'C2: a picture that does not decode is refused as a bare Error; give it a class (UnreadableFile)' };
+const HUGE_PICTURE: Known = { browser: 'chromium', item: "C3: a 400 MP picture shows the browser's raw 'createImageBitmap ... could not be allocated' text and records no failed run; refuse early as TooLarge/OutOfMemoryError with plain copy" };
+const KNOWN: Record<string, Known> = {
+  '/burn-subtitles-into-video|truncated-half.mp4': { browser: 'webkit', item: 'C4: a half-downloaded MP4 (moov atom missing) leaves Burn subtitles on "Reading the sound from…" for over 100 s in WebKit instead of refusing; add a read timeout / early probe that names it UnreadableFile' },
+};
 for (const path of ['/remove-background-noise-from-video', '/tools/remove-noise', '/tools/volume-booster', '/increase-video-volume', '/ogg-to-mp3']) {
-  for (const label of ['no-audio.mp4', 'tiny-16x16.mp4', 'uhd-flat.mp4']) KNOWN[`${path}|${label}`] = NO_SOUND_NAME;
+  for (const label of ['no-audio.mp4', 'tiny-16x16.mp4', 'uhd-flat.mp4', 'odd-853x481.webm']) KNOWN[`${path}|${label}`] = NO_SOUND_NAME;
 }
 for (const path of ['/instagram-carousel-splitter', '/image-to-pixel-art']) {
-  for (const label of ['corrupt-header.png', 'corrupt-header.jpg', 'text-named.png']) KNOWN[`${path}|${label}`] = BAD_PICTURE_NAME;
+  for (const label of ['corrupt-header.png', 'corrupt-header.jpg', 'text-named.png', 'garbage.jpg']) KNOWN[`${path}|${label}`] = BAD_PICTURE_NAME;
   KNOWN[`${path}|a 400 megapixel picture (20000x20000)`] = HUGE_PICTURE;
 }
 
@@ -247,6 +260,10 @@ function inspectOutputs(): Promise<Probe[]> {
           });
           URL.revokeObjectURL(url);
           return r.width > 0 && r.height > 0 && r.duration > 0 ? { ...base, ...r } : { ...base, ...r, problem: 'the video has no picture or no length' };
+        }
+        // Safari on Linux cannot decode FLAC (decodeAudioData hangs or returns half), so there a good FLAC header is as far as a test can look.
+        if (ext === 'flac' && !/Chrome/.test(navigator.userAgent)) {
+          return new TextDecoder('latin1').decode((await blob.slice(0, 4).arrayBuffer()) as ArrayBuffer) === 'fLaC' ? base : { ...base, problem: 'not a FLAC file' };
         }
         if (['mp3', 'wav', 'flac', 'm4a', 'aac', 'ogg', 'opus'].includes(ext)) {
           const ctx = new OfflineAudioContext(1, 1, 44100);
@@ -331,7 +348,7 @@ function judge(outcome: Outcome, sample: Sample, tool: ToolSpec): string {
       if (/undefined|\[object|NaN|Failed to execute|^[A-Za-z]*Error$/.test(text)) throw new Error(`error copy is not readable: "${text.slice(0, 160)}"`);
       if (outcome.where === 'run' && UNNAMED.has(outcome.errorClass)) throw new Error(`unnamed refusal (class "${outcome.errorClass}"): ${text.slice(0, 160)}`);
       if (sample.noSound && tool.needsSound && !['NoSoundTrack', 'UnsupportedCodec'].includes(outcome.errorClass)) throw new Error(`a video with no sound track is called ${outcome.errorClass || 'nothing'}, not NoSoundTrack: ${text.slice(0, 120)}`);
-      return `refused at ${outcome.where}: ${outcome.errorClass || '(none)'}`;
+      return `refused at ${outcome.where}: ${outcome.errorClass || '(none)'} | ${text.replace(/\s+/g, ' ')}`;
     }
     case 'output': {
       if (sample.want === 'refusal') throw new Error(`wrong output: made ${outcome.probes.map((p) => `${p.name} (${p.size} B)`).join(', ') || 'nothing'} from a file that is not valid`);
@@ -357,6 +374,7 @@ function define(tool: ToolSpec, sample: Sample, label: string, file: string) {
   test(`${tool.path} · ${label}`, async ({ page }, info) => {
     const known = sample.known ?? KNOWN[`${tool.path}|${label}`];
     if (known) test.fail(!known.browser || known.browser === info.project.name, known.item);
+    if (sample.skip) test.skip(sample.skip.browser === info.project.name, sample.skip.why);
     test.setTimeout((tool.slow ? SLOW_GUARD_MS : GUARD_MS) + 50_000);
     let crashed = false;
     page.on('crash', () => (crashed = true));

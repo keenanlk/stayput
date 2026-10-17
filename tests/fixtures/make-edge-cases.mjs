@@ -126,5 +126,21 @@ patch('good.pdf', 'corrupt-header.pdf', (b) => b.write('%PDX-9.9', 0, 'latin1'))
 writeFileSync(f('text-named.pdf'), 'Meeting notes\n- agenda\n- budget\n');
 copyFileSync(f('good.png'), f('png-named.pdf'));
 
+
+// ---- more, from the failure catalogues (commands adapted to the small sizes kept here) ------------------------------
+// A cloud-only placeholder: the right size, every byte zero (what a "free up space" phone leaves behind).
+writeFileSync(f('zeros.mp4'), Buffer.alloc(65536));
+// A JPEG that starts right and is noise after that.
+writeFileSync(f('garbage.jpg'), Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.from(Array.from({ length: 20000 }, (_, i) => (i * 2654435761) >>> 24))]));
+// MPEG-TS (a container the tools do not read), odd 853x481 size (VP9, since 4:2:0 H.264 refuses odd sizes), Motion JPEG in a MOV.
+ff(...PATTERN, ...TONE, ...H264, '-c:a', 'aac', '-shortest', '-f', 'mpegts', f('sample.ts'));
+ff('-f', 'lavfi', '-i', 'testsrc2=size=853x481:rate=15:duration=1', '-c:v', 'libvpx-vp9', '-b:v', '300k', f('odd-853x481.webm'));
+ff('-f', 'lavfi', '-i', 'testsrc=size=320x240:rate=10:duration=2', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000:duration=2', '-c:v', 'mjpeg', '-c:a', 'pcm_s16le', '-shortest', f('mjpeg.mov'));
+// 5.1 AC-3 in MKV, the moov-at-the-end MP4 with its last 4 KB cut off (a download that stopped near the end), ALAC, RF64.
+ff(...PATTERN, '-f', 'lavfi', '-i', 'sine=frequency=330:sample_rate=48000:duration=2', '-af', 'pan=5.1|FL=c0|FR=c0|FC=c0|LFE=c0|BL=c0|BR=c0', ...H264, '-c:a', 'ac3', '-shortest', f('ac3-51.mkv'));
+writeFileSync(f('truncated-moov-end.mp4'), readFileSync(f('good.mp4')).subarray(0, statSync(f('good.mp4')).size - 4000));
+ff(...SINE, '-c:a', 'alac', f('alac.m4a'));
+ff('-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=22050:duration=1', '-rf64', 'always', f('rf64.wav'));
+
 rmSync(scratch, { recursive: true, force: true });
 console.log('edge-case corpus written to', out);
