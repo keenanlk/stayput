@@ -119,14 +119,13 @@ export interface Speech {
   language: string;
   /** Seconds. */
   duration: number;
-  /** A plain sentence on which path wrote the captions, for the result line. */
+  /** A plain sentence for the result line, only when the path matters (the graphics chip stopped part-way); otherwise ''. */
   pathNote: string;
 }
 
-/** Which path recognised the pieces: the graphics chip (WebGPU) or the processor (WebAssembly), as for the video background tools. */
+/** Says something only when the run changed path part-way; a run wholly on one path needs no note. */
 function pathNote(onChip: number, onCpu: number): string {
-  if (onChip === 0) return 'Wrote the captions with the processor.';
-  return onCpu === 0 ? 'Wrote the captions with the graphics chip.' : 'Wrote the captions with the graphics chip, then with the processor after the chip stopped.';
+  return onChip > 0 && onCpu > 0 ? 'The graphics chip stopped part-way, so the rest ran on the processor.' : '';
 }
 
 /**
