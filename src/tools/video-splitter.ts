@@ -1,7 +1,10 @@
 import { bool, createShell, num, radio, str } from '../lib/shell';
 import { formatBytes, type OutputFile } from '../lib/files';
 import { overPhoneLimit } from '../lib/phone-limit';
-import { planAtTimes, planEqual, planEvery, readDuration, SplitError, videoPartName, type VideoPart } from '../lib/video-split';
+import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
+import { InputError } from '../lib/input-error';
+import { nameBare } from '../lib/bare-error';
+import { retryUnreadable } from '../lib/read-failure';
 
 /**
  * Video splitter. The length is read from the file's container; the parts are
@@ -30,13 +33,38 @@ const mode = () => {
   return m === 'every' || m === 'equal' ? m : 'times';
 };
 
-/** The parts the current settings make; throws a SplitError that says what to fix. */
+/** The parts the current settings make; throws a named error that says what to fix. */
 function plan(): VideoPart[] {
-  if (!duration) throw new SplitError('This video has no length this page can read.');
-  if (mode() === 'every') return planEvery(num('vs-every', 0) * num('vs-unit', 1), duration);
-  if (mode() === 'equal') return planEqual(num('vs-equal', 0), duration);
-  return planAtTimes(str('vs-times'), duration);
+  return planFor({ mode: mode(), times: str('vs-times'), everySeconds: num('vs-every', 0) * num('vs-unit', 1), parts: num('vs-equal', 0) }, duration);
 }
+
+const runButton = $<HTMLButtonElement>('run');
+let guarding = false;
+
+/**
+ * Keeps Run off while the cut list is bad, so a run never starts on a bad plan. A video whose length could not be read
+ * is not held back: Run reads it again and a failure is recorded under its own name.
+ */
+function guardRun() {
+  let good = true;
+  if (duration > 0) {
+    try {
+      plan();
+    } catch {
+      good = false;
+    }
+  }
+  if (!good) {
+    if (!runButton.disabled) runButton.disabled = true;
+    guarding = true;
+  } else if (guarding) {
+    guarding = false;
+    // The shell keeps Run off while it is working and while no file is chosen.
+    runButton.disabled = $('tool').classList.contains('is-busy') || $('tool').dataset.count === '0';
+  }
+}
+// The shell turns Run on again when a run ends or files change: put the guard back at once.
+new MutationObserver(guardRun).observe(runButton, { attributes: true, attributeFilter: ['disabled'] });
 
 function update() {
   timesField.hidden = mode() !== 'times';
@@ -46,6 +74,7 @@ function update() {
   list.textContent = '';
   info.classList.remove('is-over');
   delete $('tool').dataset.parts;
+  guardRun();
   if (!duration) {
     info.textContent = '';
     return;
@@ -74,11 +103,12 @@ function update() {
   }
 }
 
-async function load(file: File) {
+async function load(file: File, onNotice?: (message: string) => void) {
   duration = 0;
   fileSize = file.size;
   update();
-  duration = await readDuration(file);
+  // A phone that could not read the file the first time often can on the second.
+  duration = await retryUnreadable(file, () => readDuration(file), onNotice);
   $('tool').dataset.duration = String(Math.round(duration * 10) / 10);
   update();
 }
@@ -107,8 +137,20 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     await loading;
-    if (!duration) await load(entry.file);
-    const parts = plan();
+    if (!duration) {
+      try {
+        await load(entry.file, (m) => progress.set(m, 0));
+      } catch (e) {
+        throw nameBare('VideoReadFailed', e);
+      }
+    }
+    let parts: VideoPart[];
+    try {
+      parts = plan();
+    } catch (e) {
+      // Run is kept off for a bad list, so this is only a press that got past that: the person's input, not a failure.
+      throw new InputError(e instanceof Error ? e.message : 'Check the times and try again.');
+    }
     const exact = bool('exact');
     const { trimVideo } = await import('../lib/video-trim');
     const outs: OutputFile[] = [];
@@ -116,17 +158,23 @@ const shell = createShell({
       const label = `Part ${i + 1} of ${parts.length}`;
       progress.set(label, i / parts.length);
       // One part at a time: only the finished file is kept.
-      const r = await trimVideo(entry.file, {
-        start: part.start,
-        end: part.end,
-        exact,
-        mute: false,
-        onProgress: (f) => progress.set(`${label}: ${Math.round(f * 100)}%`, (i + f) / parts.length),
-      });
+      const r = await retryUnreadable(
+        entry.file,
+        () =>
+          trimVideo(entry.file, {
+            start: part.start,
+            end: part.end,
+            exact,
+            mute: false,
+            onProgress: (f) => progress.set(`${label}: ${Math.round(f * 100)}%`, (i + f) / parts.length),
+            onNotice: (m) => progress.set(`${label}: ${m}`, i / parts.length),
+          }),
+        (m) => progress.set(`${label}: ${m}`, i / parts.length),
+      );
       outs.push({
         name: videoPartName(entry.file.name, i, parts.length, r.ext),
         blob: r.blob,
-        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : 'fast cut'}`,
+        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : r.keyframeCopy ? 'copied from the key frame at or before the start' : 'fast cut'}`,
       });
     }
     return outs;

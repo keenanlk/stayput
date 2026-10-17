@@ -31,7 +31,11 @@ import { executeWatched } from './encoder-watchdog';
 import { requireH264Encoder } from './encoder-probe';
 import { aacSafeSampleRate } from './video-codec';
 import { unplayable } from './video-compress';
-import { UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
+import { NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
+import { nameBare } from './bare-error';
+import { isNotReadable, notReadable } from './read-failure';
+import { pageRecoveryHooks } from './recovery-hooks';
+import { withRecovery, type Attempt } from './edit-recovery';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -41,6 +45,8 @@ export interface TrimOptions {
   exact: boolean;
   mute: boolean;
   onProgress?: (fraction: number) => void;
+  /** Said when the cut starts over after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface TrimResult {
@@ -48,12 +54,55 @@ export interface TrimResult {
   ext: string;
   /** Seconds in the output. */
   duration: number;
+  /** Set when the encoder failed and the part was copied from the key frame at or before its start instead. */
+  keyframeCopy?: boolean;
 }
 
+/** Names an encoder gives up with; a fast cut that meets one falls back to copying from the key frame. */
+const ENCODER_FAILURES = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'EncoderRefused', 'EncoderUnavailable', 'OutOfMemoryError']);
+
+/**
+ * Cuts the part. A failure that comes from the device and not the file (page hidden, encoder or memory gave up) gets one
+ * more try (see edit-recovery.ts). Every failure leaves here with a name: NotReadableError for a file the phone could
+ * not read, UnreadableFile or UnsupportedCodec for what the file is, CutFailed for any other plain error.
+ */
 export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResult> {
+  const page = pageRecoveryHooks(opts.onNotice);
+  let made = 0;
+  try {
+    return await withRecovery(
+      async (attempt) => {
+        try {
+          return await trimOnce(file, opts, attempt, (side) => (made = side));
+        } catch (e) {
+          if (isNotReadable(e)) throw notReadable(e);
+          // A fast cut re-encodes a part whose start is far from a key frame. When the encoder fails, copy from the key frame.
+          const name = (e as { name?: string } | null)?.name ?? '';
+          if (!opts.exact && !attempt.maxSide && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
+            try {
+              return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true)), keyframeCopy: true };
+            } catch (again) {
+              throw isNotReadable(again) ? notReadable(again) : nameBare('CutFailed', again);
+            }
+          }
+          throw nameBare('CutFailed', e);
+        }
+      },
+      () => made,
+      page.hooks,
+    );
+  } finally {
+    page.dispose();
+  }
+}
+
+async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false): Promise<TrimResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    const format = await input.getFormat().catch(() => null);
+    const format = await input.getFormat().catch((e) => {
+      if (isNotReadable(e)) throw notReadable(e);
+      return null;
+    });
     if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new UnreadableFile('This file has no video track.');
@@ -91,20 +140,28 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
     }
 
     const trim = { start: opts.start, end: opts.end };
+    // A retry after the encoder gave up asks for a smaller picture than the first try's.
+    const longest = Math.max(video.displayWidth, video.displayHeight);
+    const smaller = attempt.maxSide && longest > attempt.maxSide ? attempt.maxSide / longest : 1;
+    const evenSide = (n: number) => Math.max(2, 2 * Math.round((n * smaller) / 2));
+    sized(Math.round(longest * smaller));
     const conversion = await Conversion.init({
       input,
       output,
       tracks: 'primary',
       trim,
-      copy: opts.exact ? false : { boundaryTolerance: 0.5 },
+      copy: keyframes ? { mode: 'forced' } : opts.exact || smaller < 1 ? false : { boundaryTolerance: 0.5 },
       // With the sound handled here, the output is started and finished here too.
       composable: !!keepSound,
-      video: opts.exact ? { bitrate: QUALITY_HIGH, allowTransformationMetadata: false } : {},
+      video: {
+        ...(opts.exact ? { bitrate: QUALITY_HIGH, allowTransformationMetadata: false } : {}),
+        ...(smaller < 1 ? { width: evenSide(video.displayWidth), height: evenSide(video.displayHeight) } : {}),
+      },
       audio: opts.mute || keepSound ? { discard: true } : opts.exact ? { bitrate: QUALITY_HIGH, sampleRate: audioRate } : {},
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoTrimFailed', 'This browser cannot cut this video.');
+      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('CutUnsupported', 'This browser cannot cut this video.');
     }
     if (keepSound) {
       let sink: Conversion | null = null;
@@ -124,7 +181,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
       await executeWatched(conversion, opts.onProgress);
     }
     const buffer = output.target.buffer;
-    if (!buffer) throw new NamedError('VideoTrimFailed', 'The video could not be written.');
+    if (!buffer) throw new NamedError('OutputNotWritten', 'The video could not be written.');
     return { blob: new Blob([buffer], { type: outFormat.mimeType }), ext: outFormat.fileExtension.replace(/^\./, ''), duration: opts.end - opts.start };
   } finally {
     input.dispose?.();
