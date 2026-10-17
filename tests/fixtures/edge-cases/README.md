@@ -46,6 +46,8 @@ Which tools see a file depends on what they take. "Good" files must give a resul
 | `no-audio.mp4`, `tiny-16x16.mp4` | video with no sound track at all; a 16x16 picture | either; sound tools refuse as NoSoundTrack |
 | `hevc.mp4`, `hdr10-hevc.mp4` | HEVC 8-bit; HEVC 10-bit HDR10 (BT.2020, PQ) | either (a browser without an HEVC decoder must refuse as UnsupportedCodec) |
 | `audio-only-named.mp4` | an M4A under an .mp4 name | either |
+| `zeros.mp4` | 64 KB of zero bytes: what a cloud-only placeholder looks like on a phone | refusal |
+| `sample.ts`, `mjpeg.mov`, `ac3-51.mkv`, `odd-853x481.webm`, `truncated-moov-end.mp4`, `alac.m4a`, `rf64.wav`, `garbage.jpg` | MPEG-TS; Motion JPEG + PCM in MOV; 5.1 AC-3 in MKV; odd 853x481 VP9; the good MP4 minus its last 4 KB; ALAC; RF64 WAV; a JPEG that is noise after four bytes. Commands adapted from the failure catalogues (`hardening/*.md`) | `garbage.jpg` refusal, others either (`odd-853x481.webm` has no sound track, so sound tools must refuse it as NoSoundTrack) |
 | `zero.mp4`, `zero.mp3`, `zero.png`, `zero.pdf` | 0 bytes | refused when added |
 | `truncated-half.*` (mp4, mp3, png, jpg, pdf) | the good file cut in half | either |
 | `corrupt-header.*` (mp4, mp3, wav, png, jpg, pdf) | header bytes changed (`ftyp`/`moov` renamed, `RIFX`, `PNX`, `%PDX`, zeroed JPEG start, 4 KB of 0xFF on the MP3) | refusal (the MP3 may also be resynced) |
@@ -64,10 +66,22 @@ Reused from `../static/`: `uhd-flat.mp4` (3840x2160, no sound), `user-locked.pdf
 
 Made when the suite runs and never committed (`tests/edge-cases-files.ts`): a 50 megapixel PNG (8160x6120) and a 400 megapixel PNG (20000x20000), each a few hundred KB because the picture is flat; and 20 minutes of 16 kHz mono WAV (38 MB) for the two audio tools.
 
+The exact words the person sees for each error class are in [ERROR-CLASSES.md](ERROR-CLASSES.md).
+
 ## Known failures (hardening items)
 
-| Item | Cases | What happens | Suggested fix |
-|------|-------|--------------|---------------|
-| H1 | `no-audio.mp4`, `tiny-16x16.mp4`, `uhd-flat.mp4` on remove-background-noise-from-video, remove-noise, volume-booster, increase-video-volume, ogg-to-mp3; both browsers | refused with the class `AudioDecodeError`, so the stats lump "no sound track" with "sound that will not decode" (the copy is clear) | raise `NoSoundTrack`, as the caption tools do |
-| H2 | `corrupt-header.png`, `corrupt-header.jpg`, `text-named.png` on instagram-carousel-splitter and image-to-pixel-art; both browsers | the copy is clear ("could not be decoded as an image") but the run records the bare class `Error` | throw `UnreadableFile` where the picture is decoded |
-| H3 | 20000x20000 PNG on instagram-carousel-splitter and image-to-pixel-art; Chromium | the browser's raw text ("Failed to execute 'createImageBitmap' on 'Window': The ImageBitmap could not be allocated") is shown and the failed run is not recorded; WebKit refuses it cleanly | check the pixel count before decoding and refuse with a named `TooLarge` and plain copy; wrap the decode failure |
+| Item | Plan item (growth hardening plan) | Cases | What happens | Suggested fix |
+|------|-----------|-------|--------------|---------------|
+| C1 | H23 (no sound track), H17 | `no-audio.mp4`, `tiny-16x16.mp4`, `uhd-flat.mp4`, `odd-853x481.webm` on remove-background-noise-from-video, remove-noise, volume-booster, increase-video-volume, ogg-to-mp3; both browsers | refused with the class `AudioDecodeError`, so the stats lump "no sound track" with "sound that will not decode" (the copy is clear) | raise `NoSoundTrack`, as the caption tools do |
+| C2 | H7, H22 | `corrupt-header.png`, `corrupt-header.jpg`, `text-named.png`, `garbage.jpg` on instagram-carousel-splitter and image-to-pixel-art; both browsers | the copy is clear ("could not be decoded as an image") but the run records the bare class `Error` | throw `UnreadableFile` where the picture is decoded |
+| C3 | H24 | 20000x20000 PNG on instagram-carousel-splitter and image-to-pixel-art; Chromium | the browser's raw text ("Failed to execute 'createImageBitmap' on 'Window': The ImageBitmap could not be allocated") is shown and the failed run is not recorded; WebKit refuses it cleanly | check the pixel count before decoding and refuse with a named `TooLarge` and plain copy; wrap the decode failure |
+
+## Passing, but on record for the hardening plan
+
+These end in a named refusal, so they pass; the plan items say what would make them better.
+
+- `zeros.mp4` (all-zero placeholder) is `UnreadableFile` on video tools and `AudioDecodeError` on sound tools; the plan's `FileNotDownloaded` (H3) would say what is wrong.
+- `sample.ts` (MPEG-TS) is `UnreadableFile` on most video tools; `UnsupportedContainer` and TS reading are plan item H3. Remove noise, Volume booster and Video to subtitles read it already.
+- `ac3-51.mkv` and `alac.m4a` are `AudioDecodeError` with a format-specific message on the caption tools and the generic one elsewhere (H18).
+- `mjpeg.mov` is `UnsupportedCodec` with the HEVC wording, which does not fit a Motion JPEG file.
+- `audio-only-named.mp4` on Burn subtitles ends in the "could not be redrawn" message although there was never a picture to redraw.
