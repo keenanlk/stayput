@@ -2,6 +2,7 @@ import { createShell, str } from '../lib/shell';
 import { closePdfJs, loadDocument, openWithPdfJs, pageThumbnail, reorderPages } from '../lib/pdf';
 import { describePages, parsePageRange } from '../lib/ranges';
 import { suffixName, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 const panel = document.getElementById('pages')!;
 const grid = document.getElementById('page-grid')!;
@@ -139,8 +140,8 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     if (total === 0) await loadDocument(new Uint8Array(await entry.file.arrayBuffer()));
-    if (order.length === 0) throw new Error('Keep at least one page.');
-    if (order.length === total && order.every((p, i) => p === i)) throw new Error('The pages are still in their original order. Move or delete a page first.');
+    if (order.length === 0) throw new NamedError('ReorderPdfFailed', 'Keep at least one page.');
+    if (order.length === total && order.every((p, i) => p === i)) throw new NamedError('ReorderPdfFailed', 'The pages are still in their original order. Move or delete a page first.');
     progress.set('Writing pages', 0.3);
     const bytes = await reorderPages(new Uint8Array(await entry.file.arrayBuffer()), order);
     progress.set('Done', 1);

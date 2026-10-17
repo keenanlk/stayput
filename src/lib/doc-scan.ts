@@ -1,3 +1,4 @@
+import { NamedError } from './input-error';
 /**
  * Turn a phone photo of a sheet of paper into a flat scan: find the page's
  * four corners, undo the perspective so the page becomes a rectangle, and
@@ -143,7 +144,7 @@ function solve(A: number[][], b: number[]): number[] {
     for (let r = c + 1; r < n; r++) if (Math.abs(M[r]![c]!) > Math.abs(M[pivot]![c]!)) pivot = r;
     [M[c], M[pivot]] = [M[pivot]!, M[c]!];
     const d = M[c]![c]!;
-    if (Math.abs(d) < 1e-12) throw new Error('The page corners are in a line.');
+    if (Math.abs(d) < 1e-12) throw new NamedError('DocScanFailed', 'The page corners are in a line.');
     for (let r = 0; r < n; r++) {
       if (r === c) continue;
       const f = M[r]![c]! / d;

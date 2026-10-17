@@ -9,6 +9,7 @@ import { fromWorkerFailure } from './worker-error';
 import { watchEncode } from './encoder-watchdog';
 import type { FlvJob, FlvMessage } from './flv-decode.worker';
 import type { ConvertOptions, ConvertResult } from './video-convert';
+import { NamedError } from './input-error';
 
 /** True when the file starts with the FLV signature ("FLV", version 1), whatever its name says. */
 export async function isFlv(file: Blob): Promise<boolean> {
@@ -40,7 +41,7 @@ export async function convertFlv(file: File, opts: ConvertOptions): Promise<Conv
               });
             } else reject(fromWorkerFailure(m.name, m.message));
           };
-          worker.onerror = (e) => reject(new Error(e.message || 'The FLV reader stopped unexpectedly.'));
+          worker.onerror = (e) => reject(new NamedError('FlvConvertFailed', e.message || 'The FLV reader stopped unexpectedly.'));
           const job: FlvJob = { file, mute: opts.mute, entry: vendorEntry('libavFlv'), audioEncoder: typeof AudioEncoder !== 'undefined' };
           worker.postMessage(job);
         }),

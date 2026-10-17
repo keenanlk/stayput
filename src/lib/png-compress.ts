@@ -7,6 +7,7 @@
  * type (lossless). Animated PNGs keep every frame. Nothing leaves the tab.
  */
 import UPNG from 'upng-js';
+import { UnreadableFile } from './input-error';
 
 export interface PngResult {
   bytes: Uint8Array<ArrayBuffer>;
@@ -22,12 +23,12 @@ const isPng = (b: Uint8Array) => b.length > 8 && b[0] === 0x89 && b[1] === 0x50 
 /** `colors` is the palette size (2 to 256) for lossy compression, or 0 for lossless. */
 export function compressPng(input: ArrayBuffer, colors: number): PngResult {
   const original = new Uint8Array(input) as Uint8Array<ArrayBuffer>;
-  if (!isPng(original)) throw new Error('This file is not a PNG. For JPG, WebP and other photos, use Compress image.');
+  if (!isPng(original)) throw new UnreadableFile('This file is not a PNG. For JPG, WebP and other photos, use Compress image.');
   let img: ReturnType<typeof UPNG.decode>;
   try {
     img = UPNG.decode(input);
   } catch {
-    throw new Error('This PNG is damaged and could not be read.');
+    throw new UnreadableFile('This PNG is damaged and could not be read.');
   }
   const frames = UPNG.toRGBA8(img);
   const delays = img.frames.length > 1 ? img.frames.map((f) => f.delay) : undefined;

@@ -202,7 +202,7 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     if (!pdf) throw new InputError('Drop a PDF first.');
-    if (boxes.length === 0) throw new Error('Mark something to redact first: search for text, or drag a box over the page.');
+    if (boxes.length === 0) throw new InputError('Mark something to redact first: search for text, or drag a box over the page.');
     const pages = new Set(boxes.map((b) => b.page)).size;
     progress.set('Redacting', 0.05);
     const bytes = await redactPdf(new Uint8Array(await entry.file.arrayBuffer()), pdf, boxes, (done, total) =>

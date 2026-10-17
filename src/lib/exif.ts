@@ -1,3 +1,4 @@
+import { UnreadableFile, NamedError } from './input-error';
 /**
  * Lossless metadata inspection and removal for JPEG, PNG and WebP, plus EXIF
  * extraction from HEIC/HEIF containers. Nothing here re-encodes pixels.
@@ -151,11 +152,11 @@ interface JpegSegment {
 }
 
 function jpegSegments(b: Uint8Array): { segments: JpegSegment[]; scanStart: number } {
-  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8) throw new Error('Not a JPEG file.');
+  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8) throw new UnreadableFile('Not a JPEG file.');
   const segments: JpegSegment[] = [];
   let p = 2;
   while (p + 4 <= b.length) {
-    if (b[p] !== 0xff) throw new Error('Corrupt JPEG structure.');
+    if (b[p] !== 0xff) throw new UnreadableFile('Corrupt JPEG structure.');
     const marker = b[p + 1]!;
     if (marker === 0xff) {
       p++;
@@ -170,11 +171,11 @@ function jpegSegments(b: Uint8Array): { segments: JpegSegment[]; scanStart: numb
     }
     const len = (b[p + 2]! << 8) | b[p + 3]!;
     const seg: JpegSegment = { marker, start: p, end: p + 2 + len, payloadStart: p + 4, payloadLength: len - 2 };
-    if (seg.end > b.length) throw new Error('Truncated JPEG file.');
+    if (seg.end > b.length) throw new UnreadableFile('Truncated JPEG file.');
     segments.push(seg);
     p = seg.end;
   }
-  throw new Error('No image data found in this JPEG.');
+  throw new NamedError('ExifFailed', 'No image data found in this JPEG.');
 }
 
 function segKind(b: Uint8Array, s: JpegSegment): string | undefined {
@@ -299,7 +300,7 @@ interface PngChunk {
 }
 
 function pngChunks(b: Uint8Array): PngChunk[] {
-  for (let i = 0; i < 8; i++) if (b[i] !== PNG_SIG[i]) throw new Error('Not a PNG file.');
+  for (let i = 0; i < 8; i++) if (b[i] !== PNG_SIG[i]) throw new UnreadableFile('Not a PNG file.');
   const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
   const chunks: PngChunk[] = [];
   let p = 8;
@@ -307,7 +308,7 @@ function pngChunks(b: Uint8Array): PngChunk[] {
     const length = dv.getUint32(p);
     const type = ascii(b, p + 4, 4);
     const end = p + 12 + length;
-    if (end > b.length) throw new Error('Truncated PNG file.');
+    if (end > b.length) throw new UnreadableFile('Truncated PNG file.');
     chunks.push({ type, start: p, end, dataStart: p + 8, length });
     p = end;
     if (type === 'IEND') break;
@@ -374,7 +375,7 @@ interface RiffChunk {
 }
 
 function webpChunks(b: Uint8Array): RiffChunk[] {
-  if (b.length < 12 || ascii(b, 0, 4) !== 'RIFF' || ascii(b, 8, 4) !== 'WEBP') throw new Error('Not a WebP file.');
+  if (b.length < 12 || ascii(b, 0, 4) !== 'RIFF' || ascii(b, 8, 4) !== 'WEBP') throw new UnreadableFile('Not a WebP file.');
   const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
   const chunks: RiffChunk[] = [];
   let p = 12;
@@ -382,7 +383,7 @@ function webpChunks(b: Uint8Array): RiffChunk[] {
     const fourcc = ascii(b, p, 4);
     const length = dv.getUint32(p + 4, true);
     const end = p + 8 + length + (length & 1);
-    if (p + 8 + length > b.length) throw new Error('Truncated WebP file.');
+    if (p + 8 + length > b.length) throw new UnreadableFile('Truncated WebP file.');
     chunks.push({ fourcc, start: p, end: Math.min(end, b.length), dataStart: p + 8, length });
     p = end;
   }
@@ -593,7 +594,7 @@ export function inspect(b: Uint8Array): MetadataSummary {
       return { kinds: t ? ['EXIF'] : [], bytes: t?.length ?? 0, hasIcc: false, ...tiffSummary(info) };
     }
     default:
-      throw new Error('Only JPEG, PNG and WebP files can be cleaned losslessly.');
+      throw new UnreadableFile('Only JPEG, PNG and WebP files can be cleaned losslessly.');
   }
 }
 
@@ -606,7 +607,7 @@ export function strip(b: Uint8Array, opts: StripOptions = {}): StripResult {
     case 'webp':
       return stripWebp(b, opts);
     default:
-      throw new Error('Only JPEG, PNG and WebP files can be cleaned losslessly. Convert HEIC photos first.');
+      throw new UnreadableFile('Only JPEG, PNG and WebP files can be cleaned losslessly. Convert HEIC photos first.');
   }
 }
 

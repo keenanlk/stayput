@@ -1,3 +1,4 @@
+import { UnreadableFile, NamedError } from './input-error';
 /**
  * Animated WebP, read frame by frame. Browsers only hand a page the first
  * frame of an animated WebP, so this parses the RIFF container itself, wraps
@@ -39,7 +40,7 @@ function* chunksOf(b: Uint8Array, start: number, end: number): Generator<{ fourc
     const id = fourcc(b, o);
     const size = v.getUint32(o + 4, true);
     const dataEnd = o + 8 + size;
-    if (dataEnd > end) throw new Error('This WebP file is cut short.');
+    if (dataEnd > end) throw new UnreadableFile('This WebP file is cut short.');
     yield { fourcc: id, data: b.subarray(o + 8, dataEnd) };
     o = dataEnd + (size & 1);
   }
@@ -108,7 +109,7 @@ export async function renderWebpFrames(anim: WebpAnimation, onFrame: (rgba: Imag
   canvas.width = anim.width;
   canvas.height = anim.height;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  if (!ctx) throw new Error('Canvas is not available in this browser.');
+  if (!ctx) throw new NamedError('WebpAnimFailed', 'Canvas is not available in this browser.');
   for (const [i, f] of anim.frames.entries()) {
     const bitmap = await createImageBitmap(frameAsWebp(f));
     if (!f.blend) ctx.clearRect(f.x, f.y, f.width, f.height);

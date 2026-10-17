@@ -1,10 +1,10 @@
+import { NamedError } from './input-error';
 /**
  * A file the browser could not read from disk (NotReadableError): on Android this is a big video, one the
  * phone moved or is still preparing, or a cloud file it let go of. It is the file or the phone, not the tool,
  * and it often passes on a second read, so a job reads the file once more before it says so. Kept free of
  * browser and codec imports so a spec can drive it directly.
  */
-import { NamedError } from './input-error';
 
 /** Whether `e`, or the error it wraps, is the browser failing to read the file. */
 export function isNotReadable(e: unknown): boolean {
@@ -17,10 +17,8 @@ export function isNotReadable(e: unknown): boolean {
 
 /** The error to show for a file that could not be read. Its name stays NotReadableError, which is what a failed run records. */
 export function notReadable(cause?: unknown): Error {
-  const out = new NamedError(
-    'NotReadableError',
-    'This file could not be read. If it is in Google Photos, Drive or another cloud app, save it to the phone first, then pick it from the Files app (or the Downloads or Movies folder) and try again.',
-  );
+  const out = new NamedError('ReadFailureFailed', 'This file could not be read. If it is in Google Photos, Drive or another cloud app, save it to the phone first, then pick it from the Files app (or the Downloads or Movies folder) and try again.');
+  out.name = 'NotReadableError';
   out.cause = cause;
   return out;
 }

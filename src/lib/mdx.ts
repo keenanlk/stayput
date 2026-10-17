@@ -7,6 +7,7 @@
  * center=True, reflect padding and a periodic Hann window, as the models were
  * trained with. Pure functions, so they run in a worker and in Node tests.
  */
+import { NamedError } from './input-error';
 
 export interface MdxConfig {
   nFft: number;
@@ -47,7 +48,7 @@ export class Fft {
     this.n = n;
     this.radix = n % 3 === 0 ? 3 : 1;
     this.m = n / this.radix;
-    if (this.m & (this.m - 1)) throw new Error(`FFT size ${n} is not 2^k or 3·2^k`);
+    if (this.m & (this.m - 1)) throw new NamedError('MdxFailed', `FFT size ${n} is not 2^k or 3·2^k`);
     const bits = Math.log2(this.m);
     this.rev = new Uint32Array(this.m);
     for (let i = 0; i < this.m; i++) {

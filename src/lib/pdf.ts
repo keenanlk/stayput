@@ -268,7 +268,7 @@ export interface CompressStats {
 }
 
 async function inflate(data: Uint8Array): Promise<Uint8Array> {
-  if (typeof DecompressionStream === 'undefined') throw new Error('unsupported');
+  if (typeof DecompressionStream === 'undefined') throw new UnreadableFile('unsupported');
   const ds = new DecompressionStream('deflate');
   const stream = new Blob([data as BlobPart]).stream().pipeThrough(ds);
   return new Uint8Array(await new Response(stream).arrayBuffer());
@@ -428,7 +428,7 @@ async function decodePdfImage(src: ImageSource): Promise<ImageBitmap> {
   }
   const raw = await inflate(src.bytes);
   const expected = src.width * src.height * src.channels;
-  if (raw.length < expected) throw new Error('short image data');
+  if (raw.length < expected) throw new UnreadableFile('short image data');
   const rgba = new Uint8ClampedArray(src.width * src.height * 4);
   if (src.channels === 3) {
     for (let i = 0, o = 0; o < rgba.length; i += 3, o += 4) {

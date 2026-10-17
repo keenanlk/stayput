@@ -2,6 +2,7 @@ import { createShell, processEach, bindRange, num, str, bool } from '../lib/shel
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import { suffixName, type OutputFile } from '../lib/files';
 import { adjust, describe, isNeutral, sharpenRadius, type Adjustments } from '../lib/adjust';
+import { InputError, NamedError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('adjust-panel');
@@ -123,7 +124,7 @@ const shell = createShell({
   },
   async process(files, progress) {
     const a = settings();
-    if (isNeutral(a)) throw new Error('Move at least one slider, or tick Invert, first: with every setting at 0 the picture would come out unchanged.');
+    if (isNeutral(a)) throw new InputError('Move at least one slider, or tick Invert, first: with every setting at 0 the picture would come out unchanged.');
     const choice = str('format', 'keep');
     const quality = num('quality', 92) / 100;
     return processEach(files, progress, 'Adjusting', async (entry) => {
@@ -144,7 +145,7 @@ const shell = createShell({
         adjust(img.data, c.width, c.height, a);
         ctx.putImageData(img, 0, 0);
         const blob = await canvasToBlob(c, type, type === 'image/png' ? undefined : quality);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+        if (blob.type !== type) throw new NamedError('AdjustImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         const bmp = await createImageBitmap(c);
         const out: OutputFile = {
           name: suffixName(entry.file.name, a.invert && describe(a) === 'inverted' ? '-inverted' : '-adjusted', extForType(type)),

@@ -4,6 +4,7 @@ import { trackToolRun } from '../lib/analytics';
 import { canvasToBlob, decodeImage, drawScaled } from '../lib/image';
 import { saveHandoff } from '../lib/handoff';
 import { firstOutsideLatin, inkAlpha, inkShare, outputSize, strokePath, strokesToSvg, trimAlpha, trimRect, type Rect, type Stroke } from '../lib/signature';
+import { InputError } from '../lib/input-error';
 
 /**
  * Signature maker. A drawn signature is kept as points and painted from them,
@@ -380,7 +381,7 @@ function changed() {
 /* ------------------------------------------------------------------ */
 async function makePng(): Promise<Blob> {
   const src = latest;
-  if (!src) throw new Error('Nothing to save yet.');
+  if (!src) throw new InputError('Nothing to save yet.');
   const c = document.createElement('canvas');
   paintTo(src, c, sizeFor(src, chosenWidth()).width);
   return canvasToBlob(c, 'image/png');

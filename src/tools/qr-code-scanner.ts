@@ -14,6 +14,7 @@ import {
   type Hit,
 } from '../lib/qr-scan';
 import type { ScanMode, ScanReply, ScanRequest } from '../lib/qr-scan.worker';
+import { NamedError } from '../lib/input-error';
 
 /**
  * QR code scanner. Images arrive through the shell (choose, drop, paste); the
@@ -216,7 +217,7 @@ interface ImageOutcome {
 }
 
 function failure(name: string, message: string): Error {
-  const e = new Error(message);
+  const e = new NamedError('QrCodeScannerFailed', message);
   e.name = name;
   return e;
 }
@@ -282,7 +283,7 @@ const shell = createShell({
         const text = shown.map((c) => c.hit.text).join('\n');
         outputs.push({ name: `${baseName(entry.file.name)}-code.txt`, blob: new Blob([text], { type: 'text/plain' }), text, badge: 'TXT', note: `${n} ${n === 1 ? 'code' : 'codes'}` });
       } catch (e) {
-        const err = e instanceof Error ? e : new Error(String(e));
+        const err = e instanceof Error ? e : new NamedError('QrCodeScannerFailed', String(e));
         console.warn(entry.file.name, err.name);
         firstError ??= err;
         skipped.push({ name: entry.file.name, reason: err.message });
@@ -483,7 +484,7 @@ async function start(deviceId?: string) {
     }
     const platform = detectPlatform(navigator.userAgent, navigator.maxTouchPoints);
     const f = cameraFailure(name, { platform, dismissed });
-    return failStart(classifyError(e), f.lines, f.state);
+    return failStart(classifyError(e, slug()), f.lines, f.state);
   }
   if (document.hidden) {
     // The tab was left while the prompt was open: do not keep the camera running in the background.

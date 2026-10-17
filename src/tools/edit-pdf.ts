@@ -2,7 +2,7 @@ import { createShell, radio } from '../lib/shell';
 import { closePdfJs, displayedSize, loadDocument, openWithPdfJs, pageThumbnail, renderPage } from '../lib/pdf';
 import type * as PdfJs from 'pdfjs-dist';
 import { suffixName, type OutputFile } from '../lib/files';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 import { applyEdits, BASELINE, drawableAsText, isIdentity, PICTURE_PX, type Edit, type EditFont } from '../lib/pdf-edit';
 
 const panel = document.getElementById('edit-panel')!;
@@ -355,7 +355,7 @@ async function textToPicture(text: string, font: EditFont, color: string): Promi
 
 function canvasPng(c: HTMLCanvasElement | OffscreenCanvas): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
-    (c as HTMLCanvasElement).toBlob(async (b) => (b ? resolve(new Uint8Array(await b.arrayBuffer())) : reject(new Error('Could not encode the picture.'))), 'image/png');
+    (c as HTMLCanvasElement).toBlob(async (b) => (b ? resolve(new Uint8Array(await b.arrayBuffer())) : reject(new NamedError('EditPdfFailed', 'Could not encode the picture.'))), 'image/png');
   });
 }
 

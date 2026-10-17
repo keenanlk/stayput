@@ -1,3 +1,4 @@
+import { InputError } from './input-error';
 /**
  * Pixel comparison for the compare-images tool. Dependency-free so specs can import it.
  * Two RGBA buffers of the same size go in; the changed-pixel count and a difference map come out.
@@ -41,7 +42,7 @@ export const HIGHLIGHT: readonly [number, number, number] = [255, 32, 96];
  * from the same value in the other image. Threshold 0 flags any change at all.
  */
 export function diffPixels(a: Uint8ClampedArray, b: Uint8ClampedArray, threshold: number): DiffResult {
-  if (a.length !== b.length) throw new Error('Both images must be the same size to compare.');
+  if (a.length !== b.length) throw new InputError('Both images must be the same size to compare.');
   const t = Math.max(0, Math.min(MAX_THRESHOLD, Math.round(threshold)));
   const total = a.length / 4;
   const map = new Uint8ClampedArray(a.length);

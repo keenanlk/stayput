@@ -11,8 +11,8 @@
  * here so the cleaned sound stays in sync with a video's picture.
  */
 import { vendorEntry } from './vendor';
-import { NamedError } from './input-error';
 import { isNotReadable, notReadable } from './read-failure';
+import { NamedError, isUnspecific } from './input-error';
 
 export const DENOISE_RATE = 48_000;
 
@@ -34,7 +34,8 @@ export function loadRnnoise(pause = 1500): Promise<Rnnoise> {
     .catch(() => new Promise((r) => setTimeout(r, pause)).then(() => loadOnce(true)))
     .catch((err) => {
       loading = undefined;
-      const out = new NamedError('NoiseModelLoadError', 'The noise remover could not load. Check your connection, or close other tabs and apps, and try again.');
+      const out = new NamedError('DenoiseFailed', 'The noise remover could not load. Check your connection, or close other tabs and apps, and try again.');
+      out.name = 'NoiseModelLoadError';
       out.cause = err;
       throw out;
     });
@@ -128,9 +129,8 @@ export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseW
   const text = e instanceof Error ? e.message : String(e);
   const memory = /memory|allocation|bad_alloc/i.test(text) || (e instanceof RangeError && /array|buffer|length/i.test(text));
   // Any other error with a name of its own keeps it; a RangeError that reads as running out of memory says so below.
-  if (e instanceof Error && e.name !== 'Error' && !(memory && e instanceof RangeError)) return e;
-  const out = new NamedError(
-    memory ? 'OutOfMemoryError' : stage,
+  if (e instanceof Error && !isUnspecific(e) && !(memory && e instanceof RangeError)) return e;
+  const out = new NamedError('DenoiseFailed', 
     memory
       ? 'This device ran out of memory cleaning this video. Trim the video to a shorter length first, or use a computer.'
       : stage === 'NoiseDecodeError'
@@ -139,6 +139,7 @@ export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseW
           ? 'The noise could not be removed from this sound. Reload the page and try again, or try a shorter clip.'
           : 'The cleaned video could not be written. Reload the page and try again, or try a shorter clip.',
   );
+  out.name = memory ? 'OutOfMemoryError' : stage;
   out.cause = e;
   return out;
 }

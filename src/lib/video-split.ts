@@ -5,6 +5,7 @@
  */
 import { parseTimes, SplitError } from './audio-split';
 import { baseName } from './files';
+import { UnreadableFile, InputError } from './input-error';
 
 export { SplitError };
 
@@ -73,10 +74,10 @@ export async function readDuration(file: File): Promise<number> {
   const { BlobSource, Input, MATROSKA, MP4, QTFF, WEBM } = await import('mediabunny');
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
-    if (!(await input.getFormat().catch(() => null))) throw new Error('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
-    if (!(await input.getPrimaryVideoTrack())) throw new Error('This file has no video track.');
+    if (!(await input.getFormat().catch(() => null))) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!(await input.getPrimaryVideoTrack())) throw new UnreadableFile('This file has no video track.');
     const seconds = await input.computeDuration();
-    if (!Number.isFinite(seconds) || seconds <= 0) throw new Error('Could not tell how long this video is.');
+    if (!Number.isFinite(seconds) || seconds <= 0) throw new InputError('Could not tell how long this video is.');
     return seconds;
   } finally {
     input.dispose?.();

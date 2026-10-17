@@ -27,7 +27,7 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
-import { InputError, UnsupportedCodec } from './input-error';
+import { InputError, UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
 
 export interface LoopOptions {
   repeats: number;
@@ -53,7 +53,7 @@ export async function probeLoop(file: File): Promise<{ duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
     return { duration: (await pictureLength(video)).length };
   } finally {
     input.dispose?.();
@@ -74,7 +74,7 @@ export async function loopVideo(file: File, opts: LoopOptions): Promise<LoopResu
   try {
     const format = await input.getFormat().catch(() => null);
     const video = format ? await input.getPrimaryVideoTrack().catch(() => null) : null;
-    if (!format || !video) throw new Error('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format || !video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
     const outFormat =
       format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack().catch(() => null);
@@ -125,7 +125,7 @@ export async function loopVideo(file: File, opts: LoopOptions): Promise<LoopResu
       () => output.cancel(),
     );
     const buffer = output.target.buffer;
-    if (!buffer) throw new Error('The video could not be written.');
+    if (!buffer) throw new NamedError('VideoLoopFailed', 'The video could not be written.');
     opts.onProgress?.(1);
     const quarter = video.rotation === 90 || video.rotation === 270;
     return {

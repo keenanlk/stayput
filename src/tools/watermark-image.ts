@@ -3,6 +3,7 @@ import { canvasToBlob, decodeImage, extForType, makeCanvas, thumbnail, type Enco
 import { suffixName, type OutputFile } from '../lib/files';
 import { drawWatermark } from '../lib/watermark';
 import { requireText, setPreview, watermarkOptions } from './watermark-common';
+import { NamedError } from '../lib/input-error';
 
 function outputType(file: File, choice: string): EncodeType {
   if (choice !== 'keep') return choice as EncodeType;
@@ -46,7 +47,7 @@ const shell = createShell({
         ctx.drawImage(bitmap, 0, 0);
         drawWatermark(ctx, c.width, c.height, o);
         const blob = await canvasToBlob(c, type, type === 'image/png' ? undefined : 0.92);
-        if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+        if (blob.type !== type) throw new NamedError('WatermarkImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
         const bmp = await createImageBitmap(blob);
         const out: OutputFile = {
           name: suffixName(entry.file.name, '-watermarked', extForType(type)),

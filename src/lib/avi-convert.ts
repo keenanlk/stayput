@@ -9,6 +9,7 @@ import { fromWorkerFailure } from './worker-error';
 import { watchEncode } from './encoder-watchdog';
 import type { AviJob, AviMessage } from './avi-decode.worker';
 import type { ConvertOptions, ConvertResult } from './video-convert';
+import { NamedError } from './input-error';
 
 /** True when the file starts like an AVI (RIFF, then "AVI "), whatever its name says. */
 export async function isAvi(file: Blob): Promise<boolean> {
@@ -41,7 +42,7 @@ export async function convertAvi(file: File, opts: ConvertOptions): Promise<Conv
               });
             } else reject(fromWorkerFailure(m.name, m.message));
           };
-          worker.onerror = (e) => reject(new Error(e.message || 'The AVI decoder stopped unexpectedly.'));
+          worker.onerror = (e) => reject(new NamedError('AviConvertFailed', e.message || 'The AVI decoder stopped unexpectedly.'));
           const job: AviJob = { file, mute: opts.mute, entry: vendorEntry('libav'), audioEncoder: typeof AudioEncoder !== 'undefined' };
           worker.postMessage(job);
         }),

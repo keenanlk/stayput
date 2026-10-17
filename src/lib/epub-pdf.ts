@@ -6,6 +6,7 @@
  */
 import type { EpubBook } from './epub';
 import { resolvePath } from './epub';
+import { UnreadableFile, NamedError } from './input-error';
 
 export type PaperSize = 'a5' | 'a4' | 'letter';
 export type TypeSize = 'small' | 'medium' | 'large';
@@ -279,9 +280,9 @@ export async function epubToPdf(book: EpubBook, opts: EpubPdfOptions, onProgress
     content.push(...nodes);
   }
   chapters = headings || bodies.length;
-  if (!content.length) throw new Error('This book has no text or pictures to put on pages.');
+  if (!content.length) throw new UnreadableFile('This book has no text or pictures to put on pages.');
   if (letters && unsupported / letters > 0.2) {
-    throw new Error('This book is mostly in a script the PDF font cannot show yet (Chinese, Japanese, Korean, Arabic, Hebrew, Thai or an Indian script). Books in Latin, Greek and Cyrillic letters work.');
+    throw new UnreadableFile('This book is mostly in a script the PDF font cannot show yet (Chinese, Japanese, Korean, Arabic, Hebrew, Thai or an Indian script). Books in Latin, Greek and Cyrillic letters work.');
   }
   // A contents page is only worth it with a few chapter headings to list.
   if (opts.contents && headings >= 3) {
@@ -310,11 +311,11 @@ function render(def: Node, onProgress: (f: number) => void): Promise<Uint8Array>
       if (m.type === 'progress') return onProgress(m.f);
       worker.terminate();
       if (m.type === 'done') resolve(m.bytes);
-      else reject(new Error(m.message));
+      else reject(new NamedError('EpubPdfFailed', m.message));
     };
     worker.onerror = (e) => {
       worker.terminate();
-      reject(new Error(e.message || 'The PDF could not be made.'));
+      reject(new NamedError('EpubPdfFailed', e.message || 'The PDF could not be made.'));
     };
     worker.postMessage(def);
   });

@@ -2,6 +2,7 @@ import { createShell, bool, processEach, type ShellFile } from '../lib/shell';
 import { inspect, strip, sniffFormat, type MetadataSummary } from '../lib/exif';
 import { decodeImage, encodeBitmap, thumbnail } from '../lib/image';
 import { formatBytes, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 const report = document.getElementById('meta-report')!;
 const summaries = new Map<number, MetadataSummary | Error>();
@@ -27,7 +28,7 @@ async function renderReport(files: ShellFile[]) {
       try {
         summaries.set(entry.id, inspect(new Uint8Array(await entry.file.arrayBuffer())));
       } catch (e) {
-        summaries.set(entry.id, e instanceof Error ? e : new Error(String(e)));
+        summaries.set(entry.id, e instanceof Error ? e : new NamedError('StripExifFailed', String(e)));
       }
     }
     const s = summaries.get(entry.id)!;

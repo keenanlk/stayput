@@ -3,6 +3,7 @@ import { canvasToBlob, decodeImage, drawScaled } from '../lib/image';
 import { imagesToPdf, type EmbeddableImage } from '../lib/pdf';
 import { enhance, findPage, flatSize, inset, warp, type Look, type Quad } from '../lib/doc-scan';
 import { suffixName, type OutputFile } from '../lib/files';
+import { NamedError } from '../lib/input-error';
 
 /**
  * Turn phone photos of paper into a clean scan (src/lib/doc-scan.ts): the
@@ -135,7 +136,7 @@ createShell({
         note: `${pages.length} page${pages.length === 1 ? '' : 's'} on ${pageSize === 'a4' ? 'A4' : 'US Letter'}${edges}`,
       });
     }
-    if (outputs.length === 0) throw new Error(describeError(files[0]!.file, firstError ?? 'nothing scanned'));
+    if (outputs.length === 0) throw new NamedError('DocumentScannerFailed', describeError(files[0]!.file, firstError ?? 'nothing scanned'));
     return { outputs, skipped };
   },
   resultsTitle: () => 'Scanned',

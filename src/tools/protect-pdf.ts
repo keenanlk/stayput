@@ -13,7 +13,7 @@ createShell({
   async process(files, progress) {
     const password = str('password');
     if (!password) throw new InputError('Enter a password to protect the PDF with.');
-    if (password !== str('password-confirm')) throw new Error('The two passwords do not match. Type the same password in both boxes.');
+    if (password !== str('password-confirm')) throw new InputError('The two passwords do not match. Type the same password in both boxes.');
     return processEach(files, progress, 'Protecting', async (entry) => {
       const src = new Uint8Array(await entry.file.arrayBuffer());
       // An already-encrypted file is opened first (asking for its old password if needed), then re-encrypted.

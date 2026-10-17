@@ -6,7 +6,7 @@
  * with the video's own sound if asked, and encoded as AAC or Opus. Nothing
  * leaves the tab.
  */
-import { NamedError } from './input-error';
+import { NamedError, UnreadableFile } from './input-error';
 import {
   AudioSampleSource,
   BlobSource,
@@ -27,7 +27,6 @@ import {
 import { CODEC_NAMES } from './video-compress';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { NoAudioEncoder, registerMp3Fallback } from './mp3-fallback';
-import { UnreadableFile } from './input-error';
 import { isNotReadable } from './read-failure';
 
 export interface AddAudioOptions {

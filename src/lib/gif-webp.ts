@@ -9,7 +9,7 @@ import { gifPictures } from './gif-apng';
 import { loadWebpEncoder } from './image';
 import { muxAnimatedWebp } from './webp-mux';
 import { DamagedGif, explain } from './gif-errors';
-import { NamedError } from './input-error';
+import { NamedError, isUnspecific } from './input-error';
 
 export interface GifToWebpOptions {
   lossless: boolean;
@@ -34,7 +34,7 @@ export async function gifToWebp(input: ArrayBuffer, opts: GifToWebpOptions): Pro
   // A GIF the parser chokes on (cut short, bad block) is a damaged GIF; out-of-memory kinds are GifTooLarge.
   const pics = await gifPictures(input, (f) => opts.onProgress?.(f * 0.1)).catch((e) => {
     const x = explain(e);
-    throw x instanceof Error && x.name !== 'Error' && x.name !== 'TypeError' ? x : new DamagedGif();
+    throw x instanceof Error && !isUnspecific(x) && x.name !== 'TypeError' ? x : new DamagedGif();
   });
   try {
     const { module, defaults } = await loadWebpEncoder().catch((e) => {
