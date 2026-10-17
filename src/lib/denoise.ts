@@ -26,12 +26,15 @@ interface Rnnoise {
 }
 
 let loading: Promise<Rnnoise> | undefined;
-export function loadRnnoise(): Promise<Rnnoise> {
-  loading ??= (import(/* @vite-ignore */ vendorEntry('rnnoise')) as Promise<{ Rnnoise: { load(): Promise<Rnnoise> } }>)
-    .then((m) => m.Rnnoise.load())
+// A module that failed to import is remembered by its address, so the second try asks for a different one.
+const loadOnce = (again = false) => (import(/* @vite-ignore */ vendorEntry('rnnoise') + (again ? '?again' : '')) as Promise<{ Rnnoise: { load(): Promise<Rnnoise> } }>).then((m) => m.Rnnoise.load());
+/** Loads the noise remover; a failed load (a dropped connection, a phone short of memory) is tried once more after a pause. */
+export function loadRnnoise(pause = 1500): Promise<Rnnoise> {
+  loading ??= loadOnce()
+    .catch(() => new Promise((r) => setTimeout(r, pause)).then(() => loadOnce(true)))
     .catch((err) => {
       loading = undefined;
-      const out = new NamedError('DenoiseFailed', 'The noise remover could not load. Check your connection and try again.');
+      const out = new NamedError('DenoiseFailed', 'The noise remover could not load. Check your connection, or close other tabs and apps, and try again.');
       out.name = 'NoiseModelLoadError';
       out.cause = err;
       throw out;

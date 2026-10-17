@@ -6,7 +6,7 @@ import { DENOISE_RATE, denoise, inStage, loadRnnoise, resample } from '../lib/de
 import { SAMPLE_RATE, decodePcm } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
 import { audioDecodeError } from '../lib/speech-errors';
-import { probeReadable, retryUnreadable } from '../lib/read-failure';
+import { retryUnreadable, snapshotFile } from '../lib/read-failure';
 
 const BITRATES = [96, 128, 160, 192, 256, 320];
 const STRENGTH: Record<string, number> = { strong: 1, medium: 0.85, light: 0.65 };
@@ -24,8 +24,9 @@ createShell({
   async process(files, progress) {
     const strength = STRENGTH[radio('strength', 'strong')] ?? 1;
     const choice = str('format', 'same');
-    // A file the browser cannot reach says so now, before the noise remover is downloaded.
-    for (const entry of files) await probeReadable(entry.file);
+    // Copy each file into memory right away: on Android a picked file can become unreadable by the time the noise remover
+    // has downloaded. A file the browser cannot reach says so now, before the download.
+    files = await Promise.all(files.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file) })));
     progress.set('Loading the noise remover…', 0.02);
     const rnnoise = await loadRnnoise();
     const cleanFile = async (entry: (typeof files)[number], index: number): Promise<OutputFile> => {
