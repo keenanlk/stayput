@@ -5,8 +5,7 @@
  * pictures.
  */
 import { ALL_FORMATS, AudioBufferSink, AudioSample, BlobSource, Input, type AudioSampleSource, type InputAudioTrack } from 'mediabunny';
-import { foldToStereo } from './audio';
-import { grown, plannedSamples } from './demux-audio';
+import { foldToStereo } from './fold-channels';
 import { NamedError } from './input-error';
 import { isNotReadable } from './read-failure';
 
@@ -36,6 +35,7 @@ function unlessFatal(e: unknown): void {
  */
 async function decodedByCodecs(track: InputAudioTrack, rate: number): Promise<Float32Array[] | null> {
   if (!track.codec || !(await track.canDecode())) return null;
+  const { grown, plannedSamples } = await import('./demux-audio');
   const seconds = await track.computeDuration();
   let out: Float32Array<ArrayBuffer>[] | null = null;
   let end = 0;
