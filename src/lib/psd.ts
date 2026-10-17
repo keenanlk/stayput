@@ -5,6 +5,7 @@
  * nothing is fetched from anywhere else.
  */
 import { extOf, readHead } from './files';
+import { NamedError, UnreadableFile } from './input-error';
 
 /** True when the file is a Photoshop document by signature ("8BPS"), or by name when the bytes are unreadable. */
 export async function isPsdFile(file: Blob & { name?: string }): Promise<boolean> {
@@ -17,23 +18,23 @@ export async function isPsdFile(file: Blob & { name?: string }): Promise<boolean
 export async function decodePsd(file: Blob): Promise<ImageBitmap> {
   const head = await readHead(file, 6);
   const version = head.length >= 6 ? (head[4]! << 8) | head[5]! : 1;
-  if (version === 2) throw new Error('This is a large-document PSB file, which is not supported. Save it as a regular PSD, or flatten it to a smaller size first.');
+  if (version === 2) throw new NamedError('PsdFailed', 'This is a large-document PSB file, which is not supported. Save it as a regular PSD, or flatten it to a smaller size first.');
   const { readPsd } = await import('ag-psd');
   let psd;
   try {
     psd = readPsd(await file.arrayBuffer(), { skipLayerImageData: true, skipThumbnail: true, skipLinkedFilesData: true, useImageData: true });
   } catch (e) {
     const msg = e instanceof Error ? e.message : '';
-    if (/CMYK|Color mode not supported/i.test(msg)) throw new Error('This PSD is in CMYK, Lab or another colour mode this page cannot read. In Photoshop, choose Image → Mode → RGB Color and save it again.');
-    throw new Error('This PSD could not be read. It may be damaged, or saved without the flattened image: in Photoshop, turn on Preferences → File Handling → Maximize PSD and PSB File Compatibility: Always, then save it again.');
+    if (/CMYK|Color mode not supported/i.test(msg)) throw new UnreadableFile('This PSD is in CMYK, Lab or another colour mode this page cannot read. In Photoshop, choose Image → Mode → RGB Color and save it again.');
+    throw new UnreadableFile('This PSD could not be read. It may be damaged, or saved without the flattened image: in Photoshop, turn on Preferences → File Handling → Maximize PSD and PSB File Compatibility: Always, then save it again.');
   }
   const img = psd.imageData;
   const { width, height } = psd;
   if (!img || !width || !height) {
-    throw new Error('This PSD has no flattened image saved in it. In Photoshop, turn on Preferences → File Handling → Maximize PSD and PSB File Compatibility: Always, then save it again.');
+    throw new UnreadableFile('This PSD has no flattened image saved in it. In Photoshop, turn on Preferences → File Handling → Maximize PSD and PSB File Compatibility: Always, then save it again.');
   }
   const px = width * height * 4;
-  if (img.data.length < px) throw new Error('This PSD uses an encoding the decoder cannot read.');
+  if (img.data.length < px) throw new UnreadableFile('This PSD uses an encoding the decoder cannot read.');
   let rgba: Uint8ClampedArray<ArrayBuffer>;
   if (img.data instanceof Uint8ClampedArray || img.data instanceof Uint8Array) {
     rgba = new Uint8ClampedArray(img.data.buffer as ArrayBuffer, img.data.byteOffset, px);

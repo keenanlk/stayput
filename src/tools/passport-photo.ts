@@ -4,6 +4,7 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { cutout, findSubject } from '../lib/background';
 import { findPortraitFaces } from '../lib/faces';
 import { measureHead, placement, renderPhoto, renderSheet, sizeById } from '../lib/passport';
+import { UnreadableFile } from '../lib/input-error';
 
 const FILL: Record<string, string> = { keep: '#ffffff', white: '#ffffff', grey: '#e4e4e4' };
 
@@ -20,10 +21,10 @@ createShell({
           if (stage === 'loading') progress.set('Loading the face finder (one time, about 4 MB)…', share(0.05));
         });
         const face = faces[0];
-        if (!face) throw new Error('No face was found. Use a photo taken straight on, with the whole face visible and well lit.');
+        if (!face) throw new UnreadableFile('No face was found. Use a photo taken straight on, with the whole face visible and well lit.');
         const second = faces[1];
         if (second && second.box.w * second.box.h > face.box.w * face.box.h * 0.2) {
-          throw new Error('There is more than one person in this photo. A passport photo must show only you.');
+          throw new UnreadableFile('There is more than one person in this photo. A passport photo must show only you.');
         }
         const mask = await findSubject(bitmap, (f) =>
           progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),

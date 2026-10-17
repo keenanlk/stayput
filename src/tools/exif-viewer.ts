@@ -1,6 +1,7 @@
 import { createShell, type ShellFile, type Skipped } from '../lib/shell';
 import { extractExifTiff, inspect, sniffFormat } from '../lib/exif';
 import { readExif, type ExifField, type ExifReport } from '../lib/exif-read';
+import { UnreadableFile, NamedError } from '../lib/input-error';
 
 const panel = document.getElementById('exif-panel')!;
 const reportEl = document.getElementById('exif-report')!;
@@ -16,7 +17,7 @@ const isTiff = (b: Uint8Array) => b.length > 4 && ((b[0] === 0x49 && b[1] === 0x
 
 function read(bytes: Uint8Array): Reading {
   if (isTiff(bytes)) return { report: readExif(bytes), kinds: ['EXIF'] };
-  if (sniffFormat(bytes) === 'unknown') throw new Error('Not a JPG, PNG, WebP, HEIC or TIFF image.');
+  if (sniffFormat(bytes) === 'unknown') throw new UnreadableFile('Not a JPG, PNG, WebP, HEIC or TIFF image.');
   const tiff = extractExifTiff(bytes);
   let kinds: string[] = [];
   try {
@@ -134,7 +135,7 @@ async function render(files: ShellFile[]) {
       try {
         readings.set(entry.id, read(new Uint8Array(await entry.file.arrayBuffer())));
       } catch (e) {
-        readings.set(entry.id, e instanceof Error ? e : new Error(String(e)));
+        readings.set(entry.id, e instanceof Error ? e : new NamedError('ExifViewerFailed', String(e)));
       }
     }
     reportEl.append(card(entry, readings.get(entry.id)!, files.length === 1));
@@ -156,7 +157,7 @@ createShell({
         try {
           reading = read(new Uint8Array(await entry.file.arrayBuffer()));
         } catch (e) {
-          reading = e instanceof Error ? e : new Error(String(e));
+          reading = e instanceof Error ? e : new NamedError('ExifViewerFailed', String(e));
         }
         readings.set(entry.id, reading);
       }
@@ -167,7 +168,7 @@ createShell({
       if (reading.report.fields.length === 0) rows.push([entry.file.name, '', '', 'no EXIF data']);
       for (const f of reading.report.fields) rows.push([entry.file.name, f.group, f.label, f.value]);
     }
-    if (skipped.length === files.length) throw new Error(`${skipped[0]!.name}: ${skipped[0]!.reason}`);
+    if (skipped.length === files.length) throw new NamedError('ExifViewerFailed', `${skipped[0]!.name}: ${skipped[0]!.reason}`);
     progress.set('Done', 1);
     const csv = rows.map((r) => r.map(csvCell).join(',')).join('\r\n') + '\r\n';
     const blob = new Blob([csv], { type: 'text/csv' });

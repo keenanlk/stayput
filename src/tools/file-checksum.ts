@@ -1,6 +1,7 @@
 import { createShell, type ShellFile, type Skipped } from '../lib/shell';
 import { formatBytes } from '../lib/files';
 import { ALGORITHMS, compareChecksum, hashFile, type Digests } from '../lib/checksum';
+import { NamedError } from '../lib/input-error';
 
 const panel = document.getElementById('cs-panel')!;
 const reportEl = document.getElementById('cs-report')!;
@@ -92,7 +93,7 @@ createShell({
     }
     shown = files.flatMap((entry) => (results.has(entry.id) ? [{ entry, digests: results.get(entry.id)! }] : []));
     render();
-    if (shown.length === 0) throw new Error(skipped.length === 1 ? skipped[0]!.reason : `None of the files could be checked. ${skipped[0]!.reason}`);
+    if (shown.length === 0) throw new NamedError('FileChecksumFailed', skipped.length === 1 ? skipped[0]!.reason : `None of the files could be checked. ${skipped[0]!.reason}`);
     progress.set('Done', 1);
     const lines = shown.flatMap(({ entry, digests }) => ALGORITHMS.map((a) => `${a.label} (${entry.file.name}) = ${digests[a.id]}`));
     const blob = new Blob([lines.join('\n') + '\n'], { type: 'text/plain' });

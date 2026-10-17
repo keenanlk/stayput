@@ -5,6 +5,7 @@
  * browser's own DOMParser.
  */
 import { unzipSync } from 'fflate';
+import { UnreadableFile } from './input-error';
 
 export interface EpubBook {
   title: string;
@@ -49,21 +50,21 @@ export function openEpub(bytes: Uint8Array): EpubBook {
   try {
     files = unzipSync(bytes);
   } catch {
-    throw new Error('This file is not an EPUB book (it could not be unzipped).');
+    throw new UnreadableFile('This file is not an EPUB book (it could not be unzipped).');
   }
   const container = files['META-INF/container.xml'];
-  if (!container) throw new Error('This file is not an EPUB book (META-INF/container.xml is missing).');
+  if (!container) throw new UnreadableFile('This file is not an EPUB book (META-INF/container.xml is missing).');
   const encryption = files['META-INF/encryption.xml'];
   if (encryption) {
     // Font obfuscation is allowed in DRM-free books; anything else encrypted means DRM.
     const methods = byName(parseXml(text(encryption), 'application/xml'), 'EncryptionMethod').map((e) => e.getAttribute('Algorithm') ?? '');
     if (methods.some((m) => !/obfuscation|fontobf|idpf\.org\/2008\/embedding/i.test(m))) {
-      throw new Error('This book is protected by DRM (bought from a store that locks its books), so its pages cannot be read. Only DRM-free EPUBs can be converted.');
+      throw new UnreadableFile('This book is protected by DRM (bought from a store that locks its books), so its pages cannot be read. Only DRM-free EPUBs can be converted.');
     }
   }
   const rootPath = byName(parseXml(text(container), 'application/xml'), 'rootfile')[0]?.getAttribute('full-path');
   const opfBytes = rootPath ? files[rootPath] : undefined;
-  if (!rootPath || !opfBytes) throw new Error('This EPUB has no package file, so its chapters cannot be found.');
+  if (!rootPath || !opfBytes) throw new UnreadableFile('This EPUB has no package file, so its chapters cannot be found.');
   const opf = parseXml(text(opfBytes), 'application/xml');
   const manifest = new Map<string, { href: string; type: string; props: string }>();
   for (const item of byName(opf, 'item')) {
@@ -80,7 +81,7 @@ export function openEpub(bytes: Uint8Array): EpubBook {
     if (!/html|xml/.test(item.type) && !/\.x?html?$/i.test(item.href)) continue;
     chapters.push({ path: item.href, nav: item.props.split(/\s+/).includes('nav'), doc: parseXml(text(data), /\.html?$/i.test(item.href) && !/xhtml/.test(item.type) ? 'text/html' : 'application/xhtml+xml') });
   }
-  if (chapters.length === 0) throw new Error('This EPUB lists no chapters to read.');
+  if (chapters.length === 0) throw new UnreadableFile('This EPUB lists no chapters to read.');
   const meta = (name: string) => byName(opf, name)[0]?.textContent?.trim() ?? '';
   const coverId = [...manifest.entries()].find(([, v]) => v.props.split(/\s+/).includes('cover-image'))?.[0]
     ?? byName(opf, 'meta').find((m) => m.getAttribute('name') === 'cover')?.getAttribute('content') ?? undefined;

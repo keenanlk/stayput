@@ -1,7 +1,7 @@
 import { createShell, describeError } from '../lib/shell';
 import { closePdfJs, loadDocument, mergePdfs, openWithPdfJs, pageThumbnail } from '../lib/pdf';
 import type { OutputFile } from '../lib/files';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 
 createShell({
   async thumbnail(file) {
@@ -20,7 +20,7 @@ createShell({
       try {
         await loadDocument(src);
       } catch (e) {
-        throw new Error(describeError(f.file, e));
+        throw new NamedError('MergePdfFailed', describeError(f.file, e));
       }
       sources.push(src);
     }

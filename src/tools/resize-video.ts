@@ -24,8 +24,8 @@ videoEditShell({
       const width = num('width', 0) || undefined;
       const height = num('height', 0) || undefined;
       if (!width && !height) throw new InputError('Enter a width, a height, or both.');
-      if ((width && width < 16) || (height && height < 16)) throw new Error('Use at least 16 pixels for the width and height.');
-      if ((width ?? 0) > 7680 || (height ?? 0) > 7680) throw new Error('The largest size this page can make is 7680 pixels on a side.');
+      if ((width && width < 16) || (height && height < 16)) throw new InputError('Use at least 16 pixels for the width and height.');
+      if ((width ?? 0) > 7680 || (height ?? 0) > 7680) throw new InputError('The largest size this page can make is 7680 pixels on a side.');
       return { mute, width, height };
     }
     const { videoSize } = await import('../lib/video-edit');

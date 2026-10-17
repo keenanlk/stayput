@@ -8,6 +8,7 @@
 import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
+import { NamedError } from './input-error';
 
 export const MODEL_URL = '/models/isnet-general-use-int8w.onnx';
 export const SIZE = 1024;
@@ -22,7 +23,7 @@ let session: Promise<ort.InferenceSession> | undefined;
 
 async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
   const res = await fetch(MODEL_URL);
-  if (!res.ok || !res.body) throw new Error(`The background model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
+  if (!res.ok || !res.body) throw new NamedError('ModelDownloadError', `The background model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
   const total = Number(res.headers.get('content-length')) || 0;
   const reader = res.body.getReader();
   const parts: Uint8Array[] = [];

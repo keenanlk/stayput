@@ -1,3 +1,4 @@
+import { NamedError } from './input-error';
 /**
  * An animated PNG (APNG) writer. Every frame is a full-canvas RGBA picture written with
  * dispose none and blend source, so each one replaces the one before and transparency survives.
@@ -68,7 +69,7 @@ export function frameDelayFraction(ms: number): [number, number] {
 
 export async function encodeApng(o: ApngOptions): Promise<Uint8Array<ArrayBuffer>> {
   const { width, height, frames } = o;
-  if (!frames.length) throw new Error('There are no frames to write.');
+  if (!frames.length) throw new NamedError('ApngFailed', 'There are no frames to write.');
   const parts: Uint8Array[] = [Uint8Array.from(SIGNATURE)];
   const ihdr = new Uint8Array(13);
   const hv = new DataView(ihdr.buffer);

@@ -1,3 +1,4 @@
+import { NamedError } from './input-error';
 /**
  * Writes one output file into the origin private file system (OPFS) for opfs-output.ts.
  * createSyncAccessHandle works in a dedicated worker in every browser that has OPFS, which is why the
@@ -21,13 +22,13 @@ async function onMessage(m: OpfsRequest): Promise<void> {
     name = m.name;
     const file = await directory.getFileHandle(name, { create: true });
     const create = (file as unknown as { createSyncAccessHandle?: () => Promise<typeof handle> }).createSyncAccessHandle;
-    if (!create) throw new Error('No sync access handle');
+    if (!create) throw new NamedError('OpfsOutputWorkerFailed', 'No sync access handle');
     handle = await create.call(file);
     handle!.truncate(0);
   } else if (m.type === 'write') {
-    if (!handle) throw new Error('Not open');
+    if (!handle) throw new NamedError('OpfsOutputWorkerFailed', 'Not open');
     const wrote = handle.write(m.data, { at: m.at });
-    if (wrote !== m.data.byteLength) throw new Error('Short write: the device may be out of space');
+    if (wrote !== m.data.byteLength) throw new NamedError('OpfsOutputWorkerFailed', 'Short write: the device may be out of space');
   } else if (m.type === 'close') {
     handle?.flush();
     handle?.close();

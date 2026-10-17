@@ -29,7 +29,7 @@ import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder, useRealtimeH264 } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
-import { UnreadableFile, UnsupportedCodec } from './input-error';
+import { UnreadableFile, UnsupportedCodec, NamedError } from './input-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
@@ -94,7 +94,7 @@ export interface EditResult {
  * whole video), otherwise a buffer in memory as before.
  */
 /** An error with its own class name, so a failed run records which step it was (never the message). */
-const failure = (name: string, message: string) => Object.assign(new Error(message), { name });
+const failure = (name: string, message: string) => Object.assign(new NamedError('VideoEditFailed', message), { name });
 
 /** A file the phone could not read is not "not a video": it keeps its own name, so the job can read it once more. */
 function readOrNull(e: unknown): null {

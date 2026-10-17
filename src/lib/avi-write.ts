@@ -1,3 +1,4 @@
+import { UnreadableFile } from './input-error';
 /**
  * A hand-written AVI (RIFF) writer for the Video to AVI tool. No library: Mediabunny has no AVI
  * muxer, and the format is small. The file is the classic layout that every AVI player reads:
@@ -266,7 +267,7 @@ export interface AviSummary {
 export function readAvi(bytes: Uint8Array): AviSummary {
   const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const str = (o: number) => String.fromCharCode(bytes[o]!, bytes[o + 1]!, bytes[o + 2]!, bytes[o + 3]!);
-  if (str(0) !== 'RIFF' || str(8) !== 'AVI ') throw new Error('Not an AVI file.');
+  if (str(0) !== 'RIFF' || str(8) !== 'AVI ') throw new UnreadableFile('Not an AVI file.');
   const s: AviSummary = {
     fileSize: bytes.length,
     riffSize: v.getUint32(4, true),

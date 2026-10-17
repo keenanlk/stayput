@@ -1,3 +1,4 @@
+import { UnreadableFile } from './input-error';
 /**
  * A Standard MIDI File writer and a small reader, with no dependencies (so a
  * spec can import it). The file is format 0: one track holding a tempo, a 4/4
@@ -79,7 +80,7 @@ export interface ParsedMidi {
 export function parseMidi(bytes: Uint8Array): ParsedMidi {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const tag = (o: number) => String.fromCharCode(...bytes.subarray(o, o + 4));
-  if (bytes.length < 14 || tag(0) !== 'MThd') throw new Error('Not a MIDI file');
+  if (bytes.length < 14 || tag(0) !== 'MThd') throw new UnreadableFile('Not a MIDI file');
   const headerLength = view.getUint32(4);
   const format = view.getUint16(8);
   const tracks = view.getUint16(10);
@@ -88,11 +89,11 @@ export function parseMidi(bytes: Uint8Array): ParsedMidi {
   let bpm: number | null = null;
   const notes: ParsedMidi['notes'] = [];
   for (let t = 0; t < tracks; t++) {
-    if (tag(pos) !== 'MTrk') throw new Error('Missing track');
+    if (tag(pos) !== 'MTrk') throw new UnreadableFile('Missing track');
     const length = view.getUint32(pos + 4);
     let p = pos + 8;
     const end = p + length;
-    if (end > bytes.length) throw new Error('Track runs past the end of the file');
+    if (end > bytes.length) throw new UnreadableFile('Track runs past the end of the file');
     let tick = 0;
     let running = 0;
     const open = new Map<number, { tick: number; velocity: number }>();
@@ -103,7 +104,7 @@ export function parseMidi(bytes: Uint8Array): ParsedMidi {
         v = (v << 7) | (b & 0x7f);
         if (!(b & 0x80)) return v;
       }
-      throw new Error('Bad variable-length number');
+      throw new UnreadableFile('Bad variable-length number');
     };
     while (p < end) {
       tick += readVlq();

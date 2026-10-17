@@ -2,7 +2,7 @@ import { createShell, bindRange, num, str, radio, bool, type ShellFile } from '.
 import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
 import type { OutputFile } from '../lib/files';
 import { planCollage, type CollageOptions, type Fit, type Layout, type Size } from '../lib/collage';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const panel = $('collage-panel');
@@ -134,7 +134,7 @@ const shell = createShell({
     plan.cells.forEach((cell, i) => ctx.drawImage(bitmaps[i]!, cell.sx, cell.sy, cell.sw, cell.sh, cell.dx, cell.dy, cell.dw, cell.dh));
     bitmaps.forEach((b) => b.close());
     const blob = await canvasToBlob(c, type, type === 'image/png' ? undefined : quality);
-    if (blob.type !== type) throw new Error(`This browser cannot save ${extForType(type).toUpperCase()} images.`);
+    if (blob.type !== type) throw new NamedError('CollageMakerFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
     const bmp = await createImageBitmap(c);
     const out: OutputFile = {
       name: `collage.${extForType(type)}`,

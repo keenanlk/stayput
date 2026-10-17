@@ -6,6 +6,7 @@
 import UPNG from 'upng-js';
 import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import { overPhoneLimit } from './phone-limit';
+import { UnreadableFile, NamedError } from './input-error';
 
 export class NotAnApng extends Error {
   constructor(still: boolean) {
@@ -87,12 +88,12 @@ export async function apngToGif(input: ArrayBuffer, onProgress?: (fraction: numb
   try {
     img = UPNG.decode(input);
   } catch {
-    throw new Error('This PNG is damaged and could not be read.');
+    throw new UnreadableFile('This PNG is damaged and could not be read.');
   }
   if (!img.tabs.acTL || img.frames.length < 2) throw new NotAnApng(true);
   // Every frame is held whole while it is converted, so a phone is held to the same budget as video.
   if (overPhoneLimit(img.width * img.height * 4 * img.frames.length)) {
-    throw new Error(`This animation is ${img.width}×${img.height} with ${img.frames.length} frames, which is more than a phone can hold in memory. Try a computer.`);
+    throw new NamedError('ApngToGifFailed', `This animation is ${img.width}×${img.height} with ${img.frames.length} frames, which is more than a phone can hold in memory. Try a computer.`);
   }
   const plays = img.tabs.acTL.num_plays;
   const repeat = gifRepeat(plays);
