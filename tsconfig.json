@@ -7,5 +7,5 @@
     "noUncheckedIndexedAccess": true
   },
   "include": [".astro/types.d.ts", "src/**/*", "tests/**/*"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "tests/fixtures/**"]
 }
