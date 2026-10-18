@@ -14,7 +14,7 @@ const INDEXED = new Set(['MP4', 'QuickTime File Format', 'WebM', 'Matroska']);
 export const CUT_SHORT = 'This file looks cut short, or is missing its index, so no sound can be read from it. Record or export it again, or try another copy.';
 
 /**
- * Throws AudioDecodeError for a video container whose sound the demuxer cannot find, before the browser's decoder
+ * Throws NoSoundTrack for a video container with no sound track, and AudioDecodeError for one whose index is missing, before the browser's decoder
  * is given the bytes. A file the demuxer cannot place at all is left to the decoder, as before.
  */
 export async function refuseSoundlessContainer(file: Blob): Promise<void> {
@@ -24,9 +24,14 @@ export async function refuseSoundlessContainer(file: Blob): Promise<void> {
     if (!format || !INDEXED.has(format.name)) return;
     const tracks = await input.getTracks();
     if (tracks.length === 0) throw audioDecodeError(CUT_SHORT);
-    if (!tracks.some((t) => t.isAudioTrack())) throw audioDecodeError();
+    if (!tracks.some((t) => t.isAudioTrack())) {
+      // A video that simply has no sound is named as the caption tools name it, so the stats do not lump it with sound that will not decode.
+      const none = audioDecodeError();
+      none.name = 'NoSoundTrack';
+      throw none;
+    }
   } catch (e) {
-    if (isNotReadable(e) || (e instanceof Error && e.name === 'AudioDecodeError')) throw e;
+    if (isNotReadable(e) || (e instanceof Error && ['AudioDecodeError', 'NoSoundTrack'].includes(e.name))) throw e;
   } finally {
     input.dispose?.();
   }

@@ -72,7 +72,6 @@ The exact words the person sees for each error class are in [ERROR-CLASSES.md](E
 
 | Item | Plan item (growth hardening plan) | Cases | What happens | Suggested fix |
 |------|-----------|-------|--------------|---------------|
-| C1 | H23 (no sound track), H17 | `no-audio.mp4`, `tiny-16x16.mp4`, `uhd-flat.mp4`, `odd-853x481.webm` on remove-background-noise-from-video, remove-noise, volume-booster, increase-video-volume, ogg-to-mp3; both browsers | refused with the class `AudioDecodeError`, so the stats lump "no sound track" with "sound that will not decode" (the copy is clear) | raise `NoSoundTrack`, as the caption tools do |
 | C3 | H24 | 20000x20000 PNG on instagram-carousel-splitter and image-to-pixel-art; Chromium | the browser's raw text ("Failed to execute 'createImageBitmap' on 'Window': The ImageBitmap could not be allocated") is shown and the failed run is not recorded; WebKit refuses it cleanly | check the pixel count before decoding and refuse with a named `TooLarge` and plain copy; wrap the decode failure |
 
 ## Passing, but on record for the hardening plan
