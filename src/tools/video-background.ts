@@ -212,7 +212,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
       name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}${retryNote(r.retry)}}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
+      note: `${describeEdit(r)}${retryNote(r.retry)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
     });
   }
   return outputs;
