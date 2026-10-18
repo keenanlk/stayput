@@ -60,8 +60,11 @@ function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {
 self.onmessage = async (e: MessageEvent<Request>) => {
   const { id, pixels } = e.data;
   const post = (msg: Reply, transfer: Transferable[] = []) => (self as unknown as Worker).postMessage(msg, transfer);
+  // A failure with no name of its own (onnxruntime throws plain Errors and bare numbers) is recorded as the step it came from.
+  let step = 'BackgroundModelLoadFailed';
   try {
     const s = await load((fraction) => post({ id, type: 'loading', fraction }));
+    step = 'BackgroundModelRunFailed';
     const input = new ort.Tensor('float32', pixels, [1, 3, SIZE, SIZE]);
     const out = await s.run({ [s.inputNames[0]!]: input });
     const data = out[s.outputNames[0]!]!.data as Float32Array;
@@ -77,6 +80,6 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     for (let i = 0; i < data.length; i++) mask[i] = ((data[i]! - lo) / span) * 255;
     post({ id, type: 'mask', mask }, [mask.buffer]);
   } catch (err) {
-    post({ id, type: 'error', ...workerFailure(err) });
+    post({ id, type: 'error', ...workerFailure(err, step) });
   }
 };

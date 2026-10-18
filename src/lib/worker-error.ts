@@ -8,10 +8,19 @@ import { NamedError } from './input-error';
 
 const CLASS_NAME = /^[A-Za-z][A-Za-z0-9]{0,39}$/;
 
-/** What the worker posts for a failure: the error's own name when it looks like a class name, else "WorkerFailed". */
-export function workerFailure(err: unknown): { name: string; message: string } {
+/** An engine that ran out of memory says so in its message, whatever it is called (an emscripten abort, a failed allocation). */
+const MEMORY = /^Aborted\(|out of memory|Cannot enlarge memory|memory access out of bounds|could not allocate|allocation failed/i;
+
+/**
+ * What the worker posts for a failure: the error's own name when it looks like a class name. A failure with no usable
+ * name (a plain Error, or something thrown that is not an error at all, as onnxruntime does) is OutOfMemoryError when
+ * its message says memory ran out, else `fallback` (the step that failed, if the worker passes one), else "WorkerFailed".
+ */
+export function workerFailure(err: unknown, fallback = 'WorkerFailed'): { name: string; message: string } {
   const name = err instanceof Error || (typeof err === 'object' && err !== null && typeof (err as { name?: unknown }).name === 'string') ? (err as { name: string }).name : '';
-  return { name: CLASS_NAME.test(name) && name !== 'Error' ? name : 'WorkerFailed', message: err instanceof Error ? err.message : String(err) };
+  const message = err instanceof Error ? err.message : String(err);
+  if (CLASS_NAME.test(name) && name !== 'Error') return { name, message };
+  return { name: MEMORY.test(message) ? 'OutOfMemoryError' : fallback, message };
 }
 
 /** Rebuild the error on the page with the name it had in the worker. */
