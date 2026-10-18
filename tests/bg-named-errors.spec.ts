@@ -31,6 +31,11 @@ test.describe('workerFailure names what has no name', () => {
   test('no step given keeps the old fallback', () => {
     expect(workerFailure(new Error('x')).name).toBe('WorkerFailed');
   });
+  test('no step given, a memory message stays WorkerFailed, as before the step names', () => {
+    expect(workerFailure(new Error('Aborted(Assertion failed: bad state)')).name).toBe('WorkerFailed');
+    expect(workerFailure(new Error('could not allocate 1048576 bytes')).name).toBe('WorkerFailed');
+    expect(workerFailure('Aborted(OOM)')).toEqual({ name: 'WorkerFailed', message: 'Aborted(OOM)' });
+  });
   test('memory running out is OutOfMemoryError, whatever it is called', () => {
     expect(workerFailure(new Error('Aborted(OOM). Build with -sASSERTIONS'), 'Step').name).toBe('OutOfMemoryError');
     expect(workerFailure('failed to allocate a buffer: out of memory', 'Step').name).toBe('OutOfMemoryError');
@@ -54,6 +59,25 @@ test('remove-background: a model file that cannot start records BackgroundModelL
   const runs = await toolRuns(page);
   expect(runs).toHaveLength(1);
   expect(runs[0]).toMatchObject({ outcome: 'error', error_class: 'BackgroundModelLoadFailed' });
+});
+
+test('remove-background: a failed start that works in the fresh worker is one successful run', async ({ page }) => {
+  test.setTimeout(180_000);
+  await stubAnalytics(page);
+  let served = 0;
+  await page.route('**/models/isnet-general-use-int8w.onnx', (route) =>
+    ++served === 1 ? route.fulfill({ contentType: 'application/octet-stream', body: Buffer.alloc(2048, 7) }) : route.continue(),
+  );
+  await page.goto('/tools/remove-background');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(photo);
+  await page.locator('#run').click();
+  await expect.poll(async () => (await toolRuns(page)).length, { timeout: 150_000 }).toBe(1);
+  expect(served).toBeGreaterThan(1);
+  const runs = await toolRuns(page);
+  expect(runs[0]).toMatchObject({ outcome: 'ok' });
+  expect(runs[0]).not.toHaveProperty('error_class');
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
 });
 
 test.describe('video background remover on Chrome for Android', () => {

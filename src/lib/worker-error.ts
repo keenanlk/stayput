@@ -16,10 +16,11 @@ const MEMORY = /^Aborted\(|out of memory|Cannot enlarge memory|memory access out
  * name (a plain Error, or something thrown that is not an error at all, as onnxruntime does) is OutOfMemoryError when
  * its message says memory ran out, else `fallback` (the step that failed, if the worker passes one), else "WorkerFailed".
  */
-export function workerFailure(err: unknown, fallback = 'WorkerFailed'): { name: string; message: string } {
+export function workerFailure(err: unknown, fallback?: string): { name: string; message: string } {
   const name = err instanceof Error || (typeof err === 'object' && err !== null && typeof (err as { name?: unknown }).name === 'string') ? (err as { name: string }).name : '';
   const message = err instanceof Error ? err.message : String(err);
   if (CLASS_NAME.test(name) && name !== 'Error') return { name, message };
+  if (fallback === undefined) return { name: 'WorkerFailed', message };
   return { name: MEMORY.test(message) ? 'OutOfMemoryError' : fallback, message };
 }
 
