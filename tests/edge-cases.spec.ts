@@ -174,16 +174,12 @@ const TOOLS: ToolSpec[] = [
  * the day the fix lands (remove its entry then). Every entry names the hardening item; see the README's table.
  */
 const NO_SOUND_NAME: Known = { item: 'C1: a video with no sound track is refused as AudioDecodeError; name it NoSoundTrack as the caption tools do (copy is already clear)' };
-const BAD_PICTURE_NAME: Known = { item: 'C2: a picture that does not decode is refused as a bare Error; give it a class (UnreadableFile)' };
 const HUGE_PICTURE: Known = { browser: 'chromium', item: "C3: a 400 MP picture shows the browser's raw 'createImageBitmap ... could not be allocated' text and records no failed run; refuse early as TooLarge/OutOfMemoryError with plain copy" };
-const KNOWN: Record<string, Known> = {
-  '/burn-subtitles-into-video|truncated-half.mp4': { browser: 'webkit', item: 'C4: a half-downloaded MP4 (moov atom missing) leaves Burn subtitles on "Reading the sound from…" for over 100 s in WebKit instead of refusing; add a read timeout / early probe that names it UnreadableFile' },
-};
+const KNOWN: Record<string, Known> = {};
 for (const path of ['/remove-background-noise-from-video', '/tools/remove-noise', '/tools/volume-booster', '/increase-video-volume', '/ogg-to-mp3']) {
   for (const label of ['no-audio.mp4', 'tiny-16x16.mp4', 'uhd-flat.mp4', 'odd-853x481.webm']) KNOWN[`${path}|${label}`] = NO_SOUND_NAME;
 }
 for (const path of ['/instagram-carousel-splitter', '/image-to-pixel-art']) {
-  for (const label of ['corrupt-header.png', 'corrupt-header.jpg', 'text-named.png', 'garbage.jpg']) KNOWN[`${path}|${label}`] = BAD_PICTURE_NAME;
   KNOWN[`${path}|a 400 megapixel picture (20000x20000)`] = HUGE_PICTURE;
 }
 

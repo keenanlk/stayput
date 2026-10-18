@@ -19,7 +19,7 @@ The class a failed run records (`error_class`) with the exact words the person s
 | `UnreadableFile` | `src/lib/speech-errors.ts` (`encodeFailedError`) | `The video could not be redrawn with captions. Your subtitles are ready: download the .srt below, then try a shorter video or another file.` | Burn subtitles, on an audio-only file and on MPEG-TS |
 | `UnsupportedCodec` | `src/lib/video-compress.ts:72` | `This browser cannot decode this video. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux cannot read: try Safari, or set the iPhone camera to "Most Compatible".` | HEVC and HDR clips; also shown for a Motion JPEG clip, where the HEVC wording does not fit |
 | `InputError` | `src/tools/crop-pdf.ts:175` | `Choose what to keep first: press Trim white margins, or drag a box on the page.` | Crop PDF, whenever Run is pressed before an area is chosen (also after a PDF that did not open) |
-| `Error` (bare) | `src/lib/image.ts:46` | `<name>: This file could not be decoded as an image.` | carousel splitter and pixel art, corrupt or wrong-extension pictures (hardening item C2) |
+| `ImageFailed` | `src/lib/image.ts:46` | `<name>: This file could not be decoded as an image.` | carousel splitter and pixel art, corrupt or wrong-extension pictures |
 | *(none recorded)* | browser, raw | `Failed to execute 'createImageBitmap' on 'Window': The ImageBitmap could not be allocated.` | carousel splitter and pixel art, 400 MP picture in Chromium (item C3) |
 
 ## Other classes thrown for these tools
