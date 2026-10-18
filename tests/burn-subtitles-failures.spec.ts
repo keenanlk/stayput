@@ -4,6 +4,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withoutSoftwareEncoder } from './no-software-encoder';
 
 /**
  * Burn subtitles into video: the failures that come from the device or the file's reading, not the tool, and the
@@ -40,6 +41,7 @@ async function start(page: Page, files: string[]) {
 
 /** Once the progress line matches `phase`, the encoder throws `name` (every time, or the first time only), and the page can be hidden for a moment. */
 async function breakEncoder(page: Page, opts: { name: string; times: number; hide?: boolean }) {
+  await withoutSoftwareEncoder(page);
   await page.addInitScript((opts) => {
     const w = window as unknown as { __thrown: number; __modes: string[] };
     w.__thrown = 0;

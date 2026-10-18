@@ -4,6 +4,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withoutSoftwareEncoder } from './no-software-encoder';
 
 /**
  * Add subtitles to video on a phone: the failures that come from the device and not the file get one more try before
@@ -118,6 +119,7 @@ test.describe('the speech step', () => {
 test.describe('the redraw', () => {
   /** Once the page says it is adding subtitles, the encoder throws `name` once (the encoder probe's frames are not counted). */
   async function breakEncoder(page: Page, name: string, hide: boolean) {
+  await withoutSoftwareEncoder(page);
     await page.addInitScript(
       ([name, hide]) => {
         let armed = false;

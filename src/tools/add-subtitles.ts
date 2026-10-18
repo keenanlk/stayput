@@ -178,7 +178,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       onProgress: (f) => progress.set(`Adding subtitles to ${file.name}: ${Math.round(f * 100)}%`, share(start + f * (1 - start))),
       });
     };
-    const r = await retryUnreadable(file, redraw, (message) => progress.set(`${file.name}: ${message}`, share(start))).catch((e) => {
+    const r = await redraw().catch((e) => {
       // A stall part way through: the same plain message and link as the early check.
       if (e instanceof EncoderStall) throw new CaptionsUnavailable();
       // A file the phone could not read is not an encoder or memory failure; its name stays NotReadableError.

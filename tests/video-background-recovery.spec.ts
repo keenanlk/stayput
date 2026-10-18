@@ -2,6 +2,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { smallerSide, withRecovery, type RecoveryHooks } from '../src/lib/edit-recovery';
+import { withoutSoftwareEncoder } from './no-software-encoder';
 
 // A phone run that fails because the page was hidden, or because the video encoder gave up, starts again by itself
 // (once) before the failure is shown. The failures are forced in the page: the encoder throws once, and visibilitychange
@@ -128,7 +129,8 @@ test.describe('recovery rules', () => {
  * In the page: once frames are being processed, the encoder throws `name` once. With `hide`, the page also reports hidden for
  * a moment (the Page Visibility API as a phone's app switch shows it) and the throw happens while it is.
  */
-async function breakEncoder(page: Page, name: string, hide: boolean) {
+async function breakEncoder(page: Page, name: string, hide: boolean, software = false) {
+  if (!software) await withoutSoftwareEncoder(page);
   await page.addInitScript(
     ([name, hide]) => {
       let armed = false;
@@ -182,6 +184,16 @@ test.describe('on the page', () => {
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
     await expect(page.locator('#results-list')).toContainText('made at a smaller size');
     await expect(page.locator('#results-list')).toContainText(/854×\d+|\d+×854/);
+  });
+
+  test('the encoder gives up at full size where a software encoder is offered: the run finishes in software and says so', async ({ page }) => {
+    test.setTimeout(240_000);
+    await breakEncoder(page, 'EncodingError', false, true);
+    await runBlur(page);
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+    const note = (await page.locator('#results-list').textContent()) ?? '';
+    // Only where the browser offers a software H.264 encoder; elsewhere the smaller-size retry is what runs.
+    expect(note).toMatch(/made with the software video encoder|made at a smaller size/);
   });
 
   test.describe('on an Android phone', () => {
