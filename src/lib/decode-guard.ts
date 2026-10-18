@@ -6,6 +6,7 @@
 import { ALL_FORMATS, BlobSource, Input } from 'mediabunny';
 import { audioDecodeError } from './speech-errors';
 import { isNotReadable } from './read-failure';
+import { NamedError } from './input-error';
 
 /** Containers whose index sits in the file's head or tail: if the demuxer finds no sound in one, a decoder will not either. */
 const INDEXED = new Set(['MP4', 'QuickTime File Format', 'WebM', 'Matroska']);
@@ -41,8 +42,7 @@ export function decodeWithin(ctx: BaseAudioContext, bytes: ArrayBuffer): Promise
   const budget = decodeBudgetMs(bytes.byteLength);
   return new Promise<AudioBuffer>((resolve, reject) => {
     const timer = setTimeout(() => {
-      const cause = new Error(`the browser's sound decoder gave no answer in ${Math.round(budget / 1000)} s`);
-      cause.name = 'DecodeTimeout';
+      const cause = new NamedError('DecodeTimeout', `the browser's sound decoder gave no answer in ${Math.round(budget / 1000)} s`);
       reject(audioDecodeError('The browser could not finish reading the sound of this file, which usually means the file is damaged or cut short. Try another copy of it.', cause));
     }, budget);
     ctx.decodeAudioData(bytes).then(resolve, reject).finally(() => clearTimeout(timer));
