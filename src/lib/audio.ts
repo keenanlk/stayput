@@ -8,6 +8,7 @@
 import { vendorDir } from './vendor';
 import { audioDecodeError } from './speech-errors';
 import { decodeWma, isAsf } from './wma-convert';
+import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
 
 /** MP3 is almost always 44.1 kHz; decoding resamples to it. */
 export const SAMPLE_RATE = 44100;
@@ -16,11 +17,12 @@ export const SAMPLE_RATE = 44100;
 export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<AudioBuffer> {
   // Windows Media Audio: no browser decodes it, so a separately loaded decoder module does.
   if (await isAsf(file)) return decodeWma(file, rate);
+  await refuseSoundlessContainer(file);
   const bytes = await file.arrayBuffer();
   const ctx = new OfflineAudioContext(2, 1, rate);
   let buffer: AudioBuffer;
   try {
-    buffer = await ctx.decodeAudioData(bytes.slice(0));
+    buffer = await decodeWithin(ctx, bytes.slice(0));
   } catch (first) {
     buffer = await decodeThroughDemuxer(file, rate, first).catch(async (error) => {
       // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.

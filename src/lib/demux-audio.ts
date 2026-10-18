@@ -9,6 +9,7 @@
 import { ALL_FORMATS, BlobSource, Input, EncodedAudioPacketSource, EncodedPacketSink, BufferTarget, Mp4OutputFormat, Output, type EncodedPacket } from 'mediabunny';
 import { channelsOf } from './audio';
 import { audioDecodeError } from './speech-errors';
+import { decodeWithin } from './decode-guard';
 
 /** Seconds of sound decoded in one go. */
 const STRETCH = 300;
@@ -113,7 +114,7 @@ async function decodeStretch(preRoll: EncodedPacket[], packets: EncodedPacket[],
   const bytes = output.target.buffer;
   if (!bytes) throw audioDecodeError();
   const ctx = new OfflineAudioContext(2, 1, rate);
-  const decoded = await ctx.decodeAudioData(bytes);
+  const decoded = await decodeWithin(ctx, bytes);
   const skip = Math.round((packets[0]!.timestamp - t0) * rate);
   return channelsOf(decoded, mono).map((ch) => ch.subarray(Math.min(skip, ch.length)));
 }
