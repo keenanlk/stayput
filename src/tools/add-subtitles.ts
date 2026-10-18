@@ -10,7 +10,7 @@ import { MODEL_DOWNLOAD_NOTE, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '
 import { InputError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { withRecovery } from '../lib/edit-recovery';
+import { retryNote, withRecovery } from '../lib/edit-recovery';
 import { isNotReadable, notReadable, probeReadable, retryUnreadable } from '../lib/read-failure';
 
 /**
@@ -200,7 +200,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       name: suffixName(file.name, '-subtitled', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? " (made at a smaller size, because the device's video encoder stopped at the full size)" : r.retry === 'again' ? ' (made on a second try, after the device\'s video encoder stopped responding)' : ''}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
+      note: `${describeEdit(r)}${retryNote(r.retry)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
     });
     if (saveSrt) outputs.push(srtOutput(file, segments));
   }
