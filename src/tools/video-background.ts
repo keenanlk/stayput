@@ -1,8 +1,9 @@
-import { bindRange, createShell, num, radio, str } from '../lib/shell';
+import { bindRange, createShell, num, radio, str, type Progress, type ShellFile } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/encoder-probe';
 import { describeEdit } from './video-edit-shell';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
+import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
 import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
@@ -116,76 +117,102 @@ async function checkPhoneClip(files: { file: File }[]) {
   phoneNote.hidden = !(heavy || tall) || hdOn;
 }
 
+/** A page script the browser could not fetch (a dropped connection, a deploy since the page opened) is a TypeError whose message says so. */
+const isChunkFailure = (e: unknown) => e instanceof TypeError && /dynamically imported module|importing a module script|error loading dynamically|failed to fetch/i.test(e.message);
+
+/** The failure of a step with no name of its own, recorded as the step (see bare-error.ts); a script that failed to load says to reload. */
+function stepFailure(step: string, e: unknown): Error {
+  if (isChunkFailure(e)) return Object.assign(new NamedError('ScriptLoadFailed', 'Part of this page could not be loaded. Check your connection, reload the page and try again.'), { cause: e });
+  return nameBare(step, e);
+}
+
 createShell({
   onFilesChanged: checkPhoneClip,
   keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
-    const pictures = files.filter((f) => isImage(f.file));
-    const videos = files.filter((f) => !isImage(f.file));
-    if (videos.length === 0) throw new InputError('Add a video too: the picture is only the new background.');
-    if (pictures.length > 1) throw new InputError('Add one picture for the background, with the videos to put it behind.');
-    let bgKind = kind();
-    if (pictures.length === 1) bgKind = 'image';
-    else if (bgKind === 'image') throw new InputError('Add a picture with the video to use as the new background, or choose Blur or Colour.');
-    const strength = num('strength', 6);
-    const color = str('bg-color', '#00b140');
-    const picture = pictures[0] ? await createImageBitmap(pictures[0].file) : undefined;
+    // Where the run is, so a TypeError (no name of its own) is recorded as the step that threw it.
+    let step = 'BackgroundSetupFailed';
+    try {
+      return await run(files, progress, (name) => (step = name));
+    } catch (e) {
+      throw stepFailure(step, e);
+    }
+  },
+});
 
-    // Find out now, in a second or two, that this browser cannot encode, not after the person finder has downloaded.
-    progress.set('Checking this browser can write the video…', 0);
-    if (!hasVideoEncoder()) throw new EncoderUnavailable();
-    await requireH264Encoder();
-    const { assertReadable, editVideo, videoSize } = await import('../lib/video-edit');
-    // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
-    for (const v of videos) await assertReadable(v.file);
-    const which = finder();
-    progress.set(`Loading the person finder, once (about ${which === 'fast' ? '12' : '28'} MB)…`, 0.01);
-    const { Matte, loadPersonMask } = await import('../lib/person-mask');
-    // The fast model has a wide variant; load the one that fits the first video (a later one loads itself if it differs).
-    const shape = await videoSize(videos[0]!.file).catch(() => undefined);
-    await loadPersonMask(which, shape);
-    const outputs: OutputFile[] = [];
-    for (const [index, entry] of videos.entries()) {
-      const file = entry.file;
-      const share = (f: number) => (index + f) / videos.length;
-      const sizeFor = async (f: File) => outputSize((await videoSize(f).catch(() => undefined)) ?? { width: 0, height: 0 });
-      const matte = new Matte(which);
-      const blurred = document.createElement('canvas');
-      // The first figures of a slow start run long (2 to 3 times too long on a phone), so wait for 8% and 10 s of real work.
-      const timeLeft = new TimeLeft(undefined, { minFraction: 0.08, minSeconds: 10 });
-      const r = await editVideo(file, {
-        // After the page was hidden, or an encoder that stopped, the run starts again by itself: say so.
-        onNotice: (message) => progress.set(`${file.name}: ${message}`, share(0.03)),
-        // The frame is only drawn on and copied from; the person finder reads its own small canvas.
-        readsBack: false,
-        // Not bigger than it went in: the default quality writes about 70% more bits than a phone does.
-        matchSourceBitrate: true,
-        ...(await sizeFor(file)),
-        async paint(ctx) {
-          await matte.apply(ctx, (c, _frame, seen) => {
+async function run(files: ShellFile[], progress: Progress, at: (step: string) => void): Promise<OutputFile[]> {
+  const pictures = files.filter((f) => isImage(f.file));
+  const videos = files.filter((f) => !isImage(f.file));
+  if (videos.length === 0) throw new InputError('Add a video too: the picture is only the new background.');
+  if (pictures.length > 1) throw new InputError('Add one picture for the background, with the videos to put it behind.');
+  let bgKind = kind();
+  if (pictures.length === 1) bgKind = 'image';
+  else if (bgKind === 'image') throw new InputError('Add a picture with the video to use as the new background, or choose Blur or Colour.');
+  const strength = num('strength', 6);
+  const color = str('bg-color', '#00b140');
+  const picture = pictures[0] ? await createImageBitmap(pictures[0].file) : undefined;
+
+  // Find out now, in a second or two, that this browser cannot encode, not after the person finder has downloaded.
+  progress.set('Checking this browser can write the video…', 0);
+  if (!hasVideoEncoder()) throw new EncoderUnavailable();
+  await requireH264Encoder();
+  const { assertReadable, editVideo, videoSize } = await import('../lib/video-edit');
+  // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
+  for (const v of videos) await assertReadable(v.file);
+  const which = finder();
+  progress.set(`Loading the person finder, once (about ${which === 'fast' ? '12' : '28'} MB)…`, 0.01);
+  at('PersonFinderLoadFailed');
+  const { Matte, loadPersonMask } = await import('../lib/person-mask');
+  // The fast model has a wide variant; load the one that fits the first video (a later one loads itself if it differs).
+  const shape = await videoSize(videos[0]!.file).catch(() => undefined);
+  await loadPersonMask(which, shape);
+  at('VideoEditFailed');
+  const outputs: OutputFile[] = [];
+  for (const [index, entry] of videos.entries()) {
+    const file = entry.file;
+    const share = (f: number) => (index + f) / videos.length;
+    const sizeFor = async (f: File) => outputSize((await videoSize(f).catch(() => undefined)) ?? { width: 0, height: 0 });
+    const matte = new Matte(which);
+    const blurred = document.createElement('canvas');
+    // The first figures of a slow start run long (2 to 3 times too long on a phone), so wait for 8% and 10 s of real work.
+    const timeLeft = new TimeLeft(undefined, { minFraction: 0.08, minSeconds: 10 });
+    const r = await editVideo(file, {
+      // After the page was hidden, or an encoder that stopped, the run starts again by itself: say so.
+      onNotice: (message) => progress.set(`${file.name}: ${message}`, share(0.03)),
+      // The frame is only drawn on and copied from; the person finder reads its own small canvas.
+      readsBack: false,
+      // Not bigger than it went in: the default quality writes about 70% more bits than a phone does.
+      matchSourceBitrate: true,
+      ...(await sizeFor(file)),
+      async paint(ctx) {
+        // A frame the finder or the background drawing fails on (a null canvas, a missing browser feature) says so by name.
+        await matte
+          .apply(ctx, (c, _frame, seen) => {
             if (bgKind === 'color') {
               c.fillStyle = color;
               c.fillRect(0, 0, c.canvas.width, c.canvas.height);
             } else if (bgKind === 'image') cover(c, picture!);
             else drawBlurred(c, seen, blurred, strength);
+          })
+          .catch((e) => {
+            throw nameBare('PersonFrameFailed', e);
           });
-        },
-        onProgress: (f) => {
-          // It is slower than the video plays, so say how long is left: a long run with only a percentage reads as stuck.
-          const left = timeLeft.update(f) ?? 'Estimating time left…';
-          progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}% · ${left}. Keep this tab open.`, share(0.03 + f * 0.97));
-        },
-      });
-      const found = matte.frames ? matte.framesWithPerson / matte.frames : 0;
-      const what = bgKind === 'blur' ? 'background blurred' : bgKind === 'color' ? `background ${color}` : `background from ${pictures[0]!.file.name}`;
-      outputs.push({
-        name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
-        blob: r.blob,
-        originalSize: file.size,
-        note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? ' (made at a smaller size, because the device\'s video encoder stopped at the full size)' : r.retry === 'again' ? ' (made on a second try, after the device\'s video encoder stopped responding)' : ''}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
-      });
-    }
-    return outputs;
-  },
-});
+      },
+      onProgress: (f) => {
+        // It is slower than the video plays, so say how long is left: a long run with only a percentage reads as stuck.
+        const left = timeLeft.update(f) ?? 'Estimating time left…';
+        progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}% · ${left}. Keep this tab open.`, share(0.03 + f * 0.97));
+      },
+    });
+    const found = matte.frames ? matte.framesWithPerson / matte.frames : 0;
+    const what = bgKind === 'blur' ? 'background blurred' : bgKind === 'color' ? `background ${color}` : `background from ${pictures[0]!.file.name}`;
+    outputs.push({
+      name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
+      blob: r.blob,
+      originalSize: file.size,
+      note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? ' (made at a smaller size, because the device\'s video encoder stopped at the full size)' : r.retry === 'again' ? ' (made on a second try, after the device\'s video encoder stopped responding)' : ''}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
+    });
+  }
+  return outputs;
+}

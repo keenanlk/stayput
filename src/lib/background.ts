@@ -45,7 +45,22 @@ function toTensor(bitmap: ImageBitmap): Float32Array {
  * cleaned up by `refineMask`; `keep` (-1 to 1) keeps less or more of what the
  * model is unsure about.
  */
-export function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) => void, keep = 0): Promise<Uint8ClampedArray> {
+export async function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) => void, keep = 0): Promise<Uint8ClampedArray> {
+  try {
+    return await findSubjectOnce(bitmap, onLoading, keep);
+  } catch (e) {
+    // A model that failed to start or run (a phone short of memory, say) leaves its session broken: a fresh worker gets one more try.
+    if (!(e instanceof Error) || !RETRY.has(e.name)) throw e;
+    worker?.terminate();
+    worker = undefined;
+    return findSubjectOnce(bitmap, onLoading, keep);
+  }
+}
+
+/** Failures worth one more try in a new worker; a model that could not be downloaded or a photo with no subject are not. */
+const RETRY = new Set(['BackgroundModelLoadFailed', 'BackgroundModelRunFailed', 'OutOfMemoryError']);
+
+function findSubjectOnce(bitmap: ImageBitmap, onLoading: ((fraction: number) => void) | undefined, keep: number): Promise<Uint8ClampedArray> {
   const id = nextId++;
   const pixels = toTensor(bitmap);
   const w = getWorker();
