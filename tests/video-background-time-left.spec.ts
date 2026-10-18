@@ -3,8 +3,9 @@ import { test, expect } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 
 // (a bare percentage reads as stuck). The figure waits for 8% and 10 s of work; tests/time-left.spec.ts has the exact rules.
-// (a bare percentage reads as stuck). 45 frames of 720x1280 take several seconds, enough to pass the short warm-up.
-const clip = fileURLToPath(new URL('./fixtures/static/iphone-portrait-person.mov', import.meta.url));
+// (a bare percentage reads as stuck). 90 frames of 720x1280 (the 45-frame person clip played twice) take about twenty seconds,
+// well past the 10 s quiet period, so the figure always has a stretch of the run to appear in before 100%.
+const clip = fileURLToPath(new URL('./fixtures/static/iphone-portrait-person-3s.mov', import.meta.url));
 
 for (const path of ['/blur-video-background', '/green-screen-video', '/tools/video-background-remover']) {
   test(`${path} shows the time left while it runs`, async ({ page }) => {
