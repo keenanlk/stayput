@@ -73,9 +73,29 @@ const nameOf = (e: unknown) => (typeof e === 'object' && e ? ((e as { name?: str
  * Runs `job`, and on a recoverable failure runs it again (each kind of retry once at most).
  * `longestSide` says the longest side of the output the failed try made.
  */
+/** How many times a job waits out a hidden page and starts again: a phone switched away from twice in one run is common. */
+const MAX_RESUMES = 2;
+
+/**
+ * Runs one step of a job (a model download, say) and, when the page was hidden or the browser took a codec back
+ * while it ran, waits for the page to come back and runs it again. Other failures are thrown as they came.
+ */
+export async function resumeWhenHidden<T>(step: () => Promise<T>, hooks: RecoveryHooks): Promise<T> {
+  for (let resumed = 0; ; resumed++) {
+    try {
+      return await step();
+    } catch (e) {
+      if (FINAL.has(nameOf(e)) || resumed >= MAX_RESUMES || !(hooks.wasHidden() || hooks.reclaimed(e))) throw e;
+      await hooks.whenVisible();
+      hooks.forgetHidden();
+      hooks.onNotice?.('The page was hidden, so this step stopped. Starting it again: keep this tab open and the screen on.');
+    }
+  }
+}
+
 export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSide: () => number, hooks: RecoveryHooks): Promise<T> {
   let attempt: Attempt = {};
-  let resumed = false;
+  let resumes = 0;
   let shrunk = false;
   let softened = false;
   for (;;) {
@@ -84,8 +104,8 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
     } catch (e) {
       const name = nameOf(e);
       if (FINAL.has(name)) throw e;
-      if (!resumed && (hooks.wasHidden() || hooks.reclaimed(e))) {
-        resumed = true;
+      if (resumes < MAX_RESUMES && (hooks.wasHidden() || hooks.reclaimed(e))) {
+        resumes++;
         await hooks.whenVisible();
         hooks.forgetHidden();
         hooks.onNotice?.('The page was hidden, so the run stopped. Starting again: keep this tab open and the screen on.');
