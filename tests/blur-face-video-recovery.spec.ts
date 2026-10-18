@@ -2,6 +2,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { nameBare } from '../src/lib/bare-error';
+import { withoutSoftwareEncoder } from './no-software-encoder';
 
 // Blur faces in video on a phone: a failure that comes from the device and not the file gets one more try before it is
 // shown, and every failure that is shown records a named error class. The failures are forced in the page: the encoder
@@ -51,6 +52,7 @@ async function lastRun(page: Page) {
 
 /** The encoder throws `name` once, the first time it is asked for a frame after faces are being hidden; with `hide`, the page is hidden for a moment. */
 async function breakEncoder(page: Page, name: string, hide: boolean) {
+  await withoutSoftwareEncoder(page);
   await page.addInitScript(
     ([name, hide, pattern]) => {
       let armed = false;

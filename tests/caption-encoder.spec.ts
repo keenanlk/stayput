@@ -4,6 +4,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withoutSoftwareEncoder } from './no-software-encoder';
 
 // Burned-in captions need the browser's H.264 encoder to answer. Safari/WebKit's can go silent with
 // the settings Mediabunny picks first; the page must then use settings that work, or say so at once
@@ -200,6 +201,7 @@ test.describe('on a phone, with a video over the phone limit', () => {
   test('an EncodingError while redrawing says the phone ran out of memory, offers the SRT, and frees the worker', async ({ page }, info) => {
     test.skip(info.project.name !== 'chromium', 'Chromium decodes this clip’s sound; the worker is a stand-in');
     test.setTimeout(120_000);
+    await withoutSoftwareEncoder(page);
     await stub(page, 'ok', 'unknown-encoding-error');
     await open(page);
     await page.locator('#file-input').setInputFiles(talk);

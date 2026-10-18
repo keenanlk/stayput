@@ -27,14 +27,15 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
-import { EncoderUnavailable, hasVideoEncoder, useRealtimeH264 } from './encoder-probe';
+import { EncoderUnavailable, hasVideoEncoder, softwareH264Offered, useRealtimeH264 } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile, UnsupportedCodec, NamedError } from './input-error';
-import { isNotReadable, notReadable } from './read-failure';
+import { isNotReadable, notReadable, retryUnreadable } from './read-failure';
+import { nameBare } from './bare-error';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
-import { withRecovery, type Attempt } from './edit-recovery';
+import { withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface EditOptions {
   mute?: boolean;
@@ -86,7 +87,7 @@ export interface EditResult {
   /** For a painted edit: frames done, and milliseconds in `paint` and in all of the frame loop (page-local, never sent). */
   timing?: { frames: number; paintMs: number; loopMs: number };
   /** Set when the first try failed and this is the second: after the page was hidden, or at a smaller size. */
-  retry?: 'resumed' | 'smaller' | 'again';
+  retry?: RetryKind;
 }
 
 /**
@@ -184,14 +185,22 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
   const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
   try {
-    return await withRecovery(
-      async (attempt) => {
-        const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
-        return attempt.retry ? { ...r, retry: attempt.retry } : r;
-      },
-      () => made,
-      page.hooks,
+    // A file the phone could not read is read once more; a failure that arrives with no name of its own is named for this step.
+    return await retryUnreadable(
+      file,
+      () =>
+        withRecovery(
+          async (attempt) => {
+            const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
+            return attempt.retry ? { ...r, retry: attempt.retry } : r;
+          },
+          () => made,
+          { ...page.hooks, softwareEncode: softwareH264Offered },
+        ),
+      opts.onNotice,
     );
+  } catch (e) {
+    throw nameBare('VideoEditFailed', e);
   } finally {
     page.dispose();
   }
@@ -288,7 +297,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       if (wanted) bitrate = new Quality({ bitrate: wanted });
     }
     // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again') useRealtimeH264();
+    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software') useRealtimeH264();
     const videoCodec = await pickVideoCodec({ width, height, bitrate });
     if (!videoCodec) {
       throw hasVideoEncoder() ? new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.') : new EncoderUnavailable();
@@ -327,6 +336,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
         video: {
           codec: videoCodec,
           bitrate,
+          ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}),
           rotate: rotate as Rotation,
           flip,
           crop,

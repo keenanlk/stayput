@@ -8,7 +8,9 @@
  *    run once more from the start;
  *  - the phone's video encoder gave up (EncodingError and its kin) or the
  *    tab ran out of memory: run once more with a smaller picture.
- * Anything else, and a second failure, is thrown as it came, with its own name.
+ *  - where the device can write video in software, the first encoder failure is retried that way at the same size
+ *    (the hardware encoder is what gives up on most phones), before the picture is made smaller.
+ * Anything else, and a failure after that, is thrown as it came, with its own name.
  */
 
 /** Errors that say what the file is, or what the person gave: a retry cannot change them. */
@@ -34,6 +36,8 @@ export interface RecoveryHooks {
   whenVisible(): Promise<void>;
   /** A codec the browser took back, as far as the error tells. */
   reclaimed(e: unknown): boolean;
+  /** Whether a software encode is on offer here; when absent or false the first encoder failure goes straight to a smaller picture. */
+  softwareEncode?(): boolean | Promise<boolean>;
   /** Said to the person just before a second try. */
   onNotice?(message: string): void;
 }
@@ -42,7 +46,25 @@ export interface Attempt {
   /** Longest side of the output this try must stay within, when a retry asked for a smaller one. */
   maxSide?: number;
   /** Which kind of retry this is, if it is one. */
-  retry?: 'resumed' | 'smaller' | 'again';
+  retry?: 'resumed' | 'smaller' | 'again' | 'software';
+}
+
+export type RetryKind = NonNullable<Attempt['retry']>;
+
+/** The words a finished file's note adds when it was made on a retry (empty for a first-try run). */
+export function retryNote(retry: RetryKind | undefined): string {
+  switch (retry) {
+    case 'resumed':
+      return ' (started again after the page was hidden)';
+    case 'smaller':
+      return " (made at a smaller size, because the device's video encoder stopped at the full size)";
+    case 'again':
+      return " (made on a second try, after the device's video encoder stopped responding)";
+    case 'software':
+      return " (made with the software video encoder, because the device's hardware encoder stopped)";
+    default:
+      return '';
+  }
 }
 
 const nameOf = (e: unknown) => (typeof e === 'object' && e ? ((e as { name?: string }).name ?? '') : '');
@@ -55,6 +77,7 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
   let attempt: Attempt = {};
   let resumed = false;
   let shrunk = false;
+  let softened = false;
   for (;;) {
     try {
       return await job(attempt);
@@ -67,6 +90,12 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
         hooks.forgetHidden();
         hooks.onNotice?.('The page was hidden, so the run stopped. Starting again: keep this tab open and the screen on.');
         attempt = { ...attempt, retry: 'resumed' };
+        continue;
+      }
+      if ((SHRINKABLE.has(name) || name === 'EncoderStall') && !softened && !shrunk && hooks.softwareEncode && (await hooks.softwareEncode())) {
+        softened = true;
+        hooks.onNotice?.("This device's video encoder stopped. Trying again with the software encoder.");
+        attempt = { retry: 'software' };
         continue;
       }
       const next = SHRINKABLE.has(name) && !shrunk ? smallerSide(longestSide()) : undefined;

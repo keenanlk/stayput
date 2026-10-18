@@ -2,6 +2,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { smallerSide, withRecovery, type RecoveryHooks } from '../src/lib/edit-recovery';
+import { withoutSoftwareEncoder } from './no-software-encoder';
 
 // A phone run that fails because the page was hidden, or because the video encoder gave up, starts again by itself
 // (once) before the failure is shown. The failures are forced in the page: the encoder throws once, and visibilitychange
@@ -128,7 +129,8 @@ test.describe('recovery rules', () => {
  * In the page: once frames are being processed, the encoder throws `name` once. With `hide`, the page also reports hidden for
  * a moment (the Page Visibility API as a phone's app switch shows it) and the throw happens while it is.
  */
-async function breakEncoder(page: Page, name: string, hide: boolean) {
+async function breakEncoder(page: Page, name: string, hide: boolean, software = false) {
+  if (!software) await withoutSoftwareEncoder(page);
   await page.addInitScript(
     ([name, hide]) => {
       let armed = false;
@@ -184,6 +186,16 @@ test.describe('on the page', () => {
     await expect(page.locator('#results-list')).toContainText(/854×\d+|\d+×854/);
   });
 
+  test('the encoder gives up at full size where a software encoder is offered: the run finishes in software and says so', async ({ page }) => {
+    test.setTimeout(240_000);
+    await breakEncoder(page, 'EncodingError', false, true);
+    await runBlur(page);
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+    const note = (await page.locator('#results-list').textContent()) ?? '';
+    // Only where the browser offers a software H.264 encoder; elsewhere the smaller-size retry is what runs.
+    expect(note).toMatch(/made with the software video encoder|made at a smaller size/);
+  });
+
   test.describe('on an Android phone', () => {
     test.use({ userAgent: ANDROID, hasTouch: true });
 
@@ -201,5 +213,83 @@ test.describe('on the page', () => {
         expect(models).toEqual([]);
       }
     });
+  });
+});
+
+test.describe('software encode fallback', () => {
+  test('the first encoder failure runs again in software at the same size, before any smaller picture', async () => {
+    const seen: (string | undefined)[] = [];
+    const sides: (number | undefined)[] = [];
+    const out = await withRecovery(
+      async (a) => {
+        seen.push(a.retry);
+        sides.push(a.maxSide);
+        if (!a.retry) throw named('EncodingError');
+        return a.retry;
+      },
+      () => 3840,
+      hooks({ softwareEncode: () => true }),
+    );
+    expect(out).toBe('software');
+    expect(seen).toEqual([undefined, 'software']);
+    expect(sides).toEqual([undefined, undefined]);
+  });
+
+  test('a failing software try goes on to the smaller picture, and a third failure is thrown with its name', async () => {
+    const seen: (string | undefined)[] = [];
+    await expect(
+      withRecovery(
+        async (a) => {
+          seen.push(a.retry);
+          throw named(a.retry === 'smaller' ? 'EncoderStall' : 'EncodingError');
+        },
+        () => 3840,
+        hooks({ softwareEncode: () => true }),
+      ),
+    ).rejects.toMatchObject({ name: 'EncoderStall' });
+    expect(seen).toEqual([undefined, 'software', 'smaller']);
+  });
+
+  test('a stalled encoder also gets the software try first', async () => {
+    const seen: (string | undefined)[] = [];
+    await withRecovery(
+      async (a) => {
+        seen.push(a.retry);
+        if (!a.retry) throw named('EncoderStall');
+        return 1;
+      },
+      () => 640,
+      hooks({ softwareEncode: async () => true }),
+    );
+    expect(seen).toEqual([undefined, 'software']);
+  });
+
+  test('without a software encoder on offer the ladder is unchanged', async () => {
+    const seen: (string | undefined)[] = [];
+    await withRecovery(
+      async (a) => {
+        seen.push(a.retry);
+        if (!a.retry) throw named('EncodingError');
+        return 1;
+      },
+      () => 3840,
+      hooks({ softwareEncode: () => false }),
+    );
+    expect(seen).toEqual([undefined, 'smaller']);
+  });
+
+  test('what is wrong with the file is never retried in software', async () => {
+    let calls = 0;
+    await expect(
+      withRecovery(
+        async () => {
+          calls++;
+          throw named('UnreadableFile');
+        },
+        () => 3840,
+        hooks({ softwareEncode: () => true }),
+      ),
+    ).rejects.toMatchObject({ name: 'UnreadableFile' });
+    expect(calls).toBe(1);
   });
 });

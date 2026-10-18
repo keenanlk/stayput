@@ -2,6 +2,7 @@ import { bindRange, createShell, num, radio, str, type Progress, type ShellFile 
 import { suffixName, type OutputFile } from '../lib/files';
 import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/encoder-probe';
 import { describeEdit } from './video-edit-shell';
+import { retryNote } from '../lib/edit-recovery';
 import { InputError, NamedError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
@@ -211,7 +212,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
       name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}${r.retry === 'resumed' ? ' (started again after the page was hidden)' : r.retry === 'smaller' ? ' (made at a smaller size, because the device\'s video encoder stopped at the full size)' : r.retry === 'again' ? ' (made on a second try, after the device\'s video encoder stopped responding)' : ''}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
+      note: `${describeEdit(r)}${retryNote(r.retry)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
     });
   }
   return outputs;

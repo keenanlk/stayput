@@ -218,5 +218,16 @@ export class EncoderRefused extends Error {
   }
 }
 
+/** Whether this browser says it can write H.264 in software, which a run retries with when the hardware encoder gave up. */
+export async function softwareH264Offered(): Promise<boolean> {
+  if (typeof VideoEncoder === 'undefined') return false;
+  try {
+    const { supported, config } = await VideoEncoder.isConfigSupported({ codec: DEFAULT_CODEC, width: 640, height: 360, bitrate: 2_000_000, framerate: 30, hardwareAcceleration: 'prefer-software' });
+    return !!supported && config?.hardwareAcceleration !== 'prefer-hardware';
+  } catch {
+    return false;
+  }
+}
+
 /** Whether this browser has a video encoder to ask. False means no tool that re-encodes can work here. */
 export const hasVideoEncoder = () => typeof VideoEncoder !== 'undefined';
