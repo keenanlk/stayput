@@ -254,11 +254,17 @@ export class Matte {
         drop();
         throw new MemoryError();
       }
-      if (!segmenter?.gpu) throw e;
-      // The graphics chip failed part way (a lost context, say): rebuild on the CPU and finish from this frame.
-      console.warn('The graphics chip stopped the person finder, using the CPU', e instanceof GpuLost ? 'context lost' : e);
-      gpuFailed = true;
-      this.switched = true;
+      // An engine the browser invalidated under us (InvalidStateError: a closed or reclaimed object) cannot be used again, on the CPU either: a fresh one gets this frame.
+      const invalidated = e instanceof Error && e.name === 'InvalidStateError';
+      if (!segmenter?.gpu && !invalidated) throw e;
+      if (segmenter?.gpu) {
+        // The graphics chip failed part way (a lost context, say): rebuild on the CPU and finish from this frame.
+        console.warn('The graphics chip stopped the person finder, using the CPU', e instanceof GpuLost ? 'context lost' : e);
+        gpuFailed = true;
+        this.switched = true;
+      } else {
+        console.warn('The person finder was invalidated, starting a new one', e);
+      }
       drop();
       seg = await load(model);
       clock += 33;
