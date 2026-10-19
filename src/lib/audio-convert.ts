@@ -9,6 +9,7 @@ import { ALL_FORMATS, AudioSampleSource, BlobSource, BufferTarget, Input, Mp4Out
 import { SAMPLE_RATE as MP3_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, type Bitrate } from './audio';
 import { encodeFlac } from './flac';
 import { NamedError } from './input-error';
+import { nameBare } from './bare-error';
 export { patchBrand } from './m4r';
 import { SAMPLE_RATE as OPUS_RATE, pcmFeeder } from './pcm';
 
@@ -69,27 +70,35 @@ export async function convertAudio(
   opts: { bitrate: number; mono: boolean; onProgress?: (f: number) => void; transform?: (chans: Float32Array[], rate: number) => Float32Array[] | Promise<Float32Array[]>; bitrateOf?: () => number },
 ): Promise<ConvertResult> {
   const { bitrate, mono, onProgress, transform } = opts;
-  const rate = format === 'mp3' ? MP3_RATE : format === 'wav' || format === 'flac' ? (await sourceRate(file)) ?? MP3_RATE : OPUS_RATE;
-  const buffer = await decodeAudio(file, rate);
-  const decoded = channelsOf(buffer, mono);
-  const chans = transform ? await transform(decoded, rate) : decoded;
-  // A transform may settle the bitrate once it has seen the sound.
-  const kbps = opts.bitrateOf?.() ?? bitrate;
-  const base = { duration: buffer.duration, sampleRate: rate, channels: chans.length };
-  if (format === 'mp3') return { ...base, blob: await encodeMp3(chans, kbps as Bitrate, onProgress) };
-  if (format === 'wav') return { ...base, blob: encodeWav(chans, rate) };
-  if (format === 'flac') return { ...base, blob: await encodeFlac(chans, rate, onProgress) };
+  // A step that fails with no name of its own (a plain Error from the decoder or encoder) is recorded as the step (see bare-error.ts).
+  let stage = 'AudioDecodeFailed';
+  try {
+    const rate = format === 'mp3' ? MP3_RATE : format === 'wav' || format === 'flac' ? (await sourceRate(file)) ?? MP3_RATE : OPUS_RATE;
+    const buffer = await decodeAudio(file, rate);
+    const decoded = channelsOf(buffer, mono);
+    stage = 'AudioTransformFailed';
+    const chans = transform ? await transform(decoded, rate) : decoded;
+    stage = 'AudioEncodeFailed';
+    // A transform may settle the bitrate once it has seen the sound.
+    const kbps = opts.bitrateOf?.() ?? bitrate;
+    const base = { duration: buffer.duration, sampleRate: rate, channels: chans.length };
+    if (format === 'mp3') return { ...base, blob: await encodeMp3(chans, kbps as Bitrate, onProgress) };
+    if (format === 'wav') return { ...base, blob: encodeWav(chans, rate) };
+    if (format === 'flac') return { ...base, blob: await encodeFlac(chans, rate, onProgress) };
 
-  if (!(await canWrite(format, chans.length))) {
-    throw new NamedError(
-      'AudioEncodeUnsupported',
-      format === 'm4a'
-        ? 'This browser has no AAC encoder, so it cannot write M4A. Safari, and Chrome or Edge on Windows and Mac, can. Or choose MP3, which plays in the same places.'
-        : 'This browser has no Opus encoder, so it cannot write OGG. Chrome, Edge and Firefox can.',
-    );
+    if (!(await canWrite(format, chans.length))) {
+      throw new NamedError(
+        'AudioEncodeUnsupported',
+        format === 'm4a'
+          ? 'This browser has no AAC encoder, so it cannot write M4A. Safari, and Chrome or Edge on Windows and Mac, can. Or choose MP3, which plays in the same places.'
+          : 'This browser has no Opus encoder, so it cannot write OGG. Chrome, Edge and Firefox can.',
+      );
+    }
+    const blob = await writeMp4(format === 'm4a' ? 'aac' : 'opus', chans, OPUS_RATE, kbps, onProgress);
+    return { ...base, blob };
+  } catch (e) {
+    throw nameBare(stage, e);
   }
-  const blob = await writeMp4(format === 'm4a' ? 'aac' : 'opus', chans, OPUS_RATE, kbps, onProgress);
-  return { ...base, blob };
 }
 
 const AAC_ERROR = 'This browser has no AAC encoder, so it cannot save M4R files. Safari, and Chrome or Edge on Windows and Mac, can. Save an MP3 instead: an iPhone can use it as a ringtone through the Files app or GarageBand, and an Android phone can use it directly.';

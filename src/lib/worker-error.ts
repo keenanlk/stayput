@@ -19,7 +19,9 @@ const MEMORY = /^Aborted\(|out of memory|Cannot enlarge memory|memory access out
 export function workerFailure(err: unknown, fallback?: string): { name: string; message: string } {
   const name = err instanceof Error || (typeof err === 'object' && err !== null && typeof (err as { name?: unknown }).name === 'string') ? (err as { name: string }).name : '';
   const message = err instanceof Error ? err.message : String(err);
-  if (CLASS_NAME.test(name) && name !== 'Error') return { name, message };
+  // With a step to fall back on, the generic names (a TypeError from a failed fetch, say) say less than the step does.
+  const generic = fallback !== undefined && /^TypeError$/.test(name) && !MEMORY.test(message);
+  if (CLASS_NAME.test(name) && name !== 'Error' && !generic) return { name, message };
   if (fallback === undefined) return { name: 'WorkerFailed', message };
   return { name: MEMORY.test(message) ? 'OutOfMemoryError' : fallback, message };
 }

@@ -1,4 +1,4 @@
-import { NamedError } from './input-error';
+import { NamedError, UnreadableFile } from './input-error';
 /**
  * A file the browser could not read from disk (NotReadableError): on Android this is a big video, one the
  * phone moved or is still preparing, or a cloud file it let go of. It is the file or the phone, not the tool,
@@ -79,4 +79,35 @@ export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIM
     }
   }
   return new File(parts, file.name, { type: file.type, lastModified: file.lastModified });
+}
+
+/** Whether `e`, or the error it wraps, is the browser saying the file is no longer there (NotFoundError): moved, deleted or its permission taken back. */
+export function isFileGone(e: unknown): boolean {
+  for (let depth = 0; depth < 4 && typeof e === 'object' && e; depth++) {
+    if ((e as { name?: string }).name === 'NotFoundError') return true;
+    e = (e as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+/**
+ * Runs `job` on a picked file; if the browser says the file is gone (or could not be read), waits a moment and reads it once
+ * more. A file that is still gone ends as UnreadableFile with a message that says to pick it again; any other failure comes
+ * back as it was.
+ */
+export async function rereadOnce<T>(job: () => Promise<T>, pause = 500): Promise<T> {
+  try {
+    return await job();
+  } catch (e) {
+    if (!isFileGone(e) && !isNotReadable(e)) throw e;
+    await new Promise((r) => setTimeout(r, pause));
+    try {
+      return await job();
+    } catch (again) {
+      if (!isFileGone(again) && !isNotReadable(again)) throw again;
+      const out = new UnreadableFile('This file could not be read. It may have been moved, deleted or still be syncing from a cloud app. Pick it again, or save it to the phone first.');
+      out.cause = again;
+      throw out;
+    }
+  }
 }
