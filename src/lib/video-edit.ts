@@ -200,6 +200,15 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       opts.onNotice,
     );
   } catch (e) {
+    // A codec or canvas the browser invalidated under the run (InvalidStateError), still failing after the retries above, is a
+    // reclaimed codec as far as anyone can tell: say what to do, and record that name instead of the browser's.
+    if (e instanceof Error && e.name === 'InvalidStateError') {
+      throw new NamedError(
+        'CodecReclaimedError',
+        'Your device took back the video encoder part-way through, and starting again did not help. Keep this tab open with the screen on and try once more; a shorter or smaller video is less likely to hit it.',
+        { cause: e },
+      );
+    }
     throw nameBare('VideoEditFailed', e);
   } finally {
     page.dispose();
