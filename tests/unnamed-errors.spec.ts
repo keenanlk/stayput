@@ -59,6 +59,8 @@ test('wav-to-m4a: an encoder that throws a plain Error records AudioEncodeFailed
   test.setTimeout(120_000);
   const go = await open(page, '/wav-to-m4a', [fx('jfk.wav')]);
   await page.addInitScript(() => {
+    // Linux CI Chromium has no AAC encoder: say there is one, so the run reaches the encode step.
+    AudioEncoder.isConfigSupported = async (config: AudioEncoderConfig) => ({ supported: true, config });
     AudioEncoder.prototype.configure = function () {
       throw new Error('encoder failed');
     };
