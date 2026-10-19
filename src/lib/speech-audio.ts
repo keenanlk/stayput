@@ -40,7 +40,9 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
     if (track) {
       const seconds = await input.computeDuration().catch(() => NaN);
       const budget = speechSecondsBudget((navigator as { deviceMemory?: number }).deviceMemory, isPhoneBrowser());
-      if (Number.isFinite(seconds) && seconds > budget) throw recordingTooLongError(seconds, budget);
+      // A container can claim any duration (a recording with an absurd one is still read), so a claim the file's size cannot back is no reason to refuse.
+      const believable = Number.isFinite(seconds) && seconds > 0 && file.size / seconds >= 500;
+      if (believable && seconds > budget) throw recordingTooLongError(seconds, budget);
     }
     let failed = false;
     if (hasVideo) {
