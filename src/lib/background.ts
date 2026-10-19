@@ -10,6 +10,7 @@ import { makeCanvas } from './image';
 import { blur as boxBlur } from './blur';
 import { refineMask } from './mask';
 import { NamedError } from './input-error';
+import { nameBare } from './bare-error';
 import { fromWorkerFailure } from './worker-error';
 
 const SIZE = 1024;
@@ -62,7 +63,12 @@ const RETRY = new Set(['BackgroundModelLoadFailed', 'BackgroundModelRunFailed', 
 
 function findSubjectOnce(bitmap: ImageBitmap, onLoading: ((fraction: number) => void) | undefined, keep: number): Promise<Uint8ClampedArray> {
   const id = nextId++;
-  const pixels = toTensor(bitmap);
+  let pixels: Float32Array;
+  try {
+    pixels = toTensor(bitmap);
+  } catch (e) {
+    throw nameBare('BackgroundPrepareFailed', e);
+  }
   const w = getWorker();
   return new Promise((resolve, reject) => {
     const onMessage = (e: MessageEvent) => {

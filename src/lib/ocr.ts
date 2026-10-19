@@ -7,6 +7,7 @@
  */
 import type { Page, Worker } from 'tesseract.js';
 import { vendorDir } from './vendor';
+import { nameBare } from './bare-error';
 
 let worker: Promise<Worker> | undefined;
 
@@ -65,10 +66,17 @@ export async function readText(
   onProgress?: (stage: 'loading' | 'reading', f: number) => void,
 ): Promise<OcrResult> {
   onProgress?.('loading', 0);
-  const w = await load((f) => onProgress?.('loading', f));
+  // A failure with no name of its own (the engine or its model could not be fetched is a plain TypeError) is recorded as the step.
+  const w = await load((f) => onProgress?.('loading', f)).catch((e) => {
+    throw nameBare('TextReaderLoadFailed', e);
+  });
   onProgress?.('reading', 0);
-  const { data } = await w.recognize(prepare(bitmap), {}, { text: true, blocks: true });
-  return confidentText(data);
+  try {
+    const { data } = await w.recognize(prepare(bitmap), {}, { text: true, blocks: true });
+    return confidentText(data);
+  } catch (e) {
+    throw nameBare('TextReadFailed', e);
+  }
 }
 
 /** Words below this confidence (0 to 100) are dropped from a photo's text. Real words on a clean background score 80+; texture reads as 0 to 40. */

@@ -5,6 +5,8 @@ import { readText, unwrap } from '../lib/ocr';
 import { buildDocx } from '../lib/docx';
 import type { PageText } from '../lib/pdftext';
 import { UnreadableFile } from '../lib/input-error';
+import { nameBare } from '../lib/bare-error';
+import { rereadOnce } from '../lib/read-failure';
 
 const preview = document.getElementById('text-preview')!;
 
@@ -19,7 +21,9 @@ createShell({
     const shown: string[] = [];
     for (const [index, entry] of files.entries()) {
       const share = (f: number) => (index + f) / files.length;
-      const { bitmap } = await decodeImage(entry.file);
+      const { bitmap } = await rereadOnce(() => decodeImage(entry.file)).catch((e) => {
+        throw nameBare('ImageDecodeFailed', e);
+      });
       try {
         const result = await readText(bitmap, (stage, f) =>
           stage === 'loading'
@@ -42,7 +46,12 @@ createShell({
     }
     const words = pages.reduce((n, p) => n + p.paragraphs.reduce((m, q) => m + q.text.split(/\s+/).length, 0), 0);
     const base = files.length === 1 ? baseName(files[0]!.file.name) : 'images';
-    const bytes = buildDocx(pages, { title: base, pageBreaks: true });
+    let bytes: Uint8Array;
+    try {
+      bytes = buildDocx(pages, { title: base, pageBreaks: true });
+    } catch (e) {
+      throw nameBare('DocxBuildFailed', e);
+    }
     progress.set('Done', 1);
     const out: OutputFile = {
       name: `${base}.docx`,

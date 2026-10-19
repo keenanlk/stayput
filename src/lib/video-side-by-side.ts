@@ -31,6 +31,7 @@ import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { InputError, UnsupportedCodec, NamedError } from './input-error';
+import { nameBare } from './bare-error';
 import { copyClipSound, pictureLength } from './video-merge';
 import { estimateMemory, memoryVerdict, outputFps, outputSeconds, planSideBySide, type Plan, type SbsFit, type SbsLayout, type SbsLength, type SbsSound } from './side-by-side-plan';
 
@@ -107,6 +108,8 @@ export async function sideBySideEstimate(files: File[], o: Omit<SideBySideOption
 export async function sideBySide(files: File[], opts: SideBySideOptions): Promise<SideBySideResult> {
   if (files.length < 2) throw new InputError('Add two videos: A and B.');
   const clips: Clip[] = [];
+  // The step under way; a failure with no name of its own is recorded as this (see bare-error.ts).
+  let stage = 'SideBySideOpenFailed';
   try {
     for (const f of files.slice(0, 2)) clips.push(await openClip(f));
     const [a, b] = clips as [Clip, Clip];
@@ -120,9 +123,11 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
     );
     if (refusal) throw new InputError(refusal);
 
+    stage = 'SideBySideCodecFailed';
     const videoCodec = await pickVideoCodec({ width: plan.width, height: plan.height, bitrate: QUALITY_HIGH });
     if (!videoCodec) throw new NamedError('VideoSideBySideFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
+    stage = 'SideBySideSoundFailed';
     // Sound: A's, B's, or both mixed, cut or padded with silence to the output's length.
     let audioNote = '';
     const source = opts.sound === 'b' ? [b] : opts.sound === 'a' ? [a] : opts.sound === 'mix' ? [a, b] : [];
@@ -168,6 +173,7 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
       }
     }
 
+    stage = 'SideBySideSetupFailed';
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
     const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH });
     output.addVideoTrack(videoSource, { frameRate: fps });
@@ -185,6 +191,7 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
         for (let k = 0; k < frames; k++) yield clip.first + Math.min(k / fps, Math.max(0, clip.length - 0.5 / fps));
       })();
 
+    stage = 'SideBySideEncodeFailed';
     await watchEncode(
       async (progress) => {
         const report = (f: number) => {
@@ -231,6 +238,7 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
       },
       () => output.cancel(),
     );
+    stage = 'SideBySideWriteFailed';
     const buffer = output.target.buffer;
     if (!buffer) throw new NamedError('VideoSideBySideFailed', 'The video could not be written.');
     opts.onProgress?.(1);
@@ -244,6 +252,8 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
       audio: !!audioSource || !!packetSource,
       audioNote,
     };
+  } catch (e) {
+    throw nameBare(stage, e);
   } finally {
     for (const c of clips) c.input.dispose?.();
   }
