@@ -48,6 +48,18 @@ test('press page offers every logo as SVG and PNG, and the files are served', as
   await expect(page.locator('footer a[href="/press"]')).toBeVisible();
 });
 
+test('contact page has the email, the issues link and the private-files note, and every footer links to it', async ({ page }) => {
+  await page.goto('/contact');
+  await expect(page.locator('a[href="mailto:hello@stayput.dev"]').first()).toBeVisible();
+  await expect(page.locator('article a[href="https://github.com/keenanlk/stayput/issues"]')).toBeVisible();
+  await expect(page.locator('article p', { hasText: "please don't attach private files" })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://stayput.dev/contact');
+  for (const path of ['/', '/about', '/privacy', '/tools/heic-to-jpg', '/contact']) {
+    await page.goto(path);
+    await expect(page.locator('footer a[href="/contact"]'), path).toBeVisible();
+  }
+});
+
 test('llms.txt lists every tool and guide with working links', async ({ request }) => {
   const res = await request.get('/llms.txt');
   expect(res.status()).toBe(200);
