@@ -75,7 +75,7 @@ export async function computeEntries(root = root0) {
   page('/', 'index');
   page('/guides', 'guides/index');
   page('/conversions', 'conversions/index');
-  for (const name of ['about', 'press', 'privacy', 'terms', 'mcp']) page(`/${name}`, name);
+  for (const name of ['about', 'contact', 'press', 'privacy', 'terms', 'mcp']) page(`/${name}`, name);
   page('/licenses', 'licenses', read(root, 'src/data/licenses.json'));
   return out;
 }

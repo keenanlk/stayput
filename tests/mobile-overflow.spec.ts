@@ -40,6 +40,7 @@ const pages = [
   '/bpm-finder',
   '/csv-to-json',
   '/press',
+  '/contact',
   '/licenses',
   '/avi-to-mp4',
   '/wma-to-mp3',
