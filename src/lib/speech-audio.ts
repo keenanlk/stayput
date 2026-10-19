@@ -16,7 +16,8 @@ import { ALL_FORMATS, AudioBufferSink, BlobSource, Input, type InputAudioTrack }
 import { demuxedSound, grown, NO_SOUND, plannedSamples } from './demux-audio';
 import { decodeAudio, channelsOf } from './audio';
 import { isNotReadable, notReadable } from './read-failure';
-import { audioDecodeError, looksLikeMemory, outOfMemoryError, SpeechError } from './speech-errors';
+import { isPhoneBrowser } from './phone-limit';
+import { audioDecodeError, looksLikeMemory, outOfMemoryError, recordingTooLongError, speechSecondsBudget, SpeechError } from './speech-errors';
 
 export const SPEECH_RATE = 16000;
 
@@ -34,6 +35,12 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
       const none = audioDecodeError(NO_SOUND, cause);
       if (cause === undefined) none.name = 'NoSoundTrack';
       throw none;
+    }
+    // A recording over the device's memory budget is refused now, not after the model is fetched and the tab is gone.
+    if (track) {
+      const seconds = await input.computeDuration().catch(() => NaN);
+      const budget = speechSecondsBudget((navigator as { deviceMemory?: number }).deviceMemory, isPhoneBrowser());
+      if (Number.isFinite(seconds) && seconds > budget) throw recordingTooLongError(seconds, budget);
     }
     let failed = false;
     if (hasVideo) {

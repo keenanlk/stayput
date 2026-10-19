@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { audioDecodeError, encodeFailedError, encodeMemoryError, looksLikeMemory, plainCaptionError, phoneSpeechMemoryError, restartsOnce, unknownCaptionError } from '../src/lib/speech-errors';
+import { audioDecodeError, encodeFailedError, encodeMemoryError, looksLikeMemory, plainCaptionError, phoneSpeechMemoryError, recordingTooLongError, restartsOnce, speechSecondsBudget, unknownCaptionError } from '../src/lib/speech-errors';
 
 test('a RangeError counts as memory only when its message says so', () => {
   const alloc = new RangeError('Array buffer allocation failed');
@@ -51,4 +51,15 @@ test('a failure that names no class is recorded under the step that failed, not 
 test('only a start-up that a fresh worker may get past is tried again', () => {
   for (const name of ['ModelLoadError', 'OutOfMemoryError', 'WorkerCrashError']) expect(restartsOnce({ name })).toBe(true);
   for (const name of ['ModelDownloadError', 'AudioDecodeError', 'NoSpeechFound', 'SpeechModelError']) expect(restartsOnce({ name })).toBe(false);
+});
+
+test('a recording over the memory budget is refused as RecordingTooLong, with the budget scaled to the device', () => {
+  expect(speechSecondsBudget(undefined, false)).toBeGreaterThan(speechSecondsBudget(undefined, true));
+  expect(speechSecondsBudget(8, false)).toBeGreaterThan(speechSecondsBudget(2, false));
+  // A two-hour recording does not fit a 2 GB device, but a one-hour one fits a computer that does not say how much memory it has.
+  expect(speechSecondsBudget(2, false)).toBeLessThan(7200);
+  expect(speechSecondsBudget(undefined, false)).toBeGreaterThan(3600);
+  const err = recordingTooLongError(7200, speechSecondsBudget(2, false));
+  expect(err.name).toBe('RecordingTooLong');
+  expect(err.message).toMatch(/minutes/);
 });

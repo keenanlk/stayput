@@ -8,7 +8,7 @@ import { NamedError, isUnspecific } from './input-error';
 
 import { isNotReadable } from './read-failure';
 
-export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound'] as const;
+export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong'] as const;
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
 
 export class SpeechError extends Error {
@@ -75,6 +75,19 @@ export function encodeFailedError(cause: unknown): Error {
   return err;
 }
 export const speechModelError = () => make('SpeechModelError', 'The speech model could not read this recording. Try again, or try a shorter recording or another file.');
+/**
+ * Seconds of sound the speech step may hold in memory on this device. The samples (16 kHz, 4 bytes each) are kept whole, and
+ * each piece is copied again for the worker and once more for a retry, so three copies must fit in a quarter of the memory
+ * the browser admits to (`navigator.deviceMemory`, in GB, capped at 8 and missing in Safari and Firefox: then 4 GB on a
+ * computer and 1.5 GB on a phone, the figure the phone limit was measured against).
+ */
+export function speechSecondsBudget(deviceMemoryGb: number | undefined, phone: boolean): number {
+  const gb = deviceMemoryGb && deviceMemoryGb > 0 ? deviceMemoryGb : phone ? 1.5 : 4;
+  return Math.floor((gb * 1e9 * 0.25) / 3 / (16000 * 4));
+}
+/** A recording longer than the device's budget, refused before any sound is read or the model is fetched. */
+export const recordingTooLongError = (seconds: number, budget: number) =>
+  make('RecordingTooLong', `This recording is about ${Math.round(seconds / 60)} minutes, more than this device can write captions for without running out of memory (about ${Math.floor(budget / 60)} minutes). Trim it or split it into parts, or use a computer with more memory.`);
 export const noSpeechFound = (message: string) => make('NoSpeechFound', message);
 
 /** A browser or runtime error that means "out of memory", as far as its message tells. */
