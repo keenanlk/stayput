@@ -35,6 +35,7 @@ import { nameBare } from './bare-error';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
+import { codecFailure, guardCodecs, isReclaim, tagCodec } from './codec-guard';
 import { withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface EditOptions {
@@ -205,15 +206,10 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       opts.onNotice,
     );
   } catch (e) {
-    // A codec or canvas the browser invalidated under the run (InvalidStateError), still failing after the retries above, is a
-    // reclaimed codec as far as anyone can tell: say what to do, and record that name instead of the browser's.
-    if (e instanceof Error && e.name === 'InvalidStateError') {
-      throw new NamedError(
-        'CodecReclaimedError',
-        'Your device took back the video encoder part-way through, and starting again did not help. Keep this tab open with the screen on and try once more; a shorter or smaller video is less likely to hit it.',
-        { cause: e },
-      );
-    }
+    // A codec, person finder or canvas the browser invalidated under the run (InvalidStateError, or a reclaim), still failing after
+    // the recovery inside the run and the retries above: name the object it was (see codec-guard.ts), say what to do.
+    const invalid = codecFailure(e);
+    if (invalid) throw invalid;
     throw nameBare('VideoEditFailed', e);
   } finally {
     page.dispose();
@@ -342,6 +338,8 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
     let blob: Blob;
     let conversion: Conversion;
+    // A decoder or encoder the browser takes back part-way is replaced and the run goes on; whatever is left open at the end is closed.
+    const unguard = guardCodecs();
     try {
       conversion = await Conversion.init({
         input,
@@ -361,7 +359,11 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
           process:
             paint && frame
               ? async (sample) => {
-                  sample.draw(frame!, 0, 0, width, height);
+                  try {
+                    sample.draw(frame!, 0, 0, width, height);
+                  } catch (e) {
+                    throw isReclaim(e) ? tagCodec(e, 'canvas', 'draw') : e;
+                  }
                   const at = sample.timestamp;
                   // Let go of the decoded frame now, and give the browser a turn between frames: without
                   // it the frames pile up faster than they are freed (about 10 MB per second of 1080p video in Safari).
@@ -388,6 +390,8 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     } catch (e) {
       await out.disk?.abort();
       throw e;
+    } finally {
+      unguard();
     }
     const kept = !opts.mute && !!sound && !conversion.discardedTracks.some((d) => d.track.isAudioTrack());
     return {

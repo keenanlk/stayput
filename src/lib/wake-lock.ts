@@ -96,6 +96,9 @@ export function looksReclaimed(e: unknown): boolean {
 /** Failures that say what the visitor gave or asked for, whatever the page was doing. */
 const NOT_INTERRUPTION = ['InputError', 'UnreadableFile', 'UnsupportedCodec', 'NoSpeechFound', 'AudioDecodeError', 'NoSoundTrack'];
 
+/** Errors that already say which codec, person finder or canvas the browser invalidated (codec-guard.ts): kept, unless the page was hidden, which is the better explanation. */
+const NAMED_CODEC_FAILURES = ['DecoderReclaimedError', 'EncoderReclaimedError', 'SegmenterInvalidError', 'CanvasInvalidError', 'CodecReclaimedError'];
+
 /**
  * The error to show when a run failed after the page went hidden, or with a
  * reclaimed codec: say the screen locked or apps switched, how to go on, and
@@ -103,7 +106,7 @@ const NOT_INTERRUPTION = ['InputError', 'UnreadableFile', 'UnsupportedCodec', 'N
  * were. The name is the only part that is recorded.
  */
 export function interruptedError(e: unknown, wasHidden: boolean, action: string, phone = isPhoneBrowser()): unknown {
-  if (!(e instanceof Error) || NOT_INTERRUPTION.includes(e.name) || (e instanceof SpeechError && e.kind === 'AudioDecodeError')) return e;
+  if (!(e instanceof Error) || NOT_INTERRUPTION.includes(e.name) || (NAMED_CODEC_FAILURES.includes(e.name) && !wasHidden) || (e instanceof SpeechError && e.kind === 'AudioDecodeError')) return e;
   const reclaimed = looksReclaimed(e);
   if (!wasHidden && !reclaimed) return e;
   const salvage = (e as { salvage?: unknown[] }).salvage;

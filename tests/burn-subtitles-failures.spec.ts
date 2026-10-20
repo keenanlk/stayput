@@ -97,7 +97,7 @@ async function breakReads(page: Page, from: number, times: number) {
 test('the page hidden during the redraw: it starts again once when the page is back and finishes', async ({ page }) => {
   test.setTimeout(90_000);
   await recordRuns(page);
-  await breakEncoder(page, { name: 'InvalidStateError', times: 1, hide: true });
+  await breakEncoder(page, { name: 'AbortError', times: 1, hide: true });
   await start(page, [clip, srtFile()]);
   await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
   await expect(page.locator('#error')).not.toHaveClass(/is-active/);

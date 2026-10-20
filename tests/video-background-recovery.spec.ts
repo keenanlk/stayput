@@ -170,7 +170,7 @@ async function runBlur(page: Page, file = clip) {
 test.describe('on the page', () => {
   test('the page hidden mid-run: the run starts again when it is back and finishes', async ({ page }) => {
     test.setTimeout(240_000);
-    await breakEncoder(page, 'InvalidStateError', true);
+    await breakEncoder(page, 'AbortError', true);
     await runBlur(page);
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
     await expect(page.locator('#results-list')).toContainText('started again after the page was hidden');

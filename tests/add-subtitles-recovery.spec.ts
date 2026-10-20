@@ -164,7 +164,7 @@ test.describe('the redraw', () => {
 
   test('the page hidden during the redraw: it starts again when the page is back and finishes', async ({ page }) => {
     test.setTimeout(240_000);
-    await breakEncoder(page, 'InvalidStateError', true);
+    await breakEncoder(page, 'AbortError', true);
     await run(page);
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
     await expect(page.locator('#results-list')).toContainText('started again after the page was hidden');

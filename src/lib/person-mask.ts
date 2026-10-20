@@ -18,6 +18,7 @@
 import type { ImageSegmenter } from '@mediapipe/tasks-vision';
 import { vendorDir } from './vendor';
 import { StageError, NamedError } from './input-error';
+import { isReclaim, tagCodec } from './codec-guard';
 
 /** Roll-back switch: false puts every finder back on the CPU delegate. */
 const GPU_FOR_EDGES = true;
@@ -269,7 +270,12 @@ export class Matte {
       seg = await load(model);
       clock += 33;
       began = performance.now();
-      result = seg.segmentForVideo(this.small, clock);
+      try {
+        result = seg.segmentForVideo(this.small, clock);
+      } catch (again) {
+        // Invalid a second time, on a fresh engine: the run records the person finder as the source.
+        throw isReclaim(again) ? tagCodec(again, 'segmenter', 'segment') : again;
+      }
     }
     const found = result.confidenceMasks?.[0];
     if (!found) throw new NamedError('PersonMaskFailed', 'The person finder returned no mask.');
