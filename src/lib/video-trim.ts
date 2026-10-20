@@ -32,7 +32,7 @@ import { requireH264Encoder } from './encoder-probe';
 import { aacSafeSampleRate } from './video-codec';
 import { unplayable } from './video-compress';
 import { NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
-import { nameBare } from './bare-error';
+import { memoryRange, nameBare } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { withRecovery, type Attempt } from './edit-recovery';
@@ -76,13 +76,14 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
           return await trimOnce(file, opts, attempt, (side) => (made = side));
         } catch (e) {
           if (isNotReadable(e)) throw notReadable(e);
+          e = memoryRange(e);
           // A fast cut re-encodes a part whose start is far from a key frame. When the encoder fails, copy from the key frame.
           const name = (e as { name?: string } | null)?.name ?? '';
           if (!opts.exact && !attempt.maxSide && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
             try {
               return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true)), keyframeCopy: true };
             } catch (again) {
-              throw isNotReadable(again) ? notReadable(again) : nameBare('CutFailed', again);
+              throw isNotReadable(again) ? notReadable(again) : nameBare('CutFailed', memoryRange(again));
             }
           }
           throw nameBare('CutFailed', e);

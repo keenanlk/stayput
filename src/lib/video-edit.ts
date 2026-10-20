@@ -156,7 +156,12 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
   try {
     const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    return { ...shownSize(video), duration: await input.computeDuration() };
+    try {
+      return { ...shownSize(video), duration: await input.computeDuration() };
+    } catch (e) {
+      // A plain TypeError here (a browser quirk while reading the picture's size) is named for this step.
+      throw isNotReadable(e) ? notReadable(e) : nameBare('VideoSizeReadFailed', e);
+    }
   } finally {
     input.dispose?.();
   }

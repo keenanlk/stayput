@@ -23,3 +23,15 @@ export function nameBare(step: string, e: unknown): Error {
   err.cause = e;
   return err;
 }
+
+/**
+ * A RangeError that says memory ran out (a buffer that could not be allocated) reaches a failed run's record as plain
+ * "RangeError", which also covers a bad length. Returns it as OutOfMemoryError, keeping it as the cause; anything else
+ * comes back as it was.
+ */
+export function memoryRange(e: unknown): unknown {
+  if (!(e instanceof RangeError) || !/memory|allocation/i.test(e.message)) return e;
+  const err = new NamedError('OutOfMemoryError', 'This device ran out of memory while cutting the video. Close other tabs and apps and try again, use a shorter video, or use a computer.');
+  err.cause = e;
+  return err;
+}
