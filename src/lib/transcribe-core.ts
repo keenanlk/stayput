@@ -15,7 +15,7 @@ import type { AutomaticSpeechRecognitionPipeline } from '@huggingface/transforme
 import { vendorDir } from './vendor';
 import { loadWithRetry } from './retry';
 import { fetchResumable, wholeOrNull } from './model-fetch';
-import { looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, type SpeechError } from './speech-errors';
+import { isRecordingTooLong, looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, type SpeechError } from './speech-errors';
 
 export const MODEL = 'whisper-base';
 export const RATE = 16000;
@@ -150,6 +150,7 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
 
   /** The named error for a failure while loading the model or while recognising. */
   function named(err: unknown, loading: boolean): SpeechError {
+    if (isRecordingTooLong(err)) return err as SpeechError;
     if (looksLikeMemory(err)) return outOfMemoryError();
     if (!loading) return speechModelError();
     return looksLikeNetwork(err) ? modelDownloadError() : modelLoadError();

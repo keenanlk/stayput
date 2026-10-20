@@ -4,7 +4,7 @@ import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
 import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/encoder-probe';
 import { EncoderStall } from '../lib/encoder-watchdog';
-import { encodeFailedError, encodeMemoryError, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
+import { encodeFailedError, encodeMemoryError, isRecordingTooLong, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
 import { MODEL_DOWNLOAD_NOTE, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
 import { InputError } from '../lib/input-error';
@@ -190,6 +190,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       // Any other failure while redrawing: the captions written from speech already exist, so hand them over with the message.
       // Out of memory, or an unnamed failure on a phone with a video this big (Safari's EncodingError "Unknown error"), says so.
       // A RangeError whose message names no memory (a bad buffer length) is not blamed on the phone's size.
+      if (isRecordingTooLong(e)) throw e;
       const memory = looksLikeMemory(e) || (overPhoneLimit(file.size) && !(e instanceof RangeError));
       const err = (memory ? asMemory(encodeMemoryError(e)) : given ? unknownCaptionError(e) : encodeFailedError(e)) as Error & { salvage?: OutputFile[] };
       if (!given) err.salvage = [srtOutput(file, segments)];

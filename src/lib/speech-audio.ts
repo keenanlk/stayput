@@ -17,7 +17,7 @@ import { demuxedSound, grown, NO_SOUND, plannedSamples } from './demux-audio';
 import { decodeAudio, channelsOf } from './audio';
 import { isNotReadable, notReadable } from './read-failure';
 import { isPhoneBrowser } from './phone-limit';
-import { audioDecodeError, looksLikeMemory, outOfMemoryError, recordingTooLongError, speechSecondsBudget, SpeechError } from './speech-errors';
+import { audioDecodeError, isRecordingTooLong, looksLikeMemory, outOfMemoryError, recordingTooLongError, speechSecondsBudget, SpeechError } from './speech-errors';
 
 export const SPEECH_RATE = 16000;
 
@@ -40,7 +40,7 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
     if (track) {
       const seconds = await input.computeDuration().catch(() => NaN);
       const budget = speechSecondsBudget((navigator as { deviceMemory?: number }).deviceMemory, isPhoneBrowser());
-      // A container can claim any duration (a recording with an absurd one is still read), so a claim the file's size cannot back is no reason to refuse.
+      // A container can claim any duration (a recording with an absurd one is still read), so a claim the file's size cannot back is no reason to refuse. Only that direction is guarded: a short claim over a far larger file is not refused here (the decoder finds the real length).
       const believable = Number.isFinite(seconds) && seconds > 0 && file.size / seconds >= 500;
       if (believable && seconds > budget) throw recordingTooLongError(seconds, budget);
     }
@@ -91,6 +91,7 @@ function unlessUnreadable(e: unknown): null {
 /** Anything a decode throws, as one of the page's own errors. */
 function asSpeechError(e: unknown): Error {
   if (isNotReadable(e)) return notReadable(e);
+  if (isRecordingTooLong(e)) return e as Error;
   if (e instanceof SpeechError && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.kind)) return e;
   if (e instanceof Error && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.name)) return e;
   return looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError(undefined, e);

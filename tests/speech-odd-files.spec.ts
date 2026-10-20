@@ -110,3 +110,42 @@ test('a video with no sound track is recorded as NoSoundTrack', async ({ page })
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
   expect((await lastRun(page))?.error_class).toBe('NoSoundTrack');
 });
+
+/** A silent mono 16-bit WAV of the given length: big enough for its claimed duration, so the early refusal believes it. */
+function silentWav(seconds: number, rate = 8000): Buffer {
+  const data = seconds * rate * 2;
+  const b = Buffer.alloc(44 + data);
+  b.write('RIFF', 0, 'latin1');
+  b.writeUInt32LE(36 + data, 4);
+  b.write('WAVEfmt ', 8, 'latin1');
+  b.writeUInt32LE(16, 16);
+  b.writeUInt16LE(1, 20);
+  b.writeUInt16LE(1, 22);
+  b.writeUInt32LE(rate, 24);
+  b.writeUInt32LE(rate * 2, 28);
+  b.writeUInt16LE(2, 32);
+  b.writeUInt16LE(16, 34);
+  b.write('data', 36, 'latin1');
+  b.writeUInt32LE(data, 40);
+  return b;
+}
+
+// The refusal's message says "memory"; it must reach the person as written (with the minutes), not be replaced by
+// the generic out-of-memory text, and the run must record RecordingTooLong.
+for (const path of ['/tools/transcribe', '/video-to-subtitles', '/auto-caption-video']) {
+  test(`${path}: a recording over the device's budget is refused as RecordingTooLong, not as out of memory`, async ({ page }) => {
+    await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'deviceMemory', { get: () => 1, configurable: true }));
+    await stubSpeech(page);
+    await page.goto(path);
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await page.locator('#file-input').setInputFiles({ name: 'long.wav', mimeType: 'audio/wav', buffer: silentWav(25 * 60) });
+    await page.locator('#run').click();
+    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+    await expect(page.locator('#error')).toContainText('about 25 minutes');
+    await expect(page.locator('#error')).toContainText('Trim it or split it into parts');
+    await expect(page.locator('#error')).not.toContainText('ran out of memory while writing captions');
+    const run = await lastRun(page);
+    expect(run?.outcome).toBe('error');
+    expect(run?.error_class).toBe('RecordingTooLong');
+  });
+}

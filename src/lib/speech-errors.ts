@@ -90,6 +90,9 @@ export const recordingTooLongError = (seconds: number, budget: number) =>
   make('RecordingTooLong', `This recording is about ${Math.round(seconds / 60)} minutes, more than this device can write captions for without running out of memory (about ${Math.floor(budget / 60)} minutes). Trim it or split it into parts, or use a computer with more memory.`);
 export const noSpeechFound = (message: string) => make('NoSpeechFound', message);
 
+/** The page's own "recording too long" refusal: its message says "memory", but it is not an out-of-memory failure and must reach the person as written. */
+export const isRecordingTooLong = (e: unknown): boolean => e instanceof Error && e.name === 'RecordingTooLong';
+
 /** A browser or runtime error that means "out of memory", as far as its message tells. */
 export function looksLikeMemory(e: unknown): boolean {
   if (typeof e === 'object' && e && (e as { name?: string }).name === 'QuotaExceededError') return false;
