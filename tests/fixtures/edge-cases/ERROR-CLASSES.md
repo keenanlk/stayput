@@ -28,6 +28,7 @@ The class a failed run records (`error_class`) with the exact words the person s
 |-------|-----------|---------|
 | `NotReadableError` | `src/lib/read-failure.ts:19` | `This file could not be read. Pick the video again, or copy it to the phone first, and try again.` |
 | `OutOfMemoryError` | `src/lib/person-mask.ts:112` | `This video is too large for this device's memory. Try a shorter or smaller video.` |
+| `OutOfMemoryError` | `src/lib/image.ts` (decodeImage) | `This picture is too large for this device to open. Try a smaller copy of it, or use a computer.` |
 | `OutOfMemoryError` | `src/lib/denoise.ts:129` | `This device ran out of memory cleaning this video. Trim the video to a shorter length first, or use a computer.` |
 | `OutOfMemoryError` | `src/lib/speech-errors.ts` | `This device ran out of memory while writing captions. Close other tabs and apps and try again, use a shorter recording, or use a desktop browser.` / `This video is too long for your browser to redraw with captions. Your subtitles are ready: download the .srt below, or trim or split the video and try again. To try again, reload the page first.` / `This phone ran out of memory while writing captions for a video this big. Trim the video to about 2 minutes or less, or use a computer. If you try again, reload the page first.` |
 | `ModelDownloadError` | `src/lib/speech-errors.ts` | `The speech model (77 MB) could not be downloaded. Check your connection, then try again: a download that stopped part way starts over. On mobile data, Wi-Fi is steadier.` |

@@ -19,7 +19,7 @@ const stat = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`
 type Want = 'output' | 'refusal' | 'any';
 type Kind = 'video' | 'audio' | 'image' | 'pdf';
 interface Known {
-  /** The hardening item: what to fix. */
+  /** Why the case fails today and what would fix it. */
   item: string;
   /** Only this browser project fails; left out, every browser does. */
   browser?: 'chromium' | 'webkit';
@@ -171,13 +171,9 @@ const TOOLS: ToolSpec[] = [
 
 /**
  * Cases that fail today. Each runs under test.fail(): CI stays green while the failure is on record, and the case turns red
- * the day the fix lands (remove its entry then). Every entry names the hardening item; see the README's table.
+ * the day the fix lands (remove its entry then). Every entry says why it fails.
  */
-const HUGE_PICTURE: Known = { browser: 'chromium', item: "C3: a 400 MP picture shows the browser's raw 'createImageBitmap ... could not be allocated' text and records no failed run; refuse early as TooLarge/OutOfMemoryError with plain copy" };
 const KNOWN: Record<string, Known> = {};
-for (const path of ['/instagram-carousel-splitter', '/image-to-pixel-art']) {
-  KNOWN[`${path}|a 400 megapixel picture (20000x20000)`] = HUGE_PICTURE;
-}
 
 // ---------------------------------------------------------------------------------------------------------------
 const GUARD_MS = 40_000;
