@@ -313,7 +313,10 @@ async function attempt(page: Page, tool: ToolSpec, file: string, crashed: () => 
     .then(() => true, () => false);
   if (crashed()) return { kind: 'crash' };
   if (!settled) return { kind: 'hang', detail: `no result and no error after ${guard / 1000} s; progress said "${(await page.locator('#progress-text').textContent().catch(() => '')) ?? ''}"` };
-  const event = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run').at(-1)?.d);
+  // The tool shows the result or error box before it pushes its tool_run event, so wait for the event (a real missing one still ends up undefined).
+  const lastRun = () => page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run').at(-1)?.d);
+  await expect.poll(async () => (await lastRun()) !== undefined, { timeout: 5_000 }).toBe(true).catch(() => undefined);
+  const event = await lastRun();
   const failed = await errorBox.evaluate((el) => el.classList.contains('is-active'));
   if (failed && event?.outcome !== 'ok') {
     return { kind: 'refusal', where: 'run', text: (await errorBox.textContent()) ?? '', errorClass: event?.error_class ?? '' };
