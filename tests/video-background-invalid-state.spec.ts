@@ -38,24 +38,25 @@ async function runOnce(page: Page, timeout = 200_000) {
   await expect.poll(async () => (await toolRuns(page)).length, { timeout }).toBe(1);
 }
 
-test('an encoder that is invalid once is retried and the run finishes', async ({ page }) => {
+test('an encoder that is invalid once is replaced in the run and it finishes', async ({ page }) => {
   test.setTimeout(300_000);
   await stubAnalytics(page);
   await page.addInitScript(breakEncoder, { times: 1, message: 'The object is in an invalid state.' });
   await runOnce(page);
   expect(await toolRuns(page)).toMatchObject([{ outcome: 'ok' }]);
-  await expect(page.locator('#results-list')).toContainText(/software video encoder|smaller size|started again/);
+  // Replaced inside the run (codec-guard.ts): the retry ladder never started.
+  await expect(page.locator('#results-list')).not.toContainText(/software video encoder|smaller size|started again/);
   await expect(page.locator('#error')).not.toHaveClass(/is-active/);
 });
 
-test('an encoder that stays invalid through every retry records CodecReclaimedError and says what to do', async ({ page }) => {
+test('an encoder that stays invalid through every retry records EncoderReclaimedError and says what to do', async ({ page }) => {
   test.setTimeout(300_000);
   await stubAnalytics(page);
   await page.addInitScript(breakEncoder, { times: 1000, message: 'The object is in an invalid state.' });
   await runOnce(page);
   const runs = await toolRuns(page);
   expect(runs).toHaveLength(1);
-  expect(runs[0]).toMatchObject({ outcome: 'error', error_class: 'CodecReclaimedError' });
+  expect(runs[0]).toMatchObject({ outcome: 'error', error_class: 'EncoderReclaimedError' });
   await expect(page.locator('#error')).toHaveClass(/is-active/);
   await expect(page.locator('#error')).toContainText('took back the video encoder');
   await expect(page.locator('#error')).toContainText('try once more');
