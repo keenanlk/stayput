@@ -2,7 +2,8 @@ import { bindRange, createShell, num, radio, str, type Progress, type ShellFile 
 import { suffixName, type OutputFile } from '../lib/files';
 import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/encoder-probe';
 import { describeEdit } from './video-edit-shell';
-import { retryNote } from '../lib/edit-recovery';
+import { resumeWhenHidden, retryNote } from '../lib/edit-recovery';
+import { pageRecoveryHooks } from '../lib/recovery-hooks';
 import { InputError, NamedError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
@@ -167,7 +168,13 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   const { Matte, loadPersonMask } = await import('../lib/person-mask');
   // The fast model has a wide variant; load the one that fits the first video (a later one loads itself if it differs).
   const shape = await videoSize(videos[0]!.file).catch(() => undefined);
-  await loadPersonMask(which, shape);
+  // A phone that switches away during the download stops it: wait for the page, then fetch again.
+  const page = pageRecoveryHooks((message) => progress.set(message, 0.01));
+  try {
+    await resumeWhenHidden(() => loadPersonMask(which, shape), page.hooks);
+  } finally {
+    page.dispose();
+  }
   at('VideoEditFailed');
   const outputs: OutputFile[] = [];
   for (const [index, entry] of videos.entries()) {

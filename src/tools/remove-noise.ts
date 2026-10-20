@@ -47,6 +47,11 @@ createShell({
       progress.set(`Reading the sound of ${file.name}…`, share(0.05));
       if (await hasVideo(file)) {
         const pcm = await decodePcm(file).catch((e) => {
+          // A video with no sound track keeps its name (NoSoundTrack) but says what this tool needs.
+          if (e instanceof Error && e.name === 'NoSoundTrack') {
+            e.message = `${file.name} has no sound to clean.`;
+            throw e;
+          }
           throw inStage('NoiseDecodeError', e);
         });
         if (!pcm || !pcm[0]?.length) throw audioDecodeError(`${file.name} has no sound to clean.`);
