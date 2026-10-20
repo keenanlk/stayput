@@ -56,8 +56,18 @@ function wasmCodecFor(file: Blob, ext: string): WasmCodec | undefined {
   return undefined;
 }
 
-/** Decode any supported image into an ImageBitmap with EXIF orientation applied. */
+/** Decode any supported image into an ImageBitmap with EXIF orientation applied. A picture too big for this device's memory is refused as OutOfMemoryError, in plain words. */
 export async function decodeImage(file: File): Promise<Decoded> {
+  try {
+    return await decodeImageUnguarded(file);
+  } catch (e) {
+    const oom = e instanceof Error && (e.name === 'OutOfMemoryError' || /could not be allocated|out of memory|allocation failed|too large|too big/i.test(e.message));
+    if (!oom) throw e;
+    throw new NamedError('OutOfMemoryError', 'This picture is too large for this device to open. Try a smaller copy of it, or use a computer.', { cause: e });
+  }
+}
+
+async function decodeImageUnguarded(file: File): Promise<Decoded> {
   const ext = extOf(file.name);
   const heic = ext === 'heic' || ext === 'heif' || file.type === 'image/heic' || file.type === 'image/heif' || (await isHeicFile(file));
   if (heic) {

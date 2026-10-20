@@ -30,7 +30,7 @@ The three speech tools (1, 2, 9) run with the speech model replaced by a stand-i
 
 ## What a case must do
 
-Exactly one of: **(a)** a result whose files are not empty and open (a picture decodes, a video loads with a picture and a length, a sound decodes, and a video that was turned still comes out upright and as long as the input), or **(b)** an early refusal: readable copy in the error panel and, for a refusal after Run, a named error class (not `Error`, not empty). Files refused the moment they are added (empty files) never start a run, so they have no class. A run with no outcome within 40 s (100 s for tools that load a model) fails as a **hang**; a crashed tab fails as a **crash**. Cases that fail today are listed in `KNOWN` in the spec under `test.fail()`, each with its hardening item (below), so CI stays green and the case turns red the day it is fixed.
+Exactly one of: **(a)** a result whose files are not empty and open (a picture decodes, a video loads with a picture and a length, a sound decodes, and a video that was turned still comes out upright and as long as the input), or **(b)** an early refusal: readable copy in the error panel and, for a refusal after Run, a named error class (not `Error`, not empty). Files refused the moment they are added (empty files) never start a run, so they have no class. A run with no outcome within 40 s (100 s for tools that load a model) fails as a **hang**; a crashed tab fails as a **crash**. A case that fails today is listed in `KNOWN` in the spec under `test.fail()`, with the reason, so CI stays green and the case turns red the day it is fixed. None are listed now.
 
 ## Files
 
@@ -47,7 +47,7 @@ Which tools see a file depends on what they take. "Good" files must give a resul
 | `hevc.mp4`, `hdr10-hevc.mp4` | HEVC 8-bit; HEVC 10-bit HDR10 (BT.2020, PQ) | either (a browser without an HEVC decoder must refuse as UnsupportedCodec) |
 | `audio-only-named.mp4` | an M4A under an .mp4 name | either |
 | `zeros.mp4` | 64 KB of zero bytes: what a cloud-only placeholder looks like on a phone | refusal |
-| `sample.ts`, `mjpeg.mov`, `ac3-51.mkv`, `odd-853x481.webm`, `truncated-moov-end.mp4`, `alac.m4a`, `rf64.wav`, `garbage.jpg` | MPEG-TS; Motion JPEG + PCM in MOV; 5.1 AC-3 in MKV; odd 853x481 VP9; the good MP4 minus its last 4 KB; ALAC; RF64 WAV; a JPEG that is noise after four bytes. Commands adapted from the failure catalogues (`hardening/*.md`) | `garbage.jpg` refusal, others either (`odd-853x481.webm` has no sound track, so sound tools must refuse it as NoSoundTrack) |
+| `sample.ts`, `mjpeg.mov`, `ac3-51.mkv`, `odd-853x481.webm`, `truncated-moov-end.mp4`, `alac.m4a`, `rf64.wav`, `garbage.jpg` | MPEG-TS; Motion JPEG + PCM in MOV; 5.1 AC-3 in MKV; odd 853x481 VP9; the good MP4 minus its last 4 KB; ALAC; RF64 WAV; a JPEG that is noise after four bytes. | `garbage.jpg` refusal, others either (`odd-853x481.webm` has no sound track, so sound tools must refuse it as NoSoundTrack) |
 | `zero.mp4`, `zero.mp3`, `zero.png`, `zero.pdf` | 0 bytes | refused when added |
 | `truncated-half.*` (mp4, mp3, png, jpg, pdf) | the good file cut in half | either |
 | `corrupt-header.*` (mp4, mp3, wav, png, jpg, pdf) | header bytes changed (`ftyp`/`moov` renamed, `RIFX`, `PNX`, `%PDX`, zeroed JPEG start, 4 KB of 0xFF on the MP3) | refusal (the MP3 may also be resynced) |
@@ -68,18 +68,16 @@ Made when the suite runs and never committed (`tests/edge-cases-files.ts`): a 50
 
 The exact words the person sees for each error class are in [ERROR-CLASSES.md](ERROR-CLASSES.md).
 
-## Known failures (hardening items)
+## Known failures
 
-| Item | Plan item (growth hardening plan) | Cases | What happens | Suggested fix |
-|------|-----------|-------|--------------|---------------|
-| C3 | H24 | 20000x20000 PNG on instagram-carousel-splitter and image-to-pixel-art; Chromium | the browser's raw text ("Failed to execute 'createImageBitmap' on 'Window': The ImageBitmap could not be allocated") is shown and the failed run is not recorded; WebKit refuses it cleanly | check the pixel count before decoding and refuse with a named `TooLarge` and plain copy; wrap the decode failure |
+None. Every case in the corpus either produces a correct output or ends in a named refusal.
 
-## Passing, but on record for the hardening plan
+## Passing, but worth improving
 
-These end in a named refusal, so they pass; the plan items say what would make them better.
+These end in a named refusal, so they pass.
 
-- `zeros.mp4` (all-zero placeholder) is `UnreadableFile` on video tools and `AudioDecodeError` on sound tools; the plan's `FileNotDownloaded` (H3) would say what is wrong.
-- `sample.ts` (MPEG-TS) is `UnreadableFile` on most video tools; `UnsupportedContainer` and TS reading are plan item H3. Remove noise, Volume booster and Video to subtitles read it already.
-- `ac3-51.mkv` and `alac.m4a` are `AudioDecodeError` with a format-specific message on the caption tools and the generic one elsewhere (H18).
+- `zeros.mp4` (all-zero placeholder) is `UnreadableFile` on video tools and `AudioDecodeError` on sound tools; a `FileNotDownloaded` class would say what is wrong.
+- `sample.ts` (MPEG-TS) is `UnreadableFile` on most video tools; `UnsupportedContainer` and TS reading are not built. Remove noise, Volume booster and Video to subtitles read it already.
+- `ac3-51.mkv` and `alac.m4a` are `AudioDecodeError` with a format-specific message on the caption tools and the generic one elsewhere.
 - `mjpeg.mov` is `UnsupportedCodec` with the HEVC wording, which does not fit a Motion JPEG file.
 - `audio-only-named.mp4` on Burn subtitles ends in the "could not be redrawn" message although there was never a picture to redraw.
