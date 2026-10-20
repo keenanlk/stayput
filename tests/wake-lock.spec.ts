@@ -4,6 +4,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resumeIfHidden } from '../src/lib/wake-lock';
 
 // A long video job holds the screen on, and a run that failed after the page was hidden (or with a codec the
 // browser took back) says so instead of the generic failure. The speech worker and the encoder are stand-ins.
@@ -249,5 +250,52 @@ test.describe('a run interrupted by the screen locking', () => {
   test('a computer sees no keep-the-screen-on hint', async ({ page }) => {
     await open(page);
     await expect(page.locator('#run-hint')).not.toContainText('Keep the screen on');
+  });
+});
+
+// A tool without recovery of its own: a run cut short by a hidden page starts again once the page is back.
+test.describe('resumeIfHidden', () => {
+  const doc = (state: { v: string }) => {
+    const l: (() => void)[] = [];
+    return {
+      get visibilityState() { return state.v; },
+      addEventListener: (_: string, f: () => void) => void l.push(f),
+      removeEventListener: () => {},
+      fire: () => l.slice().forEach((f) => f()),
+    };
+  };
+  const guard = (hidden: { v: boolean }) => ({ wasHidden: () => hidden.v, forget: () => void (hidden.v = false) });
+  const fail = (name: string) => Object.assign(new Error(name), { name });
+
+  test('waits for the page, then runs again from the start', async () => {
+    const state = { v: 'hidden' };
+    const d = doc(state);
+    const hidden = { v: true };
+    let runs = 0, resumed = 0;
+    const out = resumeIfHidden(async () => { if (runs++ === 0) throw fail('EncodingError'); return 'done'; }, guard(hidden), () => resumed++, d as never);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(runs).toBe(1);
+    state.v = 'visible';
+    d.fire();
+    expect(await out).toBe('done');
+    expect(runs).toBe(2);
+    expect(resumed).toBe(1);
+  });
+
+  test('resumes once per hiding, gives up after two, and never resumes a visible page or an input problem', async () => {
+    const visible = doc({ v: 'visible' }) as never;
+    let runs = 0;
+    await expect(resumeIfHidden(async () => { runs++; throw fail('EncodingError'); }, guard({ v: true }), () => {}, visible)).rejects.toThrow('EncodingError');
+    expect(runs).toBe(2);
+    runs = 0;
+    const stuck = { wasHidden: () => true, forget: () => {} };
+    await expect(resumeIfHidden(async () => { runs++; throw fail('EncodingError'); }, stuck, () => {}, visible)).rejects.toThrow('EncodingError');
+    expect(runs).toBe(3);
+    runs = 0;
+    await expect(resumeIfHidden(async () => { runs++; throw fail('UnreadableFile'); }, stuck, () => {}, visible)).rejects.toThrow('UnreadableFile');
+    expect(runs).toBe(1);
+    runs = 0;
+    await expect(resumeIfHidden(async () => { runs++; throw fail('EncodingError'); }, guard({ v: false }), () => {}, visible)).rejects.toThrow('EncodingError');
+    expect(runs).toBe(1);
   });
 });

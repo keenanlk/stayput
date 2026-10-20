@@ -128,5 +128,35 @@ export function interruptedError(e: unknown, wasHidden: boolean, action: string,
   return out;
 }
 
+/** How many times a run that the hidden page cut short is started again from the beginning. */
+const MAX_HIDDEN_RESUMES = 2;
+
+/**
+ * Runs `job`; when it fails after the page was hidden, waits for the page to come back and runs it again from the
+ * start (twice at most), so a tool without its own recovery does not end a phone user's run on a locked screen.
+ * Failures that name the file or the request, and failures with the page in view, are thrown as they came.
+ */
+export async function resumeIfHidden<T>(job: () => Promise<T>, guard: Pick<RunGuard, 'wasHidden' | 'forget'> | undefined, onResume: () => void, doc: Document = document): Promise<T> {
+  for (let resumed = 0; ; resumed++) {
+    try {
+      return await job();
+    } catch (e) {
+      if (!guard || !(e instanceof Error) || NOT_INTERRUPTION.includes(e.name) || resumed >= MAX_HIDDEN_RESUMES || !guard.wasHidden()) throw e;
+      if (doc.visibilityState !== 'visible') {
+        await new Promise<void>((done) => {
+          const back = () => {
+            if (doc.visibilityState !== 'visible') return;
+            doc.removeEventListener('visibilitychange', back);
+            done();
+          };
+          doc.addEventListener('visibilitychange', back);
+        });
+      }
+      guard.forget();
+      onResume();
+    }
+  }
+}
+
 /** The line shown near the run button on phones. */
 export const KEEP_SCREEN_ON_HINT = 'Keep the screen on while it works.';

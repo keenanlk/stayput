@@ -13,7 +13,7 @@ import { warmDecoders } from './vendor';
 import { droppedFiles } from './folder-drop';
 import { takeHandoff } from './handoff';
 import { releaseOutput } from './opfs-output';
-import { guardRun, interruptedError, KEEP_SCREEN_ON_HINT } from './wake-lock';
+import { guardRun, interruptedError, resumeIfHidden, KEEP_SCREEN_ON_HINT } from './wake-lock';
 import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 
@@ -506,7 +506,11 @@ export function createShell(opts: ShellOptions) {
     const mine = (guard = opts.keepAwake ? guardRun() : undefined);
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
     try {
-      const result = await opts.process(files, progressApi);
+      const result = await resumeIfHidden(
+        () => opts.process(files, progressApi),
+        mine,
+        () => progressApi.set('The page was hidden, so the run stopped. Starting again: keep this tab open and the screen on.', 0),
+      );
       const outs = Array.isArray(result) ? result : result.outputs;
       const skipped = Array.isArray(result) ? [] : result.skipped;
       if (outs.length === 0) throw new NamedError('NothingProduced', 'Nothing was produced. Check the options and try again.');
