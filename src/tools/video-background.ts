@@ -4,7 +4,7 @@ import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/
 import { describeEdit } from './video-edit-shell';
 import { resumeWhenHidden, retryNote } from '../lib/edit-recovery';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { InputError, NamedError } from '../lib/input-error';
+import { InputError, NamedError, isUnspecific } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
@@ -129,6 +129,16 @@ function stepFailure(step: string, e: unknown): Error {
   return nameBare(step, e);
 }
 
+/** The background picture, opened. A file that will not open (HEIC rejects with something that is not an Error) is said so by name; a failure that already has a name of its own is kept. */
+async function decodePicture(file: File) {
+  try {
+    return await (await import('../lib/image')).decodeImage(file);
+  } catch (e) {
+    if (e instanceof Error && !isUnspecific(e)) throw e;
+    throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Try a JPEG or PNG copy of it.'), { cause: e });
+  }
+}
+
 createShell({
   onFilesChanged: checkPhoneClip,
   keepAwake: true,
@@ -155,7 +165,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   const strength = num('strength', 6);
   const color = str('bg-color', '#00b140');
   // decodeImage also opens HEIC, which Chrome cannot decode on its own.
-  const picture = pictures[0] ? (await (await import('../lib/image')).decodeImage(pictures[0].file)).bitmap : undefined;
+  const picture = pictures[0] ? (await decodePicture(pictures[0].file)).bitmap : undefined;
 
   // Find out now, in a second or two, that this browser cannot encode, not after the person finder has downloaded.
   progress.set('Checking this browser can write the video…', 0);
