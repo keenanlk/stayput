@@ -18,7 +18,8 @@ import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
  */
 
 type Kind = 'blur' | 'color' | 'image';
-const isImage = (f: File) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|avif|gif|bmp)$/i.test(f.name);
+// HEIC/HEIF counts: the Files app and a drag hand one over, often with an empty type, and it is a picture, not a video.
+const isImage = (f: File) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|avif|gif|bmp|heic|heif)$/i.test(f.name);
 
 const kind = () => radio('bg', 'blur') as Kind;
 const finder = () => radio('finder', 'edges') as 'fast' | 'edges';
@@ -153,7 +154,8 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   else if (bgKind === 'image') throw new InputError('Add a picture with the video to use as the new background, or choose Blur or Colour.');
   const strength = num('strength', 6);
   const color = str('bg-color', '#00b140');
-  const picture = pictures[0] ? await createImageBitmap(pictures[0].file) : undefined;
+  // decodeImage also opens HEIC, which Chrome cannot decode on its own.
+  const picture = pictures[0] ? (await (await import('../lib/image')).decodeImage(pictures[0].file)).bitmap : undefined;
 
   // Find out now, in a second or two, that this browser cannot encode, not after the person finder has downloaded.
   progress.set('Checking this browser can write the video…', 0);
