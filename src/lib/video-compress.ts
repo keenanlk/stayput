@@ -94,7 +94,8 @@ async function copiedSoundBitrate(track: InputAudioTrack): Promise<number> {
 }
 
 /** Names an encoder gives up with; a run that fails every size with one of them says so in plain words. */
-const ENCODER_REFUSALS = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall']);
+// (EncoderStall already carries plain words of its own.)
+const ENCODER_REFUSALS = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError']);
 
 /**
  * Compresses the video. When the device's encoder gives up (EncodingError and its kin) or the page was hidden, the run
