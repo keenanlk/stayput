@@ -37,19 +37,38 @@ export async function refuseSoundlessContainer(file: Blob): Promise<void> {
   }
 }
 
-/** Seconds a decode may take: generous for a long recording, but finite. */
+/** Milliseconds a decode may take: generous for a long recording, but finite. A page may lower it (specs do) with `__decodeBudgetMs`. */
 export function decodeBudgetMs(bytes: number): number {
+  const override = (globalThis as { __decodeBudgetMs?: unknown }).__decodeBudgetMs;
+  if (typeof override === 'number') return override;
   return Math.max(30_000, (bytes / 1e6) * 2_000);
 }
 
-/** `decodeAudioData`, but a decode that never answers ends as a DecodeTimeout (an AudioDecodeError by kind), not a page that waits forever. */
-export function decodeWithin(ctx: BaseAudioContext, bytes: ArrayBuffer): Promise<AudioBuffer> {
-  const budget = decodeBudgetMs(bytes.byteLength);
-  return new Promise<AudioBuffer>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      const cause = new NamedError('DecodeTimeout', `the browser's sound decoder gave no answer in ${Math.round(budget / 1000)} s`);
-      reject(audioDecodeError('The browser could not finish reading the sound of this file, which usually means the file is damaged or cut short. Try another copy of it.', cause));
-    }, budget);
-    ctx.decodeAudioData(bytes).then(resolve, reject).finally(() => clearTimeout(timer));
-  });
+const TIMED_OUT = Symbol('decodeTimedOut');
+
+/**
+ * `decodeAudioData`, but a decode that never answers ends as a DecodeTimeout (an AudioDecodeError by kind), not a page that waits forever.
+ * A decode the browser refuses is tried once more on freshly supplied bytes (the browser takes the first copy away, and no spare is held
+ * meanwhile): a phone short of memory can refuse a sound it reads fine a moment later, and a file that is really damaged fails the same
+ * way twice, quickly. A decode that timed out is not tried again: a hung decoder would only hold the page for twice as long.
+ */
+export async function decodeWithin(ctx: BaseAudioContext, read: () => Promise<ArrayBuffer>): Promise<AudioBuffer> {
+  const once = (bytes: ArrayBuffer) => {
+    const budget = decodeBudgetMs(bytes.byteLength);
+    return new Promise<AudioBuffer>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        const cause = new NamedError('DecodeTimeout', `the browser's sound decoder gave no answer in ${Math.round(budget / 1000)} s`);
+        reject(Object.assign(audioDecodeError('The browser could not finish reading the sound of this file, which usually means the file is damaged or cut short. Try another copy of it.', cause), { [TIMED_OUT]: true }));
+      }, budget);
+      ctx.decodeAudioData(bytes).then(resolve, reject).finally(() => clearTimeout(timer));
+    });
+  };
+  // A file that cannot be read at all is not a decode failure: that error goes out as it is.
+  const bytes = await read();
+  try {
+    return await once(bytes);
+  } catch (first) {
+    if ((first as { [TIMED_OUT]?: boolean } | null)?.[TIMED_OUT]) throw first;
+    return once(await read());
+  }
 }
