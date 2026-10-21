@@ -1,5 +1,6 @@
 import { bool, createShell, processEach, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { retryNote } from '../lib/edit-recovery';
 import type { CompressMode } from '../lib/video-compress';
 
 /**
@@ -42,6 +43,7 @@ createShell({
         mute,
         onProgress: (f) => progress.set(`Compressing ${entry.file.name}${again}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
         onPass: () => (again = ` again to fit under ${targetMB} MB`),
+        onNotice: (m) => progress.set(m, share(0.02)),
       });
       const notes = [`${r.width}×${r.height}`, clock(r.duration), r.videoCodec];
       if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
@@ -50,7 +52,7 @@ createShell({
         name: suffixName(entry.file.name, '-compressed', 'mp4'),
         blob: r.blob,
         originalSize: entry.file.size,
-        note: notes.join(', '),
+        note: notes.join(', ') + retryNote(r.retry),
       };
       return out;
     });

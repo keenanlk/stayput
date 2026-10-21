@@ -25,7 +25,10 @@ import {
   type Quality,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
+import { softwareH264Offered, useRealtimeH264 } from './encoder-probe';
 import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
+import { pageRecoveryHooks } from './recovery-hooks';
+import { withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export type CompressMode = 'balanced' | 'small' | 'high' | 'size';
 
@@ -40,6 +43,8 @@ export interface CompressOptions {
   onProgress?: (fraction: number) => void;
   /** Called when a size target needs another pass (2, 3). */
   onPass?: (pass: number) => void;
+  /** Said when the run starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface CompressResult {
@@ -53,6 +58,8 @@ export interface CompressResult {
   audio: boolean;
   /** Set when the input had sound this browser could not re-encode, so it was left out. */
   audioDropped: boolean;
+  /** Set when the file was made on a retry after the encoder gave up or the page was hidden. */
+  retry?: RetryKind;
 }
 
 const QUALITY: Record<Exclude<CompressMode, 'size'>, Quality> = { small: QUALITY_LOW, balanced: QUALITY_MEDIUM, high: QUALITY_HIGH };
@@ -86,7 +93,37 @@ async function copiedSoundBitrate(track: InputAudioTrack): Promise<number> {
   return (await track.getAverageBitrate().catch(() => null)) ?? 128_000;
 }
 
+/** Names an encoder gives up with; a run that fails every size with one of them says so in plain words. */
+// (EncoderStall already carries plain words of its own.)
+const ENCODER_REFUSALS = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError']);
+
+/**
+ * Compresses the video. When the device's encoder gives up (EncodingError and its kin) or the page was hidden, the run
+ * starts again, at a smaller picture where the encoder is what failed (see edit-recovery.ts). If every try fails, the
+ * error keeps its class name and says what to try.
+ */
 export async function compressVideo(file: File, opts: CompressOptions): Promise<CompressResult> {
+  const page = pageRecoveryHooks(opts.onNotice);
+  let made = 0;
+  try {
+    return await withRecovery(
+      async (attempt) => {
+        const r = await compressOnce(file, opts, attempt, (side) => (made = side));
+        return attempt.retry ? { ...r, retry: attempt.retry } : r;
+      },
+      () => made,
+      { ...page.hooks, softwareEncode: softwareH264Offered },
+    );
+  } catch (e) {
+    const name = (e as { name?: string } | null)?.name ?? '';
+    if (!ENCODER_REFUSALS.has(name)) throw e;
+    throw new NamedError(name, "This device's video encoder stopped, even at a smaller size. Try a shorter clip, a recent Chrome, Edge or Safari, or a computer. Nothing was uploaded.", { cause: e });
+  } finally {
+    page.dispose();
+  }
+}
+
+async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<CompressResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
@@ -130,6 +167,15 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       audioBitrate = QUALITY[opts.mode];
     }
 
+    // A retry after the encoder gave up asks for a smaller picture than the first try's.
+    if (attempt.maxSide && Math.max(width, height) > attempt.maxSide) {
+      const k = attempt.maxSide / Math.max(width, height);
+      width = even(width * k);
+      height = even(height * k);
+    }
+    sized(Math.max(width, height));
+    // A run started again after the encoder failed asks for the encoder mode that does not stall.
+    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software') useRealtimeH264();
     const videoCodec = await pickVideoCodec({ width, height, bitrate: videoBitrate });
     if (!videoCodec) throw new NamedError('VideoCompressFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const audioCodec =
@@ -151,6 +197,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
           fit: 'contain',
           codec: videoCodec,
           bitrate,
+          ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}),
           forceTranscode: true,
           // Bake a phone's rotation into the pixels so every player shows it upright.
           allowTransformationMetadata: false,
