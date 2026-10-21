@@ -19,15 +19,19 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
   // Windows Media Audio: no browser decodes it, so a separately loaded decoder module does.
   if (await isAsf(file)) return decodeWma(file, rate);
   await refuseSoundlessContainer(file);
-  const bytes = await retryUnreadable(file, () => file.arrayBuffer());
+  const read = () => retryUnreadable(file, () => file.arrayBuffer());
+  // A file that cannot be read is no decode failure, so the first read is made out here; the decoder is handed it, and only a second attempt reads again.
+  const firstRead = await read();
+  let handedOut = false;
+  const supply = () => (handedOut ? read() : ((handedOut = true), Promise.resolve(firstRead)));
   const ctx = new OfflineAudioContext(2, 1, rate);
   let buffer: AudioBuffer;
   try {
-    buffer = await decodeWithin(ctx, bytes.slice(0));
+    buffer = await decodeWithin(ctx, supply);
   } catch (first) {
     buffer = await decodeThroughDemuxer(file, rate, first).catch(async (error) => {
       // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.
-      const aiff = await decodeAiff(bytes, rate);
+      const aiff = await decodeAiff(await read().catch(() => null), rate);
       if (!aiff) throw error;
       return aiff;
     });
@@ -36,7 +40,8 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
 }
 
 /** PCM AIFF or AIFC as an AudioBuffer at `rate`, or null when it is not one this can read. */
-async function decodeAiff(bytes: ArrayBuffer, rate: number): Promise<AudioBuffer | null> {
+async function decodeAiff(bytes: ArrayBuffer | null, rate: number): Promise<AudioBuffer | null> {
+  if (!bytes) return null;
   const { parseAiff } = await import('./aiff');
   const aiff = parseAiff(bytes);
   if (!aiff) return null;

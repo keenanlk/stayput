@@ -114,7 +114,7 @@ async function decodeStretch(preRoll: EncodedPacket[], packets: EncodedPacket[],
   const bytes = output.target.buffer;
   if (!bytes) throw audioDecodeError();
   const ctx = new OfflineAudioContext(2, 1, rate);
-  const decoded = await decodeWithin(ctx, bytes);
+  const decoded = await decodeWithin(ctx, async () => bytes.slice(0));
   const skip = Math.round((packets[0]!.timestamp - t0) * rate);
   return channelsOf(decoded, mono).map((ch) => ch.subarray(Math.min(skip, ch.length)));
 }

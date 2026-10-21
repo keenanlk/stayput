@@ -15,7 +15,7 @@ export async function decodePcm(file: Blob): Promise<Float32Array[] | null> {
   const ctx = new OfflineAudioContext(2, 1, SAMPLE_RATE);
   try {
     await refuseSoundlessContainer(file);
-    const buffer = await decodeWithin(ctx, await retryUnreadable(file, () => file.arrayBuffer()));
+    const buffer = await decodeWithin(ctx, () => retryUnreadable(file, () => file.arrayBuffer()));
     return Array.from({ length: Math.min(2, buffer.numberOfChannels) }, (_, i) => buffer.getChannelData(i));
   } catch (e) {
     // A file the browser cannot read is not one it cannot decode: say so, as the demuxer would only fail the same way.
