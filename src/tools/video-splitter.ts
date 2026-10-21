@@ -4,7 +4,7 @@ import { overPhoneLimit } from '../lib/phone-limit';
 import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
 import { InputError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
-import { retryUnreadable } from '../lib/read-failure';
+import { retryUnreadable, snapshotFile } from '../lib/read-failure';
 
 /**
  * Video splitter. The length is read from the file's container; the parts are
@@ -22,6 +22,16 @@ const equalField = $('vs-equal-field');
 let duration = 0;
 let fileSize = 0;
 let loading: Promise<void> | undefined;
+/** The picked file copied into memory (up to 50 MB), so a phone that lets go of it later cannot fail a cut. */
+let held: { picked: File; copy: Promise<File> } | undefined;
+
+/** The file to work from: the in-memory copy of the pick when there is one, else the pick itself. */
+function workFile(picked: File): Promise<File> {
+  if (held?.picked !== picked) held = { picked, copy: snapshotFile(picked) };
+  // A failed copy is dropped, so the next call reads the file again.
+  held.copy.catch(() => (held = held?.picked === picked ? undefined : held));
+  return held.copy;
+}
 
 const clock = (s: number) => {
   const m = Math.floor(s / 60);
@@ -124,10 +134,11 @@ const shell = createShell({
     if (files.length === 0) {
       duration = 0;
       fileSize = 0;
+      held = undefined;
       delete $('tool').dataset.duration;
       return update();
     }
-    loading = load(files[0]!.file).catch((e) => {
+    loading = workFile(files[0]!.file).then((f) => load(f)).catch((e) => {
       duration = 0;
       update();
       shell.showError(e instanceof Error ? e.message : String(e));
@@ -137,9 +148,10 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     await loading;
+    const file = await workFile(entry.file);
     if (!duration) {
       try {
-        await load(entry.file, (m) => progress.set(m, 0));
+        await load(file, (m) => progress.set(m, 0));
       } catch (e) {
         throw nameBare('VideoReadFailed', e);
       }
@@ -159,9 +171,9 @@ const shell = createShell({
       progress.set(label, i / parts.length);
       // One part at a time: only the finished file is kept.
       const r = await retryUnreadable(
-        entry.file,
+        file,
         () =>
-          trimVideo(entry.file, {
+          trimVideo(file, {
             start: part.start,
             end: part.end,
             exact,
