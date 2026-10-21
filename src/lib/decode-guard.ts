@@ -42,14 +42,26 @@ export function decodeBudgetMs(bytes: number): number {
   return Math.max(30_000, (bytes / 1e6) * 2_000);
 }
 
-/** `decodeAudioData`, but a decode that never answers ends as a DecodeTimeout (an AudioDecodeError by kind), not a page that waits forever. */
-export function decodeWithin(ctx: BaseAudioContext, bytes: ArrayBuffer): Promise<AudioBuffer> {
+/**
+ * `decodeAudioData`, but a decode that never answers ends as a DecodeTimeout (an AudioDecodeError by kind), not a page that waits forever.
+ * A decode that is refused is tried once more on a fresh copy of the bytes (the browser takes the first copy away): a phone short of
+ * memory can refuse a sound it reads fine a moment later, and a file that is really damaged fails the same way twice, quickly.
+ */
+export async function decodeWithin(ctx: BaseAudioContext, bytes: ArrayBuffer): Promise<AudioBuffer> {
   const budget = decodeBudgetMs(bytes.byteLength);
-  return new Promise<AudioBuffer>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      const cause = new NamedError('DecodeTimeout', `the browser's sound decoder gave no answer in ${Math.round(budget / 1000)} s`);
-      reject(audioDecodeError('The browser could not finish reading the sound of this file, which usually means the file is damaged or cut short. Try another copy of it.', cause));
-    }, budget);
-    ctx.decodeAudioData(bytes).then(resolve, reject).finally(() => clearTimeout(timer));
-  });
+  const once = (copy: ArrayBuffer) =>
+    new Promise<AudioBuffer>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        const cause = new NamedError('DecodeTimeout', `the browser's sound decoder gave no answer in ${Math.round(budget / 1000)} s`);
+        reject(audioDecodeError('The browser could not finish reading the sound of this file, which usually means the file is damaged or cut short. Try another copy of it.', cause));
+      }, budget);
+      ctx.decodeAudioData(copy).then(resolve, reject).finally(() => clearTimeout(timer));
+    });
+  const spare = bytes.slice(0);
+  try {
+    return await once(bytes);
+  } catch (first) {
+    if (first instanceof Error && first.name === 'AudioDecodeError') throw first;
+    return once(spare);
+  }
 }

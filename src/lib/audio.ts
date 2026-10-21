@@ -9,6 +9,7 @@ import { vendorDir } from './vendor';
 import { audioDecodeError } from './speech-errors';
 import { decodeWma, isAsf } from './wma-convert';
 import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
+import { retryUnreadable } from './read-failure';
 
 /** MP3 is almost always 44.1 kHz; decoding resamples to it. */
 export const SAMPLE_RATE = 44100;
@@ -18,7 +19,7 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
   // Windows Media Audio: no browser decodes it, so a separately loaded decoder module does.
   if (await isAsf(file)) return decodeWma(file, rate);
   await refuseSoundlessContainer(file);
-  const bytes = await file.arrayBuffer();
+  const bytes = await retryUnreadable(file, () => file.arrayBuffer());
   const ctx = new OfflineAudioContext(2, 1, rate);
   let buffer: AudioBuffer;
   try {
