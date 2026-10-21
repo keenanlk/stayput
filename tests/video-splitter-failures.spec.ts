@@ -112,6 +112,47 @@ test.describe('on the page', () => {
     });
   }
 
+  test('a phone that lets go of the picked file after the pick still splits, from the copy kept in memory', async ({ page }) => {
+    await open(page);
+    // Blobs made from bytes in memory (the copy, and slices of it) are marked; once the page arms the fault, every other read fails.
+    await page.addInitScript(() => {
+      const w = window as unknown as { __armed: boolean; __denied: number };
+      w.__armed = false;
+      w.__denied = 0;
+      const mine = new WeakSet<Blob>();
+      const File0 = window.File;
+      window.File = class extends File0 {
+        constructor(parts: BlobPart[], name: string, opts?: FilePropertyBag) {
+          super(parts, name, opts);
+          mine.add(this);
+        }
+      } as typeof File;
+      const slice = Blob.prototype.slice;
+      Blob.prototype.slice = function (...a: Parameters<Blob['slice']>) {
+        const out = slice.apply(this, a);
+        if (mine.has(this)) mine.add(out);
+        return out;
+      };
+      const gone = (b: Blob) => w.__armed && !mine.has(b) && (w.__denied++, true);
+      const arrayBuffer = Blob.prototype.arrayBuffer;
+      Blob.prototype.arrayBuffer = function () {
+        return gone(this) ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
+      };
+      const stream = Blob.prototype.stream;
+      Blob.prototype.stream = function () {
+        return gone(this) ? new ReadableStream({ pull: (c) => c.error(new DOMException('The requested file could not be read.', 'NotReadableError')) }) : stream.call(this);
+      };
+    });
+    await load(page, fx('split-60s.mp4'));
+    await expect(page.locator('#tool')).toHaveAttribute('data-duration', '60');
+    await page.evaluate(() => ((window as unknown as { __armed: boolean }).__armed = true));
+    await page.locator('input[name="vs-mode"][value="equal"]').check();
+    await page.locator('#vs-equal').fill('3');
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+    expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
+  });
+
   test('a file that is not a video is refused as UnreadableFile', async ({ page }) => {
     await open(page);
     await load(page, fx('../../../package.json'));
