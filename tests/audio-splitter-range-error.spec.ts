@@ -30,7 +30,7 @@ test('Audio splitter: a part that cannot be allocated records OutOfMemoryError, 
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(song);
   await expect(page.locator('#tool')).toHaveAttribute('data-duration', /\d/);
-  await page.locator('#sp-times').fill('0:01');
+  await page.locator('#sp-times').fill('0.5');
   await page.locator('#format').selectOption('wav');
   await page.evaluate(() => ((window as unknown as { __arm: boolean }).__arm = true));
   await page.locator('#run').click();
