@@ -3,6 +3,7 @@ import { type OutputFile } from '../lib/files';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../lib/audio';
 import { cutPart, parseTimes, partName, planAtTimes, planEvery, SplitError, type Part } from '../lib/audio-split';
 import { NamedError } from '../lib/input-error';
+import { nameBare } from '../lib/bare-error';
 
 /**
  * Audio splitter. The file is decoded in the page, cut into parts at the times
@@ -15,6 +16,16 @@ const info = $('sp-info');
 const list = $<HTMLOListElement>('sp-parts');
 const timesField = $('sp-times-field');
 const everyField = $('sp-every-field');
+
+/**
+ * A RangeError while the sound is decoded, cut or encoded is a length or an allocation that did not fit (the split points are
+ * checked before this, by plan()). It reaches a failed run's record as plain "RangeError", so it is named OutOfMemoryError and
+ * says what to do; any other bare error is named for the step.
+ */
+function named(step: string, e: unknown): Error {
+  if (!(e instanceof RangeError)) return nameBare(step, e);
+  return new NamedError('OutOfMemoryError', 'This device ran out of memory while working on this sound. Close other tabs and apps and try again, use a shorter file or shorter parts, choose MP3 instead of WAV, or use a computer.', { cause: e });
+}
 
 let buffer: AudioBuffer | undefined;
 let loading: Promise<void> | undefined;
@@ -69,7 +80,9 @@ function update() {
 async function load(file: File) {
   buffer = undefined;
   update();
-  buffer = await decodeAudio(file);
+  buffer = await decodeAudio(file).catch((e) => {
+    throw named('AudioDecodeError', e);
+  });
   $('tool').dataset.duration = String(Math.round(buffer.duration * 10) / 10);
   update();
 }
@@ -105,12 +118,15 @@ const shell = createShell({
     for (const [i, part] of parts.entries()) {
       const label = `Part ${i + 1} of ${parts.length}`;
       progress.set(label, i / parts.length);
-      const cut = cutPart(chans, SAMPLE_RATE, part);
       // One part at a time: only the finished file is kept.
-      const blob =
-        fmt === 'wav'
+      const blob = await (async () => {
+        const cut = cutPart(chans, SAMPLE_RATE, part);
+        return fmt === 'wav'
           ? encodeWav(cut)
-          : await encodeMp3(cut, 192, (f) => progress.set(`${label}: encoding MP3 ${Math.round(f * 100)}%`, (i + f) / parts.length));
+          : encodeMp3(cut, 192, (f) => progress.set(`${label}: encoding MP3 ${Math.round(f * 100)}%`, (i + f) / parts.length));
+      })().catch((e) => {
+        throw named('AudioSplitFailed', e);
+      });
       outs.push({
         name: partName(entry.file.name, i, parts.length, fmt),
         blob,
