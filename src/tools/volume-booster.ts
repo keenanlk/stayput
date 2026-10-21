@@ -6,6 +6,7 @@ import { applyGain, dbToGain, gainFor, type VolumeMode } from '../lib/audio-gain
 import { SAMPLE_RATE, decodePcm } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
 import { audioDecodeError } from '../lib/speech-errors';
+import { retryUnreadable, snapshotFile } from '../lib/read-failure';
 
 /** Streaming services play music at about -14 LUFS; this lands close to that. */
 const NORMALIZE_TARGET = -14;
@@ -36,7 +37,10 @@ createShell({
   async process(files, progress) {
     const m = mode();
     const choice = str('format', 'same');
-    return processEach(files, progress, 'Changing the volume of', async (entry, index) => {
+    // Copy each file into memory right away: on Android a picked file can become unreadable a moment later.
+    files = await Promise.all(files.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file) })));
+    // A file the phone fails to read part way through is read once more before the failure is shown.
+    const run = async (entry: (typeof files)[number], index: number) => {
       const file = entry.file;
       const share = (f: number) => (index + f) / files.length;
       progress.set(`Reading the sound of ${file.name}…`, share(0.05));
@@ -80,6 +84,9 @@ createShell({
         note: `${tail()}, ${formatDuration(r.duration)}, ${FORMAT_LABELS[fmt]}${lossy(fmt) ? ` ${bitrate} kbps` : ''}`,
       };
       return out;
-    });
+    };
+    return processEach(files, progress, 'Changing the volume of', (entry, index) =>
+      retryUnreadable(entry.file, () => run(entry, index), (message) => progress.set(`${entry.file.name}: ${message}`, (index + 0.05) / files.length)),
+    );
   },
 });

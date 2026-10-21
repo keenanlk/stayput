@@ -77,7 +77,7 @@ test.describe('read-failure rules', () => {
   });
 });
 
-async function unreadablePage(page: Page, reads: number) {
+async function unreadablePage(page: Page, reads: number, path = '/remove-background-noise-from-video', armOn = /Removing noise/) {
   await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
   await page.route('https://stats.keenankaufman.com/**', (route) =>
     route.fulfill({
@@ -105,20 +105,20 @@ async function unreadablePage(page: Page, reads: number) {
       return new ReadableStream({ pull: (c) => c.error(new DOMException('The requested file could not be read.', 'NotReadableError')) });
     };
   });
-  await page.goto('/remove-background-noise-from-video');
+  await page.goto(path);
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   // Arm the failure once the sound is being cleaned, so the first reads (and the check before the model loads) pass.
   await page.waitForFunction(() => 'document' in window);
-  void page.evaluate((n) => {
+  void page.evaluate(([n, source]) => {
     const text = document.querySelector('#progress-text')!;
     const watch = new MutationObserver(() => {
-      if (/Removing noise/.test(text.textContent ?? '')) {
-        (window as unknown as { __fail: number }).__fail = n;
+      if (new RegExp(source!).test(text.textContent ?? '')) {
+        (window as unknown as { __fail: number }).__fail = n as number;
         watch.disconnect();
       }
     });
     watch.observe(text, { childList: true, characterData: true, subtree: true });
-  }, reads);
+  }, [reads, armOn.source] as const);
 }
 
 for (const [label, reads, ok] of [
@@ -144,6 +144,29 @@ for (const [label, reads, ok] of [
     if (ok) expect(run.d).toMatchObject({ outcome: 'ok' });
     else expect(run.d).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
     for (const e of all) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `${e.n} carries unexpected key ${k}`).toBe(true);
+  });
+}
+
+// Increase video volume reads the file the same way, so it gets the same early copy and second read.
+for (const [label, reads, ok] of [
+  ['increase video volume: one failed read is read again and the run finishes', 1, true],
+  ['increase video volume: a file that stays unreadable says so, with the error name', 1000, false],
+] as const) {
+  test(label, async ({ page }, info) => {
+    test.setTimeout(150_000);
+    await unreadablePage(page, reads, '/increase-video-volume', /Reading the sound|Writing/);
+    await page.locator('#file-input').setInputFiles(clip(info.project.name === 'webkit' ? 'speech.mov' : 'talk.webm'));
+    await page.locator('#run').click();
+    if (ok) {
+      await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
+      expect(await page.evaluate(() => (window as unknown as { __failed: number }).__failed)).toBeGreaterThan(0);
+    } else {
+      await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 120_000 });
+      await expect(page.locator('#error')).toContainText('This file could not be read');
+    }
+    await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+    const run = (await events(page)).find((e) => e.n === 'tool_run')!;
+    expect(run.d).toMatchObject(ok ? { outcome: 'ok' } : { outcome: 'error', error_class: 'NotReadableError' });
   });
 }
 
@@ -223,9 +246,10 @@ test('a file that never reads ends quickly, saying what to do', async ({ page },
   expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
 });
 
-// The noise remover is a WebAssembly module fetched on the first run. A failed fetch is tried once more; two in a row say so.
+// The noise remover is a WebAssembly module fetched on the first run. A failed fetch is tried twice more; three in a row say so.
 for (const [label, blocked, ok] of [
   ['a noise remover that fails to load once is loaded again', 1, true],
+  ['a noise remover that fails to load twice is loaded a third time', 2, true],
   ['a noise remover that never loads says so, under its own name', 1000, false],
 ] as const) {
   test(label, async ({ page }, info) => {
