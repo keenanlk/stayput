@@ -19,6 +19,9 @@ const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'Audi
 /** Encoder and memory failures that a smaller picture can get past. */
 const SHRINKABLE = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'OutOfMemoryError', 'EncoderRefused']);
 
+/** Encoder failures worth one more try at the same size when the picture is already as small as a retry goes (not memory, which a repeat cannot fix). */
+const AGAIN = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall']);
+
 /** The ladder of longest sides a retry steps down. 1080p is the first rung, as a phone handles it comfortably. */
 const STEPS = [1920, 1280, 854];
 
@@ -120,10 +123,10 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
       }
       const next = SHRINKABLE.has(name) && !shrunk ? smallerSide(longestSide()) : undefined;
       if (next === undefined) {
-        // A stalled encoder on a picture already as small as a retry goes still gets one more try, in real-time mode, at the same size.
-        if (name !== 'EncoderStall' || shrunk) throw e;
+        // An encoder that gave up on a picture already as small as a retry goes still gets one more try, in real-time mode, at the same size.
+        if (!AGAIN.has(name) || shrunk) throw e;
         shrunk = true;
-        hooks.onNotice?.("This device's video encoder stopped responding. Trying once more.");
+        hooks.onNotice?.("This device's video encoder stopped. Trying once more.");
         attempt = { retry: 'again' };
         continue;
       }

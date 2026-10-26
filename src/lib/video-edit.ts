@@ -96,6 +96,9 @@ export interface EditResult {
  * whole video), otherwise a buffer in memory as before.
  */
 /** An error with its own class name, so a failed run records which step it was (never the message). */
+/** Encoder failures that, after every retry, end as EncoderGaveUp. */
+const ENCODER_GAVE_UP = new Set(['EncodingError', 'OperationError', 'NotSupportedError']);
+
 const failure = (name: string, message: string) => Object.assign(new NamedError('VideoEditFailed', message), { name });
 
 /** A file the phone could not read is not "not a video": it keeps its own name, so the job can read it once more. */
@@ -210,6 +213,10 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     // the recovery inside the run and the retries above: name the object it was (see codec-guard.ts), say what to do.
     const invalid = codecFailure(e);
     if (invalid) throw invalid;
+    // The device's encoder gave up on every try, including the same-size retry: say so by name, and what to try.
+    if (ENCODER_GAVE_UP.has((e as { name?: string } | null)?.name ?? '')) {
+      throw new NamedError('EncoderGaveUp', "This device's video encoder stopped, even after a second try. Choose a smaller size, or use a recent Chrome, Edge or Safari, or a computer. Nothing was uploaded.", { cause: e });
+    }
     throw nameBare('VideoEditFailed', e);
   } finally {
     page.dispose();
