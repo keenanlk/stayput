@@ -4,7 +4,8 @@ import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/
 import { describeEdit } from './video-edit-shell';
 import { resumeWhenHidden, retryNote } from '../lib/edit-recovery';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { InputError, NamedError, isUnspecific } from '../lib/input-error';
+import { InputError, NamedError, UnreadableFile, isUnspecific } from '../lib/input-error';
+import { snapshotFile } from '../lib/read-failure';
 import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
@@ -156,12 +157,21 @@ createShell({
 
 async function run(files: ShellFile[], progress: Progress, at: (step: string) => void): Promise<OutputFile[]> {
   const pictures = files.filter((f) => isImage(f.file));
-  const videos = files.filter((f) => !isImage(f.file));
-  if (videos.length === 0) throw new InputError('Add a video too: the picture is only the new background.');
-  if (pictures.length > 1) throw new InputError('Add one picture for the background, with the videos to put it behind.');
+  let videos = files.filter((f) => !isImage(f.file));
+  if (videos.length === 0) {
+    throw new InputError(
+      pictures.length > 0
+        ? 'Add a video too: this tool replaces the background of a video, and the picture is only the new background. To take the background out of a photo, use the Remove background tool instead.'
+        : 'Add a video (MP4, MOV, WebM or MKV) to replace its background.',
+    );
+  }
+  if (pictures.length > 1) throw new InputError(`${pictures.length} pictures were added. Keep one picture for the new background, remove the others, and run again.`);
   let bgKind = kind();
   if (pictures.length === 1) bgKind = 'image';
-  else if (bgKind === 'image') throw new InputError('Add a picture with the video to use as the new background, or choose Blur or Colour.');
+  else if (bgKind === 'image') throw new InputError('Picture is chosen as the new background, but no picture was added. Add a JPG or PNG with the video, or choose Blur or Colour.');
+  // Copy each video into memory right away: on Android a file picked from a cloud gallery (Google Photos, Drive) can stop being
+  // readable by the time the person finder has downloaded. One the browser cannot reach says so now, before the download.
+  videos = await Promise.all(videos.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file) })));
   const strength = num('strength', 6);
   const color = str('bg-color', '#00b140');
   // decodeImage also opens HEIC, which Chrome cannot decode on its own.
@@ -174,6 +184,13 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   const { assertReadable, editVideo, videoSize } = await import('../lib/video-edit');
   // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
   for (const v of videos) await assertReadable(v.file);
+  // A file that is not a video this page opens (3GP, AVI, WMV, a renamed file) is said so now, with the way on, not after the download.
+  for (const v of videos) {
+    await videoSize(v.file).catch((e) => {
+      if (!(e instanceof Error) || e.name !== 'UnreadableFile') return;
+      throw Object.assign(new UnreadableFile(`${v.file.name} is not a video this page can open. It needs MP4, MOV, WebM or MKV: make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
+    });
+  }
   const which = finder();
   progress.set(`Loading the person finder, once (about ${which === 'fast' ? '12' : '28'} MB)…`, 0.01);
   at('PersonFinderLoadFailed');
