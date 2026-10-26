@@ -69,7 +69,7 @@ test.describe('UnreadableFile: refused early', () => {
     await open(page);
     await page.locator('#file-input').setInputFiles([{ name: 'clip.mp4', mimeType: 'video/mp4', buffer: Buffer.from('this is not a video '.repeat(200)) }]);
     await page.locator('#run').click();
-    await expectError(page, 'clip.mp4 is not a video this page can open. It needs MP4, MOV, WebM or MKV', 'UnreadableFile');
+    await expectError(page, 'clip.mp4 is not a video this page can read (MP4, MOV, WebM or MKV)', 'UnreadableFile');
     expect(finderFetched).toBe(false);
   });
 });

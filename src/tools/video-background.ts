@@ -188,7 +188,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   for (const v of videos) {
     await videoSize(v.file).catch((e) => {
       if (!(e instanceof Error) || e.name !== 'UnreadableFile') return;
-      throw Object.assign(new UnreadableFile(`${v.file.name} is not a video this page can open. It needs MP4, MOV, WebM or MKV: make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
+      throw Object.assign(new UnreadableFile(`${v.file.name} is not a video this page can read (MP4, MOV, WebM or MKV). Make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
     });
   }
   const which = finder();
