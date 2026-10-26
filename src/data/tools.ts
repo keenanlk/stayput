@@ -1940,6 +1940,7 @@ export const tools: Tool[] = [
   {
     slug: 'add-watermark-to-video',
     icon: 'stamp',
+    sizeFact: 'The limit is your device’s memory (phones hold less): a long or large video may need a computer.',
     name: 'Add watermark to video',
     title: 'Add Watermark to Video Online, Text or Logo, No Upload | Stayput',
     description:
