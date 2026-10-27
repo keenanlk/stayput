@@ -17,6 +17,7 @@ import { releaseOutput } from './opfs-output';
 import { guardRun, interruptedError, resumeIfHidden, KEEP_SCREEN_ON_HINT } from './wake-lock';
 import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
+import { forgetWorkingSize, workingSize } from './working-size';
 
 export interface ShellFile {
   id: number;
@@ -82,6 +83,8 @@ export interface ShellOptions {
   keepAwake?: boolean;
   /** Send one tool_start event when Run is pressed (the caption tools, where phones abandon runs). */
   announceStart?: boolean;
+  /** A video job that starts at the smaller size that last worked in this tab (see edit-recovery.ts): says so, and offers "Try full size". */
+  remembersSize?: boolean;
 }
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -513,6 +516,33 @@ export function createShell(opts: ShellOptions) {
     hint.hidden = !line;
   }
 
+  /** Says when this tab's runs start at a smaller size than full, and lets the person go back to full size. */
+  const sizeNote = opts.remembersSize ? document.createElement('p') : null;
+  function showSizeNote() {
+    if (!sizeNote) return;
+    const side = workingSize();
+    sizeNote.hidden = !side;
+    if (!side) return;
+    sizeNote.className = 'hint';
+    sizeNote.id = 'working-size-note';
+    const name = side >= 1900 ? '1080p' : side >= 1200 ? '720p' : '480p';
+    const full = document.createElement('button');
+    full.type = 'button';
+    full.className = 'btn btn-sm btn-ghost';
+    full.textContent = 'Try full size';
+    full.addEventListener('click', () => {
+      forgetWorkingSize();
+      showSizeNote();
+    });
+    sizeNote.textContent = `In this tab, videos are made at up to ${name} because the full size failed on this device earlier. `;
+    sizeNote.append(full);
+  }
+  if (sizeNote) {
+    sizeNote.hidden = true;
+    hint.before(sizeNote);
+    showSizeNote();
+  }
+
   async function execute() {
     if (busy || files.length === 0) return;
     hideError();
@@ -555,6 +585,7 @@ export function createShell(opts: ShellOptions) {
       trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e, tool) });
     } finally {
       mine?.release();
+      showSizeNote();
       setBusy(false);
     }
   }

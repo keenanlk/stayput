@@ -36,7 +36,7 @@ import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { codecFailure, guardCodecs, isReclaim, tagCodec } from './codec-guard';
-import { withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { capScale, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface EditOptions {
   mute?: boolean;
@@ -203,7 +203,8 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
         withRecovery(
           async (attempt) => {
             const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
-            return attempt.retry ? { ...r, retry: attempt.retry } : r;
+            const retry = retryOf(attempt);
+            return retry ? { ...r, retry } : r;
           },
           () => made,
           { ...page.hooks, softwareEncode: softwareH264Offered, sameSizeRetry: opts.retryAtSameSize },
@@ -299,11 +300,9 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     }
     // Encoders want even sides; H.264 in most browsers also refuses odd ones.
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
-    if (attempt.maxSide && Math.max(width, height) > attempt.maxSide) {
-      const k = attempt.maxSide / Math.max(width, height);
-      width *= k;
-      height *= k;
-    }
+    const k = capScale(attempt, Math.max(width, height));
+    width *= k;
+    height *= k;
     width = even(width);
     height = even(height);
     sized?.(Math.max(width, height));
@@ -316,7 +315,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       if (wanted) bitrate = new Quality({ bitrate: wanted });
     }
     // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software') useRealtimeH264();
+    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software' || attempt.remembered) useRealtimeH264();
     const videoCodec = await pickVideoCodec({ width, height, bitrate });
     if (!videoCodec) {
       // With an encoder present, only this size is refused (iOS Safari at 4K): a smaller picture can get past it (edit-recovery.ts).

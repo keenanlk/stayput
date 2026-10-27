@@ -1,5 +1,6 @@
 import type { RecoveryHooks } from './edit-recovery';
 import { forgetPageHidden, looksReclaimed } from './wake-lock';
+import { rememberWorkingSize, workingSize } from './working-size';
 
 /**
  * The page-side half of edit-recovery.ts: whether the page was hidden since the job started, waiting for it to come
@@ -30,6 +31,7 @@ export function pageRecoveryHooks(onNotice?: (message: string) => void): { hooks
             })
           : Promise.resolve(),
       reclaimed: looksReclaimed,
+      rung: { get: workingSize, set: rememberWorkingSize },
       onNotice,
     },
     dispose: () => document.removeEventListener('visibilitychange', note),

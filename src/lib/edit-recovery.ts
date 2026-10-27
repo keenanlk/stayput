@@ -45,24 +45,55 @@ export interface RecoveryHooks {
   sameSizeRetry?: boolean;
   /** Said to the person just before a second try. */
   onNotice?(message: string): void;
+  /** The smaller size that last worked in this tab: a run starts there, and a retry that works at a smaller size is kept for the next run. */
+  rung?: { get(): number | undefined; set(side: number): void };
 }
 
 export interface Attempt {
   /** Longest side of the output this try must stay within, when a retry asked for a smaller one. */
   maxSide?: number;
   /** Which kind of retry this is, if it is one. */
-  retry?: 'resumed' | 'smaller' | 'again' | 'software';
+  retry?: 'resumed' | 'smaller' | 'again' | 'software' | 'remembered';
+  /** This try started at the size that worked earlier in this tab, not at full size. */
+  remembered?: boolean;
+  /** The try really made the picture smaller than the source (set by capScale); a cap on a small clip changes nothing and is not mentioned. */
+  capped?: boolean;
+}
+
+/**
+ * The scale (at most 1) that keeps the longest side of a picture within this try's cap. Libs call it where they size the output;
+ * it also records that the cap took effect, so the finished file's note can say so.
+ */
+export function capScale(attempt: Attempt, longest: number): number {
+  if (attempt.maxSide && longest > attempt.maxSide) {
+    attempt.capped = true;
+    return attempt.maxSide / longest;
+  }
+  return 1;
+}
+
+/** The retry kind a finished file's note is about: a size cap that took effect from the start is said even when the page was hidden or the encoder retried on the way. */
+export function retryOf(attempt: Attempt): RetryKind | undefined {
+  if (attempt.remembered && attempt.capped && attempt.retry !== 'smaller') return 'remembered';
+  return attempt.retry === 'remembered' ? undefined : attempt.retry;
 }
 
 export type RetryKind = NonNullable<Attempt['retry']>;
 
+/** A longest side as the name people know it: 1920 is 1080p. */
+export function sizeName(side: number): string {
+  return side >= 1900 ? '1080p' : side >= 1200 ? '720p' : '480p';
+}
+
 /** The words a finished file's note adds when it was made on a retry (empty for a first-try run). */
-export function retryNote(retry: RetryKind | undefined): string {
+export function retryNote(retry: RetryKind | undefined, made?: { width: number; height: number }): string {
   switch (retry) {
     case 'resumed':
       return ' (started again after the page was hidden)';
     case 'smaller':
       return " (made at a smaller size, because the device's video encoder stopped at the full size)";
+    case 'remembered':
+      return made ? ` (made at ${sizeName(Math.max(made.width, made.height))} because the full size failed on this device)` : ' (made smaller because the full size failed on this device)';
     case 'again':
       return " (made on a second try, after the device's video encoder stopped responding)";
     case 'software':
@@ -102,13 +133,19 @@ export async function resumeWhenHidden<T>(step: () => Promise<T>, hooks: Recover
 }
 
 export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSide: () => number, hooks: RecoveryHooks): Promise<T> {
-  let attempt: Attempt = {};
+  // A run starts at the smaller size that worked earlier in this tab, if one did; full size is the default.
+  const start = hooks.rung?.get();
+  const base: Attempt = start ? { maxSide: start, retry: 'remembered', remembered: true } : {};
+  let attempt: Attempt = base;
   let resumes = 0;
   let shrunk = false;
   let softened = false;
   for (;;) {
     try {
-      return await job(attempt);
+      const done = await job(attempt);
+      // A smaller size reached by a retry is what the next run starts at. A run that worked at full size writes nothing.
+      if (attempt.retry === 'smaller' && attempt.maxSide) hooks.rung?.set(attempt.maxSide);
+      return done;
     } catch (e) {
       const name = nameOf(e);
       if (FINAL.has(name)) throw e;
@@ -123,7 +160,7 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
       if ((SHRINKABLE.has(name) || name === 'EncoderStall') && !softened && !shrunk && hooks.softwareEncode && (await hooks.softwareEncode())) {
         softened = true;
         hooks.onNotice?.("This device's video encoder stopped. Trying again with the software encoder.");
-        attempt = { retry: 'software' };
+        attempt = { ...base, retry: 'software' };
         continue;
       }
       const next = (SHRINKABLE.has(name) || sizeRefused(e)) && !shrunk ? smallerSide(longestSide()) : undefined;
@@ -132,12 +169,12 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
         if (name === 'EncoderStall' ? shrunk : !(hooks.sameSizeRetry && AGAIN.has(name)) || shrunk) throw e;
         shrunk = true;
         hooks.onNotice?.(name === 'EncoderStall' ? "This device's video encoder stopped responding. Trying once more." : "This device's video encoder stopped. Trying once more.");
-        attempt = { retry: 'again' };
+        attempt = { ...base, retry: 'again' };
         continue;
       }
       shrunk = true;
       hooks.onNotice?.(`This device's video encoder stopped at the full size. Trying again at a smaller size (${next} pixels on the longest side).`);
-      attempt = { maxSide: next, retry: 'smaller' };
+      attempt = { maxSide: next, retry: 'smaller', remembered: base.remembered };
     }
   }
 }

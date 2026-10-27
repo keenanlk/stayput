@@ -28,14 +28,14 @@ import {
   getFirstEncodableAudioCodec,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
-import { requireH264Encoder } from './encoder-probe';
+import { requireH264Encoder, softwareH264Offered, useRealtimeH264 } from './encoder-probe';
 import { aacSafeSampleRate } from './video-codec';
 import { unplayable } from './video-compress';
 import { NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
 import { memoryRange, nameBare } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { pageRecoveryHooks } from './recovery-hooks';
-import { withRecovery, type Attempt } from './edit-recovery';
+import { capScale, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -56,6 +56,11 @@ export interface TrimResult {
   duration: number;
   /** Set when the encoder failed and the part was copied from the key frame at or before its start instead. */
   keyframeCopy?: boolean;
+  /** Set when the part was made on a retry, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
+  /** The picture's size, when the cut re-encoded it. */
+  width?: number;
+  height?: number;
 }
 
 /** Names an encoder gives up with; a fast cut that meets one falls back to copying from the key frame. */
@@ -73,13 +78,15 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
     return await withRecovery(
       async (attempt) => {
         try {
-          return await trimOnce(file, opts, attempt, (side) => (made = side));
+          const r = await trimOnce(file, opts, attempt, (side) => (made = side));
+          const retry = retryOf(attempt);
+          return retry ? { ...r, retry } : r;
         } catch (e) {
           if (isNotReadable(e)) throw notReadable(e);
           e = memoryRange(e);
           // A fast cut re-encodes a part whose start is far from a key frame. When the encoder fails, copy from the key frame.
           const name = (e as { name?: string } | null)?.name ?? '';
-          if (!opts.exact && !attempt.maxSide && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
+          if (!opts.exact && !attempt.capped && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
             try {
               return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true)), keyframeCopy: true };
             } catch (again) {
@@ -90,7 +97,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
         }
       },
       () => made,
-      page.hooks,
+      { ...page.hooks, softwareEncode: softwareH264Offered },
     );
   } finally {
     page.dispose();
@@ -143,9 +150,14 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
     const trim = { start: opts.start, end: opts.end };
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
     const longest = Math.max(video.displayWidth, video.displayHeight);
-    const smaller = attempt.maxSide && longest > attempt.maxSide ? attempt.maxSide / longest : 1;
+    // A fast cut copies the picture, so a size remembered from an earlier failure does not apply to it; only a retry after its own failure does.
+    const smaller = opts.exact || attempt.retry === 'smaller' ? capScale(attempt, longest) : 1;
     const evenSide = (n: number) => Math.max(2, 2 * Math.round((n * smaller) / 2));
     sized(Math.round(longest * smaller));
+    // A run started again after the encoder failed asks for the encoder mode that does not stall.
+    if (opts.exact || smaller < 1) {
+      if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software' || attempt.remembered) useRealtimeH264();
+    }
     const conversion = await Conversion.init({
       input,
       output,
@@ -156,6 +168,7 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
       composable: !!keepSound,
       video: {
         ...(opts.exact ? { bitrate: QUALITY_HIGH, allowTransformationMetadata: false } : {}),
+        ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}),
         ...(smaller < 1 ? { width: evenSide(video.displayWidth), height: evenSide(video.displayHeight) } : {}),
       },
       audio: opts.mute || keepSound ? { discard: true } : opts.exact ? { bitrate: QUALITY_HIGH, sampleRate: audioRate } : {},
@@ -183,7 +196,12 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
     }
     const buffer = output.target.buffer;
     if (!buffer) throw new NamedError('OutputNotWritten', 'The video could not be written.');
-    return { blob: new Blob([buffer], { type: outFormat.mimeType }), ext: outFormat.fileExtension.replace(/^\./, ''), duration: opts.end - opts.start };
+    return {
+      blob: new Blob([buffer], { type: outFormat.mimeType }),
+      ext: outFormat.fileExtension.replace(/^\./, ''),
+      duration: opts.end - opts.start,
+      ...(smaller < 1 ? { width: evenSide(video.displayWidth), height: evenSide(video.displayHeight) } : {}),
+    };
   } finally {
     input.dispose?.();
   }
