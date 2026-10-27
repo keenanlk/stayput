@@ -33,6 +33,14 @@ function workFile(picked: File): Promise<File> {
   return held.copy;
 }
 
+/**
+ * Runs `job` and, if the phone fails to read the file, reads it up to twice more (after 1 s, then 2.5 s). A video over the
+ * 50 MB copy limit is read from the phone's storage on every cut, so a read can fail more than once in a row. A file that
+ * is still unreadable ends as NotReadableError with the save-to-phone message, as before.
+ */
+const rereading = <T>(file: Blob, job: () => Promise<T>, onNotice?: (message: string) => void) =>
+  retryUnreadable(file, () => retryUnreadable(file, job, onNotice, 2500), onNotice, 1000);
+
 const clock = (s: number) => {
   const m = Math.floor(s / 60);
   const sec = s - m * 60;
@@ -118,7 +126,7 @@ async function load(file: File, onNotice?: (message: string) => void) {
   fileSize = file.size;
   update();
   // A phone that could not read the file the first time often can on the second.
-  duration = await retryUnreadable(file, () => readDuration(file), onNotice);
+  duration = await rereading(file, () => readDuration(file), onNotice);
   $('tool').dataset.duration = String(Math.round(duration * 10) / 10);
   update();
 }
@@ -170,7 +178,7 @@ const shell = createShell({
       const label = `Part ${i + 1} of ${parts.length}`;
       progress.set(label, i / parts.length);
       // One part at a time: only the finished file is kept.
-      const r = await retryUnreadable(
+      const r = await rereading(
         file,
         () =>
           trimVideo(file, {

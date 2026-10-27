@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { unzipSync } from 'fflate';
 import { ALL_FORMATS, BufferSource, Input } from 'mediabunny';
 import { planAtTimes, planEqual, planEvery } from '../src/lib/video-split';
@@ -152,6 +152,58 @@ test.describe('on the page', () => {
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
+
+  // A video over the 50 MB copy limit is read from the phone's storage on every cut, so it can fail more than once in a row.
+  for (const [label, reads, ok] of [
+    ['a big video whose cut fails to read twice in a row is read a third time and splits', 2, true],
+    ['a big video that stays unreadable mid-cut ends as NotReadableError with the save-to-phone message', 1000, false],
+  ] as const) {
+    test(label, async ({ page }, testInfo) => {
+      const big = testInfo.outputPath('big-60s.mp4');
+      // A 'free' box is valid padding after the movie: the clip is unchanged and the file is past the 50 MB copy limit.
+      const head = readFileSync(fx('split-60s.mp4'));
+      const pad = Buffer.alloc(52 * 1024 * 1024);
+      pad.writeUInt32BE(pad.length, 0);
+      pad.write('free', 4, 'latin1');
+      writeFileSync(big, Buffer.concat([head, pad]));
+      await open(page);
+      await page.addInitScript(() => {
+        const w = window as unknown as { __fail: number; __failed: number };
+        w.__fail = 0;
+        w.__failed = 0;
+        const fail = () => {
+          if (w.__fail <= 0) return false;
+          w.__fail--;
+          w.__failed++;
+          return true;
+        };
+        const arrayBuffer = Blob.prototype.arrayBuffer;
+        Blob.prototype.arrayBuffer = function () {
+          return fail() ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
+        };
+        const stream = Blob.prototype.stream;
+        Blob.prototype.stream = function () {
+          if (!fail()) return stream.call(this);
+          return new ReadableStream({ pull: (c) => c.error(new DOMException('The requested file could not be read.', 'NotReadableError')) });
+        };
+      });
+      await load(page, big);
+      await expect(page.locator('#tool')).toHaveAttribute('data-duration', '60');
+      await page.evaluate((n) => ((window as unknown as { __fail: number }).__fail = n), reads);
+      await page.locator('input[name="vs-mode"][value="equal"]').check();
+      await page.locator('#vs-equal').fill('2');
+      await page.locator('#run').click();
+      if (ok) {
+        await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
+        expect(await page.evaluate(() => (window as unknown as { __failed: number }).__failed)).toBe(2);
+        expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
+      } else {
+        await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 120_000 });
+        await expect(page.locator('#error')).toContainText('save it to the phone first');
+        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+      }
+    });
+  }
 
   test('a file that is not a video is refused as UnreadableFile', async ({ page }) => {
     await open(page);
