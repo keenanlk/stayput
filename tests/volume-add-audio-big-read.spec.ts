@@ -161,6 +161,7 @@ for (const [tool, path] of [['volume booster', '/increase-video-volume'], ['add 
   for (const clip of ['center51.mp4', 'center51.webm']) {
     test(`${tool}: 5.1 sound with only a centre channel keeps its voice (${clip})`, async ({ page }, info) => {
       test.skip(clip.endsWith('mp4') && info.project.name !== 'webkit', 'AAC sound is decoded in WebKit only here');
+      test.skip(clip.endsWith('mp4') && !!process.env.CI, 'Linux CI WebKit cannot decode the AAC output in the page; run on a Mac, and the WebM case covers CI');
       test.skip(clip.endsWith('webm') && info.project.name !== 'chromium', 'Opus in WebM is decoded in Chromium only here');
       test.setTimeout(180_000);
       await page.goto(path);
