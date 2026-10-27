@@ -26,15 +26,15 @@ videoEditShell({
       if (!width && !height) throw new InputError('Enter a width, a height, or both.');
       if ((width && width < 16) || (height && height < 16)) throw new InputError('Use at least 16 pixels for the width and height.');
       if ((width ?? 0) > 7680 || (height ?? 0) > 7680) throw new InputError('The largest size this page can make is 7680 pixels on a side.');
-      return { mute, width, height };
+      return { mute, width, height, retryAtSameSize: true };
     }
     const { videoSize } = await import('../lib/video-edit');
     const { width, height } = await videoSize(file);
     if (choice.endsWith('%')) {
       const f = Number(choice.slice(0, -1)) / 100;
-      return { mute, width: width * f };
+      return { mute, width: width * f, retryAtSameSize: true };
     }
     const short = Number(choice);
-    return width <= height ? { mute, width: short } : { mute, height: short };
+    return width <= height ? { mute, width: short, retryAtSameSize: true } : { mute, height: short, retryAtSameSize: true };
   },
 });
