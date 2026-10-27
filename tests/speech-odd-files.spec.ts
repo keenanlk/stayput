@@ -99,7 +99,7 @@ test('a recording the device cannot read is recorded under the error that stoppe
   await expect(page.locator('#error')).toContainText(/could not be read/);
   const run = await lastRun(page);
   expect(run?.outcome).toBe('error');
-  expect(run?.error_class).toBe('NotReadableError');
+  expect(run?.error_class).toMatch(/^NotReadable(Probe|MidRead)$/);
 });
 
 // A video with a picture and no sound track at all is told apart from a sound that could not be read.

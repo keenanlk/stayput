@@ -15,6 +15,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   VideoSample,
@@ -71,7 +72,7 @@ interface Clip {
 const mb = (n: number) => `${Math.round(n / 1e6).toLocaleString('en-US')} MB`;
 
 async function openClip(file: File): Promise<Clip> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   const track = await input.getPrimaryVideoTrack().catch(() => null);
   if (!track) throw new InputError(`${file.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
   if (!(await track.canDecode())) throw new UnsupportedCodec(`${file.name}: ${unplayable()}`);

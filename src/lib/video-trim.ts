@@ -19,6 +19,7 @@ import {
   MovOutputFormat,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   WEBM,
@@ -98,7 +99,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
 }
 
 async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false): Promise<TrimResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch((e) => {
       if (isNotReadable(e)) throw notReadable(e);

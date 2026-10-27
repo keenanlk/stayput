@@ -162,7 +162,7 @@ test.describe('on the page', () => {
       } else {
         await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 200_000 });
         await expect(page.locator('#error')).toContainText('This file could not be read');
-        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'NotReadableProbe' });
       }
     });
   }

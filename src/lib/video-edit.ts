@@ -17,6 +17,7 @@ import {
   MovOutputFormat,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   Quality,
@@ -158,7 +159,7 @@ export function shownSize(video: InputVideoTrack): { width: number; height: numb
 
 /** Size of the picture as it is shown (rotation metadata applied), before any edit. */
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
@@ -178,7 +179,7 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
  * so before it downloads a model. Anything else is left for the run to report.
  */
 export async function assertReadable(file: File): Promise<void> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (video && !(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
@@ -226,7 +227,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
 }
 
 async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch(readOrNull);
     if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');

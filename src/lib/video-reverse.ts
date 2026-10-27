@@ -16,6 +16,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   VideoSample,
@@ -76,7 +77,7 @@ export function reverseWindows(keys: number[], first: number, end: number, windo
 }
 
 export async function reverseVideo(file: File, opts: ReverseOptions): Promise<ReverseResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');

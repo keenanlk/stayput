@@ -18,6 +18,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   WEBM,
@@ -62,7 +63,7 @@ function unlessUnreadable(e: unknown): null {
 }
 
 export async function hasVideo(file: File): Promise<boolean> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     return !!(await input.getPrimaryVideoTrack().catch(unlessUnreadable));
   } finally {
@@ -72,7 +73,7 @@ export async function hasVideo(file: File): Promise<boolean> {
 
 /** `soundFile` may be the sound itself (one or two channels at 48 kHz), which skips writing it out as a file and decoding that again. */
 export async function addAudio(videoFile: File, soundFile: File | Float32Array[], opts: AddAudioOptions): Promise<AddAudioResult> {
-  const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
     if (!video || !video.codec) throw new UnreadableFile(`${videoFile.name} has no video this page can read (MP4, MOV, WebM or MKV).`);

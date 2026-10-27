@@ -17,6 +17,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   VideoSample,
@@ -89,7 +90,7 @@ export async function copyClipSound(target: EncodedAudioPacketSource, track: Inp
 
 export async function mergeVideos(files: File[], opts: MergeOptions): Promise<MergeResult> {
   if (files.length < 2) throw new InputError('Add at least two videos to join.');
-  const inputs = files.map((f) => new Input({ source: new BlobSource(f), formats: [MP4, QTFF, WEBM, MATROSKA] }));
+  const inputs = files.map((f) => new Input({ source: new BlobSource(f), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] }));
   try {
     const clips: { track: InputVideoTrack; first: number; length: number; name: string }[] = [];
     for (const [i, input] of inputs.entries()) {
