@@ -33,6 +33,7 @@ export function videoEditShell(config: {
 }) {
   return createShell({
     keepAwake: true,
+    remembersSize: true,
     onFilesChanged: config.onFilesChanged,
     async process(files, progress) {
       // About 400 KB of video code, loaded only when someone runs the tool.
@@ -51,7 +52,7 @@ export function videoEditShell(config: {
           name: suffixName(entry.file.name, config.suffix, r.ext),
           blob: r.blob,
           originalSize: entry.file.size,
-          note: [describeEdit(r) + retryNote(r.retry), config.note?.()].filter(Boolean).join(', '),
+          note: [describeEdit(r) + retryNote(r.retry, r), config.note?.()].filter(Boolean).join(', '),
         };
         return out;
       });
