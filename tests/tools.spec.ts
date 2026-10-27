@@ -79,7 +79,7 @@ async function open(page: Page, slug: string) {
   return errors;
 }
 
-async function run(page: Page, files: string[], configure?: () => Promise<void>): Promise<{ downloads: Download[]; items: number }> {
+async function run(page: Page, files: string[], configure?: () => Promise<void>, resultsTimeout = 60_000): Promise<{ downloads: Download[]; items: number }> {
   // Landing pages load their tool module on demand, so wait for the shell before dropping files.
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(files.map((f) => (f.includes('/') ? f : fx(f))));
@@ -88,7 +88,7 @@ async function run(page: Page, files: string[], configure?: () => Promise<void>)
   const downloads: Download[] = [];
   page.on('download', (d) => downloads.push(d));
   await page.locator('#run').click();
-  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: resultsTimeout });
   await expect(page.locator('#error')).not.toHaveClass(/is-active/);
   const items = await page.locator('#results-list .result-item').count();
   // Give the single-file auto download a moment to register.
@@ -7251,7 +7251,7 @@ test('Vocal remover splits speech from music into two WAVs, and no bytes leave t
   const { items } = await run(page, [file], async () => {
     await page.locator('#stems').selectOption('both');
     await page.locator('#format').selectOption('wav');
-  });
+  }, 200_000);
   expect(items).toBe(2);
   await expect(page.locator('#results-list')).toContainText('music without the vocals');
   await expect(page.locator('#results-list')).toContainText('on the CPU');

@@ -56,18 +56,26 @@ async function expectPlayableMp4(page: Page, bytes: Buffer): Promise<{ width: nu
 
 /** The mp4's sound must decode end to end, with the channel count the source had and a real tone in it. */
 async function expectAudioDecodes(page: Page, bytes: Buffer, channels: number) {
-  const r = await page.evaluate(async (data) => {
-    try {
+  // Linux WebKit's decodeAudioData sometimes never settles on a file it decodes in seconds the next time. Each
+  // attempt gets its own AudioContext and a 40 s limit; a file that does not decode in three attempts still fails.
+  let r: { ok: boolean; channels?: number; seconds?: number; peak?: number; error?: string } = { ok: false, error: 'not tried' };
+  for (let attempt = 0; attempt < 3 && !r.ok; attempt++) {
+    r = await page.evaluate(async (data) => {
       const ctx = new AudioContext();
-      const buf = await ctx.decodeAudioData(new Uint8Array(data).buffer);
-      const pcm = buf.getChannelData(0);
-      let peak = 0;
-      for (let i = 0; i < pcm.length; i++) peak = Math.max(peak, Math.abs(pcm[i]!));
-      return { ok: true, channels: buf.numberOfChannels, seconds: buf.duration, peak };
-    } catch (e) {
-      return { ok: false, error: String(e) };
-    }
-  }, [...bytes]);
+      try {
+        const decoded = ctx.decodeAudioData(new Uint8Array(data).buffer);
+        const buf = await Promise.race([decoded, new Promise<never>((_, no) => setTimeout(() => no(new Error('decodeAudioData did not settle in 40 s')), 40_000))]);
+        const pcm = buf.getChannelData(0);
+        let peak = 0;
+        for (let i = 0; i < pcm.length; i++) peak = Math.max(peak, Math.abs(pcm[i]!));
+        return { ok: true, channels: buf.numberOfChannels, seconds: buf.duration, peak };
+      } catch (e) {
+        return { ok: false, error: String(e) };
+      } finally {
+        void ctx.close().catch(() => {});
+      }
+    }, [...bytes]);
+  }
   expect(r, JSON.stringify(r)).toMatchObject({ ok: true, channels });
   expect(r.seconds).toBeGreaterThan(3);
   expect(r.peak).toBeGreaterThan(0.05);
