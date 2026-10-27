@@ -670,9 +670,9 @@ export const guides: Guide[] = [
     title: "Strip EXIF Without Re-encoding the Image: How It Works",
     description: "Remove EXIF, GPS and other metadata from JPEG, PNG and WebP by editing the file structure instead of re-saving the pixels: the segments, chunks, gotchas and code.",
     heading: "Stripping EXIF without re-encoding the JPEG",
-    dek: "How Stayput removes location and camera data from photos in the browser by editing the file structure, in about 600 lines of TypeScript and no library, and the one case that still has to re-encode.",
+    dek: "Need an EXIF remover? Stayput's EXIF remover strips location and camera data from JPG, PNG and WebP photos in your browser without re-saving the picture. This page explains how it works, in about 600 lines of TypeScript and no library.",
     keywords: ["strip exif without re-encoding", "lossless exif removal", "remove exif javascript", "jpeg app1 segment", "remove metadata without losing quality", "exif remover how it works"],
-    updated: "2026-10-14",
+    updated: "2026-10-27",
     tools: ["strip-exif", "exif-viewer", "heic-to-jpg"],
     sections: [
       {
@@ -720,6 +720,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: "Is there an EXIF remover I can just use?", a: "Yes. The [EXIF remover](/tools/strip-exif) does exactly what this page describes. Drop JPG, PNG or WebP photos, see what each one carries, and download clean copies. It is free and the photos are not uploaded." },
       { q: "Does removing EXIF this way reduce quality?", a: "No, with one exception. The compressed picture data is copied byte for byte and never decoded, for JPEG, PNG and WebP alike. The exception is a JPEG stored sideways while the tool's Apply orientation option is ticked (the default): it is decoded, rotated and saved again as a JPEG at quality 95. Untick the option and nothing is re-encoded." },
       { q: "Why not just draw the image on a canvas and export it?", a: "That works and is simpler, but it re-compresses the photo, loses some quality, discards the colour profile and usually makes a phone photo larger. It also takes more memory for big images." },
       { q: "Is this safe to run in the browser?", a: "Yes. The file is read with the File API into memory in your tab and the cleaned copy is handed to your browser's download. No request carries the file, which you can verify in the network tab." },
