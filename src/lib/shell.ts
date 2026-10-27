@@ -534,7 +534,7 @@ export function createShell(opts: ShellOptions) {
       forgetWorkingSize();
       showSizeNote();
     });
-    sizeNote.textContent = `Videos here are made at up to ${name} in this tab, because the full size failed on this device earlier. `;
+    sizeNote.textContent = `In this tab, videos are made at up to ${name} because the full size failed on this device earlier. `;
     sizeNote.append(full);
   }
   if (sizeNote) {
