@@ -1,9 +1,9 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
-import { encodeWav, formatDuration } from '../lib/audio';
+import { formatDuration } from '../lib/audio';
 import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioFormat } from '../lib/audio-convert';
 import { applyGain, dbToGain, gainFor, type VolumeMode } from '../lib/audio-gain';
-import { SAMPLE_RATE, decodePcm } from '../lib/pcm';
+import { SAMPLE_RATE, decodePcmSliced } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
 import { audioDecodeError } from '../lib/speech-errors';
 import { retryUnreadable, snapshotFile } from '../lib/read-failure';
@@ -55,10 +55,10 @@ createShell({
       const tail = () => `${signed(db)}${limited > 0.0005 ? `, ${(limited * 100).toFixed(1)}% of peaks eased` : ''}`;
 
       if (await hasVideo(file)) {
-        const pcm = await decodePcm(file);
+        const pcm = await decodePcmSliced(file);
         if (!pcm || !pcm[0]?.length) throw audioDecodeError(`${file.name} has no sound to change.`);
-        const wav = new File([encodeWav(change(pcm, SAMPLE_RATE), SAMPLE_RATE)], 'sound.wav', { type: 'audio/wav' });
-        const r = await addAudio(file, wav, { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.2 + f * 0.8)) });
+        // The changed sound goes straight to the video: no WAV is written and read back whole.
+        const r = await addAudio(file, change(pcm, SAMPLE_RATE), { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.2 + f * 0.8)) });
         const out: OutputFile = { name: suffixName(file.name, suffix(m, db), r.ext), blob: r.blob, originalSize: file.size, note: `${tail()}, picture copied, ${formatDuration(r.duration)}` };
         return out;
       }
