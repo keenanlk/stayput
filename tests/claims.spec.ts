@@ -106,7 +106,9 @@ test('no page makes an unqualified size-limit or bare offline claim about Staypu
 
 test('every other built page (home, about, press, privacy, hubs, conversions) and llms.txt make none either', () => {
   const covered = new Set(pages.map(({ path }) => `${path.slice(1)}.html`));
-  const others = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') && !covered.has(f) && f !== '404.html');
+  const others = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') && !covered.has(f) && f !== '404.html'
+    // /desktop describes a possible app ("Work offline on your computer"), not the site.
+    && f !== 'desktop.html');
   expect(others.length).toBeGreaterThan(5);
   const bad = [...others, 'llms.txt'].flatMap((f) => claimsIn(readFileSync(new URL(f, dist), 'utf8')).map((c) => `${f} ${c}`));
   expect(bad).toEqual([]);
