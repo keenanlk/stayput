@@ -169,7 +169,9 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     await loading;
-    const file = await workFile(entry.file);
+    const file = await workFile(entry.file).catch((e) => {
+      throw nameBare('VideoReadFailed', e);
+    });
     if (!duration) {
       try {
         await load(file, (m) => progress.set(m, 0));
@@ -185,7 +187,10 @@ const shell = createShell({
       throw new InputError(e instanceof Error ? e.message : 'Check the times and try again.');
     }
     const exact = bool('exact');
-    const { trimVideo } = await import('../lib/video-trim');
+    // The cutting code loads on first use: a connection that drops here fails the import with a bare TypeError ("Failed to fetch dynamically imported module").
+    const { trimVideo } = await import('../lib/video-trim').catch((e) => {
+      throw nameBare('CutToolLoadFailed', e);
+    });
     const outs: OutputFile[] = [];
     for (const [i, part] of parts.entries()) {
       const label = `Part ${i + 1} of ${parts.length}`;

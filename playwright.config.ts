@@ -10,6 +10,8 @@ const webkitSpecs = readdirSync('./tests')
 export default defineConfig({
   testDir: './tests',
   timeout: 90_000,
+  // Two workers share a small CI runner, so a plain UI assertion can need more than the 5 s default while a media test runs beside it.
+  expect: { timeout: process.env.CI ? 15_000 : 5_000 },
   fullyParallel: true,
   workers: 2,
   reporter: 'list',

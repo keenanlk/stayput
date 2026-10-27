@@ -103,6 +103,9 @@ export function retryNote(retry: RetryKind | undefined, made?: { width: number; 
   }
 }
 
+/** An EncoderUnavailable that only refused this picture size (the browser has an encoder): a smaller size can get past it. */
+const sizeRefused = (e: unknown) => nameOf(e) === 'EncoderUnavailable' && !!(e as { sizeRefused?: boolean }).sizeRefused;
+
 const nameOf = (e: unknown) => (typeof e === 'object' && e ? ((e as { name?: string }).name ?? '') : '');
 
 /**
@@ -160,7 +163,7 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
         attempt = { ...base, retry: 'software' };
         continue;
       }
-      const next = SHRINKABLE.has(name) && !shrunk ? smallerSide(longestSide()) : undefined;
+      const next = (SHRINKABLE.has(name) || sizeRefused(e)) && !shrunk ? smallerSide(longestSide()) : undefined;
       if (next === undefined) {
         // An encoder that gave up on a picture already as small as a retry goes still gets one more try, in real-time mode, at the same size.
         if (name === 'EncoderStall' ? shrunk : !(hooks.sameSizeRetry && AGAIN.has(name)) || shrunk) throw e;

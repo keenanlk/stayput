@@ -1272,9 +1272,9 @@ export const tools: Tool[] = [
     name: 'Image to Word',
     title: 'Image to Word Converter (JPG, PNG to DOCX) | Stayput',
     description:
-      'Turn JPG, PNG or WebP images into an editable Word document (.docx) in your browser. OCR reads the text, one page per image. Nothing is uploaded.',
-    heading: 'Convert image to Word',
-    tagline: 'Read the text in photos, screenshots or scans and save it as one Word document, one page per image. Only the text comes across, not the layout. Nothing is uploaded.',
+      'Image to Word converter: turn a PNG, JPG or WebP into an editable Word document (.docx). OCR reads the text, one page per image. Free, nothing uploaded.',
+    heading: 'Image to Word converter: PNG or JPG to an editable .docx',
+    tagline: 'Turn a PNG, JPG or screenshot into a Word document you can edit. The text is read from the picture, one page per image, and the layout is not kept. Nothing is uploaded.',
     category: 'images',
     accept: 'image/*,.heic,.heif,.avif,.jxl',
     multiple: true,
@@ -1288,8 +1288,12 @@ export const tools: Tool[] = [
     ],
     faq: [
       {
-        q: 'Does the Word file look like my image?',
-        a: 'No. Only the text comes across. Layout, columns, tables, fonts, colours and pictures are not kept: the document holds the recognised words as plain editable paragraphs, one page per image. That is what you want when the goal is to edit or reuse the words. If you need the picture itself in a document, Image to PDF keeps the page exactly as it looks.',
+        q: 'Is the text in the Word file editable?',
+        a: 'Yes. The words are recognised and written into the document as plain editable paragraphs, one page per image. Layout, columns, tables, fonts, colours and pictures are not kept, so the document will not look like your image. If you need the picture itself in a document, Image to PDF keeps the page exactly as it looks.',
+      },
+      {
+        q: 'Can I convert a PNG to Word, or only JPG?',
+        a: 'Both. PNG, JPG, WebP and HEIC all work, including phone screenshots and scans. Drop several and each one becomes its own page of text in the same .docx.',
       },
       {
         q: 'Is my image uploaded?',
@@ -1297,7 +1301,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Which languages does it read?',
-        a: 'English, including accented Latin letters in names and places. It is the same reader as Image to text, so it gains languages when that does.',
+        a: 'English only for now, including accented Latin letters in names and places. Text in other alphabets, such as Cyrillic, Greek, Arabic or Chinese, is not read correctly. It uses the same text reader as Image to text, so any language added there is added here too.',
       },
       {
         q: 'How accurate is it?',
