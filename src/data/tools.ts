@@ -1426,7 +1426,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How long can the GIF be?',
-        a: 'Up to 600 frames, which is 60 seconds at 10 frames per second or 30 seconds at 20. GIF is an old format with no real video compression, so a long or large GIF quickly runs to tens of megabytes. For sharing, a clip of 2 to 10 seconds at 480 pixels wide and 10 to 15 frames per second is the sweet spot.',
+        a: 'Up to 600 frames, which is 60 seconds at 10 frames per second or 30 seconds at 20. GIF is an old format with no real video compression, so a long or large GIF quickly runs to tens of megabytes. For sharing, a clip of 2 to 10 seconds at 480 pixels wide and 10 to 15 frames per second is the sweet spot. To shrink a GIF you already made, see [how to reduce GIF size](/guides/how-to-reduce-gif-size).',
       },
       {
         q: 'Why will my iPhone video not open?',
@@ -3792,6 +3792,10 @@ export const tools: Tool[] = [
         a: 'Small changes, a few semitones or up to about 1.5× speed, sound natural. Very large ones, a whole octave or half speed, add some smearing, as every pitch shifter does. Save as WAV or FLAC if you will edit the result further.',
       },
       {
+        q: 'Can it fix a recording that was slightly out of tune?',
+        a: 'No. The pitch slider moves in whole semitones for the whole recording, so it can change the key but cannot nudge a recording by a small fraction of a note. Tuning the instrument before you record is the fix: [how to tune a guitar](/guides/how-to-tune-a-guitar) shows how.',
+      },
+      {
         q: 'Can I use it on a video?',
         a: 'This page takes sound files. For a video, use Change video speed, which keeps the pitch of the voices, or save the sound first with Video to MP3.',
       },
@@ -4975,6 +4979,10 @@ export const tools: Tool[] = [
         a: 'Not yet: a scan is a picture of the words. Run the PDF through OCR PDF next, which reads the text on your device and makes the PDF searchable.',
       },
       {
+        q: 'Can I choose A4 or Letter, or change the paper size later?',
+        a: 'Yes. Under PDF paper, choose A4 or US Letter before you press Scan; the default is the usual size where you live. To change the paper size of a PDF you already have, or to make the file smaller, read [how to resize a PDF](/guides/how-to-resize-a-pdf).',
+      },
+      {
         q: 'Are my documents uploaded?',
         a: 'No. The photos are decoded, straightened and saved in this tab. IDs, contracts and medical forms never leave your phone or computer.',
       },
@@ -5171,6 +5179,10 @@ export const tools: Tool[] = [
       {
         q: 'Can it open password-protected archives?',
         a: 'Yes, when you have the password: type it before pressing Extract. That works for password-protected ZIP files, for 7z archives (whether only the contents are encrypted or the file names are too) and for RAR archives (old RAR and RAR5, with or without encrypted file names). A wrong password shows an error and nothing is extracted. For 7z and RAR the page downloads 7-Zip, about 0.7 MB more, only when an archive needs it: when it has a password, or when its list of files is itself encrypted so the page cannot read it without 7-Zip. Everything still runs in your browser and nothing is uploaded. It cannot guess or remove a password you do not have, and archives split into parts are not supported.',
+      },
+      {
+        q: 'Can I check the archive against a published checksum first?',
+        a: 'Yes. If the download page lists an MD5 or SHA-256 value, drop the archive on the [file checksum](/tools/file-checksum) tool and paste that value into its compare box. A match means it is the same file the publisher hashed.',
       },
       {
         q: 'How do I remove the password from a ZIP file?',
@@ -5952,7 +5964,7 @@ export const tools: Tool[] = [
     faq: [
       {
         q: 'Which sizes do I get?',
-        a: 'Twitch emotes come out at 112, 56 and 28 pixels, sub badges at 72, 36 and 18, Discord emoji at 128, Discord stickers at 320 and Slack emoji at 128. Each is a transparent PNG, checked against the platform’s file size limit, and the result list says if one is over.',
+        a: 'Twitch emotes come out at 112, 56 and 28 pixels, sub badges at 72, 36 and 18, Discord emoji at 128, Discord stickers at 320 and Slack emoji at 128. Each is a transparent PNG, checked against the platform’s file size limit, and the result list says if one is over. A Discord profile banner is a different shape; the [Discord banner resizer](/discord-banner-resizer) makes it.',
       },
       {
         q: 'Why does my emote look blurry at 28 pixels?',
