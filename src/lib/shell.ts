@@ -9,6 +9,7 @@ import { EncoderStall } from './encoder-watchdog';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
+import { mountDesktopTeaser } from './desktop-teaser';
 import { warmDecoders } from './vendor';
 import { droppedFiles } from './folder-drop';
 import { takeHandoff } from './handoff';
@@ -192,6 +193,7 @@ export function createShell(opts: ShellOptions) {
   const results = $('results');
   const resultsList = $('results-list');
   const resultsTitle = $('results-title');
+  const desktopTeaser = mountDesktopTeaser(root);
   const downloadAll = $<HTMLButtonElement>('download-all');
 
   let files: ShellFile[] = [];
@@ -357,6 +359,7 @@ export function createShell(opts: ShellOptions) {
   }
   function hideResults() {
     results.classList.remove('is-active');
+    desktopTeaser.hide();
     const next = document.getElementById('next-steps');
     if (next) next.hidden = true;
     resultsList.innerHTML = '';
