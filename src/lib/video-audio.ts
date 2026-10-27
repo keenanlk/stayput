@@ -70,7 +70,8 @@ export async function hasVideo(file: File): Promise<boolean> {
   }
 }
 
-export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioOptions): Promise<AddAudioResult> {
+/** `soundFile` may be the sound itself (one or two channels at 48 kHz), which skips writing it out as a file and decoding that again. */
+export async function addAudio(videoFile: File, soundFile: File | Float32Array[], opts: AddAudioOptions): Promise<AddAudioResult> {
   const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
@@ -85,8 +86,8 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     const duration = Math.max(0, end - first) || (await input.computeDuration());
     const len = Math.max(1, Math.round(duration * SAMPLE_RATE));
 
-    const added = await decodePcm(soundFile);
-    if (!added || !added[0]?.length) throw new UnreadableFile(`${soundFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
+    const added = Array.isArray(soundFile) ? soundFile : await decodePcm(soundFile);
+    if (!added || !added[0]?.length) throw new UnreadableFile(`${Array.isArray(soundFile) ? videoFile.name : soundFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
     const [inL, inR] = stereo(added);
     const soundLength = inL!.length / SAMPLE_RATE;
     const looped = opts.loop && inL!.length < len;
