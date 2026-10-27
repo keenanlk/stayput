@@ -63,6 +63,8 @@ export interface EditOptions {
    * would be above it. Without it a 4K phone clip came out 44% bigger than it went in.
    */
   matchSourceBitrate?: boolean;
+  /** The size was chosen by the person: an encoder that gives up gets one more try at that size, then ends as EncoderGaveUp. */
+  retryAtSameSize?: boolean;
   /** Output size. With only one side set, the other follows the aspect ratio. */
   width?: number;
   height?: number;
@@ -204,7 +206,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
             return attempt.retry ? { ...r, retry: attempt.retry } : r;
           },
           () => made,
-          { ...page.hooks, softwareEncode: softwareH264Offered },
+          { ...page.hooks, softwareEncode: softwareH264Offered, sameSizeRetry: opts.retryAtSameSize },
         ),
       opts.onNotice,
     );
@@ -214,7 +216,7 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     const invalid = codecFailure(e);
     if (invalid) throw invalid;
     // The device's encoder gave up on every try, including the same-size retry: say so by name, and what to try.
-    if (ENCODER_GAVE_UP.has((e as { name?: string } | null)?.name ?? '')) {
+    if (opts.retryAtSameSize && ENCODER_GAVE_UP.has((e as { name?: string } | null)?.name ?? '')) {
       throw new NamedError('EncoderGaveUp', "This device's video encoder stopped, even after a second try. Choose a smaller size, or use a recent Chrome, Edge or Safari, or a computer. Nothing was uploaded.", { cause: e });
     }
     throw nameBare('VideoEditFailed', e);

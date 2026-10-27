@@ -41,6 +41,8 @@ export interface RecoveryHooks {
   reclaimed(e: unknown): boolean;
   /** Whether a software encode is on offer here; when absent or false the first encoder failure goes straight to a smaller picture. */
   softwareEncode?(): boolean | Promise<boolean>;
+  /** Allow one more try at the same size when the picture is already as small as a retry goes (a size the person chose). */
+  sameSizeRetry?: boolean;
   /** Said to the person just before a second try. */
   onNotice?(message: string): void;
 }
@@ -124,9 +126,9 @@ export async function withRecovery<T>(job: (a: Attempt) => Promise<T>, longestSi
       const next = SHRINKABLE.has(name) && !shrunk ? smallerSide(longestSide()) : undefined;
       if (next === undefined) {
         // An encoder that gave up on a picture already as small as a retry goes still gets one more try, in real-time mode, at the same size.
-        if (!AGAIN.has(name) || shrunk) throw e;
+        if (name === 'EncoderStall' ? shrunk : !(hooks.sameSizeRetry && AGAIN.has(name)) || shrunk) throw e;
         shrunk = true;
-        hooks.onNotice?.("This device's video encoder stopped. Trying once more.");
+        hooks.onNotice?.(name === 'EncoderStall' ? "This device's video encoder stopped responding. Trying once more." : "This device's video encoder stopped. Trying once more.");
         attempt = { retry: 'again' };
         continue;
       }
