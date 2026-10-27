@@ -77,19 +77,20 @@ test.describe('on the page', () => {
         const w = window as unknown as { __fail: number; __failed: number };
         w.__fail = n;
         w.__failed = 0;
-        const fail = () => {
-          if (w.__fail <= 0) return false;
+        // Only the big reads fail; the one-byte probe between reads passes, so each failure is one run of the job.
+        const fail = (blob: Blob) => {
+          if (w.__fail <= 0 || blob.size <= 1) return false;
           w.__fail--;
           w.__failed++;
           return true;
         };
         const arrayBuffer = Blob.prototype.arrayBuffer;
         Blob.prototype.arrayBuffer = function () {
-          return fail() ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
+          return fail(this) ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
         };
         const stream = Blob.prototype.stream;
         Blob.prototype.stream = function () {
-          if (!fail()) return stream.call(this);
+          if (!fail(this)) return stream.call(this);
           return new ReadableStream({ pull: (c) => c.error(new DOMException('The requested file could not be read.', 'NotReadableError')) });
         };
       }, reads);
@@ -171,19 +172,20 @@ test.describe('on the page', () => {
         const w = window as unknown as { __fail: number; __failed: number };
         w.__fail = 0;
         w.__failed = 0;
-        const fail = () => {
-          if (w.__fail <= 0) return false;
+        // Only the big reads fail; the one-byte probe between reads passes, so each failure is one run of the job.
+        const fail = (blob: Blob) => {
+          if (w.__fail <= 0 || blob.size <= 1) return false;
           w.__fail--;
           w.__failed++;
           return true;
         };
         const arrayBuffer = Blob.prototype.arrayBuffer;
         Blob.prototype.arrayBuffer = function () {
-          return fail() ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
+          return fail(this) ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
         };
         const stream = Blob.prototype.stream;
         Blob.prototype.stream = function () {
-          if (!fail()) return stream.call(this);
+          if (!fail(this)) return stream.call(this);
           return new ReadableStream({ pull: (c) => c.error(new DOMException('The requested file could not be read.', 'NotReadableError')) });
         };
       });
@@ -200,6 +202,8 @@ test.describe('on the page', () => {
       } else {
         await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 120_000 });
         await expect(page.locator('#error')).toContainText('save it to the phone first');
+        // Read exactly three times, no more.
+        expect(await page.evaluate(() => (window as unknown as { __failed: number }).__failed)).toBe(3);
         expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
       }
     });

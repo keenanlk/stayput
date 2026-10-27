@@ -4,7 +4,7 @@ import { overPhoneLimit } from '../lib/phone-limit';
 import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
 import { InputError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
-import { retryUnreadable, snapshotFile } from '../lib/read-failure';
+import { isNotReadable, probeReadable, snapshotFile } from '../lib/read-failure';
 
 /**
  * Video splitter. The length is read from the file's container; the parts are
@@ -34,12 +34,23 @@ function workFile(picked: File): Promise<File> {
 }
 
 /**
- * Runs `job` and, if the phone fails to read the file, reads it up to twice more (after 1 s, then 2.5 s). A video over the
- * 50 MB copy limit is read from the phone's storage on every cut, so a read can fail more than once in a row. A file that
- * is still unreadable ends as NotReadableError with the save-to-phone message, as before.
+ * Runs `job` and, if the phone fails to read the file, reads it up to twice more (after 1 s, then 2.5 s): three reads in
+ * all. A video over the 50 MB copy limit is read from the phone's storage on every cut, so a read can fail more than once
+ * in a row. A file that is still unreadable ends as NotReadableError with the save-to-phone message, as before.
  */
-const rereading = <T>(file: Blob, job: () => Promise<T>, onNotice?: (message: string) => void) =>
-  retryUnreadable(file, () => retryUnreadable(file, job, onNotice, 2500), onNotice, 1000);
+async function rereading<T>(file: Blob, job: () => Promise<T>, onNotice?: (message: string) => void): Promise<T> {
+  for (const pause of [1000, 2500]) {
+    try {
+      return await job();
+    } catch (e) {
+      if (!isNotReadable(e)) throw e;
+      await new Promise((r) => setTimeout(r, pause));
+      await probeReadable(file);
+      onNotice?.('The file could not be read. Trying again.');
+    }
+  }
+  return job();
+}
 
 const clock = (s: number) => {
   const m = Math.floor(s / 60);
