@@ -1,9 +1,9 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
-import { encodeWav, formatDuration } from '../lib/audio';
+import { formatDuration } from '../lib/audio';
 import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioFormat } from '../lib/audio-convert';
 import { DENOISE_RATE, denoise, inStage, loadRnnoise, resample } from '../lib/denoise';
-import { SAMPLE_RATE, decodePcm } from '../lib/pcm';
+import { SAMPLE_RATE, decodePcmSliced } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
 import { audioDecodeError } from '../lib/speech-errors';
 import { retryUnreadable, snapshotFile } from '../lib/read-failure';
@@ -46,7 +46,7 @@ createShell({
 
       progress.set(`Reading the sound of ${file.name}…`, share(0.05));
       if (await hasVideo(file)) {
-        const pcm = await decodePcm(file).catch((e) => {
+        const pcm = await decodePcmSliced(file).catch((e) => {
           // A video with no sound track keeps its name (NoSoundTrack) but says what this tool needs.
           if (e instanceof Error && e.name === 'NoSoundTrack') {
             e.message = `${file.name} has no sound to clean.`;
@@ -55,8 +55,8 @@ createShell({
           throw inStage('NoiseDecodeError', e);
         });
         if (!pcm || !pcm[0]?.length) throw audioDecodeError(`${file.name} has no sound to clean.`);
-        const wav = new File([encodeWav(await clean(pcm, SAMPLE_RATE), SAMPLE_RATE)], 'sound.wav', { type: 'audio/wav' });
-        const r = await addAudio(file, wav, { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.7 + f * 0.3)) }).catch((e) => {
+        // The cleaned sound goes straight to the video: no WAV is written and read back whole.
+        const r = await addAudio(file, await clean(pcm, SAMPLE_RATE), { mode: 'replace', loop: false, fade: false, onProgress: (f) => progress.set(`Writing ${file.name}: ${Math.round(f * 100)}%`, share(0.7 + f * 0.3)) }).catch((e) => {
           throw inStage('NoiseWriteError', e);
         });
         const out: OutputFile = { name: suffixName(file.name, '-clean', r.ext), blob: r.blob, originalSize: file.size, note: `${voiceNote(voice)}, picture copied, ${formatDuration(r.duration)}` };
