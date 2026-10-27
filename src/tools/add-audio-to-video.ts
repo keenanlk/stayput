@@ -1,4 +1,4 @@
-import { bool, createShell, str, type ShellFile } from '../lib/shell';
+import { bool, createShell, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { InputError, UnreadableFile } from '../lib/input-error';
 
@@ -13,38 +13,9 @@ const clock = (s: number) => {
   return m ? `${m}:${String(sec).padStart(2, '0')}` : `${sec} s`;
 };
 
-/** Whether each dropped file holds a picture; undefined while it is being checked or could not be read (the run then names the problem). */
-const hasPicture = new WeakMap<File, boolean | undefined>();
-
-/** Why Run can't start yet, in one line; '' when there is one video and one sound file. */
-function missing(files: ShellFile[]): string {
-  if (files.length === 0) return 'Add one video and one sound file to start.';
-  if (files.length > 2) return `Remove ${files.length - 2} file${files.length === 3 ? '' : 's'}: this tool takes one video and one sound file.`;
-  const kinds = files.map((f) => (hasPicture.has(f.file) ? hasPicture.get(f.file) : undefined));
-  if (files.length === 1) {
-    if (!hasPicture.has(files[0]!.file)) return 'Checking the file…';
-    return kinds[0] === false ? 'Add a video too: this one is only sound.' : kinds[0] === true ? 'Add a sound file too (MP3, WAV, M4A, or another video to take the sound from).' : '';
-  }
-  if (files.some((f) => !hasPicture.has(f.file))) return 'Checking the files…';
-  return kinds.every((k) => k === false) ? 'Add a video: both of these files are only sound.' : '';
-}
-
-const shell = createShell({
+createShell({
   keepAwake: true,
   outputFormat: () => 'mp4',
-  runBlocker: missing,
-  async onFilesChanged(files) {
-    const { hasVideo } = await import('../lib/video-audio');
-    if (files.length <= 2) {
-      await Promise.all(
-        files.map(async ({ file }) => {
-          if (hasPicture.has(file)) return;
-          hasPicture.set(file, await hasVideo(file).catch(() => undefined));
-        }),
-      );
-    }
-    shell.refresh();
-  },
   async process(files, progress) {
     if (files.length === 1) {
       // Say which one is missing: a picture means the sound file is the one to add.
