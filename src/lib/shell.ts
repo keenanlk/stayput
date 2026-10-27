@@ -61,12 +61,6 @@ export interface ShellOptions {
   reorder?: boolean;
   /** Called after files are added, removed or reordered. */
   onFilesChanged?: (files: ShellFile[]) => void | Promise<void>;
-  /**
-   * Keeps Run disabled while the list can't be run, and shows the returned
-   * one-line reason above Run. Return '' when the list is fine. Evaluated on
-   * every list change and on shell.refresh().
-   */
-  runBlocker?: (files: ShellFile[]) => string;
   /** Do the work. Return the outputs to show. */
   process: (files: ShellFile[], progress: Progress) => Promise<ProcessResult>;
   /** Title shown above the results. */
@@ -295,16 +289,6 @@ export function createShell(opts: ShellOptions) {
     void filesChanged();
   }
 
-  let runBlock = '';
-  function updateRunBlock() {
-    const next = opts.runBlocker?.(files) ?? '';
-    if (next !== runBlock) {
-      runBlock = next;
-      setHint(next);
-    }
-    run.disabled = files.length === 0 || busy || !!runBlock;
-  }
-
   function render() {
     list.innerHTML = '';
     for (const [i, entry] of files.entries()) {
@@ -335,7 +319,7 @@ export function createShell(opts: ShellOptions) {
       li.append(thumb, info, actions);
       list.append(li);
     }
-    updateRunBlock();
+    run.disabled = files.length === 0 || busy;
     clear.hidden = files.length === 0;
     drop.classList.toggle('is-compact', files.length > 0);
     root.dataset.count = String(files.length);
@@ -400,7 +384,7 @@ export function createShell(opts: ShellOptions) {
 
   function setBusy(b: boolean) {
     busy = b;
-    run.disabled = b || files.length === 0 || !!runBlock;
+    run.disabled = b || files.length === 0;
     progress.classList.toggle('is-active', b);
     root.classList.toggle('is-busy', b);
     if (!b) progressApi.set('', 0);
@@ -604,7 +588,7 @@ export function createShell(opts: ShellOptions) {
     attempt = undefined;
     // Clear while a run is going: the screen no longer needs holding for it.
     guard?.release();
-    setHint(runBlock);
+    setHint();
     hideResults();
     hideError();
     render();
@@ -653,7 +637,7 @@ export function createShell(opts: ShellOptions) {
   document.getElementById('options')?.addEventListener('change', () => hideResults());
 
   render();
-  if (opts.keepAwake) setHint(runBlock);
+  if (opts.keepAwake) setHint();
   mountNetProof(root);
   mountInstallPrompt(root);
   mountNextSteps(root);
@@ -670,8 +654,6 @@ export function createShell(opts: ShellOptions) {
     showError,
     hideError,
     setHint,
-    /** Re-check opts.runBlocker after something it depends on changed (a file's kind became known). */
-    refresh: updateRunBlock,
     progress: progressApi,
     /** Expose for tests. */
     addFiles,

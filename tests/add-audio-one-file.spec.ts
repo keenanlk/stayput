@@ -24,11 +24,6 @@ for (const [slug, file, message] of cases) {
     await expect(page.locator('.hint', { hasText: 'Apple Music or Spotify' })).toBeVisible();
     await page.locator('#file-input').setInputFiles([staticFx(file)]);
     await expect(page.locator('#tool')).toHaveAttribute('data-count', '1');
-    // Run stays off for one file (see run-guard-file-count.spec.ts); forced on, the run still ends in the named refusal.
-    await expect(page.locator('#run')).toBeDisabled();
-    // Wait for the file check to settle, or it would switch Run off again after the test forces it on.
-    await expect(page.locator('#run-hint')).toContainText(message);
-    await page.evaluate(() => ((document.getElementById('run') as HTMLButtonElement).disabled = false));
     await page.locator('#run').click();
     await expect(page.locator('#error')).toHaveClass(/is-active/);
     await expect(page.locator('#error')).toContainText(message);
