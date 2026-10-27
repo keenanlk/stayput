@@ -118,12 +118,17 @@ test('One photo and 101 photos get clear messages and no download', async ({ pag
   test.setTimeout(120_000);
   await setUp(page);
   await page.locator('#file-input').setInputFiles([PHOTOS[0]!]);
+  // Run stays off with one photo; forced on, the run still ends in the named refusal.
+  await expect(page.locator('#run')).toBeDisabled();
+  await page.evaluate(() => ((document.getElementById('run') as HTMLButtonElement).disabled = false));
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('at least two photos');
   await page.reload();
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   const many = Array.from({ length: 101 }, (_, i) => ({ name: `p${i}.jpg`, mimeType: 'image/jpeg', buffer: readFileSync(PHOTOS[0]!) }));
   await page.locator('#file-input').setInputFiles(many);
+  await expect(page.locator('#run')).toBeDisabled();
+  await page.evaluate(() => ((document.getElementById('run') as HTMLButtonElement).disabled = false));
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('limit is 100');
   await expect(page.locator('#results')).not.toHaveClass(/is-active/);
