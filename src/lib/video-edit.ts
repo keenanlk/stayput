@@ -319,7 +319,10 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software') useRealtimeH264();
     const videoCodec = await pickVideoCodec({ width, height, bitrate });
     if (!videoCodec) {
-      throw hasVideoEncoder() ? new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.') : new EncoderUnavailable();
+      // With an encoder present, only this size is refused (iOS Safari at 4K): a smaller picture can get past it (edit-recovery.ts).
+      throw hasVideoEncoder()
+        ? Object.assign(new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.'), { sizeRefused: true })
+        : new EncoderUnavailable();
     }
     // Rotating 180 degrees then mirroring left to right is the same as mirroring top to bottom.
     let rotate = (opts.rotate ?? 0) as number;
