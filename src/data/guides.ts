@@ -112,7 +112,7 @@ export const guides: Guide[] = [
       {
         h: 'On an iPhone or iPad',
         p: [
-          'To stop location being recorded in the first place: Settings, Privacy & Security, Location Services, Camera, and choose **Never**. To remove it from a photo you already took: open it in Photos, tap the info button (the circled i), tap **Adjust** under the map, then **No Location**. This edits the photo in your library. When sharing, tap **Options** at the top of the share sheet and turn **Location** off; that strips it from the shared copy only.',
+          'To stop location being recorded in the first place: Settings, Privacy & Security, Location Services, Camera, and choose **Never**. To remove it from a photo you already took: open it in Photos, tap the info button (the circled i), tap **Adjust** under the map, then **No Location**. This edits the photo in your library. When sharing, tap **Options** at the top of the share sheet and turn **Location** off; that strips it from the shared copy only. The [guide to turning off location tags](/guides/turn-off-location-tags-on-photos) covers iPhone, Pixel and Samsung, and what you lose when location is off.',
         ],
       },
       {
@@ -654,7 +654,7 @@ export const guides: Guide[] = [
       },
       {
         h: "Check again after you remove it",
-        p: ["To remove all of it without changing the picture, use the [EXIF remover](/tools/strip-exif): it deletes the metadata blocks and copies the image data byte for byte, so the photo looks exactly the same (a sideways JPG is re-encoded only if you leave \"Apply orientation\" ticked). Then drop the cleaned copy on the [viewer](/tools/exif-viewer); it should say \"None stored\" for location and list no fields. The [location guide](/guides/remove-location-data-from-photos) covers the phone settings that stop new photos from recording location in the first place."],
+        p: ["To remove all of it without changing the picture, use the [EXIF remover](/tools/strip-exif): it deletes the metadata blocks and copies the image data byte for byte, so the photo looks exactly the same (a sideways JPG is re-encoded only if you leave \"Apply orientation\" ticked). Then drop the cleaned copy on the [viewer](/tools/exif-viewer); it should say \"None stored\" for location and list no fields. The [location guide](/guides/remove-location-data-from-photos) covers the phone settings that stop new photos from recording location in the first place. PDFs carry metadata too, such as the author and the program that made them; [how to remove metadata from a PDF](/guides/how-to-remove-metadata-from-a-pdf) shows what is stored and how to clear it."],
       },
     ],
     faq: [
@@ -2428,7 +2428,7 @@ export const guides: Guide[] = [
     dek: 'This changes the saved file itself, not just how a player plays it back. Here is what actually works, including keeping the audio in tune.',
     keywords: ['how to slow down a video', 'how to speed up a video', 'change video speed', 'slow motion video editor free', 'speed up video without app'],
     updated: '2026-09-29',
-    tools: ['video-speed'],
+    tools: ['video-speed', 'slow-down-video'],
     sections: [
       {
         h: 'Playback speed versus the actual file',
@@ -2602,7 +2602,7 @@ export const guides: Guide[] = [
     dek: 'Adding a soundtrack to an existing video is not something most camera rolls support directly. Here is what does the job.',
     keywords: ['how to add music to a video', 'add audio to a video free', 'put a song on a video', 'add background music to video online', 'replace video sound with music'],
     updated: '2026-10-14',
-    tools: ['add-audio-to-video'],
+    tools: ['add-audio-to-video', 'add-music-to-video'],
     sections: [
       {
         h: 'Adding versus replacing',
@@ -3467,7 +3467,7 @@ export const guides: Guide[] = [
       {
         h: 'Why "resize" alone is not enough',
         p: [
-          'Most resize tools, including phone Photos apps, scale an image down to fit inside a maximum width or height while keeping its original proportions. That is the right behavior for shrinking a photo for the web, but a field that asks for an exact size, such as a 1920x1080 banner or a 512x512 app icon, means the output must be precisely that width and height, whatever shape the source photo started as. A plain resize that respects the aspect ratio cannot hit an odd exact size on its own; the image has to be cropped, padded, or stretched to fit.',
+          'Most resize tools, including phone Photos apps, scale an image down to fit inside a maximum width or height while keeping its original proportions. That is the right behavior for shrinking a photo for the web, but a field that asks for an exact size, such as a 1920x1080 banner or a 512x512 app icon, means the output must be precisely that width and height, whatever shape the source photo started as. A plain resize that respects the aspect ratio cannot hit an odd exact size on its own; the image has to be cropped, padded, or stretched to fit. If you meant a PDF page rather than a photo, [how to resize a PDF](/guides/how-to-resize-a-pdf) covers the paper size and the file size.',
         ],
       },
       {
@@ -3490,7 +3490,7 @@ export const guides: Guide[] = [
       {
         h: 'Resize an image to specific pixels',
         p: [
-          'Stayput\'s [resize image](/resize-image) tool has an **Exact size** mode: type the width and height you need, and choose whether a mismatched photo is cropped to fill, fit with padding, or stretched. Ready-made pages cover the sizes people ask for most, such as [1920 by 1080](/resize-image-to-1920x1080) for a banner or wallpaper and [1024 by 1024](/resize-image-to-1024x1024) for an app icon, with the exact size already set. Everything happens in the browser, so a batch of photos resizes at once with nothing uploaded.',
+          'Stayput\'s [resize image](/resize-image) tool has an **Exact size** mode: type the width and height you need, and choose whether a mismatched photo is cropped to fill, fit with padding, or stretched. Ready-made pages cover the sizes people ask for most, such as [1920 by 1080](/resize-image-to-1920x1080) for a banner or wallpaper and [1024 by 1024](/resize-image-to-1024x1024) for an app icon, with the exact size already set. Everything happens in the browser, so a batch of photos resizes at once with nothing uploaded. For the sizes Instagram posts, Stories and profile pictures use, see [how to resize a photo for social media](/guides/how-to-resize-a-photo-for-social-media).',
         ],
       },
     ],
@@ -3863,7 +3863,7 @@ export const guides: Guide[] = [
       {
         h: 'Recording in the browser',
         p: [
-          'Stayput\'s [screen recorder](/tools/screen-recorder) uses the browser\'s own screen-sharing permission to capture your whole screen, one window, or a browser tab, and can [record its audio plus your microphone at the same time](/screen-recorder-with-audio) for a narrated walkthrough. The video is written to a file directly in the tab as you record, with no length cap beyond your device\'s storage, no watermark, and no account, since nothing is uploaded to a server to make the recording.',
+          'Stayput\'s [screen recorder](/tools/screen-recorder) uses the browser\'s own screen-sharing permission to capture your whole screen, one window, or a browser tab, and can [record its audio plus your microphone at the same time](/screen-recorder-with-audio) for a narrated walkthrough. The video is written to a file directly in the tab as you record, with no length cap beyond your device\'s storage, no watermark, and no account, since nothing is uploaded to a server to make the recording. To save a still image from a finished recording, drop it on [video to JPG](/tools/video-to-jpg).',
         ],
       },
     ],
@@ -4046,7 +4046,7 @@ export const guides: Guide[] = [
     dek: 'Simply turning up a quiet recording clips the loud parts before the quiet parts get loud enough. Here is a better way, and a free tool that does it without uploading the file.',
     keywords: ['how to increase volume of audio', 'increase mp3 volume free', 'make audio louder online', 'normalize audio volume free', 'boost quiet recording volume'],
     updated: '2026-09-30',
-    tools: ['volume-booster'],
+    tools: ['volume-booster', 'normalize-audio'],
     sections: [
       {
         h: 'Why a flat volume boost distorts the loud parts',
@@ -4111,7 +4111,7 @@ export const guides: Guide[] = [
       {
         h: 'Converting in the browser',
         p: [
-          'Stayput\'s [black and white photo](/tools/black-and-white-image) tool offers grayscale, a higher-contrast look, pure black-and-white for scans and signatures, and a sepia tone, with a live preview so you can compare options before saving, and batch processing for more than one photo at a time. It runs entirely in the browser, so nothing is uploaded.',
+          'Stayput\'s [black and white photo](/tools/black-and-white-image) tool offers grayscale, a higher-contrast look, pure black-and-white for scans and signatures, and a sepia tone, with a live preview so you can compare options before saving, and batch processing for more than one photo at a time. It runs entirely in the browser, so nothing is uploaded. A PDF can be made black and white too; [how to make a PDF black and white](/guides/how-to-make-a-pdf-black-and-white) covers that. For a pencil or charcoal drawing instead of a grey photo, try [photo to sketch](/tools/photo-to-sketch).',
         ],
       },
     ],
