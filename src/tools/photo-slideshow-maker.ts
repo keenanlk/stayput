@@ -72,9 +72,20 @@ matchButton.addEventListener('click', async () => {
   describe();
 });
 
+/** Why Run can't start yet, in one line; '' when the list can be made into a slideshow. */
+function missing(files: ShellFile[]): string {
+  const { pictures, songs } = split(files);
+  if (pictures.length === 0) return 'Add at least two photos to start.';
+  if (pictures.length === 1) return 'Add at least one more photo: a slideshow needs two or more.';
+  if (pictures.length > MAX_PHOTOS) return `Remove ${pictures.length - MAX_PHOTOS} photo${pictures.length - MAX_PHOTOS === 1 ? '' : 's'}: the limit is ${MAX_PHOTOS}.`;
+  if (songs.length > 1) return `Remove ${songs.length - 1} song${songs.length === 2 ? '' : 's'}: the slideshow takes one.`;
+  return '';
+}
+
 const shell = createShell({
   keepAwake: true,
   outputFormat: () => 'mp4',
+  runBlocker: missing,
   async onFilesChanged(files) {
     current = files;
     panel.hidden = split(files).pictures.length === 0;
