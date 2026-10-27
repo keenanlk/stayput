@@ -4,7 +4,7 @@ import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/
 import { describeEdit } from './video-edit-shell';
 import { resumeWhenHidden, retryNote } from '../lib/edit-recovery';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { InputError, NamedError, UnreadableFile, isUnspecific } from '../lib/input-error';
+import { InputError, NamedError, UnreadableFile, UnsupportedCodec, isUnspecific } from '../lib/input-error';
 import { snapshotFile } from '../lib/read-failure';
 import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
@@ -162,7 +162,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
     throw new InputError(
       pictures.length > 0
         ? 'Add a video too: this tool replaces the background of a video, and the picture is only the new background. To take the background out of a photo, use the Remove background tool instead.'
-        : 'Add a video (MP4, MOV, WebM or MKV) to replace its background.',
+        : `Add a video (MP4, MOV, WebM or MKV) to ${kind() === 'blur' ? 'blur' : 'replace'} its background.`,
     );
   }
   if (pictures.length > 1) throw new InputError(`${pictures.length} pictures were added. Keep one picture for the new background, remove the others, and run again.`);
@@ -183,7 +183,15 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   await requireH264Encoder();
   const { assertReadable, editVideo, videoSize } = await import('../lib/video-edit');
   // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
-  for (const v of videos) await assertReadable(v.file);
+  for (const v of videos) {
+    await assertReadable(v.file).catch((e) => {
+      // A 3GP with H.263 video opens as MP4 but cannot be decoded: the iPhone/HEVC advice would send the person the wrong way.
+      if (e instanceof Error && e.name === 'UnsupportedCodec' && /\.3g[p2]$/i.test(v.file.name)) {
+        throw new UnsupportedCodec(`${v.file.name} is a 3GP clip with video this browser cannot decode. Make an MP4 copy with the Video to MP4 tool, then add that.`);
+      }
+      throw e;
+    });
+  }
   // A file that is not a video this page opens (3GP, AVI, WMV, a renamed file) is said so now, with the way on, not after the download.
   for (const v of videos) {
     await videoSize(v.file).catch((e) => {
