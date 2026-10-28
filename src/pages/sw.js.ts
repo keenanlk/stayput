@@ -106,7 +106,7 @@ self.addEventListener('message', (event) => {
 });
 
 // The speech model files belong to transformers.js, which stores them itself.
-const isOwnedElsewhere = (url) => url.pathname.startsWith('/models/whisper-base/');
+const isOwnedElsewhere = (url) => url.pathname.startsWith('/models/whisper-base/') || url.pathname.startsWith('/models/whisper-tiny/');
 const isImmutable = (url) =>
   url.origin === self.location.origin && (url.pathname.startsWith('/_astro/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/vendor/') || url.pathname.startsWith('/models/'));
 

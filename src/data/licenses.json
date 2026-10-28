@@ -1977,6 +1977,24 @@
    "note": "OpenAI's repository releases the code and model weights under MIT. The Hugging Face card for openai/whisper-base lists Apache-2.0; both are permissive."
   },
   {
+   "id": "m-whisper-tiny",
+   "name": "Whisper tiny, 8-bit ONNX export (speech to text, smaller model for phones)",
+   "version": "tiny, onnx-community export",
+   "npm": null,
+   "licences": [
+    {
+     "name": "MIT",
+     "url": "https://spdx.org/licenses/MIT.html"
+    }
+   ],
+   "project": "https://github.com/openai/whisper",
+   "source": "https://huggingface.co/onnx-community/whisper-tiny/tree/ff4177021cc41f7db950912b73ea4fdf7d01d8e7",
+   "shipped": "/models/whisper-tiny/",
+   "kind": "model",
+   "copyright": "Copyright (c) 2022 OpenAI",
+   "note": "OpenAI's repository releases the code and model weights under MIT. Used on phones that ran short of memory with the base model."
+  },
+  {
    "id": "m-uvr",
    "name": "UVR-MDX-NET Inst HQ 3 (vocal remover)",
    "version": "unmodified ONNX file",
