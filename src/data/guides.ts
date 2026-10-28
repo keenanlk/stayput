@@ -39,7 +39,7 @@ export const guides: Guide[] = [
     heading: 'Is it safe to merge PDFs online?',
     dek: 'It depends on one thing: whether the file leaves your computer. Here is how to tell, and how to merge without it leaving.',
     keywords: ['is it safe to merge pdfs online', 'online pdf merger safe', 'merge pdf privacy', 'merge pdf without uploading', 'secure pdf merge'],
-    updated: '2026-10-14',
+    updated: '2026-10-28',
     tools: ['merge-pdf', 'combine-pdf', 'split-pdf'],
     sections: [
       {
@@ -69,7 +69,7 @@ export const guides: Guide[] = [
         h: 'Merging without uploading',
         p: [
           'PDF merging does not need a server. A PDF is a container of pages, and copying pages from several containers into a new one is something a browser can do in JavaScript with a library such as pdf-lib. Stayput\'s [merge tool](/tools/merge-pdf) does exactly that: your files are read from disk into your tab\'s memory, the combined document is written there, and the download comes from your own browser. After one visit and a short wait the page works with the network switched off, and its own request counter shows you the list.',
-          'The same goes for [splitting](/tools/split-pdf), [compressing](/tools/compress-pdf), [rotating](/tools/rotate-pdf) and [signing](/tools/sign-pdf). None of these need anything a browser cannot do.',
+          'The same goes for [splitting](/tools/split-pdf), [compressing](/tools/compress-pdf), [rotating](/tools/rotate-pdf) and [signing](/tools/sign-pdf). None of these need anything a browser cannot do. A merged PDF that is too big to send can be shrunk with [compress a PDF without losing quality](/guides/compress-pdf-without-losing-quality). A merged PDF usually also needs [page numbers](/guides/how-to-add-page-numbers-to-a-pdf). If the pages ended up in the wrong order after merging, [reorder the pages in the PDF](/guides/how-to-reorder-pages-in-a-pdf).',
         ],
       },
       {
@@ -224,7 +224,7 @@ export const guides: Guide[] = [
     heading: 'How to open HEIC files on Windows',
     dek: 'Why iPhone photos will not open, the three fixes, and the fastest free way to convert a whole batch to JPG.',
     keywords: ['open heic files windows', 'heic to jpg windows', 'how to open heic on windows 11', 'windows cannot open heic', 'heic viewer windows', 'convert heic to jpg windows 10'],
-    updated: '2026-10-14',
+    updated: '2026-10-28',
     tools: ['heic-to-jpg', 'heic-to-png', 'heic-to-pdf'],
     sections: [
       {
@@ -237,7 +237,7 @@ export const guides: Guide[] = [
         h: 'Fix 1: convert them to JPG in your browser',
         p: [
           'If what you actually want is to use the photos, attach them or send them, converting is the direct answer. Open the [HEIC to JPG converter](/tools/heic-to-jpg) in Edge, Chrome or Firefox, drop the whole folder of photos, and download them as JPGs or as one zip. The decoder (libheif, the same open-source library Linux desktops use) runs inside the browser tab, so the photos are not uploaded and there is no cap on how many you convert beyond your device’s memory (phones hold less). Choose PNG on the [HEIC to PNG page](/heic-to-png) for a lossless copy, or [HEIC to PDF](/heic-to-pdf) for photographed documents.',
-          'The conversion drops the location and camera metadata unless you choose JPG and tick "Keep EXIF metadata", which is worth knowing before you upload the results anywhere.',
+          'The conversion drops the location and camera metadata unless you choose JPG and tick "Keep EXIF metadata", which is worth knowing before you upload the results anywhere. iPhone photos also store your location in EXIF, so see [how to remove EXIF data from iPhone photos](/guides/remove-exif-data-from-iphone-photos) before you share them.',
         ],
       },
       {
@@ -1183,7 +1183,7 @@ export const guides: Guide[] = [
     heading: 'Is remove.bg safe?',
     dek: 'remove.bg is a legitimate Canva-owned service. Its policy gives no exact deletion time, and its website is closing, so it is worth knowing the options.',
     keywords: ['is remove.bg safe', 'remove.bg safe', 'is remove bg safe', 'is remove.bg legit', 'remove.bg privacy', 'remove.bg alternative no upload'],
-    updated: '2026-10-12',
+    updated: '2026-10-28',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-image'],
     sections: [
       {
@@ -1221,7 +1221,7 @@ export const guides: Guide[] = [
       {
         h: 'How to check where a photo goes',
         p: [
-          'Open your browser’s network panel, drop a photo into any background remover and look for an upload about the size of the file; or, once one photo has run and the page has had a short wait, turn on airplane mode and try again. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks.',
+          'Open your browser’s network panel, drop a photo into any background remover and look for an upload about the size of the file; or, once one photo has run and the page has had a short wait, turn on airplane mode and try again. [Does this website upload my files?](/guides/does-this-website-upload-my-files) walks through both checks. The same question applies to upload-based file converters, which the [CloudConvert alternative](/guides/cloudconvert-alternative) guide answers.',
         ],
       },
     ],
@@ -1407,7 +1407,7 @@ export const guides: Guide[] = [
     heading: 'How to trim a video without installing an app',
     dek: 'iPhone, Android, Windows and Mac can all trim a video with what is already installed. Here is how on each.',
     keywords: ['how to trim a video without an app', 'trim video online', 'cut video without app', 'trim video iphone', 'cut a video windows'],
-    updated: '2026-10-14',
+    updated: '2026-10-28',
     tools: ['trim-video', 'cut-video', 'trim-mp4'],
     sections: [
       {
@@ -1443,7 +1443,7 @@ export const guides: Guide[] = [
       {
         h: 'Trimming without re-encoding',
         p: [
-          'Every option above re-encodes the video during export, which takes time and can lose a little quality even at "the same" settings. Stayput\'s [trim video](/tools/trim-video) tool trims in your browser tab; the [Trim MP4](/trim-mp4) preset cuts at keyframes without re-encoding when the cut points allow it, which is close to instant and keeps the original quality exactly. Nothing is uploaded either way, so a private clip stays on your device.',
+          'Every option above re-encodes the video during export, which takes time and can lose a little quality even at "the same" settings. Stayput\'s [trim video](/tools/trim-video) tool trims in your browser tab; the [Trim MP4](/trim-mp4) preset cuts at keyframes without re-encoding when the cut points allow it, which is close to instant and keeps the original quality exactly. Nothing is uploaded either way, so a private clip stays on your device. Once the clip is trimmed, [how to blur a face in a video](/guides/how-to-blur-a-face-in-a-video) covers the usual next edit before posting. To trim a sound file the same way, use [Trim audio](/tools/trim-audio).',
         ],
       },
     ],
@@ -1515,7 +1515,7 @@ export const guides: Guide[] = [
     heading: 'How to remove audio from a video',
     dek: 'The mute button on your phone only silences playback. Removing the audio for good needs an actual edit. Here is how, on each platform.',
     keywords: ['how to remove audio from a video', 'mute a video', 'remove sound from video', 'delete audio from video file', 'video without sound'],
-    updated: '2026-10-14',
+    updated: '2026-10-28',
     tools: ['mute-video', 'remove-audio-from-video'],
     sections: [
       {
@@ -1551,7 +1551,7 @@ export const guides: Guide[] = [
       {
         h: 'Removing it in one step, on your phone or computer',
         p: [
-          'Stayput\'s [mute video](/tools/mute-video) tool drops the audio track entirely in your browser tab, on your phone or computer, without an app to install. The [Remove audio from video](/remove-audio-from-video) preset is the same tool set up for this exact job. The file is processed locally, so nothing is uploaded.',
+          'Stayput\'s [mute video](/tools/mute-video) tool drops the audio track entirely in your browser tab, on your phone or computer, without an app to install. The [Remove audio from video](/remove-audio-from-video) preset is the same tool set up for this exact job. The file is processed locally, so nothing is uploaded. If you want to keep only the sound, [how to convert a video to MP3](/guides/how-to-convert-a-video-to-mp3) does the reverse. When the source is an MKV, [MKV to MP3](/mkv-to-mp3) does the same job. After muting, you can put new music or a voice-over on the clip with [Add audio to video](/tools/add-audio-to-video).',
         ],
       },
     ],
@@ -2230,7 +2230,7 @@ export const guides: Guide[] = [
     heading: 'How to combine or merge videos into one on any device',
     dek: 'Most camera rolls can play clips one after another, not merge them into a single file. Here is what actually joins them.',
     keywords: ['how to merge videos', 'combine video clips into one', 'join videos together', 'merge mp4 files free', 'stitch videos into one file'],
-    updated: '2026-10-14',
+    updated: '2026-10-28',
     tools: ['merge-videos'],
     sections: [
       {
@@ -2259,12 +2259,12 @@ export const guides: Guide[] = [
       },
       {
         h: 'Put two or three video clips together',
-        p: ['Whether it is two clips or a dozen, the steps are the same: put the clips in order, join them end to end and save one file. The routes above work on every device, and the combine videos tool below does the same in a browser tab.'],
+        p: ['Whether it is two clips or a dozen, the steps are the same: put the clips in order, join them end to end and save one file. The routes above work on every device, and the combine videos tool below does the same in a browser tab. The same job for sound files is covered in [how to merge audio files](/guides/how-to-merge-audio-files). If the clips are MP3s, [Merge MP3](/merge-mp3) joins them in the same way.'],
       },
       {
         h: 'A tool built just for joining clips',
         p: [
-          'Stayput\'s [combine videos](/combine-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge.',
+          'Stayput\'s [combine videos](/combine-videos) tool skips the full editor: drop in the clips, drag to reorder them, and it joins them end to end into one MP4, keeping the original sound, directly in the browser with nothing uploaded. It handles MP4, MOV, WebM and MKV clips together in one merge. To join the soundtracks before adding them to the video, use [Merge audio](/tools/merge-audio).',
         ],
       },
     ],
@@ -3552,7 +3552,7 @@ export const guides: Guide[] = [
     heading: 'A free CamScanner alternative with no watermark',
     dek: 'CamScanner\'s free account has storage and feature limits, with a Premium plan above it. Here is a scanning alternative with no watermark and no tier to pay for.',
     keywords: ['camscanner alternative', 'camscanner alternative free', 'camscanner alternative no watermark', 'free document scanner no watermark', 'scan document without app'],
-    updated: '2026-10-08',
+    updated: '2026-10-28',
     tools: ['document-scanner', 'scan-to-pdf', 'receipt-scanner'],
     sections: [
       {
@@ -3570,7 +3570,7 @@ export const guides: Guide[] = [
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [document scanner](/tools/document-scanner) tool takes photos you have already taken and straightens, flattens and cleans them up entirely in the browser, with no watermark on the result at any tier, because there is no tier: [scan a stack of pages into one PDF](/scan-to-pdf) or [a single receipt](/receipt-scanner), in colour, greyscale or black-and-white, for free. Since your photos are not uploaded, an ID or a signed contract is not sent to a third-party server to be scanned.',
+          'Stayput\'s [document scanner](/tools/document-scanner) tool takes photos you have already taken and straightens, flattens and cleans them up entirely in the browser, with no watermark on the result at any tier, because there is no tier: [scan a stack of pages into one PDF](/scan-to-pdf) or [a single receipt](/receipt-scanner), in colour, greyscale or black-and-white, for free. Since your photos are not uploaded, an ID or a signed contract is not sent to a third-party server to be scanned. If a phone scan comes out sideways, [rotate the PDF](/guides/how-to-rotate-a-pdf) before you send it.',
         ],
       },
       {

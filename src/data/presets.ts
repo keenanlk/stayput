@@ -512,7 +512,7 @@ export const presets: Preset[] = [
     steps: ['Drop the photo or signature scan.', 'Leave the limit at 20 KB, or change it if the form says otherwise.', 'Press Compress to 20 KB and upload the JPG to the form.'],
     faq: [
       { q: 'The form also wants exact pixels, like 140 by 60. Can I do both?', a: 'Yes. Switch Resize to Exact size, type the width and height, and keep the 20 KB limit. At a small size like that the JPG usually comes out well under 20 KB at high quality.' },
-      { q: 'Why is the result 19.5 KB and not exactly 20?', a: 'The page counts 20 KB as 20,000 bytes, a little less than the 20,480 some sites mean, so the file passes whichever way the form counts. JPG sizes also move in steps as quality changes, so the last few hundred bytes are rarely filled.' },
+      { q: 'Why is the result 19.5 KB and not exactly 20?', a: 'The page counts 20 KB as 20,000 bytes, a little less than the 20,480 some sites mean, so the file passes whichever way the form counts. JPG sizes also move in steps as quality changes, so the last few hundred bytes are rarely filled. A PNG that will not reach 20 KB needs different steps, which [how to compress a PNG](/guides/how-to-compress-a-png) walks through.' },
       { q: 'My signature looks grey and blotchy at 20 KB.', a: 'Make it black and white first with the black and white photo tool’s pure black and white setting, then compress it here. Two-tone images take far fewer bytes, so the lines stay crisp.' },
       noUpload,
     ],
@@ -589,7 +589,7 @@ export const presets: Preset[] = [
     steps: ['Drop the photos, HEIC included.', 'Keep 1 MB or change the limit.', 'Press Compress to 1 MB and upload the results.'],
     faq: [
       { q: 'Is 1 MB here 1,000,000 or 1,048,576 bytes?', a: 'The page aims under 1,000,000 bytes, the smaller of the two, so the file is accepted however the site counts a megabyte.' },
-      { q: 'Will it lower the resolution?', a: 'Only if it has to. Resize is set to Keep size, so the quality is lowered first; a picture is made smaller only when even low quality at full size is above the limit, which is rare for 1 MB.' },
+      { q: 'Will it lower the resolution?', a: 'Only if it has to. Resize is set to Keep size, so the quality is lowered first; a picture is made smaller only when even low quality at full size is above the limit, which is rare for 1 MB. A PNG that has to fit under 1 MB is better served by the [PNG compressor](/png-compressor).' },
       { q: 'Can I print the compressed photo?', a: 'For prints up to about 15 × 10 cm, yes. For large prints, keep the original: compression artefacts that are invisible on screen can show on paper.' },
       { q: 'The site still says my file is too large.', a: 'Some sites measure the upload after adding form data, or quote a limit that is lower than the one they enforce. Type 900 KB into the file size box and run again; a margin of ten percent clears almost every such case.' },
       noUpload,
@@ -646,6 +646,7 @@ export const presets: Preset[] = [
       { q: 'What about 1400 × 1400 for podcasts?', a: 'Apple Podcasts accepts square art from 1400 to 3000 pixels. Change the width and height to 1400 if you want the smaller file; 3000 looks sharper on large screens.' },
       { q: 'My artwork is RGB. Do stores need CMYK?', a: 'No. Streaming stores and podcast apps show covers on screens and expect RGB, which is what this page saves. CMYK is only for printing physical CDs or vinyl sleeves, and the pressing plant will tell you its exact file requirements.' },
       { q: 'Will cropping cut off my title text?', a: 'It can if the text is near the edges of a non-square picture. Choose Fit inside to keep everything, or crop the picture yourself with the crop tool’s square shape and then resize it here.' },
+      { q: 'Can I resize to other exact sizes too?', a: 'Yes, the same Exact size box works for any pixel size. A profile photo is covered by the [LinkedIn profile picture](/linkedin-profile-picture) page. A 3000 × 3000 square is often cut into a grid for posting with [Split image](/tools/split-image). A platform banner has its own sizes on the [YouTube banner resizer](/youtube-banner-resizer).' },
       noUpload,
     ],
   },
@@ -880,7 +881,7 @@ export const presets: Preset[] = [
       'Remove metadata. Download each cleaned photo, or all of them as a zip.',
     ],
     faq: [
-      { q: 'Which apps already remove location data?', a: 'WhatsApp, Signal, Messenger, Instagram, Facebook and X strip metadata from photos you post or send. Email attachments, Google Drive and Dropbox links, iMessage in full quality, marketplaces like Craigslist, and most forums keep it.' },
+      { q: 'Which apps already remove location data?', a: 'WhatsApp, Signal, Messenger, Instagram, Facebook and X strip metadata from photos you post or send. Email attachments, Google Drive and Dropbox links, iMessage in full quality, marketplaces like Craigslist, and most forums keep it. For Discord, Reddit and Instagram in particular, see [does Discord, Reddit or Instagram remove EXIF data](/guides/does-discord-reddit-or-instagram-remove-exif-data).' },
       { q: 'How can I check that the location is gone?', a: 'Drop the cleaned photo back onto this page. The panel reads the file and reports "GPS location: no" and no removable metadata.' },
       { q: 'Does it work for HEIC photos from an iPhone?', a: 'Use the HEIC to JPG converter with "Keep EXIF metadata" unticked, which is the default: the converted JPG has no metadata at all.' },
       { q: 'Is the image re-compressed?', a: 'Not normally. Only the metadata blocks are removed and the image data is copied byte for byte, so there is no quality loss. The exception is a JPG stored sideways with a rotation tag while "Apply orientation to sideways photos" is ticked (the default): that photo is turned upright and saved again as a JPG at quality 95, and its color profile is dropped. Untick the option and it is copied unchanged, though it may then display sideways. PNG and WebP files are never re-compressed.' },
@@ -3476,7 +3477,7 @@ export const presets: Preset[] = [
     ],
     steps: ['Drop one or more videos, or tap to pick them.', 'Press Remove sound.', 'Save the silent videos; several come as a zip.'],
     faq: [
-      { q: 'Can I keep the sound as a separate file?', a: 'Yes, with Video to MP3, which saves just the sound track as an MP3 or WAV.' },
+      { q: 'Can I keep the sound as a separate file?', a: 'Yes, with Video to MP3, which saves just the sound track as an MP3 or WAV. To remove only the vocals and keep the music, use the [karaoke maker](/karaoke-maker).' },
       { q: 'Does Instagram or TikTok accept a video with no sound track?', a: 'Yes. A video with no sound track uploads and plays like any other; the app simply shows it as having no audio.' },
       { q: 'What happens to a video with several audio tracks?', a: 'They are all left out. Only the main video track is copied into the new file, so an MKV with several languages, or a game recording with separate game and microphone tracks, comes out with no sound at all. Subtitle tracks are not carried over either. The picture itself is copied exactly.' },
       { q: 'Does it work with videos from my phone?', a: 'Yes. iPhone MOV files, HEVC ones included, and Android MP4s both work, because the picture is copied rather than decoded: the browser never needs to be able to play the video to remove its sound. On a phone, tap the drop zone and choose the video from your photo library, then save the silent copy.' },
@@ -3947,7 +3948,7 @@ export const presets: Preset[] = [
     ],
     steps: ['Drop a video.', 'Choose how many frames (five a second is selected).', 'Press Save frames and download them in a zip.'],
     faq: [
-      { q: 'Can I extract frames from a YouTube video?', a: 'This tool works on a video file on your device; it does not fetch YouTube links. If you have the video file, drop it here and save every frame, or a few per second, as JPG or PNG images in one zip. Nothing is uploaded.' },
+      { q: 'Can I extract frames from a YouTube video?', a: 'This tool works on a video file on your device; it does not fetch YouTube links. If you have the video file, drop it here and save every frame, or a few per second, as JPG or PNG images in one zip. Nothing is uploaded. A frame you want as a video cover can be sized with the [YouTube thumbnail resizer](/youtube-thumbnail-resizer).' },
       { q: 'How many frames does a video have?', a: 'Most phone videos have 30 frames a second, and slow motion has 120 or 240. A one-minute clip at 30 fps is 1,800 frames, so this page saves up to 1,000 at a time; trim the video first to get every frame of a longer part.' },
       { q: 'Can I extract the frame at an exact time?', a: 'There is no box to type a time into. To get the frame you want, cut a short span around the moment with Trim video, then choose Every frame, which gives you every picture in that span. Or choose Five frames every second on the whole clip and use the time listed with each image to pick the nearest one.' },
       { q: 'Why did I get fewer frames than I expected?', a: 'Screen recordings and some phone clips use a variable frame rate: when nothing on screen moves, one frame is held for a long time. Two requested times that land on the same held frame would give the same picture twice, so only one copy is saved. The frames you do get are all different, and each shows the time it comes from.' },
@@ -5588,6 +5589,7 @@ export const presets: Preset[] = [
     faq: [
       { q: 'Is there a watermark?', a: 'No. The saved image has only your picture and your text.' },
       { q: 'Can I use just one line?', a: 'Yes. Clear the second text and only the first is drawn.' },
+      { q: 'Can I turn the meme into a sticker?', a: 'Yes, once it is saved. The [Discord sticker resizer](/discord-sticker-resizer) fits it to the size limit. The [WhatsApp sticker maker](/whatsapp-sticker-maker) turns it into a WhatsApp sticker.' },
       noUpload,
     ],
   },
@@ -7329,9 +7331,10 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Why Grey and not Black and white?', a: 'Receipts are printed by heat on thermal paper, and the print fades to light grey within months. Pure black and white can drop faint characters; Grey keeps them while still turning the paper white.' },
-      { q: 'Will it read the totals and dates for me?', a: 'No, it makes clean images of the receipts. To search or copy the text, run the PDF through OCR PDF afterwards.' },
+      { q: 'Will it read the totals and dates for me?', a: 'No, it makes clean images of the receipts. To search or copy the text, run the PDF through OCR PDF afterwards. A scanned receipt PDF becomes searchable with [Make PDF searchable](/make-pdf-searchable).' },
       { q: 'Can I keep one image per receipt?', a: 'Yes. Choose Images under Save as and each receipt is saved as its own picture.' },
       { q: 'Are my receipts uploaded?', a: 'No. They are processed in this tab, and card digits, addresses and what you bought stay on your device.' },
+      { q: 'Can I upload the receipt to an expense portal?', a: 'Many portals cap uploads, often near 100 KB, and [Compress PDF to 100 KB](/compress-pdf-to-100kb) brings a receipt PDF under that.' },
     ],
   },
   {
