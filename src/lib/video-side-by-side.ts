@@ -31,7 +31,7 @@ import { watchEncode } from './encoder-watchdog';
 import { pickVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError, UnsupportedCodec, NamedError } from './input-error';
+import { UnsupportedCodec, NamedError } from './input-error';
 import { nameBare } from './bare-error';
 import { copyClipSound, pictureLength } from './video-merge';
 import { estimateMemory, memoryVerdict, outputFps, outputSeconds, planSideBySide, type Plan, type SbsFit, type SbsLayout, type SbsLength, type SbsSound } from './side-by-side-plan';
@@ -74,10 +74,10 @@ const mb = (n: number) => `${Math.round(n / 1e6).toLocaleString('en-US')} MB`;
 async function openClip(file: File): Promise<Clip> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   const track = await input.getPrimaryVideoTrack().catch(() => null);
-  if (!track) throw new InputError(`${file.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
+  if (!track) throw new NamedError('NoVideoTrack', `${file.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
   if (!(await track.canDecode())) throw new UnsupportedCodec(`${file.name}: ${unplayable()}`);
   const { first, length } = await pictureLength(track);
-  if (length <= 0) throw new InputError(`${file.name} has no picture to show.`);
+  if (length <= 0) throw new NamedError('NoPicture', `${file.name} has no picture to show.`);
   const stats = await track.computePacketStats(120).catch(() => null);
   return { file, input, track, first, length, rate: stats?.averagePacketRate ?? 30, width: track.displayWidth, height: track.displayHeight };
 }
@@ -107,7 +107,7 @@ export async function sideBySideEstimate(files: File[], o: Omit<SideBySideOption
 }
 
 export async function sideBySide(files: File[], opts: SideBySideOptions): Promise<SideBySideResult> {
-  if (files.length < 2) throw new InputError('Add two videos: A and B.');
+  if (files.length < 2) throw new NamedError('MissingSecondVideo', 'Add two videos: A and B.');
   const clips: Clip[] = [];
   // The step under way; a failure with no name of its own is recorded as this (see bare-error.ts).
   let stage = 'SideBySideOpenFailed';
@@ -122,7 +122,7 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
       !!opts.phone,
       mb,
     );
-    if (refusal) throw new InputError(refusal);
+    if (refusal) throw new NamedError('SideBySideTooBig', refusal);
 
     stage = 'SideBySideCodecFailed';
     const videoCodec = await pickVideoCodec({ width: plan.width, height: plan.height, bitrate: QUALITY_HIGH });

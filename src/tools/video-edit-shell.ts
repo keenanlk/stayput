@@ -1,5 +1,6 @@
 import { createShell, processEach } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { nameBare } from '../lib/bare-error';
 import { retryNote } from '../lib/edit-recovery';
 import type { EditOptions, EditResult } from '../lib/video-edit';
 
@@ -41,7 +42,9 @@ export function videoEditShell(config: {
       return processEach(files, progress, config.verb, async (entry, index) => {
         const share = (f: number) => (index + f) / files.length;
         progress.set(`Reading ${entry.file.name}…`, share(0.01));
-        const options = await config.options(entry.file);
+        const options = await Promise.resolve(config.options(entry.file)).catch((e) => {
+          throw nameBare('EditOptionsFailed', e);
+        });
         // A file the phone could not read is read once more, and a failure with no name of its own is named, inside editVideo.
         const r = await editVideo(entry.file, {
           ...options,
