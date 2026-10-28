@@ -33,7 +33,7 @@ const OWN_REFUSAL = new Set(['video-background-remover']);
 const ZERO_HEAD_OK = /\.(iso|img|dmg|bin|dat|raw|tga|vhd|vhdx|vmdk)$/i;
 
 const SAVE_STEPS =
-  'Save it to this device first: in Google Photos or Drive, open the file, tap the three dots and choose Download (or Save to device); on a Chromebook, right-click it in the Files app and turn on "Available offline". Then pick the saved copy from the Downloads folder.';
+  'Save it to this device first: in Google Photos or Drive, open the file, tap the three dots and choose Download (or Save to device). On a Chromebook, right-click it in the Files app and turn on "Available offline". On an iPhone or iPad, open it in the Files app and tap the cloud icon to download it. Then add the saved copy here.';
 
 function readFirst(file: Blob): Promise<Uint8Array> {
   return file.slice(0, SNIFF_BYTES).arrayBuffer().then((b) => new Uint8Array(b));
@@ -55,14 +55,14 @@ export async function inspectFile(file: File, tool: string, base: string, accept
       await probeReadable(file);
       return null;
     } catch {
-      return { name: 'FileNotDownloaded', message: `${file.name} is not on this device yet: the browser cannot read it, which usually means it is still in the cloud. ${SAVE_STEPS}` };
+      return { name: 'FileNotDownloaded', message: `${file.name} cannot be read by the browser, which usually means it is still in the cloud and not saved on this device yet. ${SAVE_STEPS}` };
     }
   }
 
   const container = sniffBytes(head);
   // A head shorter than the file claims is not a placeholder, and a big file is left to the tool (it reads in pieces and says what failed).
   if (container === 'zeros' && file.size <= SNAPSHOT_LIMIT && head.length >= Math.min(file.size, SNIFF_BYTES) && !ZERO_HEAD_OK.test(file.name)) {
-    return { name: 'FileNotDownloaded', message: `${file.name} is empty on this device: every byte of it is zero, which usually means it is still in the cloud and only a placeholder was picked. ${SAVE_STEPS}` };
+    return { name: 'FileNotDownloaded', message: `${file.name} looks empty on this device, which usually means it is still in the cloud and only a placeholder was picked. ${SAVE_STEPS}` };
   }
 
   const fix = CONVERTERS[container];
@@ -77,8 +77,8 @@ export async function inspectFile(file: File, tool: string, base: string, accept
 
 function unsupported(file: File, fix: { label: string; text?: string; href?: string }): IntakeProblem {
   const message = fix.text
-    ? `${file.name} is ${fix.label} file, and this tool cannot open that kind. Make an MP4 copy with ${fix.text}, then add the MP4 here.`
-    : `${file.name} is ${fix.label} file, and this tool cannot open that kind. Make an MP4 copy with another converter, then add the MP4 here.`;
+    ? `${file.name} is ${fix.label} file, which this tool cannot open. Make an MP4 copy with ${fix.text}, then add the MP4 here.`
+    : `${file.name} is ${fix.label} file, which this tool cannot open. Make an MP4 copy with another converter, then add the MP4 here.`;
   return { name: 'UnsupportedContainer', message, link: fix.text && fix.href ? { text: fix.text, href: fix.href } : undefined };
 }
 

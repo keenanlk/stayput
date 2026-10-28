@@ -38,6 +38,7 @@ test.describe('a container the tool cannot open is said before Run', () => {
       await expect(hint).toBeVisible();
       await expect(hint).toHaveAttribute('data-problem', 'UnsupportedContainer');
       await expect(hint).toContainText(label);
+      await expect(hint).toContainText(`${name} is a${label === 'AVI' ? 'n' : ''} ${label} file, which this tool cannot open. Make an MP4 copy with ${href ? `${label} to MP4` : 'another converter'}, then add the MP4 here.`);
       await expect(page.locator('#run')).toBeDisabled();
       if (href) {
         const link = hint.locator('a');
@@ -77,6 +78,8 @@ test.describe('a file that is not on the device is said before Run', () => {
     await expect(hint).toContainText('Google Photos');
     await expect(hint).toContainText('Drive');
     await expect(hint).toContainText('Chromebook');
+    await expect(hint).toContainText('IMG_0001.mp4 looks empty on this device, which usually means it is still in the cloud and only a placeholder was picked. Save it to this device first');
+    await expect(hint).toContainText('Then add the saved copy here.');
     await expect(page.locator('#run')).toBeDisabled();
   });
 
@@ -92,6 +95,7 @@ test.describe('a file that is not on the device is said before Run', () => {
     await open(page, VIDEO_TOOLS[0]!);
     await page.locator('#file-input').setInputFiles(generated('tone.wav'));
     await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'FileNotDownloaded');
+    await expect(page.locator('#run-hint')).toContainText('tone.wav cannot be read by the browser, which usually means it is still in the cloud and not saved on this device yet. Save it to this device first');
     await expect(page.locator('#run')).toBeDisabled();
   });
 
