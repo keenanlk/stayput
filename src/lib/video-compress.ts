@@ -13,6 +13,7 @@ import {
   Input,
   MATROSKA,
   MP4,
+  MPEG_TS,
   QTFF,
   WEBM,
   Mp4OutputFormat,
@@ -125,7 +126,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
 }
 
 async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<CompressResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');

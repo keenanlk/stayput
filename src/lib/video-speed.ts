@@ -15,6 +15,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   VideoSampleSink,
@@ -51,7 +52,7 @@ const MAX_FPS = 60;
 export async function changeSpeed(file: File, opts: SpeedOptions): Promise<SpeedResult> {
   const speed = opts.speed;
   if (!(speed >= 0.1 && speed <= 16)) throw new InputError('Choose a speed between 0.1× and 16×.');
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');

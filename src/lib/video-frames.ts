@@ -4,7 +4,7 @@
  * the frames asked for, drawn upright onto canvases that are saved as JPG or
  * PNG. Nothing leaves the tab.
  */
-import { BlobSource, CanvasSink, Input, MATROSKA, MP4, QTFF, WEBM } from 'mediabunny';
+import { BlobSource, CanvasSink, Input, MATROSKA, MP4, MPEG_TS, QTFF, WEBM } from 'mediabunny';
 import { canvasToBlob } from './image';
 import { unplayable } from './video-compress';
 import { UnreadableFile, UnsupportedCodec } from './input-error';
@@ -51,7 +51,7 @@ export function frameTimes(every: Exclude<FrameEvery, 'all'>, first: number, dur
 }
 
 export async function extractFrames(file: File, opts: FramesOptions): Promise<FramesInfo> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
