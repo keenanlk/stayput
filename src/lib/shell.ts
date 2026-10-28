@@ -299,14 +299,11 @@ export function createShell(opts: ShellOptions) {
    * unhandled rejection; now it is shown where the result would be.
    */
   async function filesChanged() {
-    const done = markInflight(root.dataset.slug ?? 'unknown', 'preview');
     try {
       await opts.onFilesChanged?.(files);
     } catch (e) {
       const first = files[0];
       previewFailed(e, first ? describeError(first.file, e) : undefined);
-    } finally {
-      done();
     }
   }
 
