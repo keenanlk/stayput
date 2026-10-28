@@ -1,6 +1,8 @@
 // @webkit-project
 import { test, expect, devices, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
+import { speechModel, TINY_KEY } from '../src/lib/speech-path';
+import { PHONE_SAFE_BYTES } from '../src/lib/phone-limit';
 
 /**
  * Phones step down to the smaller Whisper model (tiny, 41 MB) after the base model dies of memory, and start with it
@@ -196,4 +198,43 @@ test('the real worker loads the tiny files and transcribes a spoken sentence', a
   });
   expect(Object.keys(caches)).toContain('transformers-cache-whisper-tiny');
   expect(Object.keys(caches)).not.toContain('transformers-cache');
+});
+
+/** The choice itself, for the devices and file sizes a fake worker cannot show (the decision is made on the page's own values). */
+test.describe('speechModel', () => {
+  const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1';
+  const IPAD = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15';
+  const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
+  const MAC = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
+  const env = (userAgent: string, o: { touch?: number; memory?: number; flag?: boolean; search?: string } = {}) => ({
+    search: o.search ?? '',
+    session: { getItem: (k: string) => (k === TINY_KEY && o.flag ? '1' : null), setItem: () => {} },
+    nav: { userAgent, maxTouchPoints: o.touch ?? 0, deviceMemory: o.memory },
+    now: 0,
+  });
+  const big = PHONE_SAFE_BYTES + 1;
+
+  test('file size: iPhone and iPad go tiny-first over the phone limit; Android and computers do not', () => {
+    expect(speechModel(env(IPHONE, { touch: 5 }), 50e6)).toBe('whisper-base');
+    expect(speechModel(env(IPHONE, { touch: 5 }), 150e6)).toBe('whisper-base');
+    expect(speechModel(env(IPHONE, { touch: 5 }), PHONE_SAFE_BYTES)).toBe('whisper-base');
+    expect(speechModel(env(IPHONE, { touch: 5 }), big)).toBe('whisper-tiny');
+    expect(speechModel(env(IPAD, { touch: 5 }), big)).toBe('whisper-tiny');
+    expect(speechModel(env(ANDROID, { touch: 5, memory: 8 }), big)).toBe('whisper-base');
+    expect(speechModel(env(MAC), big)).toBe('whisper-base');
+  });
+
+  test('memory: 2 GB or less on a phone is tiny-first; a computer never is', () => {
+    expect(speechModel(env(ANDROID, { touch: 5, memory: 2 }))).toBe('whisper-tiny');
+    expect(speechModel(env(ANDROID, { touch: 5, memory: 1 }))).toBe('whisper-tiny');
+    expect(speechModel(env(ANDROID, { touch: 5, memory: 4 }))).toBe('whisper-base');
+    expect(speechModel(env(MAC, { memory: 0.5 }))).toBe('whisper-base');
+  });
+
+  test('the tab flag only counts on a phone, and the address override is for tests', () => {
+    expect(speechModel(env(IPHONE, { touch: 5, flag: true }))).toBe('whisper-tiny');
+    expect(speechModel(env(MAC, { flag: true }))).toBe('whisper-base');
+    expect(speechModel(env(MAC, { search: '?speechModel=tiny' }))).toBe('whisper-tiny');
+    expect(speechModel(env(IPHONE, { touch: 5, flag: true, search: '?speechModel=base' }))).toBe('whisper-base');
+  });
 });
