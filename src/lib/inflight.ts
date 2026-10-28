@@ -75,18 +75,29 @@ function wire() {
     if (!current) return;
     const { tool, phase } = current;
     current = undefined;
+    // A preview too quick to have been marked is not worth a record.
+    const marked = read() !== undefined;
     remove();
-    send(tool, phase === 'run' ? 'LeftDuringRun' : 'LeftDuringPreview');
+    if (marked) send(tool, phase === 'run' ? 'LeftDuringRun' : 'LeftDuringPreview');
   });
 }
+
+/**
+ * A preview that ends within this long never touches storage. The marker is for work long enough for a phone to run out of
+ * memory in; and WebKit's storage calls wait on another process, which can stall a page that is busy opening a media file.
+ */
+export const PREVIEW_MARK_DELAY_MS = 1500;
 
 /** Marks a run or preview as started. Call the returned function when it ends, however it ends. */
 export function markInflight(tool: string, phase: Phase): () => void {
   wire();
   const mine = { tool, phase };
   current = mine;
-  write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden });
+  const put = () => current === mine && write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden });
+  const timer = phase === 'preview' ? setTimeout(put, PREVIEW_MARK_DELAY_MS) : undefined;
+  if (!timer) put();
   return () => {
+    clearTimeout(timer);
     if (current !== mine) return;
     current = undefined;
     remove();

@@ -169,7 +169,10 @@ test('leaving the page during a run records LeftDuringRun', async ({ page }) => 
   await page.locator('#run').click();
   await expect.poll(() => marker(page)).toContain('"phase":"run"');
   await page.goto('/');
-  expect((await runs(page)).map((r) => r.error_class)).toEqual(['LeftDuringRun']);
+  // WebKit cancels the file read of a page that is going away; if that rejection is seen before pagehide it is recorded in its place.
+  const left = (await runs(page)).map((r) => r.error_class);
+  expect(left).toHaveLength(1);
+  expect(['LeftDuringRun', 'NotReadableMidRead']).toContain(left[0]);
   expect(await marker(page)).toBeNull();
 });
 
