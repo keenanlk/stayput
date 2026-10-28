@@ -1,4 +1,5 @@
 import { MODEL_DOWNLOAD_NOTE, PHONE_SAFE_BYTES, isIosBrowser, isPhoneBrowser } from './phone-limit';
+import { SPEECH_TINY_FIRST_USE_MB } from '../data/speech-size';
 
 /**
  * Which way the speech model runs.
@@ -136,7 +137,7 @@ export function rememberTinyModel(env: Env = environment()): void {
 }
 
 /** The note above Run when the smaller model will be used (a phone only), worded by marketing (STAA-398 item 7). */
-export const SMALLER_MODEL_NOTE = 'On this device, captions use a smaller speech model, which is less accurate. It downloads with its runtime on first use, about 41 MB in all.';
+export const SMALLER_MODEL_NOTE = `On this device, captions use a smaller speech model, which is less accurate. It downloads with its runtime on first use, about ${SPEECH_TINY_FIRST_USE_MB} MB in all.`;
 
 /** What the hint above Run says about the download: the smaller model's, only when it will be used for a file of this size. */
 export function speechDownloadNote(bytes: number): string {

@@ -6998,7 +6998,7 @@ test('Video to subtitles shows the download line before any run and the phone si
   await p.locator('#file-input').setInputFiles(big);
   await expect(p.locator('#run-hint')).toContainText('about 200 MB');
   // An iPhone with a file over the phone limit starts with the smaller speech model, and the hint says that download instead.
-  await expect(p.locator('#run-hint')).toContainText('about 41 MB in all');
+  await expect(p.locator('#run-hint')).toContainText('about 45 MB in all');
   await expect(p.locator('#run-hint')).not.toContainText('about 77 MB');
   await expect(p.locator('#run-hint').getByRole('link', { name: 'Trim it first' })).toHaveAttribute('href', '/tools/trim-video');
   await phone.close();

@@ -113,7 +113,7 @@ phone('a phone', () => {
     await page.locator('#clear').click();
     // The hint above Run mentions the smaller download once it will be used.
     await page.locator('#file-input').setInputFiles(speech(info.project.name));
-    await expect(page.locator('#tool')).toContainText('about 41 MB in all');
+    await expect(page.locator('#tool')).toContainText('about 45 MB in all');
     await page.locator('#run').click();
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 150_000 });
     expect((await models(page)).slice(2)).toEqual(['whisper-tiny']);
@@ -121,7 +121,7 @@ phone('a phone', () => {
     const fresh = await context.newPage();
     await fakeSpeechWorker(fresh, ['ok']);
     await open(fresh);
-    await expect(fresh.locator('#tool')).not.toContainText('about 41 MB in all');
+    await expect(fresh.locator('#tool')).not.toContainText('about 45 MB in all');
     await runOnce(fresh, info.project.name);
     expect(await models(fresh)).toEqual(['whisper-base']);
     await expect(fresh.locator('#results-list')).not.toContainText(/smaller speech model/);
