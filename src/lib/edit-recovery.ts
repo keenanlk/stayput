@@ -16,6 +16,15 @@
 /** Errors that say what the file is, or what the person gave: a retry cannot change them. */
 const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'AudioDecodeError', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound']);
 
+/**
+ * What the shell stops an instant repeat of: FINAL, plus the other names that say the file itself cannot be used
+ * (a picture that will not decode, a container nothing here opens, a cloud-only file). Same file and same options fail the same way.
+ */
+const SAME_EVERY_TIME = new Set([...FINAL, 'PictureUnreadable', 'UnsupportedContainer', 'FileNotDownloaded']);
+export function failsTheSameAgain(name: string): boolean {
+  return SAME_EVERY_TIME.has(name);
+}
+
 /** Encoder and memory failures that a smaller picture can get past. */
 const SHRINKABLE = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'OutOfMemoryError', 'EncoderRefused']);
 
