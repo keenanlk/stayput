@@ -271,11 +271,11 @@ export const tools: Tool[] = [
       },
       {
         q: 'How does it make GIFs smaller?',
-        a: 'Most GIFs store every frame whole, even when only a small part of the picture moves. Each frame is rewritten to hold just the area that changed, with the unchanged pixels left see-through so the frame before shows through. Medium and Strong also ignore changes too small to notice and use fewer colours, which is where GIF compressors such as gifsicle and ezgif get most of their savings.',
+        a: 'Most GIFs store every frame whole, even when only a small part of the picture moves. Each frame is rewritten to hold just the area that changed, with the unchanged pixels left see-through so the frame before shows through. Medium and Strong also ignore changes too small to notice and use fewer colours, which is where GIF compressors such as gifsicle and ezgif get most of their savings. If you are comparing this with ezgif, [is ezgif safe](/guides/is-ezgif-safe) covers what it does with your file.',
       },
       {
         q: 'How do I compress a GIF for Discord or get it under a size limit?',
-        a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels (to set exact pixel dimensions instead, use [Resize GIF](/tools/resize-gif)). Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB.',
+        a: 'Size makes the biggest difference: 50% leaves a quarter of the pixels (to set exact pixel dimensions instead, use [Resize GIF](/tools/resize-gif)). Dropping every second frame roughly halves what is left. Try Medium first, then add those until the result, shown with its size, is under your limit. Discord’s limit is 10 MB for uploads, and custom emoji must be under 256 KB. A GIF that will not compress enough is usually much smaller as an MP4, as [how to convert a GIF to MP4](/guides/how-to-convert-a-gif-to-mp4) explains.',
       },
       {
         q: 'Will the animation play at the same speed?',
@@ -1216,6 +1216,10 @@ export const tools: Tool[] = [
       {
         q: 'Which formats can I copy?',
         a: 'HEX (#1E90FF), RGB (rgb(30, 144, 255)) and HSL (hsl(210, 100%, 56%)), the three formats CSS, Figma, Canva and most design tools accept. Save palette also gives you every code as text to copy.',
+      },
+      {
+        q: 'Can I change the colours of the image itself?',
+        a: 'No, this tool only reads colours. To turn a photo black and white, use [Grayscale image](/grayscale-image). For a warm vintage tone instead, use the [Sepia filter](/sepia-filter).',
       },
     ],
   },
