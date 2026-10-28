@@ -17,6 +17,7 @@ import { releaseOutput } from './opfs-output';
 import { guardRun, interruptedError, resumeIfHidden, KEEP_SCREEN_ON_HINT } from './wake-lock';
 import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
+import { failsTheSameAgain } from './edit-recovery';
 import { inspectFile, type IntakeProblem } from './intake';
 import { forgetWorkingSize, workingSize } from './working-size';
 
@@ -133,6 +134,12 @@ export function shortName(name: string, max = 26): string {
   return `${base.slice(0, room - tail)}…${base.slice(base.length - tail)}${ext}`;
 }
 
+/** The line under a failed run that cannot be repeated: the reason as the person was told it, and what to change. */
+function repeatHint(e: unknown): string {
+  const reason = (e instanceof Error ? e.message : String(e)).trim().replace(/[.\s]+$/, '');
+  return `${reason}. To try again, change the file or an option.`;
+}
+
 export function describeError(file: File, e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e);
   return msg.startsWith(file.name) ? msg : `${file.name}: ${msg}`;
@@ -237,6 +244,7 @@ export function createShell(opts: ShellOptions) {
       );
     }
     if (arr.length === 0) return;
+    repeatBlock = '';
     if (!multiple) files = [];
     for (const file of arr) {
       const entry: ShellFile = { id: nextId++, file };
@@ -288,6 +296,7 @@ export function createShell(opts: ShellOptions) {
 
   function remove(id: number) {
     files = files.filter((f) => f.id !== id);
+    repeatBlock = '';
     hideResults();
     hideError();
     render();
@@ -300,6 +309,7 @@ export function createShell(opts: ShellOptions) {
     if (i < 0 || j < 0 || j >= files.length) return;
     const [item] = files.splice(i, 1);
     files.splice(j, 0, item!);
+    repeatBlock = '';
     hideResults();
     render();
     void filesChanged();
@@ -311,9 +321,16 @@ export function createShell(opts: ShellOptions) {
   const intakeProblem = () => files.map((f) => intake.get(f.id)).find(Boolean);
 
   let runBlock = '';
+  // Set when a run failed in a way the same file and options will repeat; any change to the files or an option clears it.
+  let repeatBlock = '';
+  function unlockRepeat() {
+    if (!repeatBlock) return;
+    repeatBlock = '';
+    updateRunBlock();
+  }
   function updateRunBlock() {
     const found = intakeProblem();
-    const next = opts.runBlocker?.(files) || found?.message || '';
+    const next = opts.runBlocker?.(files) || found?.message || repeatBlock;
     if (next !== runBlock) {
       runBlock = next;
       setHint(next, next === found?.message ? found?.link : undefined);
@@ -596,11 +613,14 @@ export function createShell(opts: ShellOptions) {
       // Work finished before the failure (captions written before the video could be redrawn) stays downloadable.
       const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
       if (salvage?.length) showResults(salvage, false);
-      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e, tool) });
+      const errorClass = classifyError(e, tool);
+      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
+      if (failsTheSameAgain(errorClass)) repeatBlock = repeatHint(e);
     } finally {
       mine?.release();
       showSizeNote();
       setBusy(false);
+      updateRunBlock();
     }
   }
 
@@ -649,6 +669,7 @@ export function createShell(opts: ShellOptions) {
   run.addEventListener('click', () => void execute());
   clear.addEventListener('click', () => {
     files = [];
+    repeatBlock = '';
     attempt = undefined;
     // Clear while a run is going: the screen no longer needs holding for it.
     guard?.release();
@@ -699,6 +720,18 @@ export function createShell(opts: ShellOptions) {
 
   // Re-running with the same files should be possible after changing options.
   document.getElementById('options')?.addEventListener('change', () => hideResults());
+  // A change to an option (or anything else in the panel) re-opens Run after a failure that would only repeat.
+  // The file picker, the list, Run and the results are not options: the list calls unlock itself.
+  const notAnOption = '#drop, #file-list, #run-dock, #results';
+  for (const ev of ['input', 'change']) {
+    root.addEventListener(ev, (e) => {
+      if ((e.target as HTMLElement | null)?.id !== 'file-input') unlockRepeat();
+    });
+  }
+  // Options set by pointing (painting, a crop box) raise no input event.
+  root.addEventListener('pointerdown', (e) => {
+    if (repeatBlock && !(e.target as HTMLElement | null)?.closest?.(notAnOption)) unlockRepeat();
+  });
 
   render();
   if (opts.keepAwake) setHint(runBlock);
