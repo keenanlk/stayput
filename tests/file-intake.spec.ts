@@ -38,7 +38,7 @@ test.describe('a container the tool cannot open is said before Run', () => {
       await expect(hint).toBeVisible();
       await expect(hint).toHaveAttribute('data-problem', 'UnsupportedContainer');
       await expect(hint).toContainText(label);
-      await expect(hint).toContainText(`${name} is a${label === 'AVI' ? 'n' : ''} ${label} file, which this tool cannot open. Make an MP4 copy with ${href ? `${label} to MP4` : 'another converter'}, then add the MP4 here.`);
+      await expect(hint).toContainText(`${name} is ${label === 'WMV' ? 'a' : 'an'} ${label} file, which this tool cannot open. Make an MP4 copy with ${href ? `${label} to MP4` : 'another converter'}, then add the MP4 here.`);
       await expect(page.locator('#run')).toBeDisabled();
       if (href) {
         const link = hint.locator('a');
