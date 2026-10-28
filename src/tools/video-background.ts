@@ -136,12 +136,39 @@ async function decodePicture(file: File) {
     return await (await import('../lib/image')).decodeImage(file);
   } catch (e) {
     if (e instanceof Error && !isUnspecific(e)) throw e;
-    throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Try a JPEG or PNG copy of it.'), { cause: e });
+    throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.'), { cause: e });
   }
 }
 
-createShell({
-  onFilesChanged: checkPhoneClip,
+/** Pictures that did not open when they were added; Run stays off for them (see pictureBlocker), so the failure is said once, at the drop. */
+const unopenable = new WeakSet<File>();
+const PICTURE_MESSAGE = 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.';
+
+function pictureBlocker(files: ShellFile[]): string {
+  const pictures = files.filter((f) => isImage(f.file));
+  return pictures.length === 1 && unopenable.has(pictures[0]!.file) ? PICTURE_MESSAGE : '';
+}
+
+/** Open the new background when it is added, not when Run is pressed: a picture that will not open is told then. */
+async function checkPicture(files: ShellFile[]) {
+  const pictures = files.filter((f) => isImage(f.file));
+  if (pictures.length !== 1 || unopenable.has(pictures[0]!.file)) return;
+  const file = pictures[0]!.file;
+  try {
+    (await decodePicture(file)).bitmap.close();
+  } catch (e) {
+    // A failure with a name of its own that is not the picture's (a script that would not load) is left for Run to say.
+    if (e instanceof Error && e.name === 'PictureUnreadable') unopenable.add(file);
+  }
+  shell.refresh();
+}
+
+const shell = createShell({
+  runBlocker: pictureBlocker,
+  onFilesChanged: async (files) => {
+    void checkPicture(files);
+    await checkPhoneClip(files);
+  },
   keepAwake: true,
   remembersSize: true,
   outputFormat: () => 'mp4',

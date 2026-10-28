@@ -16,6 +16,17 @@
 /** Errors that say what the file is, or what the person gave: a retry cannot change them. */
 const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'AudioDecodeError', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound']);
 
+/**
+ * What the shell stops an instant repeat of: FINAL, plus the other names that say the file itself cannot be used
+ * (a picture that will not decode, a container nothing here opens). Same file and same options fail the same way.
+ * 'FileNotDownloaded' is left out on purpose: a cloud-only file can read fine on the very next try once the device has finished fetching it.
+ * 'UnsupportedContainer' and 'FileNotDownloaded' are the names intake.ts gives (see IntakeProblem).
+ */
+const SAME_EVERY_TIME = new Set([...FINAL, 'PictureUnreadable', 'UnsupportedContainer']);
+export function failsTheSameAgain(name: string): boolean {
+  return SAME_EVERY_TIME.has(name);
+}
+
 /** Encoder and memory failures that a smaller picture can get past. */
 const SHRINKABLE = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'OutOfMemoryError', 'EncoderRefused']);
 
