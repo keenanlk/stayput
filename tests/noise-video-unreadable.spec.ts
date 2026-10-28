@@ -142,7 +142,7 @@ for (const [label, reads, ok] of [
     const all = await events(page);
     const run = all.find((e) => e.n === 'tool_run')!;
     if (ok) expect(run.d).toMatchObject({ outcome: 'ok' });
-    else expect(run.d).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+    else expect(run.d).toMatchObject({ outcome: 'error', error_class: 'NotReadableProbe' });
     for (const e of all) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `${e.n} carries unexpected key ${k}`).toBe(true);
   });
 }
@@ -166,7 +166,7 @@ for (const [label, reads, ok] of [
     }
     await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
     const run = (await events(page)).find((e) => e.n === 'tool_run')!;
-    expect(run.d).toMatchObject(ok ? { outcome: 'ok' } : { outcome: 'error', error_class: 'NotReadableError' });
+    expect(run.d).toMatchObject(ok ? { outcome: 'ok' } : { outcome: 'error', error_class: 'NotReadableProbe' });
   });
 }
 
@@ -235,15 +235,14 @@ test('a file that stops being readable after it was picked is cleaned from the e
   expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'ok' });
 });
 
-test('a file that never reads ends quickly, saying what to do', async ({ page }, info) => {
+// A small file that does not read at all is caught when it is picked (FileNotDownloaded), before Run, with the steps to save it first.
+test('a file that never reads is said before Run, saying what to do', async ({ page }, info) => {
   test.setTimeout(60_000);
   await lazyPage(page, 'never');
   await page.locator('#file-input').setInputFiles(clip(info.project.name === 'webkit' ? 'speech.mov' : 'talk.webm'));
-  await page.locator('#run').click();
-  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 10_000 });
-  await expect(page.locator('#error')).toContainText('save it to the phone');
-  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
-  expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+  await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'FileNotDownloaded', { timeout: 10_000 });
+  await expect(page.locator('#run-hint')).toContainText('Save it to this device first');
+  await expect(page.locator('#run')).toBeDisabled();
 });
 
 // The noise remover is a WebAssembly module fetched on the first run. A failed fetch is tried twice more; three in a row say so.

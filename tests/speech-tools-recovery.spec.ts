@@ -151,7 +151,7 @@ for (const path of PAGES) {
         const run = (await events(page)).find((e) => e.n === 'tool_run')!;
         if (ok) expect(run.d).toMatchObject({ outcome: 'ok' });
         else {
-          expect(run.d).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+          expect(run.d).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^NotReadable(Probe|MidRead)$/) });
           expect(['AudioDecodeError', 'NoSoundTrack']).not.toContain(run.d.error_class);
         }
       });

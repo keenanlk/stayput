@@ -15,12 +15,42 @@ export function isNotReadable(e: unknown): boolean {
   return false;
 }
 
-/** The error to show for a file that could not be read. Its name stays NotReadableError, which is what a failed run records. */
-export function notReadable(cause?: unknown): Error {
+/** Where in a job the browser stopped reading: at the first or last byte (a file that is not reachable), part-way through (the default), or when it ran out of memory for the read. */
+export type ReadStage = 'probe' | 'mid' | 'memory';
+
+/**
+ * The error to show for a file that could not be read. Its name stays NotReadableError, which is what the code checks for; the stage
+ * rides along as a property, and a failed run records it as NotReadableProbe, NotReadableMidRead or OutOfMemoryError (see classifyError).
+ */
+export function notReadable(cause?: unknown, stage?: ReadStage): Error {
   const out = new NamedError('ReadFailureFailed', 'This file could not be read. If it is in Google Photos, Drive or another cloud app, save it to the phone first, then pick it from the Files app (or the Downloads or Movies folder) and try again.');
   out.name = 'NotReadableError';
   out.cause = cause;
+  // A failure that was already placed (the probe's) keeps its place when a tool wraps it again.
+  (out as Error & { stage?: ReadStage }).stage = stage ?? (cause as { stage?: ReadStage } | undefined)?.stage ?? 'mid';
   return out;
+}
+
+/** The class a failed run records for a NotReadableError anywhere in `e`'s cause chain, or undefined for any other error. */
+export function notReadableClass(e: unknown): 'NotReadableProbe' | 'NotReadableMidRead' | 'OutOfMemoryError' | undefined {
+  for (let depth = 0; depth < 4 && typeof e === 'object' && e; depth++) {
+    if ((e as { name?: string }).name === 'NotReadableError') {
+      const stage = (e as { stage?: ReadStage }).stage;
+      return stage === 'probe' ? 'NotReadableProbe' : stage === 'memory' ? 'OutOfMemoryError' : 'NotReadableMidRead';
+    }
+    e = (e as { cause?: unknown }).cause;
+  }
+  return undefined;
+}
+
+/** Whether a read failed because memory ran out (a RangeError from an array buffer that would not allocate), not because the file was out of reach. */
+function ranOutOfMemory(e: unknown): boolean {
+  return e instanceof RangeError || (e instanceof Error && /allocation failed|out of memory/i.test(e.message));
+}
+
+/** A read that needed more memory than the device had: the file is fine, the device is short. */
+export function readMemoryError(cause: unknown): Error {
+  return new NamedError('OutOfMemoryError', 'This device ran out of memory while reading this file. Close other tabs and apps and try again, use a smaller file, or use a computer.', { cause });
 }
 
 /** Reads the first and last byte, which is enough for the browser to say whether it can reach the file at all. */
@@ -30,7 +60,7 @@ export async function probeReadable(file: Blob): Promise<void> {
     await file.slice(0, 1).arrayBuffer();
     await file.slice(file.size - 1).arrayBuffer();
   } catch (e) {
-    throw notReadable(e);
+    throw notReadable(e, 'probe');
   }
 }
 
@@ -72,6 +102,7 @@ export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIM
         parts.push(await file.slice(at, Math.min(file.size, at + CHUNK)).arrayBuffer());
         break;
       } catch (e) {
+        if (ranOutOfMemory(e)) throw readMemoryError(e);
         if (!isNotReadable(e)) throw e;
         if (attempt >= pauses.length) throw notReadable(e);
         await new Promise((r) => setTimeout(r, pauses[attempt]));

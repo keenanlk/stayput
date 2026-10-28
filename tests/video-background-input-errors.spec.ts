@@ -124,9 +124,11 @@ test('a video that stops being readable after it was picked is run from the earl
   expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'ok' });
 });
 
-test('a video that never reads ends quickly, saying to save it to the phone', async ({ page }) => {
+test('a video that never reads is said before Run, saying to save it to the device', async ({ page }) => {
   await open(page, 'never');
   await page.locator('#file-input').setInputFiles([clip]);
-  await page.locator('#run').click();
-  await expectError(page, 'save it to the phone', 'NotReadableError');
+  // A small clip that does not read at all is caught when it is picked, before Run.
+  await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'FileNotDownloaded');
+  await expect(page.locator('#run-hint')).toContainText('Save it to this device first');
+  await expect(page.locator('#run')).toBeDisabled();
 });
