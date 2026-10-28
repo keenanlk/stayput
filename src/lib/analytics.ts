@@ -26,6 +26,7 @@
  */
 import { journey, recordRun } from './journey';
 import { beforeSend, BEFORE_SEND_HOOK } from './analytics-payload';
+import { notReadableClass } from './read-failure';
 declare global {
   interface Window {
     umami?: { track: (name: string, data?: Record<string, string | number>) => void };
@@ -126,6 +127,8 @@ function context(): Record<string, string> {
 /** Coarse error category for tool_run failures: the error's own name, never its message or stack. */
 export function classifyError(e: unknown, tool?: string): string {
   const name = e instanceof Error ? e.name : '';
+  // A file the browser would not read is told apart by where it stopped: at the first byte, part-way, or for want of memory.
+  if (name === 'NotReadableError') return notReadableClass(e) ?? name;
   // A class name only: letters and digits, short. Anything else (a name someone set to a sentence) is just "Error".
   if (/^[A-Za-z][A-Za-z0-9]{0,39}$/.test(name) && name !== 'Error') return name;
   // Safety net: an error nobody named still says which tool it came from, so it never lands in one bare "Error" bucket.

@@ -14,6 +14,7 @@ import {
   MATROSKA,
   MP4,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   WEBM,
@@ -32,7 +33,7 @@ const WEBM_VIDEO: string[] = ['vp8', 'vp9', 'av1'];
 const WEBM_AUDIO: string[] = ['opus', 'vorbis'];
 
 export async function convertToWebm(file: File, opts: ConvertOptions): Promise<ConvertResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');

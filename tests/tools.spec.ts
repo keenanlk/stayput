@@ -7007,7 +7007,7 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   writeFileSync(big, '');
   truncateSync(big, 201_000_000);
   const small = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'short.mp4');
-  writeFileSync(small, Buffer.alloc(1_000_000));
+  writeFileSync(small, Buffer.alloc(1_000_000, 1));
   const phone = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1' });
   const p = await phone.newPage();
   await p.goto('/auto-caption-video');

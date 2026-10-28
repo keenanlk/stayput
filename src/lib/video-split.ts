@@ -113,8 +113,8 @@ export function videoPartName(name: string, index: number, count: number, ext: s
  * read it once more); anything else that goes wrong here is named for what it was.
  */
 export async function readDuration(file: File): Promise<number> {
-  const { BlobSource, Input, MATROSKA, MP4, QTFF, WEBM } = await import('mediabunny');
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const { BlobSource, Input, MATROSKA, MP4, MPEG_TS, QTFF, WEBM } = await import('mediabunny');
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch((e) => {
       if (isNotReadable(e)) throw notReadable(e);

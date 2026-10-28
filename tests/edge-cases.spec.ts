@@ -297,6 +297,11 @@ async function attempt(page: Page, tool: ToolSpec, file: string, crashed: () => 
   if ((await errorBox.evaluate((el) => el.classList.contains('is-active'))) && (await run.isDisabled())) {
     return { kind: 'refusal', where: 'add', text: (await errorBox.textContent()) ?? '', errorClass: '' };
   }
+  // A file the intake check names (a cloud placeholder, a container the tool cannot open) is said above Run, which stays off; no run is recorded.
+  const problem = await page.locator('#run-hint').getAttribute('data-problem');
+  if (problem && (await run.isDisabled())) {
+    return { kind: 'refusal', where: 'add', text: (await page.locator('#run-hint').textContent()) ?? '', errorClass: problem };
+  }
   // Tools that read the file as it is added (a PDF's pages, a picture's thumbnail) may take a moment to settle.
   await expect(run).toBeEnabled({ timeout: 15_000 });
   await tool.before?.(page);
