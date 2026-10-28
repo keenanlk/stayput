@@ -36,6 +36,8 @@ export function notReadableClass(e: unknown): 'NotReadableProbe' | 'NotReadableM
   for (let depth = 0; depth < 4 && typeof e === 'object' && e; depth++) {
     if ((e as { name?: string }).name === 'NotReadableError') {
       const stage = (e as { stage?: ReadStage }).stage;
+      // Only a failed file read carries a stage. A bare NotReadableError (the camera or mic in use) keeps its own name.
+      if (!stage) return undefined;
       return stage === 'probe' ? 'NotReadableProbe' : stage === 'memory' ? 'OutOfMemoryError' : 'NotReadableMidRead';
     }
     e = (e as { cause?: unknown }).cause;

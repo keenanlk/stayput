@@ -60,7 +60,8 @@ export async function inspectFile(file: File, tool: string, base: string, accept
   }
 
   const container = sniffBytes(head);
-  if (container === 'zeros' && !ZERO_HEAD_OK.test(file.name)) {
+  // A head shorter than the file claims is not a placeholder (a placeholder reads zeros for its whole length).
+  if (container === 'zeros' && head.length >= Math.min(file.size, SNIFF_BYTES) && !ZERO_HEAD_OK.test(file.name)) {
     return { name: 'FileNotDownloaded', message: `${file.name} is empty on this device: every byte of it is zero, which usually means it is still in the cloud and only a placeholder was picked. ${SAVE_STEPS}` };
   }
 

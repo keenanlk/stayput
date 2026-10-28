@@ -1,10 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 // File intake: when a file is added, the page looks at its first bytes. A cloud placeholder (all zero bytes) or a container the tool
 // has no reader for is said before Run, with a named class, and Run stays off. MPEG-TS clips are read by the video tools.
@@ -137,11 +134,7 @@ test.describe('regression: ordinary files are not stopped', () => {
 });
 
 test.describe('MPEG-TS clips work in the video tools', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'ts-'));
-  const clip = join(dir, 'clip.ts');
-  test.beforeAll(() => {
-    execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'testsrc2=d=2:size=320x240:rate=15', '-f', 'lavfi', '-i', 'sine=d=2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-f', 'mpegts', clip]);
-  });
+  const clip = fileURLToPath(new URL('./fixtures/static/mpegts-clip.ts', import.meta.url));
   for (const [path, name] of [['/tools/mute-video', 'clip.ts'], ['/tools/compress-video', 'clip.mts'], ['/tools/video-to-mp3', 'clip.m2ts']] as const) {
     test(`${name} completes on ${path}`, async ({ page }) => {
       test.skip(!!process.env.CI && test.info().project.name === 'webkit', 'Linux WebKit in CI cannot decode video in the page');
