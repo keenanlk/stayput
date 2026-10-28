@@ -1,4 +1,5 @@
 import { bool, createShell, num, radio, str } from '../lib/shell';
+import { retryNote } from '../lib/edit-recovery';
 import { formatBytes, type OutputFile } from '../lib/files';
 import { overPhoneLimit } from '../lib/phone-limit';
 import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
@@ -149,6 +150,7 @@ for (const el of document.querySelectorAll('input[name="vs-mode"], #vs-times, #v
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   async onFilesChanged(files) {
     if (files.length === 0) {
       duration = 0;
@@ -210,7 +212,7 @@ const shell = createShell({
       outs.push({
         name: videoPartName(entry.file.name, i, parts.length, r.ext),
         blob: r.blob,
-        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : r.keyframeCopy ? 'copied from the key frame at or before the start' : 'fast cut'}`,
+        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : r.keyframeCopy ? 'copied from the key frame at or before the start' : 'fast cut'}${retryNote(r.retry, r.width && r.height ? { width: r.width, height: r.height } : undefined)}`,
       });
     }
     return outs;

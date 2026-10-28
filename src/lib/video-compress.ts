@@ -29,7 +29,7 @@ import { executeWatched } from './encoder-watchdog';
 import { softwareH264Offered, useRealtimeH264 } from './encoder-probe';
 import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
 import { pageRecoveryHooks } from './recovery-hooks';
-import { withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { capScale, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export type CompressMode = 'balanced' | 'small' | 'high' | 'size';
 
@@ -110,7 +110,8 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
     return await withRecovery(
       async (attempt) => {
         const r = await compressOnce(file, opts, attempt, (side) => (made = side));
-        return attempt.retry ? { ...r, retry: attempt.retry } : r;
+        const retry = retryOf(attempt);
+        return retry ? { ...r, retry } : r;
       },
       () => made,
       { ...page.hooks, softwareEncode: softwareH264Offered },
@@ -169,14 +170,14 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
     }
 
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
-    if (attempt.maxSide && Math.max(width, height) > attempt.maxSide) {
-      const k = attempt.maxSide / Math.max(width, height);
+    const k = capScale(attempt, Math.max(width, height));
+    if (k < 1) {
       width = even(width * k);
       height = even(height * k);
     }
     sized(Math.max(width, height));
     // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software') useRealtimeH264();
+    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software' || attempt.remembered) useRealtimeH264();
     const videoCodec = await pickVideoCodec({ width, height, bitrate: videoBitrate });
     if (!videoCodec) throw new NamedError('VideoCompressFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const audioCodec =

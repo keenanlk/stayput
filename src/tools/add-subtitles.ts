@@ -37,6 +37,7 @@ const RELOAD_NOTE = 'The last run ran out of memory. Reload the page before capt
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   announceStart: true,
   // A video too big for a phone to caption is said so now, not after the browser gives up.
   onFilesChanged(files) {
@@ -201,7 +202,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       name: suffixName(file.name, '-subtitled', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}${retryNote(r.retry)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
+      note: `${describeEdit(r)}${retryNote(r.retry, r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
     });
     if (saveSrt) outputs.push(srtOutput(file, segments));
   }
