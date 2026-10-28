@@ -18,7 +18,7 @@ export async function fetchModelBytes(url: string, what: string, onProgress: (f:
       ctl.abort();
     }, stallMs);
   };
-  const stall = () => new NamedError('ModelDownloadStalled', `The ${what} download stalled: no data arrived for ${Math.round(stallMs / 1000)} seconds. Check your connection and try again.`);
+  const stall = () => new NamedError('ModelDownloadStalled', `Downloading the ${what} stalled: nothing arrived for ${Math.round(stallMs / 1000)} seconds. Check your internet connection, then try again.`);
   arm();
   try {
     const res = await fetch(url, { signal: ctl.signal });

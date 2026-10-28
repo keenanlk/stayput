@@ -37,7 +37,7 @@ export interface WatchdogLimits {
 /** How long a tool's progress may stand still before the shell calls the run stuck (image and PDF tools). */
 export const RUN_STALL_MS = 180_000;
 
-export const RUN_STALL_MESSAGE = 'This is taking far longer than it should and has stopped moving. Reload the page and try again, or try a smaller file.';
+export const RUN_STALL_MESSAGE = 'This has stopped making progress. Reload the page, add the file again and run it. If it stops again, try a smaller file.';
 
 /** Thrown by watchProgress when the work goes silent. The name is the short error kind a failed run records. */
 export class StalledError extends Error {

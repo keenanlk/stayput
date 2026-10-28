@@ -25,7 +25,7 @@ export async function contentBounds(pdf: PdfJs.PDFDocumentProxy, index: number, 
   const { canvas } = await renderPage(pdf, index + 1, dpi / 72);
   const { width: W, height: H } = canvas;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new NamedError('CanvasUnavailable', 'This browser could not draw the page to find its margins.');
+  if (!ctx) throw new NamedError('CanvasUnavailable', 'This browser could not draw the page to find its margins. Drag on the page to crop it by hand, or try Trim white margins in another browser.');
   const data = ctx.getImageData(0, 0, W, H).data;
   canvas.width = canvas.height = 0;
   let x0 = W, y0 = H, x1 = -1, y1 = -1;
