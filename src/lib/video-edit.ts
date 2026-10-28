@@ -193,7 +193,14 @@ export async function assertReadable(file: File): Promise<void> {
  * memory) at full size, gets one more try (see edit-recovery.ts) before the failure is shown.
  */
 export async function editVideo(file: File, opts: EditOptions): Promise<EditResult> {
-  if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) return editVideoOnce(file, opts, {});
+  if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) {
+    // Remove sound: the picture is copied, with nothing to retry. A failure with no name of its own is named for this step.
+    try {
+      return await editVideoOnce(file, opts, {});
+    } catch (e) {
+      throw nameBare('VideoCopyFailed', e);
+    }
+  }
   const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
   try {
