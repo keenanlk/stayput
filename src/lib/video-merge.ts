@@ -17,6 +17,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   VideoSample,
@@ -126,7 +127,7 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
 }
 
 async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<MergeResult> {
-  const inputs = files.map((f) => new Input({ source: new BlobSource(f), formats: [MP4, QTFF, WEBM, MATROSKA] }));
+  const inputs = files.map((f) => new Input({ source: new BlobSource(f), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] }));
   try {
     const clips: { track: InputVideoTrack; first: number; length: number; name: string }[] = [];
     for (const [i, input] of inputs.entries()) {

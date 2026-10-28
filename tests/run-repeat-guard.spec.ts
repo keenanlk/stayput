@@ -2,13 +2,15 @@
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
+import { failsTheSameAgain } from '../src/lib/edit-recovery';
+import { inspectFile, intakeError } from '../src/lib/intake';
 
 // Run stays off after a failure the same file and options would repeat, so tapping it again cannot pile up the same error.
 // Any change to the files or to an option turns it back on; a failure a second try can get past never turns it off.
 const fixture = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
 const clip = readFileSync(fixture('iphone-portrait-person-3s.mov'));
 const png = readFileSync(fixture('logo-red.png'));
-const HINT = 'Change the file or the options to try again.';
+const HINT = 'To try again, change the file or an option.';
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 const runs = async (page: Page) => (await events(page)).filter((e) => e.n === 'tool_run');
@@ -117,5 +119,26 @@ test.describe('a failure a second try can get past', () => {
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 30_000 });
     await expect.poll(async () => (await runs(page)).length).toBe(2);
     expect((await runs(page))[1]!.d.outcome).toBe('ok');
+  });
+});
+
+// The two errors file intake (H3) gives, thrown the way intakeError throws them, against the H3 fixtures.
+test.describe('the errors file intake gives', () => {
+  test('a container nothing here opens repeats exactly, so it keeps Run off', async () => {
+    const file = new File([readFileSync(fixture('blur-edge.avi'))], 'clip.avi', { type: 'video/x-msvideo' });
+    const problem = await inspectFile(file, 'trim-video', 'trim-video', 'video/*');
+    expect(problem?.name).toBe('UnsupportedContainer');
+    const e = intakeError(problem!);
+    expect(e.name).toBe('UnsupportedContainer');
+    expect(failsTheSameAgain(e.name)).toBe(true);
+  });
+
+  test('a cloud-only file can read on the next try, so it does not keep Run off', async () => {
+    const file = new File([new Uint8Array(2 * 1024 * 1024)], 'IMG_0001.mp4', { type: 'video/mp4' });
+    const problem = await inspectFile(file, 'trim-video', 'trim-video', 'video/*');
+    expect(problem?.name).toBe('FileNotDownloaded');
+    const e = intakeError(problem!);
+    expect(e.name).toBe('FileNotDownloaded');
+    expect(failsTheSameAgain(e.name)).toBe(false);
   });
 });

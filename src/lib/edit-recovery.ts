@@ -18,9 +18,11 @@ const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'Audi
 
 /**
  * What the shell stops an instant repeat of: FINAL, plus the other names that say the file itself cannot be used
- * (a picture that will not decode, a container nothing here opens, a cloud-only file). Same file and same options fail the same way.
+ * (a picture that will not decode, a container nothing here opens). Same file and same options fail the same way.
+ * 'FileNotDownloaded' is left out on purpose: a cloud-only file can read fine on the very next try once the device has finished fetching it.
+ * 'UnsupportedContainer' and 'FileNotDownloaded' are the names intake.ts gives (see IntakeProblem).
  */
-const SAME_EVERY_TIME = new Set([...FINAL, 'PictureUnreadable', 'UnsupportedContainer', 'FileNotDownloaded']);
+const SAME_EVERY_TIME = new Set([...FINAL, 'PictureUnreadable', 'UnsupportedContainer']);
 export function failsTheSameAgain(name: string): boolean {
   return SAME_EVERY_TIME.has(name);
 }

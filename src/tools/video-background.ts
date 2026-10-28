@@ -136,13 +136,13 @@ async function decodePicture(file: File) {
     return await (await import('../lib/image')).decodeImage(file);
   } catch (e) {
     if (e instanceof Error && !isUnspecific(e)) throw e;
-    throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Try a JPEG or PNG copy of it.'), { cause: e });
+    throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.'), { cause: e });
   }
 }
 
 /** Pictures that did not open when they were added; Run stays off for them (see pictureBlocker), so the failure is said once, at the drop. */
 const unopenable = new WeakSet<File>();
-const PICTURE_MESSAGE = 'This picture could not be opened. Try a JPEG or PNG copy of it.';
+const PICTURE_MESSAGE = 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.';
 
 function pictureBlocker(files: ShellFile[]): string {
   const pictures = files.filter((f) => isImage(f.file));

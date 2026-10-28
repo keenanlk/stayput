@@ -484,7 +484,8 @@ async function start(deviceId?: string) {
     }
     const platform = detectPlatform(navigator.userAgent, navigator.maxTouchPoints);
     const f = cameraFailure(name, { platform, dismissed });
-    return failStart(classifyError(e, slug()), f.lines, f.state);
+    // The camera in use is a NotReadableError too, but it is not a file read: it keeps its own name.
+    return failStart(e instanceof Error && e.name === 'NotReadableError' ? e.name : classifyError(e, slug()), f.lines, f.state);
   }
   if (document.hidden) {
     // The tab was left while the prompt was open: do not keep the camera running in the background.

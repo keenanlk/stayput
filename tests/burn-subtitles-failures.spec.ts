@@ -147,7 +147,7 @@ test('a file that still cannot be read is NotReadableError, never an encoder or 
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
   await expect(page.locator('#error')).toContainText('could not be read');
   await expect(page.locator('#error')).not.toContainText(/memory|encoder/i);
-  expect((await lastRun(page)).error_class).toBe('NotReadableError');
+  expect((await lastRun(page)).error_class).toBe('NotReadableMidRead');
 });
 
 test('writing captions from the speech of a file the phone cannot read says so, not "no sound"', async ({ page }, info) => {
@@ -160,7 +160,7 @@ test('writing captions from the speech of a file the phone cannot read says so, 
   await expect(page.locator('#error')).toContainText('could not be read');
   await expect(page.locator('#error')).not.toContainText(/no sound track|No audio/i);
   const errorClass = (await lastRun(page)).error_class;
-  expect(errorClass).toBe('NotReadableError');
+  expect(errorClass).toBe('NotReadableMidRead');
   expect(['AudioDecodeError', 'NoSoundTrack']).not.toContain(errorClass);
 });
 

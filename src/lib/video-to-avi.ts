@@ -21,6 +21,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   WEBM,
   type AudioCodec,
@@ -103,7 +104,7 @@ function phoneRefusal(bytes: number): Error {
 }
 
 export async function convertToAvi(file: File, opts: AviOptions): Promise<AviResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');

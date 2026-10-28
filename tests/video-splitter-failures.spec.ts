@@ -108,7 +108,7 @@ test.describe('on the page', () => {
         await page.locator('#run').click();
         await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
         await expect(page.locator('#error')).toContainText('This file could not be read');
-        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^NotReadable(Probe|MidRead)$/) });
       }
     });
   }
@@ -204,7 +204,7 @@ test.describe('on the page', () => {
         await expect(page.locator('#error')).toContainText('save it to the phone first');
         // Read exactly three times, no more.
         expect(await page.evaluate(() => (window as unknown as { __failed: number }).__failed)).toBe(3);
-        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^NotReadable(Probe|MidRead)$/) });
       }
     });
   }

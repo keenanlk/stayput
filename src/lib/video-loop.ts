@@ -20,6 +20,7 @@ import {
   MovOutputFormat,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   WEBM,
   WebMOutputFormat,
@@ -50,7 +51,7 @@ export interface LoopResult {
 
 /** What the page needs to plan a run: the clip's length, from its packets. */
 export async function probeLoop(file: File): Promise<{ duration: number }> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
@@ -70,7 +71,7 @@ async function pictureLength(track: InputVideoTrack): Promise<{ first: number; l
 
 export async function loopVideo(file: File, opts: LoopOptions): Promise<LoopResult> {
   if (!(opts.repeats >= 2)) throw new InputError('Choose at least two repeats.');
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch(() => null);
     const video = format ? await input.getPrimaryVideoTrack().catch(() => null) : null;

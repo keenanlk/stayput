@@ -18,6 +18,7 @@ import { guardRun, interruptedError, resumeIfHidden, KEEP_SCREEN_ON_HINT } from 
 import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 import { failsTheSameAgain } from './edit-recovery';
+import { inspectFile, type IntakeProblem } from './intake';
 import { forgetWorkingSize, workingSize } from './working-size';
 
 export interface ShellFile {
@@ -136,7 +137,7 @@ export function shortName(name: string, max = 26): string {
 /** The line under a failed run that cannot be repeated: the reason as the person was told it, and what to change. */
 function repeatHint(e: unknown): string {
   const reason = (e instanceof Error ? e.message : String(e)).trim().replace(/[.\s]+$/, '');
-  return `${reason}. Change the file or the options to try again.`;
+  return `${reason}. To try again, change the file or an option.`;
 }
 
 export function describeError(file: File, e: unknown): string {
@@ -150,6 +151,8 @@ function rewrap(file: File, e: unknown): Error {
   if (e instanceof Error && e.name) out.name = e.name;
   const link = (e as { link?: { href: string; text: string } } | null)?.link;
   if (link) (out as Error & { link?: typeof link }).link = link;
+  const stage = (e as { stage?: string } | null)?.stage;
+  if (stage) (out as Error & { stage?: string }).stage = stage;
   return out;
 }
 
@@ -249,6 +252,8 @@ export function createShell(opts: ShellOptions) {
       if (!multiple) break;
     }
     render();
+    const added = files.filter((f) => !intake.has(f.id));
+    checking = Promise.all(added.map(async (f) => intake.set(f.id, (await inspectFile(f.file, root.dataset.slug ?? '', root.dataset.base ?? '', input.accept).catch(() => null)) ?? undefined))).then(updateRunBlock);
     if (!attempt || attempt.ok) {
       attempt = { ok: false };
       trackFilesAdded({ tool: root.dataset.slug ?? 'unknown', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0) });
@@ -310,6 +315,11 @@ export function createShell(opts: ShellOptions) {
     void filesChanged();
   }
 
+  // What the file-intake check found for each picked file (see intake.ts); a file with a problem keeps Run disabled.
+  const intake = new Map<number, IntakeProblem | undefined>();
+  let checking: Promise<void> = Promise.resolve();
+  const intakeProblem = () => files.map((f) => intake.get(f.id)).find(Boolean);
+
   let runBlock = '';
   // Set when a run failed in a way the same file and options will repeat; any change to the files or an option clears it.
   let repeatBlock = '';
@@ -319,10 +329,12 @@ export function createShell(opts: ShellOptions) {
     updateRunBlock();
   }
   function updateRunBlock() {
-    const next = opts.runBlocker?.(files) || repeatBlock;
+    const found = intakeProblem();
+    const next = opts.runBlocker?.(files) || found?.message || repeatBlock;
     if (next !== runBlock) {
       runBlock = next;
-      setHint(next);
+      setHint(next, next === found?.message ? found?.link : undefined);
+      hint.dataset.problem = next === found?.message ? found?.name ?? '' : '';
     }
     run.disabled = files.length === 0 || busy || !!runBlock;
   }
@@ -562,6 +574,8 @@ export function createShell(opts: ShellOptions) {
 
   async function execute() {
     if (busy || files.length === 0) return;
+    await checking;
+    if (intakeProblem()) return updateRunBlock();
     hideError();
     hideResults();
     setBusy(true);
