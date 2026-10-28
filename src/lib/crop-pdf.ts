@@ -5,6 +5,7 @@
  * box is hidden by every viewer and printer but still in the file.
  */
 import type * as PdfJs from 'pdfjs-dist';
+import { NamedError } from './input-error';
 import { displayedToUserSpace, loadDocument, loadPdfLib, renderPage } from './pdf';
 
 export interface CropRect {
@@ -23,7 +24,9 @@ export interface CropRect {
 export async function contentBounds(pdf: PdfJs.PDFDocumentProxy, index: number, margin = 0.02, dpi = 72): Promise<CropRect | undefined> {
   const { canvas } = await renderPage(pdf, index + 1, dpi / 72);
   const { width: W, height: H } = canvas;
-  const data = canvas.getContext('2d')!.getImageData(0, 0, W, H).data;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new NamedError('CanvasUnavailable', 'This browser could not draw the page to find its margins.');
+  const data = ctx.getImageData(0, 0, W, H).data;
   canvas.width = canvas.height = 0;
   let x0 = W, y0 = H, x1 = -1, y1 = -1;
   for (let y = 0; y < H; y++) {

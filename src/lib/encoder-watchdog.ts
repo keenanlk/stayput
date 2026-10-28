@@ -34,19 +34,27 @@ export interface WatchdogLimits {
   startMs?: number;
 }
 
-/**
- * Runs `work` and fails with EncoderStall if the progress it reports (by
- * calling the `progress` function it is given) stops changing. On a stall,
- * `cancel` is called to stop the encode and free what it holds. The timer is
- * always cleared when the work ends, however it ends, and on page hide.
- */
-export async function watchEncode<T>(work: (progress: (fraction: number) => void) => Promise<T>, cancel: () => unknown, limits: WatchdogLimits = {}): Promise<T> {
-  const stallMs = limits.stallMs ?? STALL_MS;
-  const startMs = limits.startMs ?? START_MS;
+/** How long a tool's progress may stand still before the shell calls the run stuck (image and PDF tools). */
+export const RUN_STALL_MS = 180_000;
+
+export const RUN_STALL_MESSAGE = 'This is taking far longer than it should and has stopped moving. Reload the page and try again, or try a smaller file.';
+
+/** Thrown by watchProgress when the work goes silent. The name is the short error kind a failed run records. */
+export class StalledError extends Error {
+  constructor(message = RUN_STALL_MESSAGE) {
+    super(message);
+    this.name = 'StalledError';
+  }
+}
+
+/** The shared core: `progress(key)` counts as movement whenever `key` differs from the last one. */
+async function watch<T>(work: (progress: (key: unknown) => void) => Promise<T>, cancel: () => unknown, limits: WatchdogLimits, defaults: { stallMs: number; startMs: number }, make: () => Error): Promise<T> {
+  const stallMs = limits.stallMs ?? defaults.stallMs;
+  const startMs = limits.startMs ?? defaults.startMs;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  let last = -Infinity;
+  let last: unknown = Symbol('none');
   let started = false;
-  let fire: (e: EncoderStall) => void = () => {};
+  let fire: (e: Error) => void = () => {};
   const stalled = new Promise<never>((_, reject) => (fire = reject));
   stalled.catch(() => undefined);
   const arm = (ms: number) => {
@@ -54,9 +62,9 @@ export async function watchEncode<T>(work: (progress: (fraction: number) => void
     timer = setTimeout(() => {
       // A tab in the background is slowed down by the browser, so silence there proves nothing.
       if (typeof document !== 'undefined' && document.hidden) return arm(ms);
-      // Say why first: cancelling makes the encode fail too, and this must be the error that is seen.
-      fire(new EncoderStall());
-      // Cancelling a stuck encoder can itself wait on it, so do not wait for the answer.
+      // Say why first: cancelling makes the work fail too, and this must be the error that is seen.
+      fire(make());
+      // Cancelling stuck work can itself wait on it, so do not wait for the answer.
       try {
         Promise.resolve(cancel()).catch(() => undefined);
       } catch {
@@ -64,10 +72,10 @@ export async function watchEncode<T>(work: (progress: (fraction: number) => void
       }
     }, ms);
   };
-  const progress = (fraction: number) => {
-    if (started && fraction === last) return;
+  const progress = (key: unknown) => {
+    if (started && key === last) return;
     started = true;
-    last = fraction;
+    last = key;
     arm(stallMs);
   };
   // A page that is going away has nothing left to watch.
@@ -82,6 +90,24 @@ export async function watchEncode<T>(work: (progress: (fraction: number) => void
     stop();
     globalThis.removeEventListener?.('pagehide', stop);
   }
+}
+
+/**
+ * Runs `work` and fails with EncoderStall if the progress it reports (by
+ * calling the `progress` function it is given) stops changing. On a stall,
+ * `cancel` is called to stop the encode and free what it holds. The timer is
+ * always cleared when the work ends, however it ends, and on page hide.
+ */
+export function watchEncode<T>(work: (progress: (fraction: number) => void) => Promise<T>, cancel: () => unknown, limits: WatchdogLimits = {}): Promise<T> {
+  return watch(work, cancel, limits, { stallMs: STALL_MS, startMs: START_MS }, () => new EncoderStall());
+}
+
+/**
+ * The same no-progress watch for any job: `tick(key)` is called with something that changes whenever the job moves
+ * (new text, a new fraction). Fails with StalledError after `stallMs` of silence, never while the page is hidden.
+ */
+export function watchProgress<T>(work: (tick: (key: unknown) => void) => Promise<T>, cancel: () => unknown, limits: WatchdogLimits = {}): Promise<T> {
+  return watch(work, cancel, limits, { stallMs: RUN_STALL_MS, startMs: RUN_STALL_MS }, () => new StalledError());
 }
 
 /** The pieces of a Mediabunny Conversion this needs. */

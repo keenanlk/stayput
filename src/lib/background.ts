@@ -78,7 +78,14 @@ function findSubjectOnce(bitmap: ImageBitmap, onLoading: ((fraction: number) => 
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       if (msg.type === 'mask') resolve(refineMask(msg.mask!, SIZE, keep));
-      else reject(fromWorkerFailure(msg.name, msg.message ?? 'Background removal failed.'));
+      else {
+        // A stalled download leaves the worker half-way through a fetch: start the next try from a clean one.
+        if (msg.name === 'ModelDownloadStalled') {
+          w.terminate();
+          worker = undefined;
+        }
+        reject(fromWorkerFailure(msg.name, msg.message ?? 'Background removal failed.'));
+      }
     };
     const onError = (e: ErrorEvent) => {
       w.removeEventListener('message', onMessage);

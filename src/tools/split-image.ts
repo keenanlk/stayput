@@ -96,7 +96,7 @@ const shell = createShell({
       redraw();
     } catch (e) {
       panel.hidden = true;
-      shell.showError(e instanceof Error ? e.message : String(e));
+      shell.previewFailed(e);
     }
   },
   async process(files, progress) {

@@ -16,6 +16,9 @@ site will render this file.
 - The Image Converter detects each file's real format from its bytes (and says when the extension is wrong), has a searchable format picker, and can now save PDF, ICO (favicon sizes 16 to 256), GIF, BMP and TIFF as well as JPG, PNG and WebP.
 - This changelog.
 
+### Changed
+- Failed attempts that used to leave no trace are now counted as failed runs with a named error kind: a picture or PDF that cannot be previewed, a tab that was closed or lost during a run, a run or a model download that stops moving, and the Erase and Trim white margins buttons. Only the tool name and the error kind are recorded; nothing about the file. A model download that sends no data for 45 seconds now ends with a clear message instead of waiting forever.
+
 ### Fixed
 - Password-protected and owner-restricted PDFs now open in every PDF tool. They are unlocked in the tab by qpdf (WebAssembly); before, they produced blank or broken output.
 - Page numbers and signatures land on the visible page when a PDF's page box does not start at 0,0 or is cropped.
