@@ -1,7 +1,7 @@
 /**
  * Runs OpenAI's Whisper base speech model (MIT, ONNX export from
  * onnx-community) through transformers.js (Apache-2.0) and onnxruntime-web,
- * off the main thread. The model is served from /models/whisper-base/ and
+ * off the main thread. The model is served from /models/whisper-base/ (or whisper-tiny/ on a phone short of memory) and
  * onnxruntime's WebAssembly from /vendor/; nothing is fetched from anywhere
  * else. The worker gets sound samples, never the file.
  *
@@ -17,10 +17,13 @@ import { loadWithRetry } from './retry';
 import { fetchResumable, wholeOrNull } from './model-fetch';
 import { isRecordingTooLong, looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, type SpeechError } from './speech-errors';
 
-export const MODEL = 'whisper-base';
+/** The models this worker can run, each with its own folder under /models/ and its own Cache API store. */
+export type ModelName = 'whisper-base' | 'whisper-tiny';
+/** transformers.js's own store name stays for base, so models already kept on devices are still found. */
+export const cacheKeyFor = (model: ModelName): string => (model === 'whisper-tiny' ? 'transformers-cache-whisper-tiny' : 'transformers-cache');
 export const RATE = 16000;
 
-export type Request = { id: number; audio: Float32Array; language: string | null; task: 'transcribe' | 'translate' };
+export type Request = { id: number; audio: Float32Array; language: string | null; task: 'transcribe' | 'translate'; model: ModelName };
 export type GpuFailure = 'unsupported' | 'network' | 'init' | 'run';
 export type Reply =
   | { id: number; type: 'loading'; fraction: number }
@@ -95,18 +98,19 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
       }
     },
   };
-  /** Drop every kept model file, so the next load downloads them again. */
-  const evict = () => (typeof caches === 'undefined' ? Promise.resolve(false) : caches.delete(env.cacheKey)).catch(() => false);
+  /** Drop every kept file of one model, so the next load of it downloads them again; the other model's files stay. */
+  const evict = (model: ModelName) => (typeof caches === 'undefined' ? Promise.resolve(false) : caches.delete(cacheKeyFor(model))).catch(() => false);
   const wasm = env.backends.onnx.wasm!;
   wasm.wasmPaths = vendorDir('ort');
   // Threads need a cross-origin-isolated page, which this site is not.
   wasm.numThreads = 1;
 
-  let asr: Promise<AutomaticSpeechRecognitionPipeline> | undefined;
+  // One pipeline per model.
+  const pipelines = new Map<ModelName, Promise<AutomaticSpeechRecognitionPipeline>>();
   const post = (msg: Reply) => (self as unknown as Worker).postMessage(msg);
 
 
-  function start(id: number, gpu: boolean): Promise<AutomaticSpeechRecognitionPipeline> {
+  function start(id: number, gpu: boolean, model: ModelName): Promise<AutomaticSpeechRecognitionPipeline> {
     // The two model files make up nearly all of the download; report them together.
     const sizes = new Map<string, [number, number]>();
     download = {
@@ -124,9 +128,16 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     const options = gpu
       ? { dtype: { encoder_model: 'fp16', decoder_model_merged: 'q8' }, device: { encoder_model: 'webgpu', decoder_model_merged: 'wasm' } }
       : { dtype: 'q8', device: 'wasm' };
-    asr ??= pipeline('automatic-speech-recognition', MODEL, options as Parameters<typeof pipeline>[2]) as Promise<AutomaticSpeechRecognitionPipeline>;
-    // A failed load (offline on first use, say) may be retried by the next request.
-    asr.catch(() => (asr = undefined));
+    // The store is read at each fetch, so it is set to this model's before the load starts.
+    env.cacheKey = cacheKeyFor(model);
+    let asr = pipelines.get(model);
+    if (!asr) {
+      asr = pipeline('automatic-speech-recognition', model, options as Parameters<typeof pipeline>[2]) as Promise<AutomaticSpeechRecognitionPipeline>;
+      pipelines.set(model, asr);
+      // A failed load (offline on first use, say) may be retried by the next request.
+      const failed = asr;
+      failed.catch(() => pipelines.get(model) === failed && pipelines.delete(model));
+    }
     return asr;
   }
 
@@ -136,14 +147,14 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
    * files are dropped before the error goes back; the page then starts a fresh worker, which downloads
    * them again (this worker's runtime is not trusted after a failed start).
    */
-  async function load(id: number, gpu: boolean): Promise<AutomaticSpeechRecognitionPipeline> {
+  async function load(id: number, gpu: boolean, model: ModelName): Promise<AutomaticSpeechRecognitionPipeline> {
     // On the WebGPU path a failure goes straight to the 8-bit path, which retries a dropped download itself
     // and keeps the files: a WebGPU that will not start says nothing about them.
-    if (gpu) return start(id, gpu);
+    if (gpu) return start(id, gpu, model);
     try {
-      return await loadWithRetry(() => start(id, gpu), looksLikeNetwork);
+      return await loadWithRetry(() => start(id, gpu, model), looksLikeNetwork);
     } catch (err) {
-      if (!looksLikeNetwork(err) && !looksLikeMemory(err)) await evict();
+      if (!looksLikeNetwork(err) && !looksLikeMemory(err)) await evict(model);
       throw err;
     }
   }
@@ -179,10 +190,10 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
   }
 
   /** Recognise one piece of speech. On the WebGPU path any failure is reported as `gpu-failed`, so the page can run the piece again on the 8-bit path. */
-  async function recognise({ id, audio, language, task }: Request, gpu: boolean): Promise<Reply> {
+  async function recognise({ id, audio, language, task, model }: Request, gpu: boolean): Promise<Reply> {
     let loading = true;
     try {
-      const run = await load(id, gpu);
+      const run = await load(id, gpu, model);
       loading = false;
       const spoken = language ?? (await detectLanguage(run, audio));
       const out = (await run(audio, { return_timestamps: true, language: spoken, task })) as { text: string; chunks?: { timestamp: [number, number | null]; text: string }[] };

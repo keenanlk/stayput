@@ -6,7 +6,8 @@ import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/
 import { EncoderStall } from '../lib/encoder-watchdog';
 import { encodeFailedError, encodeMemoryError, isRecordingTooLong, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
-import { MODEL_DOWNLOAD_NOTE, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
+import { overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
+import { speechDownloadNote } from '../lib/speech-path';
 import { InputError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
@@ -46,7 +47,7 @@ const shell = createShell({
     const videos = files.filter((f) => !isSubs(f.file));
     const speech = !files.some((f) => isSubs(f.file));
     const note = speech ? phoneLimitNote(Math.max(0, ...videos.map((f) => f.file.size))) : '';
-    shell.setHint([reloadAdvised ? RELOAD_NOTE : '', note, speech ? MODEL_DOWNLOAD_NOTE : ''].filter(Boolean).join(' '), TRIM_LINK);
+    shell.setHint([reloadAdvised ? RELOAD_NOTE : '', note, speech ? speechDownloadNote(Math.max(0, ...videos.map((f) => f.file.size))) : ''].filter(Boolean).join(' '), TRIM_LINK);
   },
   outputFormat: () => 'mp4',
   async process(files, progress) {
@@ -68,7 +69,7 @@ const shell = createShell({
   },
 });
 // Before any file is added, the hint above Run already says what the first run downloads.
-shell.setHint(MODEL_DOWNLOAD_NOTE);
+shell.setHint(speechDownloadNote(0));
 
 /** An error the page will show as "out of memory", marked so the page can advise a reload. */
 const asMemory = <T extends Error>(e: T): T => Object.assign(e, { memory: true });
