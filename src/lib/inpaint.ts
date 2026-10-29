@@ -32,7 +32,14 @@ export function inpaint(rgba: Uint8ClampedArray, hole: Uint8Array, width: number
       w.removeEventListener('message', onMessage);
       w.removeEventListener('error', onError);
       if (msg.type === 'done') resolve(msg.rgba!);
-      else reject(fromWorkerFailure(msg.name, msg.message ?? 'Removing the object failed.'));
+      else {
+        // A stalled download leaves the worker half-way through a fetch: start the next try from a clean one.
+        if (msg.name === 'ModelDownloadStalled') {
+          w.terminate();
+          worker = undefined;
+        }
+        reject(fromWorkerFailure(msg.name, msg.message ?? 'Removing the object failed.'));
+      }
     };
     const onError = (e: ErrorEvent) => {
       w.removeEventListener('message', onMessage);

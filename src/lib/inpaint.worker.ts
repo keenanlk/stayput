@@ -9,7 +9,7 @@
 import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
-import { NamedError } from './input-error';
+import { fetchModelBytes } from './model-stall';
 
 export const MODEL_URL = '/models/migan-pipeline-v2.onnx';
 
@@ -23,27 +23,8 @@ export type Reply =
 
 let session: Promise<ort.InferenceSession> | undefined;
 
-async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
-  const res = await fetch(MODEL_URL);
-  if (!res.ok || !res.body) throw new NamedError('ModelDownloadError', `The object removal model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
-  const total = Number(res.headers.get('content-length')) || 0;
-  const reader = res.body.getReader();
-  const parts: Uint8Array[] = [];
-  let got = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    parts.push(value);
-    got += value.length;
-    if (total) onProgress(Math.min(1, got / total));
-  }
-  const bytes = new Uint8Array(got);
-  let o = 0;
-  for (const p of parts) {
-    bytes.set(p, o);
-    o += p.length;
-  }
-  return bytes;
+function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
+  return fetchModelBytes(MODEL_URL, 'object removal model', onProgress);
 }
 
 function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {

@@ -124,13 +124,19 @@ layer.addEventListener('pointercancel', () => {
 document.getElementById('auto-trim')!.addEventListener('click', async () => {
   if (!pdf) return;
   let trimmed = 0;
-  for (let i = 0; i < pageCount; i++) {
-    cropResult.textContent = `Finding the margins of page ${i + 1} of ${pageCount}…`;
-    const r = await contentBounds(pdf, i);
-    if (r && (r.width < 0.98 || r.height < 0.98)) {
-      rects.set(i, r);
-      trimmed++;
+  try {
+    for (let i = 0; i < pageCount; i++) {
+      cropResult.textContent = `Finding the margins of page ${i + 1} of ${pageCount}…`;
+      const r = await contentBounds(pdf, i);
+      if (r && (r.width < 0.98 || r.height < 0.98)) {
+        rects.set(i, r);
+        trimmed++;
+      }
     }
+  } catch (e) {
+    cropResult.textContent = '';
+    shell.previewFailed(e);
+    return;
   }
   cropResult.textContent = trimmed
     ? `Trimmed the white margins on ${plural(trimmed, 'page')}. Check each page; drag to adjust any of them.`

@@ -43,7 +43,7 @@ const shell = createShell({
       await showImage(files[0]!.file);
     } catch (e) {
       hideImage();
-      shell.showError(e instanceof Error ? e.message : String(e));
+      shell.previewFailed(e);
     }
   },
   async process(files, progress) {
