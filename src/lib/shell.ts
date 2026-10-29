@@ -5,7 +5,9 @@
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
 import { classifyError, trackFilesAdded, trackToolRun, trackToolStart } from './analytics';
-import { EncoderStall } from './encoder-watchdog';
+import { EncoderStall, watchProgress } from './encoder-watchdog';
+import { markInflight, reportLostTab } from './inflight';
+import { isBare, nameBare } from './bare-error';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
@@ -70,7 +72,7 @@ export interface ShellOptions {
    * one-line reason above Run. Return '' when the list is fine. Evaluated on
    * every list change and on shell.refresh().
    */
-  runBlocker?: (files: ShellFile[]) => string;
+  runBlocker?: (files: ShellFile[]) => string | { message: string; link?: { text: string; href: string } };
   /** Do the work. Return the outputs to show. */
   process: (files: ShellFile[], progress: Progress) => Promise<ProcessResult>;
   /** Title shown above the results. */
@@ -87,6 +89,12 @@ export interface ShellOptions {
   announceStart?: boolean;
   /** A video job that starts at the smaller size that last worked in this tab (see edit-recovery.ts): says so, and offers "Try full size". */
   remembersSize?: boolean;
+  /**
+   * Fail a run whose progress stands still for three minutes (StalledError). On by default for tools that take only
+   * pictures and PDFs; the video tools run their own encoder watchdog and the speech tools sit through long silent steps,
+   * so they stay off unless a tool asks. Pass false to turn it off, true to turn it on.
+   */
+  watch?: boolean;
 }
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -196,6 +204,12 @@ export async function processEach(
   return { outputs, skipped };
 }
 
+/** True when a file picker's `accept` list names only pictures and PDFs (GIF and animated formats excluded). */
+function picturesOnly(accept: string): boolean {
+  const tokens = accept.split(',').map((t) => t.trim()).filter(Boolean);
+  return tokens.length > 0 && tokens.every((t) => !/gif|apng/i.test(t) && /^(image\/.+|application\/pdf|\.(jpe?g|png|webp|heic|heif|avif|jxl|bmp|tiff?|psd|svg|pdf))$/i.test(t));
+}
+
 export function createShell(opts: ShellOptions) {
   const root = $('tool');
   const multiple = root.dataset.multiple === 'true';
@@ -226,7 +240,7 @@ export function createShell(opts: ShellOptions) {
   // An attempt starts when files are added and ends at a clear or when new
   // files arrive after a successful run. files_added fires once per attempt, and
   // tool_run marks the attempt's first success, so completion = first successes / files_added.
-  let attempt: { ok: boolean } | undefined;
+  let attempt: { ok: boolean; previewFailed?: boolean } | undefined;
   // The file carried over from the previous tool, while it is still in the list (see adoptHandoff).
   let carriedFile: File | undefined;
 
@@ -288,16 +302,39 @@ export function createShell(opts: ShellOptions) {
    * unhandled rejection; now it is shown where the result would be.
    */
   async function filesChanged() {
+    const done = markInflight(root.dataset.slug ?? 'unknown', 'preview');
     try {
       // A file the intake check refused is not handed to the tool: trim-video, for one, would feed a WMV to its <video>, and
       // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
       await checking;
       await opts.onFilesChanged?.(files.filter((f) => !intake.get(f.id)));
     } catch (e) {
-      console.warn(e);
       const first = files[0];
-      showError(first ? describeError(first.file, e) : e instanceof Error ? e.message : String(e));
+      previewFailed(e, first ? describeError(first.file, e) : undefined);
+    } finally {
+      done();
     }
+  }
+
+  /**
+   * A preview (what a tool decodes and draws before Run) failed: show it, and record it as a failed run of this attempt,
+   * once. The class is "Preview" plus the error's own name, so these stay apart from failures of Run. An error with no
+   * name of its own is "PreviewError".
+   */
+  function previewFailed(e: unknown, message?: string) {
+    console.warn(e);
+    showError(message ?? (e instanceof Error ? e.message : String(e)));
+    if (!attempt || attempt.previewFailed) return;
+    attempt.previewFailed = true;
+    const tool = root.dataset.slug ?? 'unknown';
+    const kind = isBare(e) ? 'Error' : classifyError(nameBare('Error', e), tool);
+    trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0), ms: 0, errorClass: `Preview${kind}`.slice(0, 40) });
+  }
+
+  /** A failure the tool shows itself, outside Run (remove-object's Erase button): recorded under the error's own class. */
+  function recordError(e: unknown) {
+    const tool = root.dataset.slug ?? 'unknown';
+    trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0), ms: 0, errorClass: classifyError(e, tool) });
   }
 
   function remove(id: number) {
@@ -336,11 +373,14 @@ export function createShell(opts: ShellOptions) {
   }
   function updateRunBlock() {
     const found = intakeProblem();
-    const next = opts.runBlocker?.(files) || found?.message || repeatBlock;
+    const blocked = opts.runBlocker?.(files);
+    const own = typeof blocked === 'string' ? { message: blocked } : blocked;
+    const next = own?.message || found?.message || repeatBlock;
+    const link = own?.message ? own.link : next === found?.message ? found?.link : undefined;
     if (next !== runBlock) {
       runBlock = next;
-      setHint(next, next === found?.message ? found?.link : undefined);
-      hint.dataset.problem = next === found?.message ? found?.name ?? '' : '';
+      setHint(next, link);
+      hint.dataset.problem = !own?.message && next === found?.message ? found?.name ?? '' : '';
     }
     run.disabled = files.length === 0 || busy || !!runBlock;
   }
@@ -578,6 +618,15 @@ export function createShell(opts: ShellOptions) {
     showSizeNote();
   }
 
+  const watching = opts.watch ?? (!opts.keepAwake && picturesOnly(input.accept));
+  /** The progress the tool sees when a run is watched: every new text or fraction counts as movement. */
+  const watchedProgress = (tick: (key: unknown) => void): Progress => ({
+    set(text, fraction) {
+      tick(`${text}|${fraction}`);
+      progressApi.set(text, fraction);
+    },
+  });
+
   async function execute() {
     if (busy || files.length === 0) return;
     await checking;
@@ -591,9 +640,10 @@ export function createShell(opts: ShellOptions) {
     const tool = root.dataset.slug ?? 'unknown';
     const mine = (guard = opts.keepAwake ? guardRun() : undefined);
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
+    const clearMarker = markInflight(tool, 'run');
     try {
       const result = await resumeIfHidden(
-        () => opts.process(files, progressApi),
+        () => (watching ? watchProgress((tick) => opts.process(files, watchedProgress(tick)), () => undefined) : opts.process(files, progressApi)),
         mine,
         () => progressApi.set('The page was hidden, so the run stopped. Starting again: keep this tab open and the screen on.', 0),
       );
@@ -623,6 +673,7 @@ export function createShell(opts: ShellOptions) {
       trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
       if (failsTheSameAgain(errorClass)) repeatBlock = repeatHint(e);
     } finally {
+      clearMarker();
       mine?.release();
       showSizeNote();
       setBusy(false);
@@ -746,6 +797,7 @@ export function createShell(opts: ShellOptions) {
   mountNextSteps(root);
   warmDecoders(input.accept);
   // Landing pages load the tool module on demand; this marks the shell as live.
+  reportLostTab();
   root.dataset.ready = 'true';
   void adoptHandoff();
 
@@ -755,6 +807,10 @@ export function createShell(opts: ShellOptions) {
     },
     execute,
     showError,
+    previewFailed,
+    recordError,
+    /** Mark work outside Run as in flight (see inflight.ts); call the returned function when it ends. */
+    inflight: (phase: 'run' | 'preview') => markInflight(root.dataset.slug ?? 'unknown', phase),
     hideError,
     setHint,
     /** Re-check opts.runBlocker after something it depends on changed (a file's kind became known). */

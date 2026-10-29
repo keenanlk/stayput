@@ -55,5 +55,5 @@ const shell = createShell({
 const onFiles = effectPreview(
   (bitmap, maxSide) => render(bitmap, maxSide),
   (count) => `Preview of the first photo.${count > 1 ? ` The same settings apply to all ${count}.` : ''}`,
-  (m) => shell.showError(m),
+  (e) => shell.previewFailed(e),
 );

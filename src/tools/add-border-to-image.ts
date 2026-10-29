@@ -86,5 +86,5 @@ const shell = createShell({
 const onFiles = effectPreview(
   (bitmap, maxSide) => render(bitmap, maxSide, false).canvas,
   (count) => `Preview of the first picture.${count > 1 ? ` The same frame applies to all ${count}.` : ''}`,
-  (m) => shell.showError(m),
+  (e) => shell.previewFailed(e),
 );

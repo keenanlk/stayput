@@ -238,7 +238,13 @@ async function erase(onStatus: (text: string) => void = () => {}) {
   }
 }
 
-goBtn.addEventListener('click', () => void erase().catch(() => {}));
+// An Erase failure is shown as the notice and recorded as a failed run under its own class; a successful Erase sends nothing.
+goBtn.addEventListener('click', () => {
+  const done = shell.inflight('run');
+  void erase()
+    .catch((e) => shell.recordError(e))
+    .finally(done);
+});
 undoBtn.addEventListener('click', () => {
   if (busy) return;
   notice = undefined;
@@ -278,7 +284,7 @@ const shell = createShell({
       await showImage(files[0]!.file);
     } catch (e) {
       hideImage();
-      shell.showError(e instanceof Error ? e.message : String(e));
+      shell.previewFailed(e);
     }
   },
   async process(files, progress) {
