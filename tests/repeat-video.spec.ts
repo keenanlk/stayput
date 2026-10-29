@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { planLoop } from '../src/lib/loop-plan';
 
 /** Repeat video (/loop-video and /tools/repeat-video): the plan, the copy path and the size guard. */
@@ -95,19 +95,55 @@ test('a target length repeats the clip until it is long enough', async ({ page }
   expect(Math.abs(out.seconds - 60)).toBeLessThan(0.2);
 });
 
-test('a run over the 2 GB estimate is refused before encoding, with the reason shown', async ({ page }) => {
+test('a setup over the 2 GB estimate keeps Run off and the reason showing, and records no failed run', async ({ page }) => {
   await open(page, '/loop-video');
   await page.locator('#file-input').setInputFiles(clip);
   await page.locator('input[name="by"][value="length"]').evaluate((el) => (el as HTMLInputElement).click());
   // 3,000 minutes of a 10 s, 181 KB clip is 18,000 repeats and about 3 GB.
   await page.locator('#loop-minutes').fill('3000');
   await expect(page.locator('#run-hint')).toContainText('over the');
-  let downloaded = false;
-  page.on('download', () => (downloaded = true));
-  await page.locator('#run').click();
-  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 10_000 });
-  await expect(page.locator('#error')).toContainText('over the');
-  expect(downloaded).toBe(false);
+  await expect(page.locator('#run-hint')).toContainText('repeats fit');
+  await expect(page.locator('#run')).toBeDisabled();
+  await page.locator('#run').click({ force: true, timeout: 2_000 }).catch(() => {});
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  expect(await page.evaluate(() => (window as unknown as { __events: { n: string }[] }).__events.filter((e) => e.n === 'tool_run'))).toEqual([]);
+  // Back inside the limit, Run is on again and the estimate replaces the reason.
+  await page.locator('#loop-minutes').fill('1');
+  await expect(page.locator('#run')).toBeEnabled();
+  await expect(page.locator('#run-hint')).toContainText('6 repeats make a video');
+});
+
+test('every refusal has its own class name and says how many repeats fit', () => {
+  const base = { bytes: 1_000_000, duration: 10, count: 5, target: 600, phone: false };
+  const cls = (o: Partial<Parameters<typeof planLoop>[0]>) => planLoop({ ...base, mode: 'count', ...o }).refusalClass;
+  expect(cls({ mode: 'count', count: 1 })).toBe('LoopCountOutOfRange');
+  expect(cls({ mode: 'length', target: 0 })).toBe('LoopNoTarget');
+  expect(cls({ mode: 'length', duration: 0 })).toBe('LoopLengthUnreadable');
+  expect(cls({ mode: 'length', target: 5 })).toBe('LoopTargetTooShort');
+  expect(cls({ mode: 'count', bytes: 50_000_000, count: 50 })).toBe('LoopTooLarge');
+  expect(cls({ mode: 'count', bytes: 30_000_000, count: 10, phone: true })).toBe('LoopTooLargeForPhone');
+  expect(planLoop({ ...base, mode: 'count', bytes: 50_000_000, count: 50 }).refusal).toContain('40 repeats fit');
+  expect(planLoop({ ...base, mode: 'count', bytes: 30_000_000, count: 10, phone: true }).refusal).toContain('6 repeats fit');
+  expect(cls({ mode: 'count' })).toBe('');
+});
+
+test.describe('on a phone', () => {
+  test.use({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1', hasTouch: true });
+  test('5 repeats of a 45 MB clip are over the phone limit: Run is off, with the largest count that fits', async ({ page }, info) => {
+    const big = info.outputPath('big.mp4');
+    mkdirSync(info.outputDir, { recursive: true });
+    // The 10 s fixture plus a 45 MB top-level `free` box: it still reads as the same 10 s clip, and weighs 45 MB.
+    const pad = Buffer.alloc(45_000_000);
+    pad.writeUInt32BE(pad.length, 0);
+    pad.write('free', 4, 'ascii');
+    writeFileSync(big, Buffer.concat([readFileSync(clip), pad]));
+    await open(page, '/loop-video');
+    await page.locator('#file-input').setInputFiles(big);
+    await page.locator('#loop-count').fill('5');
+    await expect(page.locator('#run-hint')).toContainText('A phone can run out of memory');
+    await expect(page.locator('#run-hint')).toContainText('4 repeats fit');
+    await expect(page.locator('#run')).toBeDisabled();
+  });
 });
 
 test('the page says it repeats the file and is not a loop player', async ({ page }) => {
