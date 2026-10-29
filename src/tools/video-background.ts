@@ -4,8 +4,9 @@ import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/
 import { describeEdit } from './video-edit-shell';
 import { resumeWhenHidden, retryNote } from '../lib/edit-recovery';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { InputError, NamedError, UnreadableFile, UnsupportedCodec, isUnspecific } from '../lib/input-error';
+import { NamedError, UnreadableFile, UnsupportedCodec, isUnspecific } from '../lib/input-error';
 import { snapshotFile } from '../lib/read-failure';
+import { saveHandoff } from '../lib/handoff';
 import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
@@ -144,10 +145,26 @@ async function decodePicture(file: File) {
 const unopenable = new WeakSet<File>();
 const PICTURE_MESSAGE = 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.';
 
-function pictureBlocker(files: ShellFile[]): string {
+const REMOVE_BG = '/tools/remove-background';
+const PICTURE_ONLY_MESSAGE =
+  'Add a video too: this tool replaces the background of a video, and the picture is only the new background. To take the background out of a photo, use the Remove background tool instead.';
+
+function pictureBlocker(files: ShellFile[]): string | { message: string; link?: { text: string; href: string } } {
   const pictures = files.filter((f) => isImage(f.file));
+  // Only pictures were added: refused here, at the drop, so Run is never pressed (and no failed run is recorded).
+  if (pictures.length > 0 && pictures.length === files.length) return { message: PICTURE_ONLY_MESSAGE, link: { text: 'Remove background tool', href: REMOVE_BG } };
   return pictures.length === 1 && unopenable.has(pictures[0]!.file) ? PICTURE_MESSAGE : '';
 }
+
+// The link in that refusal carries a single photo over to Remove background (see handoff.ts); any other click follows the plain link.
+document.getElementById('run-hint')?.addEventListener('click', async (e) => {
+  const a = (e.target as HTMLElement).closest<HTMLAnchorElement>(`a[href="${REMOVE_BG}"]`);
+  const only = pictureOnly();
+  if (!a || !only || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.defaultPrevented) return;
+  e.preventDefault();
+  await saveHandoff({ name: only.name, blob: only }, a.pathname, 'Video background remover');
+  location.assign(a.href);
+});
 
 /** Open the new background when it is added, not when Run is pressed: a picture that will not open is told then. */
 async function checkPicture(files: ShellFile[]) {
@@ -163,9 +180,14 @@ async function checkPicture(files: ShellFile[]) {
   shell.refresh();
 }
 
+/** The one picture on the list when nothing else is, for the handoff above. */
+let current: ShellFile[] = [];
+const pictureOnly = () => (current.length === 1 && isImage(current[0]!.file) ? current[0]!.file : undefined);
+
 const shell = createShell({
   runBlocker: pictureBlocker,
   onFilesChanged: async (files) => {
+    current = files;
     void checkPicture(files);
     await checkPhoneClip(files);
   },
@@ -187,16 +209,13 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   const pictures = files.filter((f) => isImage(f.file));
   let videos = files.filter((f) => !isImage(f.file));
   if (videos.length === 0) {
-    throw new InputError(
-      pictures.length > 0
-        ? 'Add a video too: this tool replaces the background of a video, and the picture is only the new background. To take the background out of a photo, use the Remove background tool instead.'
-        : `Add a video (MP4, MOV, WebM or MKV) to ${kind() === 'blur' ? 'blur' : 'replace'} its background.`,
-    );
+    if (pictures.length > 0) throw new NamedError('PictureWithoutVideo', PICTURE_ONLY_MESSAGE);
+    throw new NamedError('NoVideo', `Add a video (MP4, MOV, WebM or MKV) to ${kind() === 'blur' ? 'blur' : 'replace'} its background.`);
   }
-  if (pictures.length > 1) throw new InputError(`${pictures.length} pictures were added. Keep one picture for the new background, remove the others, and run again.`);
+  if (pictures.length > 1) throw new NamedError('TooManyPictures', `${pictures.length} pictures were added. Keep one picture for the new background, remove the others, and run again.`);
   let bgKind = kind();
   if (pictures.length === 1) bgKind = 'image';
-  else if (bgKind === 'image') throw new InputError('Picture is chosen as the new background, but no picture was added. Add a JPG or PNG with the video, or choose Blur or Colour.');
+  else if (bgKind === 'image') throw new NamedError('PictureBackgroundMissing', 'Picture is chosen as the new background, but no picture was added. Add a JPG or PNG with the video, or choose Blur or Colour.');
   // Copy each video into memory right away: on Android a file picked from a cloud gallery (Google Photos, Drive) can stop being
   // readable by the time the person finder has downloaded. One the browser cannot reach says so now, before the download.
   videos = await Promise.all(videos.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file) })));

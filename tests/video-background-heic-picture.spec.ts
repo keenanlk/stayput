@@ -32,9 +32,9 @@ test('a video and a HEIC photo with empty types: the photo becomes the backgroun
 test('a HEIC photo alone is still asked for a video, in words that say what to do', async ({ page }) => {
   await open(page);
   await page.locator('#file-input').setInputFiles([{ name: 'IMG_0002.HEIC', mimeType: '', buffer: heic }]);
-  await page.locator('#run').click();
-  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 30_000 });
-  await expect(page.locator('#error')).toContainText('Add a video too');
+  // Refused at the drop, with Run off.
+  await expect(page.locator('#run-hint')).toContainText('Add a video too');
+  await expect(page.locator('#run')).toBeDisabled();
 });
 
 type Ev = { n: string; d: Record<string, string> };
