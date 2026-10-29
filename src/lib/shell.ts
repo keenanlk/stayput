@@ -301,7 +301,10 @@ export function createShell(opts: ShellOptions) {
   async function filesChanged() {
     const done = markInflight(root.dataset.slug ?? 'unknown', 'preview');
     try {
-      await opts.onFilesChanged?.(files);
+      // A file the intake check refused is not handed to the tool: trim-video, for one, would feed a WMV to its <video>, and
+      // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
+      await checking;
+      await opts.onFilesChanged?.(files.filter((f) => !intake.get(f.id)));
     } catch (e) {
       const first = files[0];
       previewFailed(e, first ? describeError(first.file, e) : undefined);

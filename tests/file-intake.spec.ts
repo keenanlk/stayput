@@ -32,6 +32,18 @@ test.describe('a container the tool cannot open is said before Run', () => {
   ];
   for (const [label, name, type, href] of cases) {
     test(`${label} on a video tool: UnsupportedContainer, Run off${href ? ', converter link works' : ', no link (that converter is on hold)'}`, async ({ page }) => {
+      // Count the sources the trim preview's <video> is given, even briefly: a browser that stalls on an AVI, FLV or WMV would hang the page.
+      await page.addInitScript(() => {
+        const d = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src')!;
+        (window as unknown as { __srcSets: number }).__srcSets = 0;
+        Object.defineProperty(HTMLMediaElement.prototype, 'src', {
+          ...d,
+          set(v: string) {
+            if (v) (window as unknown as { __srcSets: number }).__srcSets++;
+            d.set!.call(this, v);
+          },
+        });
+      });
       await open(page, VIDEO_TOOLS[0]!);
       await page.locator('#file-input').setInputFiles([{ name, mimeType: type, buffer: readFileSync(fixture(name)) }]);
       const hint = page.locator('#run-hint');
@@ -48,6 +60,8 @@ test.describe('a container the tool cannot open is said before Run', () => {
       } else {
         await expect(hint.locator('a')).toHaveCount(0);
       }
+      // The refused file is never given to the preview player.
+      expect(await page.evaluate(() => (window as unknown as { __srcSets: number }).__srcSets)).toBe(0);
       // Removing the file lifts it.
       await page.locator('#clear').click();
       await expect(hint).toBeHidden();

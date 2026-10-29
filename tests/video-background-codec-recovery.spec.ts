@@ -58,7 +58,9 @@ function breakCodec(f: Fault) {
     return realConfigure.call(this, cfg);
   };
   (proto as unknown as Record<string, unknown>)[method] = function (this: { big?: boolean; close(): void; init: { error: (e: unknown) => void } }, ...args: unknown[]) {
-    if (this.big && ++calls > f.after && fired < f.times) {
+    // Counted from when the frames are being replaced, not the up-front decode check that comes before.
+    const running = /Replacing the background/.test(document.getElementById('progress-text')?.textContent ?? '');
+    if (this.big && running && ++calls > f.after && fired < f.times) {
       fired++;
       if (f.how === 'throw') this.close();
       else {
