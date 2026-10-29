@@ -1,4 +1,5 @@
 import { clean, type Segment } from './captions';
+import { NamedError } from './input-error';
 import { restartsOnce } from './speech-errors';
 import type { SpeechModel } from './speech-path';
 
@@ -77,7 +78,7 @@ export async function recognisePieces(
         found = await deps.recognise(again ? piece : piece.slice(), spoken, model, (f) => deps.onLoading(model, f));
         break;
       } catch (err) {
-        const e = err instanceof Error ? err : new Error(String(err));
+        const e = err instanceof Error ? err : new NamedError('SpeechModelError', String(err));
         const down = deps.stepDown(e, model);
         if (recognised === 0) {
           // Before any piece has been recognised, a model that would not start (a kept copy the worker dropped, or a start-up
