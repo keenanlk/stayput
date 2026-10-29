@@ -1,7 +1,11 @@
 import { formatDuration } from './audio';
 import { SPEECH_RATE, speechSamples } from './speech-audio';
-import { clean, cutPoints, type Segment } from './captions';
-import { fromWorker, noSpeechFound, restartsOnce, workerCrashError } from './speech-errors';
+import { toSrt, toText, toVtt, cutPoints, type Segment } from './captions';
+import { suffixName, type OutputFile } from './files';
+import { resumeWhenHidden } from './edit-recovery';
+import { pageRecoveryHooks } from './recovery-hooks';
+import { recognisePieces, type SpeechPartial } from './speech-resume';
+import { fromWorker, noSpeechFound, workerCrashError } from './speech-errors';
 import { SPEECH_MODEL_MB } from '../data/speech-size';
 import { rememberTinyModel, rememberWebgpuFailure, speechModel, wantsWebgpu, type SpeechModel } from './speech-path';
 import { isPhoneBrowser } from './phone-limit';
@@ -147,69 +151,95 @@ function pathNote(onChip: number, onCpu: number, tiny: false | 'after-failure' |
  */
 export async function transcribeFile(
   file: File,
-  opts: { language: string; task: Request['task']; onProgress: (message: string, fraction: number) => void },
+  opts: { language: string; task: Request['task']; format?: 'txt' | 'srt' | 'vtt'; onProgress: (message: string, fraction: number) => void },
 ): Promise<Speech> {
   const { onProgress } = opts;
   onProgress(`Reading the sound from ${file.name}…`, 0.02);
-  // A file the browser could not read from disk is read once more before anything is said about its sound.
-  const samples = await retryUnreadable(
-    file,
-    () => speechSamples(file, (f) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f)),
-    (message) => onProgress(message, 0.02),
-  );
+  const page = pageRecoveryHooks();
+  let samples: Float32Array;
+  try {
+    // A page hidden while the sound is read starts that step again once it is back. A file the browser could not read
+    // from disk is read once more before anything is said about its sound.
+    samples = await resumeWhenHidden(
+      () =>
+        retryUnreadable(
+          file,
+          () => speechSamples(file, (f) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f)),
+          (message) => onProgress(message, 0.02),
+        ),
+      page.hooks,
+    );
+  } catch (err) {
+    page.dispose();
+    throw err;
+  }
   const total = samples.length / RATE;
-  if (total < 0.5) throw noSpeechFound('The recording is too short to hold any speech.');
+  if (total < 0.5) {
+    page.dispose();
+    throw noSpeechFound('The recording is too short to hold any speech.');
+  }
   const cuts = [0, ...cutPoints(samples, RATE), samples.length];
-  const segments: Segment[] = [];
-  // Detected once, from the first piece, then kept for the rest of the recording.
-  let spoken: string | null = opts.language === 'auto' ? null : opts.language;
-  let retriedModel = false;
   // Phones at risk of running out of memory start with the smaller model; a memory death with the base one steps down to it.
-  let model = speechModel(undefined, file.size);
-  const startedTiny = model === 'whisper-tiny';
-  let steppedDown = false;
-  // Pieces done in this run: the module's `modelReady` outlives a worker that died between runs, and its replacement starts the model from scratch.
-  let recognised = 0;
+  const startModel = speechModel(undefined, file.size);
+  const startedTiny = startModel === 'whisper-tiny';
   let onChip = 0;
   let onCpu = 0;
-  for (let i = 1; i < cuts.length; i++) {
-    const from = cuts[i - 1]!;
-    const at = from / RATE;
-    onProgress(`Transcribing ${file.name}: ${formatDuration(at)} of ${formatDuration(total)}`, 0.05 + 0.95 * (at / total));
-    // A copy, because the samples are handed over to the worker.
-    const piece = samples.slice(from, cuts[i]);
-    const loading = (f: number) => {
-      if (!modelReady) onProgress(`Downloading the speech model, once (${model === 'whisper-tiny' ? SPEECH_MODEL_MB.tiny : onGpu ? SPEECH_MODEL_MB.webgpu : SPEECH_MODEL_MB.q8} MB): ${Math.round(f * 100)}%`, 0.05 * f);
-    };
-    let found;
-    try {
-      found = await recognise(piece.slice(), spoken, opts.task, model, loading);
-    } catch (err) {
-      // A phone whose base model died of memory keeps the smaller one for the rest of this tab.
-      const memoryDeath = err instanceof Error && (err.name === 'OutOfMemoryError' || err.name === 'WorkerCrashError');
-      const stepDown = memoryDeath && model === 'whisper-base' && isPhoneBrowser();
-      if (stepDown) rememberTinyModel();
-      // Before any piece has been recognised, a model that would not start (a kept copy the worker dropped, or a start-up
-      // that ran out of memory or killed the worker) gets one more try in a fresh worker: a download again, or the model
-      // from the store. Once a piece of this run has been done, a failure is the recording's and is not retried.
-      if (recognised > 0 || retriedModel || !(err instanceof Error) || !restartsOnce(err)) throw err;
-      retriedModel = true;
-      // The second try is the only one left, so it is the one that is least likely to die the same way.
-      if (stepDown) {
-        model = 'whisper-tiny';
-        steppedDown = true;
-      }
-      releaseSpeechModel();
-      // A stopped worker gives its memory back a moment later.
-      await new Promise((done) => setTimeout(done, 1000));
-      found = await recognise(piece, spoken, opts.task, model, loading);
-    }
-    modelReady = true;
-    recognised++;
-    if (onGpu) onChip++;
-    else onCpu++;
-    spoken = found.language;
-    segments.push(...found.chunks.map((s) => ({ start: s.start + at, end: s.end + at, text: s.text })));
+  try {
+    const run = await recognisePieces(
+      samples,
+      cuts,
+      RATE,
+      file.name,
+      { language: opts.language === 'auto' ? null : opts.language, task: opts.task, model: startModel },
+      {
+        recognise: (piece, language, model, onLoading) => recognise(piece, language, opts.task, model, onLoading),
+        release: releaseSpeechModel,
+        pause: (ms) => new Promise((done) => setTimeout(done, ms)),
+        page: page.hooks,
+        stepDown: (err, model) => {
+          // A phone whose base model died of memory keeps the smaller one for the rest of this tab.
+          const memoryDeath = err.name === 'OutOfMemoryError' || err.name === 'WorkerCrashError';
+          const step = memoryDeath && model === 'whisper-base' && isPhoneBrowser();
+          if (step) rememberTinyModel();
+          return step;
+        },
+        time: formatDuration,
+        onProgress,
+        onLoading: (model, f) => {
+          if (!modelReady) onProgress(`Downloading the speech model, once (${model === 'whisper-tiny' ? SPEECH_MODEL_MB.tiny : onGpu ? SPEECH_MODEL_MB.webgpu : SPEECH_MODEL_MB.q8} MB): ${Math.round(f * 100)}%`, 0.05 * f);
+        },
+        onPiece: () => {
+          modelReady = true;
+          if (onGpu) onChip++;
+          else onCpu++;
+        },
+        // The worker that died took its loaded model with it; the next one starts it from the store.
+        onResume: () => {
+          modelReady = false;
+        },
+      },
+    );
+    return { segments: run.segments, language: run.language!, duration: total, pathNote: pathNote(onChip, onCpu, run.steppedDown ? 'after-failure' : startedTiny ? 'from-start' : false) };
+  } catch (err) {
+    // What was recognised before the failure goes out with it, in the format the tool writes.
+    const partial = (err as { partial?: SpeechPartial } | null)?.partial;
+    if (partial && err instanceof Error) Object.assign(err, { salvage: [partialOutput(file, partial, opts.format ?? 'srt')] });
+    throw err;
+  } finally {
+    page.dispose();
   }
-  return { segments: clean(segments), language: spoken!, duration: total, pathNote: pathNote(onChip, onCpu, steppedDown ? 'after-failure' : startedTiny ? 'from-start' : false) };
+}
+
+const PARTIAL_TYPE = { txt: 'text/plain', srt: 'application/x-subrip', vtt: 'text/vtt' } as const;
+
+/** The transcript of the pieces that finished, labelled as partial. */
+function partialOutput(file: File, p: SpeechPartial, format: 'txt' | 'srt' | 'vtt'): OutputFile {
+  const body = format === 'srt' ? toSrt(p.segments) : format === 'vtt' ? toVtt(p.segments) : toText(p.segments);
+  return {
+    name: suffixName(file.name, '-partial', format),
+    blob: new Blob([body], { type: `${PARTIAL_TYPE[format]};charset=utf-8` }),
+    originalSize: file.size,
+    note: `Partial: speech up to ${formatDuration(p.upTo)} of ${formatDuration(p.total)}.`,
+    text: body,
+  };
 }

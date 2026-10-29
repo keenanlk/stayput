@@ -19,6 +19,16 @@ export interface LoopPlan {
   bytes: number;
   /** Why this cannot run, or '' when it can. */
   refusal: string;
+  /** The class name a refused run records: one per refusal, so the counts tell them apart. '' when it can run. */
+  refusalClass: LoopRefusalClass | '';
+}
+
+export type LoopRefusalClass = 'LoopCountOutOfRange' | 'LoopNoTarget' | 'LoopLengthUnreadable' | 'LoopTargetTooShort' | 'LoopTooLarge' | 'LoopTooLargeForPhone';
+
+/** The most repeats that fit under a byte limit, or '' when not even the smallest count does. */
+function fits(perRepeat: number, limit: number): string {
+  const n = Math.min(MAX_REPEATS, Math.floor(limit / perRepeat));
+  return n >= MIN_REPEATS ? ` ${n} repeats fit.` : '';
 }
 
 export function planLoop(input: { bytes: number; duration: number; mode: LoopMode; count: number; target: number; phone: boolean }): LoopPlan {
@@ -30,19 +40,20 @@ export function planLoop(input: { bytes: number; duration: number; mode: LoopMod
         ? Math.ceil(input.target / duration - 1e-9)
         : 0;
   const plan = { repeats, duration: repeats * duration, bytes: repeats * bytes };
+  const refuse = (refusalClass: LoopRefusalClass, refusal: string, over: Partial<LoopPlan> = {}): LoopPlan => ({ ...plan, ...over, refusal, refusalClass });
   if (mode === 'count' && !(repeats >= MIN_REPEATS && repeats <= MAX_REPEATS)) {
-    return { ...plan, refusal: `Choose a repeat count from ${MIN_REPEATS} to ${MAX_REPEATS}.` };
+    return refuse('LoopCountOutOfRange', `Choose a repeat count from ${MIN_REPEATS} to ${MAX_REPEATS}.`);
   }
   if (mode === 'length') {
-    if (!(input.target > 0)) return { ...plan, refusal: 'Enter a target length.' };
-    if (!(duration > 0)) return { ...plan, refusal: 'This video has no length this page can read.' };
-    if (repeats < MIN_REPEATS) return { ...plan, repeats: MIN_REPEATS, duration: MIN_REPEATS * duration, bytes: MIN_REPEATS * bytes, refusal: 'The target is not longer than the clip itself: choose a longer target.' };
+    if (!(input.target > 0)) return refuse('LoopNoTarget', 'Enter a target length.');
+    if (!(duration > 0)) return refuse('LoopLengthUnreadable', 'This video has no length this page can read.');
+    if (repeats < MIN_REPEATS) return refuse('LoopTargetTooShort', 'The target is not longer than the clip itself: choose a longer target.', { repeats: MIN_REPEATS, duration: MIN_REPEATS * duration, bytes: MIN_REPEATS * bytes });
   }
   if (plan.bytes > MAX_OUTPUT_BYTES) {
-    return { ...plan, refusal: `${repeats} repeats would be about ${formatBytes(plan.bytes)}, over the ${formatBytes(MAX_OUTPUT_BYTES)} this page writes in one file. Choose fewer repeats or a shorter target.` };
+    return refuse('LoopTooLarge', `${repeats} repeats would be about ${formatBytes(plan.bytes)}, over the ${formatBytes(MAX_OUTPUT_BYTES)} this page writes in one file. Choose fewer repeats or a shorter target.${fits(bytes, MAX_OUTPUT_BYTES)}`);
   }
   if (input.phone && plan.bytes > PHONE_SAFE_BYTES) {
-    return { ...plan, refusal: `${repeats} repeats would be about ${formatBytes(plan.bytes)}. A phone can run out of memory above about ${formatBytes(PHONE_SAFE_BYTES)}: choose fewer repeats, or use a computer.` };
+    return refuse('LoopTooLargeForPhone', `${repeats} repeats would be about ${formatBytes(plan.bytes)}. A phone can run out of memory above about ${formatBytes(PHONE_SAFE_BYTES)}: choose fewer repeats, or use a computer.${fits(bytes, PHONE_SAFE_BYTES)}`);
   }
-  return { ...plan, refusal: '' };
+  return { ...plan, refusal: '', refusalClass: '' };
 }

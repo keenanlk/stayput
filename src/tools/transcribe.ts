@@ -37,6 +37,7 @@ const shell = createShell({
       const { segments: tidy, language: spoken, duration: total, pathNote } = await transcribeFile(file, {
         language,
         task,
+        format,
         onProgress: (message, f) => progress.set(message, share(f)),
       }).catch((e) => {
         throw plainCaptionError(e);
