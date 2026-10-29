@@ -38,8 +38,26 @@ test.describe('InputError: each refusal says what to do', () => {
   test('a photo alone (a visitor who wanted a photo cut-out) is pointed to Remove background', async ({ page }) => {
     await open(page);
     await page.locator('#file-input').setInputFiles([{ name: 'me.png', mimeType: 'image/png', buffer: png }]);
-    await page.locator('#run').click();
-    await expectError(page, /Add a video too.*Remove background tool/, 'InputError');
+    // Refused at the drop: Run stays off, so no run (failed or otherwise) is recorded.
+    await expect(page.locator('#run-hint')).toContainText(/Add a video too.*Remove background tool/);
+    await expect(page.locator('#run')).toBeDisabled();
+    expect((await events(page)).filter((e) => e.n === 'tool_run')).toEqual([]);
+    // The link carries the photo over to Remove background.
+    await page.locator('#run-hint a').click();
+    await expect(page).toHaveURL(/\/tools\/remove-background/);
+    await expect(page.locator('#handoff-note')).toContainText('me.png');
+  });
+
+  test('two pictures and no video are refused before Run too, and adding a video lifts it', async ({ page }) => {
+    await open(page);
+    await page.locator('#file-input').setInputFiles([
+      { name: 'a.png', mimeType: 'image/png', buffer: png },
+      { name: 'b.png', mimeType: 'image/png', buffer: png },
+    ]);
+    await expect(page.locator('#run-hint')).toContainText('Add a video too');
+    await expect(page.locator('#run')).toBeDisabled();
+    await page.locator('#file-input').setInputFiles([clip]);
+    await expect(page.locator('#run-hint')).not.toContainText('Add a video too');
   });
 
   test('two pictures: says how many and what to do', async ({ page }) => {
@@ -50,7 +68,7 @@ test.describe('InputError: each refusal says what to do', () => {
       { name: 'IMG_0001.MOV', mimeType: '', buffer: readFileSync(clip) },
     ]);
     await page.locator('#run').click();
-    await expectError(page, '2 pictures were added. Keep one picture', 'InputError');
+    await expectError(page, '2 pictures were added. Keep one picture', 'TooManyPictures');
   });
 
   test('Picture chosen with no picture: says so and offers Blur or Colour', async ({ page }) => {
@@ -58,7 +76,7 @@ test.describe('InputError: each refusal says what to do', () => {
     await page.locator('input[name="bg"][value="image"]').evaluate((el) => (el as HTMLInputElement).click());
     await page.locator('#file-input').setInputFiles([clip]);
     await page.locator('#run').click();
-    await expectError(page, 'Picture is chosen as the new background, but no picture was added', 'InputError');
+    await expectError(page, 'Picture is chosen as the new background, but no picture was added', 'PictureBackgroundMissing');
   });
 });
 

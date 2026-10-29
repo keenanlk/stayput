@@ -72,7 +72,7 @@ export interface ShellOptions {
    * one-line reason above Run. Return '' when the list is fine. Evaluated on
    * every list change and on shell.refresh().
    */
-  runBlocker?: (files: ShellFile[]) => string;
+  runBlocker?: (files: ShellFile[]) => string | { message: string; link?: { text: string; href: string } };
   /** Do the work. Return the outputs to show. */
   process: (files: ShellFile[], progress: Progress) => Promise<ProcessResult>;
   /** Title shown above the results. */
@@ -370,11 +370,14 @@ export function createShell(opts: ShellOptions) {
   }
   function updateRunBlock() {
     const found = intakeProblem();
-    const next = opts.runBlocker?.(files) || found?.message || repeatBlock;
+    const blocked = opts.runBlocker?.(files);
+    const own = typeof blocked === 'string' ? { message: blocked } : blocked;
+    const next = own?.message || found?.message || repeatBlock;
+    const link = own?.message ? own.link : next === found?.message ? found?.link : undefined;
     if (next !== runBlock) {
       runBlock = next;
-      setHint(next, next === found?.message ? found?.link : undefined);
-      hint.dataset.problem = next === found?.message ? found?.name ?? '' : '';
+      setHint(next, link);
+      hint.dataset.problem = !own?.message && next === found?.message ? found?.name ?? '' : '';
     }
     run.disabled = files.length === 0 || busy || !!runBlock;
   }
