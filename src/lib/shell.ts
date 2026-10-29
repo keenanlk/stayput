@@ -153,6 +153,9 @@ function rewrap(file: File, e: unknown): Error {
   if (link) (out as Error & { link?: typeof link }).link = link;
   const stage = (e as { stage?: string } | null)?.stage;
   if (stage) (out as Error & { stage?: string }).stage = stage;
+  // Work the failed step finished (a partial transcript) stays downloadable.
+  const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
+  if (salvage) (out as Error & { salvage?: OutputFile[] }).salvage = salvage;
   return out;
 }
 
