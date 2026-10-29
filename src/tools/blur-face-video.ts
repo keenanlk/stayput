@@ -33,6 +33,7 @@ let stats = { frames: 0, covered: 0, most: 0 };
 
 videoEditShell({
   suffix: '-faces-hidden',
+  checkDecode: true,
   verb: 'Hiding faces in',
   options() {
     const kind = effect();

@@ -92,12 +92,12 @@ interface Runnable {
 }
 
 /** Runs a Conversion with the watchdog, passing its progress on to `onProgress`. */
-export function executeWatched(conversion: Runnable, onProgress?: (fraction: number) => void, limits?: WatchdogLimits): Promise<void> {
+export function executeWatched(conversion: Runnable, onProgress?: (fraction: number, processedTime: number) => void, limits?: WatchdogLimits): Promise<void> {
   return watchEncode(
     (progress) => {
-      conversion.onProgress = (p) => {
+      conversion.onProgress = (p, t) => {
         progress(p);
-        onProgress?.(p);
+        onProgress?.(p, t);
       };
       return conversion.execute();
     },

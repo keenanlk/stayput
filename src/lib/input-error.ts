@@ -65,3 +65,18 @@ export class UnsupportedCodec extends Error {
     this.name = 'UnsupportedCodec';
   }
 }
+
+/**
+ * A video this browser reports it can decode (canDecode said yes) but whose pictures then fail to decode, or decode as a blank frame
+ * (iOS Safari with HEVC or HDR from a newer phone, Chrome with some HDR clips). Its own name keeps a decoder failure apart from an
+ * encoder one (both reach us as an EncodingError); it is final, since a smaller picture does not help a decoder.
+ */
+export class DecodeFailed extends Error {
+  constructor(message = DECODE_FAILED_MESSAGE, options?: ErrorOptions) {
+    super(message, options);
+    this.name = 'DecodeFailed';
+  }
+}
+
+export const DECODE_FAILED_MESSAGE =
+  "This phone can't decode this video's picture (often HDR or HEVC from a newer phone). On iPhone, share the clip to Files with 'Most Compatible', or turn off HDR Video in Settings > Camera > Record Video and record again.";
