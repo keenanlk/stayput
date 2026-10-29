@@ -31,6 +31,7 @@ import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, hasVideoEncoder, softwareH264Offered, useRealtimeH264 } from './encoder-probe';
 import { pickVideoCodec } from './video-codec';
 import { UnreadableFile, UnsupportedCodec, NamedError } from './input-error';
+import { probeDecode } from './decode-probe';
 import { isNotReadable, notReadable, retryUnreadable } from './read-failure';
 import { nameBare } from './bare-error';
 import { openOpfsOutput } from './opfs-output';
@@ -182,7 +183,10 @@ export async function assertReadable(file: File): Promise<void> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(readOrNull);
-    if (video && !(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
+    if (!video) return;
+    if (!(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
+    // canDecode only asks whether the codec is supported; a few pictures are decoded for real (DecodeFailed if they are not).
+    await probeDecode(video, await input.computeDuration().catch(() => 0));
   } finally {
     input.dispose?.();
   }
@@ -193,7 +197,14 @@ export async function assertReadable(file: File): Promise<void> {
  * memory) at full size, gets one more try (see edit-recovery.ts) before the failure is shown.
  */
 export async function editVideo(file: File, opts: EditOptions): Promise<EditResult> {
-  if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) return editVideoOnce(file, opts, {});
+  if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) {
+    // Remove sound: the picture is copied, with nothing to retry. A failure with no name of its own is named for this step.
+    try {
+      return await editVideoOnce(file, opts, {});
+    } catch (e) {
+      throw nameBare('VideoCopyFailed', e);
+    }
+  }
   const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
   try {
@@ -225,6 +236,22 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
   } finally {
     page.dispose();
   }
+}
+
+/**
+ * A decoder's EncodingError has the same name as an encoder's, and a smaller picture does not fix a decoder. So when a run ends in one,
+ * the picture is decoded again where the run stopped: if that fails it was the decoder (DecodeFailed, not retried), otherwise the
+ * encoder, and the error is returned as it came.
+ */
+async function decoderOrEncoder(e: unknown, video: InputVideoTrack, duration: number, at: number): Promise<unknown> {
+  const name = (e as { name?: string } | null)?.name;
+  if (name !== 'EncodingError' && name !== 'OperationError') return e;
+  // A hidden page or a reclaimed codec fails a decoder too; the recovery that waits for the page handles those.
+  if (document.hidden || isReclaim(e)) return e;
+  return probeDecode(video, duration, at > 0 ? at : undefined).then(
+    () => e,
+    (failed) => failed,
+  );
 }
 
 async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
@@ -350,6 +377,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
     let blob: Blob;
     let conversion: Conversion;
+    let processedTime = 0;
     // A decoder or encoder the browser takes back part-way is replaced and the run goes on; whatever is left open at the end is closed.
     const unguard = guardCodecs();
     try {
@@ -397,11 +425,14 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
         throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : failure('EditUnsupported', 'This browser cannot edit this video.');
       }
-      await executeWatched(conversion, opts.onProgress);
+      await executeWatched(conversion, (p, t) => {
+        processedTime = t;
+        opts.onProgress?.(p);
+      });
       blob = await finishOutput(out, 'video/mp4');
     } catch (e) {
       await out.disk?.abort();
-      throw e;
+      throw await decoderOrEncoder(e, video, duration, processedTime);
     } finally {
       unguard();
     }

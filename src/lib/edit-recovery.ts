@@ -14,7 +14,7 @@
  */
 
 /** Errors that say what the file is, or what the person gave: a retry cannot change them. */
-const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'AudioDecodeError', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound']);
+const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'AudioDecodeError', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound', 'DecodeFailed']);
 
 /**
  * What the shell stops an instant repeat of: FINAL, plus the other names that say the file itself cannot be used
@@ -22,7 +22,7 @@ const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'Audi
  * 'FileNotDownloaded' is left out on purpose: a cloud-only file can read fine on the very next try once the device has finished fetching it.
  * 'UnsupportedContainer' and 'FileNotDownloaded' are the names intake.ts gives (see IntakeProblem).
  */
-const SAME_EVERY_TIME = new Set([...FINAL, 'PictureUnreadable', 'UnsupportedContainer']);
+const SAME_EVERY_TIME = new Set([...FINAL, 'PictureUnreadable', 'UnsupportedContainer', 'NoVideoTrack', 'NoPicture', 'SideBySideTooBig']);
 export function failsTheSameAgain(name: string): boolean {
   return SAME_EVERY_TIME.has(name);
 }
