@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeSend } from '../src/lib/analytics-payload';
+import { injectExperiment } from './ab-inject';
 
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/generated/${name}`, import.meta.url));
 // A copy of the tracker the stats host serves, so the test never contacts that host.
@@ -14,6 +15,8 @@ test.skip(!!process.env.PW_LIVE, 'needs the local build and the real tracker; no
 /** Top-level fields an event may carry. Keep in step with /privacy. */
 const TOP_LEVEL = new Set(['website', 'hostname', 'url', 'name', 'data']);
 const VISIT = ['landing', 'ref', 'from', 'visit', 'via'];
+/** Sent on every event, but only while a page A/B test is active (src/lib/ab.ts); see tests/ab.spec.ts. */
+const AB = ['variant'];
 /**
  * Every event and the details it may carry. Keep in step with /privacy: `label` is how
  * the page names the event, and the test below checks the page still names each one.
@@ -50,7 +53,7 @@ const UMAMI_HEADERS = new Set(['x-umami-website-id', 'x-umami-hostname', 'x-umam
 const headerLog: Record<string, string>[] = [];
 
 /** Everything wrong with one analytics request body; empty when it is clean. */
-function violations({ type, payload }: Sent): string[] {
+function violations({ type, payload }: Sent, opts: { ab?: boolean } = {}): string[] {
   const bad: string[] = [];
   if (type !== 'event') bad.push(`type ${type}`);
   for (const k of Object.keys(payload)) if (!TOP_LEVEL.has(k)) bad.push(`field ${k}`);
@@ -63,7 +66,8 @@ function violations({ type, payload }: Sent): string[] {
   } else {
     const event = EVENTS[String(payload.name)];
     if (!event) bad.push(`event ${String(payload.name)}`);
-    else for (const k of Object.keys(data)) if (!event.keys.includes(k)) bad.push(`${String(payload.name)}.${k}`);
+    else for (const k of Object.keys(data)) if (!event.keys.includes(k) && !(opts.ab && AB.includes(k))) bad.push(`${String(payload.name)}.${k}`);
+  if ('variant' in data && !/^[a-z0-9]+(-[a-z0-9]+)*:[AB](,[a-z0-9]+(-[a-z0-9]+)*:[AB])*$/.test(String(data.variant))) bad.push(`data.variant ${String(data.variant)}`);
   }
   if ('error_class' in data && !ERROR_CLASS.test(String(data.error_class))) bad.push(`data.error_class ${String(data.error_class)}`);
   if ('ref' in data && !REFS.has(String(data.ref))) bad.push(`data.ref ${String(data.ref)}`);
@@ -422,9 +426,33 @@ test('search and next-step events send only what /privacy lists, and never the t
   for (const typed of ['remove gps', 'remove', 'gps']) expect(raw.toLowerCase().replace('strip-exif', '')).not.toContain(typed);
 });
 
+test('with a test experiment on, every event carries the variant, and nothing else new', async ({ page, baseURL }) => {
+  const sent = await captureAnalytics(page, baseURL!);
+  await injectExperiment(page, ['ab-test'], { from: SITE, to: baseURL! });
+  await page.goto(`${SITE}/tools/strip-exif`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(fx('photo.jpg'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBeGreaterThan(0);
+  const label = await page.evaluate(() => document.documentElement.getAttribute('data-ab-ab-test'));
+  expect(['A', 'B']).toContain(label);
+  const events = sent.filter((s) => s.payload.name !== undefined);
+  expect(events.map((s) => s.payload.name)).toEqual(expect.arrayContaining(['visit_start', 'files_added', 'tool_run']));
+  for (const s of events) {
+    expect(violations(s, { ab: true }), JSON.stringify(s)).toEqual([]);
+    expect((s.payload.data as Record<string, string>).variant, JSON.stringify(s)).toBe(`ab-test:${label}`);
+  }
+  // Without the opt-in, the same payload is rejected: the field is allowed only while a test runs.
+  expect(violations(events[0]!)).toContain(`${String(events[0]!.payload.name)}.variant`);
+});
+
 test('/privacy names every event the allowlist permits', () => {
   const page = readFileSync(fileURLToPath(new URL('../src/pages/privacy.astro', import.meta.url)), 'utf8');
   for (const [name, { label }] of Object.entries(EVENTS)) expect(page, `${name} is not described on /privacy`).toContain(`<strong>${label}</strong>`);
+  // The one field that rides on every event while a test runs is described too, in the page's own words.
+  expect(page).toContain('<strong>Test label</strong>');
+  expect(page).toMatch(/random label[^<]*kept in this tab only[^<]*not stored across visits and is not linked to you/);
 });
 
 test('nothing is sent when the browser sends Global Privacy Control', async ({ page, baseURL }) => {

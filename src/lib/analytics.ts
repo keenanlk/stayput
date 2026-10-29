@@ -19,6 +19,8 @@
  *   input, format and the journey context: only details tool_run also sends, so the
  *   runs that never finish (a phone's screen locking, a closed tab) can be counted.
  * - next_step: a click on a suggested next tool. tool, to, ns.
+ * - Every event also carries variant ("<key>:A" or "<key>:B", from ab.ts) while a page
+ *   A/B test is active, and no variant field at all otherwise.
  * - search_open: the header search was opened. page.
  * - search_pick: a header search result was opened. to (a site path), kind
  *   (tool, page or guide), rank. Never the words typed, which stay on the page.
@@ -27,6 +29,7 @@
 import { journey, recordRun } from './journey';
 import { beforeSend, BEFORE_SEND_HOOK } from './analytics-payload';
 import { notReadableClass } from './read-failure';
+import { abVariant } from './ab';
 declare global {
   interface Window {
     umami?: { track: (name: string, data?: Record<string, string | number>) => void };
@@ -98,9 +101,10 @@ export function loadAnalytics(): void {
 
 /** Send an event now, or once the deferred Umami script has loaded. */
 export function track(name: string, data: Record<string, string | number>): void {
+  const variant = abVariant();
   const send = () => {
     try {
-      window.umami?.track(name, data);
+      window.umami?.track(name, variant ? { ...data, variant } : data);
     } catch {
       // Analytics must never affect the tool.
     }
