@@ -29,6 +29,8 @@ export function videoEditShell(config: {
   options: (file: File) => Promise<Omit<EditOptions, 'onProgress'>> | Omit<EditOptions, 'onProgress'>;
   /** More to say about the file just made, after the size and codec. */
   note?: () => string | undefined;
+  /** Decode a few pictures of each file before the run starts, so a clip this browser cannot decode fails before a model downloads. */
+  checkDecode?: boolean;
   /** Called after files are added or removed (for example to show a preview). */
   onFilesChanged?: Parameters<typeof createShell>[0]['onFilesChanged'];
 }) {
@@ -38,10 +40,11 @@ export function videoEditShell(config: {
     onFilesChanged: config.onFilesChanged,
     async process(files, progress) {
       // About 400 KB of video code, loaded only when someone runs the tool.
-      const { editVideo } = await import('../lib/video-edit');
+      const { assertReadable, editVideo } = await import('../lib/video-edit');
       return processEach(files, progress, config.verb, async (entry, index) => {
         const share = (f: number) => (index + f) / files.length;
         progress.set(`Reading ${entry.file.name}…`, share(0.01));
+        if (config.checkDecode) await assertReadable(entry.file);
         const options = await Promise.resolve(config.options(entry.file)).catch((e) => {
           throw nameBare('EditOptionsFailed', e);
         });
