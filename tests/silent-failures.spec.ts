@@ -89,8 +89,10 @@ test('crop-pdf: a page that cannot be drawn during Trim shows a message and reco
   await ready(page);
   await drop(page, edge('good.pdf'));
   await expect(page.locator('#crop-panel')).toBeVisible();
-  // The first page must be drawn before any canvas is taken away (the label is there from the start; the size is set once it is drawn).
-  await expect(page.locator('#page-canvas')).toHaveCSS('width', /^[1-9]/);
+  // The first page must be drawn before any canvas is taken away: pdf.js makes off-screen canvases of its own while it draws, and
+  // one that loses its context throws a bare TypeError, recorded as PreviewError. The label and the canvas's computed width
+  // (300px by default) are there from the start; the inline size is set only once the page has been drawn.
+  await expect(page.locator('#page-canvas')).toHaveAttribute('style', /width/);
   // Off-screen canvases (the ones a page is drawn to before it is shown) lose their 2D context; the page canvas keeps its own.
   await page.evaluate(() => {
     const real = HTMLCanvasElement.prototype.getContext;
