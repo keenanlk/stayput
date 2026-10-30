@@ -4,6 +4,7 @@
 // Output is committed next to the SVGs; the build does not regenerate it.
 import { chromium } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const dir = new URL('../public/press/', import.meta.url);
 const jobs = [
@@ -23,7 +24,7 @@ for (const [name, height] of jobs) {
   await page.setContent(
     `<style>html,body{margin:0;background:transparent}svg{display:block;width:${width}px;height:${height}px}</style>${svg}`,
   );
-  await page.locator('svg').screenshot({ path: new URL(`${name}.png`, dir).pathname, omitBackground: true });
+  await page.locator('svg').screenshot({ path: fileURLToPath(new URL(`${name}.png`, dir)), omitBackground: true });
   console.log(`wrote ${name}.png (${width}x${height})`);
 }
 await browser.close();

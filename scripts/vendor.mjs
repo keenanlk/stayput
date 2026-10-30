@@ -5,6 +5,7 @@
 // part of the path, so the files can be cached forever and an upgrade gets new URLs.
 import { copyFile, mkdir, readFile, rm } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const root = new URL('../', import.meta.url);
 const vendor = JSON.parse(await readFile(new URL('src/data/vendor.json', root), 'utf8'));
@@ -21,13 +22,13 @@ for (const lib of Object.values(vendor)) {
   }
   for (const [dest, src] of Object.entries(lib.files)) {
     const target = new URL(`${vendorDir(lib)}${dest}`, out);
-    await mkdir(dirname(target.pathname), { recursive: true });
+    await mkdir(dirname(fileURLToPath(target)), { recursive: true });
     await copyFile(new URL(src, pkgDir), target);
   }
   // Licence and notice texts that must travel with the binaries, kept in the repo.
   for (const [dest, src] of Object.entries(lib.licences ?? {})) {
     const target = new URL(`${vendorDir(lib)}${dest}`, out);
-    await mkdir(dirname(target.pathname), { recursive: true });
+    await mkdir(dirname(fileURLToPath(target)), { recursive: true });
     await copyFile(new URL(src, root), target);
   }
 }
