@@ -1,5 +1,6 @@
 import { bool, createShell, num, radio } from '../lib/shell';
 import { suffixName, formatBytes, type OutputFile } from '../lib/files';
+import { retryNote } from '../lib/edit-recovery';
 import { NamedError } from '../lib/input-error';
 import { isPhoneBrowser } from '../lib/phone-limit';
 import { MAX_OUTPUT_BYTES, planLoop, type LoopMode } from '../lib/loop-plan';
@@ -31,6 +32,7 @@ function syncFields() {
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   // While the options refuse, Run stays off and the reason stays showing, so a refused setup is never a failed run.
   runBlocker: () => (known ? planLoop({ bytes: known.file.size, duration: known.duration, ...wanted() }).refusal : ''),
   outputFormat: () => 'mp4',
@@ -62,10 +64,11 @@ const shell = createShell({
       repeats: plan.repeats,
       mute: bool('mute'),
       onProgress: (f) => progress.set(`Repeating ${file.name}: ${Math.round(f * 100)}%`, 0.02 + f * 0.98),
+      onNotice: (m) => progress.set(m, 0.02),
     });
     const notes = [`${plan.repeats} repeats`, clock(r.duration), `${r.width}×${r.height}`, r.copied ? `${r.videoCodec} copied, no re-encoding` : `re-encoded to ${r.videoCodec}`];
     if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
-    const out: OutputFile = { name: suffixName(file.name, `-x${plan.repeats}`, r.ext), blob: r.blob, originalSize: file.size, note: notes.join(', ') };
+    const out: OutputFile = { name: suffixName(file.name, `-x${plan.repeats}`, r.ext), blob: r.blob, originalSize: file.size, note: notes.join(', ') + retryNote(r.retry, r) };
     return [out];
   },
   resultsTitle: () => 'Repeated video',
