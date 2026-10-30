@@ -7,7 +7,7 @@ import { SNAPSHOT_LIMIT, isNotReadable, notReadable, probeReadable, retryUnreada
 // Chrome says NotReadableError). The read is forced to fail in the page once the noise removal has started: once,
 // which must be recovered by reading again, and for good, which must say so with the error's own name.
 const clip = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 

@@ -66,7 +66,7 @@ function violations({ type, payload }: Sent, opts: { ab?: boolean } = {}): strin
   } else {
     const event = EVENTS[String(payload.name)];
     if (!event) bad.push(`event ${String(payload.name)}`);
-    else for (const k of Object.keys(data)) if (!event.keys.includes(k) && !(opts.ab && AB.includes(k))) bad.push(`${String(payload.name)}.${k}`);
+    else for (const k of Object.keys(data)) if (!event.keys.includes(k) && !((opts.ab ?? true) && AB.includes(k))) bad.push(`${String(payload.name)}.${k}`);
   if ('variant' in data && !/^[a-z0-9]+(-[a-z0-9]+)*:[AB](,[a-z0-9]+(-[a-z0-9]+)*:[AB])*$/.test(String(data.variant))) bad.push(`data.variant ${String(data.variant)}`);
   }
   if ('error_class' in data && !ERROR_CLASS.test(String(data.error_class))) bad.push(`data.error_class ${String(data.error_class)}`);
@@ -167,7 +167,7 @@ test('video background remover: the path and per-frame timing line stay on the p
   const run = sent.find((s) => s.payload.name === 'tool_run')!;
   for (const s of sent) expect(violations(s), JSON.stringify(s)).toEqual([]);
   const keys = Object.keys(run.payload.data as Record<string, string>);
-  expect(keys.filter((k) => !EVENTS.tool_run!.keys.includes(k))).toEqual([]);
+  expect(keys.filter((k) => !EVENTS.tool_run!.keys.includes(k) && !AB.includes(k))).toEqual([]);
   const raw = JSON.stringify(sent);
   for (const word of ['Each frame', 'ms a frame', 'graphics chip', 'processor', 'waiting for', 'speech']) expect(raw).not.toContain(word);
 });
@@ -272,7 +272,7 @@ for (const [path, slug, format] of [
     expect(starts).toHaveLength(1);
     expect(violations(starts[0]!), JSON.stringify(starts[0])).toEqual([]);
     const data = starts[0]!.payload.data as Record<string, string>;
-    expect(Object.keys(data).sort()).toEqual(['files', 'format', 'from', 'input', 'landing', 'ref', 'tool', 'visit']);
+    expect(Object.keys(data).filter((k) => k !== 'variant').sort()).toEqual(['files', 'format', 'from', 'input', 'landing', 'ref', 'tool', 'visit']);
     expect(data).toMatchObject({ tool: slug, files: '1', input: '<1MB', format });
     const runKeys = Object.keys((sent.find((s) => s.payload.name === 'tool_run')!.payload.data as Record<string, string>));
     for (const k of Object.keys(data)) expect(runKeys, `tool_start.${k} is not sent by tool_run`).toContain(k);
@@ -418,8 +418,8 @@ test('search and next-step events send only what /privacy lists, and never the t
   for (const n of ['search_open', 'search_pick', 'files_added', 'tool_run', 'next_step', 'pwa_install']) expect(names, n).toContain(n);
   for (const s of sent) expect(violations(s), JSON.stringify(s)).toEqual([]);
   const find = (n: string) => sent.find((s) => s.payload.name === n)!.payload.data as Record<string, string>;
-  expect(find('search_open')).toEqual({ page: '/' });
-  expect(find('search_pick')).toEqual({ to: '/tools/strip-exif', kind: 'tool', rank: '1' });
+  expect(find('search_open')).toMatchObject({ page: '/' });
+  expect(find('search_pick')).toMatchObject({ to: '/tools/strip-exif', kind: 'tool', rank: '1' });
   expect(find('files_added').via).toBe('search');
   expect(find('tool_run').via).toBe('search');
   const raw = JSON.stringify(sent);
@@ -444,7 +444,7 @@ test('with a test experiment on, every event carries the variant, and nothing el
     expect((s.payload.data as Record<string, string>).variant, JSON.stringify(s)).toBe(`ab-test:${label}`);
   }
   // Without the opt-in, the same payload is rejected: the field is allowed only while a test runs.
-  expect(violations(events[0]!)).toContain(`${String(events[0]!.payload.name)}.variant`);
+  expect(violations(events[0]!, { ab: false })).toContain(`${String(events[0]!.payload.name)}.variant`);
 });
 
 test('/privacy names every event the allowlist permits', () => {

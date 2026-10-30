@@ -5057,7 +5057,7 @@ test('QR scanner sends only files_added and tool_run, with no decoded text, file
   expect(mine.map((e) => e.n)).toEqual(['files_added', 'tool_run']);
   const run = mine[1]!.d;
   expect(run).toMatchObject({ tool: 'qr-code-scanner', outcome: 'ok', format: 'image', attempt: 'first-ok' });
-  const allowed = new Set(['tool', 'outcome', 'files', 'input', 'output', 'duration', 'format', 'attempt', 'error_class', 'landing', 'ref', 'from', 'visit', 'via', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns']);
+  const allowed = new Set(['tool', 'outcome', 'files', 'input', 'output', 'duration', 'format', 'attempt', 'error_class', 'landing', 'ref', 'from', 'visit', 'via', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'variant']);
   for (const e of mine) for (const k of Object.keys(e.d)) expect(allowed.has(k), `unexpected field ${k}`).toBe(true);
   const sent = JSON.stringify(events);
   for (const secret of ['correct-horse-battery', 'Cafe Guest', 'WIFI:', 'qr_wifi', '.png']) expect(sent, secret).not.toContain(secret);

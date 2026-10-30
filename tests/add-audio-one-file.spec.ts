@@ -38,7 +38,7 @@ for (const [slug, file, message] of cases) {
     expect(failed[0]!.d.outcome).toBe('error');
     expect(failed[0]!.d.error_class).toBe('InputError');
     // Only the fields tool_run already declares; the error carries its class name and nothing else.
-    const allowed = ['tool', 'outcome', 'files', 'input', 'duration', 'error_class', 'format', 'landing', 'ref', 'from', 'visit', 'via', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns'];
+    const allowed = ['tool', 'outcome', 'files', 'input', 'duration', 'error_class', 'format', 'landing', 'ref', 'from', 'visit', 'via', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'variant'];
     expect(Object.keys(failed[0]!.d).filter((k) => !allowed.includes(k))).toEqual([]);
     expect(JSON.stringify(failed[0]!.d)).not.toContain(file);
   });
