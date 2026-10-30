@@ -360,7 +360,7 @@ test('Remove object: an error named inside the worker is recorded under that nam
   await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
   const run = sent.find((s) => s.payload.name === 'tool_run')!;
   expect(violations(run), JSON.stringify(run)).toEqual([]);
-  expect(run.payload.data).toMatchObject({ tool: 'remove-object', outcome: 'error', error_class: 'TypeError' });
+  expect(run.payload.data).toMatchObject({ tool: 'remove-object', outcome: 'error', error_class: 'ModelDownloadError' });
   expect(JSON.stringify(sent)).not.toContain('photo');
 });
 
