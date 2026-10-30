@@ -13,7 +13,7 @@ import { PHONE_SAFE_BYTES } from '../src/lib/phone-limit';
 const here = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
 const speech = (project: string) => here(project === 'webkit' ? 'speech.mov' : 'talk.webm');
 const PATH = '/auto-caption-video';
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 

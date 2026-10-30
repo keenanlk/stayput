@@ -60,7 +60,7 @@ test('renames with prefix, numbering, find/replace and case, and the ZIP matches
   // Analytics events hold the tool slug, counts and size buckets only: no names, no pattern text.
   const events = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string | number> }[] }).__events);
   console.log('EVENTS', JSON.stringify(events));
-  const allowed = ['tool', 'files', 'input', 'output', 'duration', 'outcome', 'format', 'attempt', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via'];
+  const allowed = ['tool', 'files', 'input', 'output', 'duration', 'outcome', 'format', 'attempt', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant'];
   expect(events.some((e) => e.n === 'tool_run')).toBe(true);
   for (const e of events) {
     expect(Object.keys(e.d ?? {}).filter((k) => !allowed.includes(k))).toEqual([]);

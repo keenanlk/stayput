@@ -46,7 +46,7 @@ async function convert(page: Page, files: string[]) {
 }
 
 /** The fields every tool event already carries (see the privacy page); this tool adds none. */
-const FIELDS = ['tool', 'files', 'input', 'output', 'duration', 'outcome', 'attempt', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns'];
+const FIELDS = ['tool', 'files', 'input', 'output', 'duration', 'outcome', 'attempt', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'variant'];
 
 test.describe.configure({ timeout: 180_000 });
 

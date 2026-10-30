@@ -9,7 +9,7 @@ import { planAtTimes, planEqual, planEvery } from '../src/lib/video-split';
 // Video splitter failures: every one that can end a run has a named class (never a bare Error), a phone that cannot
 // read the file gets one more read and then a plain refusal, and odd inputs either split or are refused early.
 const fx = (n: string) => fileURLToPath(new URL(`./fixtures/static/${n}`, import.meta.url));
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 

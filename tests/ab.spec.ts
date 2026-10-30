@@ -61,7 +61,8 @@ test('only home-hero is active in the site config, and only the home page has A/
     const html = readFileSync(dist + f, 'utf8');
     expect(html, f).toContain('stayput-ab');
     expect(html, f).toContain('/ab.js');
-    if (f !== 'index.html') expect(html, f).not.toContain('data-ab="home-hero');
+    // The shared <style> names the selector on every page; only the home page may carry elements with the attribute.
+    if (f !== 'index.html') expect(html, f).not.toMatch(/<[a-z0-9]+ [^>]*data-ab="home-hero/);
   }
 });
 
