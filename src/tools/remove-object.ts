@@ -3,6 +3,8 @@ import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } fro
 import { suffixName, type OutputFile } from '../lib/files';
 import { inpaint } from '../lib/inpaint';
 import { InputError, NamedError } from '../lib/input-error';
+import { isBare, nameBare } from '../lib/bare-error';
+import { canvasWorks, fitCanvas } from '../lib/canvas-cap';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -26,15 +28,23 @@ bindRange('brush', 'brush-out');
 /* ------------------------------------------------------------------ */
 /** The preview is drawn at most this many pixels on its longer side. */
 const PREVIEW_MAX = 1600;
-/** Earlier versions kept for Undo; each is a full-size copy, so only a few. */
-const HISTORY = 8;
+/** Earlier versions kept for Undo: only the region each erase changed, so a few dozen small ones fit. */
+const HISTORY = 20;
+/** Bytes of Undo kept at most (the newest is always kept, however big). A wide brush on a big photo makes a big region. */
+const HISTORY_BYTES = 160_000_000;
+/** An erase never reaches further than this beyond the paint, or 0.75 of the painted box's longer side if that is more (pixels). */
+const CONTEXT_MIN = 128;
 const STROKE_COLOUR = '#ff2d55';
 
 type Stroke = { r: number; pts: [number, number][] };
 
-/** The picture as it stands after every erase so far, at full size. */
+/** What an erase replaced: its place in the picture and the pixels from before. */
+type Undo = { x: number; y: number; data: ImageData };
+type Region = { x: number; y: number; w: number; h: number };
+
+/** The picture as it stands after every erase so far, at the size this browser can draw (srcW × srcH). */
 let work: HTMLCanvasElement | undefined;
-let history: HTMLCanvasElement[] = [];
+let history: Undo[] = [];
 let strokes: Stroke[] = [];
 let painting: Stroke | undefined;
 let busy = false;
@@ -42,6 +52,8 @@ let srcW = 0;
 let srcH = 0;
 let previewScale = 1;
 let notice: string | undefined;
+/** Said when the picture had to be drawn smaller than it is; shown in the hint and the result note. */
+let sizeNote = '';
 
 /** Displayed pixels per source pixel. */
 const displayScale = () => (srcW ? canvas.clientWidth / srcW : 1);
@@ -97,12 +109,13 @@ function sync() {
   clearBtn.disabled = busy || !hasStrokes;
   undoBtn.disabled = busy || (!hasStrokes && history.length === 0);
   stage.classList.toggle('is-busy', busy);
-  hint.textContent = notice
+  const base = notice
     ?? (hasStrokes
       ? 'Press Erase to fill in the painted area, or keep painting.'
       : history.length > 0
         ? `${history.length} ${history.length === 1 ? 'area' : 'areas'} erased. Paint over anything else, or save the picture.`
         : 'Paint over the thing to remove, then press Erase.');
+  hint.textContent = sizeNote && !notice ? `${base} ${sizeNote}` : base;
   panel.dataset.edits = String(history.length);
   panel.dataset.strokes = String(strokes.length);
   panel.dataset.busy = String(busy);
@@ -110,13 +123,23 @@ function sync() {
 
 async function showImage(file: File) {
   const decoded = await decodeImage(file);
-  srcW = decoded.width;
-  srcH = decoded.height;
-  work = document.createElement('canvas');
-  work.width = srcW;
-  work.height = srcH;
-  work.getContext('2d')!.drawImage(decoded.bitmap, 0, 0);
-  decoded.bitmap.close();
+  try {
+    // A picture bigger than this browser can draw is edited at the largest size that works.
+    const fit = canvasWorks(decoded.width, decoded.height) ? { width: decoded.width, height: decoded.height } : fitCanvas(decoded.width, decoded.height);
+    if (!fit) throw new NamedError('CanvasTooLarge', 'This picture is too large for this browser to edit. Try a smaller copy of it, or use a computer.');
+    const next = document.createElement('canvas');
+    next.width = fit.width;
+    next.height = fit.height;
+    const wctx = next.getContext('2d', { willReadFrequently: true });
+    if (!wctx) throw new NamedError('CanvasTooLarge', 'This picture is too large for this browser to edit. Try a smaller copy of it, or use a computer.');
+    wctx.drawImage(decoded.bitmap, 0, 0, fit.width, fit.height);
+    work = next;
+    srcW = fit.width;
+    srcH = fit.height;
+    sizeNote = fit.width === decoded.width && fit.height === decoded.height ? '' : `Edited at ${fit.width} × ${fit.height}, the largest picture this browser can draw.`;
+  } finally {
+    decoded.bitmap.close();
+  }
   previewScale = Math.min(1, PREVIEW_MAX / srcW, PREVIEW_MAX / srcH);
   canvas.width = strokesCanvas.width = Math.max(1, Math.round(srcW * previewScale));
   canvas.height = strokesCanvas.height = Math.max(1, Math.round(srcH * previewScale));
@@ -132,6 +155,7 @@ function hideImage() {
   work = undefined;
   history = [];
   strokes = [];
+  sizeNote = '';
   srcW = srcH = 0;
   panel.hidden = true;
 }
@@ -179,15 +203,43 @@ stage.addEventListener('pointerleave', () => (brushRing.hidden = true));
 /* ------------------------------------------------------------------ */
 /* Erasing                                                             */
 /* ------------------------------------------------------------------ */
-/** One byte per source pixel, non-zero under the paint, and the painted bounding box. */
-function holeMask(): { hole: Uint8Array; count: number } {
+/**
+ * The part of the picture an erase works on: the painted bounding box (each point plus the brush radius), grown on every
+ * side by max(128, 0.75 × its longer side) so the model sees what lies around the paint, and kept inside the picture.
+ */
+function paintedRegion(): Region {
+  if ((window as unknown as { __inpaintFull?: boolean }).__inpaintFull) return { x: 0, y: 0, w: srcW, h: srcH };
+  let x0 = Infinity;
+  let y0 = Infinity;
+  let x1 = -Infinity;
+  let y1 = -Infinity;
+  for (const s of strokes) {
+    for (const [x, y] of s.pts) {
+      x0 = Math.min(x0, x - s.r);
+      y0 = Math.min(y0, y - s.r);
+      x1 = Math.max(x1, x + s.r);
+      y1 = Math.max(y1, y + s.r);
+    }
+  }
+  const grow = Math.max(CONTEXT_MIN, 0.75 * Math.max(x1 - x0, y1 - y0));
+  const left = Math.max(0, Math.floor(x0 - grow));
+  const top = Math.max(0, Math.floor(y0 - grow));
+  const right = Math.min(srcW, Math.ceil(x1 + grow));
+  const bottom = Math.min(srcH, Math.ceil(y1 + grow));
+  return { x: left, y: top, w: Math.max(1, right - left), h: Math.max(1, bottom - top) };
+}
+
+/** One byte per pixel of the region, non-zero under the paint. */
+function holeMask(r: Region): { hole: Uint8Array; count: number } {
   const m = document.createElement('canvas');
-  m.width = srcW;
-  m.height = srcH;
-  const ctx = m.getContext('2d', { willReadFrequently: true })!;
+  m.width = r.w;
+  m.height = r.h;
+  const ctx = m.getContext('2d', { willReadFrequently: true });
+  if (!ctx) throw new NamedError('CanvasTooLarge', 'This browser could not set aside enough memory to erase here. Close other tabs and try again, or paint a smaller area.');
+  ctx.translate(-r.x, -r.y);
   drawStrokes(ctx, 1, strokes, '#fff');
-  const data = ctx.getImageData(0, 0, srcW, srcH).data;
-  const hole = new Uint8Array(srcW * srcH);
+  const data = ctx.getImageData(0, 0, r.w, r.h).data;
+  const hole = new Uint8Array(r.w * r.h);
   let count = 0;
   for (let i = 0; i < hole.length; i++) {
     if (data[i * 4 + 3]! > 0) {
@@ -195,7 +247,24 @@ function holeMask(): { hole: Uint8Array; count: number } {
       count++;
     }
   }
+  m.width = m.height = 0;
   return { hole, count };
+}
+
+/** Plain words for a failure that has none: a browser that ran out of memory, or an error with no name of its own. */
+function plainError(e: unknown): Error {
+  if (!isBare(e)) return e as Error;
+  const text = e instanceof Error ? e.message : String(e);
+  if (/memory|allocat/i.test(text)) {
+    return new NamedError('OutOfMemoryError', 'This device ran out of memory while erasing. Close other tabs and apps and try again, paint a smaller area, or use a computer.', { cause: e });
+  }
+  return nameBare('EraseFailed', e);
+}
+
+/** Keep the newest versions for Undo while they fit the count and byte limits. */
+function trimHistory() {
+  let bytes = history.reduce((n, u) => n + u.data.data.byteLength, 0);
+  while (history.length > 1 && (history.length > HISTORY || bytes > HISTORY_BYTES)) bytes -= history.shift()!.data.data.byteLength;
 }
 
 async function erase(onStatus: (text: string) => void = () => {}) {
@@ -204,11 +273,12 @@ async function erase(onStatus: (text: string) => void = () => {}) {
   notice = undefined;
   sync();
   try {
-    const { hole, count } = holeMask();
+    const region = paintedRegion();
+    const { hole, count } = holeMask(region);
     if (count === 0) return;
     const ctx = work.getContext('2d', { willReadFrequently: true })!;
-    const rgba = ctx.getImageData(0, 0, srcW, srcH).data;
-    const filled = await inpaint(rgba, hole, srcW, srcH, {
+    const before = ctx.getImageData(region.x, region.y, region.w, region.h);
+    const filled = await inpaint(before.data, hole, region.w, region.h, {
       onLoading: (f) => {
         notice = `Downloading the object removal model (28 MB, first time only): ${Math.round(f * 100)}%`;
         onStatus(notice);
@@ -220,18 +290,15 @@ async function erase(onStatus: (text: string) => void = () => {}) {
         sync();
       },
     });
-    const before = document.createElement('canvas');
-    before.width = srcW;
-    before.height = srcH;
-    before.getContext('2d')!.drawImage(work, 0, 0);
-    history.push(before);
-    if (history.length > HISTORY) history.shift();
-    ctx.putImageData(new ImageData(filled, srcW, srcH), 0, 0);
+    ctx.putImageData(new ImageData(filled, region.w, region.h), region.x, region.y);
+    history.push({ x: region.x, y: region.y, data: before });
+    trimHistory();
     strokes = [];
     notice = undefined;
   } catch (e) {
-    notice = `Could not erase: ${e instanceof Error ? e.message : String(e)}`;
-    throw e;
+    const named = plainError(e);
+    notice = `Could not erase: ${named.message}`;
+    throw named;
   } finally {
     busy = false;
     redraw();
@@ -251,7 +318,7 @@ undoBtn.addEventListener('click', () => {
   if (strokes.length > 0) strokes.pop();
   else if (work && history.length > 0) {
     const prev = history.pop()!;
-    work.getContext('2d')!.drawImage(prev, 0, 0);
+    work.getContext('2d')!.putImageData(prev.data, prev.x, prev.y);
   }
   redraw();
 });
@@ -304,7 +371,8 @@ const shell = createShell({
       out = document.createElement('canvas');
       out.width = srcW;
       out.height = srcH;
-      const ctx = out.getContext('2d')!;
+      const ctx = out.getContext('2d');
+      if (!ctx) throw new NamedError('CanvasTooLarge', 'This picture is too large for this browser to save as JPG. Save it as PNG, or use a smaller copy.');
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, srcW, srcH);
       ctx.drawImage(work!, 0, 0);
@@ -318,7 +386,7 @@ const shell = createShell({
         blob,
         originalSize: entry.file.size,
         previewUrl: await thumbnail(preview),
-        note: `${history.length} ${history.length === 1 ? 'area' : 'areas'} erased`,
+        note: `${history.length} ${history.length === 1 ? 'area' : 'areas'} erased${sizeNote ? `. ${sizeNote}` : ''}`,
       },
     ];
     preview.close();
