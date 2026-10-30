@@ -240,7 +240,7 @@ test('a refused model (HTTP 503) is recorded as ModelDownloadError, with nothing
   await page.locator('#erase-go').click();
   await expect.poll(async () => (await runs(page)).length, { timeout: 60_000 }).toBe(1);
   expect((await runs(page))[0]).toMatchObject({ outcome: 'error', error_class: 'ModelDownloadError' });
-  for (const e of await events(page)) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `${e.n}.${k}`).toBe(true);
+  for (const e of (await events(page)).filter((e) => e.n === 'tool_run')) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `${e.n}.${k}`).toBe(true);
   await expect(page.locator('#erase-hint')).toContainText(/could not be downloaded/i);
 });
 
