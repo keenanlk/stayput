@@ -6,6 +6,12 @@ import { tools, categories } from '../data/tools';
 import { conversions, popularConversions, popularTools } from '../data/hubs';
 import { guides } from '../data/guides';
 import { profiles } from '../data/site';
+import { experiments, activeExperimentKeys } from '../data/experiments';
+
+// Homepage hero test (home-hero). A is the page as it was. B has a one-line lede and the demo
+// further down. The B lede is only in the page while the test is on; the demo is one element
+// that CSS moves, so the video is never loaded twice.
+const heroTest = activeExperimentKeys(experiments).includes('home-hero');
 
 // Short column headings so the three tool columns line up on one line.
 const shortLabel = { images: 'Images', pdf: 'PDFs and files', media: 'Video and audio' };
@@ -61,9 +67,10 @@ const jsonLd = [
     <div class="wrap hero-grid">
       <div>
         <h1>Your files stay put.</h1>
-        <p class="lede">
+        <p class="lede" data-ab={heroTest ? 'home-hero:A' : undefined}>
           Convert, compress and edit images, PDFs, video and audio right here in your browser. Nothing is uploaded, nothing is watermarked, and the main limit is your device’s memory (phones hold less). After one visit and a short wait, most tools keep working with the Wi-Fi off; the ones that download a model or engine need one online run first.
         </p>
+        {heroTest && <p class="lede" data-ab="home-hero:B" aria-hidden="true">Convert, compress and edit files in your browser. Nothing is uploaded.</p>}
         <p class="start-label" id="start-h">What do you want to do? Pick one, then drop your file.</p>
         <ul class="start-tiles" aria-labelledby="start-h">
           {startTiles.map((t) => <li><a href={t.href}>{t.label}</a></li>)}
@@ -187,6 +194,15 @@ const jsonLd = [
     .start-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>
+
+{heroTest && (
+  <style is:global>
+    /* Variant B: the demo drops to just before the spec sheet. Same element, so no second video and no jump. */
+    html[data-ab-home-hero="B"] #main { display: flex; flex-direction: column; }
+    html[data-ab-home-hero="B"] #main > .demo { order: 1; }
+    html[data-ab-home-hero="B"] #main > .split { order: 2; }
+  </style>
+)}
 
 <script>
   // The poster is a 100 kB image below the fold; fetch it only when the visitor scrolls near it,

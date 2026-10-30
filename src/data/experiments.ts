@@ -13,9 +13,19 @@ export interface Experiment {
   active: boolean;
 }
 
+/**
+ * Test and screenshot builds can switch tests on without editing this file:
+ * STAYPUT_AB_TEST=home-hero (comma-separated keys). Production builds never set it.
+ * The same variable also makes Base.astro load public/ab-force.js, which reads
+ * `?ab=<key>:B` from the address and sets this tab's pick (see that file).
+ */
+const testKeys = (process.env.STAYPUT_AB_TEST ?? '').split(',').map((k) => k.trim()).filter(Boolean);
+export const abForceAllowed = testKeys.length > 0;
+
 export const experiments: Experiment[] = [
-  // Homepage hero test (STAA-450 part 2). Not wired yet.
-  { key: 'home-hero', active: false },
+  // Homepage hero test (STAA-452): B has a one-line lede and moves the network-tab demo
+  // down to just before the spec sheet. Switch on with `active: true` once approved.
+  { key: 'home-hero', active: false || testKeys.includes('home-hero') },
 ];
 
 export function activeExperimentKeys(list: Experiment[] = experiments): string[] {

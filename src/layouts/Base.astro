@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { siteVerification } from '../data/site';
-import { experiments, activeExperimentKeys } from '../data/experiments';
+import { experiments, activeExperimentKeys, abForceAllowed } from '../data/experiments';
 import { abCss } from '../lib/ab';
 
 interface Props {
@@ -58,6 +58,7 @@ const abKeys = activeExperimentKeys(experiments);
     <meta name="twitter:image" content={ogImage} />
     {abKeys.length > 0 && <meta name="stayput-ab" content={abKeys.join(',')} />}
     {abKeys.length > 0 && <style set:html={abCss(abKeys)} />}
+    {abKeys.length > 0 && abForceAllowed && <script is:inline src="/ab-force.js"></script>}
     {abKeys.length > 0 && <script is:inline src="/ab.js"></script>}
     {jsonLd.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
   </head>
