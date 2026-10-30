@@ -16,7 +16,7 @@ import { fetchModelResumable } from '../src/lib/model-stall';
  */
 const MODEL = fileURLToPath(new URL('../public/models/migan-pipeline-v2.onnx', import.meta.url));
 const MODEL_ROUTE = '**/models/migan-pipeline-v2.onnx';
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 type Win = { __posted: { rgbaLength: number; width: number; height: number }[]; __spawned: number; __plan: ('ok' | 'die')[]; __asked: number; __inpaintFull?: boolean };
 
