@@ -1,7 +1,7 @@
 import { createShell, num } from '../lib/shell';
 import { replaceExt } from '../lib/files';
 import { channelsOf, decodeAudio, formatDuration } from '../lib/audio';
-import { InputError, UnreadableFile, NamedError } from '../lib/input-error';
+import { UnreadableFile, NamedError } from '../lib/input-error';
 import { fromWorkerFailure } from '../lib/worker-error';
 import { halve, type TempoResult } from '../lib/bpm-key';
 import { noteName } from '../lib/basic-pitch';
@@ -127,13 +127,21 @@ async function fileDuration(file: File): Promise<number | null> {
   }
 }
 
-function checkLength(seconds: number) {
-  if (seconds > MAX_SECONDS + SLACK_SECONDS) {
-    const minutes = Math.round(seconds / 60);
-    const long = minutes <= 5 ? 'just over 5 minutes' : `${minutes} minutes`;
-    throw new InputError(`This file is ${long} long. This page reads files up to 5 minutes. Cut the part you want with Trim audio, then try again.`);
-  }
+/** The refusal for a file over the limit, or '' when its length is fine. */
+function lengthRefusal(seconds: number) {
+  if (seconds <= MAX_SECONDS + SLACK_SECONDS) return '';
+  const minutes = Math.round(seconds / 60);
+  const long = minutes <= 5 ? 'just over 5 minutes' : `${minutes} minutes`;
+  return `This file is ${long} long. This page reads files up to 5 minutes. Cut the part you want with Trim audio, then try again.`;
 }
+
+function checkLength(seconds: number) {
+  const refusal = lengthRefusal(seconds);
+  if (refusal) throw new NamedError('AudioTooLong', refusal);
+}
+
+/** The dropped file's length, read once per file; while it is over the limit Run stays off, so no failed run is recorded. */
+let known: { file: File; duration: number } | undefined;
 
 let noteWorker: Worker | undefined;
 let bpmWorker: Worker | undefined;
@@ -194,7 +202,18 @@ function estimateTempo(mono: Float32Array): Promise<TempoResult | null> {
   });
 }
 
-createShell({
+const shell = createShell({
+  // A file whose header already shows it is too long is refused at drop time, not as a failed run.
+  runBlocker: () => (known ? lengthRefusal(known.duration) : ''),
+  async onFilesChanged(files) {
+    known = undefined;
+    shell.refresh();
+    const file = files[0]?.file;
+    if (!file) return;
+    const duration = await fileDuration(file);
+    if (duration !== null && files[0]?.file === file) known = { file, duration };
+    shell.refresh();
+  },
   outputFormat: () => 'mid',
   autoDownloadSingle: false,
   resultsTitle: () => 'MIDI file ready',
@@ -214,7 +233,7 @@ createShell({
     let peak = 0;
     for (let i = 0; i < mono.length; i++) peak = Math.max(peak, Math.abs(mono[i]!));
     if (peak < 0.001) throw new UnreadableFile('This file is silent, so there are no notes to find.');
-    if (seconds < 0.5) throw new InputError('This clip is too short to hold a note. Use a clip of at least half a second.');
+    if (seconds < 0.5) throw new NamedError('ClipTooShort', 'This clip is too short to hold a note. Use a clip of at least half a second.');
 
     const typed = Math.round(num('bpm', 0));
     const tempoGuess = typed === 0 && seconds >= MIN_TEMPO_SECONDS ? estimateTempo(mono.slice()) : Promise.resolve(null);
@@ -240,7 +259,7 @@ createShell({
       },
     );
     const { notes } = result;
-    if (notes.length === 0) throw new InputError('No notes were found in this file. It may be too quiet, or made of noise, speech or drums, which have no steady pitch.');
+    if (notes.length === 0) throw new NamedError('NoNotesFound', 'No notes were found in this file. It may be too quiet, or made of noise, speech or drums, which have no steady pitch.');
 
     progress.set('Writing the MIDI file…', 0.95);
     const guess = await tempoGuess;
