@@ -98,14 +98,14 @@ test('without ?ab the pick is random and sticks for the tab; the page is the sam
   expect(await page.locator('html').getAttribute('data-ab-home-hero')).toBe(first);
 });
 
-test('the production build (test off) has one lede, the demo in place, and no override script', async () => {
+test('the production build (test on) has both ledes, the A order, and no override script', async () => {
   const dist = join(process.cwd(), 'dist');
   test.skip(!existsSync(join(dist, 'index.html')), 'needs a built dist');
   const html = readFileSync(join(dist, 'index.html'), 'utf8');
-  expect(html).not.toContain('data-ab');
+  expect(html).toContain('data-ab="home-hero:A"');
+  expect(html).toContain('data-ab="home-hero:B"');
   expect(html).not.toContain('ab-force');
   expect(existsSync(join(dist, 'ab-force.js'))).toBe(false);
-  expect(html).not.toContain('stayput-ab');
-  expect(html.match(/class="lede"/g)?.length).toBe(1);
+  expect(html.match(/class="lede"/g)?.length).toBe(2);
   expect(html.indexOf('aria-labelledby="demo-h"')).toBeLessThan(html.indexOf('id="popular-h"'));
 });
