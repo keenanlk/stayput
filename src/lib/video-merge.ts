@@ -30,13 +30,12 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
-import { pickVideoCodec } from './video-codec';
+import { codecsFor, planVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { InputError, UnsupportedCodec, NamedError } from './input-error';
-import { softwareH264Offered, useRealtimeH264 } from './encoder-probe';
-import { pageRecoveryHooks } from './recovery-hooks';
-import { capScale, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { capAtRisk, pageRecoveryHooks } from './recovery-hooks';
+import { adoptPlan, capScale, encodeOptions, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface MergeOptions {
   mute: boolean;
@@ -95,9 +94,6 @@ export async function copyClipSound(target: EncodedAudioPacketSource, track: Inp
   }
 }
 
-/** Names an encoder gives up with; a run that fails every size with one of them says so in plain words. */
-const ENCODER_REFUSALS = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError']);
-
 /**
  * Joins the videos. When the device's encoder gives up (EncodingError and its kin) or the page was hidden, the run starts
  * again, at a smaller picture where the encoder is what failed (see edit-recovery.ts). If every try fails, the error keeps
@@ -115,12 +111,8 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
         return retry ? { ...r, retry } : r;
       },
       () => made,
-      { ...page.hooks, softwareEncode: softwareH264Offered },
+      page.hooks,
     );
-  } catch (e) {
-    const name = (e as { name?: string } | null)?.name ?? '';
-    if (!ENCODER_REFUSALS.has(name)) throw e;
-    throw new NamedError(name, "This device's video encoder stopped, even at a smaller size. Try a shorter clip, a recent Chrome, Edge or Safari, or a computer. Nothing was uploaded.", { cause: e });
   } finally {
     page.dispose();
   }
@@ -136,15 +128,19 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
       if (!(await track.canDecode())) throw new UnsupportedCodec(`${files[i]!.name}: ${unplayable()}`);
       clips.push({ track, ...(await pictureLength(track)), name: files[i]!.name });
     }
-    // A retry after the encoder gave up asks for a smaller picture than the first try's.
-    const k = capScale(attempt, Math.max(clips[0]!.track.displayWidth, clips[0]!.track.displayHeight));
-    const width = even(clips[0]!.track.displayWidth * k);
-    const height = even(clips[0]!.track.displayHeight * k);
+    // A retry after the encoder gave up asks for a smaller picture than the first try's; a phone given a 4K first clip starts at 1080p.
+    const shown = { w: clips[0]!.track.displayWidth, h: clips[0]!.track.displayHeight };
+    const longest = Math.max(shown.w, shown.h);
+    capAtRisk(attempt, longest);
+    const wanted = capScale(attempt, longest);
+    // The test encode at the real size can lower it further before any picture is read.
+    const plan = await planVideoCodec({ width: even(shown.w * wanted), height: even(shown.h * wanted), bitrate: QUALITY_HIGH }, codecsFor(attempt));
+    const k = adoptPlan(attempt, plan, longest);
+    const width = even(shown.w * k);
+    const height = even(shown.h * k);
     sized(Math.max(width, height));
-    // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software' || attempt.remembered) useRealtimeH264();
     const total = clips.reduce((s, c) => s + c.length, 0);
-    const videoCodec = await pickVideoCodec({ width, height, bitrate: QUALITY_HIGH });
+    const videoCodec = plan.codec;
     if (!videoCodec) throw new NamedError('VideoMergeFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
     // Where the browser cannot encode sound (iPhone Safari) but every clip carries the same
@@ -176,7 +172,7 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
     if (sound && !audioCodec) throw noAudioEncoder(true);
 
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}) });
+    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, ...encodeOptions(attempt) });
     output.addVideoTrack(videoSource, { frameRate: MAX_FPS });
     const audioSource = audioCodec ? new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH }) : null;
     if (audioSource) output.addAudioTrack(audioSource);
@@ -206,7 +202,8 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, width, height);
             sample.drawWithFit(ctx, { fit: 'contain' });
-            const d = Math.min(sample.duration, offset + clip.length - t);
+            // A zero-length frame makes VP8 and VP9 encoders fail, so a frame is never shorter than one tick of the top frame rate.
+            const d = Math.max(Math.min(sample.duration, offset + clip.length - t), 1 / MAX_FPS);
             sample.close();
             const frame = new VideoSample(canvas, { timestamp: t, duration: d });
             await feed.until(t);

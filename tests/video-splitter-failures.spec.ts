@@ -9,7 +9,7 @@ import { planAtTimes, planEqual, planEvery } from '../src/lib/video-split';
 // Video splitter failures: every one that can end a run has a named class (never a bare Error), a phone that cannot
 // read the file gets one more read and then a plain refusal, and odd inputs either split or are refused early.
 const fx = (n: string) => fileURLToPath(new URL(`./fixtures/static/${n}`, import.meta.url));
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 
@@ -263,6 +263,27 @@ test.describe('on the page', () => {
     const input = new Input({ source: new BufferSource(files[names[1]!]!), formats: ALL_FORMATS });
     const first = await (await input.getPrimaryVideoTrack())!.getFirstTimestamp();
     expect(first).toBeLessThanOrEqual(3.05);
+    expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
+  });
+
+  // No encoder answers (the silent WebKit encoder): the test encode before the cut sees it, so the part is copied from the key frame
+  // in seconds. Before it, a fast cut that needed an encoder waited for the 60 s watchdog and one retry (about 2 minutes). Runs on WebKit in CI too.
+  test('no encoder answers on a fast cut: the part is copied from the key frame within seconds, not after the watchdog', async ({ page }) => {
+    await open(page);
+    await page.addInitScript(() => {
+      // flush() never settles, as on a WebKit encoder that accepts frames and returns nothing.
+      VideoEncoder.prototype.flush = () => new Promise(() => {});
+    });
+    await load(page, fx('split-gop2s.mp4'));
+    await expect(page.locator('#tool')).toHaveAttribute('data-duration', /^8/);
+    await page.locator('#vs-times').fill('0:03');
+    const began = Date.now();
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 45_000 });
+    const seconds = (Date.now() - began) / 1000;
+    console.log(`time to the key-frame copy with a silent encoder: ${seconds.toFixed(1)} s`);
+    await expect(page.locator('#results-list')).toContainText('key frame');
+    expect(seconds).toBeLessThan(30);
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 

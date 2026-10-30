@@ -8,7 +8,7 @@ import { withoutSoftwareEncoder } from './no-software-encoder';
 // shown, and every failure that is shown records a named error class. The failures are forced in the page: the encoder
 // throws once, the page reports hidden for a moment, the file read fails, the face model cannot be fetched.
 const clip = fileURLToPath(new URL('./fixtures/static/iphone-portrait-person.mov', import.meta.url));
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 const RUNNING = /Hiding faces in/;
@@ -92,13 +92,13 @@ test.describe('on the page', () => {
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 
-  test('the encoder gives up at full size: the run finishes at a smaller size and says so', async ({ page }) => {
+  test('the encoder gives up at full size: the run finishes at a smaller size and says so', async ({ page, browserName }) => {
     test.setTimeout(240_000);
     await open(page);
     await breakEncoder(page, 'EncodingError', false);
     await run(page);
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
-    await expect(page.locator('#results-list')).toContainText('made at a smaller size');
+    await expect(page.locator('#results-list')).toContainText(browserName === 'webkit' ? 'made on a second try' : 'made at a smaller size');
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 
@@ -114,7 +114,7 @@ test.describe('on the page', () => {
     }, RUNNING.source);
     await run(page);
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 200_000 });
-    expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'EncodingError' });
+    expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'EncoderGaveUp' });
   });
 
   for (const [label, reads, ok] of [

@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
  */
 const edge = (name: string) => fileURLToPath(new URL(`./fixtures/edge-cases/${name}`, import.meta.url));
 const stat = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 
 async function recordEvents(page: Page) {

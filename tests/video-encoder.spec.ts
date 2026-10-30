@@ -356,3 +356,77 @@ test('Compress video finishes when the decoder returns frames out of presentatio
   expect(encoded.length).toBeGreaterThan(30);
   expect(encoded.filter((t, i) => i > 0 && t <= encoded[i - 1]!)).toEqual([]);
 });
+
+// STAA-482: the test encode at the real output size, before the file is decoded.
+const uhd = fileURLToPath(new URL('./fixtures/static/uhd-flat.mp4', import.meta.url));
+const hd = fileURLToPath(new URL('./fixtures/static/hd-flat.mp4', import.meta.url));
+
+/** configure() raises EncodingError for pictures over `megapixels` (unless `exceptSoftware` and the config asks for the software encoder). */
+async function refuseBigConfigs(page: Page, megapixels: number, exceptSoftware: boolean) {
+  await page.addInitScript(
+    ([limit, exceptSoftware]) => {
+      const original = VideoEncoder.prototype.configure;
+      VideoEncoder.prototype.configure = function (this: VideoEncoder, config: VideoEncoderConfig) {
+        if (config.width * config.height > (limit as number) * 1_000_000 && !(exceptSoftware && config.hardwareAcceleration === 'prefer-software')) {
+          throw new DOMException('forced by the test', 'EncodingError');
+        }
+        return original.call(this, config);
+      };
+    },
+    [megapixels, exceptSoftware] as const,
+  );
+}
+
+async function compressTimed(page: Page, file: string): Promise<{ ms: number; text: string; side: number }> {
+  await open(page, '/tools/compress-video');
+  await page.locator('#file-input').setInputFiles([file]);
+  const t0 = Date.now();
+  await runOnce(page);
+  const ms = Date.now() - t0;
+  const text = (await page.locator('#results-list').textContent()) ?? '';
+  const m = text.match(/(\d{3,4})×(\d{3,4})/);
+  return { ms, text, side: m ? Math.max(Number(m[1]), Number(m[2])) : 0 };
+}
+
+test('an encoder that refuses a big picture is tested first and the file is made smaller, with a note (every engine)', async ({ page }) => {
+  test.setTimeout(300_000);
+  // hd-flat is 1080p; configure() refuses over 0.6 MP, so the first size that answers is 854 on the long side.
+  await refuseBigConfigs(page, 0.6, false);
+  const r = await compressTimed(page, hd);
+  expect(r.side).toBeLessThanOrEqual(1280);
+  expect(r.text).toMatch(/made at 480p because the full size failed on this device/);
+});
+
+// The 4K runs below are Chromium-only here: Playwright's WebKit on a Mac does not finish a plain 4K compress either (no patch), so it says nothing about the ladder.
+test('a 4K picture the encoder refuses is tested first and made at 1080p, in under twice a normal 1080p run, with a note', async ({ page, context, browserName }) => {
+  test.skip(browserName !== 'chromium', 'see above');
+  test.setTimeout(400_000);
+  const normal = await compressTimed(page, hd);
+  const refusing = await context.newPage();
+  await refuseBigConfigs(refusing, 2.1, false);
+  const cut = await compressTimed(refusing, uhd);
+  expect(cut.side).toBeLessThanOrEqual(1920);
+  expect(cut.text).toContain('made at 1080p because the full size failed on this device');
+  // The size that worked is remembered for the tab, so the next run starts there ("Try full size" undoes it).
+  expect(await refusing.evaluate(() => sessionStorage.getItem('stayput:work-size'))).toBe('1920');
+  expect(cut.ms).toBeLessThan(normal.ms * 2);
+});
+
+test('Chromium: when only the software encoder works, the 4K file is full size H.264 with no alarming note', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'prefer-software is a Chromium setting');
+  test.setTimeout(400_000);
+  await refuseBigConfigs(page, 2.1, true);
+  const r = await compressTimed(page, uhd);
+  expect(r.side).toBe(3840);
+  expect(r.text).toContain('H.264');
+  expect(r.text).not.toMatch(/made at|smaller|second try|software|stopped/);
+});
+
+test('full size stays the default: with a working encoder and no failure history, 4K is written at 4K, with no size note', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'see above');
+  test.setTimeout(400_000);
+  const r = await compressTimed(page, uhd);
+  expect(r.side).toBe(3840);
+  expect(r.text).not.toMatch(/made at|smaller/);
+  expect(await page.evaluate(() => sessionStorage.getItem('stayput:work-size'))).toBeNull();
+});

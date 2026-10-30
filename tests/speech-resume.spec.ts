@@ -11,7 +11,7 @@ import type { Segment } from '../src/lib/captions';
  * failure has to happen on cue (a real phone running out of memory cannot be reproduced here); the recording is made
  * in the test, because CI has no ffmpeg: a WAV of about 80 seconds with a pause every 20, which is four pieces.
  */
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 const runs = async (page: Page) => (await events(page)).filter((e) => e.n === 'tool_run').map((e) => e.d);

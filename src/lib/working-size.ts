@@ -5,6 +5,10 @@
  */
 
 const KEY = 'stayput:work-size';
+/** Set when a phone's 4K source was started at 1080p without a failure (see capAtRisk in recovery-hooks.ts); cleared by "Try full size". */
+const RISK_KEY = 'stayput:risk-size';
+/** Set by "Try full size": the person chose full size, so the at-risk start is not applied again in this tab. */
+const FULL_KEY = 'stayput:full-size';
 
 /** The sides a retry steps down through (see smallerSide in edit-recovery.ts); anything else in storage is ignored. */
 const SIDES = [1920, 1280, 854];
@@ -23,6 +27,22 @@ export function workingSize(): number | undefined {
   return SIDES.includes(n) ? n : undefined;
 }
 
+/** The size an at-risk device (a phone with a 4K source) started at in this tab, or undefined. */
+export function riskSize(): number | undefined {
+  return store()?.getItem(RISK_KEY) === '1920' && !fullSizeChosen() ? 1920 : undefined;
+}
+
+export function noteRiskSize(): void {
+  try {
+    store()?.setItem(RISK_KEY, '1920');
+  } catch {
+    // Not remembered: the note is just not shown.
+  }
+}
+
+/** The person pressed "Try full size" in this tab. */
+export const fullSizeChosen = (): boolean => store()?.getItem(FULL_KEY) === '1';
+
 export function rememberWorkingSize(side: number): void {
   if (!SIDES.includes(side)) return;
   try {
@@ -36,6 +56,8 @@ export function rememberWorkingSize(side: number): void {
 export function forgetWorkingSize(): void {
   try {
     store()?.removeItem(KEY);
+    store()?.removeItem(RISK_KEY);
+    store()?.setItem(FULL_KEY, '1');
   } catch {
     // Nothing to forget.
   }

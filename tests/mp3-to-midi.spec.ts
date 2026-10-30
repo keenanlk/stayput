@@ -10,6 +10,8 @@ import { siteHost } from './allowed-host';
 const dir = mkdtempSync(join(tmpdir(), 'mp3-to-midi-'));
 const clip = join(dir, 'secret-melody-name.wav');
 const tooLong = join(dir, 'twenty-minutes.wav');
+const tooShort = join(dir, 'blip.wav');
+const noise = join(dir, 'hiss.wav');
 
 /** Ten notes of a tune, one every 0.6 s, each sounding 0.5 s, played by a piano-like tone (three decaying harmonics). */
 const TUNE = [60, 62, 64, 65, 67, 69, 71, 72, 67, 64];
@@ -34,6 +36,13 @@ function piano(): Float32Array {
 test.beforeAll(() => {
   writeFileSync(clip, wav(piano(), 22050));
   writeFileSync(tooLong, silentWav8(20 * 60, 8000));
+  const blip = new Float32Array(Math.round(0.3 * 22050));
+  blip.forEach((_, i) => (blip[i] = 0.4 * Math.sin((2 * Math.PI * 440 * i) / 22050)));
+  writeFileSync(tooShort, wav(blip, 22050));
+  // Seeded noise has no steady pitch, so the model finds no notes.
+  let seed = 12345;
+  const hiss = new Float32Array(3 * 22050).map(() => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32 - 0.5) * 0.6);
+  writeFileSync(noise, wav(hiss, 22050));
 });
 
 async function open(page: Page, { noGpu = false } = {}) {
@@ -107,13 +116,51 @@ test('runs on the WebAssembly engine, with or without WebGPU in the browser', as
   }
 });
 
-test('refuses a 20-minute file with a message, before decoding it or fetching the model', async ({ page }) => {
+/** The error_class of the one failed tool_run the page has recorded. */
+async function failedClass(page: Page) {
+  const events = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events);
+  const runs = events.filter((e) => e.n === 'tool_run');
+  expect(runs).toHaveLength(1);
+  expect(runs[0]!.d.outcome).toBe('error');
+  return runs[0]!.d.error_class;
+}
+
+test('refuses a 20-minute file at drop time, keeps Run off and records no failed run', async ({ page }) => {
   const { seen } = await open(page);
   seen.length = 0;
   await page.setInputFiles('#file-input', tooLong);
-  await page.locator('#run').click();
-  await expect(page.locator('#tool')).toContainText('This file is 20 minutes long. This page reads files up to 5 minutes.', { timeout: 30_000 });
+  const message = 'This file is 20 minutes long. This page reads files up to 5 minutes.';
+  await expect(page.locator('#run-hint')).toContainText(message, { timeout: 30_000 });
+  await expect(page.locator('#run')).toBeDisabled();
   expect(seen.some((r) => r.url.includes('/models/') || r.url.includes('/vendor/'))).toBe(false);
+  const events = await page.evaluate(() => (window as unknown as { __events: { n: string }[] }).__events);
+  expect(events.filter((e) => e.n === 'tool_run')).toEqual([]);
+});
+
+test('a 20-minute file that gets past the drop check still ends as AudioTooLong', async ({ page }) => {
+  await open(page);
+  await page.setInputFiles('#file-input', tooLong);
+  await expect(page.locator('#run-hint')).toContainText('20 minutes long', { timeout: 30_000 });
+  await page.evaluate(() => ((document.getElementById('run') as HTMLButtonElement).disabled = false));
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('This file is 20 minutes long.', { timeout: 30_000 });
+  expect(await failedClass(page)).toBe('AudioTooLong');
+});
+
+test('a clip under half a second ends as ClipTooShort', async ({ page }) => {
+  await open(page);
+  await page.setInputFiles('#file-input', tooShort);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('too short to hold a note', { timeout: 30_000 });
+  expect(await failedClass(page)).toBe('ClipTooShort');
+});
+
+test('a noise-only file ends as NoNotesFound', async ({ page }) => {
+  await open(page);
+  await page.setInputFiles('#file-input', noise);
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toContainText('No notes were found', { timeout: 80_000 });
+  expect(await failedClass(page)).toBe('NoNotesFound');
 });
 
 test('the MIDI writer and reader agree', () => {

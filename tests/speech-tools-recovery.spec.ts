@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const here = (name: string) => fileURLToPath(new URL(`./fixtures/static/${name}`, import.meta.url));
 const speech = (project: string) => here(project === 'webkit' ? 'speech.mov' : 'talk.webm');
 const PAGES = ['/tools/transcribe', '/video-to-subtitles'];
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 
