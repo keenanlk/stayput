@@ -8,9 +8,11 @@
 import { AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource, type VideoCodec } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
-import { VIDEO_CODECS, pickVideoCodec } from './video-codec';
+import { codecsFor, planVideoCodec } from './video-codec';
+import { adoptPlan, capScale, encodeOptions, type Attempt, type RetryKind } from './edit-recovery';
+import { runRecovered } from './video-run';
 import { InputError, UnreadableFile, NamedError } from './input-error';
-import { EncoderRefused, EncoderUnavailable } from './encoder-probe';
+import { EncoderUnavailable } from './encoder-probe';
 import { blur as boxBlur } from './blur';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
@@ -30,6 +32,8 @@ export interface AudioVideoResult {
   height: number;
   duration: number;
   videoCodec: string;
+  /** Set when the video was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
 }
 
 /** Longest side the blurred backdrop is made at; it is scaled up afterwards, which also softens it. */
@@ -89,65 +93,59 @@ export function drawStill(ctx: OffscreenCanvasRenderingContext2D | CanvasRenderi
   ctx.fillText(title, width / 2, height / 2);
 }
 
-/** Errors a browser's encoders raise when they refuse to start or fail at once; another size or codec may still work. */
-export const ENCODER_REFUSAL = new Set(['OperationError', 'EncodingError', 'InvalidStateError', 'NotSupportedError']);
+/** A frame scaled down, each side kept even as H.264 needs. */
+function scaledFrame(frame: { width: number; height: number }, k: number) {
+  const even = (n: number) => Math.max(2, Math.round((n * k) / 2) * 2);
+  return k >= 1 ? { ...frame } : { width: even(frame.width), height: even(frame.height) };
+}
 
 /**
- * What to try, in order. Android Chrome can say a 1080p H.264 or AAC encoder is supported and then fail
- * to create it ("Encoder creation error", an OperationError), so a refusal moves to a smaller frame
- * and, at the end, to the other codecs (VP9 and Opus in the same MP4).
+ * The frame and codec this try writes. Android Chrome can say a 1080p H.264 or AAC encoder is supported and then fail to create it
+ * ("Encoder creation error", an OperationError), so the frame starts at the size the shared recovery allows (see edit-recovery.ts):
+ * the full shape, or smaller after a failure, with the test encode at the real size lowering it further before anything is drawn.
  */
-export const ATTEMPTS: { scale: number; video: VideoCodec[]; audio: ('aac' | 'opus')[] }[] = [
-  { scale: 1, video: VIDEO_CODECS, audio: ['aac', 'opus'] },
-  { scale: 2 / 3, video: VIDEO_CODECS, audio: ['aac', 'opus'] },
-  { scale: 4 / 9, video: ['vp9', 'avc', 'av1'], audio: ['opus', 'aac'] },
-];
-
-/** A frame scaled down, each side kept even as H.264 needs. */
-export function scaledFrame(frame: { width: number; height: number }, scale: number) {
-  const even = (n: number) => Math.max(2, Math.round((n * scale) / 2) * 2);
-  return scale === 1 ? { ...frame } : { width: even(frame.width), height: even(frame.height) };
+export async function planStill(shape: Shape, attempt: Attempt, sized: (longestSide: number) => void): Promise<{ frame: { width: number; height: number }; videoCodec: VideoCodec }> {
+  const full = SHAPES[shape];
+  const longest = Math.max(full.width, full.height);
+  const wanted = capScale(attempt, longest);
+  const plan = await planVideoCodec({ ...scaledFrame(full, wanted), bitrate: QUALITY_HIGH }, codecsFor(attempt));
+  const k = adoptPlan(attempt, plan, longest);
+  const frame = scaledFrame(full, k);
+  sized(Math.max(frame.width, frame.height));
+  if (!plan.codec) throw new EncoderUnavailable('This browser cannot encode video. Try a recent version of Chrome, Edge or Safari.');
+  return { frame, videoCodec: plan.codec };
 }
 
 export async function audioToVideo(
   audio: File,
   picture: ImageBitmap | null,
-  opts: { shape: Shape; backdrop: Backdrop; title: string; onProgress?: (f: number) => void },
+  opts: { shape: Shape; backdrop: Backdrop; title: string; onProgress?: (f: number) => void; onNotice?: (message: string) => void },
 ): Promise<AudioVideoResult> {
   const pcm = await decodePcm(audio);
   if (!pcm) throw new UnreadableFile('No sound could be read from this file. It may use a format this browser cannot decode.');
   const sound = stereo(pcm);
   const duration = sound[0]!.length / SAMPLE_RATE;
   if (duration < 0.1) throw new InputError('This sound is too short to make a video from.');
-  for (const attempt of ATTEMPTS) {
-    try {
-      return await encodeStill(sound, duration, picture, opts, scaledFrame(SHAPES[opts.shape], attempt.scale), attempt.video, attempt.audio);
-    } catch (e) {
-      if (!(e instanceof Error) || !ENCODER_REFUSAL.has(e.name)) throw e;
-    }
-  }
-  throw new EncoderRefused();
+  return runRecovered('AudioVideoFailed', opts.onNotice, (attempt, sized) => encodeStill(sound, duration, picture, opts, attempt, sized));
 }
 
 async function encodeStill(
   sound: Float32Array[],
   duration: number,
   picture: ImageBitmap | null,
-  opts: { backdrop: Backdrop; title: string; onProgress?: (f: number) => void },
-  frame: { width: number; height: number },
-  videoCodecs: VideoCodec[],
-  audioCodecs: ('aac' | 'opus')[],
+  opts: { shape: Shape; backdrop: Backdrop; title: string; onProgress?: (f: number) => void },
+  attempt: Attempt,
+  sized: (longestSide: number) => void,
 ): Promise<AudioVideoResult> {
-  const videoCodec = await pickVideoCodec({ ...frame, bitrate: QUALITY_HIGH }, videoCodecs);
-  if (!videoCodec) throw new EncoderUnavailable('This browser cannot encode video. Try a recent version of Chrome, Edge or Safari.');
+  const { frame, videoCodec } = await planStill(opts.shape, attempt, sized);
   // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
   // The sound itself is already decoded above by the page's audio decoder, not WebCodecs.
-  const audioCodec = await firstEncodableSound(audioCodecs, { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 });
+  const audioCodec = await firstEncodableSound(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 });
   if (!audioCodec) throw noAudioEncoder(false);
 
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
   // A still picture needs very few bits; a key frame every two seconds keeps seeking quick.
-  const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
+  const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2, ...encodeOptions(attempt) });
   output.addVideoTrack(videoSource);
   const audioSource = new AudioSampleSource({ codec: audioCodec, bitrate: 192_000 });
   output.addAudioTrack(audioSource);

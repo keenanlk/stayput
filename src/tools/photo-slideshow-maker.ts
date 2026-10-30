@@ -1,4 +1,5 @@
 import { createShell, num, radio, str, type ShellFile } from '../lib/shell';
+import { retryNote } from '../lib/edit-recovery';
 import { type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
 import { InputError } from '../lib/input-error';
@@ -84,6 +85,7 @@ function missing(files: ShellFile[]): string {
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   outputFormat: () => 'mp4',
   runBlocker: missing,
   async onFilesChanged(files) {
@@ -117,13 +119,14 @@ const shell = createShell({
           const left = timeLeft.update(f) ?? 'Estimating time left…';
           progress.set(`Making the slideshow: ${Math.round(f * 100)}% · ${left}`, 0.02 + f * 0.98);
         },
+        onNotice: (m) => progress.set(m, 0.02),
       },
     );
     const out: OutputFile = {
       name: 'slideshow.mp4',
       blob: r.blob,
       originalSize: pictures.reduce((t, p) => t + p.file.size, 0),
-      note: `${formatDuration(r.duration)}, ${r.width}×${r.height}, ${r.videoCodec}, ${pictures.length} photos${songs.length ? ' with song' : ', no sound'}`,
+      note: `${formatDuration(r.duration)}, ${r.width}×${r.height}, ${r.videoCodec}, ${pictures.length} photos${songs.length ? ' with song' : ', no sound'}${retryNote(r.retry, r)}`,
     };
     return [out];
   },

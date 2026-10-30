@@ -18,13 +18,16 @@ import {
   MPEG_TS,
   QTFF,
   QUALITY_HIGH,
+  VideoSample,
   VideoSampleSink,
   VideoSampleSource,
   WEBM,
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
-import { pickVideoCodec } from './video-codec';
+import { codecsFor, planVideoCodec } from './video-codec';
+import { adoptPlan, capScale, encodeOptions, type Attempt, type RetryKind } from './edit-recovery';
+import { runRecovered } from './video-run';
 import { timeStretch } from './stretch';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
@@ -35,6 +38,8 @@ export interface SpeedOptions {
   speed: number;
   mute: boolean;
   onProgress?: (fraction: number) => void;
+  /** Said when the run starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface SpeedResult {
@@ -45,13 +50,21 @@ export interface SpeedResult {
   duration: number;
   videoCodec: string;
   audio: boolean;
+  /** Set when the file was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
 }
 
 const MAX_FPS = 60;
+const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 
 export async function changeSpeed(file: File, opts: SpeedOptions): Promise<SpeedResult> {
   const speed = opts.speed;
   if (!(speed >= 0.1 && speed <= 16)) throw new InputError('Choose a speed between 0.1× and 16×.');
+  return runRecovered('VideoSpeedFailed', opts.onNotice, (attempt, sized) => speedOnce(file, opts, attempt, sized));
+}
+
+async function speedOnce(file: File, opts: SpeedOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<SpeedResult> {
+  const speed = opts.speed;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
@@ -60,7 +73,15 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
     const duration = await input.computeDuration();
     const width = video.codedWidth;
     const height = video.codedHeight;
-    const videoCodec = await pickVideoCodec({ width: width + (width % 2), height: height + (height % 2), bitrate: QUALITY_HIGH });
+    // A retry after the encoder gave up asks for a smaller picture than the first try's; the test encode at the real size can lower it further.
+    const longest = Math.max(width, height);
+    const wanted = capScale(attempt, longest);
+    const plan = await planVideoCodec({ width: even(width * wanted), height: even(height * wanted), bitrate: QUALITY_HIGH }, codecsFor(attempt));
+    const k = adoptPlan(attempt, plan, longest);
+    const outW = k < 1 ? even(width * k) : width;
+    const outH = k < 1 ? even(height * k) : height;
+    sized(Math.max(outW, outH));
+    const videoCodec = plan.codec;
     if (!videoCodec) throw new NamedError('VideoSpeedFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
 
     // The sound, stretched to the new length at the same pitch.
@@ -76,7 +97,7 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
     if (sound && !audioCodec) throw noAudioEncoder(true);
 
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain' });
+    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain', ...encodeOptions(attempt) });
     output.addVideoTrack(videoSource, { rotation: video.rotation, frameRate: MAX_FPS });
     const audioSource = audioCodec ? new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH }) : null;
     if (audioSource) output.addAudioTrack(audioSource);
@@ -96,6 +117,9 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
         };
         const sink = new VideoSampleSink(video);
         const start = await video.getFirstTimestamp();
+        // At a smaller size every picture is drawn onto a canvas of that size first.
+        const canvas = k < 1 ? new OffscreenCanvas(outW, outH) : null;
+        const ctx = canvas?.getContext('2d') ?? null;
         let lastKept = -Infinity;
         for await (const sample of sink.samples()) {
           const t = (sample.timestamp - start) / speed;
@@ -110,7 +134,16 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
           sample.setDuration(d);
           sample.setRotation(0);
           await pushSoundUntil(t);
-          await videoSource.add(sample);
+          if (canvas && ctx) {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, outW, outH);
+            sample.drawWithFit(ctx, { fit: 'contain' });
+            const frame = new VideoSample(canvas, { timestamp: t, duration: d });
+            await videoSource.add(frame);
+            frame.close();
+          } else {
+            await videoSource.add(sample);
+          }
           end = Math.max(end, t + d);
           sample.close();
           report(Math.min(0.99, t / Math.max(0.001, duration / speed)));
@@ -128,8 +161,8 @@ export async function changeSpeed(file: File, opts: SpeedOptions): Promise<Speed
     const quarter = video.rotation === 90 || video.rotation === 270;
     return {
       blob: new Blob([buffer], { type: 'video/mp4' }),
-      width: quarter ? height : width,
-      height: quarter ? width : height,
+      width: quarter ? outH : outW,
+      height: quarter ? outW : outH,
       duration: Math.max(end, soundLen / SAMPLE_RATE) || duration / speed,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       audio: !!audioSource,

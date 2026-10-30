@@ -28,13 +28,15 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
-import { pickVideoCodec } from './video-codec';
+import { codecsFor, planVideoCodec } from './video-codec';
+import { adoptPlan, capScale, encodeOptions, type Attempt, type RetryKind } from './edit-recovery';
+import { runRecovered } from './video-run';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { UnsupportedCodec, NamedError } from './input-error';
 import { nameBare } from './bare-error';
 import { copyClipSound, pictureLength } from './video-merge';
-import { estimateMemory, memoryVerdict, outputFps, outputSeconds, planSideBySide, type Plan, type SbsFit, type SbsLayout, type SbsLength, type SbsSound } from './side-by-side-plan';
+import { estimateMemory, memoryVerdict, outputFps, outputSeconds, planSideBySide, scalePlan, type Plan, type SbsFit, type SbsLayout, type SbsLength, type SbsSound } from './side-by-side-plan';
 
 export interface SideBySideOptions {
   layout: SbsLayout;
@@ -44,6 +46,8 @@ export interface SideBySideOptions {
   /** Whether this is a phone or tablet, for the memory guard. */
   phone?: boolean;
   onProgress?: (fraction: number) => void;
+  /** Said when the run starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface SideBySideResult {
@@ -56,6 +60,8 @@ export interface SideBySideResult {
   audio: boolean;
   /** Set when sound was asked for but the chosen clip has none, or this browser could not encode it. */
   audioNote: string;
+  /** Set when the file was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
 }
 
 interface Clip {
@@ -106,15 +112,23 @@ export async function sideBySideEstimate(files: File[], o: Omit<SideBySideOption
   }
 }
 
+/**
+ * Puts the two videos side by side. When the device's encoder gives up (EncodingError and its kin) or the page was hidden,
+ * the run starts again, at a smaller picture where the encoder is what failed (see edit-recovery.ts).
+ */
 export async function sideBySide(files: File[], opts: SideBySideOptions): Promise<SideBySideResult> {
   if (files.length < 2) throw new NamedError('MissingSecondVideo', 'Add two videos: A and B.');
+  return runRecovered('SideBySideFailed', opts.onNotice, (attempt, sized) => sideBySideOnce(files, opts, attempt, sized));
+}
+
+async function sideBySideOnce(files: File[], opts: SideBySideOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<SideBySideResult> {
   const clips: Clip[] = [];
   // The step under way; a failure with no name of its own is recorded as this (see bare-error.ts).
   let stage = 'SideBySideOpenFailed';
   try {
     for (const f of files.slice(0, 2)) clips.push(await openClip(f));
     const [a, b] = clips as [Clip, Clip];
-    const plan = planSideBySide(a.width, a.height, b.width, b.height, opts.layout, opts.fit);
+    let plan = planSideBySide(a.width, a.height, b.width, b.height, opts.layout, opts.fit);
     const fps = outputFps(a.rate, b.rate);
     const seconds = outputSeconds(a.length, b.length, opts.length);
     const refusal = memoryVerdict(
@@ -125,7 +139,18 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
     if (refusal) throw new NamedError('SideBySideTooBig', refusal);
 
     stage = 'SideBySideCodecFailed';
-    const videoCodec = await pickVideoCodec({ width: plan.width, height: plan.height, bitrate: QUALITY_HIGH });
+    // A retry after the encoder gave up asks for a smaller frame than the first try's; the test encode at the real size can lower it further.
+    // Every cell is scaled together, so the cells keep their shapes.
+    const full = plan;
+    const longest = Math.max(full.width, full.height);
+    const scaleBy = (k: number) => scalePlan(full, k);
+    const wanted = capScale(attempt, longest);
+    if (wanted < 1) plan = scaleBy(wanted);
+    const found = await planVideoCodec({ width: plan.width, height: plan.height, bitrate: QUALITY_HIGH }, codecsFor(attempt));
+    const k = adoptPlan(attempt, found, longest);
+    if (k < wanted) plan = scaleBy(k);
+    sized(Math.max(plan.width, plan.height));
+    const videoCodec = found.codec;
     if (!videoCodec) throw new NamedError('VideoSideBySideFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
     stage = 'SideBySideSoundFailed';
@@ -176,7 +201,7 @@ export async function sideBySide(files: File[], opts: SideBySideOptions): Promis
 
     stage = 'SideBySideSetupFailed';
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH });
+    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, ...encodeOptions(attempt) });
     output.addVideoTrack(videoSource, { frameRate: fps });
     const audioSource = audioCodec ? new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH }) : null;
     if (audioSource) output.addAudioTrack(audioSource);

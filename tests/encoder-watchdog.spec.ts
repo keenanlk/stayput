@@ -210,6 +210,7 @@ for (const [tool, fixture] of STUCK) {
 
     // The user can try again: the run button works and starts a new run.
     await page.locator('#run').click();
-    await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(2);
+    // A silent encoder gets the shared runner's retries first (one more try in real-time mode), so the second failure takes a little longer.
+    await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length, { timeout: 40_000 }).toBe(2);
   });
 }

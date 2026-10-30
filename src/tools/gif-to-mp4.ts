@@ -1,6 +1,7 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
+import { retryNote } from '../lib/edit-recovery';
 import { gifToMp4, webpToMp4, isWebp } from '../lib/gif-video';
 
 /**
@@ -12,6 +13,7 @@ const onWebpPage = location.pathname.replace(/\/$/, '') === '/webp-to-mp4';
 const seconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
 
 createShell({
+  remembersSize: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const repeatValue = str('repeat', 'auto');
@@ -27,13 +29,14 @@ createShell({
         repeat,
         background,
         onProgress: (f) => progress.set(`Encoding ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.05 + f * 0.95)),
+        onNotice: (m) => progress.set(m, share(0.05)),
       });
       const out: OutputFile = {
         name: replaceExt(entry.file.name, 'mp4'),
         blob: r.blob,
         originalSize: entry.file.size,
         previewUrl: await thumbnail(r.poster),
-        note: `${r.width}×${r.height}, ${seconds(r.duration)}${r.plays > 1 ? ` (${r.plays} loops)` : ''}, ${r.codec}${r.codec === 'H.264' ? '' : ' (this browser has no H.264 encoder)'}`,
+        note: `${r.width}×${r.height}, ${seconds(r.duration)}${r.plays > 1 ? ` (${r.plays} loops)` : ''}, ${r.codec}${r.codec === 'H.264' ? '' : ' (this browser has no H.264 encoder)'}${retryNote(r.retry, r)}`,
       };
       r.poster.close();
       return out;

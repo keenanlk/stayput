@@ -360,7 +360,7 @@ test('Remove object: an error named inside the worker is recorded under that nam
   await expect.poll(() => sent.filter((s) => s.payload.name === 'tool_run').length).toBe(1);
   const run = sent.find((s) => s.payload.name === 'tool_run')!;
   expect(violations(run), JSON.stringify(run)).toEqual([]);
-  expect(run.payload.data).toMatchObject({ tool: 'remove-object', outcome: 'error', error_class: 'TypeError' });
+  expect(run.payload.data).toMatchObject({ tool: 'remove-object', outcome: 'error', error_class: 'ModelDownloadError' });
   expect(JSON.stringify(sent)).not.toContain('photo');
 });
 
@@ -552,7 +552,7 @@ for (const [label, body] of [
   });
 }
 
-test('Audio to video reports EncoderRefused when the browser encoder fails at creation at every size', async ({ page, baseURL }) => {
+test('Audio to video reports a named class, from the shared runner, when the browser encoder fails at creation at every size', async ({ page, baseURL }) => {
   test.setTimeout(180_000);
   await page.addInitScript(() => {
     const Real = window.VideoEncoder;
@@ -576,8 +576,9 @@ test('Audio to video reports EncoderRefused when the browser encoder fails at cr
     };
   });
   const out = await failedRunOf(page, baseURL!, 'audio-to-video', fx('tone.wav'));
-  expect(out.data).toMatchObject({ tool: 'audio-to-video', outcome: 'error', error_class: 'EncoderRefused' });
-  expect(out.shown).toContain('refused to start');
+  // The test encoder closes itself after failing, so the shared runner's last error reads as a codec taken back (codec-guard.ts).
+  expect(out.data).toMatchObject({ tool: 'audio-to-video', outcome: 'error', error_class: 'CodecReclaimedError' });
+  expect(out.shown).toContain('took back a video codec');
 });
 
 test('Watermark PDF on a password-protected PDF whose prompt is dismissed fails as InputError, not a bare Error', async ({ page, baseURL }) => {

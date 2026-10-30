@@ -44,6 +44,8 @@ test('side-by-side-video: a drawing failure while encoding records SideBySideEnc
   test.setTimeout(120_000);
   const go = await open(page, '/tools/side-by-side-video', [fx('sbs-a-24fps.mp4'), fx('sbs-b-30fps-6s.mp4')]);
   await page.addInitScript(() => {
+    // The test encode at the real size would draw the wide frame too, and the run would quietly start smaller: leave it out.
+    (window as unknown as { __stayputNoSizeProbe: boolean }).__stayputNoSizeProbe = true;
     // Only the output frame (two cells wide) fails: the encoder probe draws small pictures and must still pass.
     const real = OffscreenCanvasRenderingContext2D.prototype.fillRect;
     OffscreenCanvasRenderingContext2D.prototype.fillRect = function (this: OffscreenCanvasRenderingContext2D, ...a: [number, number, number, number]) {
