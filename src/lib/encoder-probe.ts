@@ -36,28 +36,28 @@ const DEFAULT_CODEC = 'avc1.640016';
 
 function configFor(v: Variant, base: VideoEncoderConfig): VideoEncoderConfig {
   const codec = v.baseline ? `avc1.4200${base.codec.slice(-2)}` : base.codec;
-  return { ...base, codec, latencyMode: realtimeOnly ? 'realtime' : v.latencyMode };
+  // A run that asks for real-time latency (its Attempt, see edit-recovery.ts) gets it; the variant's own mode is the default.
+  return { ...base, codec, latencyMode: base.latencyMode === 'realtime' || running?.latencyMode === 'realtime' ? 'realtime' : v.latencyMode };
 }
 
-/** Set by useRealtimeH264: every H.264 encoder made after it runs in real-time mode, which does not stall where quality mode can. */
-let realtimeOnly = false;
+/** The attempt whose encoder is being made right now. Set for the length of one run only, never left behind for the next. */
 let registered = false;
+let running: { latencyMode?: 'realtime' } | undefined;
 
 /**
- * For a run started again after the encoder stalled or failed: the H.264 encoder Mediabunny makes next uses real-time
- * latency (WebKit's quality mode can take a few frames and then stop answering). Call it before the new Conversion is made.
+ * Mediabunny's Conversion passes a run's hardwareAcceleration to the encoder but drops latencyMode, so a Conversion-based run
+ * (compress, edit, cut) tells this encoder its attempt's latency through here. Call it before the run and the returned function after.
  */
-export function useRealtimeH264(): void {
-  if (typeof VideoEncoder === 'undefined') return;
-  realtimeOnly = true;
-  if (!registered) {
-    registered = true;
-    registerEncoder(encoderClass(VARIANTS[1]!));
-  }
+export function encodeRun(attempt: { latencyMode?: 'realtime' }): () => void {
+  const before = running;
+  running = attempt;
+  return () => {
+    running = before;
+  };
 }
 
 /** Whether an encoder with this config hands back at least one packet and finishes, is silent, or is not offered at all. */
-async function answers(config: VideoEncoderConfig, ms: number): Promise<'yes' | 'silent' | 'unsupported'> {
+async function answers(config: VideoEncoderConfig, ms: number, frames = PROBE_FRAMES): Promise<'yes' | 'silent' | 'unsupported'> {
   let encoder: VideoEncoder | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
@@ -68,7 +68,7 @@ async function answers(config: VideoEncoderConfig, ms: number): Promise<'yes' | 
     encoder.configure(config);
     const canvas = new OffscreenCanvas(config.width, config.height);
     const ctx = canvas.getContext('2d')!;
-    for (let i = 0; i < PROBE_FRAMES; i++) {
+    for (let i = 0; i < frames; i++) {
       ctx.fillStyle = `hsl(${i * 40}, 70%, 50%)`;
       ctx.fillRect(0, 0, config.width, config.height);
       const frame = new VideoFrame(canvas, { timestamp: i * 66_667 });
@@ -91,7 +91,7 @@ async function answers(config: VideoEncoderConfig, ms: number): Promise<'yes' | 
 }
 
 /** The same test Mediabunny uses for "WebKit or a browser wrapping it" (Safari, and every browser on iOS). */
-const isWebKit = () => typeof navigator !== 'undefined' && /apple/i.test(navigator.vendor ?? '');
+export const isWebKit = () => typeof navigator !== 'undefined' && /apple/i.test(navigator.vendor ?? '');
 
 /** Mediabunny's H.264 encoder, with the settings that were seen to answer, taking frames in presentation order. */
 function encoderClass(variant: Variant) {
@@ -156,7 +156,7 @@ export function ensureH264Encoder(): Promise<boolean> {
     for (const variant of VARIANTS) {
       const result = await answers(configFor(variant, base), PROBE_MS);
       if (result === 'yes') {
-        if (variant !== VARIANTS[0] || isWebKit()) {
+        if ((variant !== VARIANTS[0] || isWebKit()) && !registered) {
           registered = true;
           registerEncoder(encoderClass(variant));
         }
@@ -180,6 +180,11 @@ export class H264Unavailable extends EncoderStall {
 /** Throws H264Unavailable (at once, before any slow work) when the browser's H.264 encoder is silent with every setting. */
 export async function requireH264Encoder(): Promise<void> {
   if (!(await ensureH264Encoder())) throw new H264Unavailable();
+  // The encoder that carries a run's real-time setting is Mediabunny's custom one (already in use on WebKit): make sure it is registered.
+  if (running?.latencyMode === 'realtime' && !registered && typeof VideoEncoder !== 'undefined') {
+    registered = true;
+    registerEncoder(encoderClass(VARIANTS[0]!));
+  }
 }
 
 /** Shown when burned-in captions cannot be made here: says so plainly and links to the tool that still works. */
@@ -224,6 +229,66 @@ export async function softwareH264Offered(): Promise<boolean> {
   try {
     const { supported, config } = await VideoEncoder.isConfigSupported({ codec: DEFAULT_CODEC, width: 640, height: 360, bitrate: 2_000_000, framerate: 30, hardwareAcceleration: 'prefer-software' });
     return !!supported && config?.hardwareAcceleration !== 'prefer-hardware';
+  } catch {
+    return false;
+  }
+}
+
+/** Chrome, Edge and the other Chromium browsers (not WebKit, which Chrome on iOS is). */
+export const isChromium = () => typeof navigator !== 'undefined' && !isWebKit() && /Chrome\/|Chromium\/|Edg\//.test(navigator.userAgent);
+
+const AVC_LEVELS: [maxMacroblocks: number, maxBitrate: number, level: number][] = [
+  [99, 64_000, 0x0a], [396, 192_000, 0x0b], [396, 384_000, 0x0c], [396, 768_000, 0x0d], [396, 2_000_000, 0x14], [792, 4_000_000, 0x15],
+  [1620, 4_000_000, 0x16], [1620, 10_000_000, 0x1e], [3600, 14_000_000, 0x1f], [5120, 20_000_000, 0x20], [8192, 20_000_000, 0x28],
+  [8192, 50_000_000, 0x29], [8704, 50_000_000, 0x2a], [22080, 135_000_000, 0x32], [36864, 240_000_000, 0x33],
+];
+
+/** The H.264 codec string Mediabunny writes for a picture (High profile, level from the macroblock count and bitrate), so the probe asks for what the run will. */
+export function avcCodecString(width: number, height: number, bitrate: number): string {
+  const macroblocks = Math.ceil(width / 16) * Math.ceil(height / 16);
+  const level = (AVC_LEVELS.find(([mb, rate]) => macroblocks <= mb && bitrate <= rate) ?? AVC_LEVELS[AVC_LEVELS.length - 1]!)[2];
+  return `avc1.6400${level.toString(16).padStart(2, '0')}`;
+}
+
+/** How long one probe may take and how many frames it encodes. */
+export const SIZE_PROBE_MS = 2500;
+export const SIZE_PROBE_FRAMES = 4;
+
+const sizeProbes = new Map<string, Promise<boolean>>();
+
+/**
+ * Whether the H.264 encoder answers at this real picture size (4 frames, 2.5 s limit), with these settings. Cached per size and
+ * settings for the page, so a refusal costs about a second once and repeats cost nothing. Resolves true when no test can be made.
+ */
+export function encodesAtSize(width: number, height: number, bitrate: number, rung: { latencyMode?: 'realtime'; hardwareAcceleration?: 'prefer-software' } = {}): Promise<boolean> {
+  if (typeof VideoEncoder === 'undefined' || typeof VideoFrame === 'undefined' || typeof OffscreenCanvas === 'undefined') return Promise.resolve(true);
+  // Test hook: a spec that breaks the encoder in the middle of a run (to test the retries) sets this so the test encode does not use up its failures.
+  if ((globalThis as { __stayputNoSizeProbe?: boolean }).__stayputNoSizeProbe) return Promise.resolve(true);
+  const key = `${width}x${height}|${rung.latencyMode ?? ''}|${rung.hardwareAcceleration ?? ''}`;
+  let known = sizeProbes.get(key);
+  if (!known) {
+    const config: VideoEncoderConfig = { codec: avcCodecString(width, height, bitrate), width, height, bitrate, framerate: 30, ...rung };
+    known = answers(config, SIZE_PROBE_MS, SIZE_PROBE_FRAMES).then((r) => r === 'yes');
+    sizeProbes.set(key, known);
+  }
+  return known;
+}
+
+/**
+ * The encoder setting a failed run is retried with at the same size: real-time latency on WebKit (its quality mode can go
+ * silent), the software encoder on Chromium (the hardware encoder is what refuses on Android and Windows). Undefined elsewhere.
+ */
+export async function sameSizeRung(): Promise<{ latencyMode?: 'realtime'; hardwareAcceleration?: 'prefer-software' } | undefined> {
+  if (isWebKit()) return { latencyMode: 'realtime' };
+  if (isChromium() && (await softwareH264Offered())) return { hardwareAcceleration: 'prefer-software' };
+  return undefined;
+}
+
+/** Whether the last rung (VP9 in the same MP4) is on offer: Chromium only, and only where its encoder takes VP9. */
+export async function vp9Offered(): Promise<boolean> {
+  if (!isChromium() || typeof VideoEncoder === 'undefined') return false;
+  try {
+    return !!(await VideoEncoder.isConfigSupported({ codec: 'vp09.00.10.08', width: 640, height: 360, bitrate: 2_000_000, framerate: 30 })).supported;
   } catch {
     return false;
   }

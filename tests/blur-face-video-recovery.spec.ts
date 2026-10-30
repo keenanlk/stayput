@@ -92,13 +92,13 @@ test.describe('on the page', () => {
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 
-  test('the encoder gives up at full size: the run finishes at a smaller size and says so', async ({ page }) => {
+  test('the encoder gives up at full size: the run finishes at a smaller size and says so', async ({ page, browserName }) => {
     test.setTimeout(240_000);
     await open(page);
     await breakEncoder(page, 'EncodingError', false);
     await run(page);
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
-    await expect(page.locator('#results-list')).toContainText('made at a smaller size');
+    await expect(page.locator('#results-list')).toContainText(browserName === 'webkit' ? 'made on a second try' : 'made at a smaller size');
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 
@@ -114,7 +114,7 @@ test.describe('on the page', () => {
     }, RUNNING.source);
     await run(page);
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 200_000 });
-    expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'EncodingError' });
+    expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'EncoderGaveUp' });
   });
 
   for (const [label, reads, ok] of [

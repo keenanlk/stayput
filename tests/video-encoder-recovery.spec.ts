@@ -80,7 +80,7 @@ test.describe('recovery rules', () => {
   });
 
   test('a software retry or a resume at the remembered size keeps the size', async () => {
-    const h = hooks({ softwareEncode: () => true });
+    const h = hooks({ firstRung: () => ({ hardwareAcceleration: 'prefer-software' as const }) });
     h.stored = 1280;
     const seen: Attempt[] = [];
     await withRecovery(
@@ -120,6 +120,7 @@ test.describe('recovery rules', () => {
  */
 async function breakEncoder(page: Page, name: string, times: number, hide = false) {
   await withoutSoftwareEncoder(page);
+  await page.addInitScript(() => ((window as unknown as { __stayputNoSizeProbe: boolean }).__stayputNoSizeProbe = true));
   await page.addInitScript(
     ([name, times, hide]) => {
       // Counted in the tab's storage, so a page opened later in the same test does not start the count again.
@@ -195,7 +196,7 @@ for (const tool of tools) {
       await breakEncoder(page, 'EncodingError', 1000);
       await run(page, tool);
       await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 200_000 });
-      await expect(page.locator('#error')).toContainText(/even at a smaller size/);
+      await expect(page.locator('#error')).toContainText(/even after trying again/);
       expect(await page.evaluate(() => sessionStorage.getItem('stayput:work-size'))).toBeNull();
     });
 

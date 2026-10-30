@@ -124,7 +124,8 @@ async function encode(
     const canvas = new OffscreenCanvas(frame.width, frame.height);
     const ctx = canvas.getContext('2d')!;
     const add = async (t: number, d: number) => {
-      const sample = new VideoSample(canvas, { timestamp: t, duration: d });
+      // Never shorter than one tick of 60 fps: VP8 and VP9 encoders fail on a frame with no length.
+      const sample = new VideoSample(canvas, { timestamp: t, duration: Math.max(d, 1 / 60) });
       await feed?.until(t);
       await videoSource.add(sample);
       sample.close();

@@ -21,7 +21,7 @@ import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 import { failsTheSameAgain } from './edit-recovery';
 import { inspectFile, type IntakeProblem } from './intake';
-import { forgetWorkingSize, workingSize } from './working-size';
+import { forgetWorkingSize, riskSize, workingSize } from './working-size';
 
 export interface ShellFile {
   id: number;
@@ -595,7 +595,7 @@ export function createShell(opts: ShellOptions) {
   const sizeNote = opts.remembersSize ? document.createElement('p') : null;
   function showSizeNote() {
     if (!sizeNote) return;
-    const side = workingSize();
+    const side = workingSize() ?? riskSize();
     sizeNote.hidden = !side;
     if (!side) return;
     sizeNote.className = 'hint';
@@ -609,7 +609,9 @@ export function createShell(opts: ShellOptions) {
       forgetWorkingSize();
       showSizeNote();
     });
-    sizeNote.textContent = `In this tab, videos are made at up to ${name} because the full size failed on this device earlier. `;
+    sizeNote.textContent = workingSize()
+      ? `In this tab, videos are made at up to ${name} because the full size failed on this device earlier. `
+      : `On this device, 4K videos are made at ${name} because 4K is heavy for it. `;
     sizeNote.append(full);
   }
   if (sizeNote) {

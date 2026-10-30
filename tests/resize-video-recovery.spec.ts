@@ -10,6 +10,7 @@ const phoneMov = fileURLToPath(new URL('./fixtures/static/iphone-portrait.mov', 
 
 /** Once the page says it is resizing, the encoder throws `name`: once, or on every frame when `always`. */
 async function breakEncoder(page: Page, name: string, always: boolean) {
+  await page.addInitScript(() => ((window as unknown as { __stayputNoSizeProbe: boolean }).__stayputNoSizeProbe = true));
   await page.addInitScript(
     ([name, always]) => {
       let armed = false;
@@ -54,7 +55,7 @@ for (const [label, software] of [['no software encoder', false], ['software enco
       await breakEncoder(page, 'EncodingError', false);
       await run(page);
       await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
-      await expect(page.locator('#results-list')).toContainText(software ? 'software video encoder' : /second try|smaller size/);
+      await expect(page.locator('#results-list')).toContainText(software ? /software video encoder|second try/ : /second try|smaller size/);
       await expect.poll(() => runClasses(page)).toEqual(['ok']);
     });
 
@@ -63,7 +64,7 @@ for (const [label, software] of [['no software encoder', false], ['software enco
       await breakEncoder(page, 'EncodingError', true);
       await run(page);
       await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 200_000 });
-      await expect(page.locator('#error')).toContainText(/Choose a smaller size/);
+      await expect(page.locator('#error')).toContainText(/smaller size/);
       await expect.poll(() => runClasses(page)).toEqual(['EncoderGaveUp']);
     });
   });

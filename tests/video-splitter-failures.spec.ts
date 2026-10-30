@@ -266,6 +266,27 @@ test.describe('on the page', () => {
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 
+  // No encoder answers (the silent WebKit encoder): the test encode before the cut sees it, so the part is copied from the key frame
+  // in seconds. Before it, a fast cut that needed an encoder waited for the 60 s watchdog and one retry (about 2 minutes). Runs on WebKit in CI too.
+  test('no encoder answers on a fast cut: the part is copied from the key frame within seconds, not after the watchdog', async ({ page }) => {
+    await open(page);
+    await page.addInitScript(() => {
+      // flush() never settles, as on a WebKit encoder that accepts frames and returns nothing.
+      VideoEncoder.prototype.flush = () => new Promise(() => {});
+    });
+    await load(page, fx('split-gop2s.mp4'));
+    await expect(page.locator('#tool')).toHaveAttribute('data-duration', /^8/);
+    await page.locator('#vs-times').fill('0:03');
+    const began = Date.now();
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 45_000 });
+    const seconds = (Date.now() - began) / 1000;
+    console.log(`time to the key-frame copy with a silent encoder: ${seconds.toFixed(1)} s`);
+    await expect(page.locator('#results-list')).toContainText('key frame');
+    expect(seconds).toBeLessThan(30);
+    expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
+  });
+
   // Odd inputs: each splits into parts that run end to end, or ends in a named class, and never hangs.
   const odd: [string, string, string, number][] = [
     ['variable frame rate', 'split-vfr-12s.mp4', '4', 12],

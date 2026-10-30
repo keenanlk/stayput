@@ -28,11 +28,10 @@ import {
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { InputError, NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
-import { pickVideoCodec } from './video-codec';
+import { codecsFor, planVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
-import { softwareH264Offered, useRealtimeH264 } from './encoder-probe';
-import { pageRecoveryHooks } from './recovery-hooks';
-import { capScale, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { capAtRisk, pageRecoveryHooks } from './recovery-hooks';
+import { adoptPlan, capScale, encodeOptions, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface ReverseOptions {
   mute: boolean;
@@ -83,8 +82,6 @@ export function reverseWindows(keys: number[], first: number, end: number, windo
   return out;
 }
 
-/** Names an encoder gives up with; a run that fails every size with one of them says so in plain words. */
-const ENCODER_REFUSALS = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError']);
 
 /**
  * Reverses the video. When the device's encoder gives up (EncodingError and its kin) or the page was hidden, the run starts
@@ -102,12 +99,8 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
         return retry ? { ...r, retry } : r;
       },
       () => made,
-      { ...page.hooks, softwareEncode: softwareH264Offered },
+      page.hooks,
     );
-  } catch (e) {
-    const name = (e as { name?: string } | null)?.name ?? '';
-    if (!ENCODER_REFUSALS.has(name)) throw e;
-    throw new NamedError(name, "This device's video encoder stopped, even at a smaller size. Try a shorter clip, a recent Chrome, Edge or Safari, or a computer. Nothing was uploaded.", { cause: e });
   } finally {
     page.dispose();
   }
@@ -133,14 +126,18 @@ async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, s
     const width = video.codedWidth;
     const height = video.codedHeight;
     // A retry after the encoder gave up asks for a smaller picture than the first try's: each frame is drawn at that size.
-    const k = capScale(attempt, Math.max(width, height));
+    // A phone given a 4K source starts at 1080p; the test encode below can lower the size further before the picture is read.
+    const longest = Math.max(width, height);
+    capAtRisk(attempt, longest);
     const evenSide = (n: number) => Math.max(2, 2 * Math.round(n / 2));
-    const outW = k < 1 ? evenSide(width * k) : width;
-    const outH = k < 1 ? evenSide(height * k) : height;
+    const sizeAt = (k: number) => ({ w: k < 1 ? evenSide(width * k) : width, h: k < 1 ? evenSide(height * k) : height });
+    let k = capScale(attempt, longest);
+    const wanted = sizeAt(k);
+    const plan = await planVideoCodec({ width: wanted.w + (wanted.w % 2), height: wanted.h + (wanted.h % 2), bitrate: QUALITY_HIGH }, codecsFor(attempt));
+    k = Math.min(k, adoptPlan(attempt, plan, longest));
+    const { w: outW, h: outH } = sizeAt(k);
     sized(Math.max(outW, outH));
-    // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software' || attempt.remembered) useRealtimeH264();
-    const videoCodec = await pickVideoCodec({ width: outW + (outW % 2), height: outH + (outH % 2), bitrate: QUALITY_HIGH });
+    const videoCodec = plan.codec;
     if (!videoCodec) throw new NamedError('VideoEncodeUnsupported', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
 
     let sound: Float32Array[] | null = null;
@@ -164,7 +161,7 @@ async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, s
     if (sound && !audioCodec) throw noAudioEncoder(true);
 
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain', ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}) });
+    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain', ...encodeOptions(attempt) });
     output.addVideoTrack(videoSource, { rotation: video.rotation });
     const audioSource = audioCodec ? new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH }) : null;
     if (audioSource) output.addAudioTrack(audioSource);

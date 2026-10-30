@@ -22,6 +22,7 @@ import {
   MPEG_TS,
   QTFF,
   QUALITY_HIGH,
+  EncodedPacketSink,
   WEBM,
   WebMOutputFormat,
   AudioSampleSource,
@@ -29,14 +30,14 @@ import {
   getFirstEncodableAudioCodec,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
-import { requireH264Encoder, softwareH264Offered, useRealtimeH264 } from './encoder-probe';
-import { aacSafeSampleRate } from './video-codec';
+import { EncoderRefused, encodeRun, requireH264Encoder } from './encoder-probe';
+import { aacSafeSampleRate, codecsFor, planVideoCodec } from './video-codec';
 import { unplayable } from './video-compress';
 import { NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
 import { memoryRange, nameBare } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { pageRecoveryHooks } from './recovery-hooks';
-import { capScale, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -78,6 +79,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   try {
     return await withRecovery(
       async (attempt) => {
+        const done = encodeRun(attempt);
         try {
           const r = await trimOnce(file, opts, attempt, (side) => (made = side));
           const retry = retryOf(attempt);
@@ -95,10 +97,12 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
             }
           }
           throw nameBare('CutFailed', e);
+        } finally {
+          done();
         }
       },
       () => made,
-      { ...page.hooks, softwareEncode: softwareH264Offered },
+      page.hooks,
     );
   } finally {
     page.dispose();
@@ -152,13 +156,23 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
     const longest = Math.max(video.displayWidth, video.displayHeight);
     // A fast cut copies the picture, so a size remembered from an earlier failure does not apply to it; only a retry after its own failure does.
-    const smaller = opts.exact || attempt.retry === 'smaller' ? capScale(attempt, longest) : 1;
+    let smaller = opts.exact || attempt.retry === 'smaller' ? capScale(attempt, longest) : 1;
+    // A cut that re-encodes (exact, or a fast cut whose start is between key frames) is tested at the real size first, before the picture is read.
+    // A fast cut only re-encodes when its start is more than the copy tolerance (0.5 s) past a key frame; otherwise no encoder is made at all.
+    const key = opts.exact || smaller < 1 || keyframes ? null : await new EncodedPacketSink(video).getKeyPacket(opts.start, { metadataOnly: true }).catch(() => null);
+    const needsEncoder = opts.exact || smaller < 1 || (!!key && opts.start - key.timestamp > 0.5);
+    if (!keyframes && video.codec === 'avc' && needsEncoder) {
+      const side = (n: number) => Math.max(2, 2 * Math.round((n * smaller) / 2));
+      const plan = await planVideoCodec({ width: side(video.displayWidth), height: side(video.displayHeight), bitrate: QUALITY_HIGH }, codecsFor(attempt));
+      if (!opts.exact && plan.maxSide) {
+        // The encoder cannot write this picture at full size and a fast cut keeps it: copy from the key frame at once (no 60 s wait).
+        throw new EncoderRefused();
+      }
+      if (opts.exact) smaller = Math.min(smaller, adoptPlan(attempt, plan, longest));
+      else adoptPlan(attempt, { latencyMode: plan.latencyMode, hardwareAcceleration: plan.hardwareAcceleration }, longest);
+    }
     const evenSide = (n: number) => Math.max(2, 2 * Math.round((n * smaller) / 2));
     sized(Math.round(longest * smaller));
-    // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (opts.exact || smaller < 1) {
-      if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software' || attempt.remembered) useRealtimeH264();
-    }
     const conversion = await Conversion.init({
       input,
       output,
@@ -169,7 +183,7 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
       composable: !!keepSound,
       video: {
         ...(opts.exact ? { bitrate: QUALITY_HIGH, allowTransformationMetadata: false } : {}),
-        ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}),
+        ...hardwareOption(attempt),
         ...(smaller < 1 ? { width: evenSide(video.displayWidth), height: evenSide(video.displayHeight) } : {}),
       },
       audio: opts.mute || keepSound ? { discard: true } : opts.exact ? { bitrate: QUALITY_HIGH, sampleRate: audioRate } : {},
