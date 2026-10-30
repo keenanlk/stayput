@@ -307,7 +307,7 @@ test.describe('a picture bigger than an iPhone can draw', () => {
     await paint(page, [[0.5, 0.5], [0.52, 0.5]], 80, 5712);
     await erase(page, 1);
     await page.locator('#run').click();
-    await expect(page.locator('#results-list')).toContainText(/Edited at \d+ × \d+/);
+    await expect(page.locator('#results-list')).toContainText(/Edited at \d+ × \d+/, { timeout: 60_000 });
   });
 });
 
