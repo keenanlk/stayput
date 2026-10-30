@@ -25,7 +25,7 @@ export const abForceAllowed = testKeys.length > 0;
 export const experiments: Experiment[] = [
   // Homepage hero test (STAA-452): B has a one-line lede and moves the network-tab demo
   // down to just before the spec sheet. Switch on with `active: true` once approved.
-  { key: 'home-hero', active: false || testKeys.includes('home-hero') },
+  { key: 'home-hero', active: true || testKeys.includes('home-hero') },
 ];
 
 export function activeExperimentKeys(list: Experiment[] = experiments): string[] {

@@ -53,14 +53,16 @@ test('with sessionStorage blocked it still picks, for that page only, and ignore
   expect(runOnce('Bad Key,,x_y', 'throws').size).toBe(0);
 });
 
-test('no experiment is active in the site config, so the build has no A/B markup', () => {
-  expect(activeExperimentKeys(experiments)).toEqual([]);
+test('only home-hero is active in the site config, and only the home page has A/B markup', () => {
+  expect(activeExperimentKeys(experiments)).toEqual(['home-hero']);
   expect(activeExperimentKeys([{ key: 'a', active: true }, { key: 'b', active: false }])).toEqual(['a']);
   const dist = fileURLToPath(new URL('../dist/', import.meta.url));
   for (const f of readdirSync(dist).filter((n) => n.endsWith('.html'))) {
     const html = readFileSync(dist + f, 'utf8');
-    expect(html, f).not.toContain('stayput-ab');
-    expect(html, f).not.toContain('/ab.js');
+    expect(html, f).toContain('stayput-ab');
+    expect(html, f).toContain('/ab.js');
+    // The shared <style> names the selector on every page; only the home page may carry elements with the attribute.
+    if (f !== 'index.html') expect(html, f).not.toMatch(/<[a-z0-9]+ [^>]*data-ab="home-hero/);
   }
 });
 

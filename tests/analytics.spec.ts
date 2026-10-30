@@ -8,7 +8,7 @@ type Ev = { n: string; d: Record<string, string> };
 /** Every property an event may carry. Anything else is a privacy regression. */
 const ALLOWED = new Set([
   'tool', 'outcome', 'files', 'input', 'output', 'duration', 'attempt',
-  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format', 'error_class', 'page', 'kind', 'rank', 'via',
+  'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'to', 'format', 'error_class', 'page', 'kind', 'rank', 'via', 'variant',
 ]);
 
 /** Replace Umami with a stub that keeps events in sessionStorage so they survive navigation. */
@@ -22,7 +22,12 @@ async function stub(page: Page) {
     }),
   );
 }
-const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
+/** The A/B arm rides on every event while a test is on (see analytics-payload.spec.ts); these specs compare the rest exactly. */
+const events = async (page: Page): Promise<Ev[]> =>
+  (await page.evaluate((): Ev[] => JSON.parse(sessionStorage.getItem('__ev') || '[]'))).map((e) => {
+    const { variant: _variant, ...d } = e.d;
+    return { ...e, d };
+  });
 
 async function runTool(page: Page, path: string, file: string) {
   await page.goto(path);
