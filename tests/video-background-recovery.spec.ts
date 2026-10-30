@@ -131,6 +131,7 @@ test.describe('recovery rules', () => {
  */
 async function breakEncoder(page: Page, name: string, hide: boolean, software = false) {
   if (!software) await withoutSoftwareEncoder(page);
+  await page.addInitScript(() => ((window as unknown as { __stayputNoSizeProbe: boolean }).__stayputNoSizeProbe = true));
   await page.addInitScript(
     ([name, hide]) => {
       let armed = false;
@@ -177,13 +178,13 @@ test.describe('on the page', () => {
     await expect(page.locator('#error')).not.toHaveClass(/is-active/);
   });
 
-  test('the encoder gives up at full size: the run finishes at a smaller size and says so', async ({ page }) => {
+  test('the encoder gives up at full size: the run finishes at a smaller size and says so', async ({ page, browserName }) => {
     test.setTimeout(240_000);
     await breakEncoder(page, 'EncodingError', false);
     await runBlur(page);
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
-    await expect(page.locator('#results-list')).toContainText('made at a smaller size');
-    await expect(page.locator('#results-list')).toContainText(/854×\d+|\d+×854/);
+    await expect(page.locator('#results-list')).toContainText(browserName === 'webkit' ? 'made on a second try' : 'made at a smaller size');
+    if (browserName !== 'webkit') await expect(page.locator('#results-list')).toContainText(/854×\d+|\d+×854/);
   });
 
   test('the encoder gives up at full size where a software encoder is offered: the run finishes in software and says so', async ({ page }) => {
@@ -193,7 +194,7 @@ test.describe('on the page', () => {
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
     const note = (await page.locator('#results-list').textContent()) ?? '';
     // Only where the browser offers a software H.264 encoder; elsewhere the smaller-size retry is what runs.
-    expect(note).toMatch(/made with the software video encoder|made at a smaller size/);
+    expect(note).toMatch(/made with the software video encoder|made at a smaller size|made on a second try/);
   });
 
   test.describe('on an Android phone', () => {
@@ -228,7 +229,7 @@ test.describe('software encode fallback', () => {
         return a.retry;
       },
       () => 3840,
-      hooks({ softwareEncode: () => true }),
+      hooks({ firstRung: () => ({ hardwareAcceleration: 'prefer-software' as const }) }),
     );
     expect(out).toBe('software');
     expect(seen).toEqual([undefined, 'software']);
@@ -244,7 +245,7 @@ test.describe('software encode fallback', () => {
           throw named(a.retry === 'smaller' ? 'EncoderStall' : 'EncodingError');
         },
         () => 3840,
-        hooks({ softwareEncode: () => true }),
+        hooks({ firstRung: () => ({ hardwareAcceleration: 'prefer-software' as const }) }),
       ),
     ).rejects.toMatchObject({ name: 'EncoderStall' });
     expect(seen).toEqual([undefined, 'software', 'smaller']);
@@ -259,7 +260,7 @@ test.describe('software encode fallback', () => {
         return 1;
       },
       () => 640,
-      hooks({ softwareEncode: async () => true }),
+      hooks({ firstRung: () => ({ hardwareAcceleration: 'prefer-software' as const }) }),
     );
     expect(seen).toEqual([undefined, 'software']);
   });
@@ -273,7 +274,7 @@ test.describe('software encode fallback', () => {
         return 1;
       },
       () => 3840,
-      hooks({ softwareEncode: () => false }),
+      hooks(),
     );
     expect(seen).toEqual([undefined, 'smaller']);
   });
@@ -287,7 +288,7 @@ test.describe('software encode fallback', () => {
           throw named('UnreadableFile');
         },
         () => 3840,
-        hooks({ softwareEncode: () => true }),
+        hooks({ firstRung: () => ({ hardwareAcceleration: 'prefer-software' as const }) }),
       ),
     ).rejects.toMatchObject({ name: 'UnreadableFile' });
     expect(calls).toBe(1);

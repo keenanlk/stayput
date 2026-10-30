@@ -165,7 +165,8 @@ async function encodeStill(
         };
         // One frame a second: players show the same picture, and the file stays small.
         for (let t = 0; t < duration; t += 1) {
-          const d = Math.min(1, duration - t);
+          // Never shorter than one tick of 60 fps: VP8 and VP9 encoders fail on a frame with no length.
+          const d = Math.max(Math.min(1, duration - t), 1 / 60);
           const sample = new VideoSample(canvas, { timestamp: t, duration: d });
           await feed.until(t);
           await videoSource.add(sample);

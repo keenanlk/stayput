@@ -28,8 +28,8 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
-import { EncoderUnavailable, hasVideoEncoder, softwareH264Offered, useRealtimeH264 } from './encoder-probe';
-import { pickVideoCodec } from './video-codec';
+import { EncoderUnavailable, encodeRun, hasVideoEncoder } from './encoder-probe';
+import { codecsFor, planVideoCodec } from './video-codec';
 import { UnreadableFile, UnsupportedCodec, NamedError } from './input-error';
 import { probeDecode } from './decode-probe';
 import { isNotReadable, notReadable, retryUnreadable } from './read-failure';
@@ -38,7 +38,7 @@ import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { codecFailure, guardCodecs, isReclaim, tagCodec } from './codec-guard';
-import { capScale, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface EditOptions {
   mute?: boolean;
@@ -65,8 +65,6 @@ export interface EditOptions {
    * would be above it. Without it a 4K phone clip came out 44% bigger than it went in.
    */
   matchSourceBitrate?: boolean;
-  /** The size was chosen by the person: an encoder that gives up gets one more try at that size, then ends as EncoderGaveUp. */
-  retryAtSameSize?: boolean;
   /** Output size. With only one side set, the other follows the aspect ratio. */
   width?: number;
   height?: number;
@@ -100,9 +98,6 @@ export interface EditResult {
  * whole video), otherwise a buffer in memory as before.
  */
 /** An error with its own class name, so a failed run records which step it was (never the message). */
-/** Encoder failures that, after every retry, end as EncoderGaveUp. */
-const ENCODER_GAVE_UP = new Set(['EncodingError', 'OperationError', 'NotSupportedError']);
-
 const failure = (name: string, message: string) => Object.assign(new NamedError('VideoEditFailed', message), { name });
 
 /** A file the phone could not read is not "not a video": it keeps its own name, so the job can read it once more. */
@@ -214,12 +209,17 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       () =>
         withRecovery(
           async (attempt) => {
-            const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
-            const retry = retryOf(attempt);
-            return retry ? { ...r, retry } : r;
+            const done = encodeRun(attempt);
+            try {
+              const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
+              const retry = retryOf(attempt);
+              return retry ? { ...r, retry } : r;
+            } finally {
+              done();
+            }
           },
           () => made,
-          { ...page.hooks, softwareEncode: softwareH264Offered, sameSizeRetry: opts.retryAtSameSize },
+          page.hooks,
         ),
       opts.onNotice,
     );
@@ -228,10 +228,6 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
     // the recovery inside the run and the retries above: name the object it was (see codec-guard.ts), say what to do.
     const invalid = codecFailure(e);
     if (invalid) throw invalid;
-    // The device's encoder gave up on every try, including the same-size retry: say so by name, and what to try.
-    if (opts.retryAtSameSize && ENCODER_GAVE_UP.has((e as { name?: string } | null)?.name ?? '')) {
-      throw new NamedError('EncoderGaveUp', "This device's video encoder stopped, even after a second try. Choose a smaller size, or use a recent Chrome, Edge or Safari, or a computer. Nothing was uploaded.", { cause: e });
-    }
     throw nameBare('VideoEditFailed', e);
   } finally {
     page.dispose();
@@ -328,23 +324,23 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     }
     // Encoders want even sides; H.264 in most browsers also refuses odd ones.
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
-    const k = capScale(attempt, Math.max(width, height));
-    width *= k;
-    height *= k;
-    width = even(width);
-    height = even(height);
-    sized?.(Math.max(width, height));
+    const longest = Math.max(width, height);
+    const capK = capScale(attempt, longest);
+    // Bitrate first, then the test encode at the real size below can lower the size before the file is decoded.
 
     let bitrate: Quality = QUALITY_HIGH;
     if (opts.matchSourceBitrate && duration > 0) {
       const average = await video.getAverageBitrate().catch(() => null);
       const sourceBps = average && average > 0 ? average : (file.size * 8) / duration - (sound ? 128_000 : 0);
-      const wanted = matchedBitrate(sourceBps, video.codec, shown.width * shown.height, width * height);
+      const wanted = matchedBitrate(sourceBps, video.codec, shown.width * shown.height, width * capK * (height * capK));
       if (wanted) bitrate = new Quality({ bitrate: wanted });
     }
-    // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software' || attempt.remembered) useRealtimeH264();
-    const videoCodec = await pickVideoCodec({ width, height, bitrate });
+    const plan = await planVideoCodec({ width: even(width * capK), height: even(height * capK), bitrate }, codecsFor(attempt));
+    const k = adoptPlan(attempt, plan, longest);
+    width = even(width * k);
+    height = even(height * k);
+    sized?.(Math.max(width, height));
+    const videoCodec = plan.codec;
     if (!videoCodec) {
       // With an encoder present, only this size is refused (iOS Safari at 4K): a smaller picture can get past it (edit-recovery.ts).
       throw hasVideoEncoder()
@@ -388,7 +384,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
         video: {
           codec: videoCodec,
           bitrate,
-          ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}),
+          ...hardwareOption(attempt),
           rotate: rotate as Rotation,
           flip,
           crop,
