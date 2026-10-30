@@ -27,12 +27,19 @@ import {
 import { executeWatched } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
-import type { ConvertOptions, ConvertResult } from './video-convert';
+import { evenSize, peekScale, type ConvertOptions, type ConvertResult } from './video-convert';
+import { capScale, hardwareOption, type Attempt } from './edit-recovery';
+import { runRecovered } from './video-run';
 
 const WEBM_VIDEO: string[] = ['vp8', 'vp9', 'av1'];
 const WEBM_AUDIO: string[] = ['opus', 'vorbis'];
 
-export async function convertToWebm(file: File, opts: ConvertOptions): Promise<ConvertResult> {
+/** A copy needs no encoder; a re-encode recovers from the encoder giving up or the page being hidden (see edit-recovery.ts). */
+export function convertToWebm(file: File, opts: ConvertOptions): Promise<ConvertResult> {
+  return runRecovered('VideoWebmFailed', opts.onNotice, (attempt, sized) => webmOnce(file, opts, attempt, sized));
+}
+
+async function webmOnce(file: File, opts: ConvertOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<ConvertResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
@@ -48,12 +55,17 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
     let best: VideoCodec | null = null;
     if (!copyVideo) {
       if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
-      best = await getFirstEncodableVideoCodec(['vp9', 'vp8'], { width: evenW, height: evenH, bitrate: QUALITY_HIGH });
+      best = await getFirstEncodableVideoCodec(['vp9', 'vp8'], { width: evenSize(evenW * peekScale(attempt, Math.max(evenW, evenH))), height: evenSize(evenH * peekScale(attempt, Math.max(evenW, evenH))), bitrate: QUALITY_HIGH });
       if (!best) {
         throw new NamedError('VideoWebmFailed', 'This browser cannot write WebM video (it has no VP8 or VP9 encoder). Use a recent Chrome, Edge or Firefox on a computer.');
       }
     }
     const videoCodec = copyVideo ? sourceVideo! : best!;
+    // Only a picture that is re-encoded takes the smaller size.
+    const k = copyVideo ? 1 : capScale(attempt, Math.max(evenW, evenH));
+    const outW = k < 1 ? evenSize(evenW * k) : evenW;
+    const outH = k < 1 ? evenSize(evenH * k) : evenH;
+    sized(copyVideo ? 0 : Math.max(outW, outH));
 
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     let audioCodec: AudioCodec | null = null;
@@ -75,7 +87,7 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
       tracks: 'primary',
       video: copyVideo
         ? {}
-        : { codec: videoCodec, bitrate: QUALITY_HIGH, width: evenW, height: evenH, fit: 'contain', allowTransformationMetadata: false },
+        : { codec: videoCodec, bitrate: QUALITY_HIGH, width: outW, height: outH, fit: 'contain', allowTransformationMetadata: false, ...hardwareOption(attempt) },
       audio: audioCodec ? (sound!.codec === audioCodec ? {} : { codec: audioCodec, bitrate: QUALITY_HIGH }) : { discard: true },
     });
     if (!conversion.isValid) {
@@ -90,8 +102,8 @@ export async function convertToWebm(file: File, opts: ConvertOptions): Promise<C
     if (!buffer) throw new NamedError('VideoWebmFailed', 'The video could not be written.');
     return {
       blob: new Blob([buffer], { type: 'video/webm' }),
-      width,
-      height,
+      width: k < 1 ? outW : width,
+      height: k < 1 ? outH : height,
       duration,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       videoCopied: copyVideo,

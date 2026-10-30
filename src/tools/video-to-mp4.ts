@@ -1,5 +1,6 @@
 import { bool, createShell, processEach } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
+import { retryNote } from '../lib/edit-recovery';
 
 /**
  * Video to MP4. Each file is remuxed or re-encoded in the page (see
@@ -14,6 +15,7 @@ const clock = (s: number) => {
 
 createShell({
   keepAwake: true,
+  remembersSize: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const mute = bool('mute');
@@ -25,6 +27,7 @@ createShell({
       const r = await convertToMp4(entry.file, {
         mute,
         onProgress: (f) => progress.set(`Converting ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
+        onNotice: (m) => progress.set(m, share(0.02)),
       });
       const notes = [`${r.width}×${r.height}`, clock(r.duration), r.videoCopied ? `${r.videoCodec} copied, no quality loss` : `re-encoded to ${r.videoCodec}`];
       if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
@@ -32,7 +35,7 @@ createShell({
         name: replaceExt(entry.file.name, 'mp4'),
         blob: r.blob,
         originalSize: entry.file.size,
-        note: notes.join(', '),
+        note: notes.join(', ') + retryNote(r.retry, r),
       };
       return out;
     });

@@ -27,7 +27,9 @@ import {
   type AudioCodec,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
-import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
+import { aacSafeSampleRate, codecsFor, planVideoCodec, type CodecPlan } from './video-codec';
+import { adoptPlan, hardwareOption, type Attempt, type RetryKind } from './edit-recovery';
+import { runRecovered } from './video-run';
 import { H264Unavailable } from './encoder-probe';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
@@ -37,6 +39,8 @@ import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 export interface ConvertOptions {
   mute: boolean;
   onProgress?: (fraction: number) => void;
+  /** Said when a re-encode starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface ConvertResult {
@@ -50,7 +54,16 @@ export interface ConvertResult {
   videoCopied: boolean;
   audio: boolean;
   audioDropped: boolean;
+  /** Set when a re-encode was made on a retry, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
 }
+
+/**
+ * The scale (at most 1) a re-encode of this size would get from this try's cap, without recording it: a picture that is copied
+ * as it is never takes a cap, so the cap is only recorded (see adoptPlan) once the picture is known to be re-encoded.
+ */
+export const peekScale = (attempt: Attempt, longest: number): number => (attempt.maxSide && longest > attempt.maxSide ? attempt.maxSide / longest : 1);
+export const evenSize = (n: number): number => Math.max(2, 2 * Math.round(n / 2));
 
 /** Codecs that play in every MP4 player worth mentioning, so they are copied rather than re-encoded. */
 const PLAYS_EVERYWHERE_VIDEO: string[] = ['avc'];
@@ -71,7 +84,12 @@ export async function convertToMp4(file: File, opts: ConvertOptions): Promise<Co
 }
 export const convertToMov = (file: File, opts: ConvertOptions) => convertVideo(file, opts, 'mov');
 
-async function convertVideo(file: File, opts: ConvertOptions, container: ConvertFormat): Promise<ConvertResult> {
+/** A copy needs no encoder; a re-encode recovers from the encoder giving up or the page being hidden (see edit-recovery.ts). */
+function convertVideo(file: File, opts: ConvertOptions, container: ConvertFormat): Promise<ConvertResult> {
+  return runRecovered('VideoConvertFailed', opts.onNotice, (attempt, sized) => convertOnce(file, opts, container, attempt, sized));
+}
+
+async function convertOnce(file: File, opts: ConvertOptions, container: ConvertFormat, attempt: Attempt, sized: (longestSide: number) => void): Promise<ConvertResult> {
   const mov = container === 'mov';
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
@@ -85,11 +103,14 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     // The best codec this browser can write; re-encoding into the codec the file already has gains nothing.
     // A silent H.264 encoder only matters if the picture really is re-encoded; copying needs no encoder.
     let silent: H264Unavailable | undefined;
-    const best = await pickVideoCodec({ width: evenW, height: evenH, bitrate: QUALITY_HIGH }, mov ? ['avc'] : undefined).catch((e) => {
+    const longest = Math.max(evenW, evenH);
+    const wanted = peekScale(attempt, longest);
+    const plan: CodecPlan = await planVideoCodec({ width: evenSize(evenW * wanted), height: evenSize(evenH * wanted), bitrate: QUALITY_HIGH }, mov ? ['avc'] : codecsFor(attempt)).catch((e) => {
       if (e instanceof H264Unavailable) silent = e;
       else throw e;
-      return null;
+      return { codec: null };
     });
+    const best = plan.codec;
     let copyVideo = !!sourceVideo && (PLAYS_EVERYWHERE_VIDEO.includes(sourceVideo) || sourceVideo === best);
     if (!copyVideo && !(await video.canDecode())) {
       // iPhone HEVC in a browser that cannot decode it: MP4 can hold HEVC as it is,
@@ -101,6 +122,11 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     if (!copyVideo && !best && mov) throw new NamedError('VideoConvertFailed', 'This browser cannot write H.264 video, which a MOV needs to play in QuickTime. Use a recent Safari, Chrome or Edge.');
     if (!copyVideo && !best) throw new NamedError('VideoConvertFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const videoCodec = copyVideo ? sourceVideo! : best!;
+    // Only a picture that is re-encoded takes the smaller size; the probe's findings (a size or setting that answers) apply then too.
+    const k = copyVideo ? 1 : adoptPlan(attempt, plan, longest);
+    const outW = k < 1 ? evenSize(evenW * k) : evenW;
+    const outH = k < 1 ? evenSize(evenH * k) : evenH;
+    sized(copyVideo ? 0 : Math.max(outW, outH));
     const duration = await input.computeDuration();
 
     // MP3 is re-encoded for a MOV: QuickTime's own sound codec is AAC.
@@ -138,7 +164,7 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
       composable: !!pcm,
       video: copyVideo
         ? {}
-        : { codec: videoCodec, bitrate: QUALITY_HIGH, width: evenW, height: evenH, fit: 'contain', allowTransformationMetadata: false },
+        : { codec: videoCodec, bitrate: QUALITY_HIGH, width: outW, height: outH, fit: 'contain', allowTransformationMetadata: false, ...hardwareOption(attempt) },
       // Sound copied as it is must not be given a bitrate: any encoder option makes Mediabunny decode and
       // re-encode it, and a browser that cannot decode AAC (Chromium on Linux) then drops the track.
       audio: audioCodec
@@ -171,8 +197,8 @@ async function convertVideo(file: File, opts: ConvertOptions, container: Convert
     if (!buffer) throw new NamedError('VideoConvertFailed', 'The video could not be written.');
     return {
       blob: new Blob([buffer], { type: mov ? 'video/quicktime' : 'video/mp4' }),
-      width,
-      height,
+      width: k < 1 ? outW : width,
+      height: k < 1 ? outH : height,
       duration,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       videoCopied: copyVideo,

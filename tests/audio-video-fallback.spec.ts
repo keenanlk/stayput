@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 // Chrome on Android can report a 1080p H.264 or AAC encoder as supported and then fail to create it
 // ("OperationError: Encoder creation error"). Audio to video then tries a smaller frame and, last, VP9 and Opus,
-// and only when every try is refused fails with its own error name, EncoderRefused.
+// and only when every try is refused fails with the shared runner's plain error (see video-run.ts).
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/generated/${name}`, import.meta.url));
 
 /** Make every VideoEncoder wider than `maxWidth` fail at creation, the way a phone's encoder does. */
@@ -56,10 +56,11 @@ test('Audio to video steps down again, to 854×480, when 720p is refused too', a
   await expect(page.locator('#results-list .result-item')).toContainText('854×480');
 });
 
-test('Audio to video says the encoder refused to start when every size is refused', async ({ page }) => {
+test('Audio to video ends with one plain error, from the shared runner, when every size is refused', async ({ page }) => {
   test.setTimeout(180_000);
   await refuseWiderThan(page, 320);
   await makeVideo(page);
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 150_000 });
-  await expect(page.locator('#error')).toContainText('refused to start');
+  // The shared runner's ladder (same size, 1080p, 720p, 480p) ends in its own named error; a test encoder that closes itself reads as a codec taken back.
+  await expect(page.locator('#error')).toContainText(/took back a video codec|even after trying again/);
 });

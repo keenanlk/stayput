@@ -1,5 +1,6 @@
 import { createShell, str } from '../lib/shell';
 import { formatBytes, suffixName, type OutputFile } from '../lib/files';
+import { retryNote } from '../lib/edit-recovery';
 import { NamedError } from '../lib/input-error';
 import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
 import type { SbsFit, SbsLayout, SbsLength, SbsSound } from '../lib/side-by-side-plan';
@@ -86,6 +87,7 @@ async function refresh() {
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   // One picked video is not a run yet: a phone's picker hands over one file at a time.
   runBlocker: (files) => (files.length === 1 ? 'Add a second video, then press Run.' : ''),
   outputFormat: () => 'mp4',
@@ -97,7 +99,7 @@ const shell = createShell({
     progress.set('Reading the two videos…', 0.01);
     const r = await sideBySide(
       files.slice(0, 2).map((f) => f.file),
-      { ...s, phone: isPhoneBrowser(), onProgress: (f) => progress.set(`Putting the videos side by side: ${Math.round(f * 100)}%`, 0.02 + f * 0.98) },
+      { ...s, phone: isPhoneBrowser(), onProgress: (f) => progress.set(`Putting the videos side by side: ${Math.round(f * 100)}%`, 0.02 + f * 0.98), onNotice: (m) => progress.set(m, 0.02) },
     );
     const notes = [`${r.width}×${r.height}`, clock(r.duration), `${r.fps} fps`, r.videoCodec];
     if (r.audio) notes.push('with sound');
@@ -106,7 +108,7 @@ const shell = createShell({
       name: suffixName(files[0]!.file.name, '-side-by-side', 'mp4'),
       blob: r.blob,
       originalSize: files[0]!.file.size + files[1]!.file.size,
-      note: notes.join(', '),
+      note: notes.join(', ') + retryNote(r.retry, r),
     };
     return [out];
   },

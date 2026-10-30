@@ -1,5 +1,6 @@
 import { bool, createShell, processEach, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { retryNote } from '../lib/edit-recovery';
 
 /**
  * Change video speed. Each video is re-timed and re-encoded in the page (see
@@ -14,6 +15,7 @@ const clock = (s: number) => {
 
 createShell({
   keepAwake: true,
+  remembersSize: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const speed = Number(str('speed', '2'));
@@ -26,6 +28,7 @@ createShell({
         speed,
         mute,
         onProgress: (f) => progress.set(`Changing speed of ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
+        onNotice: (m) => progress.set(m, share(0.02)),
       });
       const notes = [`${speed}× speed`, `now ${clock(r.duration)}`, `${r.width}×${r.height}`, r.videoCodec];
       if (!r.audio) notes.push('no sound');
@@ -33,7 +36,7 @@ createShell({
         name: suffixName(entry.file.name, `-${String(speed).replace('.', '_')}x`, 'mp4'),
         blob: r.blob,
         originalSize: entry.file.size,
-        note: notes.join(', '),
+        note: notes.join(', ') + retryNote(r.retry, r),
       };
       return out;
     });
