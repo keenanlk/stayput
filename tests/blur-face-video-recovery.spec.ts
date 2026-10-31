@@ -167,7 +167,7 @@ test.describe('on the page', () => {
     });
   }
 
-  test('the face model cannot be fetched: the failure is recorded as the model step, not a bare Error', async ({ page }) => {
+  test('the face model cannot be fetched: the failure is recorded as ModelDownloadError, not a bare Error', async ({ page }) => {
     test.setTimeout(240_000);
     await open(page);
     await page.route('**/models/blaze_face_short_range.tflite', (route) => route.abort());
@@ -175,7 +175,7 @@ test.describe('on the page', () => {
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 200_000 });
     const d = await lastRun(page);
     expect(d.outcome).toBe('error');
-    expect(d.error_class).toBe('FaceModelFailed');
+    expect(d.error_class).toBe('ModelDownloadError');
     expect(d.error_class).not.toBe('Error');
   });
 });

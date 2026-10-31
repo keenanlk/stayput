@@ -117,10 +117,10 @@ test('remove-background: a model fetch that fails in the worker records Backgrou
   await failedWith(page, 'BackgroundModelLoadFailed');
 });
 
-test('linkedin-profile-picture: a face finder that cannot load records FaceFinderFailed, not TypeError', async ({ page }) => {
+test('linkedin-profile-picture: a face finder that cannot be downloaded records ModelDownloadError, not TypeError', async ({ page }) => {
   test.setTimeout(120_000);
   const go = await open(page, '/linkedin-profile-picture', [fx('face.jpg')]);
   await page.route('**/models/blaze_face_short_range.tflite', (route) => route.abort('failed'));
   await go();
-  await failedWith(page, 'FaceFinderFailed');
+  await failedWith(page, 'ModelDownloadError');
 });

@@ -189,7 +189,7 @@ export async function matchesEntry(blob: Blob, entry: ModelEntry | undefined): P
 }
 
 /**
- * Whether the network answers at all, asked with a tiny same-origin request that the service worker does not keep: some
+ * Whether the network answers at all, asked with a plain GET of a tiny same-origin file that the service worker does not keep: some
  * browsers (iOS Safari on Wi-Fi with no internet, WebKit with its offline switch on) leave navigator.onLine at true. Only a
  * request that fails outright counts as offline; one that is merely slow is taken as online.
  */
@@ -198,7 +198,7 @@ export async function networkUp(): Promise<boolean> {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), 1500);
   try {
-    await fetch(`/robots.txt?online=${Date.now()}`, { method: 'HEAD', cache: 'no-store', signal: ctl.signal });
+    await fetch(`/robots.txt?online=${Date.now()}`, { cache: 'no-store', signal: ctl.signal });
     return true;
   } catch (err) {
     return (err as Error).name === 'AbortError';

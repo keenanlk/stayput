@@ -34,6 +34,11 @@ The class a failed run records (`error_class`) with the exact words the person s
 | `ModelDownloadError` | `src/lib/speech-errors.ts` | `The speech model (77 MB) could not be downloaded. Check your connection, then try again: a download that stopped part way starts over. On mobile data, Wi-Fi is steadier.` |
 | `ModelLoadError` | `src/lib/speech-errors.ts` | `The speech model downloaded but could not be started in this browser. Reload the page and try again, or use an up-to-date Chrome, Edge or Firefox on a computer.` |
 | `ModelLoadError` | `src/lib/person-mask.ts:146` | the browser's own message, or `The person finder could not be started in this browser.` |
+| `ModelDownloadError` | `src/lib/model-fetch.ts` (person finder, face finder, vocal remover, speech files) | `The <model> could not be downloaded. Check your connection, then try again: a download that stopped part way starts over.` |
+| `ModelOffline` | `src/lib/model-fetch.ts` | `The <model> has not been downloaded to this device yet and you are offline. Connect to the internet once, then try again; after that it works without a connection.` |
+| `StorageFull` | `src/lib/model-fetch.ts` | `There is not enough free storage on this device to keep the <model> (<n> MB). Free some space, then try again.` |
+| `ModelCorrupted` | `src/lib/model-fetch.ts` | `The <model> downloaded, but it did not pass the check that it is the right file. Check your connection, then try again.` |
+| `WorkerCrashError` | `src/tools/vocal-remover.ts` | `The vocal remover stopped unexpectedly, which usually means the browser ran out of memory. Close other tabs and try again, use a shorter song, or use a computer.` |
 | `WorkerCrashError` | `src/lib/speech-errors.ts` | `The speech model stopped unexpectedly, which usually means the browser ran short of memory. Close other tabs and try again, or use a shorter recording.` |
 | `SpeechModelError` | `src/lib/speech-errors.ts` | `The speech model could not read this recording. Try again, or try a shorter recording or another file.` |
 | `NoSpeechFound` | `src/lib/speech-errors.ts` | set where it is raised (the caption pages) |
