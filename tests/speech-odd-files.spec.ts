@@ -149,3 +149,60 @@ for (const path of ['/tools/transcribe', '/video-to-subtitles', '/auto-caption-v
     expect(run?.error_class).toBe('RecordingTooLong');
   });
 }
+
+// Sound in codecs the browser's own decoder refuses: read by the page's decoders (AC-3 and E-AC-3 through the Dolby decoder, AMR through
+// the 3GP build, Opus, FLAC and PCM through WebCodecs), and a format nothing reads is named UnsupportedSound.
+const edge = (n: string) => fileURLToPath(new URL(`./fixtures/edge-cases/${n}`, import.meta.url));
+const stat = (n: string) => fileURLToPath(new URL(`./fixtures/static/${n}`, import.meta.url));
+// Safari before 26 has no AudioDecoder: Opus, FLAC and PCM may be named there rather than read.
+const MAY_LACK = ['opus.mp4', 'flac.mkv', 'pcm.mov'];
+
+test.describe('odd sound codecs on the caption tools', () => {
+  test.setTimeout(150_000);
+  const cases: [string, string][] = [
+    ['ac3-51.mkv', edge('ac3-51.mkv')],
+    ['eac3.mp4', edge('eac3.mp4')],
+    ['pcm.mov', edge('pcm.mov')],
+    ['opus.mp4', edge('opus.mp4')],
+    ['flac.mkv', edge('flac.mkv')],
+    ['mono-8k.wav', edge('mono-8k.wav')],
+    ['amr-nb.amr', edge('amr-nb.amr')],
+    ['mpeg4-amrnb.3gp', stat('mpeg4-amrnb.3gp')],
+  ];
+  for (const [name, path] of cases) {
+    test(`${name} is read and the run ends ok`, async ({ page, browserName }) => {
+      await transcribe(page, readFileSync(path), name);
+      const lacks = browserName === 'webkit' && MAY_LACK.includes(name);
+      await expect.poll(() => lastRun(page), { timeout: 120_000 }).toBeTruthy();
+      const run = await lastRun(page);
+      if (lacks && run?.outcome === 'error') expect(run.error_class).toBe('UnsupportedSound');
+      else expect(run?.outcome).toBe('ok');
+    });
+  }
+
+  test('a DTS sound is named UnsupportedSound, with its format, before any model request', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit', "WebKit's Linux build carries a DTS decoder and reads the sound");
+    const models: string[] = [];
+    page.on('request', (r) => r.url().includes('/models/') && models.push(r.url()));
+    await transcribe(page, readFileSync(edge('dts.mkv')), 'dts.mkv');
+    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+    await expect(page.locator('#error')).toContainText('DTS');
+    expect((await lastRun(page))?.error_class).toBe('UnsupportedSound');
+    expect(models).toEqual([]);
+  });
+
+  // The Safari-before-26 case: no AudioDecoder, and decodeAudioData does not read Opus in MP4.
+  test('Opus in MP4 where the page has no AudioDecoder is UnsupportedSound before any model request', async ({ page }) => {
+    const models: string[] = [];
+    page.on('request', (r) => r.url().includes('/models/') && models.push(r.url()));
+    await page.addInitScript(() => {
+      delete (window as unknown as { AudioDecoder?: unknown }).AudioDecoder;
+      BaseAudioContext.prototype.decodeAudioData = () => Promise.reject(new DOMException('Unable to decode audio data', 'EncodingError'));
+    });
+    await transcribe(page, readFileSync(edge('opus.mp4')), 'opus.mp4');
+    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+    await expect(page.locator('#error')).toContainText('Opus');
+    expect((await lastRun(page))?.error_class).toBe('UnsupportedSound');
+    expect(models).toEqual([]);
+  });
+});
