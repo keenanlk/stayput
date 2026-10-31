@@ -28,7 +28,7 @@ type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> =>
   page.evaluate(() => JSON.parse(sessionStorage.getItem("__ev") || "[]"));
 
-const dir = mkdtempSync(join(tmpdir(), "stayput-h17-"));
+let dir = "";
 const f = (name: string) => join(dir, name);
 const ffmpeg = (...args: string[]) =>
   execFileSync("ffmpeg", ["-v", "error", "-y", ...args], { stdio: "pipe" });
@@ -60,6 +60,8 @@ test.afterAll(() => {
 });
 
 test.beforeAll(() => {
+  // Made per run: a worker that reruns this file under another project has already deleted the last folder.
+  dir = mkdtempSync(join(tmpdir(), "stayput-h17-"));
   // About 115 MB: two hours of mono 8 kHz, 16-bit. Longer than a phone is told to try, small enough for CI.
   ffmpeg(
     "-f",
