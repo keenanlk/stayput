@@ -3,7 +3,7 @@
   {
    "id": "transformers",
    "name": "Transformers.js",
-   "version": "4.3.0",
+   "version": "4.3.1",
    "npm": "@huggingface/transformers",
    "licences": [
     {
@@ -12,7 +12,7 @@
     }
    ],
    "project": "https://github.com/huggingface/transformers.js",
-   "source": "https://github.com/huggingface/transformers.js/tree/4.3.0",
+   "source": "https://github.com/huggingface/transformers.js/tree/4.3.1",
    "shipped": "Bundled into the site JavaScript (speech to text)",
    "kind": "library"
   },
@@ -151,7 +151,7 @@
   {
    "id": "mediapipe",
    "name": "MediaPipe Tasks Vision",
-   "version": "1.0.1",
+   "version": "1.1.1",
    "npm": "@mediapipe/tasks-vision",
    "licences": [
     {
@@ -500,7 +500,7 @@
   {
    "id": "mediabunny",
    "name": "Mediabunny",
-   "version": "1.61.0",
+   "version": "1.62.1",
    "npm": "mediabunny",
    "licences": [
     {
@@ -509,7 +509,7 @@
     }
    ],
    "project": "https://mediabunny.dev",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.62.1",
    "shipped": "Bundled into the site JavaScript (video and audio tools)",
    "kind": "library",
    "copyleft": "mpl",
@@ -674,7 +674,7 @@
   {
    "id": "pdfjs",
    "name": "PDF.js",
-   "version": "6.3.289",
+   "version": "6.4.299",
    "npm": "pdfjs-dist",
    "licences": [
     {
@@ -683,7 +683,7 @@
     }
    ],
    "project": "https://mozilla.github.io/pdf.js/",
-   "source": "https://github.com/mozilla/pdf.js/tree/v6.3.289",
+   "source": "https://github.com/mozilla/pdf.js/tree/v6.4.299",
    "shipped": "Bundled into the site JavaScript, plus its worker (showing PDF pages)",
    "kind": "library",
    "copyright": "Copyright Mozilla Foundation"
@@ -691,7 +691,7 @@
   {
    "id": "pdfmake",
    "name": "pdfmake",
-   "version": "0.3.11",
+   "version": "0.3.12",
    "npm": "pdfmake",
    "licences": [
     {
@@ -700,7 +700,7 @@
     }
    ],
    "project": "https://pdfmake.github.io/docs/",
-   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.11",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.12",
    "shipped": "Bundled into the site JavaScript (EPUB to PDF)",
    "kind": "library",
    "copyright": "Copyright (c) 2014-2015 bpampuch, 2016-2026 liborm85"
@@ -1031,7 +1031,7 @@
   {
    "id": "pdfmake-shims",
    "name": "Node.js compatibility shims in pdfmake's prebuilt bundle (buffer, readable-stream, safe-buffer, events, assert, util, process, stream-browserify, string_decoder, ieee754, inherits, core-js, file-saver and similar small packages)",
-   "version": "as pinned by pdfmake 0.3.11",
+   "version": "as pinned by pdfmake 0.3.12",
    "npm": null,
    "licences": [
     {
@@ -1048,7 +1048,7 @@
     }
    ],
    "project": "https://github.com/bpampuch/pdfmake",
-   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.11",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.12",
    "shipped": "Inside pdfmake",
    "kind": "library",
    "via": "pdfmake",
@@ -2168,7 +2168,7 @@
   {
    "id": "f-roboto",
    "name": "Roboto font (in pdfmake)",
-   "version": "as bundled in pdfmake 0.3.11",
+   "version": "as bundled in pdfmake 0.3.12",
    "npm": null,
    "licences": [
     {
@@ -2177,7 +2177,7 @@
     }
    ],
    "project": "https://github.com/googlefonts/roboto-classic",
-   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.11",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.12",
    "shipped": "Bundled into the site JavaScript (EPUB to PDF); version 3.014 (licence at /fonts/OFL-Roboto.txt)",
    "note": "Copyright 2011 The Roboto Project Authors. Version 3.014. Licence text at /fonts/OFL-Roboto.txt.",
    "kind": "font",
@@ -2205,7 +2205,7 @@
   {
    "id": "zxing-wasm",
    "name": "zxing-wasm",
-   "version": "3.1.5",
+   "version": "3.1.6",
    "npm": "zxing-wasm",
    "licences": [
     {
