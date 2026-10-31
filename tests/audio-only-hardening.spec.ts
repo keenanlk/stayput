@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import {
   copyFileSync,
   mkdtempSync,
+  rmSync,
   openSync,
   readSync,
   closeSync,
@@ -53,6 +54,10 @@ const seconds = (file: string) =>
       .toString()
       .trim(),
   );
+
+test.afterAll(() => {
+  rmSync(dir, { recursive: true, force: true });
+});
 
 test.beforeAll(() => {
   // About 115 MB: two hours of mono 8 kHz, 16-bit. Longer than a phone is told to try, small enough for CI.
@@ -308,6 +313,7 @@ test.describe("a two-hour recording", () => {
     test("a recording over the phone limit is decoded in stretches, not handed whole to the browser", async ({ page }, info) => {
       test.setTimeout(900_000);
       // 3 hours of mono 8 kHz, 16-bit: about 173 MB, over the 150 MB a phone decodes whole.
+      test.skip(info.project.name !== "chromium", "one 173 MB fixture is enough");
       ffmpeg("-f", "lavfi", "-i", "anoisesrc=color=pink:amplitude=0.05:sample_rate=8000", "-t", "10800", "-ac", "1", "-c:a", "pcm_s16le", f("long-3h.wav"));
       const go = await open(page, "/tools/volume-booster");
       await page.addInitScript(() => {
