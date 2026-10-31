@@ -38,7 +38,9 @@ import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { codecFailure, guardCodecs, isReclaim, tagCodec } from './codec-guard';
-import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { releaseConversion } from './conversion-release';
+import { context2d, releaseCanvas } from './canvas-memory';
+import { adoptPlan, capScale, hardwareOption, isShrinkable, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface EditOptions {
   mute?: boolean;
@@ -366,13 +368,12 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
-      frame = canvas.getContext('2d', { willReadFrequently: opts.readsBack !== false }) ?? undefined;
-      if (!frame) throw failure('CanvasUnavailable', 'Canvas is not available in this browser.');
+      frame = context2d(canvas, { willReadFrequently: opts.readsBack !== false });
     }
     const out = await outputTarget(file.size);
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
     let blob: Blob;
-    let conversion: Conversion;
+    let conversion: Conversion | undefined;
     let processedTime = 0;
     // A decoder or encoder the browser takes back part-way is replaced and the run goes on; whatever is left open at the end is closed.
     const unguard = guardCodecs();
@@ -428,9 +429,12 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       blob = await finishOutput(out, 'video/mp4');
     } catch (e) {
       await out.disk?.abort();
+      // Mediabunny cancels without waiting; let the failed try's decoder and encoder go before anything opens another.
+      await releaseConversion(conversion, isShrinkable(e));
       throw await decoderOrEncoder(e, video, duration, processedTime);
     } finally {
       unguard();
+      releaseCanvas(frame?.canvas);
     }
     const kept = !opts.mute && !!sound && !conversion.discardedTracks.some((d) => d.track.isAudioTrack());
     return {
