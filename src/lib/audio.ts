@@ -10,15 +10,48 @@ import { audioDecodeError } from './speech-errors';
 import { decodeWma, isAsf } from './wma-convert';
 import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
 import { retryUnreadable } from './read-failure';
+import { isPhoneBrowser } from './phone-limit';
+import { AUDIO_COPY, stageError } from './bare-error';
 
 /** MP3 is almost always 44.1 kHz; decoding resamples to it. */
 export const SAMPLE_RATE = 44100;
 
-/** Decode the file's audio track into PCM at `rate`. The whole file is read into memory first. */
+/** The size above which a file is decoded in stretches instead of read whole: a phone gives a tab far less memory than a computer. */
+export const stretchBytes = (phone = isPhoneBrowser()) => (phone ? 150 * 1024 ** 2 : 1024 ** 3);
+
+/** The first bytes say a WAV is the 64-bit variant (RF64, or BW64) that the browsers' decoders do not all read. */
+async function isRf64(file: Blob): Promise<boolean> {
+  const head = new TextDecoder('latin1').decode(await file.slice(0, 4).arrayBuffer().catch(() => new ArrayBuffer(0)));
+  return head === 'RF64' || head === 'BW64';
+}
+
+/** Why a decode that failed on this file failed, when the file says so itself: a WAV too big for the format the browser reads. */
+async function unsupportedWav(file: Blob): Promise<Error | null> {
+  if (await isRf64(file)) return audioDecodeError(AUDIO_COPY.unsupportedWav);
+  const riff = new TextDecoder('latin1').decode(await file.slice(0, 4).arrayBuffer().catch(() => new ArrayBuffer(0))) === 'RIFF';
+  return riff && file.size > 4 * 1024 ** 3 ? audioDecodeError(AUDIO_COPY.unsupportedWav) : null;
+}
+
+/**
+ * Decode the file's audio track into PCM at `rate`. A file under the size limit is read into memory whole and handed to the
+ * browser's decoder; a bigger one is decoded in stretches through the demuxer (see decodePcmSliced).
+ */
 export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<AudioBuffer> {
   // Windows Media Audio: no browser decodes it, so a separately loaded decoder module does.
   if (await isAsf(file)) return decodeWma(file, rate);
   await refuseSoundlessContainer(file);
+  if (file.size > stretchBytes()) {
+    const { decodePcmSliced } = await import('./pcm');
+    // The stretch decoder's out-of-memory error is worded for a video; this is a recording.
+    const chans = await decodePcmSliced(file, rate, false).catch((e) => {
+      throw e instanceof Error && e.name === 'OutOfMemoryError' && e.cause ? stageError('AudioDecodeFailed', e.cause) : e;
+    });
+    if (chans?.[0]?.length) {
+      const buffer = new AudioBuffer({ length: chans[0].length, numberOfChannels: chans.length, sampleRate: rate });
+      chans.forEach((ch, c) => buffer.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
+      return buffer;
+    }
+  }
   const read = () => retryUnreadable(file, () => file.arrayBuffer());
   // A file that cannot be read is no decode failure, so the first read is made out here; the decoder is handed it, and only a second attempt reads again.
   const firstRead = await read();
@@ -32,7 +65,7 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
     buffer = await decodeThroughDemuxer(file, rate, first).catch(async (error) => {
       // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.
       const aiff = await decodeAiff(await read().catch(() => null), rate);
-      if (!aiff) throw error;
+      if (!aiff) throw (await unsupportedWav(file)) ?? error;
       return aiff;
     });
   }

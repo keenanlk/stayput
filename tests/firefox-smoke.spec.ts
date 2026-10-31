@@ -58,6 +58,14 @@ test('Merge PDF combines two files', async ({ page }) => {
   expect(await convert(page, 'merge-pdf', [gen('text.pdf'), gen('article.pdf')])).toBe('merged.pdf');
 });
 
+test('Remove noise converts a song', async ({ page }) => {
+  expect(await convert(page, 'remove-noise', [stat('song.mp3')])).toBe('song-clean.mp3');
+});
+
+test('Volume booster converts a song', async ({ page }) => {
+  expect(await convert(page, 'volume-booster', [stat('song.mp3')])).toBe('song-louder.mp3');
+});
+
 test('Video to GIF converts', async ({ page }) => {
   expect(await convert(page, 'video-to-gif', [stat('clip.webm')])).toBe('clip.gif');
 });

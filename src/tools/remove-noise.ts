@@ -1,7 +1,8 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
-import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioFormat } from '../lib/audio-convert';
+import { FORMAT_LABELS, canWrite, convertAudio, formatOf, hideUnwritable, lossy, type AudioFormat } from '../lib/audio-convert';
+import { longRecordingHint } from '../lib/long-audio';
 import { DENOISE_RATE, denoise, inStage, loadRnnoise, resample } from '../lib/denoise';
 import { SAMPLE_RATE, decodePcmSliced } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
@@ -19,7 +20,13 @@ function bitrateFor(file: File, seconds: number): number {
 
 const voiceNote = (share: number) => (share < 0.05 ? 'no voice found, so most of the sound was treated as noise' : `voice in ${Math.round(share * 100)}% of it`);
 
-createShell({
+void hideUnwritable(document.getElementById('format') as HTMLSelectElement | null);
+const longHint = longRecordingHint({ setHint: (text, link) => shell.setHint(text, link) });
+
+const shell = createShell({
+  // A phone that locks mid-run stops the page: say so, by name, rather than failing in some step.
+  keepAwake: true,
+  onFilesChanged: longHint,
   outputFormat: () => str('format', 'same'),
   async process(files, progress) {
     const strength = STRENGTH[radio('strength', 'strong')] ?? 1;
@@ -33,14 +40,14 @@ createShell({
       const file = entry.file;
       const share = (f: number) => (index + f) / files.length;
       let voice = 0;
-      const clean = async (chans: Float32Array[], rate: number) => {
+      const clean = async (chans: Float32Array[], rate: number, audio = false) => {
         try {
           const at48 = await resample(chans, rate, DENOISE_RATE);
           const r = await denoise(rnnoise, at48, strength, (f) => progress.set(`Removing noise from ${file.name}: ${Math.round(f * 100)}%`, share(0.1 + f * 0.6)));
           voice = r.voice;
           return await resample(r.chans, DENOISE_RATE, rate);
         } catch (e) {
-          throw inStage('NoiseRemoveError', e);
+          throw inStage('NoiseRemoveError', e, audio);
         }
       };
 
@@ -71,7 +78,7 @@ createShell({
         mono: false,
         transform: (chans, rate) => {
           if (choice === 'same' && lossy(fmt)) bitrate = bitrateFor(file, chans[0]!.length / rate);
-          return clean(chans, rate);
+          return clean(chans, rate, true);
         },
         bitrateOf: () => bitrate,
         onProgress: (f) => progress.set(`Encoding ${file.name}: ${Math.round(f * 100)}%`, share(0.7 + f * 0.3)),

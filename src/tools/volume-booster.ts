@@ -1,13 +1,14 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
-import { FORMAT_LABELS, canWrite, convertAudio, formatOf, lossy, type AudioFormat } from '../lib/audio-convert';
+import { FORMAT_LABELS, canWrite, convertAudio, formatOf, hideUnwritable, lossy, type AudioFormat } from '../lib/audio-convert';
+import { longRecordingHint } from '../lib/long-audio';
 import { applyGain, dbToGain, gainFor, type VolumeMode } from '../lib/audio-gain';
 import { SAMPLE_RATE, decodePcmSliced } from '../lib/pcm';
 import { addAudio, hasVideo } from '../lib/video-audio';
 import { audioDecodeError } from '../lib/speech-errors';
 import { retryUnreadable, snapshotFile } from '../lib/read-failure';
-import { nameBare } from '../lib/bare-error';
+import { AUDIO_COPY, stageError } from '../lib/bare-error';
 
 /** Streaming services play music at about -14 LUFS; this lands close to that. */
 const NORMALIZE_TARGET = -14;
@@ -33,13 +34,19 @@ function bitrateFor(file: File, seconds: number): number {
   return BITRATES.find((b) => b >= kbps * 0.95) ?? 320;
 }
 
-createShell({
+void hideUnwritable(document.getElementById('format') as HTMLSelectElement | null);
+const longHint = longRecordingHint({ setHint: (text, link) => shell.setHint(text, link) });
+
+const shell = createShell({
+  // A phone that locks mid-run stops the page: say so, by name, rather than failing in some step.
+  keepAwake: true,
+  onFilesChanged: longHint,
   outputFormat: () => str('format', 'same'),
   async process(files, progress) {
     const m = mode();
     const choice = str('format', 'same');
     // Copy each file into memory right away: on Android a picked file can become unreadable a moment later.
-    files = await Promise.all(files.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file).catch((e) => Promise.reject(nameBare('VolumeReadFailed', e))) })));
+    files = await Promise.all(files.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file).catch((e) => Promise.reject(stageError('VolumeReadFailed', e))) })));
     // A file the phone fails to read part way through is read once more before the failure is shown.
     const run = async (entry: (typeof files)[number], index: number) => {
       // The step under way: a failure with no name of its own is recorded as this (see bare-error.ts).
@@ -47,7 +54,8 @@ createShell({
       try {
         return await runOne(entry, index, (s) => (step = s));
       } catch (e) {
-        throw nameBare(step, e);
+        // Past the read, a picture-and-sound file runs out of memory as a video would say it.
+        throw stageError(step, e, step === 'VolumeWriteFailed' ? { memory: AUDIO_COPY.memoryVideo } : {});
       }
     };
     const runOne = async (entry: (typeof files)[number], index: number, at: (step: string) => void) => {

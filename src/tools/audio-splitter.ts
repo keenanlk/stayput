@@ -3,7 +3,8 @@ import { type OutputFile } from '../lib/files';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../lib/audio';
 import { cutPart, parseTimes, partName, planAtTimes, planEvery, SplitError, type Part } from '../lib/audio-split';
 import { NamedError } from '../lib/input-error';
-import { nameBare } from '../lib/bare-error';
+import { AUDIO_COPY, stageError } from '../lib/bare-error';
+import { longRecordingHint } from '../lib/long-audio';
 import { retryUnreadable } from '../lib/read-failure';
 
 /**
@@ -21,11 +22,10 @@ const everyField = $('sp-every-field');
 /**
  * A RangeError while the sound is decoded, cut or encoded is a length or an allocation that did not fit (the split points are
  * checked before this, by plan()). It reaches a failed run's record as plain "RangeError", so it is named OutOfMemoryError and
- * says what to do; any other bare error is named for the step.
+ * says what to do; any other bare error is named for the step. The splitter does not send anyone to itself.
  */
 function named(step: string, e: unknown): Error {
-  if (!(e instanceof RangeError)) return nameBare(step, e);
-  return new NamedError('OutOfMemoryError', 'This device ran out of memory while working on this sound. Close other tabs and apps and try again, use a shorter file or shorter parts, choose MP3 instead of WAV, or use a computer.', { cause: e });
+  return stageError(step, e, { memory: AUDIO_COPY.memorySplitter, ...(step === 'AudioDecodeError' ? { message: AUDIO_COPY.read } : {}) });
 }
 
 let buffer: AudioBuffer | undefined;
@@ -93,9 +93,12 @@ for (const el of document.querySelectorAll('input[name="sp-mode"], #sp-times, #s
   el.addEventListener('change', update);
 }
 
+const longHint = longRecordingHint({ setHint: (text, link) => shell.setHint(text, link) }, { splitter: true });
+
 const shell = createShell({
   outputFormat: format,
   async onFilesChanged(files) {
+    void longHint(files);
     if (files.length === 0) {
       buffer = undefined;
       return update();

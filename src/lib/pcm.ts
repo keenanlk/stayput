@@ -80,23 +80,25 @@ async function decodedByCodecs(track: InputAudioTrack, rate: number): Promise<Fl
  * MB read at once fails the allocation, which Chrome on Android reports as NotReadableError (and a re-read fails the
  * same way). AAC and MP3 are decoded in stretches; other codecs through the page's decoder. Only a file the demuxer
  * cannot place is handed to `decodePcm`, and only up to a size a phone can hold. A failed allocation is OutOfMemoryError.
+ * `rate` is the sample rate the sound comes back at (48 kHz unless the caller needs another); with `whole` off the whole-file
+ * decoder is never tried (its sound would come back at 48 kHz), and a file the demuxer cannot place is null.
  */
-export async function decodePcmSliced(file: Blob): Promise<Float32Array[] | null> {
+export async function decodePcmSliced(file: Blob, rate = SAMPLE_RATE, whole = true): Promise<Float32Array[] | null> {
   await refuseSoundlessContainer(file);
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   try {
     const track = await input.getPrimaryAudioTrack().catch((e) => (unlessFatal(e), null));
     if (track) {
       const { demuxedSound } = await import('./demux-audio');
-      const wrapped = await demuxedSound(input, SAMPLE_RATE, false).catch((e) => (unlessFatal(e), null));
+      const wrapped = await demuxedSound(input, rate, false).catch((e) => (unlessFatal(e), null));
       if (wrapped) return wrapped;
-      const decoded = await decodedByCodecs(track, SAMPLE_RATE).catch((e) => (unlessFatal(e), null));
+      const decoded = await decodedByCodecs(track, rate).catch((e) => (unlessFatal(e), null));
       if (decoded) return decoded;
     }
   } finally {
     input.dispose?.();
   }
-  if (file.size > WHOLE_FILE_LIMIT) return null;
+  if (!whole || file.size > WHOLE_FILE_LIMIT) return null;
   return decodePcm(file).catch((e) => {
     unlessFatal(e);
     throw e;
