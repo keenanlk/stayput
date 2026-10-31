@@ -28,7 +28,7 @@ test('the QR scanner reads a photo and several codes, with every request going t
   await expect(page.locator('#qs-results .qs-address')).toHaveText(texts.url!, { timeout: 30_000 });
   await page.locator('#file-input').setInputFiles(fx('09_three_codes.png'));
   await expect(page.locator('#qs-results .qs-card')).toHaveCount(3, { timeout: 30_000 });
-  expect(wasm.map((u) => new URL(u).pathname)).toContain('/vendor/zxing-wasm@3.1.5/zxing_reader.wasm');
+  expect(wasm.map((u) => new URL(u).pathname)).toContain('/vendor/zxing-wasm@3.1.6/zxing_reader.wasm');
   expect([...hosts].filter((h) => h !== siteHost() && h !== 'stats.keenankaufman.com')).toEqual([]);
   expect(errors).toEqual([]);
 });
