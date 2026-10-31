@@ -47,7 +47,12 @@ The class a failed run records (`error_class`) with the exact words the person s
 | `NoiseRemoveError` | `src/lib/denoise.ts:129` | `The noise could not be removed from this sound. Reload the page and try again, or try a shorter clip.` |
 | `NoiseWriteError` | `src/lib/denoise.ts:129` | `The cleaned video could not be written. Reload the page and try again, or try a shorter clip.` |
 | `NoiseModelLoadError` | `src/lib/denoise.ts:33` | `The noise remover could not load. Check your connection and try again.` |
-| `PersonFinderStalled` | `src/lib/person-mask.ts:298` | `Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.` |
+| `PersonFinderStalled` | `src/lib/person-mask.ts` | `Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.` (only after Fast and the smaller picture have been tried) |
+| `PersonFinderFailed` | `src/lib/person-mask.ts` | the engine's own message, after the finder was rebuilt once and failed again |
+| `PersonMaskEmpty` | `src/lib/person-mask.ts` | `The person finder returned no mask.` (the fourth frame in a row; the last mask stands in for three) |
+| `WebGLLost` | `src/lib/person-mask.ts` | `The graphics context was lost. Close other tabs and try again.` |
+| `CanvasMemoryError` | `src/lib/canvas-memory.ts` | `This device ran out of memory for drawing. Close other tabs and apps and try again, or use a shorter or smaller video.` (retried at a smaller size) |
+| `AppUpdated` | `src/lib/lazy-import.ts` | `Stayput was updated while this page was open. Reload the page and run it again.` (with a Reload link) |
 | `EncoderStall` | `src/lib/encoder-watchdog.ts:26`, `src/lib/encoder-probe.ts:192` | set by the caller (the encoder stopped producing frames) |
 | `EncoderUnavailable` | `src/lib/encoder-probe.ts:204` | set by the caller |
 | `EncoderRefused` | `src/lib/encoder-probe.ts:217` | `This device's video encoder refused to start, even at smaller sizes. Try a recent Chrome or Edge, or a computer.` |

@@ -8,6 +8,8 @@ import { NamedError, UnreadableFile, UnsupportedCodec, isUnspecific } from '../l
 import { snapshotFile } from '../lib/read-failure';
 import { saveHandoff } from '../lib/handoff';
 import { nameBare } from '../lib/bare-error';
+import { lazyImport, warm } from '../lib/lazy-import';
+import { context2d, releaseCanvas } from '../lib/canvas-memory';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
 import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
@@ -49,7 +51,7 @@ function drawBlurred(ctx: CanvasRenderingContext2D, seen: HTMLCanvasElement, sma
   const k = Math.min(1, BLUR_WORK / Math.max(width, height));
   small.width = Math.max(2, Math.round(width * k));
   small.height = Math.max(2, Math.round(height * k));
-  const sctx = small.getContext('2d', { willReadFrequently: true })!;
+  const sctx = context2d(small, { willReadFrequently: true });
   sctx.drawImage(seen, 0, 0, small.width, small.height);
   const sigma = Math.max(2, (Math.min(width, height) * strength) / 250) * k;
   // boxBlur's radius is twice the Gaussian's spread; it reads clamped edges, so no dark border is pulled in.
@@ -106,7 +108,7 @@ async function checkPhoneClip(files: { file: File }[]) {
   let heavy = videos.some((f) => f.size > PHONE_SAFE_BYTES);
   let tall = false;
   if (videos.length > 0) {
-    const { videoSize } = await import('../lib/video-edit');
+    const { videoSize } = await lazyImport(() => import('../lib/video-edit'));
     for (const f of videos) {
       const s = await videoSize(f).catch(() => undefined);
       if (s && Math.max(s.width, s.height) > PHONE_SAFE_SIDE) tall = true;
@@ -188,6 +190,11 @@ const shell = createShell({
   runBlocker: pictureBlocker,
   onFilesChanged: async (files) => {
     current = files;
+    // Fetch the page's own code now, while the deployment that served this page is most likely still current.
+    if (files.some((f) => !isImage(f.file))) {
+      warm(() => import('../lib/video-edit'));
+      warm(() => import('../lib/person-mask'));
+    }
     void checkPicture(files);
     await checkPhoneClip(files);
   },
@@ -197,15 +204,19 @@ const shell = createShell({
   async process(files, progress) {
     // Where the run is, so a TypeError (no name of its own) is recorded as the step that threw it.
     let step = 'BackgroundSetupFailed';
+    // The new background picture is closed when the run ends, however it ends.
+    const held: { picture?: ImageBitmap } = {};
     try {
-      return await run(files, progress, (name) => (step = name));
+      return await run(files, progress, (name) => (step = name), held);
     } catch (e) {
       throw stepFailure(step, e);
+    } finally {
+      held.picture?.close();
     }
   },
 });
 
-async function run(files: ShellFile[], progress: Progress, at: (step: string) => void): Promise<OutputFile[]> {
+async function run(files: ShellFile[], progress: Progress, at: (step: string) => void, held: { picture?: ImageBitmap }): Promise<OutputFile[]> {
   const pictures = files.filter((f) => isImage(f.file));
   let videos = files.filter((f) => !isImage(f.file));
   if (videos.length === 0) {
@@ -222,13 +233,13 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   const strength = num('strength', 6);
   const color = str('bg-color', '#00b140');
   // decodeImage also opens HEIC, which Chrome cannot decode on its own.
-  const picture = pictures[0] ? (await decodePicture(pictures[0].file)).bitmap : undefined;
+  const picture = (held.picture = pictures[0] ? (await decodePicture(pictures[0].file)).bitmap : undefined);
 
   // Find out now, in a second or two, that this browser cannot encode, not after the person finder has downloaded.
   progress.set('Checking this browser can write the video…', 0);
   if (!hasVideoEncoder()) throw new EncoderUnavailable();
   await requireH264Encoder();
-  const { assertReadable, editVideo, videoSize } = await import('../lib/video-edit');
+  const { assertReadable, editVideo, videoSize } = await lazyImport(() => import('../lib/video-edit'));
   // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
   for (const v of videos) {
     await assertReadable(v.file).catch((e) => {
@@ -296,6 +307,10 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
         const left = timeLeft.update(f) ?? 'Estimating time left…';
         progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}% · ${left}. Keep this tab open.`, share(0.03 + f * 0.97));
       },
+    }).finally(() => {
+      // Safari frees a dropped canvas late and caps all of them together: hand these back now, before the next video.
+      matte.dispose();
+      releaseCanvas(blurred);
     });
     const found = matte.frames ? matte.framesWithPerson / matte.frames : 0;
     const what = bgKind === 'blur' ? 'background blurred' : bgKind === 'color' ? `background ${color}` : `background from ${pictures[0]!.file.name}`;

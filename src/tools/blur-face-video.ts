@@ -2,6 +2,7 @@ import { bindRange, bool, num, radio, str } from '../lib/shell';
 import { videoEditShell } from './video-edit-shell';
 import { apply, effectSize, firstGrapheme, type Effect } from '../lib/blur';
 import { nameBare } from '../lib/bare-error';
+import { lazyImport, warm } from '../lib/lazy-import';
 import { grow, updateTracks, type Track } from '../lib/face-track';
 
 /**
@@ -35,6 +36,9 @@ videoEditShell({
   suffix: '-faces-hidden',
   checkDecode: true,
   verb: 'Hiding faces in',
+  onFilesChanged: (files) => {
+    if (files.length > 0) warm(() => import('../lib/faces'));
+  },
   options() {
     const kind = effect();
     const strength = num('strength', 6);
@@ -52,7 +56,7 @@ videoEditShell({
           // A failure with no name of its own says which step it was: getting the detector, or reading a frame with it.
           let step = 'FaceModelFailed';
           try {
-            const { findFaces } = await import('../lib/faces');
+            const { findFaces } = await lazyImport(() => import('../lib/faces'));
             const found = await findFaces(ctx.canvas, (stage) => (step = stage === 'scanning' ? 'FaceScanFailed' : 'FaceModelFailed'), [0.5]);
             tracks = updateTracks(tracks, found, t, HOLD);
           } catch (e) {
