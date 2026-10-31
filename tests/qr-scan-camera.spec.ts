@@ -32,7 +32,7 @@ test.describe('with a QR code in front of the camera', () => {
     await expect(page.locator('#qs-results .qs-card')).toHaveCount(1, { timeout: 15_000 });
     expect(await liveTracks(page)).toBe(0);
     expect(errors).toEqual([]);
-    expect(seen.some((r) => r.url.endsWith('/vendor/zxing-wasm@3.1.5/zxing_reader.wasm'))).toBe(true);
+    expect(seen.some((r) => r.url.endsWith('/vendor/zxing-wasm@3.1.6/zxing_reader.wasm'))).toBe(true);
     expect(seen.filter((r) => /jsdelivr|unpkg|cdnjs/.test(r.url))).toEqual([]);
     for (const r of seen) {
       if (r.url.startsWith('blob:') || r.url.startsWith('data:')) continue;
