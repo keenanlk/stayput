@@ -137,11 +137,17 @@ export function plainCaptionError(e: unknown): Error {
   if (e instanceof SpeechError) return e;
   // A file the browser would not read keeps its own name and message: it is not the sound's fault.
   if (isNotReadable(e) && e instanceof Error) return e;
-  if (looksLikeMemory(e)) return outOfMemoryError();
-  return unknownCaptionError(e);
+  if (looksLikeMemory(e)) return keepSalvage(e, outOfMemoryError());
+  return keepSalvage(e, unknownCaptionError(e));
 }
 
 /** Failures of the speech model's start-up that a fresh worker may get past (a worker that died or ran out of memory, a kept copy that would not start). */
 export function restartsOnce(e: { name: string }): boolean {
   return ['ModelLoadError', 'OutOfMemoryError', 'WorkerCrashError'].includes(e.name);
+}
+
+/** Moves the partial transcript a failed speech run carries (`salvage`) from one error to the one that replaces it. */
+export function keepSalvage<T extends Error>(from: unknown, to: T): T {
+  const salvage = (from as { salvage?: unknown } | null)?.salvage;
+  return salvage ? Object.assign(to, { salvage }) : to;
 }

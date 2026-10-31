@@ -1,4 +1,5 @@
-import { isPhoneBrowser } from './phone-limit';
+import { MODEL_DOWNLOAD_NOTE, PHONE_SAFE_BYTES, isIosBrowser, isPhoneBrowser } from './phone-limit';
+import { SPEECH_TINY_FIRST_USE_MB } from '../data/speech-size';
 
 /**
  * Which way the speech model runs.
@@ -35,6 +36,8 @@ const RETRY_AFTER_MS = 7 * 24 * 3600 * 1000;
 interface Env {
   search: string;
   store?: Pick<Storage, 'getItem' | 'setItem'>;
+  /** sessionStorage: what this tab has learned (a memory death). */
+  session?: Pick<Storage, 'getItem' | 'setItem'>;
   nav: Pick<Navigator, 'userAgent' | 'maxTouchPoints'> & { gpu?: unknown; deviceMemory?: number };
   now: number;
 }
@@ -46,7 +49,13 @@ function environment(): Env {
   } catch {
     // Storage blocked: no override and no memory of failures.
   }
-  return { search: location.search, store, nav: navigator as Env['nav'], now: Date.now() };
+  let session: Storage | undefined;
+  try {
+    session = sessionStorage;
+  } catch {
+    // Storage blocked: the tab remembers nothing.
+  }
+  return { search: location.search, store, session, nav: navigator as Env['nav'], now: Date.now() };
 }
 
 /** The setting forced from the address (first) or storage, if there is one: '0' is off, '1' is on even for a phone. */
@@ -86,4 +95,51 @@ export function rememberWebgpuFailure(env: Env = environment()): void {
   } catch {
     // ignore
   }
+}
+
+export type SpeechModel = 'whisper-base' | 'whisper-tiny';
+
+/** Set in sessionStorage after a phone ran out of memory with the base model in this tab, so the tab's next runs start with the smaller one. */
+export const TINY_KEY = 'stayput-speech-tiny';
+/** Test-only, like `webgpu`: `?speechModel=tiny` (or `base`) sets the model from the address. */
+export const MODEL_OVERRIDE = 'speechModel';
+/** Phones that report this much memory or less (in GB; Chrome Android rounds down to a power of two) start with the smaller model. */
+export const TINY_MAX_DEVICE_MEMORY_GB = 2;
+
+/**
+ * Which Whisper model to load. Base (77 MB) everywhere, except on a phone or tablet where it is likely to run out of
+ * memory: one that reports 2 GB or less, an iPhone or iPad with a file over the phone limit, or a tab where the base
+ * model has already failed for memory. Those start with tiny (41 MB), which is less accurate. A computer always gets base.
+ * TODO(H6): also start with tiny when the crash breadcrumb says the last run died on this device.
+ */
+export function speechModel(env: Env = environment(), bytes = 0): SpeechModel {
+  const asked = new URLSearchParams(env.search).get(MODEL_OVERRIDE);
+  if (asked === 'tiny') return 'whisper-tiny';
+  if (asked === 'base') return 'whisper-base';
+  if (!isPhoneBrowser(env.nav)) return 'whisper-base';
+  if (typeof env.nav.deviceMemory === 'number' && env.nav.deviceMemory <= TINY_MAX_DEVICE_MEMORY_GB) return 'whisper-tiny';
+  if (isIosBrowser(env.nav) && bytes > PHONE_SAFE_BYTES) return 'whisper-tiny';
+  try {
+    if (env.session?.getItem(TINY_KEY) === '1') return 'whisper-tiny';
+  } catch {
+    // ignore
+  }
+  return 'whisper-base';
+}
+
+/** Remember in this tab that the base model ran out of memory on a phone. */
+export function rememberTinyModel(env: Env = environment()): void {
+  try {
+    env.session?.setItem(TINY_KEY, '1');
+  } catch {
+    // ignore
+  }
+}
+
+/** The note above Run when the smaller model will be used (a phone only), worded by marketing (STAA-398 item 7). */
+export const SMALLER_MODEL_NOTE = `On this device, captions use a smaller speech model, which is less accurate. It downloads with its runtime on first use, about ${SPEECH_TINY_FIRST_USE_MB} MB in all.`;
+
+/** What the hint above Run says about the download: the smaller model's, only when it will be used for a file of this size. */
+export function speechDownloadNote(bytes: number): string {
+  return speechModel(environment(), bytes) === 'whisper-tiny' && isPhoneBrowser() ? SMALLER_MODEL_NOTE : MODEL_DOWNLOAD_NOTE;
 }

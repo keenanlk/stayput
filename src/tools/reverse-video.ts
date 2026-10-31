@@ -1,5 +1,6 @@
 import { bool, createShell, processEach } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import { retryNote } from '../lib/edit-recovery';
 
 /**
  * Reverse video. Each video is decoded backwards in short windows and encoded
@@ -14,6 +15,7 @@ const clock = (s: number) => {
 
 createShell({
   keepAwake: true,
+  remembersSize: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const mute = bool('mute');
@@ -24,6 +26,7 @@ createShell({
       const r = await reverseVideo(entry.file, {
         mute,
         onProgress: (f) => progress.set(`Reversing ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
+        onNotice: (m) => progress.set(`${entry.file.name}: ${m}`, share(0.02)),
       });
       const notes = ['reversed', clock(r.duration), `${r.width}×${r.height}`, r.videoCodec];
       if (!r.audio) notes.push('no sound');
@@ -31,7 +34,7 @@ createShell({
         name: suffixName(entry.file.name, '-reversed', 'mp4'),
         blob: r.blob,
         originalSize: entry.file.size,
-        note: notes.join(', '),
+        note: notes.join(', ') + retryNote(r.retry, r),
       };
       return out;
     });

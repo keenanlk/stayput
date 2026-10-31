@@ -20,6 +20,7 @@ import {
   MovOutputFormat,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   WEBM,
   WebMOutputFormat,
@@ -27,12 +28,17 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { watchEncode } from './encoder-watchdog';
+import type { RetryKind } from './edit-recovery';
+import { memoryRange, nameBare } from './bare-error';
+import { isNotReadable, notReadable } from './read-failure';
 import { InputError, UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
 
 export interface LoopOptions {
   repeats: number;
   mute: boolean;
   onProgress?: (fraction: number) => void;
+  /** Said when a re-encoded repeat starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface LoopResult {
@@ -46,11 +52,13 @@ export interface LoopResult {
   copied: boolean;
   audio: boolean;
   audioDropped: boolean;
+  /** Set when a re-encoded repeat was made on a retry, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
 }
 
 /** What the page needs to plan a run: the clip's length, from its packets. */
 export async function probeLoop(file: File): Promise<{ duration: number }> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
@@ -68,9 +76,19 @@ async function pictureLength(track: InputVideoTrack): Promise<{ first: number; l
   return { first, length: Math.max(0, end - first) };
 }
 
+/** Repeats the video. The copy needs no encoder; a clip that cannot be copied goes through the merge code, which recovers from an encoder failure. */
 export async function loopVideo(file: File, opts: LoopOptions): Promise<LoopResult> {
   if (!(opts.repeats >= 2)) throw new InputError('Choose at least two repeats.');
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  try {
+    return await loopOnce(file, opts);
+  } catch (e) {
+    if (isNotReadable(e)) throw notReadable(e);
+    throw nameBare('VideoLoopFailed', memoryRange(e));
+  }
+}
+
+async function loopOnce(file: File, opts: LoopOptions): Promise<LoopResult> {
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch(() => null);
     const video = format ? await input.getPrimaryVideoTrack().catch(() => null) : null;
@@ -85,8 +103,8 @@ export async function loopVideo(file: File, opts: LoopOptions): Promise<LoopResu
       // Not copyable: join the clip to itself through the merge path, which re-encodes once.
       if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
       const { mergeVideos } = await import('./video-merge');
-      const r = await mergeVideos(Array.from({ length: opts.repeats }, () => file), { mute: opts.mute, onProgress: opts.onProgress });
-      return { blob: r.blob, ext: 'mp4', width: r.width, height: r.height, duration: r.duration, videoCodec: r.videoCodec, copied: false, audio: r.audio, audioDropped: r.audioDropped };
+      const r = await mergeVideos(Array.from({ length: opts.repeats }, () => file), { mute: opts.mute, onProgress: opts.onProgress, onNotice: opts.onNotice });
+      return { blob: r.blob, ext: 'mp4', width: r.width, height: r.height, duration: r.duration, videoCodec: r.videoCodec, copied: false, audio: r.audio, audioDropped: r.audioDropped, retry: r.retry };
     }
 
     const clip = await pictureLength(video);

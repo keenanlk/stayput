@@ -65,6 +65,20 @@ export function planSideBySide(aw: number, ah: number, bw: number, bh: number, l
   return { width: w, height: A.h + B.h, a: { x: 0, y: 0, ...A }, b: { x: 0, y: A.h, ...B } };
 }
 
+/**
+ * The same plan with every cell scaled by `k` (at most 1), each side kept even. A retry after the encoder gave up uses it to keep the
+ * output's longest side within a cap: planning the clips again at a smaller size would not, because the plan already scales a wide pair down.
+ */
+export function scalePlan(p: Plan, k: number): Plan {
+  if (k >= 1) return p;
+  // Rounded down to even, so two cells side by side never add up to more than the cap.
+  const down = (n: number) => Math.max(2, 2 * Math.floor((n * k) / 2));
+  const A = { w: down(p.a.w), h: down(p.a.h) };
+  const B = { w: down(p.b.w), h: down(p.b.h) };
+  if (p.b.x > 0) return { width: A.w + B.w, height: Math.max(A.h, B.h), a: { x: 0, y: 0, ...A }, b: { x: A.w, y: 0, ...B } };
+  return { width: Math.max(A.w, B.w), height: A.h + B.h, a: { x: 0, y: 0, ...A }, b: { x: 0, y: A.h, ...B } };
+}
+
 /** The output rate: the faster clip's, rounded, at most MAX_FPS. A clip whose rate is unknown counts as 30. */
 export function outputFps(a: number, b: number): number {
   const rate = (r: number) => (Number.isFinite(r) && r > 0 ? r : 30);

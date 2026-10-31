@@ -4,13 +4,13 @@ import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
 import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/encoder-probe';
 import { EncoderStall } from '../lib/encoder-watchdog';
-import { encodeFailedError, encodeMemoryError, isRecordingTooLong, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
+import { encodeFailedError, encodeMemoryError, isRecordingTooLong, keepSalvage, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
-import { MODEL_DOWNLOAD_NOTE, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
+import { overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
+import { speechDownloadNote } from '../lib/speech-path';
 import { InputError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
-import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { retryNote, withRecovery } from '../lib/edit-recovery';
+import { retryNote } from '../lib/edit-recovery';
 import { isNotReadable, notReadable, probeReadable, retryUnreadable } from '../lib/read-failure';
 
 /**
@@ -37,6 +37,7 @@ const RELOAD_NOTE = 'The last run ran out of memory. Reload the page before capt
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   announceStart: true,
   // A video too big for a phone to caption is said so now, not after the browser gives up.
   onFilesChanged(files) {
@@ -45,7 +46,7 @@ const shell = createShell({
     const videos = files.filter((f) => !isSubs(f.file));
     const speech = !files.some((f) => isSubs(f.file));
     const note = speech ? phoneLimitNote(Math.max(0, ...videos.map((f) => f.file.size))) : '';
-    shell.setHint([reloadAdvised ? RELOAD_NOTE : '', note, speech ? MODEL_DOWNLOAD_NOTE : ''].filter(Boolean).join(' '), TRIM_LINK);
+    shell.setHint([reloadAdvised ? RELOAD_NOTE : '', note, speech ? speechDownloadNote(Math.max(0, ...videos.map((f) => f.file.size))) : ''].filter(Boolean).join(' '), TRIM_LINK);
   },
   outputFormat: () => 'mp4',
   async process(files, progress) {
@@ -67,7 +68,7 @@ const shell = createShell({
   },
 });
 // Before any file is added, the hint above Run already says what the first run downloads.
-shell.setHint(MODEL_DOWNLOAD_NOTE);
+shell.setHint(speechDownloadNote(0));
 
 /** An error the page will show as "out of memory", marked so the page can advise a reload. */
 const asMemory = <T extends Error>(e: T): T => Object.assign(e, { memory: true });
@@ -109,33 +110,21 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       const speechModule = await import('../lib/speech');
       releaseSpeechModel = speechModule.releaseSpeechModel;
       // Writing the captions is roughly the first 40% of the work, encoding the rest.
-      // A phone that was backgrounded while the sound was read or transcribed starts this step again once, when the page is back.
-      const page = pageRecoveryHooks((message) => progress.set(`${file.name}: ${message}`, share(0.01)));
-      let speech;
-      try {
-        speech = await withRecovery(
-          () =>
-            // A file the phone failed to read is read once more, and never reported as a memory or sound problem.
-            retryUnreadable(
-              file,
-              () =>
-                speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
-                  if (isNotReadable(e)) throw notReadable(e);
-                  const plain = plainCaptionError(e);
-                  // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.
-                  const unnamed = !(plain instanceof SpeechError) || ['WorkerCrashError', 'SpeechModelError'].includes(plain.name);
-                  if (overPhoneLimit(file.size) && unnamed) throw asMemory(phoneSpeechMemoryError(e));
-                  throw plain.name === 'OutOfMemoryError' || plain.name === 'WorkerCrashError' ? asMemory(plain) : plain;
-                }),
-              (message) => progress.set(`${file.name}: ${message}`, share(0.01)),
-            ),
-          // There is no picture to make smaller in this step.
-          () => 0,
-          page.hooks,
-        );
-      } finally {
-        page.dispose();
-      }
+      // A page hidden, or a worker lost, partway through is picked up again from the last finished piece inside transcribeFile.
+      // A file the phone failed to read is read once more, and never reported as a memory or sound problem.
+      const speech = await retryUnreadable(
+        file,
+        () =>
+          speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', format: 'srt', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
+            if (isNotReadable(e)) throw keepSalvage(e, notReadable(e));
+            const plain = plainCaptionError(e);
+            // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.
+            const unnamed = !(plain instanceof SpeechError) || ['WorkerCrashError', 'SpeechModelError'].includes(plain.name);
+            if (overPhoneLimit(file.size) && unnamed) throw keepSalvage(e, asMemory(phoneSpeechMemoryError(e)));
+            throw plain.name === 'OutOfMemoryError' || plain.name === 'WorkerCrashError' ? asMemory(plain) : plain;
+          }),
+        (message) => progress.set(`${file.name}: ${message}`, share(0.01)),
+      );
       // The model is no longer needed; free its memory before the video is redrawn.
       speechModule.releaseSpeechModel();
       segments = speech.segments;
@@ -201,7 +190,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       name: suffixName(file.name, '-subtitled', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}${retryNote(r.retry)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
+      note: `${describeEdit(r)}${retryNote(r.retry, r)}, ${shown} caption${shown === 1 ? '' : 's'} ${from}.${path}`,
     });
     if (saveSrt) outputs.push(srtOutput(file, segments));
   }

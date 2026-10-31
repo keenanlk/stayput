@@ -21,12 +21,15 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   WEBM,
   type AudioCodec,
 } from 'mediabunny';
 import { executeWatched, watchEncode } from './encoder-watchdog';
-import { pickVideoCodec } from './video-codec';
+import { pickVideoCodec, planVideoCodec } from './video-codec';
+import { adoptPlan, capScale, hardwareOption, type Attempt, type RetryKind } from './edit-recovery';
+import { runRecovered } from './video-run';
 import { H264Unavailable } from './encoder-probe';
 import { unplayable } from './video-compress';
 import { UnsupportedCodec, NamedError, UnreadableFile } from './input-error';
@@ -40,6 +43,8 @@ export interface AviOptions {
   /** Write Motion JPEG pictures and PCM sound, which the oldest players open, at the cost of a much larger file. */
   compat: boolean;
   onProgress?: (fraction: number) => void;
+  /** Said when the H.264 pass starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface AviResult {
@@ -52,6 +57,8 @@ export interface AviResult {
   videoCodec: string;
   audio: 'MP3' | 'PCM' | null;
   audioDropped: boolean;
+  /** Set when the H.264 pass was made on a retry, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
 }
 
 /** Clips shorter than this keep uncompressed sound (about 11 MB a minute); longer ones get MP3. */
@@ -102,14 +109,38 @@ function phoneRefusal(bytes: number): Error {
   return e;
 }
 
-export async function convertToAvi(file: File, opts: AviOptions): Promise<AviResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+/**
+ * Converts to AVI. The Motion JPEG pictures come from a canvas and need no encoder; the H.264 pass recovers from the encoder
+ * giving up or the page being hidden, at a smaller picture where the encoder is what failed (see edit-recovery.ts).
+ */
+export function convertToAvi(file: File, opts: AviOptions): Promise<AviResult> {
+  return runRecovered('VideoToAviFailed', opts.onNotice, (attempt, sized) => aviOnce(file, opts, attempt, sized));
+}
+
+async function aviOnce(file: File, opts: AviOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<AviResult> {
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
-    const width = even(video.displayWidth);
-    const height = even(video.displayHeight);
+    let width = even(video.displayWidth);
+    let height = even(video.displayHeight);
+    if (!opts.compat) {
+      // A retry after the encoder gave up asks for a smaller picture than the first try's; the test encode at the real size can lower it further.
+      const longest = Math.max(width, height);
+      const wanted = capScale(attempt, longest);
+      const plan = await planVideoCodec({ width: even(width * wanted), height: even(height * wanted), bitrate: h264Bitrate(width, height, 30) }, ['avc']).catch((e) => {
+        // A silent encoder is reported by h264Frames below, with its own words.
+        if (e instanceof H264Unavailable) return null;
+        throw e;
+      });
+      const k = plan ? adoptPlan(attempt, plan, longest) : wanted;
+      if (k < 1) {
+        width = even(width * k);
+        height = even(height * k);
+      }
+      sized(Math.max(width, height));
+    }
     const duration = await input.computeDuration();
     const stats = await video.computePacketStats(300).catch(() => null);
     const rate = frameRateFraction(stats?.averagePacketRate ?? 30);
@@ -142,7 +173,7 @@ export async function convertToAvi(file: File, opts: AviOptions): Promise<AviRes
     if (opts.compat) {
       frames = await jpegFrames(video, { width, height, duration, rate, onProgress: (f) => opts.onProgress?.(0.03 + f * 0.95) });
     } else {
-      const encoded = await h264Frames({ input, file, video, width, height, duration, rate, sound: sound && !pcmSound ? sound : null, onProgress: (f) => opts.onProgress?.(0.03 + f * 0.9) });
+      const encoded = await h264Frames({ attempt, input, file, video, width, height, duration, rate, sound: sound && !pcmSound ? sound : null, onProgress: (f) => opts.onProgress?.(0.03 + f * 0.9) });
       frames = encoded.frames;
       if (encoded.mp3) {
         audio = { kind: 'mp3', channels: encoded.channels, sampleRate: encoded.sampleRate, bitrate: MP3_BITRATE, frames: encoded.mp3 };
@@ -305,6 +336,7 @@ async function canvasJpeg(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<
  * runs at a constant frame rate with every frame in order, so the AVI's frame count is the clip's length.
  */
 async function h264Frames(o: {
+  attempt: Attempt;
   input: Input;
   file: File;
   video: VideoTrack;
@@ -347,7 +379,7 @@ async function h264Frames(o: {
     output,
     tracks: 'primary',
     composable: !!pcm,
-    video: { codec: 'avc', bitrate, width: o.width, height: o.height, fit: 'contain', frameRate: o.rate.fps, forceTranscode: true, allowTransformationMetadata: false },
+    video: { codec: 'avc', bitrate, width: o.width, height: o.height, fit: 'contain', frameRate: o.rate.fps, forceTranscode: true, allowTransformationMetadata: false, ...hardwareOption(o.attempt) },
     audio: wantSound && !pcm ? { codec: 'mp3', bitrate: MP3_BITRATE, sampleRate: SAMPLE_RATE, numberOfChannels: channels } : { discard: true },
   });
   if (!conversion.isValid) {

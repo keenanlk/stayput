@@ -26,5 +26,5 @@ test('home hero offers six starting tiles that link to their tools', async ({ pa
 
 test('home lede says offline works after one visit and a short wait', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.hero .lede')).toContainText('After one visit and a short wait, most tools keep working with the Wi-Fi off; the ones that download a model or engine need one online run first.');
+  await expect(page.locator('.hero .lede[data-ab="home-hero:A"]')).toContainText('After one visit and a short wait, most tools keep working with the Wi-Fi off; the ones that download a model or engine need one online run first.');
 });

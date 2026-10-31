@@ -13,6 +13,7 @@ import {
   Input,
   MATROSKA,
   MP4,
+  MPEG_TS,
   QTFF,
   WEBM,
   Mp4OutputFormat,
@@ -25,10 +26,10 @@ import {
   type Quality,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
-import { softwareH264Offered, useRealtimeH264 } from './encoder-probe';
-import { aacSafeSampleRate, pickVideoCodec } from './video-codec';
-import { pageRecoveryHooks } from './recovery-hooks';
-import { withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { aacSafeSampleRate, codecsFor, planVideoCodec } from './video-codec';
+import { capAtRisk, pageRecoveryHooks } from './recovery-hooks';
+import { encodeRun } from './encoder-probe';
+import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export type CompressMode = 'balanced' | 'small' | 'high' | 'size';
 
@@ -93,10 +94,6 @@ async function copiedSoundBitrate(track: InputAudioTrack): Promise<number> {
   return (await track.getAverageBitrate().catch(() => null)) ?? 128_000;
 }
 
-/** Names an encoder gives up with; a run that fails every size with one of them says so in plain words. */
-// (EncoderStall already carries plain words of its own.)
-const ENCODER_REFUSALS = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError']);
-
 /**
  * Compresses the video. When the device's encoder gives up (EncodingError and its kin) or the page was hidden, the run
  * starts again, at a smaller picture where the encoder is what failed (see edit-recovery.ts). If every try fails, the
@@ -108,23 +105,25 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
   try {
     return await withRecovery(
       async (attempt) => {
-        const r = await compressOnce(file, opts, attempt, (side) => (made = side));
-        return attempt.retry ? { ...r, retry: attempt.retry } : r;
+        const done = encodeRun(attempt);
+        try {
+          const r = await compressOnce(file, opts, attempt, (side) => (made = side));
+          const retry = retryOf(attempt);
+          return retry ? { ...r, retry } : r;
+        } finally {
+          done();
+        }
       },
       () => made,
-      { ...page.hooks, softwareEncode: softwareH264Offered },
+      page.hooks,
     );
-  } catch (e) {
-    const name = (e as { name?: string } | null)?.name ?? '';
-    if (!ENCODER_REFUSALS.has(name)) throw e;
-    throw new NamedError(name, "This device's video encoder stopped, even at a smaller size. Try a shorter clip, a recent Chrome, Edge or Safari, or a computer. Nothing was uploaded.", { cause: e });
   } finally {
     page.dispose();
   }
 }
 
 async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<CompressResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
@@ -167,16 +166,18 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
       audioBitrate = QUALITY[opts.mode];
     }
 
-    // A retry after the encoder gave up asks for a smaller picture than the first try's.
-    if (attempt.maxSide && Math.max(width, height) > attempt.maxSide) {
-      const k = attempt.maxSide / Math.max(width, height);
+    // A retry after the encoder gave up asks for a smaller picture than the first try's; a phone given a 4K source starts at 1080p.
+    capAtRisk(attempt, Math.max(srcW, srcH));
+    const wanted = capScale(attempt, Math.max(width, height));
+    // The test encode at the real size can lower it further before the file is decoded.
+    const plan = await planVideoCodec({ width: wanted < 1 ? even(width * wanted) : width, height: wanted < 1 ? even(height * wanted) : height, bitrate: videoBitrate }, codecsFor(attempt));
+    const k = adoptPlan(attempt, plan, Math.max(width, height));
+    if (k < 1) {
       width = even(width * k);
       height = even(height * k);
     }
     sized(Math.max(width, height));
-    // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software') useRealtimeH264();
-    const videoCodec = await pickVideoCodec({ width, height, bitrate: videoBitrate });
+    const videoCodec = plan.codec;
     if (!videoCodec) throw new NamedError('VideoCompressFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const audioCodec =
       sound && soundOk && !copySound
@@ -197,7 +198,7 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
           fit: 'contain',
           codec: videoCodec,
           bitrate,
-          ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}),
+          ...hardwareOption(attempt),
           forceTranscode: true,
           // Bake a phone's rotation into the pixels so every player shows it upright.
           allowTransformationMetadata: false,

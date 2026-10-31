@@ -106,7 +106,9 @@ test('no page makes an unqualified size-limit or bare offline claim about Staypu
 
 test('every other built page (home, about, press, privacy, hubs, conversions) and llms.txt make none either', () => {
   const covered = new Set(pages.map(({ path }) => `${path.slice(1)}.html`));
-  const others = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') && !covered.has(f) && f !== '404.html');
+  const others = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') && !covered.has(f) && f !== '404.html'
+    // /desktop describes a possible app ("Work offline on your computer"), not the site.
+    && f !== 'desktop.html');
   expect(others.length).toBeGreaterThan(5);
   const bad = [...others, 'llms.txt'].flatMap((f) => claimsIn(readFileSync(new URL(f, dist), 'utf8')).map((c) => `${f} ${c}`));
   expect(bad).toEqual([]);
@@ -229,4 +231,16 @@ test('cut-out model pages quote the measured download, not the decoded model siz
   expect(bad).toEqual([]);
   for (const f of ['remove-background', 'sticker-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 42 MB/);
   for (const f of ['passport-photo', 'profile-picture-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 46 MB/);
+});
+
+// A tool that exists to add a watermark must not say it adds none. The shared lead and the default
+// badge both say "no watermark", so each of these tools needs its own `free` entry and sizeFact.
+test('no watermark tool page says it adds no watermark', () => {
+  const marked = pages.filter((p) => p.kind !== 'guide' && p.path.includes('watermark'));
+  expect(marked.map((p) => p.path)).toContain('/tools/add-watermark-to-video');
+  const bad = marked.flatMap(({ path }) => {
+    const text = scannable(html(path));
+    return [...text.matchAll(/\b(adds? )?no watermarks?\b|without (a |any )?watermark/gi)].map((m) => `${path}: ${m[0]}`);
+  });
+  expect(bad).toEqual([]);
 });

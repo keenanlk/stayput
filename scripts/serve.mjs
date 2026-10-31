@@ -8,8 +8,9 @@
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = new URL('../dist/', import.meta.url).pathname;
+const root = fileURLToPath(new URL('../dist/', import.meta.url));
 // Apply the response headers from vercel.json (the strict CSP among them) so the
 // local server behaves like production and the tests catch CSP violations.
 const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));

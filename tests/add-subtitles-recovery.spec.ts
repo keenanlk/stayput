@@ -153,12 +153,12 @@ test.describe('the redraw', () => {
     await page.locator('#run').click();
   }
 
-  test('the encoder gives up at full size: the captions are burned in at a smaller size, and it says so', async ({ page }) => {
+  test('the encoder gives up at full size: the captions are burned in at a smaller size, and it says so', async ({ page, browserName }) => {
     test.setTimeout(240_000);
     await breakEncoder(page, 'EncodingError', false);
     await run(page);
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
-    await expect(page.locator('#results-list')).toContainText('made at a smaller size');
+    await expect(page.locator('#results-list')).toContainText(browserName === 'webkit' ? 'made on a second try' : 'made at a smaller size');
     await expect(page.locator('#error')).not.toHaveClass(/is-active/);
   });
 

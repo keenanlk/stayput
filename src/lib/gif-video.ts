@@ -7,10 +7,12 @@
  * mp4-muxer (MIT). Nothing leaves the tab.
  */
 import { parseGIF, decompressFrame, type ParsedGif } from 'gifuct-js';
-import { EncoderStall, watchEncode } from './encoder-watchdog';
+import { watchEncode } from './encoder-watchdog';
 import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 import { parseAnimatedWebp, renderWebpFrames } from './webp-anim';
 import { NamedError, UnreadableFile } from './input-error';
+import { encodeOptions, retryOf, type Attempt, type RetryKind } from './edit-recovery';
+import { runRecovered } from './video-run';
 
 type GifFrame = Parameters<typeof decompressFrame>[0];
 
@@ -24,6 +26,8 @@ export interface GifToMp4Options {
   /** Longest side of the video, in pixels. Larger GIFs are scaled down. */
   maxSide?: number;
   onProgress?: (fraction: number) => void;
+  /** Said when the run starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface GifToMp4Result {
@@ -39,6 +43,18 @@ export interface GifToMp4Result {
   duration: number;
   /** The first frame, for a preview. */
   poster: ImageBitmap;
+  /** Set when the video was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
+}
+
+/** The longest side a try may write: the tool's own limit (1920 unless set), lowered by a retry's or the remembered cap. A cap that takes effect is recorded for the note. */
+function sideLimit(attempt: Attempt, asked: number | undefined, long: number): number {
+  const own = asked ?? 1920;
+  if (attempt.maxSide && attempt.maxSide < own && long > attempt.maxSide) {
+    attempt.capped = true;
+    return attempt.maxSide;
+  }
+  return own;
 }
 
 /** Repeat short loops to this length: Instagram and several chat apps reject shorter videos. */
@@ -71,15 +87,15 @@ const CANDIDATES: Candidate[] = [
 ];
 
 /** The encoder configs this browser says it can do at this size, best first. */
-export async function supportedCodecs(width: number, height: number, bitrate: number, framerate: number): Promise<{ config: VideoEncoderConfig; candidate: Candidate }[]> {
+export async function supportedCodecs(width: number, height: number, bitrate: number, framerate: number, attempt: Attempt = {}): Promise<{ config: VideoEncoderConfig; candidate: Candidate }[]> {
   if (typeof VideoEncoder === 'undefined') {
     throw new NamedError('GifVideoFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
   }
   const found: { config: VideoEncoderConfig; candidate: Candidate }[] = [];
   // Safari's encoder in quality mode takes eight frames and then never answers; real-time mode does.
-  const latencyMode = /apple/i.test(navigator.vendor ?? '') ? 'realtime' : 'quality';
+  const latencyMode = attempt.latencyMode ?? (/apple/i.test(navigator.vendor ?? '') ? 'realtime' : 'quality');
   for (const candidate of CANDIDATES) {
-    const config: VideoEncoderConfig = { codec: candidate.codec, width, height, bitrate, framerate, bitrateMode: 'variable', latencyMode };
+    const config: VideoEncoderConfig = { codec: candidate.codec, width, height, bitrate, framerate, bitrateMode: 'variable', latencyMode, ...encodeOptions({ hardwareAcceleration: attempt.hardwareAcceleration }) };
     if (candidate.mux === 'avc') config.avc = { format: 'avc' };
     try {
       const { supported } = await VideoEncoder.isConfigSupported(config);
@@ -88,8 +104,10 @@ export async function supportedCodecs(width: number, height: number, bitrate: nu
       // An unknown codec string throws in some browsers; try the next one.
     }
   }
+  // The last rung writes VP9 (Chromium only), when this browser offers it.
+  const wanted = attempt.vp9 ? found.filter((f) => f.candidate.name === 'VP9') : found;
   if (!found.length) throw new NamedError('GifVideoFailed', 'This browser has no video encoder for this size. Try a recent version of Chrome, Edge or Safari.');
-  return found;
+  return wanted.length ? wanted : found;
 }
 
 /** Parse the GIF, or explain what is wrong with the file. */
@@ -102,7 +120,15 @@ export function readGif(bytes: ArrayBuffer): { gif: ParsedGif; frames: GifFrame[
   return { gif, frames };
 }
 
-export async function gifToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promise<GifToMp4Result> {
+/**
+ * GIF to MP4. When the device's encoder gives up (EncodingError and its kin) or the page was hidden, the run starts again,
+ * at a smaller picture where the encoder is what failed (see edit-recovery.ts).
+ */
+export function gifToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promise<GifToMp4Result> {
+  return runRecovered('GifVideoFailed', opts.onNotice, (attempt, sized) => gifToMp4Once(bytes, opts, attempt, sized));
+}
+
+async function gifToMp4Once(bytes: ArrayBuffer, opts: GifToMp4Options, attempt: Attempt, sized: (longestSide: number) => void): Promise<GifToMp4Result> {
   const { gif, frames } = readGif(bytes);
   const gw = gif.lsd.width;
   const gh = gif.lsd.height;
@@ -113,16 +139,19 @@ export async function gifToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promi
   // Tiny GIFs (emoji, pixel art) are enlarged by a whole number so pixels stay crisp;
   // large ones are scaled down to what H.264 level 4.0 allows. Encoders want even sides.
   const long = Math.max(gw, gh);
-  const maxSide = opts.maxSide ?? 1920;
+  const maxSide = sideLimit(attempt, opts.maxSide, long);
   const scale = long < MIN_SIDE ? Math.floor(MIN_SIDE / long) : Math.min(1, maxSide / long);
   const width = even(gw * scale);
   const height = even(gh * scale);
+  sized(Math.max(width, height));
   const fps = Math.min(60, Math.max(1, Math.round((1000 * frames.length) / loopMs)));
   // Generous for GIF content: flat colours compress very well at any rate.
   const bitrate = Math.round(Math.min(16e6, Math.max(8e5, width * height * fps * 0.2)));
-  const codecs = await supportedCodecs(width, height, bitrate, fps);
+  const codecs = await supportedCodecs(width, height, bitrate, fps, attempt);
   const job: Job = { source: gifSource(gif, frames, gw, gh, delays), count: frames.length, delays, plays, width, height, fps, crisp: scale > 1, background: opts.background, onProgress: opts.onProgress };
-  return encodeWithFallback(codecs, job);
+  const r = await encodeWithFallback(codecs, job);
+  const retry = retryOf(attempt);
+  return retry ? { ...r, retry } : r;
 }
 
 /** Why a WebP could not be made into a video, with what to try next. The page shows `link` after the message. */
@@ -146,7 +175,11 @@ export const isWebp = (b: Uint8Array) => b.length >= 12 && String.fromCharCode(.
  * canvas size, rounded to even, and each frame's own duration; transparency
  * becomes `background`.
  */
-export async function webpToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promise<GifToMp4Result> {
+export function webpToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Promise<GifToMp4Result> {
+  return runRecovered('GifVideoFailed', opts.onNotice, (attempt, sized) => webpToMp4Once(bytes, opts, attempt, sized));
+}
+
+async function webpToMp4Once(bytes: ArrayBuffer, opts: GifToMp4Options, attempt: Attempt, sized: (longestSide: number) => void): Promise<GifToMp4Result> {
   const u8 = new Uint8Array(bytes);
   if (!isWebp(u8)) throw new WebpError('NotAWebp', 'This file is not a WebP image. Some apps save animations as GIF or video under a .webp name. Save the animation again from the original app.');
   let anim;
@@ -160,12 +193,13 @@ export async function webpToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Prom
   const loopMs = delays.reduce((a, b) => a + b, 0);
   const plays = opts.repeat === 'auto' ? Math.max(1, Math.ceil((MIN_SECONDS * 1000) / loopMs)) : Math.max(1, opts.repeat);
   const long = Math.max(anim.width, anim.height);
-  const scale = Math.min(1, (opts.maxSide ?? 1920) / long);
+  const scale = Math.min(1, sideLimit(attempt, opts.maxSide, long) / long);
   const width = even(anim.width * scale);
   const height = even(anim.height * scale);
+  sized(Math.max(width, height));
   const fps = Math.min(60, Math.max(1, Math.round((1000 * anim.frames.length) / loopMs)));
   const bitrate = Math.round(Math.min(16e6, Math.max(8e5, width * height * fps * 0.2)));
-  const codecs = await supportedCodecs(width, height, bitrate, fps);
+  const codecs = await supportedCodecs(width, height, bitrate, fps, attempt);
   const source: FrameSource = async (emit) => {
     const tmp = new OffscreenCanvas(anim.width, anim.height);
     const tctx = tmp.getContext('2d')!;
@@ -174,23 +208,17 @@ export async function webpToMp4(bytes: ArrayBuffer, opts: GifToMp4Options): Prom
       await emit(tmp, delays[i]!);
     });
   };
-  return encodeWithFallback(codecs, { source, count: anim.frames.length, delays, plays, width, height, fps, crisp: false, background: opts.background, onProgress: opts.onProgress });
+  const r = await encodeWithFallback(codecs, { source, count: anim.frames.length, delays, plays, width, height, fps, crisp: false, background: opts.background, onProgress: opts.onProgress });
+  const retry = retryOf(attempt);
+  return retry ? { ...r, retry } : r;
 }
 
 async function encodeWithFallback(codecs: Awaited<ReturnType<typeof supportedCodecs>>, job: Job): Promise<GifToMp4Result> {
-  // A hardware encoder can accept a config and still fail on the first frame; fall back to the next codec.
-  let lastError: unknown;
-  for (const { config, candidate } of codecs) {
-    try {
-      return await encode(job, config, candidate);
-    } catch (e) {
-      // A silent encoder is not a reason to wait through the next codec as well.
-      if (e instanceof EncoderStall) throw e;
-      console.warn(`${candidate.codec} failed, trying the next codec:`, e);
-      lastError = e;
-    }
-  }
-  throw lastError instanceof Error ? lastError : new NamedError('GifVideoFailed', String(lastError));
+  // Writes with the best codec this browser offers (H.264 first). A hardware encoder can accept a config and still fail on the first
+  // frame; that is left to the shared recovery (the same size with another setting, a smaller picture, VP9 last; see edit-recovery.ts),
+  // so a failure is not answered by a codec the person's player may not open, and a hidden page is waited out first.
+  const { config, candidate } = codecs[0]!;
+  return encode(job, config, candidate);
 }
 
 /** Draws one play of the animation, calling `emit` with each composited frame and how long it shows (ms). */

@@ -5,10 +5,13 @@
  */
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
 import { classifyError, trackFilesAdded, trackToolRun, trackToolStart } from './analytics';
-import { EncoderStall } from './encoder-watchdog';
+import { EncoderStall, watchProgress } from './encoder-watchdog';
+import { markInflight, reportLostTab } from './inflight';
+import { isBare, nameBare } from './bare-error';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
 import { mountNextSteps } from './next-steps';
+import { mountDesktopTeaser } from './desktop-teaser';
 import { warmDecoders } from './vendor';
 import { droppedFiles } from './folder-drop';
 import { takeHandoff } from './handoff';
@@ -16,6 +19,9 @@ import { releaseOutput } from './opfs-output';
 import { guardRun, interruptedError, resumeIfHidden, KEEP_SCREEN_ON_HINT } from './wake-lock';
 import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
+import { failsTheSameAgain } from './edit-recovery';
+import { inspectFile, type IntakeProblem } from './intake';
+import { forgetWorkingSize, riskSize, workingSize } from './working-size';
 
 export interface ShellFile {
   id: number;
@@ -61,6 +67,12 @@ export interface ShellOptions {
   reorder?: boolean;
   /** Called after files are added, removed or reordered. */
   onFilesChanged?: (files: ShellFile[]) => void | Promise<void>;
+  /**
+   * Keeps Run disabled while the list can't be run, and shows the returned
+   * one-line reason above Run. Return '' when the list is fine. Evaluated on
+   * every list change and on shell.refresh().
+   */
+  runBlocker?: (files: ShellFile[]) => string | { message: string; link?: { text: string; href: string } };
   /** Do the work. Return the outputs to show. */
   process: (files: ShellFile[], progress: Progress) => Promise<ProcessResult>;
   /** Title shown above the results. */
@@ -75,6 +87,14 @@ export interface ShellOptions {
   keepAwake?: boolean;
   /** Send one tool_start event when Run is pressed (the caption tools, where phones abandon runs). */
   announceStart?: boolean;
+  /** A video job that starts at the smaller size that last worked in this tab (see edit-recovery.ts): says so, and offers "Try full size". */
+  remembersSize?: boolean;
+  /**
+   * Fail a run whose progress stands still for three minutes (StalledError). On by default for tools that take only
+   * pictures and PDFs; the video tools run their own encoder watchdog and the speech tools sit through long silent steps,
+   * so they stay off unless a tool asks. Pass false to turn it off, true to turn it on.
+   */
+  watch?: boolean;
 }
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -122,6 +142,12 @@ export function shortName(name: string, max = 26): string {
   return `${base.slice(0, room - tail)}…${base.slice(base.length - tail)}${ext}`;
 }
 
+/** The line under a failed run that cannot be repeated: the reason as the person was told it, and what to change. */
+function repeatHint(e: unknown): string {
+  const reason = (e instanceof Error ? e.message : String(e)).trim().replace(/[.\s]+$/, '');
+  return `${reason}. To try again, change the file or an option.`;
+}
+
 export function describeError(file: File, e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e);
   return msg.startsWith(file.name) ? msg : `${file.name}: ${msg}`;
@@ -133,6 +159,11 @@ function rewrap(file: File, e: unknown): Error {
   if (e instanceof Error && e.name) out.name = e.name;
   const link = (e as { link?: { href: string; text: string } } | null)?.link;
   if (link) (out as Error & { link?: typeof link }).link = link;
+  const stage = (e as { stage?: string } | null)?.stage;
+  if (stage) (out as Error & { stage?: string }).stage = stage;
+  // Work the failed step finished (a partial transcript) stays downloadable.
+  const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
+  if (salvage) (out as Error & { salvage?: OutputFile[] }).salvage = salvage;
   return out;
 }
 
@@ -173,6 +204,12 @@ export async function processEach(
   return { outputs, skipped };
 }
 
+/** True when a file picker's `accept` list names only pictures and PDFs (GIF and animated formats excluded). */
+function picturesOnly(accept: string): boolean {
+  const tokens = accept.split(',').map((t) => t.trim()).filter(Boolean);
+  return tokens.length > 0 && tokens.every((t) => !/gif|apng/i.test(t) && /^(image\/.+|application\/pdf|\.(jpe?g|png|webp|heic|heif|avif|jxl|bmp|tiff?|psd|svg|pdf))$/i.test(t));
+}
+
 export function createShell(opts: ShellOptions) {
   const root = $('tool');
   const multiple = root.dataset.multiple === 'true';
@@ -192,6 +229,7 @@ export function createShell(opts: ShellOptions) {
   const results = $('results');
   const resultsList = $('results-list');
   const resultsTitle = $('results-title');
+  const desktopTeaser = mountDesktopTeaser(root);
   const downloadAll = $<HTMLButtonElement>('download-all');
 
   let files: ShellFile[] = [];
@@ -202,7 +240,7 @@ export function createShell(opts: ShellOptions) {
   // An attempt starts when files are added and ends at a clear or when new
   // files arrive after a successful run. files_added fires once per attempt, and
   // tool_run marks the attempt's first success, so completion = first successes / files_added.
-  let attempt: { ok: boolean } | undefined;
+  let attempt: { ok: boolean; previewFailed?: boolean } | undefined;
   // The file carried over from the previous tool, while it is still in the list (see adoptHandoff).
   let carriedFile: File | undefined;
 
@@ -223,6 +261,7 @@ export function createShell(opts: ShellOptions) {
       );
     }
     if (arr.length === 0) return;
+    repeatBlock = '';
     if (!multiple) files = [];
     for (const file of arr) {
       const entry: ShellFile = { id: nextId++, file };
@@ -230,6 +269,8 @@ export function createShell(opts: ShellOptions) {
       if (!multiple) break;
     }
     render();
+    const added = files.filter((f) => !intake.has(f.id));
+    checking = Promise.all(added.map(async (f) => intake.set(f.id, (await inspectFile(f.file, root.dataset.slug ?? '', root.dataset.base ?? '', input.accept).catch(() => null)) ?? undefined))).then(updateRunBlock);
     if (!attempt || attempt.ok) {
       attempt = { ok: false };
       trackFilesAdded({ tool: root.dataset.slug ?? 'unknown', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0) });
@@ -261,17 +302,44 @@ export function createShell(opts: ShellOptions) {
    * unhandled rejection; now it is shown where the result would be.
    */
   async function filesChanged() {
+    const done = markInflight(root.dataset.slug ?? 'unknown', 'preview');
     try {
-      await opts.onFilesChanged?.(files);
+      // A file the intake check refused is not handed to the tool: trim-video, for one, would feed a WMV to its <video>, and
+      // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
+      await checking;
+      await opts.onFilesChanged?.(files.filter((f) => !intake.get(f.id)));
     } catch (e) {
-      console.warn(e);
       const first = files[0];
-      showError(first ? describeError(first.file, e) : e instanceof Error ? e.message : String(e));
+      previewFailed(e, first ? describeError(first.file, e) : undefined);
+    } finally {
+      done();
     }
+  }
+
+  /**
+   * A preview (what a tool decodes and draws before Run) failed: show it, and record it as a failed run of this attempt,
+   * once. The class is "Preview" plus the error's own name, so these stay apart from failures of Run. An error with no
+   * name of its own is "PreviewError".
+   */
+  function previewFailed(e: unknown, message?: string) {
+    console.warn(e);
+    showError(message ?? (e instanceof Error ? e.message : String(e)));
+    if (!attempt || attempt.previewFailed) return;
+    attempt.previewFailed = true;
+    const tool = root.dataset.slug ?? 'unknown';
+    const kind = isBare(e) ? 'Error' : classifyError(nameBare('Error', e), tool);
+    trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0), ms: 0, errorClass: `Preview${kind}`.slice(0, 40) });
+  }
+
+  /** A failure the tool shows itself, outside Run (remove-object's Erase button): recorded under the error's own class. */
+  function recordError(e: unknown) {
+    const tool = root.dataset.slug ?? 'unknown';
+    trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0), ms: 0, errorClass: classifyError(e, tool) });
   }
 
   function remove(id: number) {
     files = files.filter((f) => f.id !== id);
+    repeatBlock = '';
     hideResults();
     hideError();
     render();
@@ -284,9 +352,37 @@ export function createShell(opts: ShellOptions) {
     if (i < 0 || j < 0 || j >= files.length) return;
     const [item] = files.splice(i, 1);
     files.splice(j, 0, item!);
+    repeatBlock = '';
     hideResults();
     render();
     void filesChanged();
+  }
+
+  // What the file-intake check found for each picked file (see intake.ts); a file with a problem keeps Run disabled.
+  const intake = new Map<number, IntakeProblem | undefined>();
+  let checking: Promise<void> = Promise.resolve();
+  const intakeProblem = () => files.map((f) => intake.get(f.id)).find(Boolean);
+
+  let runBlock = '';
+  // Set when a run failed in a way the same file and options will repeat; any change to the files or an option clears it.
+  let repeatBlock = '';
+  function unlockRepeat() {
+    if (!repeatBlock) return;
+    repeatBlock = '';
+    updateRunBlock();
+  }
+  function updateRunBlock() {
+    const found = intakeProblem();
+    const blocked = opts.runBlocker?.(files);
+    const own = typeof blocked === 'string' ? { message: blocked } : blocked;
+    const next = own?.message || found?.message || repeatBlock;
+    const link = own?.message ? own.link : next === found?.message ? found?.link : undefined;
+    if (next !== runBlock) {
+      runBlock = next;
+      setHint(next, link);
+      hint.dataset.problem = !own?.message && next === found?.message ? found?.name ?? '' : '';
+    }
+    run.disabled = files.length === 0 || busy || !!runBlock;
   }
 
   function render() {
@@ -319,7 +415,7 @@ export function createShell(opts: ShellOptions) {
       li.append(thumb, info, actions);
       list.append(li);
     }
-    run.disabled = files.length === 0 || busy;
+    updateRunBlock();
     clear.hidden = files.length === 0;
     drop.classList.toggle('is-compact', files.length > 0);
     root.dataset.count = String(files.length);
@@ -357,6 +453,7 @@ export function createShell(opts: ShellOptions) {
   }
   function hideResults() {
     results.classList.remove('is-active');
+    desktopTeaser.hide();
     const next = document.getElementById('next-steps');
     if (next) next.hidden = true;
     resultsList.innerHTML = '';
@@ -384,7 +481,7 @@ export function createShell(opts: ShellOptions) {
 
   function setBusy(b: boolean) {
     busy = b;
-    run.disabled = b || files.length === 0;
+    run.disabled = b || files.length === 0 || !!runBlock;
     progress.classList.toggle('is-active', b);
     root.classList.toggle('is-busy', b);
     if (!b) progressApi.set('', 0);
@@ -494,8 +591,48 @@ export function createShell(opts: ShellOptions) {
     hint.hidden = !line;
   }
 
+  /** Says when this tab's runs start at a smaller size than full, and lets the person go back to full size. */
+  const sizeNote = opts.remembersSize ? document.createElement('p') : null;
+  function showSizeNote() {
+    if (!sizeNote) return;
+    const side = workingSize() ?? riskSize();
+    sizeNote.hidden = !side;
+    if (!side) return;
+    sizeNote.className = 'hint';
+    sizeNote.id = 'working-size-note';
+    const name = side >= 1900 ? '1080p' : side >= 1200 ? '720p' : '480p';
+    const full = document.createElement('button');
+    full.type = 'button';
+    full.className = 'btn btn-sm btn-ghost';
+    full.textContent = 'Try full size';
+    full.addEventListener('click', () => {
+      forgetWorkingSize();
+      showSizeNote();
+    });
+    sizeNote.textContent = workingSize()
+      ? `In this tab, videos are made at up to ${name} because the full size failed on this device earlier. `
+      : `On this device, 4K videos are made at ${name} because 4K is heavy for it. `;
+    sizeNote.append(full);
+  }
+  if (sizeNote) {
+    sizeNote.hidden = true;
+    hint.before(sizeNote);
+    showSizeNote();
+  }
+
+  const watching = opts.watch ?? (!opts.keepAwake && picturesOnly(input.accept));
+  /** The progress the tool sees when a run is watched: every new text or fraction counts as movement. */
+  const watchedProgress = (tick: (key: unknown) => void): Progress => ({
+    set(text, fraction) {
+      tick(`${text}|${fraction}`);
+      progressApi.set(text, fraction);
+    },
+  });
+
   async function execute() {
     if (busy || files.length === 0) return;
+    await checking;
+    if (intakeProblem()) return updateRunBlock();
     hideError();
     hideResults();
     setBusy(true);
@@ -505,9 +642,10 @@ export function createShell(opts: ShellOptions) {
     const tool = root.dataset.slug ?? 'unknown';
     const mine = (guard = opts.keepAwake ? guardRun() : undefined);
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
+    const clearMarker = markInflight(tool, 'run');
     try {
       const result = await resumeIfHidden(
-        () => opts.process(files, progressApi),
+        () => (watching ? watchProgress((tick) => opts.process(files, watchedProgress(tick)), () => undefined) : opts.process(files, progressApi)),
         mine,
         () => progressApi.set('The page was hidden, so the run stopped. Starting again: keep this tab open and the screen on.', 0),
       );
@@ -533,10 +671,15 @@ export function createShell(opts: ShellOptions) {
       // Work finished before the failure (captions written before the video could be redrawn) stays downloadable.
       const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
       if (salvage?.length) showResults(salvage, false);
-      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass: classifyError(e, tool) });
+      const errorClass = classifyError(e, tool);
+      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
+      if (failsTheSameAgain(errorClass)) repeatBlock = repeatHint(e);
     } finally {
+      clearMarker();
       mine?.release();
+      showSizeNote();
       setBusy(false);
+      updateRunBlock();
     }
   }
 
@@ -585,10 +728,11 @@ export function createShell(opts: ShellOptions) {
   run.addEventListener('click', () => void execute());
   clear.addEventListener('click', () => {
     files = [];
+    repeatBlock = '';
     attempt = undefined;
     // Clear while a run is going: the screen no longer needs holding for it.
     guard?.release();
-    setHint();
+    setHint(runBlock);
     hideResults();
     hideError();
     render();
@@ -635,14 +779,27 @@ export function createShell(opts: ShellOptions) {
 
   // Re-running with the same files should be possible after changing options.
   document.getElementById('options')?.addEventListener('change', () => hideResults());
+  // A change to an option (or anything else in the panel) re-opens Run after a failure that would only repeat.
+  // The file picker, the list, Run and the results are not options: the list calls unlock itself.
+  const notAnOption = '#drop, #file-list, #run-dock, #results';
+  for (const ev of ['input', 'change']) {
+    root.addEventListener(ev, (e) => {
+      if ((e.target as HTMLElement | null)?.id !== 'file-input') unlockRepeat();
+    });
+  }
+  // Options set by pointing (painting, a crop box) raise no input event.
+  root.addEventListener('pointerdown', (e) => {
+    if (repeatBlock && !(e.target as HTMLElement | null)?.closest?.(notAnOption)) unlockRepeat();
+  });
 
   render();
-  if (opts.keepAwake) setHint();
+  if (opts.keepAwake) setHint(runBlock);
   mountNetProof(root);
   mountInstallPrompt(root);
   mountNextSteps(root);
   warmDecoders(input.accept);
   // Landing pages load the tool module on demand; this marks the shell as live.
+  reportLostTab();
   root.dataset.ready = 'true';
   void adoptHandoff();
 
@@ -652,8 +809,14 @@ export function createShell(opts: ShellOptions) {
     },
     execute,
     showError,
+    previewFailed,
+    recordError,
+    /** Mark work outside Run as in flight (see inflight.ts); call the returned function when it ends. */
+    inflight: (phase: 'run' | 'preview') => markInflight(root.dataset.slug ?? 'unknown', phase),
     hideError,
     setHint,
+    /** Re-check opts.runBlocker after something it depends on changed (a file's kind became known). */
+    refresh: updateRunBlock,
     progress: progressApi,
     /** Expose for tests. */
     addFiles,

@@ -1,4 +1,5 @@
 import { createShell, num, radio, str, type ShellFile } from '../lib/shell';
+import { retryNote } from '../lib/edit-recovery';
 import { type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
 import { InputError } from '../lib/input-error';
@@ -72,9 +73,21 @@ matchButton.addEventListener('click', async () => {
   describe();
 });
 
+/** Why Run can't start yet, in one line; '' when the list can be made into a slideshow. */
+function missing(files: ShellFile[]): string {
+  const { pictures, songs } = split(files);
+  if (pictures.length === 0) return 'Add at least two photos to start.';
+  if (pictures.length === 1) return 'Add at least one more photo: a slideshow needs two or more.';
+  if (pictures.length > MAX_PHOTOS) return `Remove ${pictures.length - MAX_PHOTOS} photo${pictures.length - MAX_PHOTOS === 1 ? '' : 's'}: the limit is ${MAX_PHOTOS}.`;
+  if (songs.length > 1) return `Remove ${songs.length - 1} song${songs.length === 2 ? '' : 's'}: the slideshow takes one.`;
+  return '';
+}
+
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   outputFormat: () => 'mp4',
+  runBlocker: missing,
   async onFilesChanged(files) {
     current = files;
     panel.hidden = split(files).pictures.length === 0;
@@ -106,13 +119,14 @@ const shell = createShell({
           const left = timeLeft.update(f) ?? 'Estimating time left…';
           progress.set(`Making the slideshow: ${Math.round(f * 100)}% · ${left}`, 0.02 + f * 0.98);
         },
+        onNotice: (m) => progress.set(m, 0.02),
       },
     );
     const out: OutputFile = {
       name: 'slideshow.mp4',
       blob: r.blob,
       originalSize: pictures.reduce((t, p) => t + p.file.size, 0),
-      note: `${formatDuration(r.duration)}, ${r.width}×${r.height}, ${r.videoCodec}, ${pictures.length} photos${songs.length ? ' with song' : ', no sound'}`,
+      note: `${formatDuration(r.duration)}, ${r.width}×${r.height}, ${r.videoCodec}, ${pictures.length} photos${songs.length ? ' with song' : ', no sound'}${retryNote(r.retry, r)}`,
     };
     return [out];
   },

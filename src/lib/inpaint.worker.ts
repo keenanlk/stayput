@@ -10,8 +10,11 @@ import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
 import { NamedError } from './input-error';
+import { fetchModelResumable } from './model-stall';
 
 export const MODEL_URL = '/models/migan-pipeline-v2.onnx';
+/** The file's exact size: a body of any other length is refused, not handed to the loader. */
+export const MODEL_BYTES = 28_079_181;
 
 /** `hole` has one byte per pixel, non-zero where the picture should be filled in. */
 export type Request = { id: number; type: 'inpaint'; rgba: Uint8ClampedArray; hole: Uint8Array; width: number; height: number };
@@ -23,27 +26,8 @@ export type Reply =
 
 let session: Promise<ort.InferenceSession> | undefined;
 
-async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
-  const res = await fetch(MODEL_URL);
-  if (!res.ok || !res.body) throw new NamedError('ModelDownloadError', `The object removal model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
-  const total = Number(res.headers.get('content-length')) || 0;
-  const reader = res.body.getReader();
-  const parts: Uint8Array[] = [];
-  let got = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    parts.push(value);
-    got += value.length;
-    if (total) onProgress(Math.min(1, got / total));
-  }
-  const bytes = new Uint8Array(got);
-  let o = 0;
-  for (const p of parts) {
-    bytes.set(p, o);
-    o += p.length;
-  }
-  return bytes;
+function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
+  return fetchModelResumable(MODEL_URL, 'object removal model', MODEL_BYTES, onProgress);
 }
 
 function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {
@@ -52,7 +36,13 @@ function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {
     // Threads need a cross-origin-isolated page, which this site is not.
     ort.env.wasm.numThreads = 1;
     const model = await fetchModel(onProgress);
-    return ort.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+    try {
+      return await ort.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+    } catch (err) {
+      // A file that downloaded whole but will not start: out of memory when it says so, else the load itself.
+      const f = workerFailure(err, 'ModelLoadError');
+      throw new NamedError(f.name, f.message);
+    }
   })();
   // A failed load (offline on first use, say) may be retried by the next request.
   session.catch(() => (session = undefined));
@@ -96,6 +86,6 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     const result = await inpaint(s, rgba, hole, width, height);
     post({ id, type: 'done', rgba: result, width, height }, [result.buffer]);
   } catch (err) {
-    post({ id, type: 'error', ...workerFailure(err) });
+    post({ id, type: 'error', ...workerFailure(err, 'InpaintFailed') });
   }
 };

@@ -1,4 +1,5 @@
 import { bool, createShell, num } from '../lib/shell';
+import { retryNote } from '../lib/edit-recovery';
 import { suffixName, type OutputFile } from '../lib/files';
 import { NamedError, InputError } from '../lib/input-error';
 
@@ -119,6 +120,7 @@ endInput.addEventListener('change', () => {
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   async onFilesChanged(files) {
     if (files.length === 0) return unload();
     try {
@@ -144,12 +146,13 @@ const shell = createShell({
       exact,
       mute: bool('mute'),
       onProgress: (f) => progress.set(`Cutting ${entry.file.name}: ${Math.round(f * 100)}%`, f),
+      onNotice: (m) => progress.set(`${entry.file.name}: ${m}`, 0),
     });
     const out: OutputFile = {
       name: suffixName(entry.file.name, '-trimmed', r.ext),
       blob: r.blob,
       originalSize: entry.file.size,
-      note: `${clock(start)} to ${clock(end)}, ${exact ? 'cut exactly' : 'fast cut'}`,
+      note: `${clock(start)} to ${clock(end)}, ${exact ? 'cut exactly' : 'fast cut'}${retryNote(r.retry, r.width && r.height ? { width: r.width, height: r.height } : undefined)}`,
     };
     return [out];
   },

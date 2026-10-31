@@ -4,6 +4,7 @@ import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../l
 import { cutPart, parseTimes, partName, planAtTimes, planEvery, SplitError, type Part } from '../lib/audio-split';
 import { NamedError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
+import { retryUnreadable } from '../lib/read-failure';
 
 /**
  * Audio splitter. The file is decoded in the page, cut into parts at the times
@@ -80,7 +81,7 @@ function update() {
 async function load(file: File) {
   buffer = undefined;
   update();
-  buffer = await decodeAudio(file).catch((e) => {
+  buffer = await retryUnreadable(file, () => decodeAudio(file)).catch((e) => {
     throw named('AudioDecodeError', e);
   });
   $('tool').dataset.duration = String(Math.round(buffer.duration * 10) / 10);

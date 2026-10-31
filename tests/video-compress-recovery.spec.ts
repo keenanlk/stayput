@@ -10,6 +10,7 @@ const phoneMov = fileURLToPath(new URL('./fixtures/static/iphone-portrait.mov', 
 /** Once the page says it is compressing, the encoder throws `name`: once, or on every frame when `always`. */
 async function breakEncoder(page: Page, name: string, always: boolean) {
   await withoutSoftwareEncoder(page);
+  await page.addInitScript(() => ((window as unknown as { __stayputNoSizeProbe: boolean }).__stayputNoSizeProbe = true));
   await page.addInitScript(
     ([name, always]) => {
       let armed = false;
@@ -35,13 +36,13 @@ async function run(page: Page) {
   await page.locator('#run').click();
 }
 
-test('the encoder gives up at full size: the clip is compressed at a smaller size and says so', async ({ page }) => {
+test('the encoder gives up at full size: the clip is compressed at a smaller size and says so', async ({ page, browserName }) => {
   test.setTimeout(240_000);
   await breakEncoder(page, 'EncodingError', false);
   await run(page);
   await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
-  await expect(page.locator('#results-list')).toContainText('made at a smaller size');
-  await expect(page.locator('#results-list')).toContainText(/854×\d+|\d+×854/);
+  await expect(page.locator('#results-list')).toContainText(browserName === 'webkit' ? 'made on a second try' : 'made at a smaller size');
+  if (browserName !== 'webkit') await expect(page.locator('#results-list')).toContainText(/854×\d+|\d+×854/);
 });
 
 test('the encoder refuses at every size: the run fails as EncodingError with plain words', async ({ page }) => {
@@ -49,6 +50,6 @@ test('the encoder refuses at every size: the run fails as EncodingError with pla
   await breakEncoder(page, 'EncodingError', true);
   await run(page);
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 200_000 });
-  await expect(page.locator('#error')).toContainText(/even at a smaller size/);
+  await expect(page.locator('#error')).toContainText(/even after trying again/);
   await expect(page.locator('#error')).toContainText(/Try a shorter clip/);
 });

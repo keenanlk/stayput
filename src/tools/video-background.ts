@@ -4,7 +4,9 @@ import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/
 import { describeEdit } from './video-edit-shell';
 import { resumeWhenHidden, retryNote } from '../lib/edit-recovery';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { InputError, NamedError, isUnspecific } from '../lib/input-error';
+import { NamedError, UnreadableFile, UnsupportedCodec, isUnspecific } from '../lib/input-error';
+import { snapshotFile } from '../lib/read-failure';
+import { saveHandoff } from '../lib/handoff';
 import { nameBare } from '../lib/bare-error';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
@@ -135,13 +137,62 @@ async function decodePicture(file: File) {
     return await (await import('../lib/image')).decodeImage(file);
   } catch (e) {
     if (e instanceof Error && !isUnspecific(e)) throw e;
-    throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Try a JPEG or PNG copy of it.'), { cause: e });
+    throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.'), { cause: e });
   }
 }
 
-createShell({
-  onFilesChanged: checkPhoneClip,
+/** Pictures that did not open when they were added; Run stays off for them (see pictureBlocker), so the failure is said once, at the drop. */
+const unopenable = new WeakSet<File>();
+const PICTURE_MESSAGE = 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.';
+
+const REMOVE_BG = '/tools/remove-background';
+const PICTURE_ONLY_MESSAGE =
+  'Add a video too: this tool replaces the background of a video, and the picture is only the new background. To take the background out of a photo, use the Remove background tool instead.';
+
+function pictureBlocker(files: ShellFile[]): string | { message: string; link?: { text: string; href: string } } {
+  const pictures = files.filter((f) => isImage(f.file));
+  // Only pictures were added: refused here, at the drop, so Run is never pressed (and no failed run is recorded).
+  if (pictures.length > 0 && pictures.length === files.length) return { message: PICTURE_ONLY_MESSAGE, link: { text: 'Remove background tool', href: REMOVE_BG } };
+  return pictures.length === 1 && unopenable.has(pictures[0]!.file) ? PICTURE_MESSAGE : '';
+}
+
+// The link in that refusal carries a single photo over to Remove background (see handoff.ts); any other click follows the plain link.
+document.getElementById('run-hint')?.addEventListener('click', async (e) => {
+  const a = (e.target as HTMLElement).closest<HTMLAnchorElement>(`a[href="${REMOVE_BG}"]`);
+  const only = pictureOnly();
+  if (!a || !only || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.defaultPrevented) return;
+  e.preventDefault();
+  await saveHandoff({ name: only.name, blob: only }, a.pathname, 'Video background remover');
+  location.assign(a.href);
+});
+
+/** Open the new background when it is added, not when Run is pressed: a picture that will not open is told then. */
+async function checkPicture(files: ShellFile[]) {
+  const pictures = files.filter((f) => isImage(f.file));
+  if (pictures.length !== 1 || unopenable.has(pictures[0]!.file)) return;
+  const file = pictures[0]!.file;
+  try {
+    (await decodePicture(file)).bitmap.close();
+  } catch (e) {
+    // A failure with a name of its own that is not the picture's (a script that would not load) is left for Run to say.
+    if (e instanceof Error && e.name === 'PictureUnreadable') unopenable.add(file);
+  }
+  shell.refresh();
+}
+
+/** The one picture on the list when nothing else is, for the handoff above. */
+let current: ShellFile[] = [];
+const pictureOnly = () => (current.length === 1 && isImage(current[0]!.file) ? current[0]!.file : undefined);
+
+const shell = createShell({
+  runBlocker: pictureBlocker,
+  onFilesChanged: async (files) => {
+    current = files;
+    void checkPicture(files);
+    await checkPhoneClip(files);
+  },
   keepAwake: true,
+  remembersSize: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     // Where the run is, so a TypeError (no name of its own) is recorded as the step that threw it.
@@ -156,12 +207,18 @@ createShell({
 
 async function run(files: ShellFile[], progress: Progress, at: (step: string) => void): Promise<OutputFile[]> {
   const pictures = files.filter((f) => isImage(f.file));
-  const videos = files.filter((f) => !isImage(f.file));
-  if (videos.length === 0) throw new InputError('Add a video too: the picture is only the new background.');
-  if (pictures.length > 1) throw new InputError('Add one picture for the background, with the videos to put it behind.');
+  let videos = files.filter((f) => !isImage(f.file));
+  if (videos.length === 0) {
+    if (pictures.length > 0) throw new NamedError('PictureWithoutVideo', PICTURE_ONLY_MESSAGE);
+    throw new NamedError('NoVideo', `Add a video (MP4, MOV, WebM or MKV) to ${kind() === 'blur' ? 'blur' : 'replace'} its background.`);
+  }
+  if (pictures.length > 1) throw new NamedError('TooManyPictures', `${pictures.length} pictures were added. Keep one picture for the new background, remove the others, and run again.`);
   let bgKind = kind();
   if (pictures.length === 1) bgKind = 'image';
-  else if (bgKind === 'image') throw new InputError('Add a picture with the video to use as the new background, or choose Blur or Colour.');
+  else if (bgKind === 'image') throw new NamedError('PictureBackgroundMissing', 'Picture is chosen as the new background, but no picture was added. Add a JPG or PNG with the video, or choose Blur or Colour.');
+  // Copy each video into memory right away: on Android a file picked from a cloud gallery (Google Photos, Drive) can stop being
+  // readable by the time the person finder has downloaded. One the browser cannot reach says so now, before the download.
+  videos = await Promise.all(videos.map(async (entry) => ({ ...entry, file: await snapshotFile(entry.file) })));
   const strength = num('strength', 6);
   const color = str('bg-color', '#00b140');
   // decodeImage also opens HEIC, which Chrome cannot decode on its own.
@@ -173,7 +230,22 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   await requireH264Encoder();
   const { assertReadable, editVideo, videoSize } = await import('../lib/video-edit');
   // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
-  for (const v of videos) await assertReadable(v.file);
+  for (const v of videos) {
+    await assertReadable(v.file).catch((e) => {
+      // A 3GP with H.263 video opens as MP4 but cannot be decoded: the iPhone/HEVC advice would send the person the wrong way.
+      if (e instanceof Error && e.name === 'UnsupportedCodec' && /\.3g[p2]$/i.test(v.file.name)) {
+        throw new UnsupportedCodec(`${v.file.name} is a 3GP clip with video this browser cannot decode. Make an MP4 copy with the Video to MP4 tool, then add that.`);
+      }
+      throw e;
+    });
+  }
+  // A file that is not a video this page opens (3GP, AVI, WMV, a renamed file) is said so now, with the way on, not after the download.
+  for (const v of videos) {
+    await videoSize(v.file).catch((e) => {
+      if (!(e instanceof Error) || e.name !== 'UnreadableFile') return;
+      throw Object.assign(new UnreadableFile(`${v.file.name} is not a video this page can read (MP4, MOV, WebM or MKV). Make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
+    });
+  }
   const which = finder();
   progress.set(`Loading the person finder, once (about ${which === 'fast' ? '12' : '28'} MB)…`, 0.01);
   at('PersonFinderLoadFailed');
@@ -231,7 +303,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
       name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
       blob: r.blob,
       originalSize: file.size,
-      note: `${describeEdit(r)}${retryNote(r.retry)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
+      note: `${describeEdit(r)}${retryNote(r.retry, r)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
     });
   }
   return outputs;

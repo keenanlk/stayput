@@ -1,6 +1,7 @@
-import { createShell, str, type ShellFile } from '../lib/shell';
+import { createShell, str } from '../lib/shell';
 import { formatBytes, suffixName, type OutputFile } from '../lib/files';
-import { InputError } from '../lib/input-error';
+import { retryNote } from '../lib/edit-recovery';
+import { NamedError } from '../lib/input-error';
 import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
 import type { SbsFit, SbsLayout, SbsLength, SbsSound } from '../lib/side-by-side-plan';
 
@@ -27,30 +28,42 @@ const clock = (s: number) => {
   return m ? `${m}:${sec.toFixed(1).padStart(4, '0')}` : `${sec.toFixed(1)} s`;
 };
 
-function fillSlot(letter: 'a' | 'b', entry: ShellFile | undefined) {
-  $(`sbs-name-${letter}`).textContent = entry ? entry.file.name : `Drop video ${letter.toUpperCase()}`;
-  $(`sbs-size-${letter}`).textContent = entry ? formatBytes(entry.file.size) : '';
+function fillSlot(letter: 'a' | 'b', file: File | undefined) {
+  $(`sbs-name-${letter}`).textContent = file ? file.name : `Drop video ${letter.toUpperCase()}`;
+  $(`sbs-size-${letter}`).textContent = file ? formatBytes(file.size) : '';
+}
+
+// Which video sits in which slot. The list the shell holds has no gaps, so a lone video picked for slot B
+// would read as A there; the slots keep it where it was put.
+let slots: { a?: File; b?: File } = {};
+const filled = () => [slots.a, slots.b].filter((f): f is File => !!f);
+/** Files added some other way (the drop zone) go to A, then B, in order. */
+function syncSlots() {
+  const now = shell.files.map((f) => f.file);
+  const mine = filled();
+  if (now.length !== mine.length || now.some((f, i) => f !== mine[i])) slots = { a: now[0], b: now[1] };
 }
 
 let ticket = 0;
 /** The size, length and memory estimate for the pair and the current options, shown before Run. */
 async function refresh() {
   const mine = ++ticket;
-  const files = shell.files.slice(0, 2);
-  fillSlot('a', files[0]);
-  fillSlot('b', files[1]);
+  syncSlots();
+  const files = filled();
+  fillSlot('a', slots.a);
+  fillSlot('b', slots.b);
   info.classList.remove('is-over');
   delete $('tool').dataset.refused;
   if (files.length < 2) {
-    info.textContent = files.length ? 'Add a second video for slot B.' : '';
+    info.textContent = files.length ? `Add a second video for slot ${slots.a ? 'B' : 'A'}.` : '';
     return;
   }
-  const total = files[0]!.file.size + files[1]!.file.size;
+  const total = files[0]!.size + files[1]!.size;
   const phone = isPhoneBrowser();
   try {
     const { sideBySideEstimate } = await import('../lib/video-side-by-side');
     const e = await sideBySideEstimate(
-      files.map((f) => f.file),
+      files,
       { ...settings(), phone },
     );
     if (mine !== ticket) return;
@@ -74,16 +87,19 @@ async function refresh() {
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
+  // One picked video is not a run yet: a phone's picker hands over one file at a time.
+  runBlocker: (files) => (files.length === 1 ? 'Add a second video, then press Run.' : ''),
   outputFormat: () => 'mp4',
   onFilesChanged: () => void refresh(),
   async process(files, progress) {
-    if (files.length < 2) throw new InputError('Add two videos: A and B.');
+    if (files.length < 2) throw new NamedError('MissingSecondVideo', 'Add two videos: A and B.');
     const { sideBySide } = await import('../lib/video-side-by-side');
     const s = settings();
     progress.set('Reading the two videos…', 0.01);
     const r = await sideBySide(
       files.slice(0, 2).map((f) => f.file),
-      { ...s, phone: isPhoneBrowser(), onProgress: (f) => progress.set(`Putting the videos side by side: ${Math.round(f * 100)}%`, 0.02 + f * 0.98) },
+      { ...s, phone: isPhoneBrowser(), onProgress: (f) => progress.set(`Putting the videos side by side: ${Math.round(f * 100)}%`, 0.02 + f * 0.98), onNotice: (m) => progress.set(m, 0.02) },
     );
     const notes = [`${r.width}×${r.height}`, clock(r.duration), `${r.fps} fps`, r.videoCodec];
     if (r.audio) notes.push('with sound');
@@ -92,7 +108,7 @@ const shell = createShell({
       name: suffixName(files[0]!.file.name, '-side-by-side', 'mp4'),
       blob: r.blob,
       originalSize: files[0]!.file.size + files[1]!.file.size,
-      note: notes.join(', '),
+      note: notes.join(', ') + retryNote(r.retry, r),
     };
     return [out];
   },
@@ -105,12 +121,11 @@ function bindSlot(letter: 'a' | 'b') {
   const input = $<HTMLInputElement>(`sbs-file-${letter}`);
   const set = async (file: File | undefined) => {
     if (!file) return;
-    const files = shell.files.map((f) => f.file);
-    if (letter === 'a') files[0] = file;
-    else if (files.length === 0) files.push(file);
-    else files[1] = file;
+    syncSlots();
+    const next = { ...slots, [letter]: file };
     $<HTMLButtonElement>('clear').click();
-    await shell.addFiles(files.slice(0, 2));
+    slots = next;
+    await shell.addFiles(filled());
   };
   slot.addEventListener('click', () => input.click());
   slot.addEventListener('keydown', (e) => {
@@ -139,9 +154,11 @@ bindSlot('a');
 bindSlot('b');
 
 $('sbs-swap').addEventListener('click', async () => {
-  const files = shell.files.map((f) => f.file);
-  if (files.length < 2) return;
+  syncSlots();
+  const next = { a: slots.b, b: slots.a };
+  if (!next.a && !next.b) return;
   $<HTMLButtonElement>('clear').click();
-  await shell.addFiles([files[1]!, files[0]!]);
+  slots = next;
+  await shell.addFiles(filled());
 });
 for (const id of ['sbs-layout', 'sbs-fit', 'sbs-sound', 'sbs-length']) $(id).addEventListener('change', () => void refresh());

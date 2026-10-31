@@ -18,6 +18,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   WEBM,
@@ -25,7 +26,9 @@ import {
   getFirstEncodableAudioCodec,
 } from 'mediabunny';
 import { CODEC_NAMES } from './video-compress';
-import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
+import { SAMPLE_RATE, decodePcm, decodePcmSliced, pcmFeeder, stereo } from './pcm';
+import { openOpfsOutput } from './opfs-output';
+import { SNAPSHOT_LIMIT } from './read-failure';
 import { NoAudioEncoder, registerMp3Fallback } from './mp3-fallback';
 import { isNotReadable } from './read-failure';
 
@@ -62,7 +65,7 @@ function unlessUnreadable(e: unknown): null {
 }
 
 export async function hasVideo(file: File): Promise<boolean> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     return !!(await input.getPrimaryVideoTrack().catch(unlessUnreadable));
   } finally {
@@ -70,8 +73,11 @@ export async function hasVideo(file: File): Promise<boolean> {
   }
 }
 
-export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioOptions): Promise<AddAudioResult> {
-  const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA] });
+/** `soundFile` may be the sound itself (one or two channels at 48 kHz), which skips writing it out as a file and decoding that again. */
+export async function addAudio(videoFile: File, soundFile: File | Float32Array[], opts: AddAudioOptions): Promise<AddAudioResult> {
+  const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
+  let disk: Awaited<ReturnType<typeof openOpfsOutput>>;
+  let finished = false;
   try {
     const video = await input.getPrimaryVideoTrack().catch(unlessUnreadable);
     if (!video || !video.codec) throw new UnreadableFile(`${videoFile.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
@@ -85,8 +91,9 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     const duration = Math.max(0, end - first) || (await input.computeDuration());
     const len = Math.max(1, Math.round(duration * SAMPLE_RATE));
 
-    const added = await decodePcm(soundFile);
-    if (!added || !added[0]?.length) throw new UnreadableFile(`${soundFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
+    // A big file (a video to take the sound from, say) is read in slices; a small one is cheap to decode whole.
+    const added = Array.isArray(soundFile) ? soundFile : soundFile.size > SNAPSHOT_LIMIT ? await decodePcmSliced(soundFile) : await decodePcm(soundFile);
+    if (!added || !added[0]?.length) throw new UnreadableFile(`${Array.isArray(soundFile) ? videoFile.name : soundFile.name} has no sound this browser can read. Try an MP3, WAV, M4A or another video.`);
     const [inL, inR] = stereo(added);
     const soundLength = inL!.length / SAMPLE_RATE;
     const looped = opts.loop && inL!.length < len;
@@ -107,7 +114,8 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
       }
     }
     if (opts.mode === 'mix' && (await input.getPrimaryAudioTrack())) {
-      const own = await decodePcm(videoFile);
+      // Sliced for any size: it also folds surround to stereo with the centre kept, which a whole decode's first two channels would lose.
+      const own = await decodePcmSliced(videoFile);
       if (own) {
         const [l, r] = stereo(own);
         for (const [c, ch] of [l!, r!].entries()) {
@@ -118,7 +126,9 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     }
 
     // MP4 plays everywhere, but VP8 in MP4 does not play in Safari; keep VP8 in WebM.
-    const format = video.codec === 'vp8' ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: 'in-memory' });
+    // The output goes to a temporary file on this device where the browser allows it, so its size does not set peak memory.
+    disk = await openOpfsOutput(videoFile.size);
+    const format = video.codec === 'vp8' ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: disk ? false : 'in-memory' });
     // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
     registerMp3Fallback();
     const audioCodec = await getFirstEncodableAudioCodec(
@@ -127,7 +137,8 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     );
     if (!audioCodec) throw new NoAudioEncoder("This browser cannot write the new sound into a video. On an iPhone, update iOS or use a computer; elsewhere, use a recent Chrome, Edge, Safari or Firefox.");
 
-    const output = new Output({ format, target: new BufferTarget() });
+    const memory = disk ? undefined : new BufferTarget();
+    const output = new Output({ format, target: disk ? disk.target : memory! });
     const videoSource = new EncodedVideoPacketSource(video.codec);
     output.addVideoTrack(videoSource, { rotation: video.rotation });
     const audioSource = new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH });
@@ -147,11 +158,17 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     videoSource.close();
     audioSource.close();
     await output.finalize();
-    const buffer = output.target.buffer;
-    if (!buffer) throw new NamedError('VideoWriteError', 'The video could not be written.');
+    let blob: Blob;
+    if (disk) blob = await disk.finish(format.mimeType);
+    else {
+      const buffer = memory!.buffer;
+      if (!buffer) throw new NamedError('VideoWriteError', 'The video could not be written.');
+      blob = new Blob([buffer], { type: format.mimeType });
+    }
+    finished = true;
     opts.onProgress?.(1);
     return {
-      blob: new Blob([buffer], { type: format.mimeType }),
+      blob,
       ext: format.fileExtension.replace(/^\./, ''),
       duration,
       videoCodec: CODEC_NAMES[video.codec] ?? video.codec,
@@ -161,5 +178,7 @@ export async function addAudio(videoFile: File, soundFile: File, opts: AddAudioO
     };
   } finally {
     input.dispose?.();
+    // A run that failed leaves no temporary file behind.
+    if (disk && !finished) await disk.abort();
   }
 }
