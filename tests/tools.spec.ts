@@ -4846,7 +4846,7 @@ test('the ISBN page converts an ISBN-10, names the digit it worked out and keeps
 
 const qrFx = (name: string) => fileURLToPath(new URL(`./fixtures/qr/${name}`, import.meta.url));
 const qrTexts = JSON.parse(readFileSync(qrFx('texts.json'), 'utf8')) as Record<string, string>;
-const WASM = '/vendor/zxing-wasm@3.1.5/zxing_reader.wasm';
+const WASM = '/vendor/zxing-wasm@3.1.6/zxing_reader.wasm';
 
 /** A PNG of a QR code for `text`, drawn by the site's own encoder and rasterised in a throwaway tab. */
 async function qrPng(context: BrowserContext, text: string) {

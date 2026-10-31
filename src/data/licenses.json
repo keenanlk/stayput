@@ -160,10 +160,10 @@
     }
    ],
    "project": "https://ai.google.dev/edge/mediapipe",
-   "source": "https://www.npmjs.com/package/@mediapipe/tasks-vision/v/1.0.1",
-   "shipped": "JavaScript bundled into the site; WebAssembly served from /vendor/mediapipe-tasks-vision@1.0.1/ (face blur, video background removal)",
+   "source": "https://www.npmjs.com/package/@mediapipe/tasks-vision/v/1.1.1",
+   "shipped": "JavaScript bundled into the site; WebAssembly served from /vendor/mediapipe-tasks-vision@1.1.1/ (face blur, video background removal)",
    "kind": "library",
-   "note": "The npm package is the exact source we link; upstream does not publish a Git tag for 1.0.1 (the nearest is v1.0.0 at https://github.com/google-ai-edge/mediapipe/tree/v1.0.0)."
+   "note": "The npm package is the exact source we link; upstream does not publish a Git tag for 1.1.1 (the nearest is v1.0.0 at https://github.com/google-ai-edge/mediapipe/tree/v1.0.0)."
   },
   {
    "id": "qpdf-wasm",
@@ -403,7 +403,7 @@
   {
    "id": "heic-to",
    "name": "heic-to",
-   "version": "1.6.5",
+   "version": "1.6.6",
    "npm": "heic-to",
    "licences": [
     {
@@ -412,12 +412,12 @@
     }
    ],
    "project": "https://github.com/hoppergee/heic-to",
-   "source": "https://github.com/hoppergee/heic-to/tree/v1.6.5",
-   "shipped": "Served as a separate file, /vendor/heic-to@1.6.5/heic-to.min.js, loaded only by tools that open HEIC photos. It contains libheif and libde265 compiled to WebAssembly.",
+   "source": "https://github.com/hoppergee/heic-to/tree/v1.6.6",
+   "shipped": "Served as a separate file, /vendor/heic-to@1.6.6/heic-to.min.js, loaded only by tools that open HEIC photos. It contains libheif and libde265 compiled to WebAssembly.",
    "kind": "library",
    "copyleft": "lgpl",
    "copyright": "Hopper Gee (author of heic-to; its LICENSE has no separate copyright line)",
-   "replace": "/vendor/heic-to@1.6.5/heic-to.min.js"
+   "replace": "/vendor/heic-to@1.6.6/heic-to.min.js"
   },
   {
    "id": "imagetracerjs",
@@ -1221,12 +1221,12 @@
    ],
    "project": "https://github.com/strukturag/libheif",
    "source": "https://github.com/strukturag/libheif/tree/v1.23.5",
-   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.5/heic-to.min.js",
+   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.6/heic-to.min.js",
    "kind": "wasm",
    "via": "heic-to",
    "copyleft": "lgpl",
    "copyright": "Copyright (c) 2017-2025 Dirk Farin and the libheif contributors",
-   "replace": "/vendor/heic-to@1.6.5/heic-to.min.js"
+   "replace": "/vendor/heic-to@1.6.6/heic-to.min.js"
   },
   {
    "id": "libde265",
@@ -1241,12 +1241,12 @@
    ],
    "project": "https://github.com/strukturag/libde265",
    "source": "https://github.com/strukturag/libde265/tree/v1.0.16",
-   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.5/heic-to.min.js",
+   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.6/heic-to.min.js",
    "kind": "wasm",
    "via": "heic-to",
    "copyleft": "lgpl",
    "copyright": "Copyright (c) 2013-2014 struktur AG, Dirk Farin",
-   "replace": "/vendor/heic-to@1.6.5/heic-to.min.js"
+   "replace": "/vendor/heic-to@1.6.6/heic-to.min.js"
   },
   {
    "id": "lame",
@@ -1821,7 +1821,7 @@
   {
    "id": "mediapipe-wasm",
    "name": "MediaPipe runtime (TensorFlow Lite, XNNPACK, ruy, OpenCV, libpng, libjpeg)",
-   "version": "as pinned by MediaPipe tasks-vision 1.0.1",
+   "version": "as pinned by MediaPipe tasks-vision 1.1.1",
    "npm": null,
    "licences": [
     {
@@ -1858,7 +1858,7 @@
    "via": "mediapipe",
    "copyleft": "mpl",
    "copyright": "Copyright (C) 2008 Gael Guennebaud; (C) 2007-2011 Benoit Jacob; and other Eigen contributors",
-   "replace": "/vendor/mediapipe-tasks-vision@1.0.1/vision_wasm_internal.wasm"
+   "replace": "/vendor/mediapipe-tasks-vision@1.1.1/vision_wasm_internal.wasm"
   },
   {
    "id": "eigen-ort",
@@ -2214,8 +2214,8 @@
     }
    ],
    "project": "https://github.com/Sec-ant/zxing-wasm",
-   "source": "https://github.com/Sec-ant/zxing-wasm/tree/v3.1.5",
-   "shipped": "Reader wrapper bundled into the site JavaScript; WebAssembly served as /vendor/zxing-wasm@3.1.5/zxing_reader.wasm (QR code scanner)",
+   "source": "https://github.com/Sec-ant/zxing-wasm/tree/v3.1.6",
+   "shipped": "Reader wrapper bundled into the site JavaScript; WebAssembly served as /vendor/zxing-wasm@3.1.6/zxing_reader.wasm (QR code scanner)",
    "kind": "library",
    "copyright": "Copyright (c) 2023 Ze-Zheng Wu"
   },
@@ -2227,12 +2227,12 @@
    "licences": [
     {
      "name": "Apache-2.0",
-     "url": "/vendor/zxing-wasm@3.1.5/LICENSE-zxing-cpp.txt"
+     "url": "/vendor/zxing-wasm@3.1.6/LICENSE-zxing-cpp.txt"
     }
    ],
    "project": "https://github.com/zxing-cpp/zxing-cpp",
    "source": "https://github.com/zxing-cpp/zxing-cpp/tree/2ecec3f5be0ee803f6e14a5a2c7028c0cfe525b4",
-   "shipped": "Compiled to WebAssembly as /vendor/zxing-wasm@3.1.5/zxing_reader.wasm",
+   "shipped": "Compiled to WebAssembly as /vendor/zxing-wasm@3.1.6/zxing_reader.wasm",
    "kind": "wasm",
    "via": "zxing-wasm",
    "copyright": "Copyright 2016 Nu-book Inc., Copyright 2016 ZXing authors and other contributors (the notices are in the source files)"
