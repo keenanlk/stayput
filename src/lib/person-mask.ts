@@ -291,7 +291,7 @@ export class Matte {
     const hiddenBefore = hiddenCount;
     const run = (engine: ImageSegmenter) => {
       const planned = fault();
-      if (planned === 'throw') throw new Error((globalThis as { __stayputSegFault?: Fault }).__stayputSegFault?.message ?? FAULT_MESSAGE);
+      if (planned === 'throw') throw new NamedError('SegmentFaultInjected', (globalThis as { __stayputSegFault?: Fault }).__stayputSegFault?.message ?? FAULT_MESSAGE);
       const out = engine.segmentForVideo(this.small, clock);
       if (planned === 'empty') {
         out.close();
@@ -319,7 +319,7 @@ export class Matte {
         // a second failure, or no WebGL left at all, ends the run with a name that says which.
         if (!probeWebGL().any) {
           drop();
-          throw new StageError('WebGLLost', new Error('The graphics context was lost. Close other tabs and try again.'));
+          throw new NamedError('WebGLLost', 'The graphics context was lost. Close other tabs and try again.');
         }
         if (this.rebuilt) throw new StageError('PersonFinderFailed', e);
         this.rebuilt = true;
@@ -351,7 +351,7 @@ export class Matte {
     const found = result?.confidenceMasks?.[0];
     if (!found && !(this.prev && this.empties < MAX_EMPTY)) {
       result?.close();
-      throw new StageError('PersonMaskEmpty', new Error('The person finder returned no mask.'));
+      throw new NamedError('PersonMaskEmpty', 'The person finder returned no mask.');
     }
     const conf = found?.getAsFloat32Array();
     const frameMs = performance.now() - began;
