@@ -34,9 +34,11 @@ async function unsupportedWav(file: Blob): Promise<Error | null> {
 
 /**
  * Decode the file's audio track into PCM at `rate`. A file under the size limit is read into memory whole and handed to the
- * browser's decoder; a bigger one is decoded in stretches through the demuxer (see decodePcmSliced).
+ * browser's decoder; a bigger one is decoded in stretches through the demuxer (see decodePcmSliced). A sound the browser
+ * refuses is tried with the page's own decoders (Opus or FLAC in MP4, ALAC, AC-3, AMR; see odd-audio.ts) unless `oddCodecs` is
+ * off, which a caller does when it runs that step itself (the caption tools).
  */
-export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<AudioBuffer> {
+export async function decodeAudio(file: File, rate = SAMPLE_RATE, oddCodecs = true): Promise<AudioBuffer> {
   // Windows Media Audio: no browser decodes it, so a separately loaded decoder module does.
   if (await isAsf(file)) return decodeWma(file, rate);
   await refuseSoundlessContainer(file);
@@ -46,11 +48,7 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
     const chans = await decodePcmSliced(file, rate, false).catch((e) => {
       throw e instanceof Error && e.name === 'OutOfMemoryError' && e.cause ? stageError('AudioDecodeFailed', e.cause) : e;
     });
-    if (chans?.[0]?.length) {
-      const buffer = new AudioBuffer({ length: chans[0].length, numberOfChannels: chans.length, sampleRate: rate });
-      chans.forEach((ch, c) => buffer.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
-      return buffer;
-    }
+    if (chans?.[0]?.length) return toAudioBuffer(chans, rate);
   }
   const read = () => retryUnreadable(file, () => file.arrayBuffer());
   // A file that cannot be read is no decode failure, so the first read is made out here; the decoder is handed it, and only a second attempt reads again.
@@ -63,6 +61,9 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
     buffer = await decodeWithin(ctx, supply);
   } catch (first) {
     buffer = await decodeThroughDemuxer(file, rate, first).catch(async (error) => {
+      // Sound in a codec the browser lacks (Opus in MP4, ALAC, AC-3, AMR): the page's decoders, or a named refusal.
+      const odd = oddCodecs ? await (await import('./pcm')).decodePcmByPageDecoders(file, rate) : null;
+      if (odd?.[0]?.length) return toAudioBuffer(odd, rate);
       // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.
       const aiff = await decodeAiff(await read().catch(() => null), rate);
       if (!aiff) throw (await unsupportedWav(file)) ?? error;
@@ -72,17 +73,28 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE): Promise<Audio
   return buffer.numberOfChannels > 2 ? downmixToStereo(buffer) : buffer;
 }
 
+/** Decoded channels as an AudioBuffer at `rate`. */
+function toAudioBuffer(chans: Float32Array[], rate: number): AudioBuffer {
+  const buffer = new AudioBuffer({ length: chans[0]!.length, numberOfChannels: chans.length, sampleRate: rate });
+  chans.forEach((ch, c) => buffer.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
+  return buffer;
+}
+
 /** PCM AIFF or AIFC as an AudioBuffer at `rate`, or null when it is not one this can read. */
 async function decodeAiff(bytes: ArrayBuffer | null, rate: number): Promise<AudioBuffer | null> {
   if (!bytes) return null;
   const { parseAiff } = await import('./aiff');
   const aiff = parseAiff(bytes);
   if (!aiff) return null;
-  const length = aiff.channels[0]!.length;
-  const source = new AudioBuffer({ length, numberOfChannels: aiff.channels.length, sampleRate: aiff.sampleRate });
+  const source = new AudioBuffer({ length: aiff.channels[0]!.length, numberOfChannels: aiff.channels.length, sampleRate: aiff.sampleRate });
   aiff.channels.forEach((ch, c) => source.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
-  if (aiff.sampleRate === rate) return source;
-  const ctx = new OfflineAudioContext(source.numberOfChannels, Math.max(1, Math.ceil((length * rate) / aiff.sampleRate)), rate);
+  return resampleTo(source, rate);
+}
+
+/** `source` at `rate`: itself when it is there already, otherwise rendered through an offline context. */
+export async function resampleTo(source: AudioBuffer, rate: number): Promise<AudioBuffer> {
+  if (source.sampleRate === rate) return source;
+  const ctx = new OfflineAudioContext(source.numberOfChannels, Math.max(1, Math.ceil((source.length * rate) / source.sampleRate)), rate);
   const node = ctx.createBufferSource();
   node.buffer = source;
   node.connect(ctx.destination);

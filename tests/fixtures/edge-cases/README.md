@@ -78,6 +78,6 @@ These end in a named refusal, so they pass.
 
 - `zeros.mp4` (all-zero placeholder) is `UnreadableFile` on video tools and `AudioDecodeError` on sound tools; a `FileNotDownloaded` class would say what is wrong.
 - `sample.ts` (MPEG-TS) is `UnreadableFile` on most video tools; `UnsupportedContainer` and TS reading are not built. Remove noise, Volume booster and Video to subtitles read it already.
-- `ac3-51.mkv` and `alac.m4a` are `AudioDecodeError` with a format-specific message on the caption tools and the generic one elsewhere.
+- `ac3-51.mkv`, `eac3.mp4`, `pcm.mov`, `opus.mp4`, `opus-in.mp4`, `flac.mkv`, `mono-8k.wav` and `amr-nb.amr` are read by the audio and caption tools (the page's decoders: WebCodecs, the Dolby decoder, the 3GP build's AMR decoder). `alac.m4a` is read only where the browser can (Safari), and `dts.mkv` by nothing: both end as `UnsupportedAudioCodec` on the audio tools and `UnsupportedSound` on the caption tools, naming the format.
 - `mjpeg.mov` is `UnsupportedCodec` with the HEVC wording, which does not fit a Motion JPEG file.
 - `audio-only-named.mp4` on Burn subtitles ends in the "could not be redrawn" message although there was never a picture to redraw.

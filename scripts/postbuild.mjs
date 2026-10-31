@@ -8,8 +8,9 @@ const dist = new URL('../dist/', import.meta.url);
 if (!process.env.STAYPUT_AB_TEST) await rm(new URL('ab-force.js', dist), { force: true });
 const assets = [];
 // The WebGPU speech worker and its own copy of transformers.js (about 0.6 MB) load only on the WebGPU path, so
-// they are fetched when a computer with WebGPU first writes captions, not by every visitor's first visit.
-const onDemand = /^(transcribe-gpu\.worker|transformers\.web)-[\w-]+\.js$/;
+// they are fetched when a computer with WebGPU first writes captions, not by every visitor's first visit. The Dolby
+// (AC-3) decoder, 1.1 MB of WebAssembly, is fetched when a sound in that format is first read.
+const onDemand = /^((transcribe-gpu\.worker|transformers\.web)-|mediabunny-ac3\.)[\w-]+\.js$/;
 for (const f of await readdir(new URL('_astro/', dist))) if (/\.(js|mjs|css|wasm)$/.test(f) && !onDemand.test(f)) assets.push(`/_astro/${f}`);
 try {
   for (const f of await readdir(new URL('fonts/', dist))) if (/\.(woff2?|ttf|otf)$/.test(f)) assets.push(`/fonts/${f}`);
