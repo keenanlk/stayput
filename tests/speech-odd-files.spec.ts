@@ -180,7 +180,8 @@ test.describe('odd sound codecs on the caption tools', () => {
     });
   }
 
-  test('a DTS sound is named UnsupportedSound, with its format, before any model request', async ({ page }) => {
+  test('a DTS sound is named UnsupportedSound, with its format, before any model request', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit', "WebKit's Linux build carries a DTS decoder and reads the sound");
     const models: string[] = [];
     page.on('request', (r) => r.url().includes('/models/') && models.push(r.url()));
     await transcribe(page, readFileSync(edge('dts.mkv')), 'dts.mkv');
