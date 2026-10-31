@@ -105,8 +105,11 @@ self.addEventListener('message', (event) => {
   );
 });
 
-// The speech model files belong to transformers.js, which stores them itself.
-const isOwnedElsewhere = (url) => url.pathname.startsWith('/models/whisper-base/') || url.pathname.startsWith('/models/whisper-tiny/');
+// These model files are downloaded, checked against the build-time manifest and kept by the page's own loader
+// (src/lib/model-fetch.ts): the speech model by transformers.js through it, the person finders and the vocal
+// remover's model in the 'stayput-models-v1' cache. A second, unchecked copy here would be a way for a damaged file to come back.
+const OWNED_MODELS = ['/models/whisper-base/', '/models/whisper-tiny/', '/models/selfie_', '/models/blaze_face_', '/models/uvr-mdx-net-'];
+const isOwnedElsewhere = (url) => OWNED_MODELS.some((p) => url.pathname.startsWith(p));
 const isImmutable = (url) =>
   url.origin === self.location.origin && (url.pathname.startsWith('/_astro/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/vendor/') || url.pathname.startsWith('/models/'));
 

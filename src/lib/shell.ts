@@ -19,6 +19,7 @@ import { releaseOutput } from './opfs-output';
 import { guardRun, interruptedError, resumeIfHidden, KEEP_SCREEN_ON_HINT } from './wake-lock';
 import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
+import { persistAfterRun } from './model-fetch';
 import { failsTheSameAgain } from './edit-recovery';
 import { inspectFile, type IntakeProblem } from './intake';
 import { forgetWorkingSize, riskSize, workingSize } from './working-size';
@@ -663,6 +664,8 @@ export function createShell(opts: ShellOptions) {
         showError(`${skipped.length} of ${files.length} files ${skipped.length === 1 ? 'was' : 'were'} skipped: ${list}${skipped.length > 5 ? '; …' : ''}.`);
       }
       trackToolRun({ tool, outcome: 'ok', firstOk, files: files.length, inputBytes, outputBytes: outs.reduce((n, o) => n + o.blob.size, 0), ms: performance.now() - started, format: opts.outputFormat?.() });
+      // Once a model is kept: ask the browser not to evict it. Silent in Chrome and Safari, and never before a run.
+      void persistAfterRun();
       root.dispatchEvent(new CustomEvent('stayput:done', { detail: outs }));
     } catch (raw) {
       const e = mine ? interruptedError(raw, mine.wasHidden(), run.textContent ?? '') : raw;
