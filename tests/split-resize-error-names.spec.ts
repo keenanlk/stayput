@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { memoryRange, nameBare } from '../src/lib/bare-error';
+import { cutFailed, memoryRange, nameBare, type CutStep } from '../src/lib/bare-error';
 
 // Two failures that used to reach a failed run's record under a bare built-in name: a RangeError from a buffer that
 // could not be allocated while cutting (Video splitter), and a TypeError while reading the size (Resize video).
@@ -18,6 +18,17 @@ test('a RangeError that says memory ran out is OutOfMemoryError; a bad length st
   expect(nameBare('CutFailed', bad).name).toBe('CutFailed');
   expect(memoryRange(new TypeError('x'))).toBeInstanceOf(TypeError);
   expect(nameBare('VideoSizeReadFailed', new TypeError("undefined is not an object (evaluating 'a.num')")).name).toBe('VideoSizeReadFailed');
+});
+
+test('a plain error in a cut is named for the step it stopped at; a named one keeps its name', () => {
+  const steps: CutStep[] = ['OpenInput', 'Keyframe', 'EncoderPlan', 'Init', 'Execute'];
+  for (const step of steps) {
+    const e = cutFailed(step, new Error('boom'));
+    expect(e.name).toBe(`CutFailed${step}`);
+    expect(e.message).toBe('boom');
+    expect(cutFailed(step, new TypeError('x')).name).toBe(`CutFailed${step}`);
+    expect(cutFailed(step, Object.assign(new Error('x'), { name: 'EncodingError' })).name).toBe('EncodingError');
+  }
 });
 
 async function open(page: Page) {
