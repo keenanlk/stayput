@@ -14,7 +14,11 @@ test.use({ serviceWorkers: 'allow' });
 test.beforeEach(async ({ context }) => allowServiceWorker(context));
 
 const SPOKEN = fileURLToPath(new URL('./fixtures/static/jfk.wav', import.meta.url));
-const ENCODER = '/models/whisper-base/onnx/encoder_model_quantized.onnx';
+// WebKit takes the WebGPU path (a 16-bit encoder); Chromium without a graphics adapter takes the 8-bit one.
+let ENCODER = '/models/whisper-base/onnx/encoder_model_quantized.onnx';
+test.beforeEach(({ browserName }) => {
+  ENCODER = `/models/whisper-base/onnx/encoder_model_${browserName === 'webkit' ? 'fp16' : 'quantized'}.onnx`;
+});
 const CACHE = 'transformers-cache';
 const manifest: Record<string, { size: number; sha256: string }> = JSON.parse(readFileSync(fileURLToPath(new URL('../src/data/model-manifest.json', import.meta.url)), 'utf8'));
 const entry = (path: string) => manifest[path]!;
@@ -65,7 +69,8 @@ test('a download cut at 10% and again at 50% is resumed, kept whole and matching
 test('a download that keeps dying is ModelDownloadError and the file is not in the cache', async ({ page }) => {
   test.setTimeout(240_000);
   await recordAnalytics(page);
-  await faultInWorkers(page, { match: ENCODER, cuts: Array(30).fill(0.1) });
+  // Both encoders: a WebGPU path that cannot download steps down to the 8-bit one, which is cut the same way.
+  await faultInWorkers(page, { match: '/models/whisper-base/onnx/encoder_model_', cuts: Array(60).fill(0.1) });
   await open(page);
   await run(page);
   await failed(page, 180_000);
@@ -90,19 +95,23 @@ test('a kept file with flipped bytes (same size) is evicted, fetched again once,
   await open(page);
   await run(page);
   await done(page);
-  await flipKept(page, CACHE, ENCODER);
-  expect((await kept(page, CACHE))[ENCODER]!.size).toBe(entry(ENCODER).size);
-  expect((await kept(page, CACHE))[ENCODER]!.sha256).not.toBe(entry(ENCODER).sha256);
+  await page.close();
+  // A new page for each run: WebKit crashes a page that has held the model once already.
+  const again = await context.newPage();
+  await open(again);
+  await flipKept(again, CACHE, ENCODER);
+  expect((await kept(again, CACHE))[ENCODER]!.size).toBe(entry(ENCODER).size);
+  expect((await kept(again, CACHE))[ENCODER]!.sha256).not.toBe(entry(ENCODER).sha256);
   const requests: string[] = [];
   context.on('request', (r) => r.url().endsWith(ENCODER) && requests.push(r.url()));
-  await open(page);
-  await run(page);
-  await done(page);
+  await run(again);
+  await done(again);
   expect(requests).toHaveLength(1);
-  expect((await kept(page, CACHE))[ENCODER]).toEqual(entry(ENCODER));
+  expect((await kept(again, CACHE))[ENCODER]).toEqual(entry(ENCODER));
 });
 
-test('offline with no kept model is ModelOffline within 2 s and requests no model file; kept, it runs offline', async ({ page, context }) => {
+test('offline with no kept model is ModelOffline within 2 s and requests no model file; kept, it runs offline', async ({ browserName, page, context }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit cannot read a chosen file while its offline switch is on (NotReadableError), so there is nothing to run; Chromium and the unit tests cover offline");
   test.setTimeout(300_000);
   await recordAnalytics(page);
   const requests: string[] = [];
@@ -117,15 +126,19 @@ test('offline with no kept model is ModelOffline within 2 s and requests no mode
   expect(requests).toEqual([]);
   expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'ModelOffline' })]);
   await context.setOffline(false);
-  await open(page);
-  await run(page);
-  await done(page);
+  await page.close();
+  const second = await context.newPage();
+  await open(second);
+  await run(second);
+  await done(second);
   const online = requests.length;
   expect(online).toBeGreaterThan(0);
+  await second.close();
   await context.setOffline(true);
-  await open(page);
-  await run(page);
-  await done(page);
+  const third = await context.newPage();
+  await open(third);
+  await run(third);
+  await done(third);
   expect(requests).toHaveLength(online);
 });
 
@@ -133,7 +146,7 @@ test('less free storage than the model needs is StorageFull, with no download st
   test.setTimeout(120_000);
   await recordAnalytics(page);
   await page.addInitScript(() => {
-    navigator.storage.estimate = () => Promise.resolve({ quota: 100e6, usage: 60e6 });
+    StorageManager.prototype.estimate = () => Promise.resolve({ quota: 100e6, usage: 60e6 });
   });
   const requests: string[] = [];
   context.on('request', (r) => ANY_MODEL.test(r.url()) && requests.push(r.url()));

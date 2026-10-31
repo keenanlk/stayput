@@ -118,6 +118,9 @@ function pretend(env: { onLine?: boolean; quota?: number; usage?: number; persis
 test('offline is ModelOffline at once, and too little free storage is StorageFull', async () => {
   pretend({ onLine: false });
   await expect(modelPreflight(1e6, 'test model')).rejects.toMatchObject({ name: 'ModelOffline' });
+  // A browser that says it is online while a request for a small file of ours fails is offline too.
+  pretend({ onLine: true });
+  await expect(modelPreflight(1e6, 'test model', async () => false)).rejects.toMatchObject({ name: 'ModelOffline' });
   pretend({ quota: 50e6, usage: 10e6 });
   await expect(modelPreflight(53e6, 'test model')).rejects.toMatchObject({ name: 'StorageFull' });
   await expect(modelPreflight(30e6, 'test model')).resolves.toBeUndefined();

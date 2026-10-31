@@ -80,7 +80,8 @@ test.describe('face finder (blur a face in a photo)', () => {
     expect(await kept(page, CACHE)).toEqual({ [FACE]: manifest[FACE] });
   });
 
-  test('offline with no kept model is ModelOffline with no request; kept, it works offline', async ({ page, context }) => {
+  test('offline with no kept model is ModelOffline with no request; kept, it works offline', async ({ browserName, page, context }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit cannot read a chosen file while its offline switch is on (NotReadableError), so there is nothing to run; Chromium and the unit tests cover offline");
     const requests: string[] = [];
     context.on('request', (r) => r.url().includes(FACE) && requests.push(r.url()));
     await activeWorker(page);
@@ -103,7 +104,7 @@ test.describe('face finder (blur a face in a photo)', () => {
 
   test('less free storage than the model needs is StorageFull; a cache that refuses the write still lets the finder start', async ({ page, context }) => {
     await page.addInitScript(() => {
-      navigator.storage.estimate = () => Promise.resolve({ quota: 100_000, usage: 0 });
+      StorageManager.prototype.estimate = () => Promise.resolve({ quota: 100_000, usage: 0 });
     });
     const requests: string[] = [];
     context.on('request', (r) => r.url().includes(FACE) && requests.push(r.url()));
@@ -158,7 +159,8 @@ test.describe('person finder (video background remover, the quick finder)', () =
     expect(await keptPerson(page)).toEqual([]);
   });
 
-  test('offline with no kept model is ModelOffline, with no model request', async ({ page, context }) => {
+  test('offline with no kept model is ModelOffline, with no model request', async ({ browserName, page, context }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit cannot read a chosen file while its offline switch is on (NotReadableError), so there is nothing to run; Chromium and the unit tests cover offline");
     test.setTimeout(120_000);
     await recordAnalytics(page);
     const requests: string[] = [];
@@ -192,7 +194,7 @@ test.describe('person finder (video background remover, the quick finder)', () =
     test.setTimeout(120_000);
     await recordAnalytics(page);
     await page.addInitScript(() => {
-      navigator.storage.estimate = () => Promise.resolve({ quota: 100_000, usage: 0 });
+      StorageManager.prototype.estimate = () => Promise.resolve({ quota: 100_000, usage: 0 });
     });
     const requests: string[] = [];
     context.on('request', (r) => SELFIE.test(r.url()) && requests.push(r.url()));

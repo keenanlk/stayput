@@ -189,12 +189,32 @@ export async function matchesEntry(blob: Blob, entry: ModelEntry | undefined): P
 }
 
 /**
- * Before a model that is not kept is downloaded: offline is ModelOffline, with no request made, and less free
+ * Whether the network answers at all, asked with a tiny same-origin request that the service worker does not keep: some
+ * browsers (iOS Safari on Wi-Fi with no internet, WebKit with its offline switch on) leave navigator.onLine at true. Only a
+ * request that fails outright counts as offline; one that is merely slow is taken as online.
+ */
+export async function networkUp(): Promise<boolean> {
+  if (typeof location === 'undefined') return true;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 1500);
+  try {
+    await fetch(`/robots.txt?online=${Date.now()}`, { method: 'HEAD', cache: 'no-store', signal: ctl.signal });
+    return true;
+  } catch (err) {
+    return (err as Error).name === 'AbortError';
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Before a model that is not kept is downloaded: offline (the browser says so, or a request for a small file of ours
+ * fails) is ModelOffline, with no request for the model made, and less free
  * storage than the model needs is StorageFull, instead of a half-written cache. A browser that cannot say
  * how much room is left is given the benefit of the doubt.
  */
-export async function modelPreflight(needBytes: number, what: string): Promise<void> {
-  if (offline()) throw modelOffline(what);
+export async function modelPreflight(needBytes: number, what: string, probe: () => Promise<boolean> = networkUp): Promise<void> {
+  if (offline() || !(await probe())) throw modelOffline(what);
   try {
     const { quota, usage } = (await navigator.storage?.estimate?.()) ?? {};
     if (quota !== undefined && usage !== undefined && needBytes > 0 && quota - usage < needBytes) throw storageFull(what, needBytes);

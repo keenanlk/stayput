@@ -135,10 +135,9 @@ export async function flipKept(page: Page, cacheName: string, pathEndsWith: stri
 export async function spyPersist(page: Page) {
   await page.addInitScript(() => {
     (window as unknown as { __persist: number }).__persist = 0;
-    if (navigator.storage) {
-      navigator.storage.persist = () => ((window as unknown as { __persist: number }).__persist++, Promise.resolve(true));
-      navigator.storage.persisted = () => Promise.resolve(false);
-    }
+    // On the prototype: WebKit can drop a property set on the navigator.storage object itself.
+    StorageManager.prototype.persist = () => ((window as unknown as { __persist: number }).__persist++, Promise.resolve(true));
+    StorageManager.prototype.persisted = () => Promise.resolve(false);
   });
 }
 export const persistCalls = (page: Page) => page.evaluate(() => (window as unknown as { __persist: number }).__persist);
