@@ -165,6 +165,7 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     // On the WebGPU path a failure goes straight to the 8-bit path, which retries a dropped download itself
     // and keeps the files: a WebGPU that will not start says nothing about them.
     fetchError = undefined;
+    fetchFailed = false;
     if (gpu) return start(id, gpu, model);
     try {
       // Offline, no room to keep the model, or a file that failed its check are not a dropped connection: not tried again here.
@@ -181,7 +182,7 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     if (looksLikeMemory(err)) return outOfMemoryError();
     if (!loading) return speechModelError();
     if (fetchError) return fetchError;
-    return looksLikeNetwork(err) ? modelDownloadError() : modelLoadError();
+    return fetchFailed || looksLikeNetwork(err) ? modelDownloadError() : modelLoadError();
   }
 
   /**

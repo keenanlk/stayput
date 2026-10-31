@@ -234,13 +234,14 @@ export async function downloadVerified(
   for (let attempt = 0; ; attempt++) {
     let res: Response;
     try {
-      res = await fetchResumable(doFetch, url, opts.init, opts.onProgress, opts.waits);
+      // The second try skips the browser's HTTP cache: /models/ is served immutable, so a stale copy there would come back as it was.
+      res = await fetchResumable(doFetch, url, attempt > 0 ? { ...opts.init, cache: 'reload' } : opts.init, opts.onProgress, opts.waits);
     } catch {
       throw offline() ? modelOffline(what) : modelDownloadError(what);
     }
     if (!res.ok) return res;
     const whole = await wholeOrNull(res);
-    if (!whole) throw modelDownloadError(what, 'download stopped short.');
+    if (!whole) throw offline() ? modelOffline(what) : modelDownloadError(what);
     const blob = await whole.blob();
     if (await matchesEntry(blob, entry)) return new Response(blob, { status: 200, headers: whole.headers });
     if (attempt >= 1) throw modelCorrupted(what);

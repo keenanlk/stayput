@@ -368,7 +368,7 @@ test('Vocal remover: an error named inside the worker is recorded under that nam
   const sent = await captureAnalytics(page, baseURL!);
   await page.route(`${SITE}/models/**/*.onnx`, (route) => route.abort('connectionreset'));
   const out = await failedCaptionRun(page, baseURL!, 'vocal-remover', sent);
-  expect(out.data).toMatchObject({ tool: 'vocal-remover', outcome: 'error', error_class: 'TypeError' });
+  expect(out.data).toMatchObject({ tool: 'vocal-remover', outcome: 'error', error_class: 'ModelDownloadError' });
 });
 
 test('pressing Run without what the tool needs is recorded as InputError, not as a failure', async ({ page, baseURL }) => {

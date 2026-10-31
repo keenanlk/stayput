@@ -156,12 +156,13 @@ function load(model: string): Promise<ImageSegmenter> {
 
 function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2RenderingContext | null; frameMs?: number[] }): Promise<ImageSegmenter> {
   return (async () => {
+    // The model first, whole and checked, outside the chip attempt (a failed download says nothing about the chip); offline or
+    // no room ends here, before any script is loaded.
+    const bytes = await loadModelBytes(model, { what: 'person finder', entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
     const webgl = probeWebGL();
     if (!webgl.any) throw new NamedError('PersonMaskFailed', 'The person finder needs WebGL, which this browser does not provide. Turn on hardware acceleration in the browser settings, or use an up-to-date Chrome, Edge, Firefox or Safari.');
-    // The model is fetched once, whole and checked, outside the chip attempt: a failed download says nothing about the chip.
-    const bytes = await loadModelBytes(model, { what: 'person finder', entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
     const make = async (delegate: 'CPU' | 'GPU') => {
       const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
       return ImageSegmenter.createFromOptions(fileset, {
