@@ -11,6 +11,8 @@
 import type { FaceDetector } from '@mediapipe/tasks-vision';
 import type { Rect } from './blur';
 import { vendorDir } from './vendor';
+import { NamedError } from './input-error';
+import { context2d } from './canvas-memory';
 
 const MODEL = '/models/blaze_face_short_range.tflite';
 /** Tiles are scaled to at most this size before detection; the model looks at 128 px anyway. */
@@ -37,6 +39,27 @@ function load(): Promise<FaceDetector> {
   // A failed load (offline on first use, say) may be retried by the next call.
   detector.catch(() => (detector = undefined));
   return detector;
+}
+
+/**
+ * One canvas for every tile of every call: the face tool scans ten times a second, and Safari frees a dropped canvas late
+ * (its total canvas memory is capped), so a new canvas per scan ran phones out of it.
+ */
+let scratch: HTMLCanvasElement | undefined;
+const scratchCanvas = () => (scratch ??= document.createElement('canvas'));
+
+/** The detector's WebAssembly module aborted (out of memory): it cannot be used again, so the next call loads a fresh one. */
+const ABORTED = /^Aborted\(|out of memory|Cannot enlarge memory|memory access out of bounds/i;
+function detect(fd: FaceDetector, canvas: HTMLCanvasElement) {
+  try {
+    return fd.detect(canvas).detections;
+  } catch (e) {
+    if (e instanceof Error && ABORTED.test(e.message)) {
+      detector = undefined;
+      throw new NamedError('OutOfMemoryError', "This video is too large for this device's memory. Try a shorter or smaller video.", { cause: e });
+    }
+    throw e;
+  }
 }
 
 interface Scored extends Rect {
@@ -107,15 +130,15 @@ export async function findFaces(
   const regions: Rect[] = [{ x: 0, y: 0, w: W, h: H }];
   // Halves and quarters of the shorter side catch faces down to about 1/20 of it.
   for (const f of tiers) if (short * f >= 96) regions.push(...tiles(W, H, Math.round(short * f)));
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d')!;
+  const canvas = scratchCanvas();
+  const ctx = context2d(canvas);
   const found: Scored[] = [];
   for (const r of regions) {
     const s = Math.min(1, TILE_MAX / Math.max(r.w, r.h));
     canvas.width = Math.max(1, Math.round(r.w * s));
     canvas.height = Math.max(1, Math.round(r.h * s));
     ctx.drawImage(bitmap, r.x, r.y, r.w, r.h, 0, 0, canvas.width, canvas.height);
-    for (const d of fd.detect(canvas).detections) {
+    for (const d of detect(fd, canvas)) {
       const b = d.boundingBox;
       if (!b) continue;
       const score = d.categories[0]?.score ?? 0;
@@ -148,12 +171,12 @@ export async function findPortraitFaces(bitmap: ImageBitmap, onProgress?: (stage
   const W = bitmap.width;
   const H = bitmap.height;
   const s = Math.min(1, TILE_MAX / Math.max(W, H));
-  const canvas = document.createElement('canvas');
+  const canvas = scratchCanvas();
   canvas.width = Math.max(1, Math.round(W * s));
   canvas.height = Math.max(1, Math.round(H * s));
-  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  context2d(canvas).drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   const out: Landmarks[] = [];
-  for (const d of fd.detect(canvas).detections) {
+  for (const d of detect(fd, canvas)) {
     const b = d.boundingBox;
     const k = d.keypoints;
     // BlazeFace keypoints: right eye, left eye, nose tip, mouth, right ear, left ear (0..1).

@@ -32,7 +32,7 @@ export function failsTheSameAgain(name: string): boolean {
 }
 
 /** Encoder and memory failures that a smaller picture can get past. */
-const SHRINKABLE = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'OutOfMemoryError', 'EncoderRefused']);
+const SHRINKABLE = new Set(['EncodingError', 'OperationError', 'InvalidStateError', 'NotSupportedError', 'EncoderStall', 'OutOfMemoryError', 'EncoderRefused', 'CanvasMemoryError']);
 
 
 /** The ladder of longest sides a retry steps down. 1080p is the first rung, as a phone handles it comfortably. */
@@ -168,6 +168,9 @@ export function retryNote(retry: RetryKind | undefined, made?: { width: number; 
 
 /** An EncoderUnavailable that only refused this picture size (the browser has an encoder): a smaller size can get past it. */
 const sizeRefused = (e: unknown) => nameOf(e) === 'EncoderUnavailable' && !!(e as { sizeRefused?: boolean }).sizeRefused;
+
+/** Whether the retry ladder takes this error on (a smaller or different run follows). */
+export const isShrinkable = (e: unknown) => SHRINKABLE.has(nameOf(e));
 
 const nameOf = (e: unknown) => (typeof e === 'object' && e ? ((e as { name?: string }).name ?? '') : '');
 

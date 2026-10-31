@@ -2,6 +2,7 @@ import { createShell, processEach } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { nameBare } from '../lib/bare-error';
 import { retryNote } from '../lib/edit-recovery';
+import { lazyImport, warm } from '../lib/lazy-import';
 import type { EditOptions, EditResult } from '../lib/video-edit';
 
 /**
@@ -37,10 +38,14 @@ export function videoEditShell(config: {
   return createShell({
     keepAwake: true,
     remembersSize: true,
-    onFilesChanged: config.onFilesChanged,
+    onFilesChanged: async (files) => {
+      // Fetch the editing code at drop time, while the deployment that served this page is most likely still current.
+      if (files.length > 0) warm(() => import('../lib/video-edit'));
+      return config.onFilesChanged?.(files);
+    },
     async process(files, progress) {
       // About 400 KB of video code, loaded only when someone runs the tool.
-      const { assertReadable, editVideo } = await import('../lib/video-edit');
+      const { assertReadable, editVideo } = await lazyImport(() => import('../lib/video-edit'));
       return processEach(files, progress, config.verb, async (entry, index) => {
         const share = (f: number) => (index + f) / files.length;
         progress.set(`Reading ${entry.file.name}…`, share(0.01));

@@ -19,6 +19,7 @@ import type { ImageSegmenter } from '@mediapipe/tasks-vision';
 import { vendorDir } from './vendor';
 import { StageError, NamedError } from './input-error';
 import { isReclaim, tagCodec } from './codec-guard';
+import { context2d, releaseCanvas } from './canvas-memory';
 
 /** Roll-back switch: false puts every finder back on the CPU delegate. */
 const GPU_FOR_EDGES = true;
@@ -40,8 +41,11 @@ export function modelFor(finder: PersonFinder, shape?: Shape): string {
   if (finder === 'edges') return MODELS.edges;
   return shape && shape.width / shape.height >= LANDSCAPE_FROM ? MODELS.landscape : MODELS.square;
 }
-/** Longest side of the picture the segmenter is given. */
+/** Longest side of the picture the segmenter is given, and the smaller one a device too slow even for Fast falls back to. */
 const WORK = 512;
+const WORK_SMALL = 256;
+/** Frames in a row whose mask came back empty that reuse the last good one before the run is stopped. */
+const MAX_EMPTY = 3;
 /** Share of the previous mask kept in each new one: steadier edges, slight lag on fast moves. */
 const KEEP = 0.45;
 
@@ -118,6 +122,24 @@ export class MemoryError extends Error {
 /** The graphics context was lost under the engine. */
 class GpuLost extends Error {}
 
+/**
+ * Test-only: makes the person finder fail on purpose, so a spec can drive the recovery. `at` is the frame (counting every
+ * call to the finder, retries included) to start at, `times` how many calls fail, `empty` returns no mask instead of throwing.
+ */
+type Fault = { at: number; times: number; empty?: boolean; message?: string; onFire?: () => void; before?: () => void };
+let calls = 0;
+let faulted = 0;
+function fault(): 'throw' | 'empty' | undefined {
+  const f = (globalThis as { __stayputSegFault?: Fault }).__stayputSegFault;
+  calls++;
+  if (f && calls === f.at) f.before?.();
+  if (!f || calls < f.at || faulted >= f.times) return undefined;
+  faulted++;
+  f.onFire?.();
+  return f.empty ? 'empty' : 'throw';
+}
+const FAULT_MESSAGE = 'x';
+
 /** Throw away the shared segmenter, so the next run builds a fresh one. */
 function drop() {
   const old = segmenter;
@@ -181,7 +203,10 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
         console.warn('The graphics chip could not start the person finder, using the CPU', e);
       }
     }
-    return make('CPU');
+    const seg = await make('CPU');
+    // The CPU path needs a WebGL context too (see probeWebGL), and loses it the same way: a context held here goes with it.
+    holder.sentinel = makeGL();
+    return seg;
   })();
 }
 
@@ -198,6 +223,14 @@ export class Matte {
   private person = document.createElement('canvas');
   private prev: Float32Array | undefined;
   constructor(private finder: PersonFinder = 'edges') {}
+  /** Longest side of the picture the finder is given: smaller once a device proved too slow even for Fast. */
+  private work = WORK;
+  /** The finder was rebuilt once after a failure this run; a second failure ends the run. */
+  private rebuilt = false;
+  /** Frames in a row that used the last mask because the finder returned none. */
+  private empties = 0;
+  /** Set when a slow device moved the run off Better edges, or onto a smaller picture; said in the result line. */
+  private fellBack: string[] = [];
   /** Frames in which some of the picture was a person. */
   framesWithPerson = 0;
   frames = 0;
@@ -210,8 +243,21 @@ export class Matte {
   /** Frames in a row on the processor that took over FRAME_STALL_MS. */
   private slowStreak = 0;
 
+  /** Give the frame-size canvases back at the end of a video: Safari frees them late, and each is 33 MB at 4K. */
+  dispose() {
+    releaseCanvas(this.small);
+    releaseCanvas(this.mask);
+    releaseCanvas(this.person);
+    this.prev = undefined;
+  }
+
   /** A plain sentence on which path found the people in this video, for the result line. */
   pathNote(): string {
+    const fell = this.fellBack.length ? ` ${this.fellBack.join(' ')}` : '';
+    return this.pathLine() + fell;
+  }
+
+  private pathLine(): string {
     if (this.finder === 'fast') return 'Found the person with the processor (Fast always uses it).';
     if (this.chipMs.length === 0) return 'Found the person with the processor (the graphics chip was slow or unavailable).';
     const sorted = [...this.chipMs].sort((a, b) => a - b);
@@ -229,7 +275,7 @@ export class Matte {
     const { width, height } = ctx.canvas;
     const model = modelFor(this.finder, ctx.canvas);
     let seg = await load(model);
-    const k = Math.min(1, WORK / Math.max(width, height));
+    const k = Math.min(1, this.work / Math.max(width, height));
     const sw = Math.max(16, Math.round(width * k));
     const sh = Math.max(16, Math.round(height * k));
     if (this.small.width !== sw || this.small.height !== sh) {
@@ -237,16 +283,26 @@ export class Matte {
       this.small.height = this.mask.height = sh;
       this.prev = undefined;
     }
-    this.small.getContext('2d')!.drawImage(ctx.canvas, 0, 0, sw, sh);
+    context2d(this.small).drawImage(ctx.canvas, 0, 0, sw, sh);
     // Timestamps must only grow, across videos too; the frame's own time can repeat after a seek, so count instead.
     clock += 33;
-    let result;
+    let result: ReturnType<ImageSegmenter['segmentForVideo']> | undefined;
     let began = performance.now();
     const hiddenBefore = hiddenCount;
+    const run = (engine: ImageSegmenter) => {
+      const planned = fault();
+      if (planned === 'throw') throw new Error((globalThis as { __stayputSegFault?: Fault }).__stayputSegFault?.message ?? FAULT_MESSAGE);
+      const out = engine.segmentForVideo(this.small, clock);
+      if (planned === 'empty') {
+        out.close();
+        return undefined;
+      }
+      return out;
+    };
     try {
-      result = seg.segmentForVideo(this.small, clock);
-      // A lost context does not make the engine throw: it returns masks that are wrong. Rerun the frame on the CPU.
-      if (segmenter?.gpu && segmenter.sentinel?.isContextLost()) {
+      result = run(seg);
+      // A lost context does not make the engine throw: it returns masks that are wrong. Rerun the frame on a fresh engine (the CPU, from a chip).
+      if (result && segmenter?.sentinel?.isContextLost()) {
         result.close();
         throw new GpuLost();
       }
@@ -257,8 +313,18 @@ export class Matte {
       }
       // An engine the browser invalidated under us (InvalidStateError: a closed or reclaimed object) cannot be used again, on the CPU either: a fresh one gets this frame.
       const invalidated = e instanceof Error && e.name === 'InvalidStateError';
-      if (!segmenter?.gpu && !invalidated) throw e;
-      if (segmenter?.gpu) {
+      const onChip = !!segmenter?.gpu;
+      if (!onChip && !invalidated) {
+        // On the CPU path: once per run the engine is rebuilt and the frame redone (the WebGL context under it may have been lost);
+        // a second failure, or no WebGL left at all, ends the run with a name that says which.
+        if (!probeWebGL().any) {
+          drop();
+          throw new StageError('WebGLLost', new Error('The graphics context was lost. Close other tabs and try again.'));
+        }
+        if (this.rebuilt) throw new StageError('PersonFinderFailed', e);
+        this.rebuilt = true;
+        console.warn('The person finder failed, starting a new one', e instanceof GpuLost ? 'context lost' : e);
+      } else if (onChip) {
         // The graphics chip failed part way (a lost context, say): rebuild on the CPU and finish from this frame.
         console.warn('The graphics chip stopped the person finder, using the CPU', e instanceof GpuLost ? 'context lost' : e);
         gpuFailed = true;
@@ -271,26 +337,42 @@ export class Matte {
       clock += 33;
       began = performance.now();
       try {
-        result = seg.segmentForVideo(this.small, clock);
+        result = run(seg);
       } catch (again) {
-        // Invalid a second time, on a fresh engine: the run records the person finder as the source.
-        throw isReclaim(again) ? tagCodec(again, 'segmenter', 'segment') : again;
+        // Failed a second time, on a fresh engine: the run records the person finder as the source.
+        if (isAbort(again)) {
+          drop();
+          throw new MemoryError();
+        }
+        if (isReclaim(again)) throw tagCodec(again, 'segmenter', 'segment');
+        throw new StageError('PersonFinderFailed', again);
       }
     }
-    const found = result.confidenceMasks?.[0];
-    if (!found) throw new NamedError('PersonMaskFailed', 'The person finder returned no mask.');
-    const conf = found.getAsFloat32Array();
+    const found = result?.confidenceMasks?.[0];
+    if (!found && !(this.prev && this.empties < MAX_EMPTY)) {
+      result?.close();
+      throw new StageError('PersonMaskEmpty', new Error('The person finder returned no mask.'));
+    }
+    const conf = found?.getAsFloat32Array();
     const frameMs = performance.now() - began;
     const onChip = !!segmenter?.gpu;
     if (onChip) this.chipMs.push(frameMs);
     else this.cpuFrames++;
-    const mw = found.width;
-    const mh = found.height;
+    // No mask this frame (checked above): the last one stands in, for a few frames in a row.
+    const mw = found?.width ?? this.mask.width;
+    const mh = found?.height ?? this.mask.height;
     const cur = new Float32Array(mw * mh);
-    // The multiclass model's mask 0 is the background; the binary selfie model's mask 0 is the person.
-    if (this.finder === 'edges') for (let i = 0; i < cur.length; i++) cur[i] = 1 - conf[i]!;
-    else cur.set(conf);
-    result.close();
+    if (conf) {
+      this.empties = 0;
+      // The multiclass model's mask 0 is the background; the binary selfie model's mask 0 is the person.
+      if (this.finder === 'edges') for (let i = 0; i < cur.length; i++) cur[i] = 1 - conf[i]!;
+      else cur.set(conf);
+    } else {
+      this.empties++;
+      console.warn('The person finder returned no mask, using the last one');
+      cur.set(this.prev!);
+    }
+    result?.close();
     const timing = segmenter?.gpu ? segmenter.frameMs : undefined;
     if (timing && timing.length < GPU_TIMED_FRAMES && timing.push(frameMs) === GPU_TIMED_FRAMES) {
       const sorted = timing.slice(1).sort((a, b) => a - b);
@@ -307,7 +389,18 @@ export class Matte {
     if (frameMs > FRAME_STALL_MS && !interrupted) {
       // The frame came back, so it is used; but this path is no good for the rest of the run.
       if (!onChip && ++this.slowStreak >= STALL_FRAMES) {
-        throw new StageError('PersonFinderStalled', new NamedError('PersonMaskFailed', 'Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
+        this.slowStreak = 0;
+        // A slow processor gets an easier job before the run is given up: Fast instead of Better edges, then a smaller picture.
+        if (this.finder === 'edges') {
+          console.warn('The person finder is too slow here, switching to Fast');
+          this.finder = 'fast';
+          this.fellBack.push('Switched to Fast part way, because this device was too slow for Better edges.');
+          drop();
+        } else if (this.work > WORK_SMALL) {
+          console.warn('The person finder is too slow here, using a smaller picture');
+          this.work = WORK_SMALL;
+          this.fellBack.push('Looked at a smaller picture part way, because this device was too slow for the full one.');
+        } else throw new StageError('PersonFinderStalled', new NamedError('PersonMaskFailed', 'Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
       }
       if (onChip) {
         console.warn('One frame took over 5 seconds on the graphics chip, using the CPU');
@@ -340,7 +433,7 @@ export class Matte {
       img.data[i * 4 + 3] = Math.round(a * 255);
       if (a > 0.5) on++;
     }
-    this.mask.getContext('2d')!.putImageData(img, 0, 0);
+    context2d(this.mask).putImageData(img, 0, 0);
     this.frames++;
     if (on / cur.length > 0.01) this.framesWithPerson++;
 
@@ -348,7 +441,7 @@ export class Matte {
       this.person.width = width;
       this.person.height = height;
     }
-    const p = this.person.getContext('2d')!;
+    const p = context2d(this.person);
     p.globalCompositeOperation = 'copy';
     p.drawImage(ctx.canvas, 0, 0);
     background(ctx, this.person, this.small);
