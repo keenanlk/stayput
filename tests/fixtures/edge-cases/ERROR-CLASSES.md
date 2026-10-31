@@ -34,6 +34,12 @@ The class a failed run records (`error_class`) with the exact words the person s
 | `ModelDownloadError` | `src/lib/speech-errors.ts` | `The speech model (77 MB) could not be downloaded. Check your connection, then try again: a download that stopped part way starts over. On mobile data, Wi-Fi is steadier.` |
 | `ModelLoadError` | `src/lib/speech-errors.ts` | `The speech model downloaded but could not be started in this browser. Reload the page and try again, or use an up-to-date Chrome, Edge or Firefox on a computer.` |
 | `ModelLoadError` | `src/lib/person-mask.ts:146` | the browser's own message, or `The person finder could not be started in this browser.` |
+| `ModelDownloadError` | `src/lib/model-fetch.ts` (vocal remover, speech files) | `The <model> (<size>) could not be downloaded. Check your connection and try again. On mobile data, Wi-Fi is steadier.` |
+| `ModelDownloadFailed` | `src/lib/model-fetch.ts` (person finder, face finder) | `The person finder (about 12 MB) could not be downloaded. Check your connection and try again.` |
+| `ModelOffline` | `src/lib/model-fetch.ts` | `The <model> isn't on this device yet, and there's no internet connection. Connect and try again: the first run downloads the <model> (<size>) and the engine that runs it, and after that this tool works offline.` |
+| `StorageFull` | `src/lib/model-fetch.ts` | `This browser doesn't have room to keep the <model> (<size>). Free some space on this device and try again. In a private window the browser allows much less storage, so a normal window may work.` |
+| `ModelVerifyFailed` | `src/lib/model-fetch.ts` | `The <model> was downloaded twice, but neither copy matched what was expected, so both were thrown away instead of used. Something on the way, often a public or work network, is changing the file. Try again later or on another network.` |
+| `WorkerCrashError` | `src/tools/vocal-remover.ts` | `The separation model stopped unexpectedly, which usually means the browser ran short of memory. Close other tabs and try again, or use a shorter song or a computer.` |
 | `WorkerCrashError` | `src/lib/speech-errors.ts` | `The speech model stopped unexpectedly, which usually means the browser ran short of memory. Close other tabs and try again, or use a shorter recording.` |
 | `SpeechModelError` | `src/lib/speech-errors.ts` | `The speech model could not read this recording. Try again, or try a shorter recording or another file.` |
 | `NoSpeechFound` | `src/lib/speech-errors.ts` | set where it is raised (the caption pages) |

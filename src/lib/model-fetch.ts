@@ -4,7 +4,15 @@
  * file is fetched again and the part already received is skipped, a few
  * times at most. A body that still falls short ends as an error, never as a
  * complete file, and a kept file is checked against its size (wholeOrNull).
+ *
+ * On top of that sits the one loader every model tool uses (loadModelBytes, or
+ * downloadVerified where a library keeps the files itself): a model that is not
+ * kept is first checked for the connection and for room to keep it, then
+ * downloaded and compared with the build-time manifest's size and SHA-256 before
+ * it is written to the cache or handed to the model; a kept copy that no longer
+ * matches is dropped and fetched again once.
  */
+import { NamedError } from './input-error';
 
 type FetchLike = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
@@ -137,5 +145,234 @@ export async function wholeOrNull(res: Response): Promise<Response | null> {
     return new Response(blob, { status: res.status, statusText: res.statusText, headers: res.headers });
   } catch {
     return null;
+  }
+}
+
+/** What a model file must be: its size in bytes and its SHA-256 as lower-case hex (src/data/model-manifest.json). */
+export type ModelEntry = { size: number; sha256: string };
+
+/** The Cache API store for model files that no library keeps itself. */
+export const MODEL_CACHE = 'stayput-models-v1';
+
+/** Names a failed run records; the messages are what the page shows. */
+export const MODEL_ERRORS = ['ModelDownloadError', 'ModelDownloadFailed', 'ModelOffline', 'StorageFull', 'ModelVerifyFailed'] as const;
+export type ModelErrorName = (typeof MODEL_ERRORS)[number];
+export const isModelError = (e: unknown): e is NamedError => e instanceof Error && (MODEL_ERRORS as readonly string[]).includes(e.name);
+
+/**
+ * How a model is named in a message: `model` is "speech model", "person finder" or "separation model"; `size` is what this
+ * device is actually fetching ("77 MB"), left out when there is no reliable figure. `failName` is the class a failed
+ * download records: the person and face finders use ModelDownloadFailed, everything else ModelDownloadError.
+ */
+export type ModelLabel = { model: string; size?: string; failName?: 'ModelDownloadError' | 'ModelDownloadFailed' };
+const sized = ({ model, size }: ModelLabel) => (size ? `${model} (${size})` : model);
+
+export const modelDownloadError = (label: ModelLabel) =>
+  new NamedError(
+    label.failName ?? 'ModelDownloadError',
+    `The ${sized(label)} could not be downloaded. Check your connection and try again.${label.failName === 'ModelDownloadFailed' ? '' : ' On mobile data, Wi-Fi is steadier.'}`,
+  );
+export const modelOffline = (label: ModelLabel) =>
+  new NamedError(
+    'ModelOffline',
+    `The ${label.model} isn't on this device yet, and there's no internet connection. Connect and try again: the first run downloads the ${sized(label)} and the engine that runs it, and after that this tool works offline.`,
+  );
+export const storageFull = (label: ModelLabel) =>
+  new NamedError(
+    'StorageFull',
+    `This browser doesn't have room to keep the ${sized(label)}. Free some space on this device and try again. In a private window the browser allows much less storage, so a normal window may work.`,
+  );
+export const modelVerifyFailed = (label: ModelLabel) =>
+  new NamedError(
+    'ModelVerifyFailed',
+    `The ${label.model} was downloaded twice, but neither copy matched what was expected, so both were thrown away instead of used. Something on the way, often a public or work network, is changing the file. Try again later or on another network.`,
+  );
+
+const isQuota = (e: unknown) => e instanceof Error && (e.name === 'QuotaExceededError' || /quota/i.test(e.message));
+
+/** True when the browser says the device is offline. */
+const offline = () => typeof navigator !== 'undefined' && navigator.onLine === false;
+
+/** SHA-256 of `bytes` as lower-case hex, or '' where the browser has no SubtleCrypto (a page that is not a secure context). */
+export async function sha256Hex(bytes: BufferSource): Promise<string> {
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle) return '';
+  return Array.from(new Uint8Array(await subtle.digest('SHA-256', bytes)), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** Whether `blob` is the file the manifest describes: its size, and its hash where the browser can compute one. */
+export async function matchesEntry(blob: Blob, entry: ModelEntry | undefined): Promise<boolean> {
+  if (!entry) return true;
+  if (blob.size !== entry.size) return false;
+  const hash = await sha256Hex(await blob.arrayBuffer());
+  return !hash || hash === entry.sha256;
+}
+
+/**
+ * Whether the network answers at all, asked with a plain GET of a tiny same-origin file that the service worker does not keep: some
+ * browsers (iOS Safari on Wi-Fi with no internet, WebKit with its offline switch on) leave navigator.onLine at true. Only a
+ * request that fails outright counts as offline; one that is merely slow is taken as online.
+ */
+export async function networkUp(): Promise<boolean> {
+  if (typeof location === 'undefined') return true;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 1500);
+  try {
+    await fetch(`/robots.txt?online=${Date.now()}`, { cache: 'no-store', signal: ctl.signal });
+    return true;
+  } catch (err) {
+    return (err as Error).name === 'AbortError';
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Before a model that is not kept is downloaded: offline (the browser says so, or a request for a small file of ours
+ * fails) is ModelOffline, with no request for the model made, and less free
+ * storage than the model needs is StorageFull, instead of a half-written cache. A browser that cannot say
+ * how much room is left is given the benefit of the doubt.
+ */
+export async function modelPreflight(needBytes: number, label: ModelLabel, probe: () => Promise<boolean> = networkUp): Promise<void> {
+  if (offline() || !(await probe())) throw modelOffline(label);
+  try {
+    const { quota, usage } = (await navigator.storage?.estimate?.()) ?? {};
+    if (quota !== undefined && usage !== undefined && needBytes > 0 && quota - usage < needBytes) throw storageFull(label);
+  } catch (err) {
+    if (isModelError(err)) throw err;
+  }
+}
+
+/** Bytes still to download of `paths` (each with its size from `sizeOf`), counting those not found in the cache `name`. */
+export async function uncachedBytes(name: string, paths: string[], sizeOf: (path: string) => number | undefined): Promise<number> {
+  let cache: Cache | undefined;
+  try {
+    cache = await caches.open(name);
+  } catch {
+    // Private mode may refuse the Cache API: nothing is kept there.
+  }
+  let need = 0;
+  for (const p of paths) {
+    const size = sizeOf(p);
+    if (size && !(await cache?.match(p).catch(() => undefined))) need += size;
+  }
+  return need;
+}
+
+/**
+ * Download `url` as a whole, verified file. A dropped connection is resumed (fetchResumable); the body must be the
+ * size and SHA-256 of `entry` before it is returned, and one that is not is downloaded once more before
+ * ModelVerifyFailed. A response that is not ok is returned as it came, for a caller that wants to see a 404.
+ * Anything else that goes wrong is ModelDownloadError, or ModelOffline when the browser is offline.
+ */
+export async function downloadVerified(
+  doFetch: FetchLike,
+  url: string,
+  opts: { label: ModelLabel; entry?: ModelEntry; onProgress?: (got: number, total: number) => void; init?: RequestInit; waits?: readonly number[] },
+): Promise<Response> {
+  const { label, entry } = opts;
+  for (let attempt = 0; ; attempt++) {
+    let res: Response;
+    try {
+      // The second try skips the browser's HTTP cache: /models/ is served immutable, so a stale copy there would come back as it was.
+      res = await fetchResumable(doFetch, url, attempt > 0 ? { ...opts.init, cache: 'reload' } : opts.init, opts.onProgress, opts.waits);
+    } catch {
+      throw offline() ? modelOffline(label) : modelDownloadError(label);
+    }
+    if (!res.ok) return res;
+    const whole = await wholeOrNull(res);
+    if (!whole) throw offline() ? modelOffline(label) : modelDownloadError(label);
+    const blob = await whole.blob();
+    if (await matchesEntry(blob, entry)) return new Response(blob, { status: 200, headers: whole.headers });
+    if (attempt >= 1) throw modelVerifyFailed(label);
+  }
+}
+
+/** Open a Cache API store, or undefined where the browser will not (Safari private mode, a locked-down profile). */
+async function open(name: string): Promise<Cache | undefined> {
+  try {
+    return typeof caches === 'undefined' ? undefined : await caches.open(name);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The bytes of a model file for a loader that wants them in memory (MediaPipe, onnxruntime). A kept copy is
+ * used when it matches `entry`; one that does not is evicted and the file downloaded again. A download is
+ * checked (see downloadVerified) before it is kept or returned. A cache that cannot keep it (full, refused)
+ * never stops the run: the bytes in memory are used, and `onKeepFailed` hears why.
+ */
+export async function loadModelBytes(
+  url: string,
+  opts: {
+    label: ModelLabel;
+    entry?: ModelEntry;
+    onProgress?: (fraction: number) => void;
+    onKeepFailed?: (err: NamedError) => void;
+    doFetch?: FetchLike;
+    cacheName?: string;
+    waits?: readonly number[];
+  },
+): Promise<Uint8Array> {
+  const { label, entry } = opts;
+  const cache = await open(opts.cacheName ?? MODEL_CACHE);
+  try {
+    const hit = await cache?.match(url);
+    if (hit) {
+      const blob = await hit.blob();
+      if (await matchesEntry(blob, entry)) {
+        opts.onProgress?.(1);
+        return new Uint8Array(await blob.arrayBuffer());
+      }
+      // Cut short, flipped bytes or an older file: never used, fetched again below.
+      await cache!.delete(url);
+    }
+  } catch {
+    await cache?.delete(url).catch(() => false);
+  }
+  await modelPreflight(entry?.size ?? 0, label);
+  const res = await downloadVerified(opts.doFetch ?? ((i, o) => fetch(i, o)), url, {
+    label,
+    entry,
+    waits: opts.waits,
+    onProgress: (got, total) => opts.onProgress?.(Math.min(1, got / (total || entry?.size || got || 1))),
+  });
+  if (!res.ok) throw modelDownloadError(label);
+  const blob = await res.blob();
+  try {
+    await cache?.put(url, new Response(blob, { headers: { 'content-length': String(blob.size) } }));
+  } catch (err) {
+    await cache?.delete(url).catch(() => false);
+    if (isQuota(err)) opts.onKeepFailed?.(storageFull(label));
+  }
+  return new Uint8Array(await blob.arrayBuffer());
+}
+
+const PERSIST_ASKED = 'stayput-persist-asked';
+let persistAsked = false;
+
+/**
+ * After a successful run of a tool that keeps a model, ask the browser not to evict the origin's storage
+ * (Safari drops idle Cache API data after seven days). Chrome and Safari answer without a prompt; Firefox asks, so it is
+ * asked once for this browser and never before a run. Does nothing when no model is kept.
+ */
+export async function persistAfterRun(keptIn: readonly string[] = [MODEL_CACHE, 'transformers-cache', 'transformers-cache-whisper-tiny']): Promise<void> {
+  try {
+    if (persistAsked || typeof navigator === 'undefined' || !navigator.storage?.persist || typeof caches === 'undefined') return;
+    let kept = false;
+    for (const name of keptIn) kept ||= await caches.has(name);
+    if (!kept) return;
+    persistAsked = true;
+    try {
+      if (localStorage.getItem(PERSIST_ASKED)) return;
+      localStorage.setItem(PERSIST_ASKED, '1');
+    } catch {
+      // No localStorage: asked once for this page instead.
+    }
+    if (await navigator.storage.persisted?.()) return;
+    await navigator.storage.persist();
+  } catch {
+    // Storage that cannot be persisted is no failure of the run.
   }
 }

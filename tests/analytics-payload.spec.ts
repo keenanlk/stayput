@@ -200,13 +200,13 @@ for (const slug of SPEECH_TOOLS) {
     expect(dl.shown).toContain('could not be downloaded');
   });
 
-  test(`${slug}: a damaged model file reports ModelLoadError with what to try`, async ({ page, baseURL }) => {
+  test(`${slug}: a damaged model file is refused by the hash check as ModelVerifyFailed, with what to try`, async ({ page, baseURL }) => {
     test.setTimeout(120_000);
     const sent = await captureAnalytics(page, baseURL!);
     await page.route(`${SITE}/models/**/*.onnx`, (route) => route.fulfill({ contentType: 'application/octet-stream', body: Buffer.alloc(2048, 7) }));
     const bad = await failedCaptionRun(page, baseURL!, slug, sent);
-    expect(bad.data).toMatchObject({ outcome: 'error', error_class: 'ModelLoadError' });
-    expect(bad.shown).toContain('could not be started');
+    expect(bad.data).toMatchObject({ outcome: 'error', error_class: 'ModelVerifyFailed' });
+    expect(bad.shown).toContain('neither copy matched');
   });
 
   test(`${slug}: a worker the browser kills reports WorkerCrashError`, async ({ page, baseURL }) => {
@@ -368,7 +368,7 @@ test('Vocal remover: an error named inside the worker is recorded under that nam
   const sent = await captureAnalytics(page, baseURL!);
   await page.route(`${SITE}/models/**/*.onnx`, (route) => route.abort('connectionreset'));
   const out = await failedCaptionRun(page, baseURL!, 'vocal-remover', sent);
-  expect(out.data).toMatchObject({ tool: 'vocal-remover', outcome: 'error', error_class: 'TypeError' });
+  expect(out.data).toMatchObject({ tool: 'vocal-remover', outcome: 'error', error_class: 'ModelDownloadError' });
 });
 
 test('pressing Run without what the tool needs is recorded as InputError, not as a failure', async ({ page, baseURL }) => {

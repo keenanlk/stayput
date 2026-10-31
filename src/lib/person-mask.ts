@@ -17,6 +17,8 @@
  */
 import type { ImageSegmenter } from '@mediapipe/tasks-vision';
 import { vendorDir } from './vendor';
+import { isModelError, loadModelBytes } from './model-fetch';
+import { modelEntry } from './model-manifest';
 import { StageError, NamedError } from './input-error';
 import { isReclaim, tagCodec } from './codec-guard';
 import { context2d, releaseCanvas } from './canvas-memory';
@@ -165,6 +167,8 @@ function load(model: string): Promise<ImageSegmenter> {
   });
   return mine.ready.catch((e) => {
     if (isAbort(e)) throw new MemoryError();
+    // Offline, no room, a download that failed or a file that failed its check keep their own names and messages.
+    if (isModelError(e)) throw e;
     // Whatever stopped the person finder from starting is one kind, and the message stays as it was.
     const failed = new NamedError('PersonMaskFailed', e instanceof Error && e.message ? e.message : 'The person finder could not be started in this browser.');
     failed.name = 'ModelLoadError';
@@ -174,6 +178,9 @@ function load(model: string): Promise<ImageSegmenter> {
 
 function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2RenderingContext | null; frameMs?: number[] }): Promise<ImageSegmenter> {
   return (async () => {
+    // The model first, whole and checked, outside the chip attempt (a failed download says nothing about the chip); offline or
+    // no room ends here, before any script is loaded.
+    const bytes = await loadModelBytes(model, { label: { model: 'person finder', size: model === MODELS.edges ? 'about 28 MB' : 'about 12 MB', failName: 'ModelDownloadFailed' }, entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
     const webgl = probeWebGL();
@@ -181,7 +188,7 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
     const make = async (delegate: 'CPU' | 'GPU') => {
       const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
       return ImageSegmenter.createFromOptions(fileset, {
-        baseOptions: { modelAssetPath: model, delegate },
+        baseOptions: { modelAssetBuffer: bytes, delegate },
         runningMode: 'VIDEO',
         outputConfidenceMasks: true,
         outputCategoryMask: false,

@@ -112,3 +112,17 @@ ff4177021cc41f7db950912b73ea4fdf7d01d8e7). Only the 8-bit quantised encoder
 and merged decoder are kept, with the tokenizer and config files, 41 MB in
 all. Phones that ran out of memory with the base model (and phones known to be
 short of it) load this one instead; it is less accurate.
+
+## How the page checks these files
+
+`npm run build` runs `scripts/model-manifest.mjs`, which writes `src/data/model-manifest.json`: the size and
+SHA-256 of every file here, keyed by the path it is served at. The speech, person-finder, face-finder and
+vocal-remover loaders (`src/lib/model-fetch.ts`) compare a download, and a copy kept in the Cache API, with it
+before using it, so replacing a model means rebuilding (the manifest is committed, and `node
+scripts/model-manifest.mjs --check` fails when it is out of date).
+
+Hosting note: Cloudflare Pages allows 25 MiB per file
+(https://developers.cloudflare.com/pages/platform/limits/). The Whisper base decoder
+(`whisper-base/onnx/decoder_model_merged_quantized.onnx`, 53.7 MB), the vocal-remover model (66.8 MB) and
+several others are larger, so moving the site to Cloudflare Pages would break them. `public/_headers` only
+mirrors the cache headers in `vercel.json`; the models would have to be served from object storage or another host.

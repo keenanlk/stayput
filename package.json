@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/postbuild.mjs",
+    "build": "node scripts/model-manifest.mjs && astro build && node scripts/postbuild.mjs",
     "check-links": "node scripts/check-links.mjs",
     "check-titles": "node scripts/check-titles.mjs",
     "live-caption-matrix": "node scripts/live-caption-matrix.mjs",
