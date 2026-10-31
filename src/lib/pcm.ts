@@ -9,6 +9,8 @@ import { foldToStereo } from './fold-channels';
 import { NamedError } from './input-error';
 import { isNotReadable, retryUnreadable } from './read-failure';
 import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
+import { decoderOrder, soundOf, type SoundKind } from './audio-codecs';
+import { amrPcm, bareSound, ensureAc3, hasAudioDecoder, refusalFor } from './odd-audio';
 
 export const SAMPLE_RATE = 48_000;
 
@@ -80,27 +82,73 @@ async function decodedByCodecs(track: InputAudioTrack, rate: number): Promise<Fl
  * MB read at once fails the allocation, which Chrome on Android reports as NotReadableError (and a re-read fails the
  * same way). AAC and MP3 are decoded in stretches; other codecs through the page's decoder. Only a file the demuxer
  * cannot place is handed to `decodePcm`, and only up to a size a phone can hold. A failed allocation is OutOfMemoryError.
+ * `rate` is the sample rate the sound comes back at (48 kHz unless the caller needs another); with `whole` off the whole-file
+ * decoder is never tried (its sound would come back at 48 kHz), and a file the demuxer cannot place is null.
  */
-export async function decodePcmSliced(file: Blob): Promise<Float32Array[] | null> {
+export async function decodePcmSliced(file: Blob, rate = SAMPLE_RATE, whole = true): Promise<Float32Array[] | null> {
   await refuseSoundlessContainer(file);
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  let sound: SoundKind | null = null;
+  let cause: unknown;
   try {
     const track = await input.getPrimaryAudioTrack().catch((e) => (unlessFatal(e), null));
     if (track) {
       const { demuxedSound } = await import('./demux-audio');
-      const wrapped = await demuxedSound(input, SAMPLE_RATE, false).catch((e) => (unlessFatal(e), null));
+      const wrapped = await demuxedSound(input, rate, false).catch((e) => (unlessFatal(e), null));
       if (wrapped) return wrapped;
-      const decoded = await decodedByCodecs(track, SAMPLE_RATE).catch((e) => (unlessFatal(e), null));
-      if (decoded) return decoded;
     }
+    sound = soundOf(track) ?? (await bareSound(file));
+    const found = await decodedByPageDecoders(file, track, sound, rate).catch((e) => (unlessFatal(e), (cause = e), null));
+    if (found) return found;
   } finally {
     input.dispose?.();
   }
-  if (file.size > WHOLE_FILE_LIMIT) return null;
-  return decodePcm(file).catch((e) => {
+  if (!whole || file.size > WHOLE_FILE_LIMIT) return null;
+  const pcm = await decodePcm(file).catch((e) => {
     unlessFatal(e);
-    throw e;
+    throw refusalFor(sound, cause) ?? e;
   });
+  // The browser and the demuxer both came up empty: a sound in a named format nothing here reads is said so, not called "no sound".
+  if (!pcm || !pcm[0]?.length) throw refusalFor(sound, cause) ?? new NamedError('NoSoundTrack', 'No sound could be read from this file.');
+  return pcm;
+}
+
+/**
+ * The sound read by the page's own decoders after the browser's refused it, in the order decoderOrder gives: WebCodecs, the
+ * Dolby decoder for AC-3 and E-AC-3, the libav build for AMR. Null when none applied or none could read it.
+ */
+async function decodedByPageDecoders(file: Blob, track: InputAudioTrack | null, sound: SoundKind | null, rate: number): Promise<Float32Array[] | null> {
+  if (!sound) return null;
+  for (const step of decoderOrder(sound, { audioDecoder: hasAudioDecoder() })) {
+    if (step === 'amr') return amrPcm(file, track, sound, rate);
+    if (step === 'webcodecs' || step === 'ac3') {
+      if (step === 'ac3') await ensureAc3();
+      const decoded = track ? await decodedByCodecs(track, rate) : null;
+      if (decoded) return decoded;
+    }
+  }
+  return null;
+}
+
+/**
+ * The file's sound at `rate` (one or two channels) read only by the page's decoders, for a sound the browser's own decoder refused
+ * (Opus or FLAC in MP4, ALAC, PCM in a MOV, AC-3, AMR). Null when the file holds no sound this can name; throws UnsupportedAudioCodec
+ * for a named format nothing here reads.
+ */
+export async function decodePcmByPageDecoders(file: Blob, rate: number): Promise<Float32Array[] | null> {
+  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  try {
+    const track = await input.getPrimaryAudioTrack().catch((e) => (unlessFatal(e), null));
+    const sound = soundOf(track) ?? (await bareSound(file));
+    let cause: unknown;
+    const found = await decodedByPageDecoders(file, track, sound, rate).catch((e) => (unlessFatal(e), (cause = e), null));
+    if (found) return found;
+    const refusal = refusalFor(sound, cause);
+    if (refusal) throw refusal;
+    return null;
+  } finally {
+    input.dispose?.();
+  }
 }
 
 /** Two channels, whatever came in (mono is copied to both sides). */

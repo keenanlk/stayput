@@ -1,6 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 
 /**
  * Transcribe and Video to subtitles (the same tool on two pages): the failures that come from the device and not the
@@ -162,10 +163,10 @@ for (const path of PAGES) {
       const models: string[] = [];
       page.on('request', (r) => /\/models\/|onnx/i.test(r.url()) && models.push(r.url()));
       await open(page, path);
-      await page.locator('#file-input').setInputFiles({ name: 'voice.amr', mimeType: 'audio/amr', buffer: Buffer.concat([Buffer.from('#!AMR\n'), Buffer.alloc(400, 1)]) });
+      await page.locator('#file-input').setInputFiles({ name: 'dts.mkv', mimeType: 'video/x-matroska', buffer: readFileSync(fileURLToPath(new URL('./fixtures/edge-cases/dts.mkv', import.meta.url))) });
       await page.locator('#run').click();
       await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-      await expect(page.locator('#error')).toContainText('AMR');
+      await expect(page.locator('#error')).toContainText('DTS');
       expect(models).toEqual([]);
     });
   });

@@ -516,6 +516,43 @@
    "copyright": "Copyright (c) 2026-present, Vanilagy and contributors"
   },
   {
+   "id": "mediabunny-ac3",
+   "name": "Mediabunny AC-3 extension",
+   "version": "1.61.0",
+   "npm": "@mediabunny/ac3",
+   "licences": [
+    {
+     "name": "MPL-2.0",
+     "url": "/licenses/MPL-2.0.txt"
+    }
+   ],
+   "project": "https://mediabunny.dev/guide/extensions/ac3",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "shipped": "A separate script the page fetches only when a sound in Dolby Digital (AC-3) or Dolby Digital Plus (E-AC-3) is read (audio and caption tools)",
+   "kind": "library",
+   "copyleft": "mpl",
+   "copyright": "Copyright (c) 2026-present, Vanilagy and contributors"
+  },
+  {
+   "id": "ffmpeg-libs-ac3",
+   "name": "FFmpeg AC-3 and E-AC-3 decoder, in the Mediabunny AC-3 extension",
+   "version": "n/a",
+   "npm": null,
+   "licences": [
+    {
+     "name": "LGPL-2.1-or-later",
+     "url": "/licenses/LGPL-2.1.txt"
+    }
+   ],
+   "project": "https://ffmpeg.org",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "via": "mediabunny-ac3",
+   "shipped": "Compiled to WebAssembly and embedded in the Mediabunny AC-3 extension script, loaded only for Dolby Digital sound. Only FFmpeg libavcodec's AC-3 and E-AC-3 coders are included.",
+   "kind": "wasm",
+   "copyright": "Copyright (c) 2000-2024 Fabrice Bellard, et al.",
+   "note": "The WebAssembly is inside the extension script, not a separate file. To replace it, rebuild this site from its public source with another build of @mediabunny/ac3; the extension (packages/ac3 in that repository) has its own source, FFmpeg patch and build instructions."
+  },
+  {
    "id": "mp4-muxer",
    "name": "mp4-muxer",
    "version": "5.2.2",

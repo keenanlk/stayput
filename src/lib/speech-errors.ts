@@ -8,7 +8,7 @@ import { NamedError, isUnspecific } from './input-error';
 
 import { isNotReadable } from './read-failure';
 
-export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelOffline', 'StorageFull', 'ModelVerifyFailed', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong'] as const;
+export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelOffline', 'StorageFull', 'ModelVerifyFailed', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong', 'UnsupportedSound'] as const;
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
 
 export class SpeechError extends Error {
@@ -46,6 +46,12 @@ export const audioDecodeError = (message = 'No audio could be read from this fil
   err.cause = cause;
   const named = classNameOf(cause);
   if (!REFUSALS.includes(named)) err.name = named as SpeechErrorName;
+  return err;
+};
+/** The sound is in a format no decoder this page carries can read (Dolby in a browser without the module, Opus in Safari before 26, ALAC, DTS). The message names the format; the cause, if any, is kept. */
+export const unsupportedSound = (message: string, cause?: unknown) => {
+  const err = make('UnsupportedSound', message);
+  if (cause !== undefined) err.cause = cause;
   return err;
 };
 export const workerCrashError = () =>

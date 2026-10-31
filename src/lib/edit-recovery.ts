@@ -18,7 +18,7 @@
 import { codecFailure } from './codec-guard';
 
 /** Errors that say what the file is, or what the person gave: a retry cannot change them. */
-const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'AudioDecodeError', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound', 'DecodeFailed']);
+const FINAL = new Set(['InputError', 'UnreadableFile', 'UnsupportedCodec', 'AudioDecodeError', 'UnsupportedSound', 'UnsupportedAudioCodec', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound', 'DecodeFailed']);
 
 /**
  * What the shell stops an instant repeat of: FINAL, plus the other names that say the file itself cannot be used

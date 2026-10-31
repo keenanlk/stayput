@@ -7,6 +7,8 @@ import { retryUrl } from '../lib/fresh-url';
 import workerUrl from '../lib/vocals.worker.ts?worker&url';
 import { fromWorkerFailure } from '../lib/worker-error';
 import { retryUnreadable } from '../lib/read-failure';
+import { stageError } from '../lib/bare-error';
+import { longRecordingHint } from '../lib/long-audio';
 
 /**
  * Vocal remover: split a song into the instrumental (karaoke) and the vocals
@@ -56,7 +58,10 @@ function split(left: Float32Array, right: Float32Array, onLoading: (f: number) =
 
 const minutes = (s: number) => (s < 90 ? 'about a minute' : `about ${Math.round(s / 60)} minutes`);
 
-createShell({
+const longHint = longRecordingHint({ setHint: (text, link) => shell.setHint(text, link) });
+
+const shell = createShell({
+  onFilesChanged: longHint,
   outputFormat: () => str('format', 'mp3'),
   async process(files, progress) {
     const stems = str('stems', 'instrumental');
@@ -66,45 +71,53 @@ createShell({
       const file = entry.file;
       const share = (f: number) => (index + f) / files.length;
       progress.set(`Reading ${file.name}…`, share(0.01));
-      const buffer = await retryUnreadable(file, () => decodeAudio(file, SAMPLE_RATE), (message) => progress.set(`${file.name}: ${message}`, share(0.01)));
-      const mixL = buffer.getChannelData(0).slice();
-      const mixR = (buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : buffer.getChannelData(0)).slice();
-      const seconds = mixL.length / SAMPLE_RATE;
-      if (seconds < 1) throw new InputError(`${file.name} is too short to separate.`);
-      const started = performance.now();
-      let firstPieceAt = 0;
-      const res = await split(
-        mixL.slice(),
-        mixR.slice(),
-        (f) => {
-          if (!modelReady) progress.set(`Downloading the separation model, once (67 MB): ${Math.round(f * 100)}%`, share(0.02 + 0.08 * f));
-        },
-        (done, total, engine) => {
-          modelReady = true;
-          if (done === 0) {
-            firstPieceAt = performance.now();
-            progress.set(`Separating ${file.name}${engine === 'cpu' ? ' on the CPU (no WebGPU in this browser), which is slow' : ''}…`, share(0.1));
-            return;
-          }
-          const each = (performance.now() - (firstPieceAt || started)) / done / 1000;
-          const left = Math.round(each * (total - done));
-          progress.set(`Separating ${file.name}: ${Math.round((done / total) * 100)}%${done < total ? `, ${minutes(left)} left` : ''}`, share(0.1 + 0.8 * (done / total)));
-        },
-      );
-      const inst = [res.left, res.right];
-      const voc = [mixL.map((v, i) => v - res.left[i]! / 1.022), mixR.map((v, i) => v - res.right[i]! / 1.022)];
-      const wanted: [string, Float32Array[]][] = [];
-      if (stems !== 'vocals') wanted.push(['instrumental', inst]);
-      if (stems !== 'instrumental') wanted.push(['vocals', voc]);
-      for (const [name, chans] of wanted) {
-        progress.set(`Saving the ${name}…`, share(0.92));
-        const blob = format === 'wav' ? encodeWav(chans) : await encodeMp3(chans, 320, (f) => progress.set(`Saving the ${name}: ${Math.round(f * 100)}%`, share(0.9 + 0.1 * f)));
-        outputs.push({
-          name: suffixName(file.name, `-${name}`, format),
-          blob,
-          originalSize: file.size,
-          note: `${name === 'vocals' ? 'vocals only (acapella)' : 'music without the vocals'}, ${formatDuration(seconds)}, ${format === 'wav' ? 'WAV' : 'MP3 320 kbps'}, separated in ${formatDuration((performance.now() - started) / 1000)} on the ${res.engine === 'gpu' ? 'GPU' : 'CPU'}`,
-        });
+      // The step under way: a failure with no name of its own is recorded as this, and a memory failure as OutOfMemoryError (see stageError).
+      let step = 'AudioDecodeFailed';
+      try {
+        const buffer = await retryUnreadable(file, () => decodeAudio(file, SAMPLE_RATE), (message) => progress.set(`${file.name}: ${message}`, share(0.01)));
+        const mixL = buffer.getChannelData(0).slice();
+        const mixR = (buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : buffer.getChannelData(0)).slice();
+        const seconds = mixL.length / SAMPLE_RATE;
+        if (seconds < 1) throw new InputError(`${file.name} is too short to separate.`);
+        step = 'AudioTransformFailed';
+        const started = performance.now();
+        let firstPieceAt = 0;
+        const res = await split(
+          mixL.slice(),
+          mixR.slice(),
+          (f) => {
+            if (!modelReady) progress.set(`Downloading the separation model, once (67 MB): ${Math.round(f * 100)}%`, share(0.02 + 0.08 * f));
+          },
+          (done, total, engine) => {
+            modelReady = true;
+            if (done === 0) {
+              firstPieceAt = performance.now();
+              progress.set(`Separating ${file.name}${engine === 'cpu' ? ' on the CPU (no WebGPU in this browser), which is slow' : ''}…`, share(0.1));
+              return;
+            }
+            const each = (performance.now() - (firstPieceAt || started)) / done / 1000;
+            const left = Math.round(each * (total - done));
+            progress.set(`Separating ${file.name}: ${Math.round((done / total) * 100)}%${done < total ? `, ${minutes(left)} left` : ''}`, share(0.1 + 0.8 * (done / total)));
+          },
+        );
+        const inst = [res.left, res.right];
+        const voc = [mixL.map((v, i) => v - res.left[i]! / 1.022), mixR.map((v, i) => v - res.right[i]! / 1.022)];
+        const wanted: [string, Float32Array[]][] = [];
+        if (stems !== 'vocals') wanted.push(['instrumental', inst]);
+        if (stems !== 'instrumental') wanted.push(['vocals', voc]);
+        step = 'AudioEncodeFailed';
+        for (const [name, chans] of wanted) {
+          progress.set(`Saving the ${name}…`, share(0.92));
+          const blob = format === 'wav' ? encodeWav(chans) : await encodeMp3(chans, 320, (f) => progress.set(`Saving the ${name}: ${Math.round(f * 100)}%`, share(0.9 + 0.1 * f)));
+          outputs.push({
+            name: suffixName(file.name, `-${name}`, format),
+            blob,
+            originalSize: file.size,
+            note: `${name === 'vocals' ? 'vocals only (acapella)' : 'music without the vocals'}, ${formatDuration(seconds)}, ${format === 'wav' ? 'WAV' : 'MP3 320 kbps'}, separated in ${formatDuration((performance.now() - started) / 1000)} on the ${res.engine === 'gpu' ? 'GPU' : 'CPU'}`,
+          });
+        }
+      } catch (e) {
+        throw stageError(step, e, step === 'AudioTransformFailed' ? { message: 'Something went wrong while removing the vocals. Reload the page and try again. If it keeps failing, try a shorter part of the recording or another browser.' } : {});
       }
     }
     return outputs;

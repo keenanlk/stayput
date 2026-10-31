@@ -7,17 +7,20 @@
  * phone video at once can run the tab out of memory, so a file is never given
  * to the decoder as it is.
  *
- * When the browser's own decoder refuses the sound, the page's decoder
- * (WebCodecs, through Mediabunny) gets a turn, and a sound neither can read is
- * named in the message (AMR from an Android recorder, say), not reported as a
+ * When the browser's own decoder refuses the sound, the page's decoders get a
+ * turn, in the order decoderOrder gives (WebCodecs through Mediabunny; the Dolby
+ * decoder for AC-3; the libav build for AMR), and a sound none can read ends as
+ * UnsupportedSound, naming the format (Opus in Safari before 26, say), not as a
  * generic failure.
  */
 import { ALL_FORMATS, AudioBufferSink, BlobSource, Input, type InputAudioTrack } from 'mediabunny';
 import { demuxedSound, grown, NO_SOUND, plannedSamples } from './demux-audio';
 import { decodeAudio, channelsOf } from './audio';
+import { decoderOrder, soundFormatName, soundOf, undecodableText, type SoundKind } from './audio-codecs';
+import { amrPcm, bareSound, ensureAc3, hasAudioDecoder, refusalFor } from './odd-audio';
 import { isNotReadable, notReadable } from './read-failure';
 import { isPhoneBrowser } from './phone-limit';
-import { audioDecodeError, isRecordingTooLong, looksLikeMemory, outOfMemoryError, recordingTooLongError, speechSecondsBudget, SpeechError } from './speech-errors';
+import { audioDecodeError, unsupportedSound, isRecordingTooLong, looksLikeMemory, outOfMemoryError, recordingTooLongError, speechSecondsBudget, SpeechError } from './speech-errors';
 
 export const SPEECH_RATE = 16000;
 
@@ -44,37 +47,34 @@ export async function speechSamples(file: File, onProgress?: (fraction: number) 
       const believable = Number.isFinite(seconds) && seconds > 0 && file.size / seconds >= 500;
       if (believable && seconds > budget) throw recordingTooLongError(seconds, budget);
     }
+    const sound = soundOf(track) ?? (await bareSound(file));
+    // A video's sound is copied out and decoded a stretch at a time, and a stretch the browser refuses is not retried on the whole file, which is what that path exists to avoid.
     let failed = false;
-    if (hasVideo) {
-      // A phone video's sound is copied out and decoded a stretch at a time. A stretch the browser refuses is not
-      // retried on the whole file, which is what this path exists to avoid.
+    for (const step of decoderOrder(sound ?? { codec: null }, { audioDecoder: hasAudioDecoder(), stretchFirst: hasVideo })) {
       try {
-        const mono = await demuxedSound(input, SPEECH_RATE, true, onProgress);
-        if (mono) return mono[0]!;
+        if (step === 'wrap') {
+          if (!hasVideo) continue;
+          const mono = await demuxedSound(input, SPEECH_RATE, true, onProgress);
+          if (mono) return mono[0]!;
+        } else if (step === 'browser') {
+          if (!failed) return await wholeFile(file);
+        } else if (step === 'amr') {
+          return (await amrPcm(file, track, sound!, SPEECH_RATE))[0]!;
+        } else if (track) {
+          if (step === 'ac3') await ensureAc3();
+          const samples = await decodedByCodecs(track, SPEECH_RATE, onProgress);
+          if (samples) return samples;
+        }
       } catch (e) {
-        if (looksLikeMemory(e) || isNotReadable(e) || (e instanceof SpeechError && e.message === NO_SOUND)) throw e;
+        if (looksLikeMemory(e) || isNotReadable(e) || (step === 'wrap' && e instanceof SpeechError && e.message === NO_SOUND)) throw e;
         cause ??= e;
-        failed = true;
+        if (step === 'wrap') failed = true;
       }
     }
-    if (!failed) {
-      try {
-        return await wholeFile(file);
-      } catch (e) {
-        if (looksLikeMemory(e) || isNotReadable(e)) throw e;
-        cause ??= e;
-      }
-    }
-    if (track) {
-      try {
-        const samples = await decodedByCodecs(track, SPEECH_RATE, onProgress);
-        if (samples) return samples;
-      } catch (e) {
-        if (looksLikeMemory(e) || isNotReadable(e)) throw e;
-        cause ??= e;
-      }
-    }
-    throw audioDecodeError(await undecodableMessage(file, track, cause), cause);
+    const message = undecodableMessage(sound, cause);
+    // A named format nothing here reads is its own kind of failure; a damaged AAC or MP3 file, or one that says nothing, stays a decode failure.
+    if (refusalFor(sound) && !isUnreadable(cause)) throw unsupportedSound(message, cause);
+    throw audioDecodeError(message, cause);
   } catch (e) {
     throw asSpeechError(e);
   } finally {
@@ -92,13 +92,13 @@ function unlessUnreadable(e: unknown): null {
 function asSpeechError(e: unknown): Error {
   if (isNotReadable(e)) return notReadable(e);
   if (isRecordingTooLong(e)) return e as Error;
-  if (e instanceof SpeechError && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.kind)) return e;
-  if (e instanceof Error && ['AudioDecodeError', 'OutOfMemoryError'].includes(e.name)) return e;
+  if (e instanceof SpeechError && ['AudioDecodeError', 'OutOfMemoryError', 'UnsupportedSound'].includes(e.kind)) return e;
+  if (e instanceof Error && ['AudioDecodeError', 'OutOfMemoryError', 'UnsupportedSound'].includes(e.name)) return e;
   return looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError(undefined, e);
 }
 
 async function wholeFile(file: File): Promise<Float32Array> {
-  const [samples] = channelsOf(await decodeAudio(file, SPEECH_RATE), true) as [Float32Array];
+  const [samples] = channelsOf(await decodeAudio(file, SPEECH_RATE, false), true) as [Float32Array];
   return samples;
 }
 
@@ -131,51 +131,11 @@ async function decodedByCodecs(track: InputAudioTrack, rate: number, onProgress?
   return end > 0 ? out.subarray(0, end) : null;
 }
 
-/** What the sound is called to the person looking at the page. */
-const FORMAT_NAMES: Record<string, string> = {
-  aac: 'AAC',
-  mp3: 'MP3',
-  opus: 'Opus',
-  vorbis: 'Vorbis',
-  flac: 'FLAC',
-  ac3: 'Dolby Digital (AC-3)',
-  eac3: 'Dolby Digital Plus (E-AC-3)',
-  dts: 'DTS',
-  ulaw: 'µ-law',
-  alaw: 'A-law',
-  // A format Mediabunny reads but does not name: the container's own code for it.
-  samr: 'AMR (the voice format of some Android recorders)',
-  sawb: 'AMR-WB (the voice format of some Android recorders)',
-  sawp: 'AMR-WB+',
-  'ima4': 'IMA ADPCM',
-};
-
-/** The name of a track's sound format, or '' when nothing says. */
-function soundFormat(track: InputAudioTrack | null): string {
-  if (!track) return '';
-  if (track.codec) return FORMAT_NAMES[track.codec] ?? (track.codec.startsWith('pcm') ? 'uncompressed PCM' : '');
-  const id = track.internalCodecId;
-  if (typeof id !== 'string') return '';
-  return FORMAT_NAMES[id.toLowerCase()] ?? (/^[\x20-\x7e]{4}$/.test(id) ? `the "${id.trim()}" format` : '');
-}
+const isUnreadable = (cause: unknown) => cause instanceof Error && ['NotReadableError', 'NotFoundError'].includes(cause.name);
 
 /** The sentence for a sound this browser could not read, naming its format where that is known. */
-async function undecodableMessage(file: File, track: InputAudioTrack | null, cause?: unknown): Promise<string> {
+function undecodableMessage(sound: SoundKind | null, cause?: unknown): string {
   // A file the browser could not even read (cloud storage that is not on the device, say) is not a sound format problem.
-  if (cause instanceof Error && ['NotReadableError', 'NotFoundError'].includes(cause.name)) {
-    return 'This file could not be read. If it is in cloud storage (Google Drive or Photos, say), save a copy on this device first and add that.';
-  }
-  let format = soundFormat(track);
-  // A bare .amr file has no container for the demuxer to read; its first bytes say what it is.
-  if (!format && !track) {
-    const head = new Uint8Array(await file.slice(0, 9).arrayBuffer().catch(() => new ArrayBuffer(0)));
-    const text = new TextDecoder('latin1').decode(head);
-    if (text.startsWith('#!AMR-WB')) format = FORMAT_NAMES.sawb!;
-    else if (text.startsWith('#!AMR')) format = FORMAT_NAMES.samr!;
-  }
-  if (!format) return "No audio could be read from this file. It may have no sound track, or use an audio format this browser can't decode.";
-  const common = format.startsWith('AAC') || format.startsWith('MP3');
-  return common
-    ? `This browser could not decode this file's ${format} sound. Try again, or try Chrome or Edge on a computer.`
-    : `This file's sound is ${format}, which this browser can't decode. Try Chrome or Edge on a computer, or save the video again with AAC sound and add that.`;
+  if (isUnreadable(cause)) return 'This file could not be read. If it is in cloud storage (Google Drive or Photos, say), save a copy on this device first and add that.';
+  return undecodableText(soundFormatName(sound));
 }
