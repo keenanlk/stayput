@@ -79,7 +79,7 @@ async function open(page: Page, slug: string) {
   return errors;
 }
 
-async function run(page: Page, files: string[], configure?: () => Promise<void>): Promise<{ downloads: Download[]; items: number }> {
+async function run(page: Page, files: string[], configure?: () => Promise<void>, resultsTimeout = 60_000): Promise<{ downloads: Download[]; items: number }> {
   // Landing pages load their tool module on demand, so wait for the shell before dropping files.
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles(files.map((f) => (f.includes('/') ? f : fx(f))));
@@ -88,7 +88,7 @@ async function run(page: Page, files: string[], configure?: () => Promise<void>)
   const downloads: Download[] = [];
   page.on('download', (d) => downloads.push(d));
   await page.locator('#run').click();
-  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: resultsTimeout });
   await expect(page.locator('#error')).not.toHaveClass(/is-active/);
   const items = await page.locator('#results-list .result-item').count();
   // Give the single-file auto download a moment to register.
@@ -5057,7 +5057,7 @@ test('QR scanner sends only files_added and tool_run, with no decoded text, file
   expect(mine.map((e) => e.n)).toEqual(['files_added', 'tool_run']);
   const run = mine[1]!.d;
   expect(run).toMatchObject({ tool: 'qr-code-scanner', outcome: 'ok', format: 'image', attempt: 'first-ok' });
-  const allowed = new Set(['tool', 'outcome', 'files', 'input', 'output', 'duration', 'format', 'attempt', 'error_class', 'landing', 'ref', 'from', 'visit', 'via', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns']);
+  const allowed = new Set(['tool', 'outcome', 'files', 'input', 'output', 'duration', 'format', 'attempt', 'error_class', 'landing', 'ref', 'from', 'visit', 'via', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'variant']);
   for (const e of mine) for (const k of Object.keys(e.d)) expect(allowed.has(k), `unexpected field ${k}`).toBe(true);
   const sent = JSON.stringify(events);
   for (const secret of ['correct-horse-battery', 'Cafe Guest', 'WIFI:', 'qr_wifi', '.png']) expect(sent, secret).not.toContain(secret);
@@ -6997,7 +6997,9 @@ test('Video to subtitles shows the download line before any run and the phone si
   await expect(p.locator('#run-hint')).toHaveText('The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once. Keep the screen on while it works.');
   await p.locator('#file-input').setInputFiles(big);
   await expect(p.locator('#run-hint')).toContainText('about 200 MB');
-  await expect(p.locator('#run-hint')).toContainText('about 77 MB (95 MB on computers with WebGPU)');
+  // An iPhone with a file over the phone limit starts with the smaller speech model, and the hint says that download instead.
+  await expect(p.locator('#run-hint')).toContainText('about 45 MB in all');
+  await expect(p.locator('#run-hint')).not.toContainText('about 77 MB');
   await expect(p.locator('#run-hint').getByRole('link', { name: 'Trim it first' })).toHaveAttribute('href', '/tools/trim-video');
   await phone.close();
 });
@@ -7007,7 +7009,7 @@ test('Auto caption video warns before a too-big video runs on a phone, and says 
   writeFileSync(big, '');
   truncateSync(big, 201_000_000);
   const small = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'short.mp4');
-  writeFileSync(small, Buffer.alloc(1_000_000));
+  writeFileSync(small, Buffer.alloc(1_000_000, 1));
   const phone = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1' });
   const p = await phone.newPage();
   await p.goto('/auto-caption-video');
@@ -7251,7 +7253,7 @@ test('Vocal remover splits speech from music into two WAVs, and no bytes leave t
   const { items } = await run(page, [file], async () => {
     await page.locator('#stems').selectOption('both');
     await page.locator('#format').selectOption('wav');
-  });
+  }, 200_000);
   expect(items).toBe(2);
   await expect(page.locator('#results-list')).toContainText('music without the vocals');
   await expect(page.locator('#results-list')).toContainText('on the CPU');

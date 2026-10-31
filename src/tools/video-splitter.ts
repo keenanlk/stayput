@@ -1,10 +1,11 @@
 import { bool, createShell, num, radio, str } from '../lib/shell';
+import { retryNote } from '../lib/edit-recovery';
 import { formatBytes, type OutputFile } from '../lib/files';
 import { overPhoneLimit } from '../lib/phone-limit';
 import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
 import { InputError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
-import { retryUnreadable, snapshotFile } from '../lib/read-failure';
+import { isNotReadable, probeReadable, snapshotFile } from '../lib/read-failure';
 
 /**
  * Video splitter. The length is read from the file's container; the parts are
@@ -31,6 +32,25 @@ function workFile(picked: File): Promise<File> {
   // A failed copy is dropped, so the next call reads the file again.
   held.copy.catch(() => (held = held?.picked === picked ? undefined : held));
   return held.copy;
+}
+
+/**
+ * Runs `job` and, if the phone fails to read the file, reads it up to twice more (after 1 s, then 2.5 s): three reads in
+ * all. A video over the 50 MB copy limit is read from the phone's storage on every cut, so a read can fail more than once
+ * in a row. A file that is still unreadable ends as NotReadableError with the save-to-phone message, as before.
+ */
+async function rereading<T>(file: Blob, job: () => Promise<T>, onNotice?: (message: string) => void): Promise<T> {
+  for (const pause of [1000, 2500]) {
+    try {
+      return await job();
+    } catch (e) {
+      if (!isNotReadable(e)) throw e;
+      await new Promise((r) => setTimeout(r, pause));
+      await probeReadable(file);
+      onNotice?.('The file could not be read. Trying again.');
+    }
+  }
+  return job();
 }
 
 const clock = (s: number) => {
@@ -118,7 +138,7 @@ async function load(file: File, onNotice?: (message: string) => void) {
   fileSize = file.size;
   update();
   // A phone that could not read the file the first time often can on the second.
-  duration = await retryUnreadable(file, () => readDuration(file), onNotice);
+  duration = await rereading(file, () => readDuration(file), onNotice);
   $('tool').dataset.duration = String(Math.round(duration * 10) / 10);
   update();
 }
@@ -130,6 +150,7 @@ for (const el of document.querySelectorAll('input[name="vs-mode"], #vs-times, #v
 
 const shell = createShell({
   keepAwake: true,
+  remembersSize: true,
   async onFilesChanged(files) {
     if (files.length === 0) {
       duration = 0;
@@ -148,7 +169,9 @@ const shell = createShell({
   async process(files, progress) {
     const entry = files[0]!;
     await loading;
-    const file = await workFile(entry.file);
+    const file = await workFile(entry.file).catch((e) => {
+      throw nameBare('VideoReadFailed', e);
+    });
     if (!duration) {
       try {
         await load(file, (m) => progress.set(m, 0));
@@ -164,13 +187,16 @@ const shell = createShell({
       throw new InputError(e instanceof Error ? e.message : 'Check the times and try again.');
     }
     const exact = bool('exact');
-    const { trimVideo } = await import('../lib/video-trim');
+    // The cutting code loads on first use: a connection that drops here fails the import with a bare TypeError ("Failed to fetch dynamically imported module").
+    const { trimVideo } = await import('../lib/video-trim').catch((e) => {
+      throw nameBare('CutToolLoadFailed', e);
+    });
     const outs: OutputFile[] = [];
     for (const [i, part] of parts.entries()) {
       const label = `Part ${i + 1} of ${parts.length}`;
       progress.set(label, i / parts.length);
       // One part at a time: only the finished file is kept.
-      const r = await retryUnreadable(
+      const r = await rereading(
         file,
         () =>
           trimVideo(file, {
@@ -186,7 +212,7 @@ const shell = createShell({
       outs.push({
         name: videoPartName(entry.file.name, i, parts.length, r.ext),
         blob: r.blob,
-        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : r.keyframeCopy ? 'copied from the key frame at or before the start' : 'fast cut'}`,
+        note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : r.keyframeCopy ? 'copied from the key frame at or before the start' : 'fast cut'}${retryNote(r.retry, r.width && r.height ? { width: r.width, height: r.height } : undefined)}`,
       });
     }
     return outs;

@@ -21,7 +21,7 @@ export default defineConfig({
   build: { format: 'file' },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/sw') && !page.includes('/llms') && !page.includes('/search-index'),
+      filter: (page) => !page.includes('/sw') && !page.includes('/llms') && !page.includes('/search-index') && !/^\/desktop(\/|$)/.test(new URL(page).pathname),
       serialize(item) {
         const path = new URL(item.url).pathname.replace(/(.)\/$/, '$1');
         const entry = lastmods[path];

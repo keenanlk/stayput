@@ -114,7 +114,7 @@ test('watchEncode works for hand-built encodes and cancels through the function 
 
 // The whole page, with an encoder that goes quiet part-way through.
 
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 
@@ -210,6 +210,7 @@ for (const [tool, fixture] of STUCK) {
 
     // The user can try again: the run button works and starts a new run.
     await page.locator('#run').click();
-    await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(2);
+    // A silent encoder gets the shared runner's retries first (one more try in real-time mode), so the second failure takes a little longer.
+    await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length, { timeout: 40_000 }).toBe(2);
   });
 }

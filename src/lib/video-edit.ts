@@ -17,6 +17,7 @@ import {
   MovOutputFormat,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   Quality,
@@ -27,16 +28,17 @@ import {
 } from 'mediabunny';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
-import { EncoderUnavailable, hasVideoEncoder, softwareH264Offered, useRealtimeH264 } from './encoder-probe';
-import { pickVideoCodec } from './video-codec';
+import { EncoderUnavailable, encodeRun, hasVideoEncoder } from './encoder-probe';
+import { codecsFor, planVideoCodec } from './video-codec';
 import { UnreadableFile, UnsupportedCodec, NamedError } from './input-error';
+import { probeDecode } from './decode-probe';
 import { isNotReadable, notReadable, retryUnreadable } from './read-failure';
 import { nameBare } from './bare-error';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { codecFailure, guardCodecs, isReclaim, tagCodec } from './codec-guard';
-import { withRecovery, type Attempt, type RetryKind } from './edit-recovery';
+import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface EditOptions {
   mute?: boolean;
@@ -153,7 +155,7 @@ export function shownSize(video: InputVideoTrack): { width: number; height: numb
 
 /** Size of the picture as it is shown (rotation metadata applied), before any edit. */
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(readOrNull);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
@@ -173,10 +175,13 @@ export async function videoSize(file: File): Promise<{ width: number; height: nu
  * so before it downloads a model. Anything else is left for the run to report.
  */
 export async function assertReadable(file: File): Promise<void> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(readOrNull);
-    if (video && !(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
+    if (!video) return;
+    if (!(await video.canDecode().catch(() => true))) throw new UnsupportedCodec(unplayable());
+    // canDecode only asks whether the codec is supported; a few pictures are decoded for real (DecodeFailed if they are not).
+    await probeDecode(video, await input.computeDuration().catch(() => 0));
   } finally {
     input.dispose?.();
   }
@@ -187,7 +192,14 @@ export async function assertReadable(file: File): Promise<void> {
  * memory) at full size, gets one more try (see edit-recovery.ts) before the failure is shown.
  */
 export async function editVideo(file: File, opts: EditOptions): Promise<EditResult> {
-  if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) return editVideoOnce(file, opts, {});
+  if (!opts.paint && !opts.rotate && !opts.flip && !opts.flipVertical && !opts.crop && !opts.width && !opts.height) {
+    // Remove sound: the picture is copied, with nothing to retry. A failure with no name of its own is named for this step.
+    try {
+      return await editVideoOnce(file, opts, {});
+    } catch (e) {
+      throw nameBare('VideoCopyFailed', e);
+    }
+  }
   const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
   try {
@@ -197,11 +209,17 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       () =>
         withRecovery(
           async (attempt) => {
-            const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
-            return attempt.retry ? { ...r, retry: attempt.retry } : r;
+            const done = encodeRun(attempt);
+            try {
+              const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
+              const retry = retryOf(attempt);
+              return retry ? { ...r, retry } : r;
+            } finally {
+              done();
+            }
           },
           () => made,
-          { ...page.hooks, softwareEncode: softwareH264Offered },
+          page.hooks,
         ),
       opts.onNotice,
     );
@@ -216,8 +234,24 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
   }
 }
 
+/**
+ * A decoder's EncodingError has the same name as an encoder's, and a smaller picture does not fix a decoder. So when a run ends in one,
+ * the picture is decoded again where the run stopped: if that fails it was the decoder (DecodeFailed, not retried), otherwise the
+ * encoder, and the error is returned as it came.
+ */
+async function decoderOrEncoder(e: unknown, video: InputVideoTrack, duration: number, at: number): Promise<unknown> {
+  const name = (e as { name?: string } | null)?.name;
+  if (name !== 'EncodingError' && name !== 'OperationError') return e;
+  // A hidden page or a reclaimed codec fails a decoder too; the recovery that waits for the page handles those.
+  if (document.hidden || isReclaim(e)) return e;
+  return probeDecode(video, duration, at > 0 ? at : undefined).then(
+    () => e,
+    (failed) => failed,
+  );
+}
+
 async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch(readOrNull);
     if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
@@ -290,27 +324,28 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     }
     // Encoders want even sides; H.264 in most browsers also refuses odd ones.
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
-    if (attempt.maxSide && Math.max(width, height) > attempt.maxSide) {
-      const k = attempt.maxSide / Math.max(width, height);
-      width *= k;
-      height *= k;
-    }
-    width = even(width);
-    height = even(height);
-    sized?.(Math.max(width, height));
+    const longest = Math.max(width, height);
+    const capK = capScale(attempt, longest);
+    // Bitrate first, then the test encode at the real size below can lower the size before the file is decoded.
 
     let bitrate: Quality = QUALITY_HIGH;
     if (opts.matchSourceBitrate && duration > 0) {
       const average = await video.getAverageBitrate().catch(() => null);
       const sourceBps = average && average > 0 ? average : (file.size * 8) / duration - (sound ? 128_000 : 0);
-      const wanted = matchedBitrate(sourceBps, video.codec, shown.width * shown.height, width * height);
+      const wanted = matchedBitrate(sourceBps, video.codec, shown.width * shown.height, width * capK * (height * capK));
       if (wanted) bitrate = new Quality({ bitrate: wanted });
     }
-    // A run started again after the encoder failed asks for the encoder mode that does not stall.
-    if (attempt.retry === 'smaller' || attempt.retry === 'again' || attempt.retry === 'software') useRealtimeH264();
-    const videoCodec = await pickVideoCodec({ width, height, bitrate });
+    const plan = await planVideoCodec({ width: even(width * capK), height: even(height * capK), bitrate }, codecsFor(attempt));
+    const k = adoptPlan(attempt, plan, longest);
+    width = even(width * k);
+    height = even(height * k);
+    sized?.(Math.max(width, height));
+    const videoCodec = plan.codec;
     if (!videoCodec) {
-      throw hasVideoEncoder() ? new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.') : new EncoderUnavailable();
+      // With an encoder present, only this size is refused (iOS Safari at 4K): a smaller picture can get past it (edit-recovery.ts).
+      throw hasVideoEncoder()
+        ? Object.assign(new EncoderUnavailable('This browser cannot encode video at this size. Try a smaller size, or a recent version of Chrome, Edge or Safari.'), { sizeRefused: true })
+        : new EncoderUnavailable();
     }
     // Rotating 180 degrees then mirroring left to right is the same as mirroring top to bottom.
     let rotate = (opts.rotate ?? 0) as number;
@@ -338,6 +373,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: out.disk ? false : 'in-memory' }), target: out.target });
     let blob: Blob;
     let conversion: Conversion;
+    let processedTime = 0;
     // A decoder or encoder the browser takes back part-way is replaced and the run goes on; whatever is left open at the end is closed.
     const unguard = guardCodecs();
     try {
@@ -348,7 +384,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
         video: {
           codec: videoCodec,
           bitrate,
-          ...(attempt.retry === 'software' ? { hardwareAcceleration: 'prefer-software' as const } : {}),
+          ...hardwareOption(attempt),
           rotate: rotate as Rotation,
           flip,
           crop,
@@ -385,11 +421,14 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
         throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : failure('EditUnsupported', 'This browser cannot edit this video.');
       }
-      await executeWatched(conversion, opts.onProgress);
+      await executeWatched(conversion, (p, t) => {
+        processedTime = t;
+        opts.onProgress?.(p);
+      });
       blob = await finishOutput(out, 'video/mp4');
     } catch (e) {
       await out.disk?.abort();
-      throw e;
+      throw await decoderOrEncoder(e, video, duration, processedTime);
     } finally {
       unguard();
     }

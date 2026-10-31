@@ -4,6 +4,7 @@ import { SAMPLE_RATE, decodeAudio, encodeMp3, encodeWav, formatDuration } from '
 import type { Reply, Request } from '../lib/vocals.worker';
 import { InputError, NamedError } from '../lib/input-error';
 import { fromWorkerFailure } from '../lib/worker-error';
+import { retryUnreadable } from '../lib/read-failure';
 
 /**
  * Vocal remover: split a song into the instrumental (karaoke) and the vocals
@@ -58,7 +59,7 @@ createShell({
       const file = entry.file;
       const share = (f: number) => (index + f) / files.length;
       progress.set(`Reading ${file.name}…`, share(0.01));
-      const buffer = await decodeAudio(file, SAMPLE_RATE);
+      const buffer = await retryUnreadable(file, () => decodeAudio(file, SAMPLE_RATE), (message) => progress.set(`${file.name}: ${message}`, share(0.01)));
       const mixL = buffer.getChannelData(0).slice();
       const mixR = (buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : buffer.getChannelData(0)).slice();
       const seconds = mixL.length / SAMPLE_RATE;

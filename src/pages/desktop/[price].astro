@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+
+export function getStaticPaths() {
+  return [{ params: { price: '29' } }, { params: { price: '49' } }];
+}
+const { price } = Astro.params;
+---
+<Base noindex title="Thanks | Stayput" description={`Thanks for telling us you'd pay $${price} for a Stayput desktop app. Nothing was bought.`}>
+  <article class="wrap-narrow prose page">
+    <h1>Thanks, that helps</h1>
+    <p>You told us you'd pay ${price} for a Stayput desktop app. Nothing was bought and nothing was charged. We didn't ask for any details about you: all we recorded is one anonymous view of this page, the kind described on our <a href="/privacy">privacy page</a>.</p>
+    <p>The app isn't built yet. We'll decide whether to make it after we've seen how many people want it.</p>
+    <p><a href="/">Back to the tools</a></p>
+  </article>
+</Base>

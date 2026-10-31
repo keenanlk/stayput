@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { unzipSync } from 'fflate';
 import { ALL_FORMATS, BufferSource, Input } from 'mediabunny';
 import { planAtTimes, planEqual, planEvery } from '../src/lib/video-split';
@@ -9,7 +9,7 @@ import { planAtTimes, planEqual, planEvery } from '../src/lib/video-split';
 // Video splitter failures: every one that can end a run has a named class (never a bare Error), a phone that cannot
 // read the file gets one more read and then a plain refusal, and odd inputs either split or are refused early.
 const fx = (n: string) => fileURLToPath(new URL(`./fixtures/static/${n}`, import.meta.url));
-const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via']);
+const KEYS = new Set(['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', 'landing', 'ref', 'from', 'visit', 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'via', 'variant']);
 type Ev = { n: string; d: Record<string, string> };
 const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
 
@@ -77,19 +77,20 @@ test.describe('on the page', () => {
         const w = window as unknown as { __fail: number; __failed: number };
         w.__fail = n;
         w.__failed = 0;
-        const fail = () => {
-          if (w.__fail <= 0) return false;
+        // Only the big reads fail; the one-byte probe between reads passes, so each failure is one run of the job.
+        const fail = (blob: Blob) => {
+          if (w.__fail <= 0 || blob.size <= 1) return false;
           w.__fail--;
           w.__failed++;
           return true;
         };
         const arrayBuffer = Blob.prototype.arrayBuffer;
         Blob.prototype.arrayBuffer = function () {
-          return fail() ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
+          return fail(this) ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
         };
         const stream = Blob.prototype.stream;
         Blob.prototype.stream = function () {
-          if (!fail()) return stream.call(this);
+          if (!fail(this)) return stream.call(this);
           return new ReadableStream({ pull: (c) => c.error(new DOMException('The requested file could not be read.', 'NotReadableError')) });
         };
       }, reads);
@@ -107,7 +108,7 @@ test.describe('on the page', () => {
         await page.locator('#run').click();
         await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
         await expect(page.locator('#error')).toContainText('This file could not be read');
-        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'NotReadableError' });
+        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^NotReadable(Probe|MidRead)$/) });
       }
     });
   }
@@ -152,6 +153,61 @@ test.describe('on the page', () => {
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 60_000 });
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
+
+  // A video over the 50 MB copy limit is read from the phone's storage on every cut, so it can fail more than once in a row.
+  for (const [label, reads, ok] of [
+    ['a big video whose cut fails to read twice in a row is read a third time and splits', 2, true],
+    ['a big video that stays unreadable mid-cut ends as NotReadableError with the save-to-phone message', 1000, false],
+  ] as const) {
+    test(label, async ({ page }, testInfo) => {
+      const big = testInfo.outputPath('big-60s.mp4');
+      // A 'free' box is valid padding after the movie: the clip is unchanged and the file is past the 50 MB copy limit.
+      const head = readFileSync(fx('split-60s.mp4'));
+      const pad = Buffer.alloc(52 * 1024 * 1024);
+      pad.writeUInt32BE(pad.length, 0);
+      pad.write('free', 4, 'latin1');
+      writeFileSync(big, Buffer.concat([head, pad]));
+      await open(page);
+      await page.addInitScript(() => {
+        const w = window as unknown as { __fail: number; __failed: number };
+        w.__fail = 0;
+        w.__failed = 0;
+        // Only the big reads fail; the one-byte probe between reads passes, so each failure is one run of the job.
+        const fail = (blob: Blob) => {
+          if (w.__fail <= 0 || blob.size <= 1) return false;
+          w.__fail--;
+          w.__failed++;
+          return true;
+        };
+        const arrayBuffer = Blob.prototype.arrayBuffer;
+        Blob.prototype.arrayBuffer = function () {
+          return fail(this) ? Promise.reject(new DOMException('The requested file could not be read.', 'NotReadableError')) : arrayBuffer.call(this);
+        };
+        const stream = Blob.prototype.stream;
+        Blob.prototype.stream = function () {
+          if (!fail(this)) return stream.call(this);
+          return new ReadableStream({ pull: (c) => c.error(new DOMException('The requested file could not be read.', 'NotReadableError')) });
+        };
+      });
+      await load(page, big);
+      await expect(page.locator('#tool')).toHaveAttribute('data-duration', '60');
+      await page.evaluate((n) => ((window as unknown as { __fail: number }).__fail = n), reads);
+      await page.locator('input[name="vs-mode"][value="equal"]').check();
+      await page.locator('#vs-equal').fill('2');
+      await page.locator('#run').click();
+      if (ok) {
+        await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
+        expect(await page.evaluate(() => (window as unknown as { __failed: number }).__failed)).toBe(2);
+        expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
+      } else {
+        await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 120_000 });
+        await expect(page.locator('#error')).toContainText('save it to the phone first');
+        // Read exactly three times, no more.
+        expect(await page.evaluate(() => (window as unknown as { __failed: number }).__failed)).toBe(3);
+        expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^NotReadable(Probe|MidRead)$/) });
+      }
+    });
+  }
 
   test('a file that is not a video is refused as UnreadableFile', async ({ page }) => {
     await open(page);
@@ -207,6 +263,27 @@ test.describe('on the page', () => {
     const input = new Input({ source: new BufferSource(files[names[1]!]!), formats: ALL_FORMATS });
     const first = await (await input.getPrimaryVideoTrack())!.getFirstTimestamp();
     expect(first).toBeLessThanOrEqual(3.05);
+    expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
+  });
+
+  // No encoder answers (the silent WebKit encoder): the test encode before the cut sees it, so the part is copied from the key frame
+  // in seconds. Before it, a fast cut that needed an encoder waited for the 60 s watchdog and one retry (about 2 minutes). Runs on WebKit in CI too.
+  test('no encoder answers on a fast cut: the part is copied from the key frame within seconds, not after the watchdog', async ({ page }) => {
+    await open(page);
+    await page.addInitScript(() => {
+      // flush() never settles, as on a WebKit encoder that accepts frames and returns nothing.
+      VideoEncoder.prototype.flush = () => new Promise(() => {});
+    });
+    await load(page, fx('split-gop2s.mp4'));
+    await expect(page.locator('#tool')).toHaveAttribute('data-duration', /^8/);
+    await page.locator('#vs-times').fill('0:03');
+    const began = Date.now();
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 45_000 });
+    const seconds = (Date.now() - began) / 1000;
+    console.log(`time to the key-frame copy with a silent encoder: ${seconds.toFixed(1)} s`);
+    await expect(page.locator('#results-list')).toContainText('key frame');
+    expect(seconds).toBeLessThan(30);
     expect(await lastRun(page)).toMatchObject({ outcome: 'ok' });
   });
 

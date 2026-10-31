@@ -4,16 +4,17 @@
  * its still. Photos are decoded one at a time and held as frame-sized
  * pictures only while they are on screen or fading in. Nothing leaves the tab.
  */
-import { AudioSample, AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource, type VideoCodec } from 'mediabunny';
+import { AudioSample, AudioSampleSource, BufferTarget, Mp4OutputFormat, Output, QUALITY_HIGH, VideoSample, VideoSampleSource } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES } from './video-compress';
-import { pickVideoCodec } from './video-codec';
+import { runRecovered } from './video-run';
+import type { Attempt } from './edit-recovery';
+import { encodeOptions } from './edit-recovery';
 import { InputError, UnreadableFile, NamedError } from './input-error';
-import { EncoderRefused, EncoderUnavailable } from './encoder-probe';
 import { SAMPLE_RATE, decodePcm, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { decodeImage, drawScaled } from './image';
-import { ATTEMPTS, ENCODER_REFUSAL, SHAPES, drawStill, scaledFrame, type AudioVideoResult, type Backdrop, type Shape } from './audio-video';
+import { drawStill, planStill, type AudioVideoResult, type Backdrop, type Shape } from './audio-video';
 
 export const MAX_PHOTOS = 100;
 export const FADE_SECONDS = 0.5;
@@ -29,6 +30,8 @@ export interface SlideshowOptions {
   crossfade: boolean;
   song?: File | null;
   onProgress?: (f: number) => void;
+  /** Said when the run starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 /** One photo as a ready frame: scaled to the frame first so a 40-megapixel photo is not kept whole. */
@@ -82,34 +85,25 @@ export async function makeSlideshow(pictures: File[], opts: SlideshowOptions): P
     if (!pcm || pcm[0]!.length < SAMPLE_RATE * 0.1) throw new UnreadableFile('No sound could be read from the song. It may use a format this browser cannot decode.');
     sound = stereo(pcm);
   }
-  for (const attempt of ATTEMPTS) {
-    try {
-      return await encode(pictures, sound, opts, scaledFrame(SHAPES[opts.shape], attempt.scale), attempt.video, attempt.audio);
-    } catch (e) {
-      if (!(e instanceof Error) || !ENCODER_REFUSAL.has(e.name)) throw e;
-    }
-  }
-  throw new EncoderRefused();
+  return runRecovered('SlideshowFailed', opts.onNotice, (attempt, sized) => encode(pictures, sound, opts, attempt, sized));
 }
 
 async function encode(
   pictures: File[],
   sound: Float32Array[] | null,
   opts: SlideshowOptions,
-  frame: { width: number; height: number },
-  videoCodecs: VideoCodec[],
-  audioCodecs: ('aac' | 'opus')[],
+  attempt: Attempt,
+  sized: (longestSide: number) => void,
 ): Promise<AudioVideoResult> {
-  const videoCodec = await pickVideoCodec({ ...frame, bitrate: QUALITY_HIGH }, videoCodecs);
-  if (!videoCodec) throw new EncoderUnavailable('This browser cannot encode video. Try a recent version of Chrome, Edge or Safari.');
-  const audioCodec = sound ? await firstEncodableSound(audioCodecs, { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 }) : null;
+  const { frame, videoCodec } = await planStill(opts.shape, attempt, sized);
+  const audioCodec = sound ? await firstEncodableSound(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: 192_000 }) : null;
   if (sound && !audioCodec) throw noAudioEncoder(false);
 
   const per = Math.min(10, Math.max(1, opts.secondsPer));
   const total = pictures.length * per;
   const fade = opts.crossfade ? Math.min(FADE_SECONDS, per / 2) : 0;
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-  const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
+  const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2, ...encodeOptions(attempt) });
   output.addVideoTrack(videoSource);
   let audioSource: AudioSampleSource | null = null;
   if (sound && audioCodec) {
@@ -124,7 +118,8 @@ async function encode(
     const canvas = new OffscreenCanvas(frame.width, frame.height);
     const ctx = canvas.getContext('2d')!;
     const add = async (t: number, d: number) => {
-      const sample = new VideoSample(canvas, { timestamp: t, duration: d });
+      // Never shorter than one tick of 60 fps: VP8 and VP9 encoders fail on a frame with no length.
+      const sample = new VideoSample(canvas, { timestamp: t, duration: Math.max(d, 1 / 60) });
       await feed?.until(t);
       await videoSource.add(sample);
       sample.close();

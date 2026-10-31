@@ -45,7 +45,7 @@ const does: Record<string, string> = {
   'blur-image': 'Blurs, pixelates or blacks out faces, number plates and text in a photo, and saves the edited image.',
   'rotate-image': 'Rotates photos by 90 or 180 degrees and flips or mirrors them, for one image or a batch.',
   'color-picker': 'Picks any colour from an image, shows its HEX, RGB and HSL codes, and lists the image’s main colours as a palette.',
-  'image-to-word': 'Reads the text in photos, screenshots and scans (JPG, PNG, HEIC, WebP) with OCR and saves it as one Word document (.docx), one page per image. Only the text is kept.',
+  'image-to-word': 'Converts an image to Word: OCR reads the text in a photo, screenshot or scan (PNG, JPG, HEIC or WebP) and saves it as one editable Word document (.docx), one page per image. Only the text is kept, not the layout.',
   'image-to-text': 'Reads the text in a photo, screenshot or scan (JPG, PNG, HEIC, WebP) with OCR and lets you copy it.',
   'video-to-mp3': 'Pulls the audio out of a video (MOV, MKV, WebM, MP4) or converts M4A, WAV and FLAC audio to MP3.',
   'video-to-gif': 'Turns an MP4, MOV or WebM clip into an animated GIF, with trimming, size and frame rate options.',
@@ -266,6 +266,7 @@ const free: Record<string, string> = {
   // These tools exist to add a watermark, so they must not say they add none.
   'watermark-image': freeLine('your files are'),
   'watermark-pdf': freeLine('your files are'),
+  'add-watermark-to-video': freeLine('your videos and logo are'),
 };
 const freeFiles = 'It is free, needs no account and adds no watermark, and your files are not uploaded: everything runs in your browser on your device.';
 const memory = 'The size limit is your device’s memory, and phones hold less; give the page a short while after one visit to save itself for offline use, and then it works offline.';

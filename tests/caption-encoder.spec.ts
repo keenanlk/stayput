@@ -216,7 +216,7 @@ test.describe('on a phone, with a video over the phone limit', () => {
     expect((await download).suggestedFilename()).toMatch(/\.srt$/);
     // The speech worker is gone, a class name is all that is recorded, and Clear says to reload.
     await expect.poll(() => workers(page)).toEqual({ created: 1, terminated: 1 });
-    expect(await lastErrorClass(page)).toBe('EncodingError');
+    expect(await lastErrorClass(page)).toBe('EncoderGaveUp');
     await page.locator('#clear').click();
     await expect(page.locator('#results')).not.toHaveClass(/is-active/);
     await expect(page.locator('#run-hint')).toContainText('Reload the page');

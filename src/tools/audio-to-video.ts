@@ -3,6 +3,7 @@ import { replaceExt, type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
 import type { Backdrop, Shape } from '../lib/audio-video';
 import { InputError, UnreadableFile } from '../lib/input-error';
+import { retryNote } from '../lib/edit-recovery';
 
 /**
  * Audio to video. Each sound file becomes an MP4 showing one still picture
@@ -13,6 +14,7 @@ import { InputError, UnreadableFile } from '../lib/input-error';
 const isImage = (f: File) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif|avif|bmp)$/i.test(f.name);
 
 createShell({
+  remembersSize: true,
   keepAwake: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
@@ -38,11 +40,12 @@ createShell({
           backdrop,
           title,
           onProgress: (f) => progress.set(`Making a video of ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.05 + f * 0.95)),
+          onNotice: (m) => progress.set(m, share(0.05)),
         });
         const out: OutputFile = {
           name: replaceExt(entry.file.name, 'mp4'),
           blob: r.blob,
-          note: `${formatDuration(r.duration)}, ${r.width}×${r.height}, ${r.videoCodec}${bitmap ? '' : ', title on plain background'}`,
+          note: `${formatDuration(r.duration)}, ${r.width}×${r.height}, ${r.videoCodec}${bitmap ? '' : ', title on plain background'}${retryNote(r.retry, r)}`,
         };
         return out;
       });

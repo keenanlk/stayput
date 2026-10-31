@@ -24,6 +24,7 @@ const clock = (s: number) => {
 
 createShell({
   keepAwake: true,
+  remembersSize: true,
   outputFormat: () => 'mp4',
   async process(files, progress) {
     const mode = str('mode', 'balanced') as CompressMode;
@@ -52,7 +53,7 @@ createShell({
         name: suffixName(entry.file.name, '-compressed', 'mp4'),
         blob: r.blob,
         originalSize: entry.file.size,
-        note: notes.join(', ') + retryNote(r.retry),
+        note: notes.join(', ') + retryNote(r.retry, r),
       };
       return out;
     });

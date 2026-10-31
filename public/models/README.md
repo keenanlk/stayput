@@ -104,3 +104,11 @@ picture and a mask as 8-bit pixels, crops around the masked area, fills it at
 512 × 512 and blends the fill back at full size. The object remover loads it on
 the first erase and runs it in a web worker through onnxruntime-web, served
 from /vendor/.
+
+`whisper-tiny/` is OpenAI's Whisper tiny speech-recognition model, released
+under the MIT License, as the ONNX export published by onnx-community on
+Hugging Face (https://huggingface.co/onnx-community/whisper-tiny, revision
+ff4177021cc41f7db950912b73ea4fdf7d01d8e7). Only the 8-bit quantised encoder
+and merged decoder are kept, with the tokenizer and config files, 41 MB in
+all. Phones that ran out of memory with the base model (and phones known to be
+short of it) load this one instead; it is less accurate.

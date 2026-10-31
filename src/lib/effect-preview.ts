@@ -9,7 +9,7 @@ type Canvas = HTMLCanvasElement | OffscreenCanvas;
  * preview redraws whenever an option changes. Returns the shell's
  * onFilesChanged handler.
  */
-export function effectPreview(render: (bitmap: ImageBitmap, maxSide: number) => Canvas | Promise<Canvas>, hint: (count: number) => string, onError: (message: string) => void) {
+export function effectPreview(render: (bitmap: ImageBitmap, maxSide: number) => Canvas | Promise<Canvas>, hint: (count: number) => string, onError: (e: unknown) => void) {
   const panel = document.getElementById('fx-panel')!;
   const canvas = document.getElementById('fx-canvas') as HTMLCanvasElement;
   const hintEl = document.getElementById('fx-hint')!;
@@ -44,7 +44,7 @@ export function effectPreview(render: (bitmap: ImageBitmap, maxSide: number) => 
       await redraw();
     } catch (e) {
       panel.hidden = true;
-      onError(e instanceof Error ? e.message : String(e));
+      onError(e);
     }
   };
 }

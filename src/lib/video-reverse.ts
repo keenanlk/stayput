@@ -16,6 +16,7 @@ import {
   MP4,
   Mp4OutputFormat,
   Output,
+  MPEG_TS,
   QTFF,
   QUALITY_HIGH,
   VideoSample,
@@ -27,12 +28,16 @@ import {
 import { watchEncode } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
 import { InputError, NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
-import { pickVideoCodec } from './video-codec';
+import { codecsFor, planVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
+import { capAtRisk, pageRecoveryHooks } from './recovery-hooks';
+import { adoptPlan, capScale, encodeOptions, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface ReverseOptions {
   mute: boolean;
   onProgress?: (fraction: number) => void;
+  /** Said when the run starts again after the page was hidden, or at a smaller size after the encoder gave up. */
+  onNotice?: (message: string) => void;
 }
 
 export interface ReverseResult {
@@ -42,6 +47,8 @@ export interface ReverseResult {
   duration: number;
   videoCodec: string;
   audio: boolean;
+  /** Set when the file was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
+  retry?: RetryKind;
 }
 
 /**
@@ -75,8 +82,32 @@ export function reverseWindows(keys: number[], first: number, end: number, windo
   return out;
 }
 
+
+/**
+ * Reverses the video. When the device's encoder gives up (EncodingError and its kin) or the page was hidden, the run starts
+ * again, at a smaller picture where the encoder is what failed (see edit-recovery.ts). If every try fails, the error keeps
+ * its class name and says what to try.
+ */
 export async function reverseVideo(file: File, opts: ReverseOptions): Promise<ReverseResult> {
-  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA] });
+  const page = pageRecoveryHooks(opts.onNotice);
+  let made = 0;
+  try {
+    return await withRecovery(
+      async (attempt) => {
+        const r = await reverseOnce(file, opts, attempt, (side) => (made = side));
+        const retry = retryOf(attempt);
+        return retry ? { ...r, retry } : r;
+      },
+      () => made,
+      page.hooks,
+    );
+  } finally {
+    page.dispose();
+  }
+}
+
+async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<ReverseResult> {
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(() => null);
     if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
@@ -94,7 +125,19 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
     if (!(total > 0)) throw new InputError('This video has no frames to reverse.');
     const width = video.codedWidth;
     const height = video.codedHeight;
-    const videoCodec = await pickVideoCodec({ width: width + (width % 2), height: height + (height % 2), bitrate: QUALITY_HIGH });
+    // A retry after the encoder gave up asks for a smaller picture than the first try's: each frame is drawn at that size.
+    // A phone given a 4K source starts at 1080p; the test encode below can lower the size further before the picture is read.
+    const longest = Math.max(width, height);
+    capAtRisk(attempt, longest);
+    const evenSide = (n: number) => Math.max(2, 2 * Math.round(n / 2));
+    const sizeAt = (k: number) => ({ w: k < 1 ? evenSide(width * k) : width, h: k < 1 ? evenSide(height * k) : height });
+    let k = capScale(attempt, longest);
+    const wanted = sizeAt(k);
+    const plan = await planVideoCodec({ width: wanted.w + (wanted.w % 2), height: wanted.h + (wanted.h % 2), bitrate: QUALITY_HIGH }, codecsFor(attempt));
+    k = Math.min(k, adoptPlan(attempt, plan, longest));
+    const { w: outW, h: outH } = sizeAt(k);
+    sized(Math.max(outW, outH));
+    const videoCodec = plan.codec;
     if (!videoCodec) throw new NamedError('VideoEncodeUnsupported', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
 
     let sound: Float32Array[] | null = null;
@@ -118,7 +161,7 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
     if (sound && !audioCodec) throw noAudioEncoder(true);
 
     const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain' });
+    const videoSource = new VideoSampleSource({ codec: videoCodec, bitrate: QUALITY_HIGH, sizeChangeBehavior: 'contain', ...encodeOptions(attempt) });
     output.addVideoTrack(videoSource, { rotation: video.rotation });
     const audioSource = audioCodec ? new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH }) : null;
     if (audioSource) output.addAudioTrack(audioSource);
@@ -135,6 +178,8 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
         const fps = Math.max(1, packets / total);
         const window = Math.min(2, Math.max(0.1, WINDOW_BYTES / (width * height * 1.5 * fps)));
         const sink = new VideoSampleSink(video);
+        const canvas = k < 1 ? new OffscreenCanvas(outW, outH) : null;
+        const ctx = canvas?.getContext('2d') ?? null;
         let lastT = Infinity;
         for (const [start, stop] of reverseWindows(keys, first, end, window)) {
           const held: Held[] = [];
@@ -156,7 +201,13 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
           for (const h of held) {
             const d = h.duration || 1 / fps;
             const t = Math.max(0, total - (h.timestamp - first) - d);
-            const frame = new VideoSample(h.data, { format: h.format, codedWidth: h.codedWidth, codedHeight: h.codedHeight, timestamp: t, duration: d });
+            const full = new VideoSample(h.data, { format: h.format, codedWidth: h.codedWidth, codedHeight: h.codedHeight, timestamp: t, duration: d });
+            let frame = full;
+            if (canvas && ctx) {
+              full.drawWithFit(ctx, { fit: 'fill' });
+              frame = new VideoSample(canvas, { timestamp: t, duration: d });
+              full.close();
+            }
             await feed.until(t);
             await videoSource.add(frame);
             frame.close();
@@ -178,8 +229,8 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
     const quarter = video.rotation === 90 || video.rotation === 270;
     return {
       blob: new Blob([buffer], { type: 'video/mp4' }),
-      width: quarter ? height : width,
-      height: quarter ? width : height,
+      width: quarter ? outH : outW,
+      height: quarter ? outW : outH,
       duration: total,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       audio: !!audioSource,

@@ -1,9 +1,11 @@
 // Runs after `astro build`: lists the hashed assets and fonts in dist/ and writes
 // them into the service worker so every tool's on-demand code is cached for
 // offline use on the first visit, not only the chunks that happened to load.
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile, rm } from 'node:fs/promises';
 
 const dist = new URL('../dist/', import.meta.url);
+// The test-only A/B override (public/ab-force.js) ships only in builds made with STAYPUT_AB_TEST.
+if (!process.env.STAYPUT_AB_TEST) await rm(new URL('ab-force.js', dist), { force: true });
 const assets = [];
 // The WebGPU speech worker and its own copy of transformers.js (about 0.6 MB) load only on the WebGPU path, so
 // they are fetched when a computer with WebGPU first writes captions, not by every visitor's first visit.

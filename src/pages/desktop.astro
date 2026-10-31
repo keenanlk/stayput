@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base noindex title="A Stayput desktop app? | Stayput" description="We're considering a Stayput desktop app. It isn't built and nothing is for sale. If you'd pay for one, press a button to tell us. No sign-up, no email.">
+  <article class="wrap-narrow prose page">
+    <h1>A Stayput desktop app?</h1>
+    <p>We're thinking about making Stayput as an app for your computer. It isn't built yet. Nothing is for sale, there's nothing to sign up for, and we won't ask for your email.</p>
+    <p>What it would do:</p>
+    <ul>
+      <li>Work offline on your computer.</li>
+      <li>Handle whole folders at once, not one file at a time.</li>
+      <li>Aim to be faster on big files, such as long videos.</li>
+      <li>Keep the same promise as this site: your files would never leave your computer.</li>
+    </ul>
+    <p>Would you pay for it? If we build it, it would be a one-time price, not a subscription. Pressing a button only opens a thank-you page. We count how many times each thank-you page is viewed, with the same anonymous page count described on our <a href="/privacy">privacy page</a>, and that count is how we'll decide whether to build it. If your browser sends Do Not Track or Global Privacy Control, nothing is counted.</p>
+    <p class="desktop-choices">
+      <a class="btn btn-primary" href="/desktop/29">I'd pay $29</a>
+      <a class="btn btn-primary" href="/desktop/49">I'd pay $49</a>
+    </p>
+    <p class="hint"><a href="/">No thanks, back to the tools →</a></p>
+  </article>
+</Base>
+<style>
+  .desktop-choices { display: flex; gap: 12px; flex-wrap: wrap; }
+  .desktop-choices .btn { flex: 1 1 180px; justify-content: center; }
+</style>
