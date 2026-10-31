@@ -35,3 +35,11 @@ export function memoryRange(e: unknown): unknown {
   err.cause = e;
   return err;
 }
+
+/** The steps of a video cut, in order; a plain error from one of them is named `CutFailed` plus the step. */
+export type CutStep = 'OpenInput' | 'Keyframe' | 'EncoderPlan' | 'Init' | 'Execute';
+
+/** `nameBare` for a cut: `CutFailedOpenInput`, `CutFailedKeyframe`, `CutFailedEncoderPlan`, `CutFailedInit` or `CutFailedExecute`. */
+export function cutFailed(step: CutStep, e: unknown): Error {
+  return nameBare(`CutFailed${step}`, e);
+}

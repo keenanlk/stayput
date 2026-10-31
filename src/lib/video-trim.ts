@@ -34,7 +34,7 @@ import { EncoderRefused, encodeRun, requireH264Encoder } from './encoder-probe';
 import { aacSafeSampleRate, codecsFor, planVideoCodec } from './video-codec';
 import { unplayable } from './video-compress';
 import { NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
-import { memoryRange, nameBare } from './bare-error';
+import { memoryRange, nameBare, cutFailed, type CutStep } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
@@ -71,17 +71,19 @@ const ENCODER_FAILURES = new Set(['EncodingError', 'OperationError', 'InvalidSta
 /**
  * Cuts the part. A failure that comes from the device and not the file (page hidden, encoder or memory gave up) gets one
  * more try (see edit-recovery.ts). Every failure leaves here with a name: NotReadableError for a file the phone could
- * not read, UnreadableFile or UnsupportedCodec for what the file is, CutFailed for any other plain error.
+ * not read, UnreadableFile or UnsupportedCodec for what the file is, CutFailed plus the step it stopped at (CutFailedOpenInput,
+ * CutFailedKeyframe, CutFailedEncoderPlan, CutFailedInit, CutFailedExecute) for any other plain error.
  */
 export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResult> {
   const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
+  let step: CutStep = 'OpenInput';
   try {
     return await withRecovery(
       async (attempt) => {
         const done = encodeRun(attempt);
         try {
-          const r = await trimOnce(file, opts, attempt, (side) => (made = side));
+          const r = await trimOnce(file, opts, attempt, (side) => (made = side), false, (at) => (step = at));
           const retry = retryOf(attempt);
           return retry ? { ...r, retry } : r;
         } catch (e) {
@@ -91,12 +93,12 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
           const name = (e as { name?: string } | null)?.name ?? '';
           if (!opts.exact && !attempt.capped && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
             try {
-              return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true)), keyframeCopy: true };
+              return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true, (at) => (step = at))), keyframeCopy: true };
             } catch (again) {
-              throw isNotReadable(again) ? notReadable(again) : nameBare('CutFailed', memoryRange(again));
+              throw isNotReadable(again) ? notReadable(again) : cutFailed(step, memoryRange(again));
             }
           }
-          throw nameBare('CutFailed', e);
+          throw cutFailed(step, e);
         } finally {
           done();
         }
@@ -109,7 +111,8 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   }
 }
 
-async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false): Promise<TrimResult> {
+async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false, at: (step: CutStep) => void = () => {}): Promise<TrimResult> {
+  at('OpenInput');
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch((e) => {
@@ -120,7 +123,11 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new UnreadableFile('This file has no video track.');
     if (opts.exact && !(await video.canDecode())) throw new UnsupportedCodec(unplayable());
-    if (opts.exact) await requireH264Encoder();
+    if (opts.exact) {
+      at('EncoderPlan');
+      await requireH264Encoder();
+      at('OpenInput');
+    }
     const outFormat =
       format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
     const output = new Output({ format: outFormat, target: new BufferTarget() });
@@ -159,8 +166,10 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
     let smaller = opts.exact || attempt.retry === 'smaller' ? capScale(attempt, longest) : 1;
     // A cut that re-encodes (exact, or a fast cut whose start is between key frames) is tested at the real size first, before the picture is read.
     // A fast cut only re-encodes when its start is more than the copy tolerance (0.5 s) past a key frame; otherwise no encoder is made at all.
+    at('Keyframe');
     const key = opts.exact || smaller < 1 || keyframes ? null : await new EncodedPacketSink(video).getKeyPacket(opts.start, { metadataOnly: true }).catch(() => null);
     const needsEncoder = opts.exact || smaller < 1 || (!!key && opts.start - key.timestamp > 0.5);
+    at('EncoderPlan');
     if (!keyframes && video.codec === 'avc' && needsEncoder) {
       const side = (n: number) => Math.max(2, 2 * Math.round((n * smaller) / 2));
       const plan = await planVideoCodec({ width: side(video.displayWidth), height: side(video.displayHeight), bitrate: QUALITY_HIGH }, codecsFor(attempt));
@@ -173,6 +182,7 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
     }
     const evenSide = (n: number) => Math.max(2, 2 * Math.round((n * smaller) / 2));
     sized(Math.round(longest * smaller));
+    at('Init');
     const conversion = await Conversion.init({
       input,
       output,
@@ -192,6 +202,7 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
       throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('CutUnsupported', 'This browser cannot cut this video.');
     }
+    at('Execute');
     if (keepSound) {
       let sink: Conversion | null = null;
       let source: AudioSampleSource | null = null;
