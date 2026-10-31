@@ -1,7 +1,7 @@
 {
   "heic": {
     "package": "heic-to",
-    "version": "1.6.5",
+    "version": "1.6.6",
     "entry": "heic-to.min.js",
     "files": { "heic-to.min.js": "dist/csp/heic-to.min.js", "LICENSE": "LICENSE" }
   },
@@ -66,7 +66,7 @@
   },
   "mediapipe": {
     "package": "@mediapipe/tasks-vision",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "entry": "vision_wasm_internal.js",
     "files": {
       "vision_wasm_internal.js": "wasm/vision_wasm_internal.js",
@@ -206,7 +206,7 @@
   },
   "zxing": {
     "package": "zxing-wasm",
-    "version": "3.1.5",
+    "version": "3.1.6",
     "entry": "zxing_reader.wasm",
     "files": { "zxing_reader.wasm": "dist/reader/zxing_reader.wasm", "LICENSE": "LICENSE" },
     "licences": { "LICENSE-zxing-cpp.txt": "vendor-licenses/zxing-wasm/LICENSE-zxing-cpp.txt" }

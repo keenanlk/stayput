@@ -698,7 +698,24 @@ async function textItems(bytes: Uint8Array, pageNumber: number): Promise<{ str: 
   return items;
 }
 
+/** Pretend this browser has no native JPEG XL decoder (newer Chromium has one) so the Wasm decoder is the one that runs. */
+async function hideNativeJxl(page: Page) {
+  await page.addInitScript(() => {
+    const native = window.createImageBitmap.bind(window);
+    window.createImageBitmap = (async (src: ImageBitmapSource, ...rest: unknown[]) => {
+      if (src instanceof Blob) {
+        const head = new Uint8Array(await src.slice(0, 12).arrayBuffer());
+        const codestream = head[0] === 0xff && head[1] === 0x0a;
+        const container = String.fromCharCode(...head.subarray(4, 8)) === 'JXL ';
+        if (codestream || container) throw new DOMException('no native JXL', 'InvalidStateError');
+      }
+      return (native as (...a: unknown[]) => Promise<ImageBitmap>)(src, ...rest);
+    }) as typeof window.createImageBitmap;
+  });
+}
+
 test('Image converter decodes JPEG XL and AVIF, with the JXL decoder fetched as code only', async ({ page }) => {
+  await hideNativeJxl(page);
   const errors = await open(page, 'convert-image');
   const net = watchNetwork(page);
   const { items } = await run(page, [staticFx('checker.jxl'), staticFx('checker.avif')], async () => {
@@ -731,6 +748,7 @@ test.describe('decoder caching', () => {
   test.use({ serviceWorkers: 'allow' });
   test.beforeEach(async ({ context }) => allowServiceWorker(context));
   test('Decoders are cached only by pages that can need them, from this site, and only when the browser lacks one', async ({ page }) => {
+    await hideNativeJxl(page);
     await stubAnalytics(page);
     // A PDF tool never needs an image decoder, so a visit costs none of those bytes.
     await page.goto('/tools/merge-pdf');
@@ -747,6 +765,7 @@ test.describe('decoder caching', () => {
 });
 
 test('JXL to PNG page converts with the preset format and lists the decoder in the network proof', async ({ page }) => {
+  await hideNativeJxl(page);
   await stubAnalytics(page);
   await page.goto('/jxl-to-png');
   await expect(page.locator('#format')).toHaveValue('image/png');
@@ -1694,6 +1713,7 @@ test.describe('offline', () => {
     // The decoders used to load from a CDN at the moment a file needed them, so
     // offline those formats failed even after a visit. Pretend this browser has
     // no native AVIF decoder (Chromium has one) so all three Wasm decoders run.
+    await hideNativeJxl(page);
     await page.addInitScript(() => {
       const native = window.createImageBitmap.bind(window);
       window.createImageBitmap = (async (src: ImageBitmapSource, ...rest: unknown[]) => {
@@ -4846,7 +4866,7 @@ test('the ISBN page converts an ISBN-10, names the digit it worked out and keeps
 
 const qrFx = (name: string) => fileURLToPath(new URL(`./fixtures/qr/${name}`, import.meta.url));
 const qrTexts = JSON.parse(readFileSync(qrFx('texts.json'), 'utf8')) as Record<string, string>;
-const WASM = '/vendor/zxing-wasm@3.1.5/zxing_reader.wasm';
+const WASM = '/vendor/zxing-wasm@3.1.6/zxing_reader.wasm';
 
 /** A PNG of a QR code for `text`, drawn by the site's own encoder and rasterised in a throwaway tab. */
 async function qrPng(context: BrowserContext, text: string) {
