@@ -1,10 +1,11 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { ALL_FORMATS, BufferSource, Input } from 'mediabunny';
 import { estimateMemory, memoryVerdict, outputFps, outputSeconds, planSideBySide, PHONE_MEMORY_CAP } from '../src/lib/side-by-side-plan';
 
-const fx = (n: string) => new URL(`./fixtures/static/${n}`, import.meta.url).pathname;
+const fx = (n: string) => fileURLToPath(new URL(`./fixtures/static/${n}`, import.meta.url));
 const A = fx('sbs-a-24fps.mp4'); // 10 s, 24 fps, 440 Hz, grey ramp
 const B = fx('sbs-b-30fps.mp4'); // 10 s, 30 fps, 880 Hz, tinted ramp
 const B6 = fx('sbs-b-30fps-6s.mp4'); // 6 s of the same
