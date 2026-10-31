@@ -63,7 +63,9 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE, oddCodecs = tr
   } catch (first) {
     buffer = await decodeThroughDemuxer(file, rate, first).catch(async (error) => {
       // Sound in a codec the browser lacks (Opus in MP4, ALAC, AC-3, AMR): the page's decoders, or a named refusal.
-      const odd = oddCodecs ? await (await import('./pcm')).decodePcmByPageDecoders(file, rate) : null;
+      // A decoder that hung is not asked twice over, and a WAV the format itself rules out is named as such.
+      const hung = (first as { cause?: { name?: string } } | null)?.cause?.name === 'DecodeTimeout';
+      const odd = oddCodecs && !hung && !(await isRf64(file)) ? await (await import('./pcm')).decodePcmByPageDecoders(file, rate) : null;
       if (odd?.[0]?.length) return toAudioBuffer(odd, rate);
       // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.
       const aiff = await decodeAiff(await read().catch(() => null), rate);
