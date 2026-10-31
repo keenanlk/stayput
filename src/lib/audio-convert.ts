@@ -9,7 +9,7 @@ import { ALL_FORMATS, AudioSampleSource, BlobSource, BufferTarget, Input, Mp4Out
 import { SAMPLE_RATE as MP3_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, type Bitrate } from './audio';
 import { encodeFlac } from './flac';
 import { NamedError } from './input-error';
-import { nameBare } from './bare-error';
+import { AUDIO_COPY, stageError } from './bare-error';
 export { patchBrand } from './m4r';
 import { SAMPLE_RATE as OPUS_RATE, pcmFeeder } from './pcm';
 
@@ -57,6 +57,17 @@ export async function canWrite(format: AudioFormat, channels = 2): Promise<boole
   return true;
 }
 
+/** Takes the formats this browser cannot write out of a "Save as" list, so a choice made there cannot end in AudioEncodeUnsupported. */
+export async function hideUnwritable(select: HTMLSelectElement | null): Promise<void> {
+  if (!select) return;
+  for (const option of Array.from(select.options)) {
+    if ((option.value !== 'm4a' && option.value !== 'ogg') || (await canWrite(option.value))) continue;
+    option.hidden = true;
+    option.disabled = true;
+  }
+  if (select.selectedOptions[0]?.disabled) select.value = Array.from(select.options).find((o) => !o.disabled)?.value ?? select.value;
+}
+
 export interface ConvertResult {
   blob: Blob;
   duration: number;
@@ -70,7 +81,7 @@ export async function convertAudio(
   opts: { bitrate: number; mono: boolean; onProgress?: (f: number) => void; transform?: (chans: Float32Array[], rate: number) => Float32Array[] | Promise<Float32Array[]>; bitrateOf?: () => number },
 ): Promise<ConvertResult> {
   const { bitrate, mono, onProgress, transform } = opts;
-  // A step that fails with no name of its own (a plain Error from the decoder or encoder) is recorded as the step (see bare-error.ts).
+  // A step that fails with no name of its own (a plain Error from the decoder or encoder) is recorded as the step, and a memory failure as OutOfMemoryError (see stageError in bare-error.ts).
   let stage = 'AudioDecodeFailed';
   try {
     const rate = format === 'mp3' ? MP3_RATE : format === 'wav' || format === 'flac' ? (await sourceRate(file)) ?? MP3_RATE : OPUS_RATE;
@@ -97,7 +108,7 @@ export async function convertAudio(
     const blob = await writeMp4(format === 'm4a' ? 'aac' : 'opus', chans, OPUS_RATE, kbps, onProgress);
     return { ...base, blob };
   } catch (e) {
-    throw nameBare(stage, e);
+    throw stageError(stage, e, stage === 'AudioEncodeFailed' ? { message: AUDIO_COPY.save(format === 'm4a' ? 'M4A' : format.toUpperCase()) } : {});
   }
 }
 

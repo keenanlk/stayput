@@ -160,6 +160,8 @@ function rewrap(file: File, e: unknown): Error {
   if (e instanceof Error && e.name) out.name = e.name;
   const link = (e as { link?: { href: string; text: string } } | null)?.link;
   if (link) (out as Error & { link?: typeof link }).link = link;
+  const links = (e as { links?: { href: string; text: string }[] } | null)?.links;
+  if (links?.length) (out as Error & { links?: typeof links }).links = links;
   const stage = (e as { stage?: string } | null)?.stage;
   if (stage) (out as Error & { stage?: string }).stage = stage;
   // Work the failed step finished (a partial transcript) stays downloadable.
@@ -438,13 +440,22 @@ export function createShell(opts: ShellOptions) {
     return b;
   }
 
-  function showError(message: string, link?: { href: string; text: string }) {
+  function showError(message: string, link?: { href: string; text: string } | { href: string; text: string }[]) {
     error.textContent = message;
-    if (link) {
+    // Links whose words are in the message become anchors in place; a link whose words are not there is added at the end.
+    for (const l of [link ?? []].flat()) {
+      const at = error.lastChild?.nodeType === Node.TEXT_NODE ? (error.lastChild.textContent ?? '').indexOf(l.text) : -1;
       const a = document.createElement('a');
-      a.href = link.href;
-      a.textContent = link.text;
-      error.append(' ', a);
+      a.href = l.href;
+      a.textContent = l.text;
+      if (at < 0) {
+        error.append(' ', a);
+        continue;
+      }
+      const tail = error.lastChild as Text;
+      const after = tail.splitText(at);
+      after.textContent = (after.textContent ?? '').slice(l.text.length);
+      error.insertBefore(a, after);
     }
     error.classList.add('is-active');
   }
@@ -670,7 +681,8 @@ export function createShell(opts: ShellOptions) {
     } catch (raw) {
       const e = mine ? interruptedError(raw, mine.wasHidden(), run.textContent ?? '') : raw;
       console.error(raw);
-      showError(e instanceof Error ? e.message : String(e), (e as { link?: { href: string; text: string } } | null)?.link);
+      const own = e as { link?: { href: string; text: string }; links?: { href: string; text: string }[] } | null;
+      showError(e instanceof Error ? e.message : String(e), own?.links?.length ? own.links : own?.link);
       // Work finished before the failure (captions written before the video could be redrawn) stays downloadable.
       const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
       if (salvage?.length) showResults(salvage, false);

@@ -1,6 +1,7 @@
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { formatDuration } from '../lib/audio';
+import { longRecordingHint } from '../lib/long-audio';
 import { FORMAT_LABELS, canWrite, convertAudio, lossy, type AudioFormat } from '../lib/audio-convert';
 
 const format = () => str('format', 'mp3') as AudioFormat;
@@ -26,7 +27,10 @@ const syncFields = async () => {
 document.getElementById('format')?.addEventListener('change', syncFields);
 void syncFields();
 
-createShell({
+const longHint = longRecordingHint({ setHint: (text, link) => shell.setHint(text, link) });
+
+const shell = createShell({
+  onFilesChanged: longHint,
   outputFormat: format,
   async process(files, progress) {
     const fmt = format();

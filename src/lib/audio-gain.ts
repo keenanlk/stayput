@@ -35,7 +35,9 @@ export function loudnessOf(chans: Float32Array[], rate: number): number {
     }
     levels.push(sum / Math.max(1, count));
   }
-  const loudest = Math.max(...levels, 1e-12);
+  // A loop, not Math.max(...levels): JavaScriptCore refuses more than 65,536 arguments (about 7.3 hours of audio).
+  let loudest = 1e-12;
+  for (const l of levels) if (l > loudest) loudest = l;
   const kept = levels.filter((l) => l >= loudest / 100);
   const mean = kept.reduce((a, b) => a + b, 0) / Math.max(1, kept.length);
   return 10 * Math.log10(Math.max(mean, 1e-12));

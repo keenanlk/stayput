@@ -12,7 +12,8 @@
  */
 import { vendorEntry } from './vendor';
 import { isNotReadable, notReadable } from './read-failure';
-import { NamedError, isUnspecific } from './input-error';
+import { NamedError } from './input-error';
+import { AUDIO_COPY, stageError } from './bare-error';
 
 export const DENOISE_RATE = 48_000;
 
@@ -123,25 +124,21 @@ export async function resample(chans: Float32Array[], from: number, to: number):
  * Give an error from one step of cleaning a file a name that says which step
  * (the name is all a failed run records). Errors that already have a name of
  * their own pass through; a bare Error takes the step's name, and an error
- * that reads as running out of memory says so.
+ * that reads as running out of memory says so. `audio` is a recording with no picture:
+ * its messages talk about the recording, not a video.
  */
-export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseWriteError', e: unknown): Error {
+export function inStage(stage: 'NoiseDecodeError' | 'NoiseRemoveError' | 'NoiseWriteError', e: unknown, audio = false): Error {
   // The browser could not read the file from disk (a big video, or one the phone moved or is still preparing). The name is kept.
   if (isNotReadable(e)) return notReadable(e);
-  const text = e instanceof Error ? e.message : String(e);
-  const memory = /memory|allocation|bad_alloc/i.test(text) || (e instanceof RangeError && /array|buffer|length/i.test(text));
-  // Any other error with a name of its own keeps it; a RangeError that reads as running out of memory says so below.
-  if (e instanceof Error && !isUnspecific(e) && !(memory && e instanceof RangeError)) return e;
-  const out = new NamedError('DenoiseFailed', 
-    memory
-      ? 'This device ran out of memory cleaning this video. Trim the video to a shorter length first, or use a computer.'
-      : stage === 'NoiseDecodeError'
-        ? 'The sound of this file could not be read. Try a shorter clip or another file.'
-        : stage === 'NoiseRemoveError'
-          ? 'The noise could not be removed from this sound. Reload the page and try again, or try a shorter clip.'
-          : 'The cleaned video could not be written. Reload the page and try again, or try a shorter clip.',
-  );
-  out.name = memory ? 'OutOfMemoryError' : stage;
-  out.cause = e;
-  return out;
+  const message =
+    stage === 'NoiseDecodeError'
+      ? 'The sound of this file could not be read. Try a shorter clip or another file.'
+      : stage === 'NoiseRemoveError'
+        ? 'The noise could not be removed from this sound. Reload the page and try again, or try a shorter clip.'
+        : 'The cleaned video could not be written. Reload the page and try again, or try a shorter clip.';
+  return stageError(stage, e, {
+    renameFailed: true,
+    memory: audio ? AUDIO_COPY.memory : { message: 'This device ran out of memory cleaning this video. Trim the video to a shorter length first, or use a computer.' },
+    ...(audio ? {} : { message }),
+  });
 }
