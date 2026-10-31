@@ -83,7 +83,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
       async (attempt) => {
         const done = encodeRun(attempt);
         try {
-          const r = await trimOnce(file, opts, attempt, (side) => (made = side), false, (at) => (step = at));
+          const r = await trimOnce(file, opts, attempt, (side) => (made = side), false, (at) => testFault((step = at)));
           const retry = retryOf(attempt);
           return retry ? { ...r, retry } : r;
         } catch (e) {
@@ -93,7 +93,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
           const name = (e as { name?: string } | null)?.name ?? '';
           if (!opts.exact && !attempt.capped && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
             try {
-              return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true, (at) => (step = at))), keyframeCopy: true };
+              return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true, (at) => testFault((step = at)))), keyframeCopy: true };
             } catch (again) {
               throw isNotReadable(again) ? notReadable(again) : cutFailed(step, memoryRange(again));
             }
@@ -109,6 +109,11 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   } finally {
     page.dispose();
   }
+}
+
+/** Test hook: a spec sets `__stayputCutFault` to a step's name to make that step fail with a plain Error. */
+function testFault(step: CutStep) {
+  if ((globalThis as { __stayputCutFault?: string }).__stayputCutFault === step) throw new Error('forced');
 }
 
 async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false, at: (step: CutStep) => void = () => {}): Promise<TrimResult> {
