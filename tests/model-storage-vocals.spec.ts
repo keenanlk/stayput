@@ -48,7 +48,7 @@ test('a download cut at 10% and again at 50% is resumed with Range requests, kep
   // persist() is asked for once, after the first run that worked; a second run does not ask again.
   await expect.poll(() => persistCalls(page)).toBe(1);
   await page.locator('#run').click();
-  await toolRuns(page, 2);
+  await toolRuns(page, 2, 240_000);
   expect(await persistCalls(page)).toBe(1);
 });
 

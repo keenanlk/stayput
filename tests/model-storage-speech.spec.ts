@@ -14,11 +14,12 @@ test.use({ serviceWorkers: 'allow' });
 test.beforeEach(async ({ context }) => allowServiceWorker(context));
 
 const SPOKEN = fileURLToPath(new URL('./fixtures/static/jfk.wav', import.meta.url));
-// WebKit takes the WebGPU path (a 16-bit encoder); Chromium without a graphics adapter takes the 8-bit one.
-let ENCODER = '/models/whisper-base/onnx/encoder_model_quantized.onnx';
-test.beforeEach(({ browserName }) => {
-  ENCODER = `/models/whisper-base/onnx/encoder_model_${browserName === 'webkit' ? 'fp16' : 'quantized'}.onnx`;
-});
+// Whichever encoder this browser fetches: the 16-bit one on a computer with WebGPU, the 8-bit one without.
+const ENCODER_ANY = '/models/whisper-base/onnx/encoder_model_';
+const ENCODER_RE = /\/models\/whisper-base\/onnx\/encoder_model_(quantized|fp16)\.onnx$/;
+/** The kept encoder, as [path, size and hash], or undefined. */
+const keptEncoder = async (page: Page) => Object.entries(await kept(page, CACHE)).find(([path]) => ENCODER_RE.test(path));
+
 const CACHE = 'transformers-cache';
 const manifest: Record<string, { size: number; sha256: string }> = JSON.parse(readFileSync(fileURLToPath(new URL('../src/data/model-manifest.json', import.meta.url)), 'utf8'));
 const entry = (path: string) => manifest[path]!;
@@ -53,15 +54,16 @@ test('a download cut at 10% and again at 50% is resumed, kept whole and matching
   test.setTimeout(240_000);
   await recordAnalytics(page);
   await spyPersist(page);
-  await faultInWorkers(page, { match: ENCODER, cuts: [0.1, 0.5, null] });
+  await faultInWorkers(page, { match: ENCODER_ANY, cuts: [0.1, 0.5, null] });
   const requests: string[] = [];
-  context.on('request', (r) => r.url().endsWith(ENCODER) && requests.push(r.url()));
+  context.on('request', (r) => ENCODER_RE.test(r.url()) && requests.push(r.url()));
   await open(page);
   expect(await persistCalls(page)).toBe(0);
   await run(page);
   await done(page);
   expect(requests).toHaveLength(3);
-  expect((await kept(page, CACHE))[ENCODER]).toEqual(entry(ENCODER));
+  const [path, got] = (await keptEncoder(page))!;
+  expect(got).toEqual(entry(path));
   expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ tool: 'transcribe', outcome: 'ok' })]);
   await expect.poll(() => persistCalls(page)).toBe(1);
 });
@@ -70,24 +72,25 @@ test('a download that keeps dying is ModelDownloadError and the file is not in t
   test.setTimeout(240_000);
   await recordAnalytics(page);
   // Both encoders: a WebGPU path that cannot download steps down to the 8-bit one, which is cut the same way.
-  await faultInWorkers(page, { match: '/models/whisper-base/onnx/encoder_model_', cuts: Array(60).fill(0.1) });
+  await faultInWorkers(page, { match: ENCODER_ANY, cuts: Array(60).fill(0.1) });
   await open(page);
   await run(page);
   await failed(page, 180_000);
   expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'ModelDownloadError' })]);
-  expect((await kept(page, CACHE))[ENCODER]).toBeUndefined();
+  expect(await keptEncoder(page)).toBeUndefined();
 });
 
 test('a server that ignores Range sends the file from its start again and the run finishes', async ({ page, context }) => {
   test.setTimeout(240_000);
-  await faultInWorkers(page, { match: ENCODER, cuts: [0.5, null], ranges: false });
+  await faultInWorkers(page, { match: ENCODER_ANY, cuts: [0.5, null], ranges: false });
   const requests: string[] = [];
-  context.on('request', (r) => r.url().endsWith(ENCODER) && requests.push(r.url()));
+  context.on('request', (r) => ENCODER_RE.test(r.url()) && requests.push(r.url()));
   await open(page);
   await run(page);
   await done(page);
   expect(requests).toHaveLength(2);
-  expect((await kept(page, CACHE))[ENCODER]).toEqual(entry(ENCODER));
+  const [path, got] = (await keptEncoder(page))!;
+  expect(got).toEqual(entry(path));
 });
 
 test('a kept file with flipped bytes (same size) is evicted, fetched again once, and the run succeeds', async ({ page, context }) => {
@@ -99,15 +102,17 @@ test('a kept file with flipped bytes (same size) is evicted, fetched again once,
   // A new page for each run: WebKit crashes a page that has held the model once already.
   const again = await context.newPage();
   await open(again);
-  await flipKept(again, CACHE, ENCODER);
-  expect((await kept(again, CACHE))[ENCODER]!.size).toBe(entry(ENCODER).size);
-  expect((await kept(again, CACHE))[ENCODER]!.sha256).not.toBe(entry(ENCODER).sha256);
+  const [path] = (await keptEncoder(again))!;
+  await flipKept(again, CACHE, path);
+  const flipped = (await kept(again, CACHE))[path]!;
+  expect(flipped.size).toBe(entry(path).size);
+  expect(flipped.sha256).not.toBe(entry(path).sha256);
   const requests: string[] = [];
-  context.on('request', (r) => r.url().endsWith(ENCODER) && requests.push(r.url()));
+  context.on('request', (r) => r.url().endsWith(path) && requests.push(r.url()));
   await run(again);
   await done(again);
   expect(requests).toHaveLength(1);
-  expect((await kept(again, CACHE))[ENCODER]).toEqual(entry(ENCODER));
+  expect((await kept(again, CACHE))[path]).toEqual(entry(path));
 });
 
 test('offline with no kept model is ModelOffline within 2 s and requests no model file; kept, it runs offline', async ({ browserName, page, context }) => {

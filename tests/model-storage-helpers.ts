@@ -97,8 +97,8 @@ export async function recordAnalytics(page: Page) {
 
 export type Ev = { n: string; d: Record<string, string> };
 export const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]'));
-export async function toolRuns(page: Page, count: number) {
-  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length, { timeout: 30_000 }).toBe(count);
+export async function toolRuns(page: Page, count: number, timeout = 30_000) {
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length, { timeout }).toBe(count);
   return (await events(page)).filter((e) => e.n === 'tool_run').map((e) => e.d);
 }
 
