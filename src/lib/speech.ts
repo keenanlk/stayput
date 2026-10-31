@@ -6,6 +6,12 @@ import { resumeWhenHidden } from './edit-recovery';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { recognisePieces, type SpeechPartial } from './speech-resume';
 import { fromWorker, noSpeechFound, workerCrashError } from './speech-errors';
+import { isModelError, modelPreflight, uncachedBytes } from './model-fetch';
+import { modelEntry } from './model-manifest';
+import { cacheKeyFor } from './transcribe-core';
+import { retryUrl } from './fresh-url';
+import gpuWorkerUrl from './transcribe-gpu.worker.ts?worker&url';
+import cpuWorkerUrl from './transcribe.worker.ts?worker&url';
 import { SPEECH_MODEL_MB } from '../data/speech-size';
 import { rememberTinyModel, rememberWebgpuFailure, speechModel, wantsWebgpu, type SpeechModel } from './speech-path';
 import { isPhoneBrowser } from './phone-limit';
@@ -31,11 +37,12 @@ let gpuFailed = false;
 /** The model the live worker holds. A worker keeps the one it was asked for first; another model gets a fresh worker. */
 let workerModel: SpeechModel = 'whisper-base';
 
+/** Workers started so far: a restart loads the script from a new URL (see retryUrl). */
+let started = 0;
+
 function spawn(gpu: boolean): Worker {
   onGpu = gpu;
-  return gpu
-    ? new Worker(new URL('./transcribe-gpu.worker.ts', import.meta.url), { type: 'module' })
-    : new Worker(new URL('./transcribe.worker.ts', import.meta.url), { type: 'module' });
+  return new Worker(retryUrl(gpu ? gpuWorkerUrl : cpuWorkerUrl, started++), { type: 'module' });
 }
 
 /** One piece of speech through the live worker. Rejects with `GPU_FAILED` when the WebGPU path could not run it. */
@@ -104,9 +111,25 @@ function ask(audio: Float32Array, language: string | null, task: Request['task']
 
 const GPU_FAILED = Symbol('gpu-failed');
 
+/**
+ * Before the first piece, when the model is not kept on this device: offline or too little room to keep it ends
+ * the run here as ModelOffline or StorageFull, with no request to /models/ made and no half-written cache.
+ */
+async function checkModelRoom(model: SpeechModel, gpu: boolean): Promise<void> {
+  const dir = `/models/${model}/onnx/`;
+  const files = [gpu ? 'encoder_model_fp16.onnx' : 'encoder_model_quantized.onnx', 'decoder_model_merged_quantized.onnx'].map((f) => dir + f);
+  try {
+    const need = await uncachedBytes(cacheKeyFor(model), files, (p) => modelEntry(p)?.size);
+    if (need > 0) await modelPreflight(need, { model: 'speech model', size: `${SPEECH_MODEL_MB[model === 'whisper-tiny' ? 'tiny' : gpu ? 'webgpu' : 'q8']} MB` });
+  } catch (err) {
+    if (isModelError(err)) throw fromWorker(err.name, err.message);
+  }
+}
+
 async function recognise(audio: Float32Array, language: string | null, task: Request['task'], model: SpeechModel, onLoading: (f: number) => void): Promise<{ chunks: Segment[]; language: string }> {
   // The worker takes the samples; keep a copy only while a WebGPU attempt could still hand the piece back.
   const spare = model === 'whisper-base' && !gpuFailed && wantsWebgpu() ? audio.slice() : undefined;
+  if (!modelReady) await checkModelRoom(model, spare !== undefined);
   try {
     return await ask(audio, language, task, model, onLoading);
   } catch (err) {

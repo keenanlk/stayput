@@ -1,0 +1,98 @@
+{
+  "/models/blaze_face_short_range.tflite": {
+    "size": 229746,
+    "sha256": "b4578f35940bf5a1a655214a1cce5cab13eba73c1297cd78e1a04c2380b0152f"
+  },
+  "/models/isnet-general-use-int8w.onnx": {
+    "size": 46535524,
+    "sha256": "a3b47c80d7a8cd22e90f9b2ab067055182260ae76f20b74c85d75bcd67764b85"
+  },
+  "/models/migan-pipeline-v2.onnx": {
+    "size": 28079181,
+    "sha256": "6f1f3530a1a2324b19752018ce756088b07973cda8d7d890034ace5c8a48c40b"
+  },
+  "/models/nmp.onnx": {
+    "size": 230444,
+    "sha256": "2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec"
+  },
+  "/models/realesr-general-x4v3.onnx": {
+    "size": 4866394,
+    "sha256": "e9c7fd8872f541ef5feeef5cbf0db1adc897f63c6203460406f42eb02940e43a"
+  },
+  "/models/selfie_multiclass_256x256.tflite": {
+    "size": 16371837,
+    "sha256": "c6748b1253a99067ef71f7e26ca71096cd449baefa8f101900ea23016507e0e0"
+  },
+  "/models/selfie_segmenter.tflite": {
+    "size": 249537,
+    "sha256": "191ac9529ae506ee0beefa6b2c945a172dab9d07d1e802a290a4e4038226658b"
+  },
+  "/models/selfie_segmenter_landscape.tflite": {
+    "size": 250177,
+    "sha256": "490e9ea734313e0de10fa0cd9e3c6133e36ea4db2b7a49bde9ef019f72796b8e"
+  },
+  "/models/uvr-mdx-net-inst-hq-3.onnx": {
+    "size": 66759214,
+    "sha256": "317554b07fe1ea5279a77f2b1520a41ea4b93432560c4ffd08792c30fddf9adc"
+  },
+  "/models/whisper-base/config.json": {
+    "size": 2243,
+    "sha256": "f4d0608f7d918166da7edb3e188de5ef1bfe70d9802e785d271fd88111e9cf4b"
+  },
+  "/models/whisper-base/generation_config.json": {
+    "size": 3832,
+    "sha256": "61070cf8de25b1e9256e8e102ded49d8d24a8369ed36ef84fdf21549e68125a0"
+  },
+  "/models/whisper-base/onnx/decoder_model_merged_quantized.onnx": {
+    "size": 53693315,
+    "sha256": "fa3ef9902734ce5ae6f9ef2bdb2ba9a6c4b5785b09f4f420ce036573dc9d090b"
+  },
+  "/models/whisper-base/onnx/encoder_model_fp16.onnx": {
+    "size": 41332612,
+    "sha256": "ffba51b20185377c1b89362b1128148d0132de936a32b200af973da2a11a5369"
+  },
+  "/models/whisper-base/onnx/encoder_model_quantized.onnx": {
+    "size": 23201314,
+    "sha256": "5862993336bf33acd23736071aae2b32261d3b1b2f37780194460d4ef974dd46"
+  },
+  "/models/whisper-base/preprocessor_config.json": {
+    "size": 339,
+    "sha256": "a6a76d28c93edb273669eb9e0b0636a2bddbb1272c3261e47b7ca6dfdbac1b8d"
+  },
+  "/models/whisper-base/tokenizer.json": {
+    "size": 2480466,
+    "sha256": "27fc476bfe7f17299480be2273fc0608e4d5a99aba2ab5dec5374b4482d1a566"
+  },
+  "/models/whisper-base/tokenizer_config.json": {
+    "size": 282682,
+    "sha256": "2e036e4dbacfdeb7242c7d4ec4149f4a16e86026048f94d1637e3a8ee9c6a573"
+  },
+  "/models/whisper-tiny/config.json": {
+    "size": 2243,
+    "sha256": "46aeea0a406afbeb563fc8e59ca10609203df4299af6a83f73752fef369efd2d"
+  },
+  "/models/whisper-tiny/generation_config.json": {
+    "size": 3772,
+    "sha256": "f5c67e5a4f7102f8cb4d058bc95da276bbc19eeec997267c3bb0f25ef68facd1"
+  },
+  "/models/whisper-tiny/onnx/decoder_model_merged_quantized.onnx": {
+    "size": 30719241,
+    "sha256": "25e807a962b6349356d0ea5d0dfe530b7e5bf0e2a484aeca0359d03143faddd3"
+  },
+  "/models/whisper-tiny/onnx/encoder_model_quantized.onnx": {
+    "size": 10124990,
+    "sha256": "2af4a414ca47aa30f61246017e5fe82b0a8d229281d1255ba666a2a7f6b84d19"
+  },
+  "/models/whisper-tiny/preprocessor_config.json": {
+    "size": 339,
+    "sha256": "a6a76d28c93edb273669eb9e0b0636a2bddbb1272c3261e47b7ca6dfdbac1b8d"
+  },
+  "/models/whisper-tiny/tokenizer.json": {
+    "size": 2480466,
+    "sha256": "27fc476bfe7f17299480be2273fc0608e4d5a99aba2ab5dec5374b4482d1a566"
+  },
+  "/models/whisper-tiny/tokenizer_config.json": {
+    "size": 282683,
+    "sha256": "2a4c4281cf9f51ac6ccc406fdc711a087afe6530f671fa7b80953edc498275ce"
+  }
+}
