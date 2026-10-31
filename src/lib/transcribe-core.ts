@@ -14,8 +14,9 @@ import type * as Transformers from '@huggingface/transformers';
 import type { AutomaticSpeechRecognitionPipeline } from '@huggingface/transformers';
 import { vendorDir } from './vendor';
 import { loadWithRetry } from './retry';
-import { fetchResumable, wholeOrNull } from './model-fetch';
-import { isRecordingTooLong, looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, type SpeechError } from './speech-errors';
+import { downloadVerified, isModelError, matchesEntry, modelPreflight, wholeOrNull } from './model-fetch';
+import { modelEntry } from './model-manifest';
+import { isRecordingTooLong, looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, fromWorker, type SpeechError } from './speech-errors';
 
 /** The models this worker can run, each with its own folder under /models/ and its own Cache API store. */
 export type ModelName = 'whisper-base' | 'whisper-tiny';
@@ -56,17 +57,25 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
   // Set when a file could not be fetched: on the WebGPU path, the one failure that says nothing about WebGPU.
   let fetchFailed = false;
   let download: { sizes: Map<string, [number, number]>; report: () => void } | undefined;
-  //  - Each file is read to its last byte here, resuming a dropped connection (see model-fetch.ts),
-  //    so what transformers.js receives, and caches, is always the whole file.
+  //  - Each file is read to its last byte here, resuming a dropped connection (see model-fetch.ts), and
+  //    compared with the build-time manifest's size and SHA-256 before transformers.js sees a byte of it,
+  //    so what it uses, and caches, is always the whole, right file. A model that is not kept is first
+  //    checked for a connection and for room to keep it.
+  /** The first named failure to fetch (offline, storage full, a failed check): what the page is told instead of a generic download error. */
+  let fetchError: SpeechError | undefined;
   env.fetch = async (input, init) => {
     const url = String(input);
     const counted = download && /\.onnx$/.test(url) ? download : undefined;
     const onProgress = counted && ((got: number, total: number) => total && (counted.sizes.set(url, [got, total]), counted.report()));
+    const entry = modelEntry(url);
+    const what = 'speech model';
     let res: Response;
     try {
-      res = await fetchResumable((i, o) => fetchOnce(i as string | URL, { ...o, cache: 'no-store' }) as Promise<Response>, url, init, onProgress);
+      await modelPreflight(entry?.size ?? 0, what);
+      res = await downloadVerified((i, o) => fetchOnce(i as string | URL, { ...o, cache: 'no-store' }) as Promise<Response>, url, { what, entry, init, onProgress });
     } catch (err) {
       fetchFailed = true;
+      if (isModelError(err) && err.name !== 'ModelDownloadError') fetchError ??= fromWorker(err.name, err.message);
       throw err;
     }
     if (!res.ok) fetchFailed = true;
@@ -82,19 +91,24 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
         const hit = await cache?.match(key);
         if (!hit) return undefined;
         const whole = await wholeOrNull(hit);
-        if (!whole) await cache!.delete(key);
-        return whole ?? undefined;
+        // A kept file that is not the size it promises, or not the file the manifest names, is dropped and fetched again.
+        if (!whole || !(await matchesEntry(await whole.clone().blob(), modelEntry(key)))) {
+          await cache!.delete(key);
+          return undefined;
+        }
+        return whole;
       } catch {
         return undefined;
       }
     },
-    // Only a whole file is written.
+    // Only a whole file is written (env.fetch has already checked it against the manifest).
     put: async (key, response) => {
       try {
         const whole = await wholeOrNull(response);
         if (whole) await (await store())?.put(key, whole);
-      } catch {
-        // A model that cannot be kept is still used for this run.
+      } catch (err) {
+        // A model that cannot be kept (storage full, the Cache API refused) is still used for this run.
+        console.warn('The speech model could not be kept for next time', err);
       }
     },
   };
@@ -150,11 +164,13 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
   async function load(id: number, gpu: boolean, model: ModelName): Promise<AutomaticSpeechRecognitionPipeline> {
     // On the WebGPU path a failure goes straight to the 8-bit path, which retries a dropped download itself
     // and keeps the files: a WebGPU that will not start says nothing about them.
+    fetchError = undefined;
     if (gpu) return start(id, gpu, model);
     try {
-      return await loadWithRetry(() => start(id, gpu, model), looksLikeNetwork);
+      // Offline, no room to keep the model, or a file that failed its check are not a dropped connection: not tried again here.
+      return await loadWithRetry(() => start(id, gpu, model), (e) => !fetchError && looksLikeNetwork(e));
     } catch (err) {
-      if (!looksLikeNetwork(err) && !looksLikeMemory(err)) await evict(model);
+      if (!fetchError && !looksLikeNetwork(err) && !looksLikeMemory(err)) await evict(model);
       throw err;
     }
   }
@@ -164,6 +180,7 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     if (isRecordingTooLong(err)) return err as SpeechError;
     if (looksLikeMemory(err)) return outOfMemoryError();
     if (!loading) return speechModelError();
+    if (fetchError) return fetchError;
     return looksLikeNetwork(err) ? modelDownloadError() : modelLoadError();
   }
 

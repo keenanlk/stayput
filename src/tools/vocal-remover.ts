@@ -3,6 +3,8 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { SAMPLE_RATE, decodeAudio, encodeMp3, encodeWav, formatDuration } from '../lib/audio';
 import type { Reply, Request } from '../lib/vocals.worker';
 import { InputError, NamedError } from '../lib/input-error';
+import { retryUrl } from '../lib/fresh-url';
+import workerUrl from '../lib/vocals.worker.ts?worker&url';
 import { fromWorkerFailure } from '../lib/worker-error';
 import { retryUnreadable } from '../lib/read-failure';
 
@@ -14,11 +16,16 @@ import { retryUnreadable } from '../lib/read-failure';
  */
 
 let worker: Worker | undefined;
+/** Workers started so far: a restart loads the script from a new URL (see retryUrl). */
+let started = 0;
 let nextId = 0;
 let modelReady = false;
 
+const workerCrashError = () =>
+  new NamedError('WorkerCrashError', 'The vocal remover stopped unexpectedly, which usually means the browser ran out of memory. Close other tabs and try again, use a shorter song, or use a computer.');
+
 function split(left: Float32Array, right: Float32Array, onLoading: (f: number) => void, onPiece: (done: number, total: number, engine: 'gpu' | 'cpu') => void) {
-  worker ??= new Worker(new URL('../lib/vocals.worker.ts', import.meta.url), { type: 'module' });
+  worker ??= new Worker(retryUrl(workerUrl, started++), { type: 'module' });
   const w = worker;
   const id = nextId++;
   return new Promise<{ left: Float32Array; right: Float32Array; engine: 'gpu' | 'cpu' }>((resolve, reject) => {
@@ -35,7 +42,7 @@ function split(left: Float32Array, right: Float32Array, onLoading: (f: number) =
       done();
       worker = undefined;
       w.terminate();
-      reject(new NamedError('VocalRemoverFailed', e.message || 'The separation model stopped unexpectedly. The song may be too long for this device’s memory.'));
+      reject(workerCrashError());
     };
     const done = () => {
       w.removeEventListener('message', onMessage);

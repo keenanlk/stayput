@@ -4,14 +4,16 @@
  * spectrogram maths is in mdx.ts; the network runs through onnxruntime-web on
  * the GPU (WebGPU) where the browser offers it, which is many times faster,
  * and on the CPU (WebAssembly) otherwise. Both builds are served from /vendor/
- * and the model from /models/, fetched on first use only. The worker sees
+ * and the model from /models/, fetched on first use only (resumed if the connection drops, checked against
+ * the build's size and SHA-256, and kept in the Cache API). The worker sees
  * decoded samples, never the file.
  */
 import type { InferenceSession, Tensor } from 'onnxruntime-web';
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
 import { INST_HQ_3, Mdx, separate } from './mdx';
-import { NamedError } from './input-error';
+import { loadModelBytes } from './model-fetch';
+import { modelEntry } from './model-manifest';
 
 export const MODEL_URL = '/models/uvr-mdx-net-inst-hq-3.onnx';
 /** The model's instrumental comes out slightly quiet; UVR scales it by this. */
@@ -28,28 +30,14 @@ type Ort = typeof import('onnxruntime-web');
 interface Loaded { ort: Ort; session: InferenceSession; engine: 'gpu' | 'cpu' }
 let loaded: Promise<Loaded> | undefined;
 
-async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
-  const res = await fetch(MODEL_URL);
-  if (!res.ok || !res.body) throw new NamedError('ModelDownloadError', `The separation model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
-  const total = Number(res.headers.get('content-length')) || 0;
-  const reader = res.body.getReader();
-  const parts: Uint8Array[] = [];
-  let got = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    parts.push(value);
-    got += value.length;
-    if (total) onProgress(Math.min(1, got / total));
-  }
-  const bytes = new Uint8Array(got);
-  let o = 0;
-  for (const p of parts) {
-    bytes.set(p, o);
-    o += p.length;
-  }
-  return bytes;
-}
+/** The model, whole and checked: a kept copy that still matches the manifest, else a resumed, size- and hash-checked download (see model-fetch.ts). */
+const fetchModel = (onProgress: (f: number) => void): Promise<Uint8Array> =>
+  loadModelBytes(MODEL_URL, {
+    what: 'separation model (67 MB)',
+    entry: modelEntry(MODEL_URL),
+    onProgress,
+    onKeepFailed: (err) => console.warn('The separation model could not be kept for next time', err),
+  });
 
 async function hasGpu(): Promise<boolean> {
   const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu;

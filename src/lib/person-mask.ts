@@ -17,6 +17,8 @@
  */
 import type { ImageSegmenter } from '@mediapipe/tasks-vision';
 import { vendorDir } from './vendor';
+import { isModelError, loadModelBytes } from './model-fetch';
+import { modelEntry } from './model-manifest';
 import { StageError, NamedError } from './input-error';
 import { isReclaim, tagCodec } from './codec-guard';
 
@@ -143,6 +145,8 @@ function load(model: string): Promise<ImageSegmenter> {
   });
   return mine.ready.catch((e) => {
     if (isAbort(e)) throw new MemoryError();
+    // Offline, no room, a download that failed or a file that failed its check keep their own names and messages.
+    if (isModelError(e)) throw e;
     // Whatever stopped the person finder from starting is one kind, and the message stays as it was.
     const failed = new NamedError('PersonMaskFailed', e instanceof Error && e.message ? e.message : 'The person finder could not be started in this browser.');
     failed.name = 'ModelLoadError';
@@ -156,10 +160,12 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
     const webgl = probeWebGL();
     if (!webgl.any) throw new NamedError('PersonMaskFailed', 'The person finder needs WebGL, which this browser does not provide. Turn on hardware acceleration in the browser settings, or use an up-to-date Chrome, Edge, Firefox or Safari.');
+    // The model is fetched once, whole and checked, outside the chip attempt: a failed download says nothing about the chip.
+    const bytes = await loadModelBytes(model, { what: 'person finder', entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
     const make = async (delegate: 'CPU' | 'GPU') => {
       const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
       return ImageSegmenter.createFromOptions(fileset, {
-        baseOptions: { modelAssetPath: model, delegate },
+        baseOptions: { modelAssetBuffer: bytes, delegate },
         runningMode: 'VIDEO',
         outputConfidenceMasks: true,
         outputCategoryMask: false,

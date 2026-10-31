@@ -11,6 +11,8 @@
 import type { FaceDetector } from '@mediapipe/tasks-vision';
 import type { Rect } from './blur';
 import { vendorDir } from './vendor';
+import { loadModelBytes } from './model-fetch';
+import { modelEntry } from './model-manifest';
 
 const MODEL = '/models/blaze_face_short_range.tflite';
 /** Tiles are scaled to at most this size before detection; the model looks at 128 px anyway. */
@@ -27,9 +29,11 @@ let detector: Promise<FaceDetector> | undefined;
 function load(): Promise<FaceDetector> {
   detector ??= (async () => {
     const { FilesetResolver, FaceDetector } = await import('@mediapipe/tasks-vision');
+    // Whole and checked, resumed if the connection drops (see model-fetch.ts), instead of MediaPipe's own unchecked fetch.
+    const bytes = await loadModelBytes(MODEL, { what: 'face finder', entry: modelEntry(MODEL), onKeepFailed: (err) => console.warn('The face finder could not be kept for next time', err) });
     const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
     return FaceDetector.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: MODEL, delegate: 'CPU' },
+      baseOptions: { modelAssetBuffer: bytes, delegate: 'CPU' },
       runningMode: 'IMAGE',
       minDetectionConfidence: 0.6,
     });
