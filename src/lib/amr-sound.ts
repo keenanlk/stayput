@@ -2,7 +2,6 @@
  * AMR speech as plain samples, for the sound tools and the caption tools. A worker decodes frames (cut by hand from a bare .amr
  * file, see amr-frames.ts, or lifted from the packets of a 3GP or MP4 track) with the libav build the 3GP page ships. The decoder is fetched only when an AMR sound turns up.
  */
-import { vendorEntry } from './vendor';
 import { fromWorkerFailure } from './worker-error';
 import { NamedError } from './input-error';
 import type { AmrJob, AmrMessage } from './amr-decode.worker';
@@ -14,6 +13,8 @@ export async function decodeAmrFrames(frames: Uint8Array[], wide: boolean): Prom
   const bytes = new Uint8Array(lengths.reduce((a, b) => a + b, 0));
   let at = 0;
   for (const f of frames) (bytes.set(f, at), (at += f.length));
+  // Loaded here: tests import the audio helpers in Node, which cannot read vendor.json.
+  const { vendorEntry } = await import('./vendor');
   const worker = new Worker(new URL('./amr-decode.worker.ts', import.meta.url), { type: 'module' });
   try {
     return await new Promise((resolve, reject) => {

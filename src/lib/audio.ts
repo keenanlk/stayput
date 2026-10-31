@@ -12,6 +12,7 @@ import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
 import { retryUnreadable } from './read-failure';
 import { isPhoneBrowser } from './phone-limit';
 import { AUDIO_COPY, stageError } from './bare-error';
+import { resampleTo } from './odd-audio';
 
 /** MP3 is almost always 44.1 kHz; decoding resamples to it. */
 export const SAMPLE_RATE = 44100;
@@ -89,17 +90,6 @@ async function decodeAiff(bytes: ArrayBuffer | null, rate: number): Promise<Audi
   const source = new AudioBuffer({ length: aiff.channels[0]!.length, numberOfChannels: aiff.channels.length, sampleRate: aiff.sampleRate });
   aiff.channels.forEach((ch, c) => source.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
   return resampleTo(source, rate);
-}
-
-/** `source` at `rate`: itself when it is there already, otherwise rendered through an offline context. */
-export async function resampleTo(source: AudioBuffer, rate: number): Promise<AudioBuffer> {
-  if (source.sampleRate === rate) return source;
-  const ctx = new OfflineAudioContext(source.numberOfChannels, Math.max(1, Math.ceil((source.length * rate) / source.sampleRate)), rate);
-  const node = ctx.createBufferSource();
-  node.buffer = source;
-  node.connect(ctx.destination);
-  node.start();
-  return ctx.startRendering();
 }
 
 /**

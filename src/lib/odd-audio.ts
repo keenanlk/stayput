@@ -8,7 +8,6 @@ import { EncodedPacketSink, type InputAudioTrack } from 'mediabunny';
 import { isAmrWide, isCommonFormat, sniffAmr, soundFormatName, undecodableText, type SoundKind } from './audio-codecs';
 import { decodeAmrFrames } from './amr-sound';
 import { splitAmr } from './amr-frames';
-import { resampleTo } from './audio';
 import { NamedError } from './input-error';
 
 export const hasAudioDecoder = () => typeof AudioDecoder !== 'undefined';
@@ -34,6 +33,18 @@ export function refusalFor(sound: SoundKind | null, cause?: unknown): Error | nu
   const format = soundFormatName(sound);
   if (!format || isCommonFormat(format)) return null;
   return new NamedError('UnsupportedAudioCodec', undecodableText(format), cause === undefined ? undefined : { cause });
+}
+
+
+/** `source` at `rate`: itself when it is there already, otherwise rendered through an offline context. */
+export async function resampleTo(source: AudioBuffer, rate: number): Promise<AudioBuffer> {
+  if (source.sampleRate === rate) return source;
+  const ctx = new OfflineAudioContext(source.numberOfChannels, Math.max(1, Math.ceil((source.length * rate) / source.sampleRate)), rate);
+  const node = ctx.createBufferSource();
+  node.buffer = source;
+  node.connect(ctx.destination);
+  node.start();
+  return ctx.startRendering();
 }
 
 /** AMR speech as mono samples at `rate`: frames cut out of a bare file or lifted from a 3GP or MP4 track, decoded by the libav build. */
