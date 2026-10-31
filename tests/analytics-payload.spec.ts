@@ -200,13 +200,13 @@ for (const slug of SPEECH_TOOLS) {
     expect(dl.shown).toContain('could not be downloaded');
   });
 
-  test(`${slug}: a damaged model file is refused by the hash check as ModelCorrupted, with what to try`, async ({ page, baseURL }) => {
+  test(`${slug}: a damaged model file is refused by the hash check as ModelVerifyFailed, with what to try`, async ({ page, baseURL }) => {
     test.setTimeout(120_000);
     const sent = await captureAnalytics(page, baseURL!);
     await page.route(`${SITE}/models/**/*.onnx`, (route) => route.fulfill({ contentType: 'application/octet-stream', body: Buffer.alloc(2048, 7) }));
     const bad = await failedCaptionRun(page, baseURL!, slug, sent);
-    expect(bad.data).toMatchObject({ outcome: 'error', error_class: 'ModelCorrupted' });
-    expect(bad.shown).toContain('did not pass the check');
+    expect(bad.data).toMatchObject({ outcome: 'error', error_class: 'ModelVerifyFailed' });
+    expect(bad.shown).toContain('neither copy matched');
   });
 
   test(`${slug}: a worker the browser kills reports WorkerCrashError`, async ({ page, baseURL }) => {

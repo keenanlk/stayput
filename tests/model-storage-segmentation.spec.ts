@@ -89,7 +89,7 @@ test.describe('face finder (blur a face in a photo)', () => {
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
     await context.setOffline(true);
     await page.locator('#file-input').setInputFiles(at('face.jpg'));
-    await expect(hint(page)).toContainText('you are offline', { timeout: 2_000 });
+    await expect(hint(page)).toContainText('no internet connection', { timeout: 2_000 });
     expect(requests).toEqual([]);
     await context.setOffline(false);
     await find(page);
@@ -109,7 +109,7 @@ test.describe('face finder (blur a face in a photo)', () => {
     const requests: string[] = [];
     context.on('request', (r) => r.url().includes(FACE) && requests.push(r.url()));
     await find(page);
-    await expect(hint(page)).toContainText('not enough free storage', { timeout: 10_000 });
+    await expect(hint(page)).toContainText("doesn't have room", { timeout: 10_000 });
     expect(requests).toEqual([]);
 
     const refusing = await page.context().newPage();
@@ -148,14 +148,14 @@ test.describe('person finder (video background remover, the quick finder)', () =
     await expect.poll(() => persistCalls(page)).toBe(1);
   });
 
-  test('a download that keeps dying is ModelDownloadError, with nothing kept', async ({ page }) => {
+  test('a download that keeps dying is ModelDownloadFailed, with nothing kept', async ({ page }) => {
     test.setTimeout(120_000);
     await recordAnalytics(page);
     await faultInPage(page, { match: 'selfie_segmenter', cuts: Array(8).fill(0.1) });
     await start(page);
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
     await expect(page.locator('#error')).toContainText('person finder');
-    expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'ModelDownloadError' })]);
+    expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'ModelDownloadFailed' })]);
     expect(await keptPerson(page)).toEqual([]);
   });
 

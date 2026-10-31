@@ -22,7 +22,7 @@ let nextId = 0;
 let modelReady = false;
 
 const workerCrashError = () =>
-  new NamedError('WorkerCrashError', 'The vocal remover stopped unexpectedly, which usually means the browser ran out of memory. Close other tabs and try again, use a shorter song, or use a computer.');
+  new NamedError('WorkerCrashError', 'The separation model stopped unexpectedly, which usually means the browser ran short of memory. Close other tabs and try again, or use a shorter song or a computer.');
 
 function split(left: Float32Array, right: Float32Array, onLoading: (f: number) => void, onPiece: (done: number, total: number, engine: 'gpu' | 'cpu') => void) {
   worker ??= new Worker(retryUrl(workerUrl, started++), { type: 'module' });

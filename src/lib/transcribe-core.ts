@@ -16,6 +16,8 @@ import { vendorDir } from './vendor';
 import { loadWithRetry } from './retry';
 import { downloadVerified, isModelError, matchesEntry, modelPreflight, wholeOrNull } from './model-fetch';
 import { modelEntry } from './model-manifest';
+import { SPEECH_MODEL_MB } from '../data/speech-size';
+import type { ModelLabel } from './model-fetch';
 import { isRecordingTooLong, looksLikeMemory, looksLikeNetwork, modelDownloadError, modelLoadError, outOfMemoryError, speechModelError, fromWorker, type SpeechError } from './speech-errors';
 
 /** The models this worker can run, each with its own folder under /models/ and its own Cache API store. */
@@ -63,16 +65,17 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
   //    checked for a connection and for room to keep it.
   /** The first named failure to fetch (offline, storage full, a failed check): what the page is told instead of a generic download error. */
   let fetchError: SpeechError | undefined;
+  /** How the model being loaded is named in a message, with the size of the files this device fetches (the 16-bit encoder makes the WebGPU download bigger). */
+  let label: ModelLabel = { model: 'speech model', size: `${SPEECH_MODEL_MB.q8} MB` };
   env.fetch = async (input, init) => {
     const url = String(input);
     const counted = download && /\.onnx$/.test(url) ? download : undefined;
     const onProgress = counted && ((got: number, total: number) => total && (counted.sizes.set(url, [got, total]), counted.report()));
     const entry = modelEntry(url);
-    const what = 'speech model';
     let res: Response;
     try {
-      await modelPreflight(entry?.size ?? 0, what);
-      res = await downloadVerified((i, o) => fetchOnce(i as string | URL, { ...o, cache: 'no-store' }) as Promise<Response>, url, { what, entry, init, onProgress });
+      await modelPreflight(entry?.size ?? 0, label);
+      res = await downloadVerified((i, o) => fetchOnce(i as string | URL, { ...o, cache: 'no-store' }) as Promise<Response>, url, { label, entry, init, onProgress });
     } catch (err) {
       fetchFailed = true;
       if (isModelError(err) && err.name !== 'ModelDownloadError') fetchError ??= fromWorker(err.name, err.message);
@@ -142,6 +145,7 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     const options = gpu
       ? { dtype: { encoder_model: 'fp16', decoder_model_merged: 'q8' }, device: { encoder_model: 'webgpu', decoder_model_merged: 'wasm' } }
       : { dtype: 'q8', device: 'wasm' };
+    label = { model: 'speech model', size: `${SPEECH_MODEL_MB[model === 'whisper-tiny' ? 'tiny' : gpu ? 'webgpu' : 'q8']} MB` };
     // The store is read at each fetch, so it is set to this model's before the load starts.
     env.cacheKey = cacheKeyFor(model);
     let asr = pipelines.get(model);

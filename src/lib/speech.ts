@@ -120,7 +120,7 @@ async function checkModelRoom(model: SpeechModel, gpu: boolean): Promise<void> {
   const files = [gpu ? 'encoder_model_fp16.onnx' : 'encoder_model_quantized.onnx', 'decoder_model_merged_quantized.onnx'].map((f) => dir + f);
   try {
     const need = await uncachedBytes(cacheKeyFor(model), files, (p) => modelEntry(p)?.size);
-    if (need > 0) await modelPreflight(need, 'speech model');
+    if (need > 0) await modelPreflight(need, { model: 'speech model', size: `${SPEECH_MODEL_MB[model === 'whisper-tiny' ? 'tiny' : gpu ? 'webgpu' : 'q8']} MB` });
   } catch (err) {
     if (isModelError(err)) throw fromWorker(err.name, err.message);
   }

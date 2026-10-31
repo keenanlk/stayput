@@ -176,6 +176,6 @@ test('a worker that dies is WorkerCrashError, not a bare Error', async ({ page }
   await open(page);
   await run(page);
   await failed(page);
-  await expect(page.locator('#error')).toContainText('ran out of memory');
+  await expect(page.locator('#error')).toContainText('ran short of memory');
   expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'WorkerCrashError' })]);
 });

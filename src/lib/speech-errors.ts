@@ -8,7 +8,7 @@ import { NamedError, isUnspecific } from './input-error';
 
 import { isNotReadable } from './read-failure';
 
-export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelOffline', 'StorageFull', 'ModelCorrupted', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong'] as const;
+export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelOffline', 'StorageFull', 'ModelVerifyFailed', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong'] as const;
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
 
 export class SpeechError extends Error {

@@ -33,7 +33,7 @@ let loaded: Promise<Loaded> | undefined;
 /** The model, whole and checked: a kept copy that still matches the manifest, else a resumed, size- and hash-checked download (see model-fetch.ts). */
 const fetchModel = (onProgress: (f: number) => void): Promise<Uint8Array> =>
   loadModelBytes(MODEL_URL, {
-    what: 'separation model (67 MB)',
+    label: { model: 'separation model', size: '67 MB' },
     entry: modelEntry(MODEL_URL),
     onProgress,
     onKeepFailed: (err) => console.warn('The separation model could not be kept for next time', err),

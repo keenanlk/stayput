@@ -30,7 +30,7 @@ function load(): Promise<FaceDetector> {
   detector ??= (async () => {
     // Whole and checked, resumed if the connection drops (see model-fetch.ts), instead of MediaPipe's own unchecked fetch;
     // offline or no room ends here, before any script is loaded.
-    const bytes = await loadModelBytes(MODEL, { what: 'face finder', entry: modelEntry(MODEL), onKeepFailed: (err) => console.warn('The face finder could not be kept for next time', err) });
+    const bytes = await loadModelBytes(MODEL, { label: { model: 'face finder', failName: 'ModelDownloadFailed' }, entry: modelEntry(MODEL), onKeepFailed: (err) => console.warn('The face finder could not be kept for next time', err) });
     const { FilesetResolver, FaceDetector } = await import('@mediapipe/tasks-vision');
     const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
     return FaceDetector.createFromOptions(fileset, {

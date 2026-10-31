@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { downloadVerified, modelPreflight, persistAfterRun, sha256Hex } from '../src/lib/model-fetch';
+import { downloadVerified, modelDownloadError, modelOffline, modelPreflight, modelVerifyFailed, persistAfterRun, sha256Hex, storageFull } from '../src/lib/model-fetch';
 import { retryUrl } from '../src/lib/fresh-url';
 
 const root = fileURLToPath(new URL('../public/models/', import.meta.url));
@@ -55,7 +55,8 @@ function host({ cuts = [] as (number | null)[], ranges = true, bodies = [] as (U
   };
   return { doFetch, seen };
 }
-const opts = { what: 'test model', entry: ENTRY, waits: [0, 0, 0] };
+const LABEL = { model: 'test model', size: '1 KB' };
+const opts = { label: LABEL, entry: ENTRY, waits: [0, 0, 0] };
 
 test('a download cut at 10% and again at 50% resumes with Range requests and passes the SHA-256 check', async () => {
   const h = host({ cuts: [0.1, 0.5, null] });
@@ -75,20 +76,20 @@ test('a download whose resumes all fail is ModelDownloadError', async () => {
   await expect(downloadVerified(h.doFetch, '/m.onnx', opts)).rejects.toMatchObject({ name: 'ModelDownloadError' });
 });
 
-test('a body of the right size with the wrong bytes is downloaded once more, then refused as ModelCorrupted', async () => {
+test('a body of the right size with the wrong bytes is downloaded once more, then refused as ModelVerifyFailed', async () => {
   const flipped = FILE.map((b, i) => (i % 10 === 0 ? ~b & 0xff : b));
   const once = host({ bodies: [flipped, null] });
   const ok = await downloadVerified(once.doFetch, '/m.onnx', opts);
   expect(new Uint8Array(await ok.arrayBuffer())).toEqual(FILE);
   expect(once.seen).toHaveLength(2);
   const twice = host({ bodies: [flipped, flipped, flipped] });
-  await expect(downloadVerified(twice.doFetch, '/m.onnx', opts)).rejects.toMatchObject({ name: 'ModelCorrupted' });
+  await expect(downloadVerified(twice.doFetch, '/m.onnx', opts)).rejects.toMatchObject({ name: 'ModelVerifyFailed' });
   expect(twice.seen).toHaveLength(2);
 });
 
 test('a body of the wrong size is refused the same way', async () => {
   const h = host({ bodies: [FILE.slice(0, 900), FILE.slice(0, 900)] });
-  await expect(downloadVerified(h.doFetch, '/m.onnx', opts)).rejects.toMatchObject({ name: 'ModelCorrupted' });
+  await expect(downloadVerified(h.doFetch, '/m.onnx', opts)).rejects.toMatchObject({ name: 'ModelVerifyFailed' });
 });
 
 test('a response that is not ok is handed back as it came', async () => {
@@ -117,16 +118,16 @@ function pretend(env: { onLine?: boolean; quota?: number; usage?: number; persis
 
 test('offline is ModelOffline at once, and too little free storage is StorageFull', async () => {
   pretend({ onLine: false });
-  await expect(modelPreflight(1e6, 'test model')).rejects.toMatchObject({ name: 'ModelOffline' });
+  await expect(modelPreflight(1e6, LABEL)).rejects.toMatchObject({ name: 'ModelOffline' });
   // A browser that says it is online while a request for a small file of ours fails is offline too.
   pretend({ onLine: true });
-  await expect(modelPreflight(1e6, 'test model', async () => false)).rejects.toMatchObject({ name: 'ModelOffline' });
+  await expect(modelPreflight(1e6, LABEL, async () => false)).rejects.toMatchObject({ name: 'ModelOffline' });
   pretend({ quota: 50e6, usage: 10e6 });
-  await expect(modelPreflight(53e6, 'test model')).rejects.toMatchObject({ name: 'StorageFull' });
-  await expect(modelPreflight(30e6, 'test model')).resolves.toBeUndefined();
+  await expect(modelPreflight(53e6, LABEL)).rejects.toMatchObject({ name: 'StorageFull' });
+  await expect(modelPreflight(30e6, LABEL)).resolves.toBeUndefined();
   // A browser that does not say how much room there is gets the benefit of the doubt.
   pretend({});
-  await expect(modelPreflight(53e6, 'test model')).resolves.toBeUndefined();
+  await expect(modelPreflight(53e6, LABEL)).resolves.toBeUndefined();
 });
 
 test('persist() is asked once, only after a model has been kept', async () => {
@@ -147,4 +148,23 @@ test('a worker or script that is tried again is asked for from a new URL', () =>
 
 test('sha256Hex matches node', async () => {
   expect(await sha256Hex(FILE)).toBe(ENTRY.sha256);
+});
+
+test("the messages are marketing's copy, with the model and size filled in and the bracket dropped when there is no size", () => {
+  const person = { model: 'person finder', size: 'about 12 MB', failName: 'ModelDownloadFailed' as const };
+  expect(modelOffline({ model: 'speech model', size: '77 MB' }).message).toBe(
+    "The speech model isn't on this device yet, and there's no internet connection. Connect and try again: the first run downloads the speech model (77 MB) and the engine that runs it, and after that this tool works offline.",
+  );
+  expect(storageFull({ model: 'separation model', size: '67 MB' }).message).toBe(
+    "This browser doesn't have room to keep the separation model (67 MB). Free some space on this device and try again. In a private window the browser allows much less storage, so a normal window may work.",
+  );
+  expect(modelVerifyFailed({ model: 'speech model' }).message).toBe(
+    'The speech model was downloaded twice, but neither copy matched what was expected, so both were thrown away instead of used. Something on the way, often a public or work network, is changing the file. Try again later or on another network.',
+  );
+  expect(modelDownloadError(person)).toMatchObject({ name: 'ModelDownloadFailed', message: 'The person finder (about 12 MB) could not be downloaded. Check your connection and try again.' });
+  expect(modelDownloadError({ model: 'face finder', failName: 'ModelDownloadFailed' }).message).toBe('The face finder could not be downloaded. Check your connection and try again.');
+  expect(modelDownloadError({ model: 'separation model', size: '67 MB' })).toMatchObject({
+    name: 'ModelDownloadError',
+    message: 'The separation model (67 MB) could not be downloaded. Check your connection and try again. On mobile data, Wi-Fi is steadier.',
+  });
 });
