@@ -23,8 +23,7 @@ step 5 can affect visitors. Rollback is at the end.
    - Account > **Workers R2 Storage** > Edit
 
    Scope it to this account. It needs no zone permissions, because the domain is attached in the dashboard in step 5.
-   If a deploy fails with an authentication error, add Account > **Account Settings** > Read: Cloudflare's docs
-   list it for build tokens, and this minimal set has not been tried against a real account.
+   These two were enough for the first real deploy and R2 upload.
 
 ### GitHub
 
@@ -57,7 +56,7 @@ curl -s "$H$M" | shasum -a 256
 # The ranged .wasm: no Content-Encoding. (`wrangler dev` does compress this; Cloudflare's docs say the edge does not.)
 curl -sD - -o /dev/null -r 0-9 -H 'Accept-Encoding: br, gzip' "$H/vendor/onnxruntime-web@1.30.0/ort-wasm-simd-threaded.asyncify.wasm"
 
-# A model under 25 MiB, served as a static asset: note whether it is 206 or 200, and any Content-Encoding
+# A model under 25 MiB, served as a static asset: expect 200 and the whole file, because static assets ignore Range
 curl -sD - -o /dev/null -r 0-9 -H 'Accept-Encoding: br, gzip' "$H/models/selfie_segmenter.tflite"
 
 # Redirect, 404 page, security headers
@@ -117,7 +116,7 @@ This is the actual cutover.
    `100::` and add a **Redirect Rule**: hostname `www.stayput.dev` to `https://stayput.dev${path}`, 308, keep the query string.
 3. Check `curl -sI https://stayput.dev/ | grep -i server` says cloudflare, rerun the step 2 checks with
    `H=https://stayput.dev`, and rerun them in a browser.
-4. Check the edge cache, which can't be tested on workers.dev or locally. Request a big file twice from the same
+4. Check the edge cache on the real domain (it works on workers.dev). Request a big file twice from the same
    place: the second response should have `X-Stayput-Source: cache`. If it stays `r2`, the site still works but
    every read costs an R2 operation.
 
@@ -136,7 +135,8 @@ This is the actual cutover.
   Canonical tags still name the right URL. `_redirects` sources do get 308, with and without a trailing slash.
 - `.onnx` and `.tflite` files under 25 MiB have no `Content-Type` (Vercel sends `application/octet-stream`), because
   wrangler has no type for those extensions. The loaders read them with `fetch` and don't look at it.
-- A model under 25 MiB may not honour Range; `wrangler dev` doesn't. See step 2.
+- Models under 25 MiB ignore Range (confirmed on workers.dev): a ranged request gets 200 and the whole file. A dropped
+  download still finishes, because `model-fetch.ts` refetches and skips what it has, but it re-downloads those bytes.
 - Each edge location caches big files separately, so a location's first reader of a file comes from R2.
 - `run_worker_first` must match the big files in `dist/`. When a file crosses 25 MiB, or an
   onnxruntime-web upgrade changes the `/vendor/` path, CI fails until you run
