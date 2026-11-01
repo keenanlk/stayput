@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { memoryRange, nameBare } from '../src/lib/bare-error';
+import { cutFailed, memoryRange, nameBare, type CutStep } from '../src/lib/bare-error';
 
 // Two failures that used to reach a failed run's record under a bare built-in name: a RangeError from a buffer that
 // could not be allocated while cutting (Video splitter), and a TypeError while reading the size (Resize video).
@@ -18,6 +18,17 @@ test('a RangeError that says memory ran out is OutOfMemoryError; a bad length st
   expect(nameBare('CutFailed', bad).name).toBe('CutFailed');
   expect(memoryRange(new TypeError('x'))).toBeInstanceOf(TypeError);
   expect(nameBare('VideoSizeReadFailed', new TypeError("undefined is not an object (evaluating 'a.num')")).name).toBe('VideoSizeReadFailed');
+});
+
+test('a plain error in a cut is named for the step it stopped at; a named one keeps its name', () => {
+  const steps: CutStep[] = ['OpenInput', 'Keyframe', 'EncoderPlan', 'Init', 'Execute'];
+  for (const step of steps) {
+    const e = cutFailed(step, new Error('boom'));
+    expect(e.name).toBe(`CutFailed${step}`);
+    expect(e.message).toBe('boom');
+    expect(cutFailed(step, new TypeError('x')).name).toBe(`CutFailed${step}`);
+    expect(cutFailed(step, Object.assign(new Error('x'), { name: 'EncodingError' })).name).toBe('EncodingError');
+  }
 });
 
 async function open(page: Page) {
@@ -60,6 +71,61 @@ test.describe('on the page', () => {
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 120_000 });
     await expect(page.locator('#error')).toContainText('ran out of memory');
     expect(await errorClass(page)).toMatchObject({ outcome: 'error', error_class: 'OutOfMemoryError' });
+  });
+
+  // trimVideo's step tracking, driven through the real page: the cut is made to fail at each step with a plain Error
+  // (a test hook the cut checks as it enters each step), and the run's record must carry that step's name.
+  const load = async (page: Page, exact: boolean) => {
+    await page.goto('/tools/video-splitter');
+    await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+    await page.locator('#file-input').setInputFiles(fx('split-60s.mp4'));
+    await expect(page.locator('#tool')).toHaveAttribute('data-duration', '60');
+    await page.locator('input[name="vs-mode"][value="equal"]').check();
+    await page.locator('#vs-equal').fill('2');
+    if (exact) await page.locator('#exact').check();
+    await page.evaluate(() => ((window as unknown as { __arm: boolean }).__arm = true));
+    await page.locator('#run').click();
+    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 120_000 });
+    return errorClass(page);
+  };
+
+  for (const step of ['OpenInput', 'Keyframe', 'EncoderPlan', 'Init', 'Execute'] as CutStep[]) {
+    test(`Video splitter: a plain Error at the ${step} step records CutFailed${step}`, async ({ page }) => {
+      await open(page);
+      await page.addInitScript((s) => ((globalThis as { __stayputCutFault?: string }).__stayputCutFault = s), step);
+      expect(await load(page, false)).toMatchObject({ outcome: 'error', error_class: `CutFailed${step}` });
+    });
+  }
+
+  // The same through a browser API that really throws: the first VideoDecoder.configure is Conversion.init's, the second is the run's.
+  for (const [step, n] of [['Init', 1], ['Execute', 2]] as const) {
+    test(`Video splitter: a plain Error from the decoder while ${step === 'Init' ? 'starting' : 'running'} the conversion records CutFailed${step}`, async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'counts VideoDecoder.configure calls, which differ between engines');
+      await open(page);
+      await page.addInitScript((n) => {
+        const real = VideoDecoder.prototype.configure;
+        let calls = 0;
+        VideoDecoder.prototype.configure = function (this: VideoDecoder, c: VideoDecoderConfig) {
+          if ((window as unknown as { __arm?: boolean }).__arm && ++calls === n) throw new Error('forced');
+          return real.call(this, c);
+        };
+      }, n);
+      expect(await load(page, true)).toMatchObject({ outcome: 'error', error_class: `CutFailed${step}` });
+    });
+  }
+
+  test('Video splitter: an error that already has a name keeps it through the cut', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'counts VideoDecoder.configure calls, which differ between engines');
+    await open(page);
+    await page.addInitScript(() => {
+      const real = VideoDecoder.prototype.configure;
+      let calls = 0;
+      VideoDecoder.prototype.configure = function (this: VideoDecoder, c: VideoDecoderConfig) {
+        if ((window as unknown as { __arm?: boolean }).__arm && ++calls >= 2) throw Object.assign(new Error('forced'), { name: 'DataError' });
+        return real.call(this, c);
+      };
+    });
+    expect((await load(page, true)).error_class).toBe('DataError');
   });
 
   test('Resize video: a TypeError while reading the size is never recorded as TypeError', async ({ page }) => {
