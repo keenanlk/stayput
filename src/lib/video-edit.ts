@@ -160,6 +160,22 @@ export function shownSize(video: InputVideoTrack): { width: number; height: numb
   return { width: video.displayWidth, height: video.displayHeight };
 }
 
+/** About how many frames a video has (duration times the frame rate from its first packets); undefined when it cannot be told. */
+export async function frameEstimate(file: File): Promise<number | undefined> {
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
+  try {
+    const video = await input.getPrimaryVideoTrack();
+    if (!video) return undefined;
+    const [duration, stats] = await Promise.all([input.computeDuration(), video.computePacketStats(120).catch(() => null)]);
+    const rate = stats?.averagePacketRate;
+    return rate && rate > 0 && duration > 0 ? Math.max(1, Math.round(duration * rate)) : undefined;
+  } catch {
+    return undefined;
+  } finally {
+    input.dispose?.();
+  }
+}
+
 /** Size of the picture as it is shown (rotation metadata applied), before any edit. */
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });

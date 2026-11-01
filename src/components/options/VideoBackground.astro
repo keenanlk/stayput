@@ -40,6 +40,7 @@ const size = defaults.size ?? 'full';
 </div>
 <p class="hint" id="image-hint" hidden={bg !== 'image'}>Drop a JPG or PNG with the video to fill the frame behind the person.</p>
 <p class="hint">Made for people. Fast is rougher around hair and in dim light.</p>
-<p class="hint" id="time-note">Can run slower than the video plays; the time left shows as it runs.</p>
+<p class="hint" id="phone-fast-note" hidden>On a phone, Fast is chosen for you because Better edges is slower there. Choose Better edges for cleaner hair edges; Fast can find no one in dim light.</p>
+<p class="hint" id="time-note">Can run slower than the video plays; the time left shows as it runs. Phones start on Fast.</p>
 <p class="hint" id="phone-note" hidden>This clip is big for a phone. For a faster, steadier run, trim it first or use a 1080p copy.</p>
 <p class="hint" id="size-note" hidden>This video is bigger than 1080p, so the output is set to 1080p on a phone: much quicker and a smaller file. Choose Same as the video to keep the size.</p>

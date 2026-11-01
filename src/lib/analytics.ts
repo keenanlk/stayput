@@ -164,7 +164,7 @@ export function trackToolStart(data: { tool: string; files: number; inputBytes: 
   }
 }
 
-export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firstOk?: boolean; files: number; inputBytes: number; outputBytes?: number; ms: number; format?: string; errorClass?: string }): void {
+export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firstOk?: boolean; files: number; inputBytes: number; outputBytes?: number; ms: number; format?: string; errorClass?: string; leftAfter?: string; leftAt?: string; mode?: string }): void {
   try {
     const run = recordRun(data.tool, data.outcome === 'ok');
     track('tool_run', {
@@ -177,6 +177,10 @@ export function trackToolRun(data: { tool: string; outcome: 'ok' | 'error'; firs
       ...(data.format ? { format: data.format } : {}),
       ...(data.outcome === 'ok' ? { attempt: data.firstOk ? 'first-ok' : 'repeat' } : {}),
       ...(data.errorClass ? { error_class: data.errorClass } : {}),
+      // Only when someone left a run part-way (see inflight.ts): coarse buckets, never raw times.
+      ...(data.leftAfter ? { left_after: data.leftAfter } : {}),
+      ...(data.leftAt ? { left_at: data.leftAt } : {}),
+      ...(data.mode ? { mode: data.mode } : {}),
       ...context(),
       prev_tool: run.prevTool,
       run_n: run.runN,

@@ -57,8 +57,36 @@ function remove() {
   }
 }
 
-function send(tool: string, errorClass: string) {
-  trackToolRun({ tool, outcome: 'error', files: 1, inputBytes: 0, ms: 0, errorClass });
+/** How long a run had been going when the visitor left: six coarse steps, never the milliseconds. */
+export function leftAfterBucket(ms: number): string {
+  if (ms < 10_000) return '<10s';
+  if (ms < 30_000) return '10-30s';
+  if (ms < 60_000) return '30-60s';
+  if (ms < 180_000) return '1-3m';
+  if (ms < 600_000) return '3-10m';
+  return '>10m';
+}
+
+/** How far along a run was (a fraction from 0 to 1) when the visitor left. */
+export function leftAtBucket(fraction: number): string {
+  const pct = Math.floor(Math.min(1, Math.max(0, fraction)) * 100);
+  if (pct <= 0) return '0';
+  if (pct <= 25) return '1-25';
+  if (pct <= 50) return '26-50';
+  if (pct <= 75) return '51-75';
+  return '76-99';
+}
+
+/** What a tool says about its run in progress, so that leaving it can be told apart by mode. Held in memory only. */
+let detail: { mode?: string; fraction: number } | undefined;
+
+/** A tool that wants LeftDuringRun to say how far it got, and in which mode, calls this as it goes (see markInflight). */
+export function noteRunDetail(d: { mode?: string; fraction?: number }): void {
+  detail = { mode: d.mode ?? detail?.mode, fraction: d.fraction ?? detail?.fraction ?? 0 };
+}
+
+function send(tool: string, errorClass: string, extra: { leftAfter?: string; leftAt?: string; mode?: string } = {}) {
+  trackToolRun({ tool, outcome: 'error', files: 1, inputBytes: 0, ms: 0, errorClass, ...extra });
 }
 
 let current: { tool: string; phase: Phase } | undefined;
@@ -77,9 +105,12 @@ function wire() {
     const { tool, phase } = current;
     current = undefined;
     // A preview too quick to have been marked is not worth a record.
-    const marked = read() !== undefined;
+    const m = read();
+    const d = detail;
     remove();
-    if (marked) send(tool, phase === 'run' ? 'LeftDuringRun' : 'LeftDuringPreview');
+    if (!m) return;
+    if (phase === 'run' && d) send(tool, 'LeftDuringRun', { leftAfter: leftAfterBucket(Date.now() - m.t), leftAt: leftAtBucket(d.fraction), ...(d.mode ? { mode: d.mode } : {}) });
+    else send(tool, phase === 'run' ? 'LeftDuringRun' : 'LeftDuringPreview');
   });
 }
 
@@ -94,6 +125,7 @@ export function markInflight(tool: string, phase: Phase): () => void {
   wire();
   const mine = { tool, phase };
   current = mine;
+  detail = undefined;
   const put = () => current === mine && write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden });
   const timer = phase === 'preview' ? setTimeout(put, PREVIEW_MARK_DELAY_MS) : undefined;
   if (!timer) put();
@@ -101,6 +133,7 @@ export function markInflight(tool: string, phase: Phase): () => void {
     clearTimeout(timer);
     if (current !== mine) return;
     current = undefined;
+    detail = undefined;
     remove();
   };
 }

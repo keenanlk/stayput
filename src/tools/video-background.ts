@@ -13,6 +13,7 @@ import { context2d, releaseCanvas } from '../lib/canvas-memory';
 import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
 import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
+import { noteRunDetail } from '../lib/inflight';
 
 /**
  * Video background remover: the people in each frame are found by MediaPipe's
@@ -36,6 +37,17 @@ const sync = () => {
 for (const r of document.querySelectorAll<HTMLInputElement>('input[name="bg"]')) r.addEventListener('change', () => (sync(), shell.refresh()));
 bindRange('strength', 'strength-out');
 sync();
+
+/**
+ * On a phone Fast is preselected: Better edges ran about five times slower there, and runs that long were often left. It is set once,
+ * as the page opens, so whatever the person picks afterwards stands. A computer keeps Better edges.
+ */
+if (isPhoneBrowser()) {
+  const fast = document.querySelector<HTMLInputElement>('input[name="finder"][value="fast"]');
+  if (fast) fast.checked = true;
+  const note = document.getElementById('phone-fast-note');
+  if (note) note.hidden = false;
+}
 
 /** Longest side the blurred background is made at; it is scaled up afterwards, which also softens it. */
 const BLUR_WORK = 480;
@@ -78,6 +90,10 @@ function frameSplit(t: { frames: number; paintMs: number; loopMs: number } | und
   const wait = Math.max(0, Math.round((t.loopMs - t.paintMs) / t.frames));
   return ` Each frame took about ${paint} ms to find the person and draw the background, and ${wait} ms more waiting for the picture to be decoded and the result encoded.`;
 }
+
+/** Fast finds nobody in dim light; a run that found no one says so and points at Better edges instead of returning an untouched picture. */
+const lowLightMessage = (name: string) =>
+  `The Fast person finder found no one in ${name}. This often happens in dim light. Choose Better edges under Person finder and run again.`;
 
 /** Longest side of a clip a phone handles comfortably: 1080p. Bigger ones are slow and more likely to run out of memory. */
 const PHONE_SAFE_SIDE = 1920;
@@ -207,6 +223,8 @@ const shell = createShell({
   async process(files, progress) {
     // Where the run is, so a TypeError (no name of its own) is recorded as the step that threw it.
     let step = 'BackgroundSetupFailed';
+    // From the first moment of the run, a leave records the mode and how far it got (see inflight.ts).
+    noteRunDetail({ mode: finder() === 'fast' ? 'fast' : 'better', fraction: 0 });
     // The new background picture is closed when the run ends, however it ends.
     const held: { picture?: ImageBitmap } = {};
     try {
@@ -242,7 +260,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   progress.set('Checking this browser can write the video…', 0);
   if (!hasVideoEncoder()) throw new EncoderUnavailable();
   await requireH264Encoder();
-  const { assertReadable, editVideo, videoSize } = await lazyImport(() => import('../lib/video-edit'));
+  const { assertReadable, editVideo, videoSize, frameEstimate } = await lazyImport(() => import('../lib/video-edit'));
   // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
   for (const v of videos) {
     await assertReadable(v.file).catch((e) => {
@@ -261,7 +279,8 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
     });
   }
   const which = finder();
-  progress.set(`Loading the person finder, once (about ${which === 'fast' ? '12' : '28'} MB)…`, 0.01);
+  const size = which === 'fast' ? '12' : '28';
+  progress.set(`Loading the person finder, once (about ${size} MB)…`, 0.01);
   at('PersonFinderLoadFailed');
   const { Matte, loadPersonMask } = await import('../lib/person-mask');
   // The fast model has a wide variant; load the one that fits the first video (a later one loads itself if it differs).
@@ -269,7 +288,14 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   // A phone that switches away during the download stops it: wait for the page, then fetch again.
   const page = pageRecoveryHooks((message) => progress.set(message, 0.01));
   try {
-    await resumeWhenHidden(() => loadPersonMask(which, shape), page.hooks);
+    await resumeWhenHidden(
+      () =>
+        loadPersonMask(which, shape, (f) => {
+          const pct = Math.round(f * 100);
+          progress.set(`Downloading the person finder, once (about ${size} MB): ${pct}%`, 0.01 + f * 0.02);
+        }),
+      page.hooks,
+    );
   } finally {
     page.dispose();
   }
@@ -280,6 +306,8 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
     const share = (f: number) => (index + f) / videos.length;
     const sizeFor = async (f: File) => outputSize((await videoSize(f).catch(() => undefined)) ?? { width: 0, height: 0 });
     const matte = new Matte(which);
+    progress.set(`Preparing ${file.name}…`, share(0.03));
+    const total = await frameEstimate(file);
     const blurred = document.createElement('canvas');
     // The first figures of a slow start run long (2 to 3 times too long on a phone), so wait for 8% and 10 s of real work.
     const timeLeft = new TimeLeft(undefined, { minFraction: 0.08, minSeconds: 10 });
@@ -308,7 +336,10 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
       onProgress: (f) => {
         // It is slower than the video plays, so say how long is left: a long run with only a percentage reads as stuck.
         const left = timeLeft.update(f) ?? 'Estimating time left…';
-        progress.set(`Replacing the background of ${file.name}: ${Math.round(f * 100)}% · ${left}. Keep this tab open.`, share(0.03 + f * 0.97));
+        noteRunDetail({ fraction: share(f) });
+        // "Frame X of Y" from the frames the finder has done and the clip's own rate; without a rate, the percentage alone.
+        const frames = total ? `Frame ${Math.min(matte.frames, total).toLocaleString('en-US')} of ${total.toLocaleString('en-US')} · ` : '';
+        progress.set(`Replacing the background of ${file.name}: ${frames}${Math.round(f * 100)}% · ${left}. Keep this tab open.`, share(0.03 + f * 0.97));
       },
     }).finally(() => {
       // Safari frees a dropped canvas late and caps all of them together: hand these back now, before the next video.
@@ -317,12 +348,15 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
     });
     const found = matte.frames ? matte.framesWithPerson / matte.frames : 0;
     const what = bgKind === 'blur' ? 'background blurred' : bgKind === 'color' ? `background ${color}` : `background from ${pictures[0]!.file.name}`;
-    outputs.push({
+    const made: OutputFile = {
       name: suffixName(file.name, bgKind === 'blur' ? '-blurred-background' : '-new-background', r.ext),
       blob: r.blob,
       originalSize: file.size,
       note: `${describeEdit(r)}${retryNote(r.retry, r)}, ${what}, ${found < 0.05 ? 'no person found, so the whole picture was treated as background' : `a person in ${Math.round(found * 100)}% of frames`}. ${matte.pathNote()}${frameSplit(r.timing)}`,
-    });
+    };
+    // Fast in dim light: the picture came back as it was. Said as an error that names the fix; the file stays downloadable.
+    if (which === 'fast' && found < 0.05) throw Object.assign(new NamedError('FastFoundNoPerson', lowLightMessage(file.name)), { salvage: [made] });
+    outputs.push(made);
   }
   return outputs;
 }
