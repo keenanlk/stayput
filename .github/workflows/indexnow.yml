@@ -38,7 +38,7 @@ jobs:
       - uses: actions/setup-node@v7
         if: steps.changed.outputs.site == 'true'
         with:
-          node-version: 22
+          node-version-file: .nvmrc
       # Remembers pings from the last few minutes so a repeat of the same URL set is skipped.
       # The newest earlier entry is restored; each run saves its own, carrying the records forward.
       - uses: actions/cache@v6
