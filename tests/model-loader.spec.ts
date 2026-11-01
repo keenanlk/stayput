@@ -97,6 +97,16 @@ test('a response that is not ok is handed back as it came', async () => {
   expect(res.status).toBe(404);
 });
 
+// Put back what pretend() overrides after each test, so no read-only global leaks into other specs in the worker.
+const GLOBAL_KEYS = ['navigator', 'caches', 'localStorage'] as const;
+const ORIGINALS = GLOBAL_KEYS.map((k) => [k, Object.getOwnPropertyDescriptor(globalThis, k)] as const);
+test.afterEach(() => {
+  for (const [k, d] of ORIGINALS) {
+    if (d) Object.defineProperty(globalThis, k, d);
+    else delete (globalThis as Record<string, unknown>)[k];
+  }
+});
+
 function pretend(env: { onLine?: boolean; quota?: number; usage?: number; persist?: () => Promise<boolean>; persisted?: boolean; caches?: string[] }) {
   const calls = { persist: 0 };
   Object.defineProperty(globalThis, 'navigator', {
