@@ -36,7 +36,7 @@ import { isNotReadable, notReadable, retryUnreadable } from './read-failure';
 import { nameBare } from './bare-error';
 import { openOpfsOutput } from './opfs-output';
 import { matchedBitrate } from './output-bitrate';
-import { pageRecoveryHooks } from './recovery-hooks';
+import { capAtRisk, pageRecoveryHooks } from './recovery-hooks';
 import { codecFailure, guardCodecs, isReclaim, tagCodec } from './codec-guard';
 import { releaseConversion } from './conversion-release';
 import { context2d, releaseCanvas } from './canvas-memory';
@@ -71,6 +71,11 @@ export interface EditOptions {
   width?: number;
   height?: number;
   onProgress?: (fraction: number) => void;
+  /**
+   * Start a phone at a smaller size when the source is 4K, or after the browser closed the page in an earlier run (see capAtRisk).
+   * Only the caption redraw asks: it holds a canvas and a speech model's leftovers, which is what ran phones out of memory.
+   */
+  capFirstTry?: boolean;
   /** Said when the job starts over after the page was hidden, or at a smaller size after the encoder gave up. */
   onNotice?: (message: string) => void;
 }
@@ -327,6 +332,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     // Encoders want even sides; H.264 in most browsers also refuses odd ones.
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
     const longest = Math.max(width, height);
+    if (opts.capFirstTry) capAtRisk(attempt, Math.max(shown.width, shown.height), true);
     const capK = capScale(attempt, longest);
     // Bitrate first, then the test encode at the real size below can lower the size before the file is decoded.
 

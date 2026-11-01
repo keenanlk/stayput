@@ -6,7 +6,7 @@ import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/
 import { EncoderStall } from '../lib/encoder-watchdog';
 import { encodeFailedError, encodeMemoryError, isRecordingTooLong, keepSalvage, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
-import { overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
+import { isPhoneBrowser, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
 import { speechDownloadNote } from '../lib/speech-path';
 import { InputError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
@@ -127,6 +127,8 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       );
       // The model is no longer needed; free its memory before the video is redrawn.
       speechModule.releaseSpeechModel();
+      // A phone gets a second to hand the model's memory back before the redraw asks for its own (the same pause as in speech.ts's start-up retry).
+      if (isPhoneBrowser()) await new Promise((done) => setTimeout(done, 1000));
       segments = speech.segments;
       path = speech.pathNote ? ` ${speech.pathNote}` : '';
       if (segments.length === 0) throw noSpeechFound(`No speech was found in ${file.name}, so there are no subtitles to add.`);
@@ -142,6 +144,8 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       shown = 0;
       last = undefined;
       return editVideo(file, {
+      // A phone starts a 4K source at 1080p (720p with little memory), and any source at 720p after a lost run in this tab; the note says so.
+      capFirstTry: true,
       // After the page was hidden, or an encoder that stopped, the redraw starts again by itself: say so.
       onNotice: (message) => {
         shown = 0;

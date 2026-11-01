@@ -47,6 +47,14 @@ function stubEncoder(fails: Fails) {
   };
 }
 
+// Restore globalThis.navigator after each test: a non-writable override left behind makes pdfjs-dist's
+// `globalThis.navigator = ...` throw when it loads later in the same worker.
+const ORIGINAL_NAVIGATOR = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+test.afterEach(() => {
+  if (ORIGINAL_NAVIGATOR) Object.defineProperty(globalThis, 'navigator', ORIGINAL_NAVIGATOR);
+  else delete (globalThis as { navigator?: unknown }).navigator;
+});
+
 function setNavigator(userAgent: string, maxTouchPoints = 0, vendor = 'Google Inc.') {
   Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent, maxTouchPoints, vendor } });
 }
@@ -264,5 +272,48 @@ test.describe('phones with a 4K source', () => {
     const a: Attempt = { maxSide: 1280, retry: 'remembered', remembered: true };
     capAtRisk(a, 3840);
     expect(a.maxSide).toBe(1280);
+  });
+
+  test('a phone that reports 3 GB or less starts a 4K source at 720p; 4 GB, or no report (Safari), at 1080p', () => {
+    const withMemory = (deviceMemory?: number) => {
+      setNavigator(IPHONE, 5, 'Apple Computer, Inc.');
+      Object.assign(navigator, { deviceMemory });
+    };
+    for (const [gb, side] of [[3, 1280], [2, 1280], [4, 1920], [undefined, 1920]] as const) {
+      withMemory(gb);
+      const a: Attempt = {};
+      capAtRisk(a, 3840);
+      expect(a, `deviceMemory ${gb}`).toMatchObject({ maxSide: side, retry: 'atrisk' });
+      expect(store.get('stayput:risk-size')).toBe(String(side));
+    }
+    withMemory(3);
+    const a: Attempt = {};
+    capAtRisk(a, 3840);
+    adoptPlan(a, {}, 3840);
+    expect(retryNote(retryOf(a), { width: 1280, height: 720 })).toContain('made at 720p because 4K is heavy for this device; use Try full size to keep 4K');
+  });
+
+  test('after a lost run the caption redraw starts any source over 1280 at 1280, until Try full size; other callers are not asked', async () => {
+    setNavigator(IPHONE, 5, 'Apple Computer, Inc.');
+    const { noteLostRun, forgetWorkingSize, lostRun } = await import('../src/lib/working-size');
+    const hd: Attempt = {};
+    capAtRisk(hd, 1920, true);
+    expect(hd).toEqual({});
+    noteLostRun();
+    const other: Attempt = {};
+    capAtRisk(other, 1920);
+    expect(other).toEqual({});
+    const small: Attempt = {};
+    capAtRisk(small, 1280, true);
+    expect(small).toEqual({});
+    capAtRisk(hd, 1920, true);
+    expect(hd).toMatchObject({ maxSide: 1280, retry: 'lost' });
+    adoptPlan(hd, {}, 1920);
+    expect(retryNote(retryOf(hd), { width: 1280, height: 720 })).toContain('made at 720p because the browser closed this page during the last run, most likely out of memory; use Try full size to keep the original size');
+    forgetWorkingSize();
+    expect(lostRun()).toBe(false);
+    const after: Attempt = {};
+    capAtRisk(after, 1920, true);
+    expect(after).toEqual({});
   });
 });
