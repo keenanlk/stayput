@@ -6,7 +6,7 @@ Thanks for looking. Bug reports, fixes and new tools are welcome. A few ground r
 
 **No change may cause a user's file, or anything derived from it, to leave the browser.** No upload endpoints, no "just for this format" server fallbacks, no third-party APIs that receive file data, no analytics that include file names or sizes finer than the existing buckets. If a feature cannot be done in the browser, it waits until it can.
 
-Related: the Content-Security-Policy in `vercel.json` and `public/_headers` deliberately restricts `connect-src`. Widening it needs a very good reason.
+Related: the Content-Security-Policy in `vercel.json` (the Cloudflare headers are generated from it) deliberately restricts `connect-src`. Widening it needs a very good reason.
 
 ## Ground rules
 

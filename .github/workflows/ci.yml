@@ -28,6 +28,8 @@ jobs:
           cache: npm
       - name: IndexNow script tests (stubbed fetch, no network)
         run: node --test scripts/indexnow.test.mjs
+      - name: Cloudflare rules and Worker tests (no network)
+        run: node --test scripts/cloudflare-assets.test.mjs worker/handler.test.mjs
       - run: npm ci
       - run: npx tsc --noEmit -p tsconfig.json
 
@@ -52,6 +54,12 @@ jobs:
       - name: MCP server (mcp/)
         working-directory: mcp
         run: npm ci && npm run typecheck && npm test
+      # Writes the Cloudflare files into dist/, so the commit Playwright tests is the one deployed.
+      # Fails if a vercel.json rule would be lost or wrangler.jsonc does not route every big file.
+      - name: Cloudflare rules and big-file manifest
+        run: node scripts/cloudflare-assets.mjs
+      - name: Cloudflare deploy check (no asset over 25 MiB; needs no account)
+        run: npx wrangler deploy --dry-run
       - uses: actions/upload-artifact@v7
         with:
           name: dist
@@ -120,3 +128,142 @@ jobs:
           test "${{ needs.checks.result }}" = success
           test "${{ needs.build.result }}" = success
           test "${{ needs.playwright.result }}" = success
+
+  # Only a commit that passed everything above gets here, and it deploys the dist that was tested.
+  # Skips with a warning until the secrets exist. See docs/cloudflare-cutover.md.
+  deploy-production:
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # One deploy at a time, in the order they reach this job.
+    concurrency:
+      group: cloudflare-production
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - id: gate
+        name: Check the Cloudflare secrets are set
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Cloudflare secrets are not set; skipping the deploy."
+          fi
+      - uses: actions/checkout@v7
+        if: steps.gate.outputs.enabled == 'true'
+      - uses: actions/setup-node@v7
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - if: steps.gate.outputs.enabled == 'true'
+        run: npm ci
+      - uses: actions/download-artifact@v8
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          name: dist
+          path: dist
+      # CI runs for two merges can finish out of order; the older one must not replace the newer.
+      - id: newest
+        name: Check no newer commit is already live
+        if: steps.gate.outputs.enabled == 'true'
+        run: |
+          live="$(npx wrangler r2 object get stayput-assets/deployed-commit --pipe --remote 2>/dev/null || true)"
+          state=""
+          if [ -n "$live" ]; then
+            state="$(gh api "repos/${{ github.repository }}/compare/$live...$GITHUB_SHA" --jq .status || true)"
+          fi
+          if [ "$state" = "behind" ]; then
+            echo "::notice::$live is newer than this commit and already live; not deploying."
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Upload changed big files to R2
+        if: steps.newest.outputs.deploy == 'true'
+        run: node scripts/cloudflare-r2-upload.mjs
+      - name: Deploy
+        if: steps.newest.outputs.deploy == 'true'
+        run: npx wrangler deploy --message "$GITHUB_SHA"
+      - name: Record the live commit
+        if: steps.newest.outputs.deploy == 'true'
+        run: |
+          printf '%s' "$GITHUB_SHA" > "$RUNNER_TEMP/deployed-commit"
+          npx wrangler r2 object put stayput-assets/deployed-commit --file "$RUNNER_TEMP/deployed-commit" --remote
+
+  # A skipped deploy still counts as success here, so pings do not stop while Vercel is the host.
+  indexnow:
+    needs: deploy-production
+    uses: ./.github/workflows/indexnow.yml
+
+  # A version nobody is routed to, at its own URL, using the live R2 bucket. Big files are safe to
+  # upload from a PR: keys include the hash, so production's objects are never touched.
+  # Secrets do not reach forks or Dependabot, so those PRs skip this.
+  preview:
+    needs: build
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - id: gate
+        name: Check the Cloudflare secrets are set
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Cloudflare secrets are not available to this run; no preview."
+          fi
+      - uses: actions/checkout@v7
+        if: steps.gate.outputs.enabled == 'true'
+      - uses: actions/setup-node@v7
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - if: steps.gate.outputs.enabled == 'true'
+        run: npm ci
+      - uses: actions/download-artifact@v8
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          name: dist
+          path: dist
+      - name: Upload changed big files to R2
+        if: steps.gate.outputs.enabled == 'true'
+        run: node scripts/cloudflare-r2-upload.mjs
+      - name: Upload a preview version
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
+        run: npx wrangler versions upload --preview-alias "pr-$PR" --message "PR $PR ${{ github.event.pull_request.head.sha }}"
+      - name: Comment the preview URL
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          urls="$(node -e '
+            const lines = require("fs").readFileSync(process.env.WRANGLER_OUTPUT_FILE_PATH, "utf8").trim().split("\n").map(JSON.parse);
+            const v = lines.findLast((l) => l.type === "version-upload");
+            console.log([v?.preview_alias_url, v?.preview_url].filter(Boolean).join("\n"));
+          ')"
+          if [ -z "$urls" ]; then
+            echo "::error::wrangler reported no preview URL. Is preview_urls on?"
+            exit 1
+          fi
+          marker="<!-- cloudflare-preview -->"
+          body="$(printf '%s\n**Cloudflare preview** for %s\n\n%s\n\nUses the live R2 bucket.' "$marker" "$HEAD_SHA" "$urls")"
+          id="$(gh api "repos/${{ github.repository }}/issues/$PR/comments" --paginate --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/${{ github.repository }}/issues/comments/$id" -f body="$body" > /dev/null
+          else
+            gh api --method POST "repos/${{ github.repository }}/issues/$PR/comments" -f body="$body" > /dev/null
+          fi
