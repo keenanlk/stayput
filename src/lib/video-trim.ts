@@ -111,9 +111,9 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   }
 }
 
-/** Test hook: a spec sets `__stayputCutFault` to a step's name to make that step fail with a plain Error. */
+/** Test hook: a spec sets `__stayputCutFault` to a step's name to make that step fail with a bare error (TypeError). */
 function testFault(step: CutStep) {
-  if ((globalThis as { __stayputCutFault?: string }).__stayputCutFault === step) throw new Error('forced');
+  if ((globalThis as { __stayputCutFault?: string }).__stayputCutFault === step) throw new TypeError('forced');
 }
 
 async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false, at: (step: CutStep) => void = () => {}): Promise<TrimResult> {
