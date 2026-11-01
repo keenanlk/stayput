@@ -71,13 +71,30 @@ test.describe('InputError: each refusal says what to do', () => {
     await expectError(page, '2 pictures were added. Keep one picture', 'TooManyPictures');
   });
 
-  test('Picture chosen with no picture: says so and offers Blur or Colour', async ({ page }) => {
+  test('Picture chosen with a video and no picture: Run stays off with a hint, and no run is recorded', async ({ page }) => {
     await open(page);
     await page.locator('input[name="bg"][value="image"]').evaluate((el) => (el as HTMLInputElement).click());
     await page.locator('#file-input').setInputFiles([clip]);
-    await page.locator('#run').click();
-    await expectError(page, 'Picture is chosen as the new background, but no picture was added', 'PictureBackgroundMissing');
+    await expect(page.locator('#run-hint')).toContainText('Add a picture for the new background');
+    await expect(page.locator('#run')).toBeDisabled();
+    expect((await events(page)).filter((e) => e.n === 'tool_run')).toEqual([]);
+    // Adding a picture turns Run on.
+    await page.locator('#file-input').setInputFiles([{ name: 'bg.png', mimeType: 'image/png', buffer: png }]);
+    await expect(page.locator('#run')).toBeEnabled();
+    await expect(page.locator('#run-hint')).not.toContainText('Add a picture for the new background');
   });
+
+  for (const mode of ['blur', 'color']) {
+    test(`Picture chosen with a video and no picture: switching to ${mode} turns Run on`, async ({ page }) => {
+      await open(page);
+      await page.locator('#file-input').setInputFiles([clip]);
+      await expect(page.locator('#run')).toBeEnabled();
+      await page.locator('input[name="bg"][value="image"]').evaluate((el) => (el as HTMLInputElement).click());
+      await expect(page.locator('#run')).toBeDisabled();
+      await page.locator(`input[name="bg"][value="${mode}"]`).evaluate((el) => (el as HTMLInputElement).click());
+      await expect(page.locator('#run')).toBeEnabled();
+    });
+  }
 });
 
 test.describe('UnreadableFile: refused early', () => {

@@ -32,7 +32,8 @@ const sync = () => {
   document.getElementById('color-field')!.hidden = kind() !== 'color';
   document.getElementById('image-hint')!.hidden = kind() !== 'image';
 };
-for (const r of document.querySelectorAll<HTMLInputElement>('input[name="bg"]')) r.addEventListener('change', sync);
+// A change of background also re-checks Run (pictureBlocker); `shell` exists by the time anyone can change it, though not when sync() first runs.
+for (const r of document.querySelectorAll<HTMLInputElement>('input[name="bg"]')) r.addEventListener('change', () => (sync(), shell.refresh()));
 bindRange('strength', 'strength-out');
 sync();
 
@@ -147,6 +148,7 @@ async function decodePicture(file: File) {
 const unopenable = new WeakSet<File>();
 const PICTURE_MESSAGE = 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.';
 
+const PICTURE_MISSING_HINT = 'Add a picture for the new background (JPG or PNG), or choose Blur or Colour.';
 const REMOVE_BG = '/tools/remove-background';
 const PICTURE_ONLY_MESSAGE =
   'Add a video too: this tool replaces the background of a video, and the picture is only the new background. To take the background out of a photo, use the Remove background tool instead.';
@@ -155,6 +157,7 @@ function pictureBlocker(files: ShellFile[]): string | { message: string; link?: 
   const pictures = files.filter((f) => isImage(f.file));
   // Only pictures were added: refused here, at the drop, so Run is never pressed (and no failed run is recorded).
   if (pictures.length > 0 && pictures.length === files.length) return { message: PICTURE_ONLY_MESSAGE, link: { text: 'Remove background tool', href: REMOVE_BG } };
+  if (pictures.length === 0 && files.length > 0 && kind() === 'image') return PICTURE_MISSING_HINT;
   return pictures.length === 1 && unopenable.has(pictures[0]!.file) ? PICTURE_MESSAGE : '';
 }
 
