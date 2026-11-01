@@ -1,5 +1,5 @@
 // @webkit-project
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 
 /**
@@ -119,4 +119,22 @@ test('a worker that dies on every try is shown once under a named error class, a
   expect(['OutOfMemoryError', 'WorkerCrashError', 'SpeechModelError']).toContain(run!.error_class);
   expect(await spawned(page)).toBe(2);
   for (const e of await events(page)) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `${e.n} carries unexpected key ${k}`).toBe(true);
+});
+
+test.describe('on a phone', () => {
+  const { defaultBrowserType: _ignored, ...iPhone } = devices['iPhone 15'];
+  test.use(iPhone);
+
+  test('speech, the one-second pause and the redraw still complete, with the same one tool_run event', async ({ page }, info) => {
+    test.setTimeout(300_000);
+    await recordEvents(page);
+    await fakeSpeechWorker(page, ['ok']);
+    await open(page);
+    await page.locator('#file-input').setInputFiles(speech(info.project.name));
+    await page.locator('#run').click();
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
+    await expect(page.locator('#results-list')).toContainText('written from English speech');
+    expect(await runs(page)).toMatchObject([{ outcome: 'ok' }]);
+    for (const e of await events(page)) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `${e.n} carries unexpected key ${k}`).toBe(true);
+  });
 });

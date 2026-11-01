@@ -5,6 +5,7 @@
  * Stored: the tool's slug, the phase and the time. Nothing about the file is stored or sent, and the marker never leaves the device.
  */
 import { trackToolRun } from './analytics';
+import { CAPTION_TOOLS, noteLostRun } from './working-size';
 
 /**
  * Where the marker lives. sessionStorage survives a reload of the same tab and is gone with the tab. If a phone turns out
@@ -111,5 +112,7 @@ export function reportLostTab(): void {
   remove();
   if (Date.now() - m.t > MAX_AGE_MS || m.t > Date.now() + 60_000) return;
   const cls = m.hidden ? 'TabLostWhileHidden' : m.phase === 'run' ? 'TabLostDuringRun' : 'TabLostDuringPreview';
+  // A caption run the browser closed: the redraw starts smaller in this tab (see capAtRisk). Kept as a flag in this tab; nothing more is sent.
+  if (cls === 'TabLostDuringRun' && CAPTION_TOOLS.includes(m.tool)) noteLostRun();
   send(m.tool, cls);
 }

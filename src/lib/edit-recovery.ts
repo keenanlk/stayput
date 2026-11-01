@@ -88,9 +88,10 @@ export interface Attempt extends EncodeRung {
   vp9?: boolean;
   /**
    * Which kind of retry this is, if it is one. 'probed': the test encode at the real size failed, so the run starts smaller;
-   * 'atrisk': a phone with a 4K source starts at 1080p.
+   * 'atrisk': a phone with a 4K source starts at 1080p (720p with 3 GB of memory or less);
+   * 'lost': the browser closed the page during a caption run earlier in this tab, so the redraw starts at 720p.
    */
-  retry?: 'resumed' | 'smaller' | 'again' | 'software' | 'remembered' | 'probed' | 'atrisk' | 'vp9';
+  retry?: 'resumed' | 'smaller' | 'again' | 'software' | 'remembered' | 'probed' | 'atrisk' | 'lost' | 'vp9';
   /** This try started at the size that worked earlier in this tab, not at full size. */
   remembered?: boolean;
   /** The try really made the picture smaller than the source (set by capScale); a cap on a small clip changes nothing and is not mentioned. */
@@ -131,7 +132,7 @@ export function adoptPlan(attempt: Attempt, plan: ProbePlan, longest: number): n
 /** The retry kind a finished file's note is about: a size cap that took effect from the start is said even when the page was hidden or the encoder retried on the way. */
 export function retryOf(attempt: Attempt): RetryKind | undefined {
   if (attempt.remembered && attempt.capped && attempt.retry !== 'smaller') return 'remembered';
-  if ((attempt.retry === 'probed' || attempt.retry === 'atrisk') && !attempt.capped) return undefined;
+  if ((attempt.retry === 'probed' || attempt.retry === 'atrisk' || attempt.retry === 'lost') && !attempt.capped) return undefined;
   return attempt.retry === 'remembered' ? undefined : attempt.retry;
 }
 
@@ -155,6 +156,8 @@ export function retryNote(retry: RetryKind | undefined, made?: { width: number; 
       return made ? ` (made at ${sizeName(Math.max(made.width, made.height))} because the full size failed on this device)` : ' (made smaller because the full size failed on this device)';
     case 'atrisk':
       return made ? ` (made at ${sizeName(Math.max(made.width, made.height))} because 4K is heavy for this device; use Try full size to keep 4K)` : ' (made smaller because 4K is heavy for this device)';
+    case 'lost':
+      return made ? ` (made at ${sizeName(Math.max(made.width, made.height))} because the browser closed this page during the last run, most likely out of memory; use Try full size to keep the original size)` : ' (made smaller because the browser closed this page during the last run, most likely out of memory; use Try full size to keep the original size)';
     case 'vp9':
       return ' (made as VP9 video, which plays in Chrome, Firefox and Android but not on older iPhones)';
     case 'again':
