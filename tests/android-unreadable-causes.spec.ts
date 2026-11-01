@@ -67,13 +67,12 @@ test.describe('readDuration names why it refuses', () => {
     expect(await nameOf(readFileSync(join(d, 'a.m4a')), 'VID.m4a', 'audio/mp4')).toMatchObject({ name: 'NoVideoTrack', message: 'This file has no video track.' });
   });
 
-  test('a video whose duration cannot be told is UnknownDuration', async () => {
+  test('a video whose duration cannot be told is UnknownDuration', async ({}, testInfo) => {
     const { Input } = await import('mediabunny');
     const orig = Input.prototype.computeDuration;
     Input.prototype.computeDuration = async () => 0;
     try {
-      const d = join('/Volumes/Toshiba Ext/stayput-scratch/staa-566');
-      mkdirSync(d, { recursive: true });
+      const d = dir(testInfo);
       ffmpeg(...SRC, ...H264, join(d, 'z.mp4'));
       expect(await nameOf(readFileSync(join(d, 'z.mp4')))).toMatchObject({ name: 'UnknownDuration', message: 'Could not tell how long this video is.' });
     } finally {
