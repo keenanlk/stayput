@@ -48,6 +48,15 @@ async function decodesNatively(format: 'jxl' | 'avif'): Promise<boolean> {
   return Promise.race([probe, new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000))]);
 }
 
+/**
+ * Modules that can need a library whatever the file type (the MP3 writer needs the LAME encoder on every page that
+ * saves MP3). They register it when they load; `warmDecoders` reads the set once the page's tool module has finished loading.
+ */
+const wanted = new Set<VendorLib>();
+export function wantVendor(...libs: VendorLib[]): void {
+  for (const l of libs) wanted.add(l);
+}
+
 /** Which decoders a file input's `accept` list can call for in this browser. */
 export async function decodersFor(accept: string): Promise<VendorLib[]> {
   const a = accept.toLowerCase();
@@ -61,7 +70,8 @@ export async function decodersFor(accept: string): Promise<VendorLib[]> {
   const flv = /\.flv\b|x-flv/.test(a) ? (['libavFlv'] as const) : [];
   // The MP3 encoder comes with it: AMR sound is written as MP3 where the browser has no AAC encoder (Linux Chromium), and must work offline.
   const gp = /\.3gpp?\b|\.3g2\b|video\/3gpp/.test(a) ? (['libav3gp', 'lame'] as const) : [];
-  return [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi, ...flv, ...gp, ...wma];
+  const list: VendorLib[] = [...(/heic|heif/.test(a) ? (['heic'] as const) : []), ...wasm.filter((_, i) => !native[i]), ...avi, ...flv, ...gp, ...wma, ...wanted];
+  return [...new Set(list)];
 }
 
 interface WarmReply {
