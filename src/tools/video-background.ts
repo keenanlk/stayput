@@ -39,7 +39,7 @@ bindRange('strength', 'strength-out');
 sync();
 
 /**
- * On a phone Fast is preselected: Better edges ran about five times slower there, and runs that long were often left. It is set once,
+ * On a phone Fast is preselected: runs on a phone were often left before they finished. It is set once,
  * as the page opens, so whatever the person picks afterwards stands. A computer keeps Better edges.
  */
 if (isPhoneBrowser()) {

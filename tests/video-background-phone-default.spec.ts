@@ -127,10 +127,14 @@ test.describe('phone', () => {
     await recordEvents(page);
     await page.goto('/tools/video-background-remover');
     await ready(page);
+    // track() waits for load when the tracker is not there yet; leaving before it is ready drops the event.
+    await expect.poll(() => page.evaluate(() => !!(window as unknown as { umami?: unknown }).umami)).toBe(true);
     await page.locator('#file-input').setInputFiles([clip]);
     await page.locator('#run').click();
     await expect.poll(() => page.evaluate(() => sessionStorage.getItem('stayput:inflight'))).toContain('"phase":"run"');
     await expect(page.locator('#progress-text')).toContainText(/Checking|person finder|Frame|Replacing/);
+    // Let the page take a turn or two once the run is going; WebKit under load can drop pagehide for a page that is left the instant the run starts.
+    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 300))));
     await page.goto('/');
     const left = (await runs(page)).filter((r) => r.error_class === 'LeftDuringRun');
     expect(left).toHaveLength(1);
