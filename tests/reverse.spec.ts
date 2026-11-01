@@ -2,7 +2,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { reverseInPlace, reverseWindows } from '../src/lib/video-reverse';
+import { reverseInPlace, reverseWindows, stage } from '../src/lib/video-reverse';
 
 /** How Reverse video splits a video into pieces to decode, last first. */
 
@@ -132,7 +132,7 @@ test('a 10-bit HEVC clip is reversed or refused as UnsupportedCodec, never a bar
   await stubBeacon(page);
   await open(page, tenBit);
   await page.locator('#run').click();
-  await expect(page.locator('#results, #error')).toHaveClass(/is-active/, { timeout: 150_000 });
+  await expect.poll(() => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]').some((e: { n: string }) => e.n === 'tool_run')), { timeout: 150_000 }).toBe(true);
   const run = await page.evaluate(() => (JSON.parse(sessionStorage.getItem('__ev') || '[]') as { n: string; d: Record<string, string> }[]).filter((e) => e.n === 'tool_run').at(-1)?.d);
   if (run?.outcome === 'error') expect(['UnsupportedCodec', 'UnreadableFile']).toContain(run.error_class);
   else expect(run?.outcome).not.toBe('error');
@@ -157,3 +157,12 @@ for (const [name, patch] of STAGES) {
     expect(run?.error_class).toBe(name);
   });
 }
+
+// The packet scan reads from tables already in memory, so no browser fault reaches it; the helper every stage goes through is checked here.
+test('a stage names a plain error and leaves a named one, such as the encoder\'s EncodingError, as it was', async () => {
+  const bare = await stage('ReverseIndex', async () => { throw new TypeError('x'); }).catch((e: Error) => e);
+  expect(bare.name).toBe('ReverseIndex');
+  expect(bare.cause).toBeInstanceOf(TypeError);
+  const encoding = Object.assign(new Error('x'), { name: 'EncodingError' });
+  expect(await stage('ReverseEncode', async () => { throw encoding; }).catch((e: Error) => e)).toBe(encoding);
+});

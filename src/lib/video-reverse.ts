@@ -63,7 +63,7 @@ const WINDOW_BYTES = 30e6;
 const DIRECT_FORMATS = new Set<string>(['I420', 'I420A', 'NV12', 'RGBA', 'RGBX', 'BGRA', 'BGRX']);
 
 /** Runs one step of a reverse run; a plain Error out of it takes the step's name, and one that already has a name is left alone so the retry rules still see it. */
-async function stage<T>(name: string, step: () => Promise<T>): Promise<T> {
+export async function stage<T>(name: string, step: () => Promise<T>): Promise<T> {
   try {
     return await step();
   } catch (e) {
