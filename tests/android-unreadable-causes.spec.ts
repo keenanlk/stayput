@@ -100,9 +100,9 @@ const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(ses
 
 test.describe('on the splitter page', () => {
   test.setTimeout(120_000);
-  for (const [label, want] of [
-    ['a file with no video structure', 'UnreadableContainer'],
-    ['an audio-only M4A', 'NoVideoTrack'],
+  for (const [label, want, shown] of [
+    ['a file with no video structure', 'UnreadableContainer', 'not a video this page can read'],
+    ['an audio-only M4A', 'NoVideoTrack', 'no video track'],
   ] as const) {
     test(`${label} records ${want}`, async ({ page }, testInfo) => {
       const d = dir(testInfo);
@@ -115,7 +115,9 @@ test.describe('on the splitter page', () => {
       await page.goto('/tools/video-splitter');
       await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
       await page.locator('#file-input').setInputFiles({ name: 'VID_0.mp4', mimeType: 'video/mp4', buffer });
-      await page.locator('#run').click({ force: true });
+      // Wait for the page to have read the file before Run, or the click can land first and start nothing.
+      await expect(page.locator('#error')).toContainText(shown);
+      await page.locator('#run').click();
       await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length, { timeout: 60_000 }).toBeGreaterThan(0);
       const runs = (await events(page)).filter((e) => e.n === 'tool_run');
       for (const e of runs) for (const k of Object.keys(e.d)) expect(KEYS.has(k), `carries unexpected key ${k}`).toBe(true);
