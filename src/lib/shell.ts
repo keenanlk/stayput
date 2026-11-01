@@ -22,7 +22,7 @@ import { NamedError } from './input-error';
 import { persistAfterRun } from './model-fetch';
 import { failsTheSameAgain } from './edit-recovery';
 import { inspectFile, type IntakeProblem } from './intake';
-import { forgetWorkingSize, riskSize, workingSize } from './working-size';
+import { CAPTION_TOOLS, forgetWorkingSize, LOST_SIDE, lostRun, riskSize, workingSize } from './working-size';
 
 export interface ShellFile {
   id: number;
@@ -607,7 +607,9 @@ export function createShell(opts: ShellOptions) {
   const sizeNote = opts.remembersSize ? document.createElement('p') : null;
   function showSizeNote() {
     if (!sizeNote) return;
-    const side = workingSize() ?? riskSize();
+    // After the browser closed a caption run's page: videos in this tab start at 720p (see capAtRisk in recovery-hooks.ts).
+    const lost = lostRun() && CAPTION_TOOLS.includes(root.dataset.slug ?? '');
+    const side = lost ? LOST_SIDE : (workingSize() ?? riskSize());
     sizeNote.hidden = !side;
     if (!side) return;
     sizeNote.className = 'hint';
@@ -621,6 +623,13 @@ export function createShell(opts: ShellOptions) {
       forgetWorkingSize();
       showSizeNote();
     });
+    if (lost) {
+      const a = document.createElement('a');
+      a.href = '/video-to-subtitles';
+      a.textContent = 'Video to subtitles';
+      sizeNote.replaceChildren(`The last run stopped because the browser closed this page, most likely out of memory. In this tab, videos are now made at ${name} so the next run is lighter. If you only need the subtitle file, use `, a, '. ', full);
+      return;
+    }
     sizeNote.textContent = workingSize()
       ? `In this tab, videos are made at up to ${name} because the full size failed on this device earlier. `
       : `On this device, 4K videos are made at ${name} because 4K is heavy for it. `;
@@ -815,6 +824,7 @@ export function createShell(opts: ShellOptions) {
   warmDecoders(input.accept);
   // Landing pages load the tool module on demand; this marks the shell as live.
   reportLostTab();
+  showSizeNote();
   root.dataset.ready = 'true';
   void adoptHandoff();
 
