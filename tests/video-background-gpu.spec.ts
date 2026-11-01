@@ -135,7 +135,7 @@ test.describe('on the graphics chip', () => {
         addEventListener('DOMContentLoaded', () => {
           const el = document.getElementById('progress-text')!;
           new MutationObserver(() => {
-            const pct = /(\d+)%/.exec(el.textContent ?? '')?.[1];
+            const pct = /Replacing the background.*?(\d+)%/.exec(el.textContent ?? '')?.[1];
             if (fired || !pct || Number(pct) < 30) return;
             fired = true;
             for (const gl of held) gl.getExtension('WEBGL_lose_context')?.loseContext();

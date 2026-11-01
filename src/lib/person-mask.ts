@@ -180,7 +180,7 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
   return (async () => {
     // The model first, whole and checked, outside the chip attempt (a failed download says nothing about the chip); offline or
     // no room ends here, before any script is loaded.
-    const bytes = await loadModelBytes(model, { label: { model: 'person finder', size: model === MODELS.edges ? 'about 28 MB' : 'about 12 MB', failName: 'ModelDownloadFailed' }, entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
+    const bytes = await loadModelBytes(model, { onProgress: (f) => downloadListener?.(f), label: { model: 'person finder', size: model === MODELS.edges ? 'about 28 MB' : 'about 12 MB', failName: 'ModelDownloadFailed' }, entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
     const webgl = probeWebGL();
@@ -218,7 +218,15 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
 }
 
 /** Load the model ahead of the first frame, so its download shows as its own step. */
-export const loadPersonMask = (finder: PersonFinder, shape?: Shape) => load(modelFor(finder, shape)).then(() => undefined);
+export const loadPersonMask = (finder: PersonFinder, shape?: Shape, onDownload?: (fraction: number) => void) => {
+  // Only the load that builds the finder downloads anything; a later one finds it ready and never calls this.
+  downloadListener = onDownload;
+  return load(modelFor(finder, shape))
+    .then(() => undefined)
+    .finally(() => (downloadListener = undefined));
+};
+/** Hears the model download's progress (0 to 1) while loadPersonMask runs. */
+let downloadListener: ((fraction: number) => void) | undefined;
 
 /**
  * Keeps the people in each frame and replaces everything else. One instance

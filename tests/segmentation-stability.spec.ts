@@ -223,7 +223,7 @@ async function slowUntil(page: Page, stopOn: string | null) {
       addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('progress-text')!;
         new MutationObserver(() => {
-          const pct = /(\d+)%/.exec(el.textContent ?? '')?.[1];
+          const pct = /Replacing the background.*?(\d+)%/.exec(el.textContent ?? '')?.[1];
           if (pct && Number(pct) >= 10 && !spent) on = true;
         }).observe(el, { childList: true, characterData: true, subtree: true });
       });

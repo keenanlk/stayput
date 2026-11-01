@@ -28,7 +28,7 @@ const EVENTS: Record<string, { label: string; keys: string[] }> = {
   tool_start: { label: 'Tool start', keys: ['tool', 'files', 'input', 'format', ...VISIT] },
   tool_run: {
     label: 'Tool run',
-    keys: ['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', ...VISIT, 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns'],
+    keys: ['tool', 'outcome', 'attempt', 'files', 'input', 'output', 'duration', 'format', 'error_class', ...VISIT, 'prev_tool', 'run_n', 'tools_used', 'run_gap', 'ns', 'left_after', 'left_at', 'mode'],
   },
   next_step: { label: 'Next step click', keys: ['tool', 'to', 'ns'] },
   search_open: { label: 'Search opened', keys: ['page'] },
@@ -45,6 +45,11 @@ const REFS = new Set([
 ]);
 
 /** An error kind is a class name only: letters and digits, at most 40, never a sentence. */
+/** Buckets for a run the visitor left part-way: how long it had run, how far along it was, and which finder mode. Never raw numbers. */
+const LEFT_AFTER = new Set(['<10s', '10-30s', '30-60s', '1-3m', '3-10m', '>10m']);
+const LEFT_AT = new Set(['0', '1-25', '26-50', '51-75', '76-99']);
+const MODES = new Set(['fast', 'better']);
+
 const ERROR_CLASS = /^[A-Za-z][A-Za-z0-9]{0,39}$/;
 
 type Sent = { type: string; payload: Record<string, unknown> };
@@ -70,6 +75,9 @@ function violations({ type, payload }: Sent, opts: { ab?: boolean } = {}): strin
   if ('variant' in data && !/^[a-z0-9]+(-[a-z0-9]+)*:[AB](,[a-z0-9]+(-[a-z0-9]+)*:[AB])*$/.test(String(data.variant))) bad.push(`data.variant ${String(data.variant)}`);
   }
   if ('error_class' in data && !ERROR_CLASS.test(String(data.error_class))) bad.push(`data.error_class ${String(data.error_class)}`);
+  if ('left_after' in data && !LEFT_AFTER.has(String(data.left_after))) bad.push(`data.left_after ${String(data.left_after)}`);
+  if ('left_at' in data && !LEFT_AT.has(String(data.left_at))) bad.push(`data.left_at ${String(data.left_at)}`);
+  if ('mode' in data && !MODES.has(String(data.mode))) bad.push(`data.mode ${String(data.mode)}`);
   if ('ref' in data && !REFS.has(String(data.ref))) bad.push(`data.ref ${String(data.ref)}`);
   return bad;
 }
