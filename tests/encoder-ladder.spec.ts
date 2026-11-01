@@ -47,6 +47,14 @@ function stubEncoder(fails: Fails) {
   };
 }
 
+// Restore globalThis.navigator after each test: a non-writable override left behind makes pdfjs-dist's
+// `globalThis.navigator = ...` throw when it loads later in the same worker.
+const ORIGINAL_NAVIGATOR = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+test.afterEach(() => {
+  if (ORIGINAL_NAVIGATOR) Object.defineProperty(globalThis, 'navigator', ORIGINAL_NAVIGATOR);
+  else delete (globalThis as { navigator?: unknown }).navigator;
+});
+
 function setNavigator(userAgent: string, maxTouchPoints = 0, vendor = 'Google Inc.') {
   Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent, maxTouchPoints, vendor } });
 }
