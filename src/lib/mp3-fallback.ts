@@ -6,9 +6,12 @@
  * and MP4 carries MP3 sound that iPhones play.
  */
 import { CustomAudioEncoder, EncodedPacket, getFirstEncodableAudioCodec, registerEncoder, type AudioCodec, type AudioSample, type Quality } from 'mediabunny';
-import { vendorDir } from './vendor';
+import { vendorDir, wantVendor } from './vendor';
 import { splitMp3Frames } from './mp3-frames';
 import { NamedError } from './input-error';
+
+// Any page that loads this can write MP3, so it must work offline after one visit.
+wantVendor('lame');
 
 type Mp3Encoder = {
   configure(o: { channels: 1 | 2; sampleRate: number; bitrate: number }): void;

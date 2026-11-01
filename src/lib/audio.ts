@@ -5,7 +5,7 @@
  * WebAssembly (wasm-media-encoders, served from /vendor/) or as 16-bit WAV by
  * the small writer below.
  */
-import { vendorDir } from './vendor';
+import { vendorDir, wantVendor } from './vendor';
 import { audioDecodeError } from './speech-errors';
 import { decodeWma, isAsf } from './wma-convert';
 import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
@@ -132,6 +132,9 @@ export function channelsOf(buffer: AudioBuffer, mono: boolean): Float32Array[] {
   for (let i = 0; i < out.length; i++) out[i] = (l[i]! + r[i]!) / 2;
   return [out];
 }
+
+// Any page that loads this can write MP3, so it must work offline after one visit.
+wantVendor('lame');
 
 export type Bitrate = 32 | 48 | 64 | 80 | 96 | 112 | 128 | 160 | 192 | 224 | 256 | 320;
 
