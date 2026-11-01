@@ -2,7 +2,7 @@ import type { Attempt, RecoveryHooks } from './edit-recovery';
 import { isPhoneBrowser } from './phone-limit';
 import { sameSizeRung, vp9Offered } from './encoder-probe';
 import { forgetPageHidden, looksReclaimed } from './wake-lock';
-import { fullSizeChosen, noteRiskSize, rememberWorkingSize, workingSize } from './working-size';
+import { fullSizeChosen, LOST_SIDE, lostRun, noteRiskSize, rememberWorkingSize, workingSize } from './working-size';
 
 /**
  * The page-side half of edit-recovery.ts: whether the page was hidden since the job started, waiting for it to come
@@ -45,13 +45,28 @@ export function pageRecoveryHooks(onNotice?: (message: string) => void): { hooks
 /** A source longer than this on its longest side (past 1440p) is 4K for this purpose. */
 const AT_RISK_SOURCE = 2560;
 
+/** Phones that report 3 GB of memory or less (Chromium on Android; Safari does not say) start a 4K source at 720p, not 1080p. */
+const lowMemory = (): boolean => {
+  const gb = (navigator as { deviceMemory?: unknown }).deviceMemory;
+  return typeof gb === 'number' && gb <= 3;
+};
+
 /**
- * Full size stays the default. The one exception that needs no failure first: a phone detected here (user agent and touch, nothing sent
- * anywhere) given a 4K source in compress, reverse or merge starts at 1080p, and the file's note says so. "Try full size" turns it off.
+ * Full size stays the default. The exceptions that need no failure first, all on a phone detected here (user agent and touch, nothing sent
+ * anywhere): a 4K source in compress, reverse, merge or the caption redraw starts at 1080p (720p when the phone reports 3 GB of memory
+ * or less), and the file's note says so. With `afterLostRun` (the caption redraw), a tab that was closed by the browser mid-run earlier
+ * starts any source over 720p at 720p. "Try full size" turns all of it off.
  */
-export function capAtRisk(attempt: Attempt, sourceLongest: number): void {
-  if (attempt.maxSide || sourceLongest <= AT_RISK_SOURCE || !isPhoneBrowser() || fullSizeChosen()) return;
-  attempt.maxSide = 1920;
+export function capAtRisk(attempt: Attempt, sourceLongest: number, afterLostRun = false): void {
+  if (attempt.maxSide || !isPhoneBrowser() || fullSizeChosen()) return;
+  if (afterLostRun && lostRun() && sourceLongest > LOST_SIDE) {
+    attempt.maxSide = LOST_SIDE;
+    attempt.retry = 'lost';
+    return;
+  }
+  if (sourceLongest <= AT_RISK_SOURCE) return;
+  const side = lowMemory() ? 1280 : 1920;
+  attempt.maxSide = side;
   attempt.retry = 'atrisk';
-  noteRiskSize();
+  noteRiskSize(side);
 }
