@@ -86,9 +86,10 @@ refetches and skips what it has), but that path has only been tested locally.
 
    DNS can't be listed from outside, so this table is what was found, not proof nothing else exists. Subdomains in
    particular (DKIM selectors, `_vercel` TXT verification) only show up in the Namecheap panel.
-3. **Mail:** those MX records are Namecheap's Email Forwarding, which may stop working or lose its settings page
-   once the domain leaves Namecheap's nameservers. Check with Namecheap first. Write down every alias. If it won't
-   carry over, set up Cloudflare Email Routing with the same aliases. Send a test message after step 4.
+3. **Mail:** forwarding moves to Cloudflare Email Routing, because Namecheap's Email Forwarding belongs to its own DNS.
+   Before step 4, write down every alias from Namecheap, and add and verify each destination address under
+   **Compute > Email Service > Email Routing > Destination Addresses**. Destinations belong to the account, so this
+   works before the zone is active. Leave the aliases set up at Namecheap for now.
 4. Turn off anything that rewrites pages or `robots.txt`, because the CSP and the privacy page depend on the site
    being served unmodified: Rocket Loader, Email Address Obfuscation, Web Analytics automatic setup, and
    the managed `robots.txt` / AI bot blocking. Compare `https://<zone>/robots.txt` after cutover with `public/robots.txt`.
@@ -97,14 +98,21 @@ refetches and skips what it has), but that path has only been tested locally.
 
 The domain still points at Vercel afterwards, so this step moves DNS only.
 
-1. **stayput.dev has DNSSEC on** (a DS record is published). Turn it off at Namecheap and **wait at least 24 hours**
-   (the DS TTL, plus a margin) before changing nameservers. Doing it the other way round makes the domain fail to
-   resolve for every validating resolver.
+1. DNSSEC must be off first. It was turned off at Namecheap on 2026-11-01. Before changing nameservers, check that
+   `dig DS stayput.dev @9.9.9.9` and `@1.1.1.1` return nothing, and allow 24 hours from the change as a margin.
 2. A few hours before, lower the TTLs in the Namecheap panel if it allows it.
 3. In Namecheap, set Custom DNS to the two nameservers Cloudflare assigned.
-4. Wait for the zone to show **Active**. Check `dig NS stayput.dev`, that the site still loads with `server: Vercel`, and
-   that test mail arrives.
-5. Re-enable DNSSEC later, from Cloudflare, once everything has settled.
+4. Wait for the zone to show **Active**. Check `dig NS stayput.dev` and that the site still loads with `server: Vercel`.
+5. Move mail to Email Routing straight away, in one sitting:
+   1. Delete the five `eforward` MX records. Onboarding fails with error 2008 while they exist. Senders retry during
+      the short gap with no MX records.
+   2. Under **Email Routing**, select **Onboard Domain** and choose stayput.dev. Cloudflare adds its MX and DKIM records.
+   3. Replace the SPF TXT record with `v=spf1 include:_spf.mx.cloudflare.net ~all`. There must be only one SPF record,
+      and the Namecheap include is no longer needed once nothing routes through it.
+   4. Create a routing rule for every alias immediately. Mail to an address with no rule is rejected and not retried,
+      so add a catch-all rule if Namecheap had one.
+   5. Send a test message to each alias from an outside address, and check the replies work.
+6. Re-enable DNSSEC later, from Cloudflare, once everything has settled.
 
 ## 5. Point the domain at the Worker
 
