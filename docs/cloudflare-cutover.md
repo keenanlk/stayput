@@ -23,8 +23,7 @@ step 5 can affect visitors. Rollback is at the end.
    - Account > **Workers R2 Storage** > Edit
 
    Scope it to this account. It needs no zone permissions, because the domain is attached in the dashboard in step 5.
-   If a deploy fails with an authentication error, add Account > **Account Settings** > Read: Cloudflare's docs
-   list it for build tokens, and this minimal set has not been tried against a real account.
+   These two were enough for the first real deploy and R2 upload.
 
 ### GitHub
 
@@ -57,7 +56,7 @@ curl -s "$H$M" | shasum -a 256
 # The ranged .wasm: no Content-Encoding. (`wrangler dev` does compress this; Cloudflare's docs say the edge does not.)
 curl -sD - -o /dev/null -r 0-9 -H 'Accept-Encoding: br, gzip' "$H/vendor/onnxruntime-web@1.30.0/ort-wasm-simd-threaded.asyncify.wasm"
 
-# A model under 25 MiB, served as a static asset: note whether it is 206 or 200, and any Content-Encoding
+# A model under 25 MiB, served as a static asset: expect 200 and the whole file, because static assets ignore Range
 curl -sD - -o /dev/null -r 0-9 -H 'Accept-Encoding: br, gzip' "$H/models/selfie_segmenter.tflite"
 
 # Redirect, 404 page, security headers
@@ -72,7 +71,7 @@ refetches and skips what it has), but that path has only been tested locally.
 ## 3. Add the zone (nothing changes yet)
 
 1. **Add a domain** in Cloudflare, choose stayput.dev, Free plan. Cloudflare scans the DNS.
-2. Compare every record with the Namecheap panel, not just with the scan. Public DNS showed these on 2026-11-01:
+2. Compare every record with the Namecheap panel, not just with the scan. These came from public DNS and the Namecheap panel on 2026-11-01:
 
    | Name | Type | Value | Note |
    | --- | --- | --- | --- |
@@ -81,15 +80,17 @@ refetches and skips what it has), but that path has only been tested locally.
    | `@` | MX | five `eforward` hosts, below | Mail, must not be proxied |
    | `@` | TXT | `v=spf1 include:spf.efwd.registrar-servers.com ~all` | Mail |
    | `@` | TXT | `google-site-verification=nu6sCzOSTOr6cHoXj831pIpgJaT6J7EfmuEajynrAAE` | Search Console |
+   | `_atproto` | TXT | `did=did:plc:3mqfqnkoa6y63rs4uuqcom6s` | Bluesky handle. Copy exactly |
+   | `_dmarc` | TXT | `v=DMARC1; p=reject; adkim=s; aspf=s` | Mail policy. Keep it |
 
    MX records: priority 10 `eforward1`, `eforward2`, `eforward3`; 15 `eforward4`; 20 `eforward5`, all
    `.registrar-servers.com`.
 
-   DNS can't be listed from outside, so this table is what was found, not proof nothing else exists. Subdomains in
-   particular (DKIM selectors, `_vercel` TXT verification) only show up in the Namecheap panel.
-3. **Mail:** those MX records are Namecheap's Email Forwarding, which may stop working or lose its settings page
-   once the domain leaves Namecheap's nameservers. Check with Namecheap first. Write down every alias. If it won't
-   carry over, set up Cloudflare Email Routing with the same aliases. Send a test message after step 4.
+   Namecheap doesn't show the MX records in its panel while Email Forwarding is on, so check they were copied.
+3. **Mail:** forwarding moves to Cloudflare Email Routing, because Namecheap's Email Forwarding belongs to its own DNS.
+   Before step 4, write down every alias from Namecheap, and add and verify each destination address under
+   **Compute > Email Service > Email Routing > Destination Addresses**. Destinations belong to the account, so this
+   works before the zone is active. Leave the aliases set up at Namecheap for now.
 4. Turn off anything that rewrites pages or `robots.txt`, because the CSP and the privacy page depend on the site
    being served unmodified: Rocket Loader, Email Address Obfuscation, Web Analytics automatic setup, and
    the managed `robots.txt` / AI bot blocking. Compare `https://<zone>/robots.txt` after cutover with `public/robots.txt`.
@@ -98,14 +99,21 @@ refetches and skips what it has), but that path has only been tested locally.
 
 The domain still points at Vercel afterwards, so this step moves DNS only.
 
-1. **stayput.dev has DNSSEC on** (a DS record is published). Turn it off at Namecheap and **wait at least 24 hours**
-   (the DS TTL, plus a margin) before changing nameservers. Doing it the other way round makes the domain fail to
-   resolve for every validating resolver.
+1. DNSSEC must be off first. It was turned off at Namecheap on 2026-11-01. Before changing nameservers, check that
+   `dig DS stayput.dev @9.9.9.9` and `@1.1.1.1` return nothing, and allow 24 hours from the change as a margin.
 2. A few hours before, lower the TTLs in the Namecheap panel if it allows it.
 3. In Namecheap, set Custom DNS to the two nameservers Cloudflare assigned.
-4. Wait for the zone to show **Active**. Check `dig NS stayput.dev`, that the site still loads with `server: Vercel`, and
-   that test mail arrives.
-5. Re-enable DNSSEC later, from Cloudflare, once everything has settled.
+4. Wait for the zone to show **Active**. Check `dig NS stayput.dev` and that the site still loads with `server: Vercel`.
+5. Move mail to Email Routing straight away, in one sitting:
+   1. Delete the five `eforward` MX records. Onboarding fails with error 2008 while they exist. Senders retry during
+      the short gap with no MX records.
+   2. Under **Email Routing**, select **Onboard Domain** and choose stayput.dev. Cloudflare adds its MX and DKIM records.
+   3. Replace the SPF TXT record with `v=spf1 include:_spf.mx.cloudflare.net ~all`. There must be only one SPF record,
+      and the Namecheap include is no longer needed once nothing routes through it.
+   4. Create a routing rule for every alias immediately. Mail to an address with no rule is rejected and not retried,
+      so add a catch-all rule if Namecheap had one.
+   5. Send a test message to each alias from an outside address, and check the replies work.
+6. Re-enable DNSSEC later, from Cloudflare, once everything has settled.
 
 ## 5. Point the domain at the Worker
 
@@ -117,7 +125,7 @@ This is the actual cutover.
    `100::` and add a **Redirect Rule**: hostname `www.stayput.dev` to `https://stayput.dev${path}`, 308, keep the query string.
 3. Check `curl -sI https://stayput.dev/ | grep -i server` says cloudflare, rerun the step 2 checks with
    `H=https://stayput.dev`, and rerun them in a browser.
-4. Check the edge cache, which can't be tested on workers.dev or locally. Request a big file twice from the same
+4. Check the edge cache on the real domain (it works on workers.dev). Request a big file twice from the same
    place: the second response should have `X-Stayput-Source: cache`. If it stays `r2`, the site still works but
    every read costs an R2 operation.
 
@@ -136,7 +144,8 @@ This is the actual cutover.
   Canonical tags still name the right URL. `_redirects` sources do get 308, with and without a trailing slash.
 - `.onnx` and `.tflite` files under 25 MiB have no `Content-Type` (Vercel sends `application/octet-stream`), because
   wrangler has no type for those extensions. The loaders read them with `fetch` and don't look at it.
-- A model under 25 MiB may not honour Range; `wrangler dev` doesn't. See step 2.
+- Models under 25 MiB ignore Range (confirmed on workers.dev): a ranged request gets 200 and the whole file. A dropped
+  download still finishes, because `model-fetch.ts` refetches and skips what it has, but it re-downloads those bytes.
 - Each edge location caches big files separately, so a location's first reader of a file comes from R2.
 - `run_worker_first` must match the big files in `dist/`. When a file crosses 25 MiB, or an
   onnxruntime-web upgrade changes the `/vendor/` path, CI fails until you run
