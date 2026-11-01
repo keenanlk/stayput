@@ -1,4 +1,4 @@
-import { NamedError, UnreadableFile } from './input-error';
+import { NamedError } from './input-error';
 /**
  * A file the browser could not read from disk (NotReadableError): on Android this is a big video, one the
  * phone moved or is still preparing, or a cloud file it let go of. It is the file or the phone, not the tool,
@@ -123,7 +123,7 @@ export function isFileGone(e: unknown): boolean {
 
 /**
  * Runs `job` on a picked file; if the browser says the file is gone (or could not be read), waits a moment and reads it once
- * more. A file that is still gone ends as UnreadableFile with a message that says to pick it again; any other failure comes
+ * more. A file that is still gone ends as UnreadableFileGone with a message that says to pick it again; any other failure comes
  * back as it was.
  */
 export async function rereadOnce<T>(job: () => Promise<T>, pause = 500): Promise<T> {
@@ -136,7 +136,7 @@ export async function rereadOnce<T>(job: () => Promise<T>, pause = 500): Promise
       return await job();
     } catch (again) {
       if (!isFileGone(again) && !isNotReadable(again)) throw again;
-      const out = new UnreadableFile('This file could not be read. It may have been moved, deleted or still be syncing from a cloud app. Pick it again, or save it to the phone first.');
+      const out = new NamedError('UnreadableFileGone', 'This file could not be read. It may have been moved, deleted or still be syncing from a cloud app. Pick it again, or save it to the phone first.');
       out.cause = again;
       throw out;
     }
