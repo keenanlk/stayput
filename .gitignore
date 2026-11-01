@@ -10,6 +10,8 @@ dist/
 !vendor-builds/libav-3gp/dist/
 .astro/
 .vercel/
+.wrangler/
+.dev.vars*
 test-results/
 playwright-report/
 tests/fixtures/generated/

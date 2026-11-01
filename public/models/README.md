@@ -121,8 +121,7 @@ vocal-remover loaders (`src/lib/model-fetch.ts`) compare a download, and a copy 
 before using it, so replacing a model means rebuilding (the manifest is committed, and `node
 scripts/model-manifest.mjs --check` fails when it is out of date).
 
-Hosting note: Cloudflare Pages allows 25 MiB per file
-(https://developers.cloudflare.com/pages/platform/limits/). The Whisper base decoder
-(`whisper-base/onnx/decoder_model_merged_quantized.onnx`, 53.7 MB), the vocal-remover model (66.8 MB) and
-several others are larger, so moving the site to Cloudflare Pages would break them. `public/_headers` only
-mirrors the cache headers in `vercel.json`; the models would have to be served from object storage or another host.
+Hosting note: Cloudflare allows 25 MiB per static asset. `scripts/cloudflare-assets.mjs` finds the files over that
+in `dist/` and they are served from R2 by the Worker in `worker/`, at these same URLs. A new file over the limit fails
+that script until `wrangler.jsonc` routes it (`node scripts/cloudflare-assets.mjs --write-config`). See
+`docs/cloudflare-cutover.md`.

@@ -13,6 +13,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "node scripts/model-manifest.mjs && astro build && node scripts/postbuild.mjs",
+    "build:cloudflare": "npm run build && node scripts/cloudflare-assets.mjs",
+    "cloudflare:upload": "node scripts/cloudflare-r2-upload.mjs",
     "check-links": "node scripts/check-links.mjs",
     "check-titles": "node scripts/check-titles.mjs",
     "live-caption-matrix": "node scripts/live-caption-matrix.mjs",
@@ -23,7 +25,6 @@
     "launch-assets": "node scripts/make-launch-samples.mjs && python3 scripts/make-launch-samples.py && node scripts/make-launch-assets.mjs && python3 scripts/make-launch-gif.py"
   },
   "dependencies": {
-    "7z-wasm": "1.2.0",
     "@astrojs/sitemap": "3.7.4",
     "@huggingface/transformers": "4.3.1",
     "@jsquash/avif": "2.1.1",
@@ -35,6 +36,7 @@
     "@noble/ciphers": "2.4.0",
     "@shiguredo/rnnoise-wasm": "2025.1.5",
     "@tesseract.js-data/eng": "1.0.0",
+    "7z-wasm": "1.2.0",
     "ag-psd": "31.0.3",
     "astro": "7.4.2",
     "fflate": "0.8.3",
@@ -64,7 +66,8 @@
     "@playwright/test": "1.64.1",
     "@types/node": "26.6.5",
     "@types/upng-js": "2.1.5",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "wrangler": "4.156.0"
   },
   "overrides": {
     "@huggingface/transformers": {

@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stayput",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-10-28",
+  // On for testing before cutover. Set workers_dev to false once stayput.dev points here, so the
+  // site does not also live at a second, indexable address. See docs/cloudflare-cutover.md.
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./dist/",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+    // Exactly the files in dist/ over the 25 MiB asset limit. scripts/cloudflare-assets.mjs fails
+    // when this drifts; its --write-config flag updates it.
+    "run_worker_first": [
+      "/models/isnet-general-use-int8w.onnx",
+      "/models/migan-pipeline-v2.onnx",
+      "/models/uvr-mdx-net-inst-hq-3.onnx",
+      "/models/whisper-base/onnx/decoder_model_merged_quantized.onnx",
+      "/models/whisper-base/onnx/encoder_model_fp16.onnx",
+      "/models/whisper-tiny/onnx/decoder_model_merged_quantized.onnx",
+      "/vendor/onnxruntime-web@1.30.0/ort-wasm-simd-threaded.asyncify.wasm",
+    ],
+  },
+  "r2_buckets": [
+    {
+      "binding": "ASSETS_BUCKET",
+      "bucket_name": "stayput-assets",
+    },
+  ],
+}
