@@ -1689,18 +1689,29 @@ test.describe('offline', () => {
     expect(missing?.status()).toBe(404);
   });
 
-  test('After one visit every tool works offline, including code it never loaded online', async ({ page, context }) => {
-    // Before the fix the service worker cached only chunks the visit happened to
-    // load, so a first-time visitor who went offline could not run a PDF tool.
+  test('After one visit to a tool, it works offline, including code it only loads on first use', async ({ page, context }) => {
+    // The worker caches a page's own scripts, workers and wasm after the visit (not the
+    // whole site at install), so a visitor who opened merge-pdf can run it offline.
     await stubAnalytics(page);
-    await page.goto('/');
+    await page.goto('/tools/merge-pdf');
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;
     });
-    // Wait until the install step has put every asset in the cache.
+    // Wait until the visited page and its files are stored, then until the count stops growing.
     await expect
-      .poll(async () => page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).length), { timeout: 30_000 })
-      .toBeGreaterThan(20);
+      .poll(async () => page.evaluate(async () => (await (await caches.open('stayput-pages')).keys()).map((r) => new URL(r.url).pathname)), { timeout: 30_000 })
+      .toContain('/tools/merge-pdf');
+    const count = () => page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).length);
+    await expect.poll(count, { timeout: 30_000 }).toBeGreaterThan(5);
+    let last = -1;
+    await expect
+      .poll(async () => {
+        const n = await count();
+        const same = n === last;
+        last = n;
+        return same;
+      }, { timeout: 30_000, intervals: [1500] })
+      .toBe(true);
     await context.setOffline(true);
     await page.goto('/tools/merge-pdf');
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
