@@ -51,6 +51,9 @@ async function burn(page: Page, video: string): Promise<{ text: string; side: nu
   return { text, side: Math.max(width, height), width, height };
 }
 
+/** Playwright's WebKit does not finish a 4K decode (see video-encoder.spec.ts); the 4K cases run on Chromium, the rest on both. */
+const needs4K = (browserName: string) => test.skip(browserName === 'webkit', "Playwright's WebKit does not finish a 4K decode");
+
 const again = async (page: Page) => {
   await page.locator('#clear').click();
 };
@@ -60,7 +63,8 @@ test.skip(({ browserName }) => browserName === 'webkit' && !!process.env.CI && p
 test.describe('iPhone', () => {
   test.use(iPhone);
 
-  test('a 4K source starts at 1080p, says so, and Try full size is there; pressing it gives full size next run', async ({ page }) => {
+  test('a 4K source starts at 1080p, says so, and Try full size is there; pressing it gives full size next run', async ({ page, browserName }) => {
+    needs4K(browserName);
     test.setTimeout(300_000);
     await open(page);
     const r = await burn(page, uhd);
@@ -83,7 +87,8 @@ test.describe('iPhone', () => {
     expect(r.text).not.toMatch(/made at|Try full size/);
   });
 
-  test('a portrait 4K clip with rotation metadata is capped by its shown longest side, not squashed', async ({ page }) => {
+  test('a portrait 4K clip with rotation metadata is capped by its shown longest side, not squashed', async ({ page, browserName }) => {
+    needs4K(browserName);
     test.setTimeout(300_000);
     await open(page);
     const r = await burn(page, uhdRotated);
@@ -133,7 +138,8 @@ test.describe('iPhone', () => {
 test.describe('Android', () => {
   test.use(pixel);
 
-  test('3 GB of memory or less: a 4K source starts at 720p and the note says 720p', async ({ page }) => {
+  test('3 GB of memory or less: a 4K source starts at 720p and the note says 720p', async ({ page, browserName }) => {
+    needs4K(browserName);
     test.setTimeout(300_000);
     await page.addInitScript(() => Object.defineProperty(navigator, 'deviceMemory', { value: 3, configurable: true }));
     await open(page);
@@ -143,7 +149,8 @@ test.describe('Android', () => {
     await expect(page.locator('#working-size-note button', { hasText: 'Try full size' })).toBeVisible();
   });
 
-  test('4 GB of memory: 1080p', async ({ page }) => {
+  test('4 GB of memory: 1080p', async ({ page, browserName }) => {
+    needs4K(browserName);
     test.setTimeout(300_000);
     await page.addInitScript(() => Object.defineProperty(navigator, 'deviceMemory', { value: 4, configurable: true }));
     await open(page);
@@ -153,7 +160,8 @@ test.describe('Android', () => {
   });
 });
 
-test('a computer keeps full size for a 4K source, with no note', async ({ page }) => {
+test('a computer keeps full size for a 4K source, with no note', async ({ page, browserName }) => {
+  needs4K(browserName);
   test.setTimeout(300_000);
   await open(page);
   const r = await burn(page, uhd);
@@ -162,7 +170,8 @@ test('a computer keeps full size for a 4K source, with no note', async ({ page }
   await expect(page.locator('#working-size-note')).toBeHidden();
 });
 
-test('on a phone, an encoder that fails at the capped size still steps down the ladder (1920, then 1280)', async ({ page }) => {
+test('on a phone, an encoder that fails at the capped size still steps down the ladder (1920, then 1280)', async ({ page, browserName }) => {
+  needs4K(browserName);
   test.setTimeout(300_000);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
