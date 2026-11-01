@@ -11,7 +11,9 @@ import { UnreadableFile, checkGif, explain, gifSize, MEMORY_BUDGET, GifTooLarge 
  * the tab.
  */
 
-const TOO_LARGE = 'Try a desktop browser, or merge fewer GIFs and run it again.';
+const TOO_LARGE = 'Merge fewer or shorter GIFs, or close other tabs and apps, then run it again.';
+/** The smallest share of the first GIF's size a merge is scaled down to; below this it is refused. */
+const MIN_SCALE = 0.2;
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 createShell({
@@ -37,8 +39,22 @@ createShell({
         throw explain(e, TOO_LARGE);
       }
     }
-    // Every frame of the result is held whole at the first GIF's size.
-    if (first.width * first.height * 4 * frames > MEMORY_BUDGET) throw new GifTooLarge(TOO_LARGE);
+    // Every frame of the result is held whole. When they would not fit at the first GIF's size,
+    // the result is made smaller (with a little room to spare) instead of refusing.
+    const needed = first.width * first.height * 4 * frames;
+    let width = first.width;
+    let height = first.height;
+    if (needed > MEMORY_BUDGET) {
+      const k = Math.floor(Math.sqrt((MEMORY_BUDGET / needed) * 0.95) * 100) / 100;
+      if (k < MIN_SCALE) throw new GifTooLarge(TOO_LARGE);
+      width = Math.max(1, Math.floor(first.width * k));
+      height = Math.max(1, Math.floor(first.height * k));
+      while (width * height * 4 * frames > MEMORY_BUDGET && width > 1 && height > 1) {
+        width--;
+        height--;
+      }
+    }
+    const scaled = width !== first.width || height !== first.height;
 
     const cover = $<HTMLSelectElement>('fit').value === 'cover';
     const transparent = $<HTMLInputElement>('transparent').checked;
@@ -46,7 +62,7 @@ createShell({
       level: 'light',
       scale: 1,
       keepEvery: 1,
-      box: { width: first.width, height: first.height, fit: cover ? 'cover' : 'contain' },
+      box: { width, height, fit: cover ? 'cover' : 'contain' },
       append: buffers.slice(1),
       fill: transparent ? undefined : $<HTMLInputElement>('bars').value || '#ffffff',
       force: true,
@@ -68,7 +84,7 @@ createShell({
       blob,
       originalSize: files.reduce((n, f) => n + f.file.size, 0),
       previewUrl,
-      note: `${r.width}×${r.height}, ${r.framesOut} frames`,
+      note: `${r.width}×${r.height}, ${r.framesOut} frames${scaled ? `, scaled down from ${first.width}×${first.height} to fit this device's memory` : ''}`,
     };
     return [out];
   },
