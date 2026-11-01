@@ -71,7 +71,7 @@ refetches and skips what it has), but that path has only been tested locally.
 ## 3. Add the zone (nothing changes yet)
 
 1. **Add a domain** in Cloudflare, choose stayput.dev, Free plan. Cloudflare scans the DNS.
-2. Compare every record with the Namecheap panel, not just with the scan. Public DNS showed these on 2026-11-01:
+2. Compare every record with the Namecheap panel, not just with the scan. These came from public DNS and the Namecheap panel on 2026-11-01:
 
    | Name | Type | Value | Note |
    | --- | --- | --- | --- |
@@ -80,12 +80,13 @@ refetches and skips what it has), but that path has only been tested locally.
    | `@` | MX | five `eforward` hosts, below | Mail, must not be proxied |
    | `@` | TXT | `v=spf1 include:spf.efwd.registrar-servers.com ~all` | Mail |
    | `@` | TXT | `google-site-verification=nu6sCzOSTOr6cHoXj831pIpgJaT6J7EfmuEajynrAAE` | Search Console |
+   | `_atproto` | TXT | `did=did:plc:3mqfqnkoa6y63rs4uuqcom6s` | Bluesky handle. Copy exactly |
+   | `_dmarc` | TXT | `v=DMARC1; p=reject; adkim=s; aspf=s` | Mail policy. Keep it |
 
    MX records: priority 10 `eforward1`, `eforward2`, `eforward3`; 15 `eforward4`; 20 `eforward5`, all
    `.registrar-servers.com`.
 
-   DNS can't be listed from outside, so this table is what was found, not proof nothing else exists. Subdomains in
-   particular (DKIM selectors, `_vercel` TXT verification) only show up in the Namecheap panel.
+   Namecheap doesn't show the MX records in its panel while Email Forwarding is on, so check they were copied.
 3. **Mail:** forwarding moves to Cloudflare Email Routing, because Namecheap's Email Forwarding belongs to its own DNS.
    Before step 4, write down every alias from Namecheap, and add and verify each destination address under
    **Compute > Email Service > Email Routing > Destination Addresses**. Destinations belong to the account, so this
