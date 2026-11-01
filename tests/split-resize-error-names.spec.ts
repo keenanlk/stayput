@@ -99,7 +99,8 @@ test.describe('on the page', () => {
 
   // The same through a browser API that really throws: the first VideoDecoder.configure is Conversion.init's, the second is the run's.
   for (const [step, n] of [['Init', 1], ['Execute', 2]] as const) {
-    test(`Video splitter: a plain Error from the decoder while ${step === 'Init' ? 'starting' : 'running'} the conversion records CutFailed${step}`, async ({ page }) => {
+    test(`Video splitter: a plain Error from the decoder while ${step === 'Init' ? 'starting' : 'running'} the conversion records CutFailed${step}`, async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'counts VideoDecoder.configure calls, which differ between engines');
       await open(page);
       await page.addInitScript((n) => {
         const real = VideoDecoder.prototype.configure;
@@ -113,7 +114,8 @@ test.describe('on the page', () => {
     });
   }
 
-  test('Video splitter: an error that already has a name keeps it through the cut', async ({ page }) => {
+  test('Video splitter: an error that already has a name keeps it through the cut', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'counts VideoDecoder.configure calls, which differ between engines');
     await open(page);
     await page.addInitScript(() => {
       const real = VideoDecoder.prototype.configure;
