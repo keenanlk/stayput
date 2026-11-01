@@ -256,7 +256,7 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   // A file that is not a video this page opens (3GP, AVI, WMV, a renamed file) is said so now, with the way on, not after the download.
   for (const v of videos) {
     await videoSize(v.file).catch((e) => {
-      if (!(e instanceof Error) || e.name !== 'UnreadableFile') return;
+      if (!(e instanceof Error) || !['UnreadableFile', 'NoVideoTrack', 'UnreadableContainer'].includes(e.name)) return;
       throw Object.assign(new UnreadableFile(`${v.file.name} is not a video this page can read (MP4, MOV, WebM or MKV). Make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
     });
   }

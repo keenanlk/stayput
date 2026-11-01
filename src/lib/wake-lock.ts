@@ -94,7 +94,7 @@ export function looksReclaimed(e: unknown): boolean {
 }
 
 /** Failures that say what the visitor gave or asked for, whatever the page was doing. */
-const NOT_INTERRUPTION = ['InputError', 'UnreadableFile', 'UnsupportedCodec', 'NoSpeechFound', 'AudioDecodeError', 'NoSoundTrack', 'UnsupportedSound', 'UnsupportedAudioCodec'];
+const NOT_INTERRUPTION = ['InputError', 'UnreadableFile', 'UnreadableFileGone', 'UnreadableContainer', 'NoVideoTrack', 'UnknownDuration', 'UnsupportedCodec', 'NoSpeechFound', 'AudioDecodeError', 'NoSoundTrack', 'UnsupportedSound', 'UnsupportedAudioCodec'];
 
 /** Errors that already say which codec, person finder or canvas the browser invalidated (codec-guard.ts): kept, unless the page was hidden, which is the better explanation. */
 const NAMED_CODEC_FAILURES = ['DecoderReclaimedError', 'EncoderReclaimedError', 'SegmenterInvalidError', 'CanvasInvalidError', 'CodecReclaimedError'];

@@ -33,7 +33,7 @@ import { executeWatched } from './encoder-watchdog';
 import { EncoderRefused, encodeRun, requireH264Encoder } from './encoder-probe';
 import { aacSafeSampleRate, codecsFor, planVideoCodec } from './video-codec';
 import { unplayable } from './video-compress';
-import { NamedError, UnreadableFile, UnsupportedCodec } from './input-error';
+import { NamedError, UnsupportedCodec } from './input-error';
 import { memoryRange, nameBare, cutFailed, type CutStep } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { pageRecoveryHooks } from './recovery-hooks';
@@ -71,7 +71,7 @@ const ENCODER_FAILURES = new Set(['EncodingError', 'OperationError', 'InvalidSta
 /**
  * Cuts the part. A failure that comes from the device and not the file (page hidden, encoder or memory gave up) gets one
  * more try (see edit-recovery.ts). Every failure leaves here with a name: NotReadableError for a file the phone could
- * not read, UnreadableFile or UnsupportedCodec for what the file is, CutFailed plus the step it stopped at (CutFailedOpenInput,
+ * not read, UnreadableContainer, NoVideoTrack or UnsupportedCodec for what the file is, CutFailed plus the step it stopped at (CutFailedOpenInput,
  * CutFailedKeyframe, CutFailedEncoderPlan, CutFailedInit, CutFailedExecute) for any other plain error.
  */
 export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResult> {
@@ -124,9 +124,9 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
       if (isNotReadable(e)) throw notReadable(e);
       return null;
     });
-    if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format) throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
-    if (!video) throw new UnreadableFile('This file has no video track.');
+    if (!video) throw new NamedError('NoVideoTrack', 'This file has no video track.');
     if (opts.exact && !(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     if (opts.exact) {
       at('EncoderPlan');
