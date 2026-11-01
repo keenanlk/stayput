@@ -60,7 +60,9 @@ test.describe('phone', () => {
     expect(await finderValue(page)).toBe('edges');
   });
 
-  test('progress is visible at once, moves, and never goes backwards; the wake lock is held from Run to the end', async ({ page }) => {
+  test('progress is visible at once, moves, and never goes backwards; the wake lock is held from Run to the end', async ({ page, browserName }) => {
+    // Linux WebKit in CI stalls decoding video in the page; macOS WebKit and Chromium cover this.
+    test.skip(browserName === 'webkit' && !!process.env.CI, 'CI WebKit cannot encode video');
     test.setTimeout(300_000);
     await page.addInitScript(() => {
       const log: string[] = [];
@@ -108,7 +110,8 @@ test.describe('phone', () => {
     await expect.poll(() => page.evaluate(() => (window as unknown as { __wl: string[] }).__wl.includes('release'))).toBe(true);
   });
 
-  test('Fast finding no one says so and suggests Better edges, and keeps the file downloadable', async ({ page }) => {
+  test('Fast finding no one says so and suggests Better edges, and keeps the file downloadable', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit' && !!process.env.CI, 'CI WebKit cannot encode video');
     test.setTimeout(240_000);
     await page.goto('/tools/video-background-remover');
     await ready(page);
