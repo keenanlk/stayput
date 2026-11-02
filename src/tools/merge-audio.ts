@@ -1,5 +1,6 @@
 import { createShell, str } from '../lib/shell';
 import type { OutputFile } from '../lib/files';
+import '../lib/mp3-warm';
 import { SAMPLE_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, formatDuration, type Bitrate } from '../lib/audio';
 import { joinParts, parseBetween } from '../lib/audio-merge';
 import { InputError, NamedError } from '../lib/input-error';

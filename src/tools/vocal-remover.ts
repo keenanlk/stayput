@@ -1,5 +1,6 @@
 import { createShell, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import '../lib/mp3-warm';
 import { SAMPLE_RATE, decodeAudio, encodeMp3, encodeWav, formatDuration } from '../lib/audio';
 import type { Reply, Request } from '../lib/vocals.worker';
 import { InputError, NamedError } from '../lib/input-error';

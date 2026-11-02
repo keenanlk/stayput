@@ -49,3 +49,27 @@ test('after one visit Trim audio writes MP3 offline', async ({ page, context }) 
   // An MP3 starts with an ID3 tag or an MPEG frame sync.
   expect(bytes[0] === 0x49 || (bytes[0] === 0xff && (bytes[1]! & 0xe0) === 0xe0)).toBe(true);
 });
+
+const MP3_WASM = /\/vendor\/wasm-media-encoders@[^/]+\/mp3\.wasm$/;
+const cachedPaths = (page: import('@playwright/test').Page) =>
+  page.evaluate(async () => (await (await caches.open('stayput-assets')).keys()).map((r) => new URL(r.url).pathname));
+
+for (const slug of ['trim-audio', 'audio-converter', 'video-to-mp3']) {
+  test(`${slug} caches the MP3 encoder after one visit`, async ({ page }) => {
+    await page.goto(`/tools/${slug}`);
+    await expect(page.locator('html')).toHaveAttribute('data-decoders', 'cached', { timeout: 60_000 });
+    expect((await cachedPaths(page)).some((p) => MP3_WASM.test(p))).toBe(true);
+  });
+}
+
+for (const slug of ['transcribe', 'bpm-key-finder', 'mp3-to-midi']) {
+  test(`${slug} does not fetch the MP3 encoder`, async ({ page }) => {
+    const fetched: string[] = [];
+    page.on('request', (r) => fetched.push(new URL(r.url()).pathname));
+    await page.goto(`/tools/${slug}`);
+    await expect(page.locator('html')).toHaveAttribute('data-decoders', /^(none|cached)$/, { timeout: 60_000 });
+    await page.waitForTimeout(2_000);
+    expect((await cachedPaths(page)).some((p) => MP3_WASM.test(p))).toBe(false);
+    expect(fetched.some((p) => MP3_WASM.test(p))).toBe(false);
+  });
+}
