@@ -2,7 +2,7 @@
  * One marker for "a run or a preview is going on in this tab". A tab the browser kills for memory (iOS), or discards
  * while hidden, runs no code on the way out, so the next page load finds the marker still there and records the loss.
  * A tab that is left normally runs `pagehide` first, which clears it and records that the visitor left.
- * Stored: the tool's slug, the phase and the time. Nothing about the file is stored or sent, and the marker never leaves the device.
+ * Stored: the tool's slug, the phase, the time and the input's total size (sent only as the existing size bucket). Nothing else about the file is stored or sent, and the marker never leaves the device.
  */
 import { trackToolRun } from './analytics';
 import { CAPTION_TOOLS, noteLostRun } from './working-size';
@@ -22,6 +22,8 @@ interface Marker {
   phase: Phase;
   t: number;
   hidden: boolean;
+  /** Size of the input, so the loss is recorded under the same `input` size bucket as the run's other outcomes. Stays on this device. */
+  bytes?: number;
 }
 
 const store = (): Storage | undefined => {
@@ -85,8 +87,8 @@ export function noteRunDetail(d: { mode?: string; fraction?: number }): void {
   detail = { mode: d.mode ?? detail?.mode, fraction: d.fraction ?? detail?.fraction ?? 0 };
 }
 
-function send(tool: string, errorClass: string, extra: { leftAfter?: string; leftAt?: string; mode?: string } = {}) {
-  trackToolRun({ tool, outcome: 'error', files: 1, inputBytes: 0, ms: 0, errorClass, ...extra });
+function send(tool: string, errorClass: string, extra: { leftAfter?: string; leftAt?: string; mode?: string } = {}, inputBytes = 0) {
+  trackToolRun({ tool, outcome: 'error', files: 1, inputBytes, ms: 0, errorClass, ...extra });
 }
 
 let current: { tool: string; phase: Phase } | undefined;
@@ -109,8 +111,8 @@ function wire() {
     const d = detail;
     remove();
     if (!m) return;
-    if (phase === 'run' && d) send(tool, 'LeftDuringRun', { leftAfter: leftAfterBucket(Date.now() - m.t), leftAt: leftAtBucket(d.fraction), ...(d.mode ? { mode: d.mode } : {}) });
-    else send(tool, phase === 'run' ? 'LeftDuringRun' : 'LeftDuringPreview');
+    if (phase === 'run' && d) send(tool, 'LeftDuringRun', { leftAfter: leftAfterBucket(Date.now() - m.t), leftAt: leftAtBucket(d.fraction), ...(d.mode ? { mode: d.mode } : {}) }, m.bytes);
+    else send(tool, phase === 'run' ? 'LeftDuringRun' : 'LeftDuringPreview', {}, m.bytes);
   });
 }
 
@@ -121,12 +123,12 @@ function wire() {
 export const PREVIEW_MARK_DELAY_MS = 1500;
 
 /** Marks a run or preview as started. Call the returned function when it ends, however it ends. */
-export function markInflight(tool: string, phase: Phase): () => void {
+export function markInflight(tool: string, phase: Phase, bytes?: number): () => void {
   wire();
   const mine = { tool, phase };
   current = mine;
   detail = undefined;
-  const put = () => current === mine && write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden });
+  const put = () => current === mine && write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden, ...(bytes && bytes > 0 ? { bytes } : {}) });
   const timer = phase === 'preview' ? setTimeout(put, PREVIEW_MARK_DELAY_MS) : undefined;
   if (!timer) put();
   return () => {
@@ -147,5 +149,5 @@ export function reportLostTab(): void {
   const cls = m.hidden ? 'TabLostWhileHidden' : m.phase === 'run' ? 'TabLostDuringRun' : 'TabLostDuringPreview';
   // A caption run the browser closed: the redraw starts smaller in this tab (see capAtRisk). Kept as a flag in this tab; nothing more is sent.
   if (cls === 'TabLostDuringRun' && CAPTION_TOOLS.includes(m.tool)) noteLostRun();
-  send(m.tool, cls);
+  send(m.tool, cls, {}, typeof m.bytes === 'number' ? m.bytes : 0);
 }
