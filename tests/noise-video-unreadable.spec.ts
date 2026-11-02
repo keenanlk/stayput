@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { SNAPSHOT_LIMIT, isNotReadable, notReadable, probeReadable, retryUnreadable, snapshotFile } from '../src/lib/read-failure';
+import { SNAPSHOT_LIMIT, unlessReadFailure, isNotReadable, notReadable, probeReadable, retryUnreadable, snapshotFile } from '../src/lib/read-failure';
 
 // Remove background noise from a video on a phone whose browser fails to read the file part way through (Android
 // Chrome says NotReadableError). The read is forced to fail in the page once the noise removal has started: once,
@@ -74,6 +74,13 @@ test.describe('read-failure rules', () => {
     const gone = new Blob(['abc']);
     gone.slice = () => ({ arrayBuffer: () => Promise.reject(named('NotReadableError')) }) as unknown as Blob;
     await expect(probeReadable(gone)).rejects.toMatchObject({ name: 'NotReadableError' });
+  });
+
+  test('a track probe that runs out of memory is OutOfMemoryError, not "no video"; other failures still mean no track', () => {
+    const oom = new RangeError('Array buffer allocation failed');
+    expect(() => unlessReadFailure(oom)).toThrow(expect.objectContaining({ name: 'OutOfMemoryError', cause: oom }));
+    expect(() => unlessReadFailure(named('NotReadableError'))).toThrow(expect.objectContaining({ name: 'NotReadableError' }));
+    expect(unlessReadFailure(new Error('Invalid or unsupported file'))).toBeNull();
   });
 });
 

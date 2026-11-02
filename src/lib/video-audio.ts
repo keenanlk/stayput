@@ -28,9 +28,8 @@ import {
 import { CODEC_NAMES } from './video-compress';
 import { SAMPLE_RATE, decodePcm, decodePcmSliced, pcmFeeder, stereo } from './pcm';
 import { openOpfsOutput } from './opfs-output';
-import { SNAPSHOT_LIMIT } from './read-failure';
+import { SNAPSHOT_LIMIT, unlessReadFailure } from './read-failure';
 import { NoAudioEncoder, registerMp3Fallback } from './mp3-fallback';
-import { isNotReadable } from './read-failure';
 
 export interface AddAudioOptions {
   /** Replace the video's sound, or play both together. */
@@ -58,11 +57,8 @@ const FADE = 1.5;
 const MIX_LEVEL = 0.5;
 
 /** True when the file holds a picture Mediabunny can read. */
-/** A failure to read the file stays that; any other failure to find a track means there is none. */
-function unlessUnreadable(e: unknown): null {
-  if (isNotReadable(e)) throw e;
-  return null;
-}
+/** A failure to read the file (or to find memory for the read) stays that; any other failure to find a track means there is none. */
+const unlessUnreadable = unlessReadFailure;
 
 export async function hasVideo(file: File): Promise<boolean> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
