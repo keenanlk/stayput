@@ -1,5 +1,6 @@
 import { bool, createShell, num, radio, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
+import '../lib/mp3-warm';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../lib/audio';
 import { cutChannels, peaks } from '../lib/audio-trim';
 import { NamedError, InputError } from '../lib/input-error';
