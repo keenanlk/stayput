@@ -37,6 +37,7 @@ import { NamedError, UnsupportedCodec } from './input-error';
 import { memoryRange, nameBare, cutFailed, type CutStep } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { pageRecoveryHooks } from './recovery-hooks';
+import { openOpfsOutput, type OpfsOutput } from './opfs-output';
 import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
@@ -78,12 +79,14 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
   let step: CutStep = 'OpenInput';
+  // Cleared when the device cannot hold the temporary file (no room left): the part is then made in memory, as before.
+  let toDisk = true;
   try {
     return await withRecovery(
       async (attempt) => {
         const done = encodeRun(attempt);
         try {
-          const r = await trimOnce(file, opts, attempt, (side) => (made = side), false, (at) => testFault((step = at)));
+          const r = await withInitRetry(() => step, () => withMemoryFallback(() => toDisk, () => (toDisk = false), (disk) => trimOnce(file, opts, attempt, (side) => (made = side), false, (at) => testFault((step = at)), disk)));
           const retry = retryOf(attempt);
           return retry ? { ...r, retry } : r;
         } catch (e) {
@@ -93,7 +96,7 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
           const name = (e as { name?: string } | null)?.name ?? '';
           if (!opts.exact && !attempt.capped && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
             try {
-              return { ...(await trimOnce(file, opts, attempt, (side) => (made = side), true, (at) => testFault((step = at)))), keyframeCopy: true };
+              return { ...(await withMemoryFallback(() => toDisk, () => (toDisk = false), (disk) => trimOnce(file, opts, attempt, (side) => (made = side), true, (at) => testFault((step = at)), disk))), keyframeCopy: true };
             } catch (again) {
               throw isNotReadable(again) ? notReadable(again) : cutFailed(step, memoryRange(again));
             }
@@ -111,12 +114,56 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
   }
 }
 
-/** Test hook: a spec sets `__stayputCutFault` to a step's name to make that step fail with a bare error (TypeError). */
-function testFault(step: CutStep) {
-  if ((globalThis as { __stayputCutFault?: string }).__stayputCutFault === step) throw new TypeError('forced');
+/**
+ * A bare error while the converter is set up (CutFailedInit) is a codec or memory hiccup more often than a bad file:
+ * the cut starts over once, on a fresh reader, before it counts as failed. Named errors (what the file is) are not retried.
+ */
+async function withInitRetry<T>(stepNow: () => CutStep, run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (e) {
+    const bare = !(e instanceof NamedError) && !isNotReadable(e) && !(e as { name?: string } | null)?.name?.match(/^(Encod|Operation|Invalid|NotSupported|Unsupported|Cut|Out)/);
+    if (stepNow() !== 'Init' || !bare) throw e;
+    await new Promise((r) => setTimeout(r, 400));
+    return run();
+  }
 }
 
-async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false, at: (step: CutStep) => void = () => {}): Promise<TrimResult> {
+/** Runs a cut writing to disk; when the device has no room for the file (OutputWriteError), runs it again writing to memory. */
+async function withMemoryFallback<T>(onDisk: () => boolean, stopDisk: () => void, run: (toDisk: boolean) => Promise<T>): Promise<T> {
+  try {
+    return await run(onDisk());
+  } catch (e) {
+    if (!onDisk() || (e as { name?: string } | null)?.name !== 'OutputWriteError') throw e;
+    stopDisk();
+    return run(false);
+  }
+}
+
+/** Test hook: a spec sets `__stayputCutFault` to a step's name to make that step fail with a bare error (TypeError); with `__stayputCutFaultOnce` it fails only the first time. */
+function testFault(step: CutStep) {
+  const g = globalThis as { __stayputCutFault?: string; __stayputCutFaultOnce?: boolean };
+  if (g.__stayputCutFault !== step) return;
+  if (g.__stayputCutFaultOnce) g.__stayputCutFault = undefined;
+  throw new TypeError('forced');
+}
+
+/**
+ * One try at the cut. The part is written to a temporary file on this device where the browser allows it (the tab then
+ * holds a chunk, not the part: a 1 GB video cut in two used to hold two 500 MB buffers and then copy each into a Blob),
+ * and to memory otherwise. A failed try deletes its file.
+ */
+async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes = false, at: (step: CutStep) => void = () => {}, toDisk = true): Promise<TrimResult> {
+  const disk = toDisk ? await openOpfsOutput(file.size) : undefined;
+  try {
+    return await cutOnce(file, opts, attempt, sized, keyframes, at, disk);
+  } catch (e) {
+    await disk?.abort();
+    throw e;
+  }
+}
+
+async function cutOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (longestSide: number) => void, keyframes: boolean, at: (step: CutStep) => void, disk: OpfsOutput | undefined): Promise<TrimResult> {
   at('OpenInput');
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
@@ -133,9 +180,10 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
       await requireH264Encoder();
       at('OpenInput');
     }
+    const fastStart = disk ? false : 'in-memory';
     const outFormat =
-      format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
-    const output = new Output({ format: outFormat, target: new BufferTarget() });
+      format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart }) : new Mp4OutputFormat({ fastStart });
+    const output = new Output({ format: outFormat, target: disk ? disk.target : new BufferTarget() });
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     const audioRate = opts.exact && !opts.mute ? await aacSafeSampleRate(sound) : undefined;
     // Sound the container holds and a browser encoder can write (PCM is not one: Mediabunny writes it without WebCodecs).
@@ -225,10 +273,15 @@ async function trimOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: 
     } else {
       await executeWatched(conversion, opts.onProgress);
     }
-    const buffer = output.target.buffer;
-    if (!buffer) throw new NamedError('OutputNotWritten', 'The video could not be written.');
+    let blob: Blob;
+    if (disk) blob = await disk.finish(outFormat.mimeType);
+    else {
+      const buffer = (output.target as BufferTarget).buffer;
+      if (!buffer) throw new NamedError('OutputNotWritten', 'The video could not be written.');
+      blob = new Blob([buffer], { type: outFormat.mimeType });
+    }
     return {
-      blob: new Blob([buffer], { type: outFormat.mimeType }),
+      blob,
       ext: outFormat.fileExtension.replace(/^\./, ''),
       duration: opts.end - opts.start,
       ...(smaller < 1 ? { width: evenSide(video.displayWidth), height: evenSide(video.displayHeight) } : {}),

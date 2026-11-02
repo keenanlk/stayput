@@ -53,6 +53,23 @@ async function rereading<T>(file: Blob, job: () => Promise<T>, onNotice?: (messa
   return job();
 }
 
+/** The cutting code, loaded on first use. Two more tries after a failure; a load that still fails is CutToolLoadFailed. */
+async function loadCutTool(onRetry: () => void): Promise<typeof import('../lib/video-trim')> {
+  let last: unknown;
+  for (const pause of [0, 800, 2000]) {
+    if (pause) {
+      onRetry();
+      await new Promise((r) => setTimeout(r, pause));
+    }
+    try {
+      return await import('../lib/video-trim');
+    } catch (e) {
+      last = e;
+    }
+  }
+  throw nameBare('CutToolLoadFailed', last);
+}
+
 const clock = (s: number) => {
   const m = Math.floor(s / 60);
   const sec = s - m * 60;
@@ -188,9 +205,8 @@ const shell = createShell({
     }
     const exact = bool('exact');
     // The cutting code loads on first use: a connection that drops here fails the import with a bare TypeError ("Failed to fetch dynamically imported module").
-    const { trimVideo } = await import('../lib/video-trim').catch((e) => {
-      throw nameBare('CutToolLoadFailed', e);
-    });
+    // A dropped connection or a busy phone fails it once and not twice, so it is asked for again (after 0.8 s, then 2 s) before the run fails.
+    const { trimVideo } = await loadCutTool(() => progress.set('The cutting code could not load. Trying again.', 0));
     const outs: OutputFile[] = [];
     for (const [i, part] of parts.entries()) {
       const label = `Part ${i + 1} of ${parts.length}`;

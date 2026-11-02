@@ -305,7 +305,7 @@ export function createShell(opts: ShellOptions) {
    * unhandled rejection; now it is shown where the result would be.
    */
   async function filesChanged() {
-    const done = markInflight(root.dataset.slug ?? 'unknown', 'preview');
+    const done = markInflight(root.dataset.slug ?? 'unknown', 'preview', files.reduce((n, f) => n + f.file.size, 0));
     try {
       // A file the intake check refused is not handed to the tool: trim-video, for one, would feed a WMV to its <video>, and
       // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
@@ -663,7 +663,7 @@ export function createShell(opts: ShellOptions) {
     const tool = root.dataset.slug ?? 'unknown';
     const mine = (guard = opts.keepAwake ? guardRun() : undefined);
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
-    const clearMarker = markInflight(tool, 'run');
+    const clearMarker = markInflight(tool, 'run', inputBytes);
     try {
       const result = await resumeIfHidden(
         () => (watching ? watchProgress((tick) => opts.process(files, watchedProgress(tick)), () => undefined) : opts.process(files, progressApi)),
@@ -837,7 +837,7 @@ export function createShell(opts: ShellOptions) {
     previewFailed,
     recordError,
     /** Mark work outside Run as in flight (see inflight.ts); call the returned function when it ends. */
-    inflight: (phase: 'run' | 'preview') => markInflight(root.dataset.slug ?? 'unknown', phase),
+    inflight: (phase: 'run' | 'preview') => markInflight(root.dataset.slug ?? 'unknown', phase, files.reduce((n, f) => n + f.file.size, 0)),
     hideError,
     setHint,
     /** Re-check opts.runBlocker after something it depends on changed (a file's kind became known). */
