@@ -165,6 +165,7 @@ test('leaving the page during a run records LeftDuringRun', async ({ page }) => 
   });
   await page.goto('/tools/split-image');
   await ready(page);
+  await expect.poll(() => page.evaluate(() => !!(window as unknown as { umami?: unknown }).umami)).toBe(true);
   await drop(page, stat('frenchie.jpg'));
   await expect(page.locator('#run')).toBeEnabled();
   await page.evaluate(() => ((window as unknown as { __hang?: boolean }).__hang = true));

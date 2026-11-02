@@ -99,12 +99,12 @@ test.describe('image-to-word', () => {
     expect((await toolRuns(page))[0]).toMatchObject({ outcome: 'ok' });
   });
 
-  test('a file that stays gone records UnreadableFile and says to pick it again', async ({ page }) => {
+  test('a file that stays gone records UnreadableFileGone and says to pick it again', async ({ page }) => {
     test.setTimeout(120_000);
     const go = await open(page, '/tools/image-to-word', [fx('ocr-note.png')]);
     await page.addInitScript(gone, 1000);
     await go();
-    await failedWith(page, 'UnreadableFile');
+    await failedWith(page, 'UnreadableFileGone');
     await expect(page.locator('#error')).toContainText('Pick it again');
   });
 });

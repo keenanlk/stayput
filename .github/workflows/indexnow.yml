@@ -1,9 +1,9 @@
 name: IndexNow
 
-# After Vercel finishes a production deploy, tell Bing and other IndexNow
-# engines to recrawl the site. Skipped when the deploy changed no site files.
+# After a production deploy (the deploy-production job in ci.yml calls this), tell Bing and
+# other IndexNow engines to recrawl the site. Skipped when the deploy changed no site files.
 on:
-  deployment_status:
+  workflow_call:
   workflow_dispatch:
     inputs:
       all:
@@ -21,7 +21,6 @@ on:
 
 jobs:
   ping:
-    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

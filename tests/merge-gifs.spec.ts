@@ -238,3 +238,37 @@ test('Merge GIFs asks for two GIFs and refuses a file that is not a GIF', async 
   await page.locator('#run').click();
   await expect(page.locator('#error')).toContainText('This file is not a GIF.');
 });
+
+test('Merge GIFs scales the result down to fit memory instead of refusing', async ({ page }) => {
+  test.setTimeout(240_000);
+  await open(page);
+  // Two 4000 by 4000 GIFs of 9 frames each: 18 whole frames is about 1.07 GiB, over the 1 GiB budget.
+  const { GIFEncoder } = ((m: any) => m.default ?? m)(await import('gifenc'));
+  const big = (name: string, colour: number[]) => {
+    const w = 4000;
+    const enc = GIFEncoder();
+    const index = new Uint8Array(w * w);
+    for (let i = 0; i < 9; i++) {
+      // A black block that moves each frame, so no two frames are alike.
+      index.fill(0);
+      for (let y = 3000; y < 3200; y++) index.fill(1, y * w + i * 400, y * w + i * 400 + 200);
+      enc.writeFrame(index, w, w, { palette: [colour, [0, 0, 0]], delay: 100, repeat: 0 });
+    }
+    enc.finish();
+    const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), name);
+    writeFileSync(file, enc.bytes());
+    return file;
+  };
+  await addFiles(page, [big('a.gif', [220, 30, 30]), big('b.gif', [30, 40, 220])]);
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
+  const out = await readGif(await merge(page, downloads));
+  expect(out.frames).toHaveLength(18);
+  expect(out.size[0]! * out.size[1]! * 4 * 18).toBeLessThanOrEqual(2 ** 30);
+  expect(out.size[0]).toBeLessThan(4000);
+  expect(out.size[0]! / out.size[1]!).toBeCloseTo(1, 1);
+  near(at(out, 0, 100, 100), RED);
+  near(at(out, 17, 100, 100), BLUE);
+  await expect(page.locator('#results')).toContainText('scaled down from 4000×4000');
+  await expect(page.locator('#error')).toBeHidden();
+});

@@ -122,7 +122,9 @@ test.describe('output size', () => {
     await page.locator(`input[name="size"][value="${size}"]`).evaluate((el) => (el as HTMLInputElement).click());
     await page.locator('#run').click();
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 200_000 });
-    await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+    // These clips have no person, so Fast says so (and keeps the file); any other error is a failure.
+    const error = (await page.locator('#error').textContent()) ?? '';
+    if (await page.locator('#error').evaluate((el) => el.classList.contains('is-active'))) expect(error).toContain('Fast person finder found no one');
     return (await page.locator('#results-list').textContent()) ?? '';
   }
 

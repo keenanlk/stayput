@@ -30,7 +30,7 @@ import { CODEC_NAMES, unplayable } from './video-compress';
 import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, encodeRun, hasVideoEncoder } from './encoder-probe';
 import { codecsFor, planVideoCodec } from './video-codec';
-import { UnreadableFile, UnsupportedCodec, NamedError } from './input-error';
+import { UnsupportedCodec, NamedError } from './input-error';
 import { probeDecode } from './decode-probe';
 import { isNotReadable, notReadable, retryUnreadable } from './read-failure';
 import { nameBare } from './bare-error';
@@ -160,12 +160,28 @@ export function shownSize(video: InputVideoTrack): { width: number; height: numb
   return { width: video.displayWidth, height: video.displayHeight };
 }
 
+/** About how many frames a video has (duration times the frame rate from its first packets); undefined when it cannot be told. */
+export async function frameEstimate(file: File): Promise<number | undefined> {
+  const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
+  try {
+    const video = await input.getPrimaryVideoTrack();
+    if (!video) return undefined;
+    const [duration, stats] = await Promise.all([input.computeDuration(), video.computePacketStats(120).catch(() => null)]);
+    const rate = stats?.averagePacketRate;
+    return rate && rate > 0 && duration > 0 ? Math.max(1, Math.round(duration * rate)) : undefined;
+  } catch {
+    return undefined;
+  } finally {
+    input.dispose?.();
+  }
+}
+
 /** Size of the picture as it is shown (rotation metadata applied), before any edit. */
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await input.getPrimaryVideoTrack().catch(readOrNull);
-    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    if (!video) throw new NamedError('NoVideoTrack', 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
     try {
       return { ...shownSize(video), duration: await input.computeDuration() };
     } catch (e) {
@@ -261,9 +277,9 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch(readOrNull);
-    if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format) throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const video = await input.getPrimaryVideoTrack();
-    if (!video) throw new UnreadableFile('This file has no video track.');
+    if (!video) throw new NamedError('NoVideoTrack', 'This file has no video track.');
     const duration = await input.computeDuration();
     const sound = await input.getPrimaryAudioTrack();
 

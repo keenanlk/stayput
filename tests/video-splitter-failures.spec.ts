@@ -209,13 +209,13 @@ test.describe('on the page', () => {
     });
   }
 
-  test('a file that is not a video is refused as UnreadableFile', async ({ page }) => {
+  test('a file that is not a video is refused as UnreadableContainer', async ({ page }) => {
     await open(page);
     await load(page, fx('../../../package.json'));
     await expect(page.locator('#error')).toContainText('not a video this page can read');
     await page.locator('#run').click();
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-    expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'UnreadableFile' });
+    expect(await lastRun(page)).toMatchObject({ outcome: 'error', error_class: 'UnreadableContainer' });
   });
 
   test('Run waits for a good cut list and comes back for a good one', async ({ page }) => {

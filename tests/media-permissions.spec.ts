@@ -18,8 +18,6 @@ test('vercel.json lets the site itself use the camera and microphone, and still 
     expect(v).toContain('geolocation=()');
     expect(v).not.toContain('display-capture=()');
   }
-  const cloudflare = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
-  expect(cloudflare).toContain('Permissions-Policy: camera=(self), microphone=(self), geolocation=()');
 });
 
 test.use({

@@ -5,7 +5,7 @@
  */
 import { parseTimes, SplitError } from './audio-split';
 import { baseName } from './files';
-import { NamedError, UnreadableFile } from './input-error';
+import { NamedError } from './input-error';
 import { nameBare } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 
@@ -120,17 +120,17 @@ export async function readDuration(file: File): Promise<number> {
       if (isNotReadable(e)) throw notReadable(e);
       return null;
     });
-    if (!format) throw new UnreadableFile('This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format) throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
     const track = await input.getPrimaryVideoTrack().catch((e) => {
       if (isNotReadable(e)) throw notReadable(e);
       throw nameBare('VideoReadFailed', e);
     });
-    if (!track) throw new UnreadableFile('This file has no video track.');
+    if (!track) throw new NamedError('NoVideoTrack', 'This file has no video track.');
     const seconds = await input.computeDuration().catch((e) => {
       if (isNotReadable(e)) throw notReadable(e);
       throw nameBare('VideoReadFailed', e);
     });
-    if (!Number.isFinite(seconds) || seconds <= 0) throw new UnreadableFile('Could not tell how long this video is.');
+    if (!Number.isFinite(seconds) || seconds <= 0) throw new NamedError('UnknownDuration', 'Could not tell how long this video is.');
     return seconds;
   } finally {
     input.dispose?.();
