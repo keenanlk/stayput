@@ -3,7 +3,7 @@
   {
    "id": "transformers",
    "name": "Transformers.js",
-   "version": "4.3.1",
+   "version": "4.3.2",
    "npm": "@huggingface/transformers",
    "licences": [
     {
@@ -12,7 +12,7 @@
     }
    ],
    "project": "https://github.com/huggingface/transformers.js",
-   "source": "https://github.com/huggingface/transformers.js/tree/4.3.1",
+   "source": "https://github.com/huggingface/transformers.js/tree/4.3.2",
    "shipped": "Bundled into the site JavaScript (speech to text)",
    "kind": "library"
   },
@@ -53,7 +53,7 @@
   {
    "id": "ort-web",
    "name": "ONNX Runtime Web",
-   "version": "1.30.0",
+   "version": "1.31.1",
    "npm": "onnxruntime-web",
    "licences": [
     {
@@ -62,14 +62,14 @@
     }
    ],
    "project": "https://github.com/microsoft/onnxruntime",
-   "source": "https://github.com/microsoft/onnxruntime/tree/v1.30.0",
-   "shipped": "JavaScript bundled into the site; WebAssembly files served from /vendor/onnxruntime-web@1.30.0/ (background remover, upscaler, object remover, speech to text, vocal remover, MP3 to MIDI)",
+   "source": "https://github.com/microsoft/onnxruntime/tree/v1.31.1",
+   "shipped": "JavaScript bundled into the site; WebAssembly files served from /vendor/onnxruntime-web@1.31.1/ (background remover, upscaler, object remover, speech to text, vocal remover, MP3 to MIDI)",
    "kind": "library"
   },
   {
    "id": "ort-common",
    "name": "onnxruntime-common",
-   "version": "1.30.0",
+   "version": "1.31.1",
    "npm": null,
    "licences": [
     {
@@ -78,7 +78,7 @@
     }
    ],
    "project": "https://github.com/microsoft/onnxruntime/tree/main/js/common",
-   "source": "https://github.com/microsoft/onnxruntime/tree/v1.30.0/js/common",
+   "source": "https://github.com/microsoft/onnxruntime/tree/v1.31.1/js/common",
    "shipped": "Inside ONNX Runtime Web",
    "kind": "library",
    "via": "ort-web"
@@ -151,7 +151,7 @@
   {
    "id": "mediapipe",
    "name": "MediaPipe Tasks Vision",
-   "version": "1.1.1",
+   "version": "1.2.0",
    "npm": "@mediapipe/tasks-vision",
    "licences": [
     {
@@ -160,10 +160,10 @@
     }
    ],
    "project": "https://ai.google.dev/edge/mediapipe",
-   "source": "https://www.npmjs.com/package/@mediapipe/tasks-vision/v/1.1.1",
-   "shipped": "JavaScript bundled into the site; WebAssembly served from /vendor/mediapipe-tasks-vision@1.1.1/ (face blur, video background removal)",
+   "source": "https://www.npmjs.com/package/@mediapipe/tasks-vision/v/1.2.0",
+   "shipped": "JavaScript bundled into the site; WebAssembly served from /vendor/mediapipe-tasks-vision@1.2.0/ (face blur, video background removal)",
    "kind": "library",
-   "note": "The npm package is the exact source we link; upstream does not publish a Git tag for 1.1.1 (the nearest is v1.0.0 at https://github.com/google-ai-edge/mediapipe/tree/v1.0.0)."
+   "note": "The npm package is the exact source we link; upstream does not publish a Git tag for 1.2.0 (the nearest is v1.0.0 at https://github.com/google-ai-edge/mediapipe/tree/v1.0.0)."
   },
   {
    "id": "qpdf-wasm",
@@ -403,7 +403,7 @@
   {
    "id": "heic-to",
    "name": "heic-to",
-   "version": "1.6.6",
+   "version": "1.6.7",
    "npm": "heic-to",
    "licences": [
     {
@@ -412,12 +412,12 @@
     }
    ],
    "project": "https://github.com/hoppergee/heic-to",
-   "source": "https://github.com/hoppergee/heic-to/tree/v1.6.6",
-   "shipped": "Served as a separate file, /vendor/heic-to@1.6.6/heic-to.min.js, loaded only by tools that open HEIC photos. It contains libheif and libde265 compiled to WebAssembly.",
+   "source": "https://github.com/hoppergee/heic-to/tree/v1.6.7",
+   "shipped": "Served as a separate file, /vendor/heic-to@1.6.7/heic-to.min.js, loaded only by tools that open HEIC photos. It contains libheif and libde265 compiled to WebAssembly.",
    "kind": "library",
    "copyleft": "lgpl",
    "copyright": "Hopper Gee (author of heic-to; its LICENSE has no separate copyright line)",
-   "replace": "/vendor/heic-to@1.6.6/heic-to.min.js"
+   "replace": "/vendor/heic-to@1.6.7/heic-to.min.js"
   },
   {
    "id": "imagetracerjs",
@@ -500,7 +500,7 @@
   {
    "id": "mediabunny",
    "name": "Mediabunny",
-   "version": "1.61.0",
+   "version": "1.64.0",
    "npm": "mediabunny",
    "licences": [
     {
@@ -509,7 +509,7 @@
     }
    ],
    "project": "https://mediabunny.dev",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.64.0",
    "shipped": "Bundled into the site JavaScript (video and audio tools)",
    "kind": "library",
    "copyleft": "mpl",
@@ -518,7 +518,7 @@
   {
    "id": "mediabunny-ac3",
    "name": "Mediabunny AC-3 extension",
-   "version": "1.61.0",
+   "version": "1.64.0",
    "npm": "@mediabunny/ac3",
    "licences": [
     {
@@ -527,7 +527,7 @@
     }
    ],
    "project": "https://mediabunny.dev/guide/extensions/ac3",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.64.0",
    "shipped": "A separate script the page fetches only when a sound in Dolby Digital (AC-3) or Dolby Digital Plus (E-AC-3) is read (audio and caption tools)",
    "kind": "library",
    "copyleft": "mpl",
@@ -728,7 +728,7 @@
   {
    "id": "pdfmake",
    "name": "pdfmake",
-   "version": "0.3.12",
+   "version": "0.3.13",
    "npm": "pdfmake",
    "licences": [
     {
@@ -737,7 +737,7 @@
     }
    ],
    "project": "https://pdfmake.github.io/docs/",
-   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.12",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.13",
    "shipped": "Bundled into the site JavaScript (EPUB to PDF)",
    "kind": "library",
    "copyright": "Copyright (c) 2014-2015 bpampuch, 2016-2026 liborm85"
@@ -1258,12 +1258,12 @@
    ],
    "project": "https://github.com/strukturag/libheif",
    "source": "https://github.com/strukturag/libheif/tree/v1.23.5",
-   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.6/heic-to.min.js",
+   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.7/heic-to.min.js",
    "kind": "wasm",
    "via": "heic-to",
    "copyleft": "lgpl",
    "copyright": "Copyright (c) 2017-2025 Dirk Farin and the libheif contributors",
-   "replace": "/vendor/heic-to@1.6.6/heic-to.min.js"
+   "replace": "/vendor/heic-to@1.6.7/heic-to.min.js"
   },
   {
    "id": "libde265",
@@ -1278,12 +1278,12 @@
    ],
    "project": "https://github.com/strukturag/libde265",
    "source": "https://github.com/strukturag/libde265/tree/v1.0.16",
-   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.6/heic-to.min.js",
+   "shipped": "Compiled to WebAssembly inside /vendor/heic-to@1.6.7/heic-to.min.js",
    "kind": "wasm",
    "via": "heic-to",
    "copyleft": "lgpl",
    "copyright": "Copyright (c) 2013-2014 struktur AG, Dirk Farin",
-   "replace": "/vendor/heic-to@1.6.6/heic-to.min.js"
+   "replace": "/vendor/heic-to@1.6.7/heic-to.min.js"
   },
   {
    "id": "lame",
@@ -1858,7 +1858,7 @@
   {
    "id": "mediapipe-wasm",
    "name": "MediaPipe runtime (TensorFlow Lite, XNNPACK, ruy, OpenCV, libpng, libjpeg)",
-   "version": "as pinned by MediaPipe tasks-vision 1.1.1",
+   "version": "as pinned by MediaPipe tasks-vision 1.2.0",
    "npm": null,
    "licences": [
     {
