@@ -7,6 +7,7 @@ site will render this file.
 ## Unreleased
 
 ### Added
+- An "As seen on Open Source Alternatives" badge in the README and the site footer, linking to opensourcealternatives.to. The site serves its own copy of the badge, so it adds no outside request and the CSP is unchanged.
 - PDF to SVG: converts each page of a PDF to an SVG in the tab, with vector shapes, gradients and transparency, text drawn from the embedded fonts plus a selectable text layer, and pictures embedded. Several pages come as a zip. A page that uses blend modes, soft masks, tiling patterns, mesh gradients or Type 3 fonts is saved as a picture inside the SVG, with a note saying why.
 - JPG to AVIF and PNG to AVIF: new converter pages. AVIF output uses the browser's own encoder where it has one (Safari's engine does) and otherwise the jSquash AVIF encoder (Apache-2.0, libavif and libaom compiled to WebAssembly), which loads only when you convert and can be cancelled. Quality 1 to 100, a faster-encode option and a downscale option; transparency is kept.
 - WMA to MP3: converts Windows Media Audio (versions 1 and 2) files to MP3 in the tab, keeping the title and artist. WMA Pro, WMA Lossless and WMA Voice are refused by name. The decoder is built from FFmpeg's libraries (LGPL) with only the ASF demuxer and the two WMA decoders, and loads only when you convert a WMA.
