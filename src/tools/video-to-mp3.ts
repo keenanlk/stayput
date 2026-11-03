@@ -3,6 +3,7 @@ import { longRecordingHint } from '../lib/long-audio';
 import { createShell, processEach, radio, str } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { id3Tag, wmaTagsOf } from '../lib/wma-convert';
+import '../lib/mp3-warm';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, formatDuration, type Bitrate } from '../lib/audio';
 import { retryUnreadable } from '../lib/read-failure';
 

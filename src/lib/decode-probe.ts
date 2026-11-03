@@ -16,12 +16,37 @@ export function isBlankFrame(rgba: ArrayLike<number>): boolean {
   return true;
 }
 
-function within<T>(work: Promise<T>, ms = TIMEOUT_MS): Promise<T> {
+/**
+ * Waits for `work` for `ms`. When it times out and `work` later delivers a sample, that sample is closed: nobody else holds it, and an
+ * unclosed VideoSample keeps its decoded frame (GPU and decoder memory) until the garbage collector warns about it.
+ */
+export function within<T>(work: Promise<T>, ms = TIMEOUT_MS): Promise<T> {
   let timer: ReturnType<typeof setTimeout>;
+  let timedOut = false;
   const late = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new NamedError('DecodeTimeout', 'The video decoder did not answer.')), ms);
+    timer = setTimeout(() => {
+      timedOut = true;
+      reject(new NamedError('DecodeTimeout', 'The video decoder did not answer.'));
+    }, ms);
   });
+  work.then(
+    (value) => {
+      if (timedOut) closeLate(value);
+    },
+    () => undefined,
+  );
   return Promise.race([work, late]).finally(() => clearTimeout(timer));
+}
+
+/** Closes whatever a timed-out wait finally produced: a sample, or an iterator result holding one. */
+function closeLate(value: unknown) {
+  const v = value as { close?: () => void; value?: { close?: () => void } } | null | undefined;
+  try {
+    v?.close?.();
+    v?.value?.close?.();
+  } catch {
+    // Already closed.
+  }
 }
 
 /** Draws the picture small and throws if it came out fully transparent. Always closes the sample. */

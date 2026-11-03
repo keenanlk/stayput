@@ -6,7 +6,7 @@
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
 import { classifyError, trackFilesAdded, trackToolRun, trackToolStart } from './analytics';
 import { EncoderStall, watchProgress } from './encoder-watchdog';
-import { markInflight, reportLostTab } from './inflight';
+import { markInflight, pageIsBeingLeft, reportLostTab } from './inflight';
 import { isBare, nameBare } from './bare-error';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
@@ -305,7 +305,7 @@ export function createShell(opts: ShellOptions) {
    * unhandled rejection; now it is shown where the result would be.
    */
   async function filesChanged() {
-    const done = markInflight(root.dataset.slug ?? 'unknown', 'preview');
+    const done = markInflight(root.dataset.slug ?? 'unknown', 'preview', files.reduce((n, f) => n + f.file.size, 0));
     try {
       // A file the intake check refused is not handed to the tool: trim-video, for one, would feed a WMV to its <video>, and
       // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
@@ -663,7 +663,7 @@ export function createShell(opts: ShellOptions) {
     const tool = root.dataset.slug ?? 'unknown';
     const mine = (guard = opts.keepAwake ? guardRun() : undefined);
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
-    const clearMarker = markInflight(tool, 'run');
+    const clearMarker = markInflight(tool, 'run', inputBytes);
     try {
       const result = await resumeIfHidden(
         () => (watching ? watchProgress((tick) => opts.process(files, watchedProgress(tick)), () => undefined) : opts.process(files, progressApi)),
@@ -696,7 +696,8 @@ export function createShell(opts: ShellOptions) {
       const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
       if (salvage?.length) showResults(salvage, false);
       const errorClass = classifyError(e, tool);
-      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
+      // A visitor who left made the download or worker fail; inflight.ts records that as the leave, not as this error.
+      if (!pageIsBeingLeft()) trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
       if (failsTheSameAgain(errorClass)) repeatBlock = repeatHint(e);
     } finally {
       clearMarker();
@@ -837,7 +838,7 @@ export function createShell(opts: ShellOptions) {
     previewFailed,
     recordError,
     /** Mark work outside Run as in flight (see inflight.ts); call the returned function when it ends. */
-    inflight: (phase: 'run' | 'preview') => markInflight(root.dataset.slug ?? 'unknown', phase),
+    inflight: (phase: 'run' | 'preview') => markInflight(root.dataset.slug ?? 'unknown', phase, files.reduce((n, f) => n + f.file.size, 0)),
     hideError,
     setHint,
     /** Re-check opts.runBlocker after something it depends on changed (a file's kind became known). */

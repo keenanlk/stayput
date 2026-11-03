@@ -3,9 +3,9 @@
   "name": "stayput",
   "main": "worker/index.mjs",
   "compatibility_date": "2026-10-28",
-  // On for testing before cutover. Set workers_dev to false once stayput.dev points here, so the
-  // site does not also live at a second, indexable address. See docs/cloudflare-cutover.md.
-  "workers_dev": true,
+  // Off since stayput.dev moved here, so the site does not also live at a second, indexable address.
+  // PR previews still get workers.dev Version URLs through preview_urls.
+  "workers_dev": false,
   "preview_urls": true,
   "assets": {
     "directory": "./dist/",

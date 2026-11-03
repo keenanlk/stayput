@@ -1,5 +1,6 @@
 import { createShell, num, radio, str } from '../lib/shell';
 import { type OutputFile } from '../lib/files';
+import '../lib/mp3-warm';
 import { channelsOf, decodeAudio, encodeMp3, encodeWav, SAMPLE_RATE } from '../lib/audio';
 import { cutPart, parseTimes, partName, planAtTimes, planEvery, SplitError, type Part } from '../lib/audio-split';
 import { NamedError } from '../lib/input-error';

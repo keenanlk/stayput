@@ -6,6 +6,7 @@
  * a WAV to FLAC conversion is lossless.
  */
 import { ALL_FORMATS, AudioSampleSource, BlobSource, BufferTarget, Input, Mp4OutputFormat, OggOutputFormat, Output, canEncodeAudio } from 'mediabunny';
+import './mp3-warm';
 import { SAMPLE_RATE as MP3_RATE, channelsOf, decodeAudio, encodeMp3, encodeWav, type Bitrate } from './audio';
 import { encodeFlac } from './flac';
 import { NamedError } from './input-error';

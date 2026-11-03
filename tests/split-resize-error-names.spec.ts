@@ -53,6 +53,8 @@ test.describe('on the page', () => {
     await open(page);
     // The finished part is wrapped in a Blob; make that fail the way a device short of memory does.
     await page.addInitScript(() => {
+      // No file on the device to write to, so the part is made in memory (with one, the part is a file and no buffer is made).
+      Object.defineProperty(navigator.storage, 'getDirectory', { value: undefined, configurable: true });
       window.Blob = new Proxy(window.Blob, {
         construct(target, args: [BlobPart[]?, BlobPropertyBag?], newTarget) {
           if ((window as unknown as { __arm?: boolean }).__arm && args[1]?.type && /^video\//.test(args[1].type)) throw new RangeError('Array buffer allocation failed');
@@ -106,7 +108,8 @@ test.describe('on the page', () => {
         const real = VideoDecoder.prototype.configure;
         let calls = 0;
         VideoDecoder.prototype.configure = function (this: VideoDecoder, c: VideoDecoderConfig) {
-          if ((window as unknown as { __arm?: boolean }).__arm && ++calls === n) throw new Error('forced');
+          // Starting the conversion is tried twice (the first failure is retried), so both tries fail here.
+          if ((window as unknown as { __arm?: boolean }).__arm && (++calls === n || (n === 1 && calls === 2))) throw new Error('forced');
           return real.call(this, c);
         };
       }, n);

@@ -14,6 +14,8 @@ export async function isPsdFile(file: Blob & { name?: string }): Promise<boolean
   return (file.name ? extOf(file.name) : '') === 'psd';
 }
 
+const NOT_RGB = 'This PSD is in CMYK, Lab or another colour mode this page cannot read. In Photoshop, choose Image → Mode → RGB Color and save it again.';
+
 /** Decode the saved composite image of a PSD to a bitmap, with its transparency. */
 export async function decodePsd(file: Blob): Promise<ImageBitmap> {
   const head = await readHead(file, 6);
@@ -25,9 +27,11 @@ export async function decodePsd(file: Blob): Promise<ImageBitmap> {
     psd = readPsd(await file.arrayBuffer(), { skipLayerImageData: true, skipThumbnail: true, skipLinkedFilesData: true, useImageData: true });
   } catch (e) {
     const msg = e instanceof Error ? e.message : '';
-    if (/CMYK|Color mode not supported/i.test(msg)) throw new UnreadableFile('This PSD is in CMYK, Lab or another colour mode this page cannot read. In Photoshop, choose Image → Mode → RGB Color and save it again.');
+    if (/CMYK|Color mode not supported/i.test(msg)) throw new UnreadableFile(NOT_RGB);
     throw new UnreadableFile('This PSD could not be read. It may be damaged, or saved without the flattened image: in Photoshop, turn on Preferences → File Handling → Maximize PSD and PSB File Compatibility: Always, then save it again.');
   }
+  // ag-psd 34 reads CMYK instead of throwing, but without the colour profile the result is wrong: keep declining it.
+  if (psd.colorMode === 4) throw new UnreadableFile(NOT_RGB);
   const img = psd.imageData;
   const { width, height } = psd;
   if (!img || !width || !height) {
