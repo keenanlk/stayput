@@ -329,6 +329,13 @@ test('Compress video finishes when the decoder returns frames out of presentatio
       get decodeQueueSize() {
         return this.real.decodeQueueSize;
       }
+      // Mediabunny 1.62+ listens for 'dequeue' on the decoder it is given.
+      addEventListener(...args: Parameters<VideoDecoder['addEventListener']>) {
+        this.real.addEventListener(...args);
+      }
+      removeEventListener(...args: Parameters<VideoDecoder['removeEventListener']>) {
+        this.real.removeEventListener(...args);
+      }
       configure(config: VideoDecoderConfig) {
         this.real.configure(config);
       }
