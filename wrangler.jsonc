@@ -20,7 +20,7 @@
       "/models/whisper-base/onnx/decoder_model_merged_quantized.onnx",
       "/models/whisper-base/onnx/encoder_model_fp16.onnx",
       "/models/whisper-tiny/onnx/decoder_model_merged_quantized.onnx",
-      "/vendor/onnxruntime-web@1.30.0/ort-wasm-simd-threaded.asyncify.wasm",
+      "/vendor/onnxruntime-web@1.31.1/ort-wasm-simd-threaded.asyncify.wasm",
     ],
   },
   "r2_buckets": [
