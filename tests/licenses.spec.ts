@@ -145,3 +145,16 @@ test('hash-wasm is credited as MIT and its licence is served next to it', async 
   for (const file of ['index.esm.min.js', 'LICENSE']) expect((await request.get(`${dir}${file}`)).status(), file).toBe(200);
   expect(await (await request.get(`${dir}LICENSE`)).text()).toContain('MIT License');
 });
+
+test('every /vendor/<pkg>@<version>/ path in licenses.json matches a package and version in vendor.json', () => {
+  const shipped = new Set(
+    (Object.values(vendor) as { package: string; version: string }[]).map(
+      (lib) => `${lib.package.replace(/^@/, '').replace('/', '-')}@${lib.version}`,
+    ),
+  );
+  const stale: string[] = [];
+  for (const m of JSON.stringify(data).matchAll(/\/vendor\/([^/\s"]+@[^/\s"]+)\//g)) {
+    if (!shipped.has(m[1]!)) stale.push(m[0]);
+  }
+  expect(stale, 'licenses.json names vendor versions this build does not ship').toEqual([]);
+});

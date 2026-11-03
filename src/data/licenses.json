@@ -1068,7 +1068,7 @@
   {
    "id": "pdfmake-shims",
    "name": "Node.js compatibility shims in pdfmake's prebuilt bundle (buffer, readable-stream, safe-buffer, events, assert, util, process, stream-browserify, string_decoder, ieee754, inherits, core-js, file-saver and similar small packages)",
-   "version": "as pinned by pdfmake 0.3.12",
+   "version": "as pinned by pdfmake 0.3.13",
    "npm": null,
    "licences": [
     {
@@ -1085,7 +1085,7 @@
     }
    ],
    "project": "https://github.com/bpampuch/pdfmake",
-   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.12",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.13",
    "shipped": "Inside pdfmake",
    "kind": "library",
    "via": "pdfmake",
@@ -1895,7 +1895,7 @@
    "via": "mediapipe",
    "copyleft": "mpl",
    "copyright": "Copyright (C) 2008 Gael Guennebaud; (C) 2007-2011 Benoit Jacob; and other Eigen contributors",
-   "replace": "/vendor/mediapipe-tasks-vision@1.1.1/vision_wasm_internal.wasm"
+   "replace": "/vendor/mediapipe-tasks-vision@1.2.0/vision_wasm_internal.wasm"
   },
   {
    "id": "eigen-ort",
@@ -1915,12 +1915,12 @@
    "via": "ort-web",
    "copyleft": "mpl",
    "copyright": "Copyright (C) 2008 Gael Guennebaud; (C) 2007-2011 Benoit Jacob; and other Eigen contributors",
-   "replace": "/vendor/onnxruntime-web@1.30.0/ort-wasm-simd-threaded.wasm"
+   "replace": "/vendor/onnxruntime-web@1.31.1/ort-wasm-simd-threaded.wasm"
   },
   {
    "id": "ort-wasm-other",
    "name": "Other libraries inside ONNX Runtime's WebAssembly (protobuf, ONNX, FlatBuffers, Abseil, XNNPACK and others)",
-   "version": "as pinned by ONNX Runtime 1.30.0",
+   "version": "as pinned by ONNX Runtime 1.31.1",
    "npm": null,
    "licences": [
     {
@@ -1937,7 +1937,7 @@
     }
    ],
    "project": "https://github.com/microsoft/onnxruntime",
-   "source": "https://github.com/microsoft/onnxruntime/blob/v1.30.0/ThirdPartyNotices.txt",
+   "source": "https://github.com/microsoft/onnxruntime/blob/v1.31.1/ThirdPartyNotices.txt",
    "shipped": "Compiled into the ort-wasm-simd-threaded*.wasm files",
    "kind": "wasm",
    "via": "ort-web",
@@ -2205,7 +2205,7 @@
   {
    "id": "f-roboto",
    "name": "Roboto font (in pdfmake)",
-   "version": "as bundled in pdfmake 0.3.12",
+   "version": "as bundled in pdfmake 0.3.13",
    "npm": null,
    "licences": [
     {
@@ -2214,7 +2214,7 @@
     }
    ],
    "project": "https://github.com/googlefonts/roboto-classic",
-   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.12",
+   "source": "https://github.com/bpampuch/pdfmake/tree/0.3.13",
    "shipped": "Bundled into the site JavaScript (EPUB to PDF); version 3.014 (licence at /fonts/OFL-Roboto.txt)",
    "note": "Copyright 2011 The Roboto Project Authors. Version 3.014. Licence text at /fonts/OFL-Roboto.txt.",
    "kind": "font",
