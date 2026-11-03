@@ -6,7 +6,7 @@
 import { downloadBlob, formatBytes, zipFiles, type OutputFile } from './files';
 import { classifyError, trackFilesAdded, trackToolRun, trackToolStart } from './analytics';
 import { EncoderStall, watchProgress } from './encoder-watchdog';
-import { markInflight, reportLostTab } from './inflight';
+import { markInflight, pageIsBeingLeft, reportLostTab } from './inflight';
 import { isBare, nameBare } from './bare-error';
 import { mountNetProof } from './netproof';
 import { mountInstallPrompt } from './install';
@@ -696,7 +696,8 @@ export function createShell(opts: ShellOptions) {
       const salvage = (e as { salvage?: OutputFile[] } | null)?.salvage;
       if (salvage?.length) showResults(salvage, false);
       const errorClass = classifyError(e, tool);
-      trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
+      // A visitor who left made the download or worker fail; inflight.ts records that as the leave, not as this error.
+      if (!pageIsBeingLeft()) trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
       if (failsTheSameAgain(errorClass)) repeatBlock = repeatHint(e);
     } finally {
       clearMarker();
