@@ -14,6 +14,7 @@ Your files are not uploaded, there are no accounts or file size caps beyond what
 [![CI](https://github.com/keenanlk/stayput/actions/workflows/ci.yml/badge.svg)](https://github.com/keenanlk/stayput/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f6f5f.svg)](LICENSE)
 [![No backend](https://img.shields.io/badge/backend-none-1f6f5f.svg)](#how-it-works)
+[![As seen on Open Source Alternatives](https://www.opensourcealternatives.to/badge-osa.svg)](https://www.opensourcealternatives.to)
 
 <a href="https://stayput.dev"><img src="docs/readme/home.png" width="800" alt="The Stayput home page: Your files stay put. Convert, compress and clean images, PDFs, video and audio right here in your browser."></a>
 
