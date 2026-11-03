@@ -93,6 +93,18 @@ function send(tool: string, errorClass: string, extra: { leftAfter?: string; lef
 
 let current: { tool: string; phase: Phase } | undefined;
 let wired = false;
+/** True once the page has started to be left (`beforeunload`, then `pagehide`), until it is shown again. */
+let leaving = false;
+let gone = false;
+
+/**
+ * Whether the page is being left. Navigation cancels a download or a worker the run is waiting on, and WebKit rejects that
+ * promise before it fires `pagehide`: a run's failure handler that recorded the error would count the visitor leaving as a
+ * failure, and the marker it cleared would leave `pagehide` nothing to record. `beforeunload` comes first, so by then this is true.
+ */
+export function pageIsBeingLeft(): boolean {
+  return leaving;
+}
 
 function wire() {
   if (wired || typeof document === 'undefined') return;
@@ -102,7 +114,19 @@ function wire() {
     if (m && current) write({ ...m, hidden: document.hidden });
   });
   // The page is going away on purpose (or being frozen): it is not a lost run, so the marker goes and the visitor leaving is recorded.
+  addEventListener('beforeunload', () => {
+    leaving = true;
+    // Something may still call the leave off; a page that is not gone a few seconds on is staying.
+    setTimeout(() => {
+      if (!gone) leaving = false;
+    }, 5000);
+  });
+  addEventListener('pageshow', () => {
+    leaving = false;
+    gone = false;
+  });
   addEventListener('pagehide', () => {
+    leaving = gone = true;
     if (!current) return;
     const { tool, phase } = current;
     current = undefined;
@@ -131,12 +155,17 @@ export function markInflight(tool: string, phase: Phase, bytes?: number): () => 
   const put = () => current === mine && write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden, ...(bytes && bytes > 0 ? { bytes } : {}) });
   const timer = phase === 'preview' ? setTimeout(put, PREVIEW_MARK_DELAY_MS) : undefined;
   if (!timer) put();
-  return () => {
-    clearTimeout(timer);
+  const finish = () => {
     if (current !== mine) return;
     current = undefined;
     detail = undefined;
     remove();
+  };
+  return () => {
+    clearTimeout(timer);
+    // The run ended because the page is being left: leave the marker for `pagehide`. If the leave was called off, the marker goes a moment later.
+    if (leaving) setTimeout(finish, 1000);
+    else finish();
   };
 }
 
