@@ -1128,7 +1128,7 @@
   {
    "id": "ag-psd",
    "name": "ag-psd",
-   "version": "31.0.3",
+   "version": "34.1.0",
    "npm": "ag-psd",
    "licences": [
     {
@@ -1137,7 +1137,7 @@
     }
    ],
    "project": "https://github.com/Agamnentzar/ag-psd",
-   "source": "https://www.npmjs.com/package/ag-psd/v/31.0.3",
+   "source": "https://www.npmjs.com/package/ag-psd/v/34.1.0",
    "shipped": "Bundled into the site JavaScript (PSD)",
    "kind": "library",
    "copyright": "Copyright (c) 2016 Agamnentzar"
