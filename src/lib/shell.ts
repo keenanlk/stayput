@@ -697,7 +697,7 @@ export function createShell(opts: ShellOptions) {
       if (salvage?.length) showResults(salvage, false);
       const errorClass = classifyError(e, tool);
       // A visitor who left made the download or worker fail; inflight.ts records that as the leave, not as this error.
-      if (!(await pageIsBeingLeft())) trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
+      if (!pageIsBeingLeft()) trackToolRun({ tool, outcome: 'error', files: files.length, inputBytes, ms: performance.now() - started, format: opts.outputFormat?.(), errorClass });
       if (failsTheSameAgain(errorClass)) repeatBlock = repeatHint(e);
     } finally {
       clearMarker();
