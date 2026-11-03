@@ -6,9 +6,10 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, rmSync, truncateSync, writeFileSync, copyFileSync, statSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-const out = new URL('./edge-cases/', import.meta.url).pathname;
+const out = fileURLToPath(new URL('./edge-cases/', import.meta.url));
 mkdirSync(out, { recursive: true });
 const scratch = mkdtempSync(join(tmpdir(), 'edge-'));
 const f = (n) => join(out, n);

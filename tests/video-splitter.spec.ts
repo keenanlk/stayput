@@ -1,11 +1,12 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
 import { ALL_FORMATS, BufferSource, Input } from 'mediabunny';
 import { MAX_VIDEO_PARTS, planAtTimes, planEqual, planEvery, videoPartName } from '../src/lib/video-split';
 
-const clip = new URL('./fixtures/static/split-60s.mp4', import.meta.url).pathname;
+const clip = fileURLToPath(new URL('./fixtures/static/split-60s.mp4', import.meta.url));
 
 // Plain planning, no browser needed.
 
