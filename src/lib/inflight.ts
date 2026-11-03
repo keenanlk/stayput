@@ -93,6 +93,17 @@ function send(tool: string, errorClass: string, extra: { leftAfter?: string; lef
 
 let current: { tool: string; phase: Phase } | undefined;
 let wired = false;
+/** True from `pagehide` until the page is shown again (it can come back from the back/forward cache). */
+let leaving = false;
+
+/**
+ * Whether the page is being left. Navigation cancels a download or a worker the run is waiting on, and WebKit rejects that
+ * promise before it fires `pagehide`: a run's failure handler that records the error at once would count the visitor leaving
+ * as a failure, and clear the marker before `pagehide` could record the leave. Await this first and skip the error record if it says true.
+ */
+export function pageIsBeingLeft(): Promise<boolean> {
+  return new Promise((resolve) => setTimeout(() => resolve(leaving), 100));
+}
 
 function wire() {
   if (wired || typeof document === 'undefined') return;
@@ -102,7 +113,11 @@ function wire() {
     if (m && current) write({ ...m, hidden: document.hidden });
   });
   // The page is going away on purpose (or being frozen): it is not a lost run, so the marker goes and the visitor leaving is recorded.
+  addEventListener('pageshow', () => {
+    leaving = false;
+  });
   addEventListener('pagehide', () => {
+    leaving = true;
     if (!current) return;
     const { tool, phase } = current;
     current = undefined;

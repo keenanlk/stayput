@@ -125,6 +125,9 @@ test.describe('phone', () => {
   test('leaving a run records only buckets and the mode', async ({ page }) => {
     test.setTimeout(240_000);
     await recordEvents(page);
+    // Hold the person finder's download open, so the run is still going, in the same step, whatever the browser does with the clip after it.
+    // Leaving then cancels the download; the cancelled download must not be recorded as a failure of its own.
+    await page.route(/\/models\/selfie_segmenter(_landscape)?\.tflite$/, () => new Promise<void>(() => {}));
     await page.goto('/tools/video-background-remover');
     await ready(page);
     // track() waits for load when the tracker is not there yet; leaving before it is ready drops the event.
@@ -136,7 +139,9 @@ test.describe('phone', () => {
     // Let the page take a turn or two once the run is going; WebKit under load can drop pagehide for a page that is left the instant the run starts.
     await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 300))));
     await page.goto('/');
-    const left = (await runs(page)).filter((r) => r.error_class === 'LeftDuringRun');
+    const all = await runs(page);
+    expect(all.map((r) => r.error_class)).toEqual(['LeftDuringRun']);
+    const left = all.filter((r) => r.error_class === 'LeftDuringRun');
     expect(left).toHaveLength(1);
     const d = left[0]!;
     expect(['<10s', '10-30s', '30-60s', '1-3m', '3-10m', '>10m']).toContain(d.left_after);
