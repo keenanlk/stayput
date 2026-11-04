@@ -77,6 +77,17 @@ test.describe('probeReadable', () => {
   });
 });
 
+test('a small file that failed every try is UnreadableFileGone on its next snapshot, and a recovered one is copied', async () => {
+  const f = new File(['abcdef'], 'VID_0004.mp4', { type: 'video/mp4' });
+  const slice = f.slice.bind(f);
+  let broken = true;
+  f.slice = (...a: Parameters<Blob['slice']>) => (broken ? ({ arrayBuffer: notReadable } as unknown as Blob) : slice(...a));
+  await expect(snapshotFile(f, undefined, [0])).rejects.toMatchObject({ name: 'NotReadableError' });
+  await expect(snapshotFile(f, undefined, [0])).rejects.toMatchObject({ name: 'UnreadableFileGone', message: expect.stringContaining('Pick it again') });
+  broken = false;
+  expect(await (await snapshotFile(f, undefined, [0])).text()).toBe('abcdef');
+});
+
 test.describe('file intake', () => {
   test('a big file whose first byte never reads is FileNotDownloaded at pick time', async () => {
     const f = new File(['x'], 'VID_0002.mp4', { type: 'video/mp4' });

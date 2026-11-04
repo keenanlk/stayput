@@ -130,11 +130,13 @@ const CHUNK = 8 * 1024 * 1024;
  * and works from it. Each piece is tried a few times; a file that never reads ends with NotReadableError after about a
  * second. A file over `limit` is only checked, and returned as it was. Nothing leaves the device.
  */
-export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIMIT, pauses = [250, 750, 2000]): Promise<File> {
+export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIMIT, pauses = [250, 750]): Promise<File> {
   if (file.size === 0 || file.size > limit) {
     await probeReadable(file);
     return file;
   }
+  // A copy that failed all its tries on this File before: a File the browser lost (changed or re-saved after it was picked) does not come back.
+  if (unreachable.has(file)) await probeReadable(file, 0);
   const parts: ArrayBuffer[] = [];
   for (let at = 0; at < file.size; at += CHUNK) {
     for (let attempt = 0; ; attempt++) {
@@ -144,7 +146,10 @@ export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIM
       } catch (e) {
         if (ranOutOfMemory(e)) throw readMemoryError(e);
         if (!isNotReadable(e)) throw e;
-        if (attempt >= pauses.length) throw notReadable(e);
+        if (attempt >= pauses.length) {
+          unreachable.add(file);
+          throw notReadable(e);
+        }
         await new Promise((r) => setTimeout(r, pauses[attempt]));
       }
     }
