@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { isBlankFrame } from '../src/lib/decode-probe';
+import { isBlankFrame, within } from '../src/lib/decode-probe';
 
 // A clip the browser says it can decode but cannot (iOS Safari with HEVC: "EncodingError: Decoder failure") is refused as DecodeFailed
 // before any model downloads, and a decoder failure part-way through a run is not retried at a smaller size as if the encoder had failed.
@@ -100,5 +100,34 @@ test.describe('the blank-frame check', () => {
     const one = new Uint8ClampedArray(16 * 16 * 4);
     one[3] = 255;
     expect(isBlankFrame(one)).toBe(false);
+  });
+});
+
+test.describe('a sample that arrives after the wait timed out', () => {
+  // A VideoSample nobody closes keeps its decoded frame until the GC warns "A VideoSample was garbage collected without first being closed".
+  const fake = () => ({
+    closed: 0,
+    close() {
+      this.closed++;
+    },
+  });
+
+  test('is closed, whether bare or inside an iterator result', async () => {
+    const a = fake();
+    const b = fake();
+    const slowA = new Promise<typeof a>((r) => setTimeout(() => r(a), 60));
+    const slowB = new Promise<{ done: false; value: typeof b }>((r) => setTimeout(() => r({ done: false, value: b }), 60));
+    await expect(within(slowA, 10)).rejects.toMatchObject({ name: 'DecodeTimeout' });
+    await expect(within(slowB, 10)).rejects.toMatchObject({ name: 'DecodeTimeout' });
+    await new Promise((r) => setTimeout(r, 150));
+    expect(a.closed).toBe(1);
+    expect(b.closed).toBe(1);
+  });
+
+  test('is left alone when it arrived in time (the caller owns it)', async () => {
+    const s = fake();
+    expect(await within(Promise.resolve(s), 1000)).toBe(s);
+    await new Promise((r) => setTimeout(r, 20));
+    expect(s.closed).toBe(0);
   });
 });

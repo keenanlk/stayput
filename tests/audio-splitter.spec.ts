@@ -3,12 +3,13 @@ import { test, expect, type Page } from '@playwright/test';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
 import { wav } from './music-synth';
 
 const dir = mkdtempSync(join(tmpdir(), 'audio-splitter-'));
 const rehearsal = join(dir, 'rehearsal.wav');
-const song = new URL('./fixtures/static/song.mp3', import.meta.url).pathname;
+const song = fileURLToPath(new URL('./fixtures/static/song.mp3', import.meta.url));
 const SECONDS = 30;
 
 test.beforeAll(() => {

@@ -3,9 +3,9 @@
   "name": "stayput",
   "main": "worker/index.mjs",
   "compatibility_date": "2026-10-28",
-  // On for testing before cutover. Set workers_dev to false once stayput.dev points here, so the
-  // site does not also live at a second, indexable address. See docs/cloudflare-cutover.md.
-  "workers_dev": true,
+  // Off since stayput.dev moved here, so the site does not also live at a second, indexable address.
+  // PR previews still get workers.dev Version URLs through preview_urls.
+  "workers_dev": false,
   "preview_urls": true,
   "assets": {
     "directory": "./dist/",
@@ -20,7 +20,7 @@
       "/models/whisper-base/onnx/decoder_model_merged_quantized.onnx",
       "/models/whisper-base/onnx/encoder_model_fp16.onnx",
       "/models/whisper-tiny/onnx/decoder_model_merged_quantized.onnx",
-      "/vendor/onnxruntime-web@1.30.0/ort-wasm-simd-threaded.asyncify.wasm",
+      "/vendor/onnxruntime-web@1.31.1/ort-wasm-simd-threaded.asyncify.wasm",
     ],
   },
   "r2_buckets": [
