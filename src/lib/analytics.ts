@@ -73,6 +73,8 @@ const UMAMI_WEBSITE = '52e5e00a-c867-497a-9f44-14c769361768';
  * What is sent is limited by beforeSend (analytics-payload.ts).
  */
 export function loadAnalytics(): void {
+  // Self-hosted builds (PUBLIC_ANALYTICS=off, the Docker default) never add the script or talk to the stats host.
+  if (import.meta.env.PUBLIC_ANALYTICS === 'off') return;
   try {
     if (location.hash === '#notrack' || location.hash === '#track') {
       const off = location.hash === '#notrack';

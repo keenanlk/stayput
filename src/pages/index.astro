@@ -8,6 +8,9 @@ import { guides } from '../data/guides';
 import { profiles } from '../data/site';
 import { experiments, activeExperimentKeys } from '../data/experiments';
 
+// Self-hosted builds (PUBLIC_ANALYTICS=off) carry no usage counter, so the demo leaves that row out.
+const analyticsOn = import.meta.env.PUBLIC_ANALYTICS !== 'off';
+
 // Homepage hero test (home-hero). A is the page as it was. B has a one-line lede and the demo
 // further down. The B lede is only in the page while the test is on; the demo is one element
 // that CSS moves, so the video is never loaded twice.
@@ -78,7 +81,7 @@ const jsonLd = [
         <p class="start-note">Your file stays in this tab. <a class="hero-link" href="#tools">See all {tools.length} tools</a></p>
       </div>
       <figure>
-        <div class="devtools" role="img" aria-label="A browser network panel after converting photos: requests for the site's code and the decoder, then a few small anonymous usage-count requests. None of them carry the photos.">
+        <div class="devtools" role="img" aria-label={`A browser network panel after converting photos: requests for the site's code and the decoder${analyticsOn ? ', then a few small anonymous usage-count requests' : ''}. None of them carry the photos.`}>
           <div class="tabs"><span>Elements</span><span>Console</span><span class="on">Network</span><span>Application</span></div>
           <div class="rows">
             <div class="row head"><span>Name</span><span>Status</span><span>Size</span></div>
@@ -86,11 +89,11 @@ const jsonLd = [
             <div class="row"><span>heic-to-jpg.a8f3.js</span><span class="ok">200</span><span>0.96 kB</span></div>
             <div class="row"><span>heic-to.min.js (decoder)</span><span class="ok">200</span><span>739 kB</span></div>
             <div class="drop">IMG_4021.HEIC, IMG_4022.HEIC, IMG_4023.HEIC added</div>
-            <div class="row"><span>stats.keenankaufman.com ×4 (usage count)</span><span class="ok">200</span><span>1.9 kB</span></div>
+            {analyticsOn && <div class="row"><span>stats.keenankaufman.com ×4 (usage count)</span><span class="ok">200</span><span>1.9 kB</span></div>}
             <div class="empty"><b>No</b> request carried your photos.</div>
           </div>
         </div>
-        <figcaption>A simplified view of your browser's Network tab while three iPhone photos convert: the site's page and code load, the HEIC decoder loads once, then a few small anonymous usage-count requests go to our stats server. No request carries your photos. Press F12 and try it.</figcaption>
+        <figcaption>A simplified view of your browser's Network tab while three iPhone photos convert: the site's page and code load, the HEIC decoder loads once{analyticsOn ? ', then a few small anonymous usage-count requests go to our stats server' : ''}. No request carries your photos. Press F12 and try it.</figcaption>
       </figure>
     </div>
   </section>
@@ -133,7 +136,7 @@ const jsonLd = [
   <section class="wrap section split" aria-labelledby="spec-h">
     <div class="spec-intro">
       <h2 id="spec-h">Open the network tab. Your files never appear in it.</h2>
-      <p style="margin-top:16px">Every tool here is JavaScript and WebAssembly running in your tab. There is no server that could receive your files, so none does. You will see a few small anonymous usage-count requests; they carry the page, which tool, and rough ranges such as file count and size, never your file. Full list: <a href="/privacy">/privacy</a>.</p>
+      <p style="margin-top:16px">Every tool here is JavaScript and WebAssembly running in your tab. There is no server that could receive your files, so none does.{analyticsOn ? ' You will see a few small anonymous usage-count requests; they carry the page, which tool, and rough ranges such as file count and size, never your file.' : ''} Full list: <a href="/privacy">/privacy</a>.</p>
       <p>Every tool that takes files also counts the requests this tab makes after you add them and lists them, so you do not have to take our word for it. Requests made inside background workers, such as a model download, are not in that list.</p>
       <div class="actions">
         <a class="btn btn-primary" href="/tools/heic-to-jpg">Try it with a photo</a>
