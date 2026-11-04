@@ -281,3 +281,35 @@ for (const [label, blocked, ok] of [
     }
   });
 }
+
+// iPhone with a full disk: the temporary file cannot be written (OutputWriteError). The video is then written to memory instead.
+test('a device with no room for the temporary file still finishes the run, writing to memory', async ({ page }, info) => {
+  test.setTimeout(150_000);
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
+  await page.route('https://stats.keenankaufman.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: `window.umami={track:(n,d)=>{const k='__ev';const a=JSON.parse(sessionStorage.getItem(k)||'[]');a.push({n,d});sessionStorage.setItem(k,JSON.stringify(a));}};`,
+    }),
+  );
+  await page.addInitScript(() => {
+    const Real = window.Worker;
+    window.Worker = class extends Real {
+      postMessage(m: unknown, ...rest: unknown[]) {
+        if ((m as { type?: string } | null)?.type === 'write') {
+          queueMicrotask(() => this.onmessage?.({ data: { ok: false, error: 'full' } } as MessageEvent));
+          return;
+        }
+        (super.postMessage as (...a: unknown[]) => void)(m, ...rest);
+      }
+    };
+  });
+  await page.goto('/remove-background-noise-from-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(clip(info.project.name === 'webkit' ? 'speech.mov' : 'talk.webm'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+  expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'ok' });
+});

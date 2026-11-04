@@ -71,6 +71,16 @@ export async function hasVideo(file: File): Promise<boolean> {
 
 /** `soundFile` may be the sound itself (one or two channels at 48 kHz), which skips writing it out as a file and decoding that again. */
 export async function addAudio(videoFile: File, soundFile: File | Float32Array[], opts: AddAudioOptions): Promise<AddAudioResult> {
+  try {
+    return await addAudioOnce(videoFile, soundFile, opts, true);
+  } catch (e) {
+    // The device had no room for the temporary file (an iPhone with a full disk, say): write the video to memory instead.
+    if ((e as { name?: string } | null)?.name !== 'OutputWriteError') throw e;
+    return addAudioOnce(videoFile, soundFile, opts, false);
+  }
+}
+
+async function addAudioOnce(videoFile: File, soundFile: File | Float32Array[], opts: AddAudioOptions, toDisk: boolean): Promise<AddAudioResult> {
   const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   let disk: Awaited<ReturnType<typeof openOpfsOutput>>;
   let finished = false;
@@ -123,7 +133,7 @@ export async function addAudio(videoFile: File, soundFile: File | Float32Array[]
 
     // MP4 plays everywhere, but VP8 in MP4 does not play in Safari; keep VP8 in WebM.
     // The output goes to a temporary file on this device where the browser allows it, so its size does not set peak memory.
-    disk = await openOpfsOutput(videoFile.size);
+    disk = toDisk ? await openOpfsOutput(videoFile.size) : undefined;
     const format = video.codec === 'vp8' ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: disk ? false : 'in-memory' });
     // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
     registerMp3Fallback();
