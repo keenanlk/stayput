@@ -9,7 +9,7 @@
 #
 # Test hook: VERCEL_IGNORE_FILES (newline-separated) replaces the git diff.
 
-NON_SITE='^(\.github/|\.claude/|tests/|docs/|mcp/|glama/|glama\.json$|playwright\.config\.ts$|README\.md$|CHANGELOG\.md$|CONTRIBUTING\.md$|LICENSE$)'
+NON_SITE='^(\.github/|\.claude/|tests/|docs/|mcp/|glama/|glama\.json$|Dockerfile$|docker-compose\.yml$|\.dockerignore$|docker/|scripts/nginx-conf\.mjs$|playwright\.config\.ts$|README\.md$|CHANGELOG\.md$|CONTRIBUTING\.md$|LICENSE$)'
 
 build() { echo "vercel-ignore: build ($1)"; exit 1; }
 

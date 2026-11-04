@@ -6,9 +6,10 @@
  * and the anonymous usage counter show up too, each labelled with what it carries.
  * What never appears is a request carrying a file, because there is none.
  */
-const LABELS: [RegExp, string][] = [
-  [/^stats\.keenankaufman\.com$/, 'anonymous usage count: which tool and rough ranges, no file names or contents'],
-];
+const LABELS: [RegExp, string][] =
+  import.meta.env.PUBLIC_ANALYTICS === 'off'
+    ? []
+    : [[/^stats\.keenankaufman\.com$/, 'anonymous usage count: which tool and rough ranges, no file names or contents']];
 
 function label(host: string, decoder: boolean): string {
   if (host === location.hostname) return decoder ? 'this site’s own code, including a decoder program (code only, cached)' : 'this site’s own code';
