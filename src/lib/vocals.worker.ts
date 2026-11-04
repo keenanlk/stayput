@@ -23,7 +23,7 @@ export type Request = { id: number; left: Float32Array; right: Float32Array; gpu
 export type Reply =
   | { id: number; type: 'loading'; fraction: number }
   | { id: number; type: 'progress'; done: number; total: number; engine: 'gpu' | 'cpu' }
-  | { id: number; type: 'done'; left: Float32Array; right: Float32Array; engine: 'gpu' | 'cpu' }
+  | { id: number; type: 'done'; left: Float32Array; right: Float32Array; vocalsLeft: Float32Array; vocalsRight: Float32Array; engine: 'gpu' | 'cpu' }
   | { id: number; type: 'error'; name: string; message: string };
 
 type Ort = typeof import('onnxruntime-web');
@@ -98,12 +98,16 @@ self.onmessage = async (e: MessageEvent<Request>) => {
       },
       (done, total) => post({ id, type: 'progress', done, total, engine }),
     );
+    // The vocals are the song minus the instrumental. They are worked out here, over the song's own buffers, so the page
+    // never holds a second copy of the whole song (that, and the copies around it, is what a phone's tab ran out on).
     for (let i = 0; i < l.length; i++) {
       l[i]! *= COMPENSATE;
       r[i]! *= COMPENSATE;
+      left[i] = left[i]! - l[i]! / COMPENSATE;
+      right[i] = right[i]! - r[i]! / COMPENSATE;
     }
-    post({ id, type: 'done', left: l, right: r, engine }, [l.buffer, r.buffer]);
+    post({ id, type: 'done', left: l, right: r, vocalsLeft: left, vocalsRight: right, engine }, [l.buffer, r.buffer, left.buffer, right.buffer]);
   } catch (err) {
-    post({ id, type: 'error', ...workerFailure(err) });
+    post({ id, type: 'error', ...workerFailure(err, 'SeparationFailed') });
   }
 };
