@@ -48,6 +48,16 @@ function ranOutOfMemory(e: unknown): boolean {
   return e instanceof RangeError || (e instanceof Error && /allocation failed|out of memory/i.test(e.message));
 }
 
+/**
+ * For a track probe that treats "could not open it" as "no such track": a read the browser refused stays that, and a read that
+ * ran out of memory stays that (OutOfMemoryError), so neither is reported as a file with no video or sound. Anything else is null.
+ */
+export function unlessReadFailure(e: unknown): null {
+  if (isNotReadable(e)) throw e;
+  if (ranOutOfMemory(e)) throw readMemoryError(e);
+  return null;
+}
+
 /** A read that needed more memory than the device had: the file is fine, the device is short. */
 export function readMemoryError(cause: unknown): Error {
   return new NamedError('OutOfMemoryError', 'This device ran out of memory while reading this file. Close other tabs and apps and try again, use a smaller file, or use a computer.', { cause });

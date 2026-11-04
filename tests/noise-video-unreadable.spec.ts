@@ -1,7 +1,7 @@
 // @webkit-project
 import { test, expect, type Page } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
-import { SNAPSHOT_LIMIT, isNotReadable, notReadable, probeReadable, retryUnreadable, snapshotFile } from '../src/lib/read-failure';
+import { SNAPSHOT_LIMIT, unlessReadFailure, isNotReadable, notReadable, probeReadable, retryUnreadable, snapshotFile } from '../src/lib/read-failure';
 
 // Remove background noise from a video on a phone whose browser fails to read the file part way through (Android
 // Chrome says NotReadableError). The read is forced to fail in the page once the noise removal has started: once,
@@ -74,6 +74,13 @@ test.describe('read-failure rules', () => {
     const gone = new Blob(['abc']);
     gone.slice = () => ({ arrayBuffer: () => Promise.reject(named('NotReadableError')) }) as unknown as Blob;
     await expect(probeReadable(gone)).rejects.toMatchObject({ name: 'NotReadableError' });
+  });
+
+  test('a track probe that runs out of memory is OutOfMemoryError, not "no video"; other failures still mean no track', () => {
+    const oom = new RangeError('Array buffer allocation failed');
+    expect(() => unlessReadFailure(oom)).toThrow(expect.objectContaining({ name: 'OutOfMemoryError', cause: oom }));
+    expect(() => unlessReadFailure(named('NotReadableError'))).toThrow(expect.objectContaining({ name: 'NotReadableError' }));
+    expect(unlessReadFailure(new Error('Invalid or unsupported file'))).toBeNull();
   });
 });
 
@@ -274,3 +281,48 @@ for (const [label, blocked, ok] of [
     }
   });
 }
+
+// iPhone with a full disk: the temporary file cannot be written (OutputWriteError). The video is then written to memory instead.
+test('a device with no room for the temporary file still finishes the run, writing to memory', async ({ page }, info) => {
+  test.setTimeout(150_000);
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
+  await page.route('https://stats.keenankaufman.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: `window.umami={track:(n,d)=>{const k='__ev';const a=JSON.parse(sessionStorage.getItem(k)||'[]');a.push({n,d});sessionStorage.setItem(k,JSON.stringify(a));}};`,
+    }),
+  );
+  await page.addInitScript(() => {
+    // The temporary-file worker is answered here: it opens fine (so every browser, WebKit included, takes the disk path)
+    // and then every write fails. Other workers are left alone.
+    const Real = window.Worker;
+    (window as unknown as { __blocked: number }).__blocked = 0;
+    window.Worker = class extends Real {
+      private readonly fake: boolean;
+      constructor(url: string | URL, opts?: WorkerOptions) {
+        super(url, opts);
+        this.fake = String(url).includes('opfs-output');
+      }
+      postMessage(m: unknown, ...rest: unknown[]) {
+        const type = (m as { type?: string } | null)?.type;
+        if (this.fake && type) {
+          if (type === 'write') (window as unknown as { __blocked: number }).__blocked++;
+          const reply = type === 'write' ? { ok: false, error: 'full' } : { ok: true };
+          queueMicrotask(() => this.onmessage?.({ data: reply } as MessageEvent));
+          return;
+        }
+        (super.postMessage as (...a: unknown[]) => void)(m, ...rest);
+      }
+    };
+  });
+  await page.goto('/remove-background-noise-from-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles(clip(info.project.name === 'webkit' ? 'speech.mov' : 'talk.webm'));
+  await page.locator('#run').click();
+  await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
+  await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  // The disk path was reached and refused at least one write, so the finish came from the memory fallback.
+  expect(await page.evaluate(() => (window as unknown as { __blocked: number }).__blocked)).toBeGreaterThan(0);
+  await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
+  expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'ok' });
+});

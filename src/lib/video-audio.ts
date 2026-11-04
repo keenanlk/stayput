@@ -28,9 +28,8 @@ import {
 import { CODEC_NAMES } from './video-compress';
 import { SAMPLE_RATE, decodePcm, decodePcmSliced, pcmFeeder, stereo } from './pcm';
 import { openOpfsOutput } from './opfs-output';
-import { SNAPSHOT_LIMIT } from './read-failure';
+import { SNAPSHOT_LIMIT, unlessReadFailure } from './read-failure';
 import { NoAudioEncoder, registerMp3Fallback } from './mp3-fallback';
-import { isNotReadable } from './read-failure';
 
 export interface AddAudioOptions {
   /** Replace the video's sound, or play both together. */
@@ -58,11 +57,8 @@ const FADE = 1.5;
 const MIX_LEVEL = 0.5;
 
 /** True when the file holds a picture Mediabunny can read. */
-/** A failure to read the file stays that; any other failure to find a track means there is none. */
-function unlessUnreadable(e: unknown): null {
-  if (isNotReadable(e)) throw e;
-  return null;
-}
+/** A failure to read the file (or to find memory for the read) stays that; any other failure to find a track means there is none. */
+const unlessUnreadable = unlessReadFailure;
 
 export async function hasVideo(file: File): Promise<boolean> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
@@ -75,6 +71,16 @@ export async function hasVideo(file: File): Promise<boolean> {
 
 /** `soundFile` may be the sound itself (one or two channels at 48 kHz), which skips writing it out as a file and decoding that again. */
 export async function addAudio(videoFile: File, soundFile: File | Float32Array[], opts: AddAudioOptions): Promise<AddAudioResult> {
+  try {
+    return await addAudioOnce(videoFile, soundFile, opts, true);
+  } catch (e) {
+    // The device had no room for the temporary file (an iPhone with a full disk, say): write the video to memory instead.
+    if ((e as { name?: string } | null)?.name !== 'OutputWriteError') throw e;
+    return addAudioOnce(videoFile, soundFile, opts, false);
+  }
+}
+
+async function addAudioOnce(videoFile: File, soundFile: File | Float32Array[], opts: AddAudioOptions, toDisk: boolean): Promise<AddAudioResult> {
   const input = new Input({ source: new BlobSource(videoFile), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   let disk: Awaited<ReturnType<typeof openOpfsOutput>>;
   let finished = false;
@@ -127,7 +133,7 @@ export async function addAudio(videoFile: File, soundFile: File | Float32Array[]
 
     // MP4 plays everywhere, but VP8 in MP4 does not play in Safari; keep VP8 in WebM.
     // The output goes to a temporary file on this device where the browser allows it, so its size does not set peak memory.
-    disk = await openOpfsOutput(videoFile.size);
+    disk = toDisk ? await openOpfsOutput(videoFile.size) : undefined;
     const format = video.codec === 'vp8' ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: disk ? false : 'in-memory' });
     // iOS 18 and earlier have no AudioEncoder: MP3 (encoded in WebAssembly) is the sound an MP4 can then hold.
     registerMp3Fallback();
