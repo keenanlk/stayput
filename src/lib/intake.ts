@@ -48,8 +48,8 @@ export async function inspectFile(file: File, tool: string, base: string, accept
   try {
     head = await readFirst(file);
   } catch (e) {
-    // A small file the browser cannot reach at byte 0, twice: a cloud file that is not on the device. A big one is left to the tool, which reads it in pieces and retries.
-    if (!isNotReadable(e) || file.size > SNAPSHOT_LIMIT) return null;
+    // A file the browser cannot reach at byte 0, twice: a cloud file that is not on the device, or (a big video on Android) one the phone moved. Said now, before Run, with the steps to save it.
+    if (!isNotReadable(e)) return null;
     await new Promise((r) => setTimeout(r, 300));
     try {
       await probeReadable(file);

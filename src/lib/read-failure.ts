@@ -63,14 +63,54 @@ export function readMemoryError(cause: unknown): Error {
   return new NamedError('OutOfMemoryError', 'This device ran out of memory while reading this file. Close other tabs and apps and try again, use a smaller file, or use a computer.', { cause });
 }
 
-/** Reads the first and last byte, which is enough for the browser to say whether it can reach the file at all. */
-export async function probeReadable(file: Blob): Promise<void> {
+/** Files whose first byte stayed out of reach. The same File object is never going to read again, so a second failure on it says to pick it again. */
+const unreachable = new WeakSet<object>();
+
+/** The refusal for a file that has already failed to read, and still does: the same File object will not come back, so the person picks it again. */
+function pickAgain(cause: unknown): Error {
+  const out = new NamedError('UnreadableFileGone', 'This file could not be read. It may have been moved, deleted or still be syncing from a cloud app. Pick it again, or save it to the phone first.');
+  out.cause = cause;
+  return out;
+}
+
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** One byte at `at`, read; tried again once after `wait` ms: a content:// file can need a moment. */
+async function readByte(file: Blob, at: number, wait: number): Promise<void> {
+  try {
+    await file.slice(at, at + 1).arrayBuffer();
+  } catch (e) {
+    if (!isNotReadable(e)) throw e;
+    await pause(wait);
+    await file.slice(at, at + 1).arrayBuffer();
+  }
+}
+
+/**
+ * Checks the browser can reach the file: the first byte must read (each read is tried twice). A last byte that will not read is not
+ * taken as the end of the file: if the middle reads, the run goes on, and a tool that really needs the end fails there with a mid-read
+ * failure. A file whose first byte failed before, and fails again, is UnreadableFileGone (pick it again) rather than the same message.
+ */
+export async function probeReadable(file: Blob, wait = 250): Promise<void> {
   if (file.size === 0) return;
   try {
-    await file.slice(0, 1).arrayBuffer();
-    await file.slice(file.size - 1).arrayBuffer();
+    await readByte(file, 0, wait);
   } catch (e) {
+    if (!isNotReadable(e)) throw notReadable(e, 'probe');
+    if (unreachable.has(file)) throw pickAgain(e);
+    unreachable.add(file);
     throw notReadable(e, 'probe');
+  }
+  if (file.size < 2) return;
+  try {
+    await readByte(file, file.size - 1, wait);
+  } catch (e) {
+    // Only the end is out of reach. Can the middle be read? Then the data is there in pieces and the run may go on.
+    try {
+      await readByte(file, Math.floor(file.size / 2), 0);
+    } catch {
+      throw notReadable(e, 'probe');
+    }
   }
 }
 
@@ -105,6 +145,8 @@ export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIM
     await probeReadable(file);
     return file;
   }
+  // A copy that failed all its tries on this File before: a File the browser lost (changed or re-saved after it was picked) does not come back.
+  if (unreachable.has(file)) await probeReadable(file, 0);
   const parts: ArrayBuffer[] = [];
   for (let at = 0; at < file.size; at += CHUNK) {
     for (let attempt = 0; ; attempt++) {
@@ -114,7 +156,10 @@ export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIM
       } catch (e) {
         if (ranOutOfMemory(e)) throw readMemoryError(e);
         if (!isNotReadable(e)) throw e;
-        if (attempt >= pauses.length) throw notReadable(e);
+        if (attempt >= pauses.length) {
+          unreachable.add(file);
+          throw notReadable(e);
+        }
         await new Promise((r) => setTimeout(r, pauses[attempt]));
       }
     }
