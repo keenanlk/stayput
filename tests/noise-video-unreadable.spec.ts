@@ -293,11 +293,22 @@ test('a device with no room for the temporary file still finishes the run, writi
     }),
   );
   await page.addInitScript(() => {
+    // The temporary-file worker is answered here: it opens fine (so every browser, WebKit included, takes the disk path)
+    // and then every write fails. Other workers are left alone.
     const Real = window.Worker;
+    (window as unknown as { __blocked: number }).__blocked = 0;
     window.Worker = class extends Real {
+      private readonly fake: boolean;
+      constructor(url: string | URL, opts?: WorkerOptions) {
+        super(url, opts);
+        this.fake = String(url).includes('opfs-output');
+      }
       postMessage(m: unknown, ...rest: unknown[]) {
-        if ((m as { type?: string } | null)?.type === 'write') {
-          queueMicrotask(() => this.onmessage?.({ data: { ok: false, error: 'full' } } as MessageEvent));
+        const type = (m as { type?: string } | null)?.type;
+        if (this.fake && type) {
+          if (type === 'write') (window as unknown as { __blocked: number }).__blocked++;
+          const reply = type === 'write' ? { ok: false, error: 'full' } : { ok: true };
+          queueMicrotask(() => this.onmessage?.({ data: reply } as MessageEvent));
           return;
         }
         (super.postMessage as (...a: unknown[]) => void)(m, ...rest);
@@ -310,6 +321,8 @@ test('a device with no room for the temporary file still finishes the run, writi
   await page.locator('#run').click();
   await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 120_000 });
   await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+  // The disk path was reached and refused at least one write, so the finish came from the memory fallback.
+  expect(await page.evaluate(() => (window as unknown as { __blocked: number }).__blocked)).toBeGreaterThan(0);
   await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
   expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'ok' });
 });
