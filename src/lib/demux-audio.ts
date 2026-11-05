@@ -8,11 +8,15 @@
  */
 import { ALL_FORMATS, BlobSource, Input, EncodedAudioPacketSource, EncodedPacketSink, BufferTarget, Mp4OutputFormat, Output, type EncodedPacket } from 'mediabunny';
 import { channelsOf } from './audio';
-import { audioDecodeError } from './speech-errors';
+import { audioDamaged, audioDecodeError, looksLikeMemory } from './speech-errors';
 import { decodeWithin } from './decode-guard';
+import { isPhoneBrowser } from './phone-limit';
+import { isNotReadable } from './read-failure';
 
-/** Seconds of sound decoded in one go. */
-const STRETCH = 300;
+/** Seconds of sound decoded in one go. The browser decodes at the file's own rate and in stereo before resampling, so 5 minutes of 48 kHz sound is over 100 MB at once: too much for a phone, which takes a fifth of that. */
+export const stretchSeconds = (phone = isPhoneBrowser()) => (phone ? 60 : 300);
+/** The fewest packets a stretch is split down to when the browser refuses it; a bit this small that is still refused is damaged and left out. */
+const SMALLEST = 8;
 /** Packets decoded before each stretch (and thrown away) so the decoder has warmed up where the real sound starts. */
 const PRE_ROLL = 4;
 /** Codecs the browsers' own decoders read from an MP4 wrapper. */
@@ -90,7 +94,7 @@ export async function demuxedSound(input: Input, rate: number, mono: boolean, on
   for await (const p of new EncodedPacketSink(track).packets()) {
     if (packets.length === 0) spanStart = Math.max(0, p.timestamp);
     packets.push(p);
-    if (p.timestamp - spanStart >= STRETCH) {
+    if (p.timestamp - spanStart >= stretchSeconds()) {
       await flush();
       onProgress?.(Math.min(0.99, p.timestamp / duration));
     }
@@ -105,7 +109,7 @@ export async function demuxedSound(input: Input, rate: number, mono: boolean, on
  * stretches written out as zeros) so the caller can let each one go. Null before the first stretch when the file has no
  * sound track this can copy into a wrapper. Throws NO_SOUND when the track holds no sound.
  */
-export async function* demuxedStretches(input: Input, rate: number, onProgress?: (fraction: number) => void): AsyncGenerator<Float32Array> {
+export async function* demuxedStretches(input: Input, rate: number, onProgress?: (fraction: number) => void, onLost?: (seconds: number) => void): AsyncGenerator<Float32Array> {
   const track = await input.getPrimaryAudioTrack().catch(() => null);
   if (!track || !track.codec || !WRAPPABLE.has(track.codec)) return;
   const config = await track.getDecoderConfig();
@@ -113,12 +117,14 @@ export async function* demuxedStretches(input: Input, rate: number, onProgress?:
   const declared = await input.computeDuration().catch(() => NaN);
   const duration = Number.isFinite(declared) ? Math.max(1, declared) : 1;
   let written = 0;
+  let lostSeconds = 0;
   let packets: EncodedPacket[] = [];
   let tail: EncodedPacket[] = [];
   let spanStart = 0;
   const flush = async (): Promise<Float32Array | null> => {
     if (packets.length === 0) return null;
-    const [mono] = await decodeStretch(tail, packets, config, rate, true);
+    // A stretch the browser refuses is cut in halves until what it will not take is small; that bit is left out as silence and counted.
+    const mono = await decodeOrSplit(tail, packets, config, rate, (seconds) => onLost?.((lostSeconds += seconds)));
     const at = placedAt(spanStart, written, rate);
     tail = packets.slice(-PRE_ROLL);
     packets = [];
@@ -133,7 +139,7 @@ export async function* demuxedStretches(input: Input, rate: number, onProgress?:
   for await (const p of new EncodedPacketSink(track).packets()) {
     if (packets.length === 0) spanStart = Math.max(0, p.timestamp);
     packets.push(p);
-    if (p.timestamp - spanStart >= STRETCH) {
+    if (p.timestamp - spanStart >= stretchSeconds()) {
       const out = await flush();
       onProgress?.(Math.min(0.99, p.timestamp / duration));
       if (out?.length) yield out;
@@ -142,6 +148,34 @@ export async function* demuxedStretches(input: Input, rate: number, onProgress?:
   const last = await flush();
   if (last?.length) yield last;
   if (written === 0) throw audioDecodeError(NO_SOUND);
+  // Most of the sound could not be read: what was heard is not a transcript of this recording.
+  if (lostSeconds * rate >= written / 2) throw audioDamaged(lostSeconds);
+}
+
+/** `decodeStretch` mono; when the browser refuses the stretch, its two halves, and so on down to `SMALLEST` packets, which are then given up (silence, reported to `lost`). */
+async function decodeOrSplit(preRoll: EncodedPacket[], packets: EncodedPacket[], config: AudioDecoderConfig, rate: number, lost: (seconds: number) => void): Promise<Float32Array> {
+  try {
+    return (await decodeStretch(preRoll, packets, config, rate, true))[0]!;
+  } catch (e) {
+    // A file that cannot be read, and a decoder that hung (splitting would hang it again), are not a damaged stretch.
+    if (isNotReadable(e) || (e as { name?: string; cause?: { name?: string } } | null)?.cause?.name === 'DecodeTimeout' || (e as { name?: string } | null)?.name === 'DecodeTimeout') throw e;
+    if (packets.length <= SMALLEST) {
+      // Too little memory for even this bit is the device's, not the file's.
+      if (looksLikeMemory(e)) throw e;
+      const last = packets[packets.length - 1]!;
+      const seconds = Math.max(0, last.timestamp + last.duration - packets[0]!.timestamp);
+      lost(seconds);
+      return new Float32Array(Math.round(seconds * rate));
+    }
+    const mid = packets.length >> 1;
+    const head = packets.slice(0, mid);
+    const first = await decodeOrSplit(preRoll, head, config, rate, lost);
+    const second = await decodeOrSplit(head.slice(-PRE_ROLL), packets.slice(mid), config, rate, lost);
+    const both = new Float32Array(first.length + second.length);
+    both.set(first);
+    both.set(second, first.length);
+    return both;
+  }
 }
 
 /** Wrap some packets in an MP4 and decode it; the pre-roll packets are decoded too, then dropped from the front. */

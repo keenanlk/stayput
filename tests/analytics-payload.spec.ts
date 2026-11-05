@@ -291,12 +291,12 @@ for (const [path, slug, format] of [
   });
 }
 
-test('a file with no readable sound fails with AudioDecodeError before any model is fetched', async ({ page, baseURL }) => {
+test('a file that is no recording fails with NotAnAudioFile before any model is fetched', async ({ page, baseURL }) => {
   const sent = await captureAnalytics(page, baseURL!);
   const models: string[] = [];
   page.on('request', (r) => r.url().includes('/models/') && models.push(r.url()));
   const out = await failedCaptionRun(page, baseURL!, 'transcribe', sent, fx('anim.gif'));
-  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'AudioDecodeError' });
+  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'NotAnAudioFile' });
   expect(models).toEqual([]);
 });
 

@@ -162,7 +162,12 @@ export interface Speech {
 }
 
 /** Says something only when the run changed path part-way; a run wholly on one path needs no note. */
-function pathNote(onChip: number, onCpu: number, tiny: false | 'after-failure' | 'from-start'): string {
+function pathNote(onChip: number, onCpu: number, tiny: false | 'after-failure' | 'from-start', lostSeconds = 0): string {
+  const lost = lostSeconds >= 1 ? `About ${formatDuration(lostSeconds)} of the sound could not be read and was left out, so some speech may be missing. ` : '';
+  return (lost + basePathNote(onChip, onCpu, tiny)).trim();
+}
+
+function basePathNote(onChip: number, onCpu: number, tiny: false | 'after-failure' | 'from-start'): string {
   // Marketing's wording (STAA-398 item 6).
   if (tiny === 'after-failure') return 'This device ran short of memory, so these captions were made with the smaller speech model, which is less accurate. Check them before you use them.';
   if (tiny === 'from-start') return 'These captions were made with the smaller speech model, which is less accurate. Check them before you use them.';
@@ -183,12 +188,13 @@ export async function transcribeFile(
   let sound: SpeechSound;
   let pieces: AsyncGenerator<Piece>;
   let first: Piece;
+  let lostSeconds = 0;
   const readNote = (f: number) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f);
   try {
     // A page hidden while the sound is read starts that step again once it is back. A file the browser could not read
     // from disk is read once more before anything is said about its sound.
     sound = await resumeWhenHidden(() => retryUnreadable(file, () => openSpeech(file), (message) => onProgress(message, 0.02)), page.hooks);
-    pieces = readPieces(sound, file, page.hooks, readNote, (message) => onProgress(message, 0.02));
+    pieces = readPieces(sound, file, page.hooks, readNote, (seconds) => (lostSeconds = seconds), (message) => onProgress(message, 0.02));
     // The first piece is read before the model is: a recording with no readable sound ends here, not after a download.
     const next = await pieces.next();
     if (next.done || next.value.samples.length / RATE < 0.5) throw noSpeechFound('The recording is too short to hold any speech.');
@@ -242,7 +248,7 @@ export async function transcribeFile(
         },
       },
     );
-    return { segments: run.segments, language: run.language!, duration: run.total, pathNote: pathNote(onChip, onCpu, run.steppedDown ? 'after-failure' : startedTiny ? 'from-start' : false) };
+    return { segments: run.segments, language: run.language!, duration: run.total, pathNote: pathNote(onChip, onCpu, run.steppedDown ? 'after-failure' : startedTiny ? 'from-start' : false, lostSeconds) };
   } catch (err) {
     // What was recognised before the failure goes out with it, in the format the tool writes.
     const partial = (err as { partial?: SpeechPartial } | null)?.partial;
@@ -258,12 +264,12 @@ export async function transcribeFile(
  * The recording as pieces, read lazily. A read that stops because the page was hidden, or because the file could not be
  * read for a moment, starts again from the end of the last piece handed over (the sound before it is decoded and dropped).
  */
-async function* readPieces(sound: SpeechSound, file: File, hooks: ReturnType<typeof pageRecoveryHooks>['hooks'], onProgress: (f: number) => void, onNotice: (message: string) => void): AsyncGenerator<Piece> {
+async function* readPieces(sound: SpeechSound, file: File, hooks: ReturnType<typeof pageRecoveryHooks>['hooks'], onProgress: (f: number) => void, onLost: (seconds: number) => void, onNotice: (message: string) => void): AsyncGenerator<Piece> {
   let from = 0;
   let hidden = 0;
   let unreadable = 0;
   for (;;) {
-    const source = piecesOf(sound.chunks(onProgress), RATE, from);
+    const source = piecesOf(sound.chunks(onProgress, onLost), RATE, from);
     try {
       for (;;) {
         const next = await source.next();

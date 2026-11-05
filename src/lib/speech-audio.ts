@@ -20,7 +20,7 @@ import { decoderOrder, soundFormatName, soundOf, undecodableText, type SoundKind
 import { amrPcm, bareSound, ensureAc3, hasAudioDecoder, refusalFor } from './odd-audio';
 import { isNotReadable, notReadable } from './read-failure';
 import { isPhoneBrowser } from './phone-limit';
-import { audioDecodeError, unsupportedSound, isRecordingTooLong, looksLikeMemory, outOfMemoryError, recordingTooLongError, speechSecondsBudget, SpeechError } from './speech-errors';
+import { audioDamaged, audioDecodeError, notAnAudioFile, unsupportedSound, isRecordingTooLong, looksLikeMemory, outOfMemoryError, recordingTooLongError, speechSecondsBudget, SpeechError } from './speech-errors';
 
 export const SPEECH_RATE = 16000;
 
@@ -32,7 +32,7 @@ export interface SpeechSound {
   /** The container's own length in seconds, NaN when it says none (only a guide: the real length is what the sound turns out to be). */
   seconds: number;
   /** The sound as mono 16 kHz chunks, in order. A read that fails before any sound arrived tries the next decoder; one that fails later throws. */
-  chunks(onProgress?: (fraction: number) => void): AsyncGenerator<Float32Array>;
+  chunks(onProgress?: (fraction: number) => void, onLost?: (seconds: number) => void): AsyncGenerator<Float32Array>;
   dispose(): void;
 }
 
@@ -71,15 +71,15 @@ export async function openSpeech(file: File): Promise<SpeechSound> {
     return {
       seconds: believable ? seconds : NaN,
       dispose: () => input.dispose?.(),
-      async *chunks(onProgress) {
+      async *chunks(onProgress, onLost) {
         try {
-          yield* decode(onProgress);
+          yield* decode(onProgress, onLost);
         } catch (e) {
           throw asSpeechError(e);
         }
       },
     };
-    async function* decode(onProgress?: (fraction: number) => void): AsyncGenerator<Float32Array> {
+    async function* decode(onProgress?: (fraction: number) => void, onLost?: (seconds: number) => void): AsyncGenerator<Float32Array> {
       {
         let streamedSome = false;
         // A video's sound is copied out and decoded a stretch at a time, and a stretch the browser refuses is not retried on the whole file, which is what that path exists to avoid.
@@ -93,7 +93,7 @@ export async function openSpeech(file: File): Promise<SpeechSound> {
           try {
             if (step === 'wrap') {
               if (!hasVideo && !long) continue;
-              source = demuxedStretches(input, SPEECH_RATE, onProgress);
+              source = demuxedStretches(input, SPEECH_RATE, onProgress, onLost);
             } else if (step === 'browser') {
               if (failed) continue;
               needsWhole();
@@ -123,6 +123,9 @@ export async function openSpeech(file: File): Promise<SpeechSound> {
         const message = undecodableMessage(sound, err);
         // A named format nothing here reads is its own kind of failure; a damaged AAC or MP3 file, or one that says nothing, stays a decode failure.
         if (refusalFor(sound) && !isUnreadable(err)) throw unsupportedSound(message, err);
+        // What is left is told apart by what the browser and the container reader said, so the stats split by cause.
+        if (!(await input.getFormat().catch(() => null))) throw notAnAudioFile(err);
+        if (track && err instanceof Error && ['EncodingError', 'DataError'].includes(err.name)) throw audioDamaged(undefined, err);
         throw audioDecodeError(message, err);
       }
     }
@@ -138,12 +141,14 @@ function unlessUnreadable(e: unknown): null {
   return null;
 }
 
+const SPEECH_OWN = ['AudioDecodeError', 'OutOfMemoryError', 'UnsupportedSound', 'AudioDamaged', 'NotAnAudioFile'];
+
 /** Anything a decode throws, as one of the page's own errors. */
 function asSpeechError(e: unknown): Error {
   if (isNotReadable(e)) return notReadable(e);
   if (isRecordingTooLong(e)) return e as Error;
-  if (e instanceof SpeechError && ['AudioDecodeError', 'OutOfMemoryError', 'UnsupportedSound'].includes(e.kind)) return e;
-  if (e instanceof Error && ['AudioDecodeError', 'OutOfMemoryError', 'UnsupportedSound'].includes(e.name)) return e;
+  if (e instanceof SpeechError && SPEECH_OWN.includes(e.kind)) return e;
+  if (e instanceof Error && SPEECH_OWN.includes(e.name)) return e;
   return looksLikeMemory(e) ? outOfMemoryError() : audioDecodeError(undefined, e);
 }
 
