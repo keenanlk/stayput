@@ -27,7 +27,7 @@ async function errorClass(page: Page) {
 test.describe('on the page', () => {
   test.setTimeout(300_000);
 
-  test('Video splitter: the cutting code failing to load records CutToolLoadFailed, not TypeError', async ({ page }) => {
+  test('Video splitter: the cutting code gone from the server says Reload and records AppUpdated, not TypeError', async ({ page }) => {
     await open(page);
     await page.route(/\/_astro\/video-trim[^/]*\.js/, (route) => route.abort());
     await page.goto('/tools/video-splitter');
@@ -38,7 +38,9 @@ test.describe('on the page', () => {
     await page.locator('#vs-equal').fill('2');
     await page.locator('#run').click();
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 120_000 });
-    expect(await errorClass(page)).toMatchObject({ outcome: 'error', error_class: 'CutToolLoadFailed' });
+    await expect(page.locator('#error')).toContainText('Reload');
+    await expect(page.locator('#error a')).toHaveText('Reload');
+    expect(await errorClass(page)).toMatchObject({ outcome: 'error', error_class: 'AppUpdated' });
   });
 
   test('Extract audio from video: the MP3 encoder failing to load records Mp3EncodeFailed, not TypeError', async ({ page }) => {

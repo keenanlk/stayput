@@ -5,6 +5,7 @@ import { overPhoneLimit } from '../lib/phone-limit';
 import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/video-split';
 import { InputError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
+import { lazyImport, warm } from '../lib/lazy-import';
 import { isNotReadable, probeReadable, snapshotFile } from '../lib/read-failure';
 
 /**
@@ -53,21 +54,16 @@ async function rereading<T>(file: Blob, job: () => Promise<T>, onNotice?: (messa
   return job();
 }
 
-/** The cutting code, loaded on first use. Two more tries after a failure; a load that still fails is CutToolLoadFailed. */
-async function loadCutTool(onRetry: () => void): Promise<typeof import('../lib/video-trim')> {
-  let last: unknown;
-  for (const pause of [0, 800, 2000]) {
-    if (pause) {
-      onRetry();
-      await new Promise((r) => setTimeout(r, pause));
-    }
-    try {
-      return await import('../lib/video-trim');
-    } catch (e) {
-      last = e;
-    }
+/**
+ * The cutting code, loaded on first use. A chunk that is gone after a deploy is AppUpdated with a Reload link (retrying
+ * cannot help: the browser remembers a failed import by URL). Any other load error is named CutToolLoadFailed.
+ */
+async function loadCutTool(): Promise<typeof import('../lib/video-trim')> {
+  try {
+    return await lazyImport(() => import('../lib/video-trim'));
+  } catch (e) {
+    throw nameBare('CutToolLoadFailed', e);
   }
-  throw nameBare('CutToolLoadFailed', last);
 }
 
 const clock = (s: number) => {
@@ -169,6 +165,8 @@ const shell = createShell({
   keepAwake: true,
   remembersSize: true,
   async onFilesChanged(files) {
+    // Fetch the cutting code at drop time, while the deployment that served this page is most likely still current.
+    if (files.length > 0) warm(() => import('../lib/video-trim'));
     if (files.length === 0) {
       duration = 0;
       fileSize = 0;
@@ -204,9 +202,8 @@ const shell = createShell({
       throw new InputError(e instanceof Error ? e.message : 'Check the times and try again.');
     }
     const exact = bool('exact');
-    // The cutting code loads on first use: a connection that drops here fails the import with a bare TypeError ("Failed to fetch dynamically imported module").
-    // A dropped connection or a busy phone fails it once and not twice, so it is asked for again (after 0.8 s, then 2 s) before the run fails.
-    const { trimVideo } = await loadCutTool(() => progress.set('The cutting code could not load. Trying again.', 0));
+    // The cutting code loads on first use (and is warmed when the file is added).
+    const { trimVideo } = await loadCutTool();
     const outs: OutputFile[] = [];
     for (const [i, part] of parts.entries()) {
       const label = `Part ${i + 1} of ${parts.length}`;
