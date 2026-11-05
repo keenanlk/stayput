@@ -7011,7 +7011,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Which video files does it read?', a: 'MP4, MOV, M4V, WebM and MKV, as long as your browser can play the sound track. For audio-only files use [Audio to text](/audio-to-text).' },
-      { q: 'Is there a length limit?', a: 'No fixed limit. Only the soundtrack is read, a stretch at a time, so a long video needs no more memory than a short one; it just takes longer. In our tests on a computer, recordings of two and three hours were transcribed. A few unusual files can only be read by the browser as a whole, and those still have a limit (about half an hour on a phone); the page says so before it downloads anything.' },
+      { q: 'Is there a length limit?', a: 'No fixed limit. Only the soundtrack is read, a stretch at a time, so a long video needs no more memory than a short one; it just takes longer. In our tests on a computer, audio recordings of one, two and three hours were transcribed; we have not yet tested a video that long. A few unusual files can only be read by the browser as a whole, and those still have a limit (about half an hour on a phone); the page says so before it downloads anything.' },
       { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (77 MB, or 95 MB on computers with WebGPU) are stored by your browser, so you can transcribe without a connection.' },
       { q: 'Can I get subtitles instead of plain text?', a: 'Yes. Use [Video to subtitles](/video-to-subtitles) for an SRT or WebVTT file timed to the speech.' },
       { q: 'Does it say who is speaking?', a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph, which usually falls where the speaker changes.' },
