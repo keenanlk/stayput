@@ -2,6 +2,7 @@ import { clean, type Segment } from './captions';
 import { NamedError } from './input-error';
 import { restartsOnce } from './speech-errors';
 import type { SpeechModel } from './speech-path';
+import type { Piece } from './speech-pieces';
 
 /**
  * The piece-by-piece part of a speech run, with the worker, the page and the clock passed in so it can be tested
@@ -35,6 +36,8 @@ export interface PieceDeps {
 }
 
 export interface PieceRun {
+  /** Seconds of sound the run went through. */
+  total: number;
   segments: Segment[];
   language: string | null;
   model: SpeechModel;
@@ -54,7 +57,25 @@ export async function recognisePieces(
   opts: { language: string | null; task: string; model: SpeechModel },
   deps: PieceDeps,
 ): Promise<PieceRun> {
-  const total = samples.length / rate;
+  async function* all(): AsyncGenerator<Piece> {
+    for (let i = 1; i < cuts.length; i++) yield { from: cuts[i - 1]!, samples: samples.slice(cuts[i - 1], cuts[i]) };
+  }
+  return recognisePieceStream(all(), rate, samples.length / rate, fileName, opts, deps);
+}
+
+/**
+ * The same run over pieces that arrive one at a time (see speech-pieces.ts), so only the piece in hand, and the one
+ * being read, are in memory. `guess` is the recording's length as its container says (NaN when it says none), used for the
+ * progress line until the pieces show the real one.
+ */
+export async function recognisePieceStream(
+  pieces: AsyncIterable<Piece>,
+  rate: number,
+  guess: number,
+  fileName: string,
+  opts: { language: string | null; task: string; model: SpeechModel },
+  deps: PieceDeps,
+): Promise<PieceRun> {
   const segments: Segment[] = [];
   // Detected once, from the first piece, then kept for the rest of the recording.
   let spoken = opts.language;
@@ -65,11 +86,12 @@ export async function recognisePieces(
   let resumes = 0;
   let sinceResume = 0;
   let covered = 0;
-  for (let i = 1; i < cuts.length; i++) {
-    const from = cuts[i - 1]!;
+  let total = Number.isFinite(guess) ? guess : 0;
+  try {
+  for await (const { from, samples: piece } of pieces) {
     const at = from / rate;
-    deps.onProgress(`Transcribing ${fileName}: ${deps.time(at)} of ${deps.time(total)}`, 0.05 + 0.95 * (at / total));
-    const piece = samples.slice(from, cuts[i]);
+    total = Math.max(total, at + piece.length / rate);
+    deps.onProgress(`Transcribing ${fileName}: ${deps.time(at)}${total > 0 && Number.isFinite(guess) ? ` of ${deps.time(total)}` : ''}`, 0.05 + 0.95 * (total > 0 ? at / total : 0));
     let found;
     // The first try hands over a copy, because the sound is handed over to the worker; a later try uses the piece itself.
     let again = false;
@@ -109,11 +131,16 @@ export async function recognisePieces(
     deps.onPiece();
     recognised++;
     sinceResume++;
-    covered = (cuts[i] ?? samples.length) / rate;
+    covered = at + piece.length / rate;
     spoken = found.language;
     segments.push(...found.chunks.map((s) => ({ start: s.start + at, end: s.end + at, text: s.text })));
   }
-  return { segments: clean(segments), language: spoken, model, steppedDown };
+  } catch (err) {
+    // A read that failed between pieces (the sound could not be decoded further on) hands over what was recognised so far.
+    if (err instanceof Error && !(err as { partial?: unknown }).partial) throw partial(err, segments, spoken, covered, total);
+    throw err;
+  }
+  return { total: covered, segments: clean(segments), language: spoken, model, steppedDown };
 }
 
 /** The error to throw, with what was recognised so far attached. */

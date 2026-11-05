@@ -18,23 +18,29 @@ export interface Segment {
  */
 export function cutPoints(samples: Float32Array, rate: number, max = 28, min = 18): number[] {
   const cuts: number[] = [];
-  const win = Math.round(rate * 0.1);
   let start = 0;
   while (samples.length - start > max * rate) {
-    let best = start + max * rate;
-    let quietest = Infinity;
-    for (let a = start + min * rate; a + win <= start + max * rate; a += win) {
-      let sum = 0;
-      for (let i = a; i < a + win; i++) sum += samples[i]! * samples[i]!;
-      if (sum < quietest) {
-        quietest = sum;
-        best = a + Math.floor(win / 2);
-      }
-    }
+    const best = nextCut(samples, start, rate, max, min);
     cuts.push(best);
     start = best;
   }
   return cuts;
+}
+
+/** Where the piece starting at `start` ends: the quietest tenth of a second between `min` and `max` seconds on. Needs more than `max` seconds after `start`. */
+export function nextCut(samples: Float32Array, start: number, rate: number, max = 28, min = 18): number {
+  const win = Math.round(rate * 0.1);
+  let best = start + max * rate;
+  let quietest = Infinity;
+  for (let a = start + min * rate; a + win <= start + max * rate; a += win) {
+    let sum = 0;
+    for (let i = a; i < a + win; i++) sum += samples[i]! * samples[i]!;
+    if (sum < quietest) {
+      quietest = sum;
+      best = a + Math.floor(win / 2);
+    }
+  }
+  return best;
 }
 
 /** Tidy the model's text: collapse spaces and drop empty or bracketed non-speech lines. */

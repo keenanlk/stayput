@@ -100,6 +100,50 @@ export async function demuxedSound(input: Input, rate: number, mono: boolean, on
   return (out as Float32Array[]).map((ch) => ch.subarray(0, written));
 }
 
+/**
+ * The same sound as `demuxedSound`, handed over a stretch at a time (mono at `rate`, in order, silence between
+ * stretches written out as zeros) so the caller can let each one go. Null before the first stretch when the file has no
+ * sound track this can copy into a wrapper. Throws NO_SOUND when the track holds no sound.
+ */
+export async function* demuxedStretches(input: Input, rate: number, onProgress?: (fraction: number) => void): AsyncGenerator<Float32Array> {
+  const track = await input.getPrimaryAudioTrack().catch(() => null);
+  if (!track || !track.codec || !WRAPPABLE.has(track.codec)) return;
+  const config = await track.getDecoderConfig();
+  if (!config) return;
+  const declared = await input.computeDuration().catch(() => NaN);
+  const duration = Number.isFinite(declared) ? Math.max(1, declared) : 1;
+  let written = 0;
+  let packets: EncodedPacket[] = [];
+  let tail: EncodedPacket[] = [];
+  let spanStart = 0;
+  const flush = async (): Promise<Float32Array | null> => {
+    if (packets.length === 0) return null;
+    const [mono] = await decodeStretch(tail, packets, config, rate, true);
+    const at = placedAt(spanStart, written, rate);
+    tail = packets.slice(-PRE_ROLL);
+    packets = [];
+    // Silence the timestamps leave between stretches is kept; sound they say overlaps the last stretch is not played twice.
+    const lead = at > written ? new Float32Array(at - written) : null;
+    const body = at < written ? mono!.subarray(Math.min(written - at, mono!.length)) : mono!;
+    const out = new Float32Array((lead?.length ?? 0) + body.length);
+    out.set(body, lead?.length ?? 0);
+    written += out.length;
+    return out;
+  };
+  for await (const p of new EncodedPacketSink(track).packets()) {
+    if (packets.length === 0) spanStart = Math.max(0, p.timestamp);
+    packets.push(p);
+    if (p.timestamp - spanStart >= STRETCH) {
+      const out = await flush();
+      onProgress?.(Math.min(0.99, p.timestamp / duration));
+      if (out?.length) yield out;
+    }
+  }
+  const last = await flush();
+  if (last?.length) yield last;
+  if (written === 0) throw audioDecodeError(NO_SOUND);
+}
+
 /** Wrap some packets in an MP4 and decode it; the pre-roll packets are decoded too, then dropped from the front. */
 async function decodeStretch(preRoll: EncodedPacket[], packets: EncodedPacket[], config: AudioDecoderConfig, rate: number, mono: boolean): Promise<Float32Array[]> {
   const all = [...preRoll, ...packets];

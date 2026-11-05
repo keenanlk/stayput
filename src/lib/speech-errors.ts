@@ -82,10 +82,12 @@ export function encodeFailedError(cause: unknown): Error {
 }
 export const speechModelError = () => make('SpeechModelError', 'The speech model could not read this recording. Try again, or try a shorter recording or another file.');
 /**
- * Seconds of sound the speech step may hold in memory on this device. The samples (16 kHz, 4 bytes each) are kept whole, and
- * each piece is copied again for the worker and once more for a retry, so three copies must fit in a quarter of the memory
- * the browser admits to (`navigator.deviceMemory`, in GB, capped at 8 and missing in Safari and Firefox: then 4 GB on a
- * computer and 1.5 GB on a phone, the figure the phone limit was measured against).
+ * Seconds of sound a decode that must hold the whole recording may ask for on this device (the browser's own whole-file
+ * decode, for a sound the page's decoders cannot read a stretch at a time; AAC, MP3 and every codec the page can decode are
+ * read a stretch at a time and have no such limit). The samples (16 kHz, 4 bytes each) are kept whole, with a copy for the
+ * worker and one for a retry, so three copies must fit in a quarter of the memory the browser admits to
+ * (`navigator.deviceMemory`, in GB, capped at 8 and missing in Safari and Firefox: then 4 GB on a computer and 1.5 GB on a phone,
+ * the figure the phone limit was measured against).
  */
 export function speechSecondsBudget(deviceMemoryGb: number | undefined, phone: boolean): number {
   const gb = deviceMemoryGb && deviceMemoryGb > 0 ? deviceMemoryGb : phone ? 1.5 : 4;
