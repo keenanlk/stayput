@@ -6,7 +6,7 @@
  * cannot decode a QuickTime .mov (what an iPhone records) by itself, and
  * decoding a whole phone video at once can run the tab out of memory.
  */
-import { ALL_FORMATS, BlobSource, Input, EncodedAudioPacketSource, EncodedPacketSink, BufferTarget, Mp3OutputFormat, Mp4OutputFormat, Output, type EncodedPacket } from 'mediabunny';
+import { ALL_FORMATS, BlobSource, Input, type InputAudioTrack, EncodedAudioPacketSource, EncodedPacketSink, BufferTarget, Mp3OutputFormat, Mp4OutputFormat, Output, type EncodedPacket } from 'mediabunny';
 import { channelsOf } from './audio';
 import { audioDamaged, audioDecodeError, looksLikeMemory } from './speech-errors';
 import { decodeWithin } from './decode-guard';
@@ -45,6 +45,36 @@ export function grown(channel: Float32Array<ArrayBuffer>, need: number): Float32
 export function placedAt(seconds: number, written: number, rate: number): number {
   const at = Math.round(Math.max(0, seconds) * rate);
   return at > written + MAX_GAP_SECONDS * rate ? written : at;
+}
+
+/** Under this share of an MP3 unparsed is tags, padding and a Xing frame, not lost sound. */
+const UNPARSED_TOLERANCE = 0.02;
+
+/** Bytes of ID3 tags at the start and end of an MP3 (cover art can be megabytes), which hold no sound. */
+async function id3Bytes(file: Blob): Promise<number> {
+  const head = new Uint8Array(await file.slice(0, 10).arrayBuffer());
+  const v2 = head.length === 10 && head[0] === 0x49 && head[1] === 0x44 && head[2] === 0x33 ? 10 + (((head[6]! & 127) << 21) | ((head[7]! & 127) << 14) | ((head[8]! & 127) << 7) | (head[9]! & 127)) + ((head[5]! & 16) !== 0 ? 10 : 0) : 0;
+  const tail = file.size >= 128 ? new Uint8Array(await file.slice(file.size - 128, file.size - 125).arrayBuffer()) : new Uint8Array();
+  const v1 = tail[0] === 0x54 && tail[1] === 0x41 && tail[2] === 0x47 ? 128 : 0;
+  return v2 + v1;
+}
+
+/**
+ * Seconds of an MP3's sound the reader dropped because the bytes did not parse as frames (random or zeroed stretches
+ * in the middle of the file): mediabunny gives the frames that remain consecutive timestamps, so the file's duration shrinks
+ * to match and no gap shows. What shows is the bytes: the frames found are a share of the file, and the rest of it,
+ * less tags, is sound that was lost. 0 for a file that is not a plain MP3 or whose frames fill it.
+ */
+export async function unparsedSeconds(track: InputAudioTrack, file: Blob): Promise<number> {
+  if (track.codec !== 'mp3') return 0;
+  const seconds = await track.computeDuration().catch(() => NaN);
+  if (!Number.isFinite(seconds) || seconds <= 0) return 0;
+  let parsed = 0;
+  for await (const p of new EncodedPacketSink(track).packets(undefined, undefined, { metadataOnly: true })) parsed += p.byteLength;
+  const total = file.size - (await id3Bytes(file));
+  if (parsed <= 0 || total <= 0) return 0;
+  const lost = 1 - parsed / total;
+  return lost < UNPARSED_TOLERANCE ? 0 : (seconds * lost) / (1 - lost);
 }
 
 export const NO_SOUND = 'No sound track was found in this file, so there is no speech to write down.';

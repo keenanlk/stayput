@@ -14,7 +14,7 @@
  * generic failure.
  */
 import { ALL_FORMATS, AudioBufferSink, BlobSource, Input, type InputAudioTrack } from 'mediabunny';
-import { demuxedStretches, NO_SOUND, placedAt } from './demux-audio';
+import { demuxedStretches, NO_SOUND, placedAt, unparsedSeconds } from './demux-audio';
 import { decodeAudio, channelsOf } from './audio';
 import { decoderOrder, soundFormatName, soundOf, undecodableText, type SoundKind } from './audio-codecs';
 import { amrPcm, bareSound, ensureAc3, hasAudioDecoder, refusalFor } from './odd-audio';
@@ -67,13 +67,20 @@ export async function openSpeech(file: File): Promise<SpeechSound> {
     const wrappable = !!track && (track.codec === 'aac' || track.codec === 'mp3');
     const streams = wrappable || (!!track && !!track.codec && (await track.canDecode().catch(() => false)));
     if (!streams) needsWhole();
+    // Bytes of an MP3 that did not parse are dropped by the reader without a trace in its timestamps: measured here, from the file, before the model is fetched.
+    const unparsed = track && !hasVideo ? await unparsedSeconds(track, file).catch(() => 0) : 0;
+    // Half or more of the recording gone: what is heard is not a transcript of it.
+    if (unparsed > 0 && unparsed >= seconds) throw audioDamaged(unparsed);
     const long = believable && seconds > STREAM_ABOVE;
     return {
       seconds: believable ? seconds : NaN,
       dispose: () => input.dispose?.(),
       async *chunks(onProgress, onLost) {
+        // What the reader dropped, plus what a stretch the browser refused adds to it.
+        const report = (more: number) => onLost?.(unparsed + more);
+        if (unparsed > 0) report(0);
         try {
-          yield* decode(onProgress, onLost);
+          yield* decode(onProgress, report);
         } catch (e) {
           throw asSpeechError(e);
         }
