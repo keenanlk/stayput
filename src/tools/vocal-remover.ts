@@ -9,7 +9,9 @@ import workerUrl from '../lib/vocals.worker.ts?worker&url';
 import { fromWorkerFailure } from '../lib/worker-error';
 import { retryUnreadable } from '../lib/read-failure';
 import { stageError } from '../lib/bare-error';
-import { longRecordingHint } from '../lib/long-audio';
+import { audioSeconds, longRecordingHint } from '../lib/long-audio';
+import { isPhoneBrowser } from '../lib/phone-limit';
+import { RETRYABLE, phoneSongBudget, separationFailedError, tooLongForPhone } from '../lib/vocal-limit';
 
 /**
  * Vocal remover: split a song into the instrumental (karaoke) and the vocals
@@ -31,7 +33,7 @@ function split(left: Float32Array, right: Float32Array, onLoading: (f: number) =
   worker ??= new Worker(retryUrl(workerUrl, started++), { type: 'module' });
   const w = worker;
   const id = nextId++;
-  return new Promise<{ left: Float32Array; right: Float32Array; engine: 'gpu' | 'cpu' }>((resolve, reject) => {
+  return new Promise<Extract<Reply, { type: 'done' }>>((resolve, reject) => {
     const onMessage = (e: MessageEvent<Reply>) => {
       const msg = e.data;
       if (msg.id !== id) return;
@@ -71,38 +73,63 @@ const shell = createShell({
     for (const [index, entry] of files.entries()) {
       const file = entry.file;
       const share = (f: number) => (index + f) / files.length;
+      if (isPhoneBrowser()) {
+        // A long song is refused by name before anything is decoded; its length comes from the file's header.
+        const length = await audioSeconds(file);
+        const budget = phoneSongBudget((navigator as { deviceMemory?: number }).deviceMemory);
+        if (length > budget) throw tooLongForPhone(file.name, length, budget);
+      }
       progress.set(`Reading ${file.name}…`, share(0.01));
       // The step under way: a failure with no name of its own is recorded as this, and a memory failure as OutOfMemoryError (see stageError).
       let step = 'AudioDecodeFailed';
       try {
-        const buffer = await retryUnreadable(file, () => decodeAudio(file, SAMPLE_RATE), (message) => progress.set(`${file.name}: ${message}`, share(0.01)));
-        const mixL = buffer.getChannelData(0).slice();
-        const mixR = (buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : buffer.getChannelData(0)).slice();
-        const seconds = mixL.length / SAMPLE_RATE;
+        // One copy of the song at a time: the decoded buffer is let go of as soon as it is copied, and the worker
+        // (not this page) works out the vocals over its own buffers.
+        const readSong = async () => {
+          const buffer = await retryUnreadable(file, () => decodeAudio(file, SAMPLE_RATE), (message) => progress.set(`${file.name}: ${message}`, share(0.01)));
+          const l = buffer.getChannelData(0).slice();
+          const r = buffer.numberOfChannels > 1 ? buffer.getChannelData(1).slice() : l.slice();
+          return { l, r };
+        };
+        let song = await readSong();
+        const seconds = song.l.length / SAMPLE_RATE;
         if (seconds < 1) throw new InputError(`${file.name} is too short to separate.`);
         step = 'AudioTransformFailed';
         const started = performance.now();
         let firstPieceAt = 0;
-        const res = await split(
-          mixL.slice(),
-          mixR.slice(),
-          (f) => {
-            if (!modelReady) progress.set(`Downloading the separation model, once (67 MB): ${Math.round(f * 100)}%`, share(0.02 + 0.08 * f));
-          },
-          (done, total, engine) => {
-            modelReady = true;
-            if (done === 0) {
-              firstPieceAt = performance.now();
-              progress.set(`Separating ${file.name}${engine === 'cpu' ? ' on the CPU (no WebGPU in this browser), which is slow' : ''}…`, share(0.1));
-              return;
-            }
-            const each = (performance.now() - (firstPieceAt || started)) / done / 1000;
-            const left = Math.round(each * (total - done));
-            progress.set(`Separating ${file.name}: ${Math.round((done / total) * 100)}%${done < total ? `, ${minutes(left)} left` : ''}`, share(0.1 + 0.8 * (done / total)));
-          },
-        );
+        const onLoading = (f: number) => {
+          if (!modelReady) progress.set(`Downloading the separation model, once (67 MB): ${Math.round(f * 100)}%`, share(0.02 + 0.08 * f));
+        };
+        const onPiece = (done: number, total: number, engine: 'gpu' | 'cpu') => {
+          modelReady = true;
+          if (done === 0) {
+            firstPieceAt = performance.now();
+            progress.set(`Separating ${file.name}${engine === 'cpu' ? ' on the CPU (no WebGPU in this browser), which is slow' : ''}…`, share(0.1));
+            return;
+          }
+          const each = (performance.now() - (firstPieceAt || started)) / done / 1000;
+          const left = Math.round(each * (total - done));
+          progress.set(`Separating ${file.name}: ${Math.round((done / total) * 100)}%${done < total ? `, ${minutes(left)} left` : ''}`, share(0.1 + 0.8 * (done / total)));
+        };
+        let res: Awaited<ReturnType<typeof split>>;
+        try {
+          res = await split(song.l, song.r, onLoading, onPiece);
+        } catch (first) {
+          // A worker that died or failed with no name of its own gets one more try on a fresh worker; then the error names what to do.
+          if (!(first instanceof Error) || !RETRYABLE.has(first.name)) throw first;
+          worker?.terminate();
+          worker = undefined;
+          progress.set(`Separating ${file.name}: starting again…`, share(0.1));
+          song = await readSong();
+          try {
+            res = await split(song.l, song.r, onLoading, onPiece);
+          } catch (second) {
+            if (second instanceof Error && RETRYABLE.has(second.name)) throw separationFailedError(second);
+            throw second;
+          }
+        }
         const inst = [res.left, res.right];
-        const voc = [mixL.map((v, i) => v - res.left[i]! / 1.022), mixR.map((v, i) => v - res.right[i]! / 1.022)];
+        const voc = [res.vocalsLeft, res.vocalsRight];
         const wanted: [string, Float32Array[]][] = [];
         if (stems !== 'vocals') wanted.push(['instrumental', inst]);
         if (stems !== 'instrumental') wanted.push(['vocals', voc]);

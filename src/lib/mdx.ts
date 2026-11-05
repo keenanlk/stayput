@@ -139,6 +139,12 @@ export class Mdx {
   private readonly window: Float64Array;
   private readonly re: Float64Array;
   private readonly im: Float64Array;
+  // Working space kept from one piece to the next, so a long song does not allocate (and wait for the browser to
+  // collect) about 35 MB of new arrays per piece: the spectrogram, and the sound accumulators and output.
+  private specBuf?: Float32Array;
+  private acc?: Float64Array;
+  private norm?: Float64Array;
+  private pieceOut?: [Float32Array, Float32Array];
 
   constructor(cfg: MdxConfig) {
     this.cfg = cfg;
@@ -155,7 +161,8 @@ export class Mdx {
   spectrogram(channels: [Float32Array, Float32Array]): Float32Array {
     const { nFft, hop, dimF, dimT } = this.cfg;
     const half = nFft / 2;
-    const out = new Float32Array(4 * dimF * dimT);
+    // Every cell is written below, so the buffer needs no clearing. The caller is done with it once the network has run.
+    const out = (this.specBuf ??= new Float32Array(4 * dimF * dimT));
     const { re, im, window } = this;
     channels.forEach((x, c) => {
       const len = x.length;
@@ -185,10 +192,12 @@ export class Mdx {
     const half = nFft / 2;
     const chunk = hop * (dimT - 1);
     const { re, im, window } = this;
-    const result: Float32Array[] = [];
+    const result = (this.pieceOut ??= [new Float32Array(chunk), new Float32Array(chunk)]);
+    const acc = (this.acc ??= new Float64Array(chunk + nFft));
+    const norm = (this.norm ??= new Float64Array(chunk + nFft));
     for (let c = 0; c < 2; c++) {
-      const acc = new Float64Array(chunk + nFft);
-      const norm = new Float64Array(chunk + nFft);
+      acc.fill(0);
+      norm.fill(0);
       const baseRe = (2 * c) * dimF * dimT;
       const baseIm = (2 * c + 1) * dimF * dimT;
       for (let f = 0; f < dimT; f++) {
@@ -211,14 +220,14 @@ export class Mdx {
           norm[o + i]! += window[i]! * window[i]!;
         }
       }
-      const y = new Float32Array(chunk);
+      const y = result[c]!;
       for (let i = 0; i < chunk; i++) {
         const w = norm[i + half]!;
         y[i] = w > 1e-11 ? acc[i + half]! / w : 0;
       }
-      result.push(y);
     }
-    return result as [Float32Array, Float32Array];
+    // The two arrays are reused by the next piece: copy what is wanted from them first (separate() does).
+    return result;
   }
 }
 
