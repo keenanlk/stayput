@@ -24,3 +24,5 @@ public/vendor/
 
 # internal work log written by outside tooling
 worklog.jsonl
+tests/fixtures/scanners/
+tests/fixtures/scanners/
