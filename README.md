@@ -121,6 +121,50 @@ That is the whole pitch, and you can check it in three ways:
 
 Plus dedicated pages for the jobs people search for: image conversions such as [HEIC to PNG](https://stayput.dev/heic-to-png), [PNG to JPG](https://stayput.dev/png-to-jpg), [WebP to PNG](https://stayput.dev/webp-to-png), [AVIF to JPG](https://stayput.dev/avif-to-jpg) and [JXL to PNG](https://stayput.dev/jxl-to-png); tool presets such as [JPG to PDF](https://stayput.dev/jpg-to-pdf), [PDF to JPG](https://stayput.dev/pdf-to-jpg), [Combine PDF](https://stayput.dev/combine-pdf), [Resize image](https://stayput.dev/resize-image), [Crop to circle](https://stayput.dev/crop-image-to-circle) and [Remove location from photos](https://stayput.dev/remove-location-from-photos); and [guides](https://stayput.dev/guides) that answer the question behind the tool ("is it safe to merge PDFs online?", "how do I remove location data from photos?").
 
+## Self-hosting
+
+Stayput is a static site, so it runs anywhere that can serve files. With Docker:
+
+```sh
+docker compose up -d --build
+```
+
+Then open <http://localhost:8080>. To use another port, set `STAYPUT_PORT`, for example `STAYPUT_PORT=3000 docker compose up -d --build`. The image is `nginx:alpine` plus the built site, with the same redirects, cache rules and security headers (Content-Security-Policy included) as stayput.dev, generated from `vercel.json` when the image is built.
+
+**No analytics.** Self-hosted builds ship without the usage counter: the page has no analytics script, the browser makes no request to our stats server, and the Content-Security-Policy does not allow that host. To turn it on anyway, build with `PUBLIC_ANALYTICS=on docker compose up -d --build`. (stayput.dev's own build is unchanged.)
+
+Without Docker, build it yourself (Node 22+) and serve `dist/` with any static server:
+
+```sh
+npm ci
+PUBLIC_ANALYTICS=off npm run build   # leave the variable out to include the usage counter
+```
+
+The server has to try `<path>.html` for a clean URL such as `/tools/merge-pdf` (the build writes flat files), serve `.wasm` as `application/wasm`, and use `404.html` for misses. For nginx:
+
+```nginx
+root /path/to/dist;
+location / { try_files $uri $uri.html =404; }
+error_page 404 /404.html;
+```
+
+For Caddy:
+
+```caddy
+:8080 {
+	root * /path/to/dist
+	encode gzip
+	try_files {path} {path}.html
+	file_server
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}
+```
+
+The tools that use your microphone or camera need a secure origin: `localhost` works, anything else needs HTTPS. The full header set and old-path redirects live in `vercel.json`; `docker/nginx.conf` shows how they map to nginx.
+
 ## MCP server
 
 Stayput also ships as a local [Model Context Protocol](https://modelcontextprotocol.io) server, [`stayput-mcp`](mcp/), so an LLM client can call the same PDF and photo tools as tool calls, still with no network access and no uploads:

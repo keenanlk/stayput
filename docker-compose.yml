@@ -1,0 +1,11 @@
+services:
+  stayput:
+    build:
+      context: .
+      args:
+        # "off" (the default here) builds without the usage counter. Set to "on" to include it.
+        PUBLIC_ANALYTICS: ${PUBLIC_ANALYTICS:-off}
+    image: stayput:local
+    ports:
+      - "${STAYPUT_PORT:-8080}:80"
+    restart: unless-stopped
