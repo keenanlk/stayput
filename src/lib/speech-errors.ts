@@ -8,7 +8,7 @@ import { NamedError, isUnspecific } from './input-error';
 
 import { isNotReadable } from './read-failure';
 
-export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelOffline', 'StorageFull', 'ModelVerifyFailed', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong', 'UnsupportedSound'] as const;
+export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelOffline', 'StorageFull', 'ModelVerifyFailed', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong', 'UnsupportedSound', 'AudioDamaged', 'NotAnAudioFile'] as const;
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
 
 export class SpeechError extends Error {
@@ -25,7 +25,7 @@ export class SpeechError extends Error {
 const make = (name: SpeechErrorName, message: string) => new SpeechError(name, message);
 
 export const modelDownloadError = () =>
-  make('ModelDownloadError', 'The speech model (77 MB) could not be downloaded. Check your connection, then try again: a download that stopped part way starts over. On mobile data, Wi-Fi is steadier.');
+  make('ModelDownloadError', 'The speech model (77 MB) could not be downloaded, even after trying again. Try again on a better connection: Wi-Fi, if you are on mobile data. A download that stops part way starts over.');
 export const modelLoadError = () =>
   make('ModelLoadError', 'The speech model downloaded but could not be started in this browser. Reload the page and try again, or use an up-to-date Chrome, Edge or Firefox on a computer.');
 export const outOfMemoryError = () =>
@@ -46,6 +46,21 @@ export const audioDecodeError = (message = 'No audio could be read from this fil
   err.cause = cause;
   const named = classNameOf(cause);
   if (!REFUSALS.includes(named)) err.name = named as SpeechErrorName;
+  return err;
+};
+/** Most of the sound could not be decoded: the browser refused it stretch after stretch, as it does for a file that was cut short, corrupted in transit or only partly saved. `lostSeconds` is how much was left out, when known. */
+export const audioDamaged = (lostSeconds?: number, cause?: unknown) => {
+  const err = make(
+    'AudioDamaged',
+    `${lostSeconds ? `About ${Math.max(1, Math.round(lostSeconds / 60))} min of this recording's sound could not be read. ` : "The sound in this file could not be read. "}It looks damaged or cut short, for example by a download or a copy that did not finish. Record or save it again, or try another copy.`,
+  );
+  if (cause !== undefined) err.cause = cause;
+  return err;
+};
+/** The file is not a sound or video at all (a picture, a document, a file with the wrong ending): no container this page reads. */
+export const notAnAudioFile = (cause?: unknown) => {
+  const err = make('NotAnAudioFile', "This file doesn't look like a recording or a video. Choose an audio or video file (MP3, M4A, WAV, MP4, MOV, WebM and so on).");
+  if (cause !== undefined) err.cause = cause;
   return err;
 };
 /** The sound is in a format no decoder this page carries can read (Dolby in a browser without the module, Opus in Safari before 26, ALAC, DTS). The message names the format; the cause, if any, is kept. */
@@ -82,10 +97,12 @@ export function encodeFailedError(cause: unknown): Error {
 }
 export const speechModelError = () => make('SpeechModelError', 'The speech model could not read this recording. Try again, or try a shorter recording or another file.');
 /**
- * Seconds of sound the speech step may hold in memory on this device. The samples (16 kHz, 4 bytes each) are kept whole, and
- * each piece is copied again for the worker and once more for a retry, so three copies must fit in a quarter of the memory
- * the browser admits to (`navigator.deviceMemory`, in GB, capped at 8 and missing in Safari and Firefox: then 4 GB on a
- * computer and 1.5 GB on a phone, the figure the phone limit was measured against).
+ * Seconds of sound a decode that must hold the whole recording may ask for on this device (the browser's own whole-file
+ * decode, for a sound the page's decoders cannot read a stretch at a time; AAC, MP3 and every codec the page can decode are
+ * read a stretch at a time and have no such limit). The samples (16 kHz, 4 bytes each) are kept whole, with a copy for the
+ * worker and one for a retry, so three copies must fit in a quarter of the memory the browser admits to
+ * (`navigator.deviceMemory`, in GB, capped at 8 and missing in Safari and Firefox: then 4 GB on a computer and 1.5 GB on a phone,
+ * the figure the phone limit was measured against).
  */
 export function speechSecondsBudget(deviceMemoryGb: number | undefined, phone: boolean): number {
   const gb = deviceMemoryGb && deviceMemoryGb > 0 ? deviceMemoryGb : phone ? 1.5 : 4;

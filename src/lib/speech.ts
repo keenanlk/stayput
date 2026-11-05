@@ -1,10 +1,11 @@
 import { formatDuration } from './audio';
-import { SPEECH_RATE, speechSamples } from './speech-audio';
-import { toSrt, toText, toVtt, cutPoints, type Segment } from './captions';
+import { SPEECH_RATE, openSpeech, type SpeechSound } from './speech-audio';
+import { piecesOf, type Piece } from './speech-pieces';
+import { toSrt, toText, toVtt, type Segment } from './captions';
 import { suffixName, type OutputFile } from './files';
 import { resumeWhenHidden } from './edit-recovery';
 import { pageRecoveryHooks } from './recovery-hooks';
-import { recognisePieces, type SpeechPartial } from './speech-resume';
+import { recognisePieceStream, type SpeechPartial } from './speech-resume';
 import { fromWorker, noSpeechFound, workerCrashError } from './speech-errors';
 import { isModelError, modelPreflight, uncachedBytes } from './model-fetch';
 import { modelEntry } from './model-manifest';
@@ -15,7 +16,7 @@ import cpuWorkerUrl from './transcribe.worker.ts?worker&url';
 import { SPEECH_MODEL_MB } from '../data/speech-size';
 import { rememberTinyModel, rememberWebgpuFailure, speechModel, wantsWebgpu, type SpeechModel } from './speech-path';
 import { isPhoneBrowser } from './phone-limit';
-import { retryUnreadable } from './read-failure';
+import { isNotReadable, retryUnreadable } from './read-failure';
 import type { Reply, Request } from './transcribe.worker';
 
 /**
@@ -161,7 +162,12 @@ export interface Speech {
 }
 
 /** Says something only when the run changed path part-way; a run wholly on one path needs no note. */
-function pathNote(onChip: number, onCpu: number, tiny: false | 'after-failure' | 'from-start'): string {
+function pathNote(onChip: number, onCpu: number, tiny: false | 'after-failure' | 'from-start', lostSeconds = 0): string {
+  const lost = lostSeconds >= 1 ? `About ${formatDuration(lostSeconds)} of the sound could not be read and was left out, so some speech may be missing. ` : '';
+  return (lost + basePathNote(onChip, onCpu, tiny)).trim();
+}
+
+function basePathNote(onChip: number, onCpu: number, tiny: false | 'after-failure' | 'from-start'): string {
   // Marketing's wording (STAA-398 item 6).
   if (tiny === 'after-failure') return 'This device ran short of memory, so these captions were made with the smaller speech model, which is less accurate. Check them before you use them.';
   if (tiny === 'from-start') return 'These captions were made with the smaller speech model, which is less accurate. Check them before you use them.';
@@ -179,39 +185,39 @@ export async function transcribeFile(
   const { onProgress } = opts;
   onProgress(`Reading the sound from ${file.name}…`, 0.02);
   const page = pageRecoveryHooks();
-  let samples: Float32Array;
+  let sound: SpeechSound;
+  let pieces: AsyncGenerator<Piece>;
+  let first: Piece;
+  let lostSeconds = 0;
+  const readNote = (f: number) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f);
   try {
     // A page hidden while the sound is read starts that step again once it is back. A file the browser could not read
     // from disk is read once more before anything is said about its sound.
-    samples = await resumeWhenHidden(
-      () =>
-        retryUnreadable(
-          file,
-          () => speechSamples(file, (f) => onProgress(`Reading the sound from ${file.name}…`, 0.02 + 0.03 * f)),
-          (message) => onProgress(message, 0.02),
-        ),
-      page.hooks,
-    );
+    sound = await resumeWhenHidden(() => retryUnreadable(file, () => openSpeech(file), (message) => onProgress(message, 0.02)), page.hooks);
+    pieces = readPieces(sound, file, page.hooks, readNote, (seconds) => (lostSeconds = seconds), (message) => onProgress(message, 0.02));
+    // The first piece is read before the model is: a recording with no readable sound ends here, not after a download.
+    const next = await pieces.next();
+    if (next.done || next.value.samples.length / RATE < 0.5) throw noSpeechFound('The recording is too short to hold any speech.');
+    first = next.value;
   } catch (err) {
     page.dispose();
+    sound!?.dispose();
     throw err;
   }
-  const total = samples.length / RATE;
-  if (total < 0.5) {
-    page.dispose();
-    throw noSpeechFound('The recording is too short to hold any speech.');
+  async function* withFirst(): AsyncGenerator<Piece> {
+    yield first;
+    yield* pieces;
   }
-  const cuts = [0, ...cutPoints(samples, RATE), samples.length];
   // Phones at risk of running out of memory start with the smaller model; a memory death with the base one steps down to it.
   const startModel = speechModel(undefined, file.size);
   const startedTiny = startModel === 'whisper-tiny';
   let onChip = 0;
   let onCpu = 0;
   try {
-    const run = await recognisePieces(
-      samples,
-      cuts,
+    const run = await recognisePieceStream(
+      withFirst(),
       RATE,
+      sound.seconds,
       file.name,
       { language: opts.language === 'auto' ? null : opts.language, task: opts.task, model: startModel },
       {
@@ -242,7 +248,7 @@ export async function transcribeFile(
         },
       },
     );
-    return { segments: run.segments, language: run.language!, duration: total, pathNote: pathNote(onChip, onCpu, run.steppedDown ? 'after-failure' : startedTiny ? 'from-start' : false) };
+    return { segments: run.segments, language: run.language!, duration: run.total, pathNote: pathNote(onChip, onCpu, run.steppedDown ? 'after-failure' : startedTiny ? 'from-start' : false, lostSeconds) };
   } catch (err) {
     // What was recognised before the failure goes out with it, in the format the tool writes.
     const partial = (err as { partial?: SpeechPartial } | null)?.partial;
@@ -250,6 +256,37 @@ export async function transcribeFile(
     throw err;
   } finally {
     page.dispose();
+    sound.dispose();
+  }
+}
+
+/**
+ * The recording as pieces, read lazily. A read that stops because the page was hidden, or because the file could not be
+ * read for a moment, starts again from the end of the last piece handed over (the sound before it is decoded and dropped).
+ */
+async function* readPieces(sound: SpeechSound, file: File, hooks: ReturnType<typeof pageRecoveryHooks>['hooks'], onProgress: (f: number) => void, onLost: (seconds: number) => void, onNotice: (message: string) => void): AsyncGenerator<Piece> {
+  let from = 0;
+  let hidden = 0;
+  let unreadable = 0;
+  for (;;) {
+    const source = piecesOf(sound.chunks(onProgress, onLost), RATE, from);
+    try {
+      for (;;) {
+        const next = await source.next();
+        if (next.done) return;
+        from = next.value.from + next.value.samples.length;
+        yield next.value;
+      }
+    } catch (e) {
+      if (isNotReadable(e) && unreadable++ < 1) {
+        await new Promise((r) => setTimeout(r, 1000));
+        onNotice('The file could not be read the first time. Trying once more.');
+      } else if ((hooks.wasHidden() || hooks.reclaimed(e)) && hidden++ < 2) {
+        await hooks.whenVisible();
+        hooks.forgetHidden();
+        onNotice('The page was hidden, so this step stopped. Starting it again: keep this tab open and the screen on.');
+      } else throw e;
+    }
   }
 }
 

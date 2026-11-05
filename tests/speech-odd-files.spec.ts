@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 // Recordings whose container says something odd about the sound. The speech worker is a stand-in, so these run
 // in WebKit too: what is under test is how the sound is read and what a failure is called.
+const edge = (n: string) => fileURLToPath(new URL(`./fixtures/edge-cases/${n}`, import.meta.url));
 const SPEECH_MOV = readFileSync(fileURLToPath(new URL('./fixtures/static/speech.mov', import.meta.url)));
 
 /** Every box of a type, as the offset of its size field. */
@@ -130,15 +131,30 @@ function silentWav(seconds: number, rate = 8000): Buffer {
   return b;
 }
 
+/** The Opus-in-MP4 clip with its sample durations stretched to claim `seconds`, padded with a free box so the file is as big as that sound would be. Without AudioDecoder no page decoder reads Opus, so only the browser's own whole-file decode is left: the one kind of recording that still has to fit in memory. */
+function opusClaiming(seconds: number): Buffer {
+  const f = Buffer.from(readFileSync(edge('opus.mp4')));
+  const stts = f.indexOf('stts');
+  const timescale = f.readUInt32BE(f.indexOf('mdhd') + 16);
+  f.writeUInt32BE(Math.ceil((seconds * timescale) / f.readUInt32BE(stts + 12)), stts + 16);
+  const pad = Buffer.alloc(seconds * 600);
+  pad.writeUInt32BE(pad.length, 0);
+  pad.write('free', 4, 'latin1');
+  return Buffer.concat([f, pad]);
+}
+
 // The refusal's message says "memory"; it must reach the person as written (with the minutes), not be replaced by
 // the generic out-of-memory text, and the run must record RecordingTooLong.
 for (const path of ['/tools/transcribe', '/video-to-subtitles', '/auto-caption-video']) {
-  test(`${path}: a recording over the device's budget is refused as RecordingTooLong, not as out of memory`, async ({ page }) => {
-    await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'deviceMemory', { get: () => 1, configurable: true }));
+  test(`${path}: a recording only a whole-file decode can read, over the device's budget, is refused as RecordingTooLong, not as out of memory`, async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(Navigator.prototype, 'deviceMemory', { get: () => 1, configurable: true });
+      delete (window as unknown as { AudioDecoder?: unknown }).AudioDecoder;
+    });
     await stubSpeech(page);
     await page.goto(path);
     await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-    await page.locator('#file-input').setInputFiles({ name: 'long.wav', mimeType: 'audio/wav', buffer: silentWav(25 * 60) });
+    await page.locator('#file-input').setInputFiles({ name: 'long.mp4', mimeType: 'audio/mp4', buffer: opusClaiming(25 * 60) });
     await page.locator('#run').click();
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
     await expect(page.locator('#error')).toContainText('about 25 minutes');
@@ -152,7 +168,6 @@ for (const path of ['/tools/transcribe', '/video-to-subtitles', '/auto-caption-v
 
 // Sound in codecs the browser's own decoder refuses: read by the page's decoders (AC-3 and E-AC-3 through the Dolby decoder, AMR through
 // the 3GP build, Opus, FLAC and PCM through WebCodecs), and a format nothing reads is named UnsupportedSound.
-const edge = (n: string) => fileURLToPath(new URL(`./fixtures/edge-cases/${n}`, import.meta.url));
 const stat = (n: string) => fileURLToPath(new URL(`./fixtures/static/${n}`, import.meta.url));
 // Safari before 26 has no AudioDecoder: Opus, FLAC and PCM may be named there rather than read.
 const MAY_LACK = ['opus.mp4', 'flac.mkv', 'pcm.mov'];

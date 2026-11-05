@@ -76,6 +76,9 @@ test('a download that keeps dying is ModelDownloadError and the file is not in t
   await open(page);
   await run(page);
   await failed(page, 180_000);
+  // It says it tried again, and to try again on a better connection.
+  await expect(page.locator('#error')).toContainText('even after trying again');
+  await expect(page.locator('#error')).toContainText('better connection');
   expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'ModelDownloadError' })]);
   expect(await keptEncoder(page)).toBeUndefined();
 });
