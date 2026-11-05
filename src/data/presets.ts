@@ -6946,7 +6946,7 @@ export const presets: Preset[] = [
       'Press Transcribe, then copy the text or download it as a .txt file.',
     ],
     faq: [
-      { q: 'Is there a length limit?', a: 'No fixed limit. Long recordings take proportionally longer, and very long ones (several hours) need a device with plenty of memory, since the whole recording is decoded first.' },
+      { q: 'Is there a length limit?', a: 'No fixed limit. The recording is read and transcribed a stretch at a time, so a long one needs no more memory than a short one; it just takes longer. In our tests on a computer, MP3 and M4A recordings of one, two and three hours were transcribed. A few unusual files can only be read by the browser as a whole, and those still have a limit (about half an hour on a phone); the page says so before it downloads anything.' },
       { q: 'Why is my transcript missing punctuation or names?', a: 'Whisper adds punctuation itself, but mumbling, crosstalk and unusual names trip it up. Clear audio from a microphone close to the speaker gives the best result.' },
       { q: 'Will it work offline?', a: 'After the first run, yes: the page and the speech model are stored by your browser, so you can transcribe on a plane.' },
       { q: 'What if my recording is not an MP3?', a: 'It still works: WAV, M4A, OGG, FLAC and other audio files are read the same way. [Audio to text](/audio-to-text) is the same tool set up for recorder files, meetings and lectures, and the general [transcribe](/tools/transcribe) tool also takes video.' },
@@ -6969,7 +6969,7 @@ export const presets: Preset[] = [
     intro: [
       'Audio recorders, meeting apps and phones all save sound in different formats: WAV from a handheld recorder, OGG or Opus from a chat app, FLAC from a lossless capture, M4A from a phone. This page reads all of them and writes out what is said as paragraphs of plain text you can search, quote and paste into your notes. For a single MP3 or a voice memo, [MP3 to text](/mp3-to-text) is the same tool with that case in mind.',
       'A worked example: a one-hour team meeting saved as a WAV by a recorder on the table. Drop it here with the language left on Detect. The sound is decoded in the tab, cut at pauses into pieces, and each piece is transcribed by Whisper on your device. A paragraph break falls wherever there was a pause of two seconds or more, which usually lands where someone else starts talking. It does not label who is speaking, so add names when you read it through.',
-      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer and need memory, since the whole recording is decoded first.',
+      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. Because the model runs in your browser, the recording is not uploaded: a client call, a patient dictation or a source interview stays on your device. Long recordings take proportionally longer, but they are read a stretch at a time, so a three-hour meeting needs no more memory than a short one.',
       'If the recording is a video, such as a recorded lecture or a Zoom MP4, use [Video to text](/video-to-text). For timed captions instead of plain text, choose Subtitles (.srt) on the general [transcribe](/tools/transcribe) tool.',
     ],
     steps: [
@@ -6979,7 +6979,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Which audio formats does it read?', a: 'MP3, WAV, M4A, AAC, OGG, Opus and FLAC, plus WebM audio. A video file works too, on [Video to text](/video-to-text).' },
-      { q: 'Is there a length limit?', a: 'No fixed limit. Long recordings take proportionally longer, and very long ones (several hours) need a device with plenty of memory, since the whole recording is decoded first.' },
+      { q: 'Is there a length limit?', a: 'No fixed limit. The recording is read and transcribed a stretch at a time, so a long one needs no more memory than a short one; it just takes longer. In our tests on a computer, MP3 and M4A recordings of one, two and three hours were transcribed. A few unusual files can only be read by the browser as a whole, and those still have a limit (about half an hour on a phone); the page says so before it downloads anything.' },
       { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (77 MB, or 95 MB on computers with WebGPU) are stored by your browser, so you can transcribe without a connection.' },
       { q: 'Can it translate the recording?', a: 'Into English only. Choose Translate to English for a foreign-language recording; for text in the spoken language, leave it off. It does not translate into other languages.' },
       { q: 'Does it say who is speaking?', a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph, which usually falls where the speaker changes.' },
@@ -7002,7 +7002,7 @@ export const presets: Preset[] = [
     intro: [
       'A recorded lecture, a Zoom call, a screen recording of a demo: the words are in the video, but finding the one you need means watching it all. This page reads the soundtrack of the video and writes what is said as paragraphs of plain text you can search, quote and paste into your notes.',
       'A worked example: a 50-minute lecture saved from Zoom as an MP4. Drop it here with the language left on Detect. Only the soundtrack is decoded, in the tab; the picture is never touched. The speech is cut at pauses into pieces and transcribed by Whisper on your device, and a new paragraph starts wherever there was a pause of two seconds or more. Copy it, or download it as a .txt file.',
-      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer and need memory, since the whole soundtrack is decoded first. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
+      'The first run downloads the speech model (77 MB, or 95 MB on computers with WebGPU) and the engine that runs it from this site, once; after that it works offline. The video is not uploaded. Long videos take proportionally longer, but the soundtrack is read a stretch at a time, so a long lecture needs no more memory than a short one. For timed captions instead of plain text, use [Video to subtitles](/video-to-subtitles); for sound-only files, [Audio to text](/audio-to-text); for the sound itself, [Video to MP3](/tools/video-to-mp3).',
     ],
     steps: [
       'Drop the video: MP4, MOV, M4V, WebM or MKV.',
@@ -7011,7 +7011,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Which video files does it read?', a: 'MP4, MOV, M4V, WebM and MKV, as long as your browser can play the sound track. For audio-only files use [Audio to text](/audio-to-text).' },
-      { q: 'Is there a length limit?', a: 'No fixed limit. Long videos take proportionally longer, and very long ones (several hours) need a device with plenty of memory, since the whole soundtrack is decoded first.' },
+      { q: 'Is there a length limit?', a: 'No fixed limit. Only the soundtrack is read, a stretch at a time, so a long video needs no more memory than a short one; it just takes longer. In our tests on a computer, recordings of two and three hours were transcribed. A few unusual files can only be read by the browser as a whole, and those still have a limit (about half an hour on a phone); the page says so before it downloads anything.' },
       { q: 'Does it work offline?', a: 'After the first run, yes: the page and the speech model (77 MB, or 95 MB on computers with WebGPU) are stored by your browser, so you can transcribe without a connection.' },
       { q: 'Can I get subtitles instead of plain text?', a: 'Yes. Use [Video to subtitles](/video-to-subtitles) for an SRT or WebVTT file timed to the speech.' },
       { q: 'Does it say who is speaking?', a: 'No. It writes what is said, not who said it. Long pauses start a new paragraph, which usually falls where the speaker changes.' },
