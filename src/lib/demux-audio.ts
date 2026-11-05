@@ -6,7 +6,7 @@
  * cannot decode a QuickTime .mov (what an iPhone records) by itself, and
  * decoding a whole phone video at once can run the tab out of memory.
  */
-import { ALL_FORMATS, BlobSource, Input, EncodedAudioPacketSource, EncodedPacketSink, BufferTarget, Mp4OutputFormat, Output, type EncodedPacket } from 'mediabunny';
+import { ALL_FORMATS, BlobSource, Input, EncodedAudioPacketSource, EncodedPacketSink, BufferTarget, Mp3OutputFormat, Mp4OutputFormat, Output, type EncodedPacket } from 'mediabunny';
 import { channelsOf } from './audio';
 import { audioDamaged, audioDecodeError, looksLikeMemory } from './speech-errors';
 import { decodeWithin } from './decode-guard';
@@ -182,8 +182,10 @@ async function decodeOrSplit(preRoll: EncodedPacket[], packets: EncodedPacket[],
 async function decodeStretch(preRoll: EncodedPacket[], packets: EncodedPacket[], config: AudioDecoderConfig, rate: number, mono: boolean): Promise<Float32Array[]> {
   const all = [...preRoll, ...packets];
   const t0 = all[0]!.timestamp;
-  const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
-  const source = new EncodedAudioPacketSource(config.codec.startsWith('mp3') ? 'mp3' : 'aac');
+  // MP3 goes out as plain MP3 frames, with no Xing frame to add a silent frame at the front: WebKit cannot decode MP3 held in an MP4.
+  const mp3 = config.codec.startsWith('mp3');
+  const output = new Output({ format: mp3 ? new Mp3OutputFormat({ xingHeader: false }) : new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
+  const source = new EncodedAudioPacketSource(mp3 ? 'mp3' : 'aac');
   output.addAudioTrack(source);
   await output.start();
   for (const [i, p] of all.entries()) await source.add(p.clone({ timestamp: p.timestamp - t0 }), i === 0 ? { decoderConfig: config } : undefined);

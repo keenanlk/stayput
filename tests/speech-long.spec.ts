@@ -1,3 +1,4 @@
+// @webkit-project
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { createWriteStream, readFileSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -121,6 +122,16 @@ test.describe('long recordings', () => {
     expect((await lastRun(page))?.outcome).toBe('ok');
     // The transcript runs to the end of the recording.
     await expect(page.locator('#results')).toContainText('2:00:00 of English speech');
+  });
+
+  test('a committed 12-minute MP3 is read in several stretches with none lost', async ({ page }) => {
+    await stub(page, { memory: 4 });
+    await run(page, '/tools/transcribe', fileURLToPath(new URL('./fixtures/speech-12min.mp3', import.meta.url)));
+    await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 240_000 });
+    await expect(page.locator('#error')).not.toHaveClass(/is-active/);
+    await expect(page.locator('#results')).not.toContainText('could not be read');
+    expect((await lastRun(page))?.outcome).toBe('ok');
+    expect((await win(page)).pieces).toBeGreaterThanOrEqual(Math.ceil((720 - 5) / 28));
   });
 
   for (const path of ['/tools/transcribe', '/video-to-subtitles', '/auto-caption-video']) {
