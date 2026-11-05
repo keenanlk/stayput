@@ -1,7 +1,8 @@
 // @webkit-project
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { existsSync, appendFileSync } from 'node:fs';
+import { existsSync, appendFileSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { MESSAGES } from '../src/lib/qr-scan';
 
@@ -37,7 +38,11 @@ const CASES: { name: string; expect: string[] | 'NoCodeFound' }[] = [
 ];
 
 test.beforeAll(() => {
-  if (!existsSync(dir + 'no-code.png') || !existsSync(dir + 'code128-in-12mp.jpg')) execFileSync(process.execPath, [fileURLToPath(new URL('./make-scanner-fixtures.mjs', import.meta.url))], { stdio: 'inherit' });
+  // The images are not committed: rebuild them when missing or when they came from another version of the script.
+  const script = fileURLToPath(new URL('./make-scanner-fixtures.mjs', import.meta.url));
+  const stamp = createHash('sha1').update(readFileSync(script)).digest('hex');
+  const current = existsSync(dir + '.stamp') && readFileSync(dir + '.stamp', 'utf8') === stamp && existsSync(dir + 'no-code.png');
+  if (!current) execFileSync(process.execPath, [script], { stdio: 'inherit' });
 });
 
 const classOf = (message: string): string => {

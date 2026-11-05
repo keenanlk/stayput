@@ -2,7 +2,8 @@
 // Run: node tests/make-scanner-fixtures.mjs   -> tests/fixtures/scanners/*.{png,jpg}
 import sharp from 'sharp';
 import { writeBarcode } from 'zxing-wasm/writer';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, renameSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const out = fileURLToPath(new URL('./fixtures/scanners/', import.meta.url));
@@ -24,8 +25,10 @@ async function place(codeBuf, W, H, { x, y, w, rotate = 0, blur = 0, contrast = 
 }
 const canvas = (W, H, bg = '#ffffff') => sharp({ create: { width: W, height: H, channels: 3, background: bg } });
 const save = async (name, img, jpg) => {
-  const file = out + name;
-  await (jpg ? img.jpeg({ quality: jpg }) : img.png()).toFile(file);
+  // Written aside and renamed, so a parallel test worker never reads a half-written image.
+  const tmp = out + name + '.' + process.pid + '.tmp';
+  await img.toFormat(jpg ? 'jpeg' : 'png', jpg ? { quality: jpg } : {}).toFile(tmp);
+  renameSync(tmp, out + name);
 };
 
 const qr = await code('QRCode', QR, 6);
@@ -34,7 +37,19 @@ const upc = await code('UPC-A', '012345678905', 4);
 const c128 = await code('Code128', 'Stayput 12345', 4);
 
 // Noise so the 12 MP photo is not a trivially flat canvas.
-const noise = (W, H) => sharp({ create: { width: W, height: H, channels: 3, noise: { type: 'gaussian', mean: 200, sigma: 18 } } });
+// Seeded, so every machine (CI, QA, a laptop) gets the same pixels.
+let seed = 677;
+const rand = () => {
+  seed = (seed + 0x6d2b79f5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+const noise = (W, H) => {
+  const buf = Buffer.alloc(W * H * 3);
+  for (let i = 0; i < buf.length; i++) buf[i] = Math.max(0, Math.min(255, 200 + (rand() + rand() + rand() - 1.5) * 2 * 18));
+  return sharp(buf, { raw: { width: W, height: H, channels: 3 } });
+};
 
 const specs = [
   ['qr-small.png', async () => canvas(400, 400).composite([await place(qr, 400, 400, { x: 150, y: 150, w: 90 })])],
@@ -64,3 +79,5 @@ const specs = [
   ['no-code.png', async () => sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8eef7"/><stop offset="1" stop-color="#9fb4d6"/></linearGradient></defs><rect width="900" height="600" fill="url(#g)"/><circle cx="650" cy="220" r="110" fill="#33507a"/><rect x="60" y="80" width="360" height="26" rx="6" fill="#223"/><rect x="60" y="130" width="300" height="14" rx="6" fill="#556"/><rect x="60" y="160" width="330" height="14" rx="6" fill="#556"/><text x="60" y="400" font-family="Helvetica, Arial, sans-serif" font-size="44" fill="#112">No code in this picture</text></svg>`))],
 ];
 for (const [name, make, jpg] of specs) { await save(name, await make(), jpg); console.log(name); }
+// Stamp of this script, so the spec can tell when the images on disk are from an older version of it.
+writeFileSync(out + '.stamp', createHash('sha1').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'));
