@@ -1852,7 +1852,7 @@ export const presets: Preset[] = [
     ],
     faq: [
       { q: 'Can I get a Word document instead of text?', a: 'Yes. [Image to Word](/tools/image-to-word) reads the same way and saves one .docx with each image on its own page. Only the text comes across, not the layout.' },
-      { q: 'Can I use it on my phone?', a: 'Yes. On an iPhone or Android phone, tap the drop area and choose a photo or take one with the camera. The first run downloads the reader and its engine, about 6 MB in all, so start it on Wi-Fi if your data plan is tight.' },
+      { q: 'Can I use it on my phone?', a: 'Yes. On an iPhone or Android phone, tap the drop area and choose a photo or take one with the camera. The first run downloads the reader and its engine, about 4 MB in all, so start it on Wi-Fi if your data plan is tight.' },
       { q: 'Does it read handwriting?', a: 'Only neat block capitals, and not reliably. The engine is trained on printed text. For handwritten notes expect to fix a good share of the words.' },
       { q: 'Can it read other languages?', a: 'It reads English. Languages written in the same alphabet mostly come through, but letters with accents, like é or ü, may be misread, so check names and words carefully. Text in other scripts, such as Cyrillic, Arabic, Hindi or Chinese, is not recognised and comes out as noise or not at all.' },
       { q: 'Why are lines from my photo mixed up?', a: 'This usually happens with a picture of two pages, several columns or a poster with text in separate blocks. The reader tries to work out the reading order and sometimes joins lines that sit side by side. Take one page or one column per picture and the order comes out right.' },
@@ -4000,7 +4000,7 @@ export const presets: Preset[] = [
       'For a logo on a plain white or coloured backdrop, the same model separates the mark from the page. Check the preview at the edges of thin strokes and small text: very fine detail on a busy background is the hardest case. If you need the file smaller for the web, choose WebP, which keeps the transparency at a fraction of the PNG size.',
     ],
     steps: [
-      'Drop the photos or logos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 42 MB in all).',
+      'Drop the photos or logos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 50 MB in all).',
       'Keep Transparent and PNG, or choose WebP for a smaller file with the same transparency.',
       'Download the transparent images at their original size, or all of them in one zip.',
     ],
@@ -4030,7 +4030,7 @@ export const presets: Preset[] = [
       'The same fill works for profile pictures and staff photos where a busy room would distract. Pick Colour instead of White for a brand shade or a light grey. For photos that must meet an official passport or visa rule, check that service’s requirements too: they also set head size, lighting and shadow rules that a new background alone does not satisfy.',
     ],
     steps: [
-      'Drop the product photos or portraits, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 42 MB in all).',
+      'Drop the product photos or portraits, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 50 MB in all).',
       'Keep White, or choose Colour for another shade, and pick JPG or PNG.',
       'Download the photos on white at full size, or all of them in one zip.',
     ],
@@ -4164,7 +4164,7 @@ export const presets: Preset[] = [
       'It is useful for profile pictures and staff photos taken in the office, product shots on a busy desk, and for hiding what is behind you, such as house numbers, whiteboards or other people, while keeping a natural photo instead of a flat colour. For hiding a face or a number plate itself, use the blur image tool instead, which blurs the areas you mark.',
     ],
     steps: [
-      'Drop the photos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 42 MB in all).',
+      'Drop the photos, or tap to pick them. The first one downloads the cut-out model and its WebAssembly runtime once (about 50 MB in all).',
       'Keep Blur, set the strength, and pick JPG, PNG or WebP.',
       'Download the photos with the blurred background at full size, or all of them in one zip.',
     ],
@@ -7137,7 +7137,7 @@ export const presets: Preset[] = [
     defaults: { stems: 'vocals', format: 'wav' },
     intro: [
       'An acapella is the vocal of a song on its own. Producers use them to remix and mash up tracks, singers use them to hear exactly how a phrase is sung, and they make lyrics far easier to write down. Official acapellas are rarely released, so the usual way to get one is to separate it from the finished song.',
-      'A worked example: a 4 minute FLAC of a song you want to remix at a different tempo. Drop it here; vocals only and WAV are already chosen, since a remix needs every bit of quality, and the result is a 16-bit stereo WAV of about 42 MB. The model predicts the music, and the vocal is what is left when that is subtracted from the song, so it lines up sample for sample with the original and drops into your project at bar one.',
+      'A worked example: a 4 minute FLAC of a song you want to remix at a different tempo. Drop it here; vocals only and WAV are already chosen, since a remix needs every bit of quality, and the result is a 16-bit stereo WAV of about 50 MB. The model predicts the music, and the vocal is what is left when that is subtracted from the song, so it lines up sample for sample with the original and drops into your project at bar one.',
       'Expect some bleed. Hi-hats, snare hits and sustained synths that share the voice’s frequencies can leave traces in the acapella, most noticeable in gaps between phrases. A gate or a little editing in your audio editor cleans those up; for sampling a single phrase, pick one where the arrangement is sparse.',
     ],
     steps: [

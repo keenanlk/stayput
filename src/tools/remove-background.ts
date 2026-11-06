@@ -41,7 +41,7 @@ createShell({
       try {
         progress.set(`Finding the subject in ${entry.file.name}…`, share(0.1));
         const mask = await findSubject(bitmap, (f) =>
-          progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 * f)),
+          progress.set(`Downloading the cut-out model and its runtime (one time, about 50 MB): ${Math.round(f * 100)}%`, share(0.1 * f)),
           Number(radio('keep', '0')),
         );
         if (coverage(mask) < 0.005) {

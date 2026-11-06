@@ -1250,7 +1250,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my image uploaded?',
-        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page. The engine and its English model (about 6 MB) are downloaded from this site the first time you use it, and after that first use the tool works offline. Switch off Wi-Fi after the first run and it still reads images.',
+        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page. The engine and its English model (about 4 MB) are downloaded from this site the first time you use it, and after that first use the tool works offline. Switch off Wi-Fi after the first run and it still reads images.',
       },
       {
         q: 'How accurate is it?',
@@ -1301,7 +1301,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is my image uploaded?',
-        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page, and the .docx is built in the same tab. The engine and its English model (about 6 MB) are downloaded from this site on your first run, and after your first run the tool works offline.',
+        a: 'No. The text is recognised by Tesseract, the open-source OCR engine, compiled to WebAssembly and running inside this page, and the .docx is built in the same tab. The engine and its English model (about 4 MB) are downloaded from this site on your first run, and after your first run the tool works offline.',
       },
       {
         q: 'Which languages does it read?',
@@ -3947,7 +3947,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'How big is the download, and how long does it take?',
-        a: 'The note model is 0.2 MB and the engine that runs it is about 14 MB (less on the wire, since it is compressed). They are fetched once and kept for later visits. After that, on a recent laptop, a 30-second clip takes about a second and a five-minute file about ten seconds; a phone is slower.',
+        a: 'The note model is 0.2 MB and the engine that runs it is about 3.5 MB to download (about 14 MB once unpacked). They are fetched once and kept for later visits. After that, on a recent laptop, a 30-second clip takes about a second and a five-minute file about ten seconds; a phone is slower.',
       },
       {
         q: 'Where does the tempo come from?',
@@ -5455,7 +5455,7 @@ export const tools: Tool[] = [
     dropLabel: 'Drop photos to remove the background',
     action: 'Remove background',
     lead:
-      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model and its WebAssembly runtime (about 42 MB in all) to your browser, and after that the tool works offline.',
+      'Removes the background from a photo (JPG, PNG, WebP, HEIC, AVIF or JPEG XL) and saves a transparent PNG or WebP, a white or coloured background as PNG, WebP or JPG, or the same photo with the background blurred, at the photo’s full resolution. It is free, needs no account and adds no watermark, and your photos are not uploaded: a cut-out model runs in your browser. The first run downloads that model and its WebAssembly runtime (about 50 MB in all) to your browser, and after that the tool works offline.',
     sections: [
       {
         heading: 'A worked example: a product photo on a white background',
@@ -5477,7 +5477,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Why is the first photo slow?',
-        a: 'The first time, the page downloads the model and the WebAssembly runtime that runs it (about 42 MB in all), and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
+        a: 'The first time, the page downloads the model and the WebAssembly runtime that runs it (about 50 MB in all), and shows the progress. Both are cached by your browser, so later photos, and later visits, start straight away. Each photo then takes a few seconds, depending on your device.',
       },
       {
         q: 'What resolution is the result?',
@@ -5514,7 +5514,7 @@ export const tools: Tool[] = [
       },
       {
         q: 'Is this an alternative to remove.bg?',
-        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 12 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 42 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
+        a: 'It does the same job in your browser. remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 12 October 2026). This is free, needs no account, and your photos are not uploaded; the first run downloads a model and its runtime, about 50 MB in all. There is no API. See [remove.bg alternatives](/guides/remove-bg-alternative).',
       },
     ],
   },
@@ -5547,7 +5547,7 @@ export const tools: Tool[] = [
       },
     ],
     lead:
-      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models and their WebAssembly runtimes (about 46 MB in all) to your browser, and after that the tool works offline.',
+      'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, with the head sized to the allowed range at 600 pixels per inch, plus a 4 × 6 inch print sheet. It is free, needs no account and adds no watermark, and your photo is not uploaded: a face finder and a cut-out model run in your browser. The first run downloads those models and their WebAssembly runtimes (about 54 MB in all) to your browser, and after that the tool works offline.',
     faq: [
       {
         q: 'Can I make a passport photo without uploading my photo?',
