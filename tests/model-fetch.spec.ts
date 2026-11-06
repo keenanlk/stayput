@@ -71,3 +71,30 @@ test('wholeOrNull rejects a body shorter than its content-length and keeps a who
   const whole = await wholeOrNull(new Response(FILE, { headers: { 'content-length': String(FILE.length) } }));
   expect(new Uint8Array(await whole!.arrayBuffer())).toEqual(FILE);
 });
+
+test('a download cut while the phone has no network waits for it and does not use up its tries', async () => {
+  // Three cuts, but only two tries: each try is made after the network is back, so the wait is what carries it.
+  const s = server({ cuts: [200, 200] });
+  let waits = 0;
+  const res = await fetchResumable(s.doFetch, '/m.onnx', undefined, undefined, [0, 0], async () => void waits++);
+  expect(new Uint8Array(await res.arrayBuffer())).toEqual(FILE);
+  expect(waits).toBe(2);
+  expect(s.calls).toEqual([null, 'bytes=200-', 'bytes=400-']);
+});
+
+test('waitForOnline resolves at once when online, on the online event when not, and at the limit otherwise', async () => {
+  const { waitForOnline } = await import('../src/lib/model-fetch');
+  const listeners = new Set<() => void>();
+  const target = { addEventListener: (_: string, f: () => void) => void listeners.add(f), removeEventListener: (_: string, f: () => void) => void listeners.delete(f) };
+  await waitForOnline(5000, { onLine: true }, target);
+  expect(listeners.size).toBe(0);
+  const pending = waitForOnline(5000, { onLine: false }, target);
+  expect(listeners.size).toBe(1);
+  [...listeners][0]!();
+  await pending;
+  expect(listeners.size).toBe(0);
+  const started = Date.now();
+  await waitForOnline(50, { onLine: false }, target);
+  expect(Date.now() - started).toBeGreaterThanOrEqual(40);
+  expect(listeners.size).toBe(0);
+});

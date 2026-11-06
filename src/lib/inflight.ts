@@ -6,6 +6,7 @@
  */
 import { trackToolRun } from './analytics';
 import { CAPTION_TOOLS, noteLostRun } from './working-size';
+import { rememberTinyModel } from './speech-path';
 
 /**
  * Where the marker lives. sessionStorage survives a reload of the same tab and is gone with the tab. If a phone turns out
@@ -169,6 +170,9 @@ export function markInflight(tool: string, phase: Phase, bytes?: number): () => 
   };
 }
 
+/** The tools whose speech model starts smaller after a lost run: the slugs stored for them. */
+export const SPEECH_TOOLS = ['transcribe', 'video-to-subtitles', 'auto-caption-video', 'add-subtitles-to-video'];
+
 /** At page load: a marker left by an earlier load of this tab means that tab died mid-work. Records it once and clears it. */
 export function reportLostTab(): void {
   const m = read();
@@ -178,5 +182,7 @@ export function reportLostTab(): void {
   const cls = m.hidden ? 'TabLostWhileHidden' : m.phase === 'run' ? 'TabLostDuringRun' : 'TabLostDuringPreview';
   // A caption run the browser closed: the redraw starts smaller in this tab (see capAtRisk). Kept as a flag in this tab; nothing more is sent.
   if (cls === 'TabLostDuringRun' && CAPTION_TOOLS.includes(m.tool)) noteLostRun();
+  // A speech run the browser closed (on a phone, most likely out of memory): this tab's next speech run starts with the smaller model. A flag in this tab only.
+  if (m.phase === 'run' && SPEECH_TOOLS.includes(m.tool)) rememberTinyModel();
   send(m.tool, cls, {}, typeof m.bytes === 'number' ? m.bytes : 0);
 }
