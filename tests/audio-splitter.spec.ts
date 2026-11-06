@@ -95,6 +95,7 @@ test('says why the times cannot be used, and states the part cap', async ({ page
   await page.locator('#sp-unit').selectOption('1');
   await page.locator('#sp-every').fill('0.1');
   await expect(page.locator('#sp-info')).toContainText('at most 100 parts');
-  await page.locator('#run').click();
-  await expect(page.locator('#error')).toContainText('at most 100 parts');
+  // Run stays off, with the reason above it, so a split that cannot be made is never started.
+  await expect(page.locator('#run')).toBeDisabled();
+  await expect(page.locator('#run-hint')).toContainText('at most 100 parts');
 });

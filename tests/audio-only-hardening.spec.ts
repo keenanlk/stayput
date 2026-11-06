@@ -292,17 +292,26 @@ test.describe("a two-hour recording", () => {
         await go();
         await page.locator("#file-input").setInputFiles(f("long-2h.wav"));
         const hint = page.locator("#run-hint");
-        await expect(hint).toContainText("an hour or longer", {
-          timeout: 60_000,
-        });
-        if (url.endsWith("audio-splitter"))
-          await expect(hint).toContainText("try it on a computer");
-        else
+        if (url.endsWith("audio-splitter")) {
+          // The splitter reads a long recording a part at a time, so it has nothing to warn about: it says how long the recording is,
+          // and Run waits only for the times (it is off, with that reason, until they are typed).
+          await expect(page.locator("#sp-info")).toContainText("120:00.0 long", { timeout: 60_000 });
+          await expect(page.locator("#sp-info")).not.toContainText("too big");
+          await expect(hint).not.toContainText("an hour or longer");
+          await expect(page.locator("#run")).toBeDisabled();
+          await expect(hint).toContainText("Type at least one time");
+          await page.locator("#sp-times").fill("1:00:00");
+          await expect(page.locator("#run")).toBeEnabled();
+        } else {
+          await expect(hint).toContainText("an hour or longer", {
+            timeout: 60_000,
+          });
           await expect(hint.locator("a")).toHaveAttribute(
             "href",
             "/tools/audio-splitter",
           );
-        await expect(page.locator("#run")).toBeEnabled();
+          await expect(page.locator("#run")).toBeEnabled();
+        }
         // Nothing about it is recorded.
         expect(
           (await events(page)).filter(
