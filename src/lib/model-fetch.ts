@@ -19,6 +19,27 @@ type FetchLike = (input: string | URL | Request, init?: RequestInit) => Promise<
 /** Waits before each further try at one file, in milliseconds. */
 export const RESUME_BACKOFF_MS = [500, 1500, 3000] as const;
 
+/** The longest a download waits for the connection to come back before it counts a try as used, in milliseconds. */
+export const OFFLINE_PATIENCE_MS = 120_000;
+
+/**
+ * Resolves at once when the browser thinks it is online; otherwise when it says it is, or after `ms`. A phone that
+ * leaves Wi-Fi, enters a tunnel or is backgrounded drops the connection for longer than the few seconds of backoff
+ * below, so the tries are not spent while there is no network to try on.
+ */
+export function waitForOnline(ms: number = OFFLINE_PATIENCE_MS, nav: { onLine?: boolean } | undefined = globalThis.navigator, target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> | undefined = globalThis): Promise<void> {
+  if (!nav || nav.onLine !== false || !target?.addEventListener) return Promise.resolve();
+  return new Promise((resolve) => {
+    const done = () => {
+      clearTimeout(timer);
+      target.removeEventListener('online', done);
+      resolve();
+    };
+    const timer = setTimeout(done, ms);
+    target.addEventListener('online', done);
+  });
+}
+
 const wait = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
 
 /** The size a response promises, or 0 when it promises none that can be checked (no length, or a compressed body). */
@@ -53,6 +74,7 @@ export async function fetchResumable(
   init: RequestInit | undefined,
   onProgress?: (got: number, total: number) => void,
   waits: readonly number[] = RESUME_BACKOFF_MS,
+  online: () => Promise<void> = waitForOnline,
 ): Promise<Response> {
   const first = await doFetch(input, init);
   if (!first.ok || !first.body) return first;
@@ -82,6 +104,8 @@ export async function fetchResumable(
     for (;;) {
       if (retries >= waits.length) throw new TypeError(`Failed to fetch: ${input} stopped at ${got} bytes`);
       await wait(waits[retries++]!);
+      // No network right now: wait for it to come back, up to a while, before this try is made (and used).
+      await online();
       try {
         const headers = new Headers(init?.headers);
         if (got > 0) headers.set('Range', `bytes=${got}-`);
@@ -268,14 +292,14 @@ export async function uncachedBytes(name: string, paths: string[], sizeOf: (path
 export async function downloadVerified(
   doFetch: FetchLike,
   url: string,
-  opts: { label: ModelLabel; entry?: ModelEntry; onProgress?: (got: number, total: number) => void; init?: RequestInit; waits?: readonly number[] },
+  opts: { label: ModelLabel; entry?: ModelEntry; onProgress?: (got: number, total: number) => void; init?: RequestInit; waits?: readonly number[]; online?: () => Promise<void> },
 ): Promise<Response> {
   const { label, entry } = opts;
   for (let attempt = 0; ; attempt++) {
     let res: Response;
     try {
       // The second try skips the browser's HTTP cache: /models/ is served immutable, so a stale copy there would come back as it was.
-      res = await fetchResumable(doFetch, url, attempt > 0 ? { ...opts.init, cache: 'reload' } : opts.init, opts.onProgress, opts.waits);
+      res = await fetchResumable(doFetch, url, attempt > 0 ? { ...opts.init, cache: 'reload' } : opts.init, opts.onProgress, opts.waits, opts.online);
     } catch {
       throw offline() ? modelOffline(label) : modelDownloadError(label);
     }
