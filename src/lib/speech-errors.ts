@@ -25,7 +25,7 @@ export class SpeechError extends Error {
 const make = (name: SpeechErrorName, message: string) => new SpeechError(name, message);
 
 export const modelDownloadError = () =>
-  make('ModelDownloadError', 'The speech model (77 MB) could not be downloaded, even after trying again. Try again on a better connection: Wi-Fi, if you are on mobile data. A download that stops part way starts over.');
+  make('ModelDownloadError', 'The speech model (77 MB) could not be downloaded, even after trying again. Try again on a better connection: Wi-Fi, if you are on mobile data.');
 export const modelLoadError = () =>
   make('ModelLoadError', 'The speech model downloaded but could not be started in this browser. Reload the page and try again, or use an up-to-date Chrome, Edge or Firefox on a computer.');
 export const outOfMemoryError = () =>
