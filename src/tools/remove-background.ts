@@ -1,5 +1,6 @@
 import { bindRange, createShell, num, processEach, radio, str } from '../lib/shell';
-import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } from '../lib/image';
+import { extForType, thumbnail, type EncodeType } from '../lib/image';
+import { jpegIsCutOff, openPicture, renderAndSave } from '../lib/bg-input';
 import { suffixName, type OutputFile } from '../lib/files';
 import { blurBackground, coverage, cutout, findSubject } from '../lib/background';
 import { InputError, NamedError } from '../lib/input-error';
@@ -36,24 +37,35 @@ createShell({
     const type = str('format', 'image/png') as EncodeType;
     return processEach(files, progress, blurred ? 'Blurring the background of' : 'Removing the background from', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
-      const { bitmap } = await decodeImage(entry.file);
+      const { bitmap, reducedFrom } = await openPicture(entry.file);
       try {
         progress.set(`Finding the subject in ${entry.file.name}…`, share(0.1));
         const mask = await findSubject(bitmap, (f) =>
           progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 * f)),
           Number(radio('keep', '0')),
         );
-        if (coverage(mask) < 0.005) throw new InputError('No subject was found in this photo. It works best on a clear person, animal or object against its background.');
+        if (coverage(mask) < 0.005) {
+          // A photo cut off part-way decodes with a grey fill where the rest should be: that is a damaged file, not a photo with no subject.
+          const isJpeg = /\.jpe?g$/i.test(entry.file.name) || entry.file.type === 'image/jpeg';
+          if (isJpeg && (await jpegIsCutOff(entry.file))) {
+            throw new NamedError('PictureDamaged', "This picture looks damaged or cut off, so it can't be read. Save or export it again from the original, or try another copy.");
+          }
+          throw new InputError('No subject was found in this photo. It works best on a clear person, animal or object against its background.');
+        }
         progress.set(`Saving ${entry.file.name}…`, share(0.9));
-        const canvas = blurred ? blurBackground(bitmap, mask, strength) : cutout(bitmap, mask, { background: fill });
-        const blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : 0.92);
+        const { blob, canvas, width, height, scaled } = await renderAndSave(
+          bitmap,
+          (src) => (blurred ? blurBackground(src, mask, strength) : cutout(src, mask, { background: fill })),
+          type,
+          type === 'image/png' ? undefined : 0.92,
+        );
         if (blob.type !== type) throw new NamedError('ImageEncodeUnsupported', `This browser cannot save ${type.replace('image/', '').toUpperCase()} images. Choose PNG.`);
         const preview = await createImageBitmap(canvas);
         const out: OutputFile = {
           name: suffixName(entry.file.name, blurred ? '-blurred-bg' : '-no-bg', extForType(type)),
           blob,
           previewUrl: await thumbnail(preview),
-          note: `${bitmap.width}×${bitmap.height}`,
+          note: scaled || reducedFrom ? `${width}×${height} (smaller than the photo, to fit this device)` : `${width}×${height}`,
         };
         preview.close();
         return out;
