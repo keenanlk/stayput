@@ -48,20 +48,21 @@ function toTensor(bitmap: ImageBitmap): Float32Array {
  */
 export async function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) => void, keep = 0): Promise<Uint8ClampedArray> {
   try {
-    return await findSubjectOnce(bitmap, onLoading, keep);
+    return await findSubjectOnce(bitmap, onLoading, keep, false);
   } catch (e) {
-    // A model that failed to start or run (a phone short of memory, say) leaves its session broken: a fresh worker gets one more try.
+    // A model that failed to start or run (a phone short of memory, say) leaves its session broken: a fresh worker gets one more try,
+    // with the engine set to use less memory (no pre-planned buffers, lighter graph optimisation), which is slower and smaller.
     if (!(e instanceof Error) || !RETRY.has(e.name)) throw e;
     worker?.terminate();
     worker = undefined;
-    return findSubjectOnce(bitmap, onLoading, keep);
+    return findSubjectOnce(bitmap, onLoading, keep, true);
   }
 }
 
 /** Failures worth one more try in a new worker; a model that could not be downloaded or a photo with no subject are not. */
 const RETRY = new Set(['BackgroundModelLoadFailed', 'BackgroundModelRunFailed', 'OutOfMemoryError']);
 
-function findSubjectOnce(bitmap: ImageBitmap, onLoading: ((fraction: number) => void) | undefined, keep: number): Promise<Uint8ClampedArray> {
+function findSubjectOnce(bitmap: ImageBitmap, onLoading: ((fraction: number) => void) | undefined, keep: number, lean: boolean): Promise<Uint8ClampedArray> {
   const id = nextId++;
   let pixels: Float32Array;
   try {
@@ -95,7 +96,7 @@ function findSubjectOnce(bitmap: ImageBitmap, onLoading: ((fraction: number) => 
     };
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);
-    w.postMessage({ id, type: 'mask', pixels }, [pixels.buffer]);
+    w.postMessage({ id, type: 'mask', pixels, lean }, [pixels.buffer]);
   });
 }
 

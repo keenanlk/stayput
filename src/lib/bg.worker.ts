@@ -13,7 +13,7 @@ import { fetchModelBytes } from './model-stall';
 export const MODEL_URL = '/models/isnet-general-use-int8w.onnx';
 export const SIZE = 1024;
 
-export type Request = { id: number; type: 'mask'; pixels: Float32Array };
+export type Request = { id: number; type: 'mask'; pixels: Float32Array; lean?: boolean };
 export type Reply =
   | { id: number; type: 'loading'; fraction: number }
   | { id: number; type: 'mask'; mask: Uint8ClampedArray }
@@ -25,13 +25,19 @@ function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
   return fetchModelBytes(MODEL_URL, 'background model', onProgress);
 }
 
-function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {
+function load(onProgress: (f: number) => void, lean = false): Promise<ort.InferenceSession> {
   session ??= (async () => {
     ort.env.wasm.wasmPaths = vendorDir('ort');
     // Threads need a cross-origin-isolated page, which this site is not.
     ort.env.wasm.numThreads = 1;
     const model = await fetchModel(onProgress);
-    return ort.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+    // The retry after a failed run asks for a lighter session: no memory arena or planned buffers, and fewer graph rewrites.
+    return ort.InferenceSession.create(
+      model,
+      lean
+        ? { executionProviders: ['wasm'], graphOptimizationLevel: 'basic', enableCpuMemArena: false, enableMemPattern: false }
+        : { executionProviders: ['wasm'], graphOptimizationLevel: 'all' },
+    );
   })();
   // A failed load (offline on first use, say) may be retried by the next request.
   session.catch(() => (session = undefined));
@@ -39,12 +45,12 @@ function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {
 }
 
 self.onmessage = async (e: MessageEvent<Request>) => {
-  const { id, pixels } = e.data;
+  const { id, pixels, lean } = e.data;
   const post = (msg: Reply, transfer: Transferable[] = []) => (self as unknown as Worker).postMessage(msg, transfer);
   // A failure with no name of its own (onnxruntime throws plain Errors and bare numbers) is recorded as the step it came from.
   let step = 'BackgroundModelLoadFailed';
   try {
-    const s = await load((fraction) => post({ id, type: 'loading', fraction }));
+    const s = await load((fraction) => post({ id, type: 'loading', fraction }), lean);
     step = 'BackgroundModelRunFailed';
     const input = new ort.Tensor('float32', pixels, [1, 3, SIZE, SIZE]);
     const out = await s.run({ [s.inputNames[0]!]: input });
