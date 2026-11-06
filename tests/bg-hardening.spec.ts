@@ -86,6 +86,7 @@ const CASES: Case[] = [
   { name: 'JPEG header followed by noise', file: () => edge('garbage.jpg'), want: 'PictureDamaged', says: /damaged or cut off/ },
   { name: 'text file renamed .png', file: () => edge('text-named.png'), want: 'NotAPicture', says: /isn't a picture/ },
   { name: 'photo with no subject', file: () => bg('no-subject.jpg'), want: 'InputError' },
+  { name: 'photo with no subject and a video after its end marker (motion photo)', file: () => bg('motion-photo-no-subject.jpg'), want: 'InputError', says: /No subject was found/ },
 ];
 
 for (const c of CASES) {
