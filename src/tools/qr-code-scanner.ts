@@ -15,6 +15,7 @@ import {
 } from '../lib/qr-scan';
 import type { ScanMode, ScanReply, ScanRequest } from '../lib/qr-scan.worker';
 import { NamedError } from '../lib/input-error';
+import { tileGrid } from '../lib/qr-scan-passes';
 
 /**
  * QR code scanner. Images arrive through the shell (choose, drop, paste); the
@@ -39,6 +40,8 @@ const note = $('qs-note');
 
 const MAX_SIDE = 2048;
 const MAX_IMAGES = 20;
+/** Most full-size pieces read from one big photo: about a 40 megapixel picture. */
+const MAX_TILES = 12;
 const MAX_CODES = 8;
 
 // ---------- the decoder worker ----------
@@ -222,6 +225,16 @@ function failure(name: string, message: string): Error {
   return e;
 }
 
+/** One full-size piece of a bitmap, on white. */
+function cropPixels(bitmap: ImageBitmap, t: { x: number; y: number; width: number; height: number }): ImageData {
+  const canvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(t.width, t.height) : Object.assign(document.createElement('canvas'), { width: t.width, height: t.height });
+  const ctx = canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, t.width, t.height);
+  ctx.drawImage(bitmap, t.x, t.y, t.width, t.height, 0, 0, t.width, t.height);
+  return ctx.getImageData(0, 0, t.width, t.height) as ImageData;
+}
+
 /** One image to its decoded codes. Throws an Error whose name says why nothing was read. */
 async function readImage(file: File): Promise<ImageOutcome> {
   if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) throw failure('NotAnImage', MESSAGES.pdf);
@@ -233,6 +246,7 @@ async function readImage(file: File): Promise<ImageOutcome> {
     throw memory ? failure('RangeError', MESSAGES.tooLarge) : failure('UnreadableFile', MESSAGES.notImage);
   }
   let pixels: ImageData;
+  let reply: ScanReply;
   try {
     const { width, height } = fitSize(decoded.width, decoded.height, { maxWidth: MAX_SIDE, maxHeight: MAX_SIDE });
     // White behind transparent pixels: a transparent PNG would otherwise be read as black.
@@ -240,12 +254,34 @@ async function readImage(file: File): Promise<ImageOutcome> {
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
     pixels = ctx.getImageData(0, 0, width, height) as ImageData;
   } catch {
+    decoded.bitmap.close();
     throw failure('RangeError', MESSAGES.tooLarge);
+  }
+  const height = pixels.height;
+  try {
+    reply = await scan(pixels, 'image');
+    // A code that is a small part of a big photo is lost when the photo is shrunk to fit: read it again in pieces at full size.
+    if (!reply.error && !reply.hits?.length) {
+      const damaged = reply.invalid ?? 0;
+      for (const t of tileGrid(decoded.width, decoded.height).slice(0, MAX_TILES)) {
+        let piece: ImageData;
+        try {
+          piece = cropPixels(decoded.bitmap, t);
+        } catch {
+          break;
+        }
+        const r = await scan(piece, 'tile');
+        if (r.error) break;
+        if (r.hits?.length) {
+          reply = { ...r, invalid: 0 };
+          break;
+        }
+        reply.invalid = Math.max(damaged, r.invalid ?? 0, reply.invalid ?? 0);
+      }
+    }
   } finally {
     decoded.bitmap.close();
   }
-  const height = pixels.height;
-  const reply = await scan(pixels, 'image');
   if (reply.error === 'load') throw failure('DecoderLoadError', MESSAGES.decoderFailed);
   if (reply.error || !reply.hits) throw failure('UnreadableFile', MESSAGES.notImage);
   if (reply.hits.length === 0) {
