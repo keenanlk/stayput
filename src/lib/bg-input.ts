@@ -22,11 +22,39 @@ export function kindOfHead(head: Uint8Array): PictureKind {
   return 'other';
 }
 
-/** A JPEG that ends without its end marker was cut off (a download that stopped, a card pulled early). */
+/**
+ * A JPEG whose picture data stops before its end marker was cut off (a download that stopped, a card pulled early).
+ * Bytes after the end marker do not count: motion photos carry a video there, and some cameras add a long trailer. So
+ * the segments are walked from the start, through every scan, and the file is whole once an end marker (FF D9) is
+ * reached; a stray FF D9 inside an embedded EXIF thumbnail is skipped with its segment.
+ */
 export async function jpegIsCutOff(file: Blob): Promise<boolean> {
   const tail = new Uint8Array(await file.slice(Math.max(0, file.size - 64)).arrayBuffer());
   for (let i = tail.length - 2; i >= 0; i--) if (tail[i] === 0xff && tail[i + 1] === 0xd9) return false;
-  return true;
+  return !jpegReachesEnd(new Uint8Array(await file.arrayBuffer()));
+}
+
+function jpegReachesEnd(b: Uint8Array): boolean {
+  let i = 2;
+  while (i + 1 < b.length) {
+    if (b[i] !== 0xff) return false;
+    const marker = b[i + 1]!;
+    if (marker === 0xff) { i++; continue; }
+    if (marker === 0xd9) return true;
+    if (marker === 0x01 || (marker >= 0xd0 && marker <= 0xd8)) { i += 2; continue; }
+    if (i + 3 >= b.length) return false;
+    i += 2 + ((b[i + 2]! << 8) | b[i + 3]!);
+    if (marker !== 0xda) continue;
+    // Scan data: runs until the next marker (FF followed by something other than 00 or a restart marker).
+    for (;;) {
+      i = b.indexOf(0xff, i);
+      if (i < 0 || i + 1 >= b.length) return false;
+      const next = b[i + 1]!;
+      if (next !== 0x00 && !(next >= 0xd0 && next <= 0xd7)) break;
+      i += 2;
+    }
+  }
+  return false;
 }
 
 /** Width and height from a PNG or JPEG header, or undefined when it cannot be read. */

@@ -51,3 +51,10 @@ open(f('jpeg-named.png'), 'wb').write(open(os.path.join(here, 'static', 'frenchi
 
 # A plain-text file with a .jpg name (a non-image), and bytes that start like a JPEG and go on as noise (a damaged one: edge-cases/garbage.jpg).
 open(f('notes.jpg'), 'w').write('Shopping list\n- milk\n- eggs\n' * 20)
+
+# A whole photo with no subject and an MP4-like blob (over 64 KB) after its end marker, as a motion photo has: it must
+# still end "No subject was found", never "damaged or cut off".
+random.seed(11)
+whole = open(f('no-subject.jpg'), 'rb').read()
+blob = b'\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom' + bytes(random.randrange(256) for _ in range(100_000)) + b'\xff\xd9\x00\x00'
+open(f('motion-photo-no-subject.jpg'), 'wb').write(whole + blob)
