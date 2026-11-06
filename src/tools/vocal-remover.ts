@@ -10,7 +10,7 @@ import { fromWorkerFailure } from '../lib/worker-error';
 import { retryUnreadable } from '../lib/read-failure';
 import { stageError } from '../lib/bare-error';
 import { audioSeconds, longRecordingHint } from '../lib/long-audio';
-import { isPhoneBrowser } from '../lib/phone-limit';
+import { isIosBrowser, isPhoneBrowser } from '../lib/phone-limit';
 import { RETRYABLE, phoneSongBudget, separationFailedError, tooLongForPhone } from '../lib/vocal-limit';
 
 /**
@@ -76,7 +76,7 @@ const shell = createShell({
       if (isPhoneBrowser()) {
         // A long song is refused by name before anything is decoded; its length comes from the file's header.
         const length = await audioSeconds(file);
-        const budget = phoneSongBudget((navigator as { deviceMemory?: number }).deviceMemory);
+        const budget = phoneSongBudget((navigator as { deviceMemory?: number }).deviceMemory, isIosBrowser());
         if (length > budget) throw tooLongForPhone(file.name, length, budget);
       }
       progress.set(`Reading ${file.name}…`, share(0.01));
@@ -93,6 +93,11 @@ const shell = createShell({
         };
         let song = await readSong();
         const seconds = song.l.length / SAMPLE_RATE;
+        // A header that gave no length (audioSeconds is 0) let any song through above: the decoded length is checked before the worker gets it.
+        if (isPhoneBrowser()) {
+          const budget = phoneSongBudget((navigator as { deviceMemory?: number }).deviceMemory, isIosBrowser());
+          if (seconds > budget) throw tooLongForPhone(file.name, seconds, budget);
+        }
         if (seconds < 1) throw new InputError(`${file.name} is too short to separate.`);
         step = 'AudioTransformFailed';
         const started = performance.now();

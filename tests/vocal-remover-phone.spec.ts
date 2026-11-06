@@ -41,8 +41,8 @@ async function open(page: Page) {
 }
 
 /** Replaces the separation worker with one that fails `fails` times (no name of its own), then returns the song as the instrumental and silence as vocals. */
-async function fakeWorker(page: Page, fails: number) {
-  await page.addInitScript((fails) => {
+async function fakeWorker(page: Page, fails: number, failName = 'WorkerFailed') {
+  await page.addInitScript(([fails, failName]) => {
     const Real = window.Worker;
     const w = window as unknown as { __made: number; Worker: unknown };
     w.__made = 0;
@@ -54,14 +54,14 @@ async function fakeWorker(page: Page, fails: number) {
         setTimeout(() => {
           const data =
             n < fails
-              ? { id: m.id, type: 'error', name: 'WorkerFailed', message: 'the worker went away' }
+              ? { id: m.id, type: 'error', name: failName, message: 'the worker went away' }
               : { id: m.id, type: 'done', left: m.left, right: m.right, vocalsLeft: new Float32Array(m.left.length), vocalsRight: new Float32Array(m.right.length), engine: 'cpu' };
           t.dispatchEvent(new MessageEvent('message', { data }));
         }, 10);
       t.terminate = () => {};
       return t;
     };
-  }, fails);
+  }, [fails, failName] as const);
 }
 
 const made = (page: Page) => page.evaluate(() => (window as unknown as { __made: number }).__made);
@@ -79,6 +79,18 @@ test.describe('on an iPhone', () => {
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 30_000 });
     await expect(page.locator('#error')).toContainText('about 11 minutes');
     await expect(page.locator('#error')).toContainText('Audio splitter');
+    expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'TooLongForPhone' })]);
+    expect(await made(page)).toBe(0);
+  });
+
+  test('a 5-minute song is refused on an iPhone, which has no deviceMemory to halve the budget (STAA-720)', async ({ page }) => {
+    await recordAnalytics(page);
+    await fakeWorker(page, 0);
+    await open(page);
+    await page.locator('#file-input').setInputFiles({ name: 'five.wav', mimeType: 'audio/wav', buffer: wav(5 * 60, 8000, 1) });
+    await page.locator('#run').click();
+    await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 30_000 });
+    await expect(page.locator('#error')).toContainText('longer than about 4 minutes');
     expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'TooLongForPhone' })]);
     expect(await made(page)).toBe(0);
   });
@@ -114,6 +126,17 @@ test.describe('a worker that fails with no name of its own', () => {
     expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'SeparationFailed' })]);
     expect(await made(page)).toBe(2);
   });
+});
+
+test('a worker that names its step keeps that name after the retry also fails', async ({ page }) => {
+  await recordAnalytics(page);
+  await fakeWorker(page, 5, 'SessionCreateFailed');
+  await open(page);
+  await page.locator('#file-input').setInputFiles({ name: 'a.wav', mimeType: 'audio/wav', buffer: wav(3, 44100, 2) });
+  await page.locator('#run').click();
+  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
+  expect(await toolRuns(page, 1)).toEqual([expect.objectContaining({ outcome: 'error', error_class: 'SessionCreateFailed' })]);
+  expect(await made(page)).toBe(2);
 });
 
 test('on a computer a short song comes out as an instrumental and vocals that add back to the song', async ({ page }) => {

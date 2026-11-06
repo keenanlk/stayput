@@ -10,7 +10,17 @@ import { NamedError } from './input-error';
  */
 export const PHONE_SONG_SECONDS = 6 * 60;
 
-export const phoneSongBudget = (deviceMemoryGb?: number): number => (deviceMemoryGb && deviceMemoryGb <= 2 ? PHONE_SONG_SECONDS / 2 : PHONE_SONG_SECONDS);
+/**
+ * Safari never reports navigator.deviceMemory, so the half budget for a small phone could not apply to an iPhone, and a
+ * 3 GB iPhone got the same 6 minutes as a 8 GB one (STAA-720). iPhones get 4 minutes: about 1.25 GB with the model, leaving
+ * room for the encoders that run after the separation.
+ */
+export const IOS_SONG_SECONDS = 4 * 60;
+
+export const phoneSongBudget = (deviceMemoryGb?: number, ios = false): number => {
+  const base = ios ? IOS_SONG_SECONDS : PHONE_SONG_SECONDS;
+  return deviceMemoryGb && deviceMemoryGb <= 2 ? base / 2 : base;
+};
 
 /** The refusal for a song over the budget, raised before anything is decoded. */
 export const tooLongForPhone = (name: string, seconds: number, budget: number) =>
@@ -20,12 +30,12 @@ export const tooLongForPhone = (name: string, seconds: number, budget: number) =
   );
 
 /** Failures worth one more try with a fresh worker: the worker died or failed with no name of its own. */
-export const RETRYABLE = new Set(['WorkerCrashError', 'WorkerFailed', 'SeparationFailed']);
+export const RETRYABLE = new Set(['WorkerCrashError', 'WorkerFailed', 'SeparationFailed', 'SessionCreateFailed', 'SeparationRunFailed']);
 
 /** The error shown after the retry also failed: it says what happened and what to do. */
 export const separationFailedError = (cause: Error) =>
   new NamedError(
-    // A worker the browser killed keeps its own name, so the counts still tell a crash from other failures.
-    cause.name === 'WorkerCrashError' ? 'WorkerCrashError' : 'SeparationFailed',
+    // The cause keeps its own name (a crash, the engine not starting, the run breaking), so the counts tell them apart.
+    RETRYABLE.has(cause.name) && cause.name !== 'WorkerFailed' ? cause.name : 'SeparationFailed',
     `The separation worker failed twice${cause.message ? ` (${cause.message.slice(0, 160)})` : ''}. Reload the page and try again, close other tabs, or try a shorter song or another browser.`,
   );

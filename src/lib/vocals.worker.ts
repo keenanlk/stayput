@@ -78,12 +78,15 @@ function load(wantGpu: boolean, onProgress: (f: number) => void): Promise<Loaded
 self.onmessage = async (e: MessageEvent<Request>) => {
   const { id, left, right, gpu } = e.data;
   const post = (msg: Reply, transfer: Transferable[] = []) => (self as unknown as Worker).postMessage(msg, transfer);
+  // The step under way names an unnamed failure: SeparationFailed alone hid whether the engine could not start or the run broke.
+  let step = 'SessionCreateFailed';
   try {
     const { ort, session, engine } = await load(gpu, (fraction) => post({ id, type: 'loading', fraction }));
     const mdx = new Mdx(INST_HQ_3);
     const { dimF, dimT } = INST_HQ_3;
     const input = session.inputNames[0]!;
     const output = session.outputNames[0]!;
+    step = 'SeparationRunFailed';
     post({ id, type: 'progress', done: 0, total: 1, engine });
     const [l, r] = await separate(
       left,
@@ -108,6 +111,6 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     }
     post({ id, type: 'done', left: l, right: r, vocalsLeft: left, vocalsRight: right, engine }, [l.buffer, r.buffer, left.buffer, right.buffer]);
   } catch (err) {
-    post({ id, type: 'error', ...workerFailure(err, 'SeparationFailed') });
+    post({ id, type: 'error', ...workerFailure(err, step) });
   }
 };
