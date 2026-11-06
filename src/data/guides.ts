@@ -3137,6 +3137,138 @@ export const guides: Guide[] = [
     ],
   },
   {
+    slug: 'clideo-alternative',
+    title: 'A Free Clideo Alternative With No Watermark and No Upload',
+    description: 'Clideo\'s free plan takes files up to 500 MB, and in our test it sent the video to its servers and marked the free result with its logo. Here is a browser-based alternative for compressing, joining, cutting and resizing video, where your video is not uploaded.',
+    heading: 'A free Clideo alternative with no watermark and no upload',
+    dek: 'Clideo works, but the free plan caps the file at 500 MB and the video goes to its servers. Here is what changes when the video never leaves your device.',
+    keywords: ['clideo alternative', 'free clideo alternative', 'clideo alternative no watermark', 'clideo without watermark', 'clideo file size limit', 'video editor without upload'],
+    updated: '2026-11-05',
+    tools: ['compress-video', 'merge-videos', 'trim-video', 'video-splitter', 'resize-video', 'crop-video', 'video-speed', 'add-audio-to-video'],
+    sections: [
+      {
+        h: 'What Clideo does well',
+        p: [
+          'Clideo is an online video editor with a long list of single-purpose tools: compress, merge, resize, split, a GIF maker, a video translator and text to speech, among others. It works on phones as well as computers and can open files straight from Dropbox and Google Drive. It is a legitimate, widely used service.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'Clideo is upload-based: as of November 2026, per [clideo.com/compress-video](https://clideo.com/compress-video), its Compress Video page says you can choose a file up to 500 MB for free, and that premium users get larger file size limits and no watermark. A few minutes of 4K phone video can pass 500 MB.',
+          'When we tested Clideo\'s Compress Video on October 11, 2026, the video was sent to clideo.com, and the free result had a "clideo.com" mark in its bottom-right corner.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s video tools run inside the browser tab, so your video is not uploaded and nothing is added to it: no watermark, no logo. [Compress video](/tools/compress-video) makes MP4, MOV, WebM and MKV files smaller or fits them under a size such as 25 MB, [merge videos](/tools/merge-videos) joins clips end to end, and [trim video](/tools/trim-video) and [split video](/tools/video-splitter) cut without re-encoding by default, so they take seconds and lose no quality. [Resize](/tools/resize-video), [crop](/tools/crop-video), [change the speed](/tools/video-speed) and [add music](/tools/add-audio-to-video) cover the rest of the common edits.',
+          'They are free and need no account. There is no size cap beyond what your device can hold in memory (phones hold less), and the splitter writes each part to your device\'s storage as it cuts, so it does not need to hold the whole video in memory.',
+        ],
+      },
+      {
+        h: 'Where Clideo still has the edge',
+        p: [
+          'Clideo\'s all-in-one editor, video translator, text to speech and cloud imports go beyond what Stayput offers today, and because its servers do the work, a phone can handle a file too big for its own memory. For compressing, joining, cutting, cropping or resizing a clip without a watermark and without sending it anywhere, a browser tool covers the common case; long HD clips may need a computer rather than a phone.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is Clideo\'s free file size limit?', a: 'As of November 2026, its Compress Video page says you can choose a file up to 500 MB for free, and that premium users get larger limits.' },
+      { q: 'Does Clideo add a watermark?', a: 'In our October 11, 2026 test, the free result from Clideo\'s Compress Video had a "clideo.com" mark in the bottom-right corner. Its Compress Video page lists no watermark as a premium feature.' },
+      { q: 'Can I compress a video without uploading it?', a: 'Yes. Stayput\'s Compress video re-encodes the video with your browser\'s own video encoder on your device, and your browser\'s network panel shows the video is not uploaded.' },
+      { q: 'Is there a free video editor with no watermark?', a: 'For single jobs like compressing, joining, cutting, cropping and resizing, yes: Stayput\'s video tools are free, need no account and add nothing to your video.' },
+    ],
+  },
+  {
+    slug: 'tinywow-alternative',
+    title: 'A Free TinyWow Alternative That Never Uploads Your Files',
+    description: 'TinyWow keeps the files you give it for up to an hour and lists ad-free use as part of a $9-a-month Premium plan. Here is a browser-based alternative for the photo and PDF tools people use most, where your files are not uploaded.',
+    heading: 'A free TinyWow alternative that never uploads your files',
+    dek: 'TinyWow puts a lot of tools in one place, but your files go to it first. Here is what changes when they never leave your device.',
+    keywords: ['tinywow alternative', 'free tinywow alternative', 'tinywow alternative no ads', 'sites like tinywow', 'tinywow alternative no upload'],
+    updated: '2026-11-05',
+    tools: ['remove-text-from-image', 'remove-background', 'upscale-image', 'combine-images', 'compress-image', 'image-to-text', 'merge-pdf', 'compress-pdf'],
+    sections: [
+      {
+        h: 'What TinyWow does well',
+        p: [
+          'TinyWow puts a wide spread of free tools in one place: PDF tools, image tools such as a background remover, photo cleanup and an upscaler, and AI writing tools, usable without signing up. It is run by Jenni AI and is a legitimate, widely used service.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'As of November 2026, the footer of [tinywow.com](https://tinywow.com/) says that all files, processed and unprocessed, are deleted after 1 hour. So whatever you put through it, a scanned ID or a family photo, is kept by TinyWow for up to an hour first.',
+          'The same site offers Premium for $9 a month and lists ad-free use, unlimited usage and faster processing as what it adds.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s tools run inside the browser tab, so your files are not uploaded and there is nothing to delete afterwards. [Remove text from an image](/remove-text-from-image) and [remove objects](/tools/remove-object) fill in whatever you brush over with a small AI model that runs on your device, [remove background](/tools/remove-background) cuts out the subject at the photo\'s full resolution, and [upscale image](/tools/upscale-image) makes a picture 2, 3 or 4 times bigger. [Combine images](/combine-images), [compress image](/tools/compress-image), [image to text](/tools/image-to-text), [merge PDF](/tools/merge-pdf) and [compress PDF](/tools/compress-pdf) handle the everyday jobs.',
+          'They are free, need no account, show no ads and add no watermark. The AI tools download their model once on first use (about 28 MB for the object eraser, about 42 MB in all for the background remover), and after that they work offline.',
+        ],
+      },
+      {
+        h: 'Where TinyWow still has the edge',
+        p: [
+          'TinyWow has AI writing tools, Word to PDF, photo colorizing and other tools Stayput doesn\'t offer today. Where the two overlap, such as cleaning text or objects off a photo, cutting out a background or merging and compressing a PDF, a browser tool does the job without the file leaving your device. On a busy photo the eraser can leave a soft patch that needs a second pass.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'How long does TinyWow keep my files?', a: 'As of November 2026, its site says all files, processed and unprocessed, are deleted after 1 hour.' },
+      { q: 'Is there a TinyWow alternative without ads?', a: 'Yes. Stayput shows no ads and needs no account. TinyWow lists ad-free use as part of its $9-a-month Premium plan, as of November 2026.' },
+      { q: 'Can I remove text from a photo without uploading it?', a: 'Yes. Stayput\'s Remove text from image runs a small inpainting model in your browser: the photo is opened, filled in and saved in your tab, and is not uploaded.' },
+      { q: 'Which TinyWow tools does Stayput not have?', a: 'As of November 2026, AI writing tools, Word to PDF and photo colorizing, among others. Stayput covers the common photo, image and PDF jobs.' },
+    ],
+  },
+  {
+    slug: 'iloveimg-alternative',
+    title: 'A Free iLoveIMG Alternative That Doesn\'t Upload Your Images',
+    description: 'iLoveIMG\'s free plan caps most batches at 30 images and 200 MB per task, and its upscaler and background remover take files up to 6 MB. Here is a browser-based alternative where your images are not uploaded.',
+    heading: 'A free iLoveIMG alternative that doesn\'t upload your images',
+    dek: 'iLoveIMG\'s free plan works, with caps on batch size and file size per task. Here is what changes when the image never leaves your device.',
+    keywords: ['iloveimg alternative', 'free iloveimg alternative', 'iloveimg alternative no upload', 'iloveimg alternative no ads', 'iloveimg file size limit'],
+    updated: '2026-11-05',
+    tools: ['compress-image', 'resize-image', 'crop-image', 'convert-image', 'upscale-image', 'remove-background', 'watermark-image', 'blur-face'],
+    sections: [
+      {
+        h: 'What iLoveIMG does well',
+        p: [
+          'iLoveIMG is the image sister site of iLovePDF, with tools to compress, resize, crop, convert, rotate, watermark and upscale images, remove backgrounds, blur faces and make memes. It is a legitimate, widely used service with an API and team plans.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'As of November 2026, per [iloveimg.com/pricing](https://www.iloveimg.com/pricing), the free Basic plan processes up to 30 images per task for compressing, resizing and converting (Premium: 120), and up to 200 MB per task (Premium: 4 GB). Upscale image takes one image per task on the free plan, and both it and Remove background take files up to 6 MB on every plan. Ad-free use is a Premium feature, at US$5 a month billed annually or $9 monthly.',
+          'iLoveIMG is upload-based: when we tested its Remove background on October 11, 2026, the photo was sent to iLoveIMG\'s servers. Its [security page](https://www.iloveimg.com/help/security) says processed files are automatically deleted within two hours.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s image tools run inside the browser tab, so your images are not uploaded and there is no per-task count or file-size tier. [Compress image](/tools/compress-image) and [resize image](/resize-image) take a whole batch at once, [crop image](/tools/crop-image), [convert image](/tools/convert-image) and [watermark image](/tools/watermark-image) cover the everyday edits, and [blur face](/blur-face) finds the faces in a photo for you.',
+          '[Remove background](/tools/remove-background) and [upscale image](/tools/upscale-image) run their AI models on your device, with no 6 MB cap on the photo you start from; the upscaled picture can be up to about 16.7 megapixels (4096 × 4096). Each model downloads once on first use (about 42 MB in all for the background remover, about 4.9 MB for the upscaler), and after that the tools work offline. Everything is free, with no account, no ads and no watermark; the limit is your device\'s memory (phones hold less).',
+        ],
+      },
+      {
+        h: 'Where iLoveIMG still has the edge',
+        p: [
+          'iLoveIMG has an HTML-to-image tool, a photo editor, an API, integrations such as Zapier and team plans, which go beyond what runs in a browser tab today. For compressing, resizing, converting, cropping or cutting out a background, a browser tool with no per-task cap covers what most people come to iLoveIMG for. For PDFs, see the [iLovePDF alternative](/guides/ilovepdf-alternative).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What are iLoveIMG\'s free limits?', a: 'As of November 2026, its pricing page lists up to 30 images and 200 MB per task for compressing, resizing and converting on the free plan, one image per task for upscaling, and a 6 MB file limit for upscaling and background removal on every plan.' },
+      { q: 'How long does iLoveIMG keep my images?', a: 'Its security page says processed files are automatically deleted within two hours, as of November 2026.' },
+      { q: 'Can I compress or resize images without uploading them?', a: 'Yes. Stayput\'s compress and resize tools work on a batch of images in your browser, and your browser\'s network panel shows the images are not uploaded.' },
+      { q: 'Is there an image upscaler with no 6 MB limit?', a: 'Yes. Stayput\'s Upscale image runs in your browser, so the picture you start from is limited by your device\'s memory rather than a file cap; the enlarged result can be up to about 16.7 megapixels.' },
+    ],
+  },
+  {
     slug: 'how-to-transcribe-audio-to-text',
     title: 'How to Transcribe Audio to Text (iPhone, Android, Windows, Mac)',
     description: 'Turning a recording into text used to mean typing it out by hand or paying per minute. Here is how to transcribe audio on each platform, plus a free browser tool with no upload and no per-minute charge.',

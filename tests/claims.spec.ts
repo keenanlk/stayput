@@ -47,6 +47,7 @@ const competitorPhrases = [
   'a slider move a phone could do offline', 'a filter a phone could do offline', 'an offline or in-browser tool is the way to stay within policy',
   'iLovePDF Desktop for Windows and Mac', 'push a subscription for features like unlimited pages', 'gate features like unlimited length',
   'Does iLovePDF have an offline version', 'its offline app is the more private option',
+  'lists ad-free use, unlimited usage and faster processing as what it adds',
 ];
 // Two guide titles carry the slogan in their H1 and URL; they are listed in the build notes, not guarded.
 const slogan = /alternative with no file size cap/gi;
