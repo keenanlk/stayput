@@ -14,7 +14,7 @@ import type * as Transformers from '@huggingface/transformers';
 import type { AutomaticSpeechRecognitionPipeline } from '@huggingface/transformers';
 import { vendorDir } from './vendor';
 import { loadWithRetry } from './retry';
-import { downloadVerified, isModelError, matchesEntry, modelPreflight, wholeOrNull } from './model-fetch';
+import { downloadVerified, importWhenOnline, isModelError, matchesEntry, modelPreflight, wholeOrNull } from './model-fetch';
 import { modelEntry } from './model-manifest';
 import { SPEECH_MODEL_MB } from '../data/speech-size';
 import type { ModelLabel } from './model-fetch';
@@ -127,6 +127,21 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
   const post = (msg: Reply) => (self as unknown as Worker).postMessage(msg);
 
 
+  /**
+   * The engine's WebAssembly module, imported ahead of the model so a device that goes offline while it loads waits for the
+   * network and tries once more, instead of failing at once as "no available backend found". Once imported, the runtime's
+   * own import of the same address finds it already loaded. The WebGPU path leaves this to the 8-bit path it falls back to.
+   */
+  async function warmEngine(): Promise<void> {
+    try {
+      await importWhenOnline(`${vendorDir('ort')}ort-wasm-simd-threaded.mjs`, { label });
+    } catch (err) {
+      fetchFailed = true;
+      if (isModelError(err) && err.name !== 'ModelDownloadError') fetchError ??= fromWorker(err.name, err.message);
+      throw err;
+    }
+  }
+
   function start(id: number, gpu: boolean, model: ModelName): Promise<AutomaticSpeechRecognitionPipeline> {
     // The two model files make up nearly all of the download; report them together.
     const sizes = new Map<string, [number, number]>();
@@ -150,7 +165,11 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     env.cacheKey = cacheKeyFor(model);
     let asr = pipelines.get(model);
     if (!asr) {
-      asr = pipeline('automatic-speech-recognition', model, options as Parameters<typeof pipeline>[2]) as Promise<AutomaticSpeechRecognitionPipeline>;
+      // Stored at once (not after the engine is warm) so a second request for the same model joins this load.
+      asr = (async () => {
+        if (!gpu) await warmEngine();
+        return pipeline('automatic-speech-recognition', model, options as Parameters<typeof pipeline>[2]) as Promise<AutomaticSpeechRecognitionPipeline>;
+      })();
       pipelines.set(model, asr);
       // A failed load (offline on first use, say) may be retried by the next request.
       const failed = asr;
@@ -186,7 +205,7 @@ export function createRecogniser({ env, pipeline, Tensor }: typeof Transformers)
     if (looksLikeMemory(err)) return outOfMemoryError();
     if (!loading) return speechModelError();
     if (fetchError) return fetchError;
-    return fetchFailed || looksLikeNetwork(err) ? modelDownloadError() : modelLoadError();
+    return fetchFailed || looksLikeNetwork(err) ? modelDownloadError(label.size) : modelLoadError();
   }
 
   /**

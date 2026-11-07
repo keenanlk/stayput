@@ -98,3 +98,93 @@ test('waitForOnline resolves at once when online, on the online event when not, 
   expect(Date.now() - started).toBeGreaterThanOrEqual(40);
   expect(listeners.size).toBe(0);
 });
+
+test('an abort during the offline wait ends the fetch at once, with no further tries', async () => {
+  const s = server({ cuts: [200, 200, 200] });
+  const ctl = new AbortController();
+  let waiting = 0;
+  // A network that never comes back; only the abort ends the wait.
+  const online = (signal?: AbortSignal) => {
+    waiting++;
+    return new Promise<void>((_, reject) => signal?.addEventListener('abort', () => reject(signal.reason)));
+  };
+  const res = await fetchResumable(s.doFetch, '/m.onnx', { signal: ctl.signal }, undefined, [0, 0, 0], online);
+  const body = res.arrayBuffer();
+  await expect.poll(() => waiting).toBe(1);
+  const callsBefore = s.calls.length;
+  const started = Date.now();
+  ctl.abort();
+  await expect(body).rejects.toBeDefined();
+  expect(Date.now() - started).toBeLessThan(1000);
+  expect(waiting).toBe(1);
+  expect(s.calls.length).toBe(callsBefore);
+});
+
+test('waitForOnline ends at once on abort, and not at all when already aborted', async () => {
+  const { waitForOnline } = await import('../src/lib/model-fetch');
+  const listeners = new Set<() => void>();
+  const target = { addEventListener: (_: string, f: () => void) => void listeners.add(f), removeEventListener: (_: string, f: () => void) => void listeners.delete(f) };
+  const ctl = new AbortController();
+  const pending = waitForOnline(60_000, { onLine: false }, target, ctl.signal);
+  const rejected = expect(pending).rejects.toBeDefined();
+  ctl.abort();
+  await rejected;
+  expect(listeners.size).toBe(0);
+  await expect(waitForOnline(60_000, { onLine: false }, target, ctl.signal)).rejects.toBeDefined();
+});
+
+test('an ONNX Runtime import cut by a dropped connection is tried again once the network is back', async () => {
+  const { importWhenOnline } = await import('../src/lib/model-fetch');
+  let net = true;
+  const imports: boolean[] = [];
+  const doImport = async () => {
+    imports.push(net);
+    if (!net) throw new TypeError('Failed to fetch dynamically imported module');
+  };
+  // The device goes offline during the first import; the network returns while the wait is on.
+  net = false;
+  let waited = 0;
+  await importWhenOnline('/vendor/x/ort.mjs', { label: { model: 'speech model' }, doImport, online: async () => void (waited++, (net = true)), isOffline: () => false });
+  expect(imports).toEqual([false, true]);
+  expect(waited).toBe(1);
+});
+
+test('an ONNX Runtime import that stays down ends as a named error after one more try', async () => {
+  const { importWhenOnline } = await import('../src/lib/model-fetch');
+  let tries = 0;
+  const err = await importWhenOnline('/vendor/x/ort.mjs', {
+    label: { model: 'speech model', size: '41 MB' },
+    doImport: async () => (tries++, Promise.reject(new TypeError('Failed to fetch'))),
+    online: async () => undefined,
+    isOffline: () => false,
+  }).then(() => new Error('resolved'), (e: Error) => e);
+  expect(tries).toBe(2);
+  expect(err.name).toBe('ModelDownloadError');
+  expect(err.message).toContain('41 MB');
+  // Still offline after the wait: ModelOffline.
+  const off = await importWhenOnline('/vendor/x/ort.mjs', { label: { model: 'speech model' }, doImport: () => Promise.reject(new TypeError('x')), online: async () => undefined, isOffline: (() => { let n = 0; return () => n++ > 0; })() }).then(() => new Error('resolved'), (e: Error) => e);
+  expect(off.name).toBe('ModelOffline');
+});
+
+test('an ONNX Runtime import with the device offline from the start fails at once as ModelOffline, without waiting', async () => {
+  const { importWhenOnline } = await import('../src/lib/model-fetch');
+  let waited = 0;
+  const err = await importWhenOnline('/vendor/x/ort.mjs', { label: { model: 'speech model' }, doImport: () => Promise.reject(new TypeError('x')), online: async () => void waited++, isOffline: () => true }).then(() => new Error('resolved'), (e: Error) => e);
+  expect(err.name).toBe('ModelOffline');
+  expect(waited).toBe(0);
+});
+
+test('an abort during the wait for the ONNX Runtime import is not retried', async () => {
+  const { importWhenOnline } = await import('../src/lib/model-fetch');
+  const ctl = new AbortController();
+  let tries = 0;
+  const err = await importWhenOnline('/vendor/x/ort.mjs', {
+    label: { model: 'speech model' },
+    doImport: () => (tries++, Promise.reject(new TypeError('x'))),
+    online: async (signal) => (ctl.abort(), Promise.reject(signal?.reason ?? new Error('aborted'))),
+    signal: ctl.signal,
+    isOffline: () => false,
+  }).then(() => new Error('resolved'), (e: Error) => e);
+  expect(tries).toBe(1);
+  expect(err.name).toBe('AbortError');
+});
