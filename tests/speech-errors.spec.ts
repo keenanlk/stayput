@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { SPEECH_MODEL_MB } from '../src/data/speech-size';
 import { modelDownloadError, audioDecodeError, encodeFailedError, encodeMemoryError, looksLikeMemory, plainCaptionError, phoneSpeechMemoryError, recordingTooLongError, restartsOnce, speechSecondsBudget, unknownCaptionError } from '../src/lib/speech-errors';
 
 test('a RangeError counts as memory only when its message says so', () => {
@@ -65,6 +66,6 @@ test('a recording over the memory budget is refused as RecordingTooLong, with th
 });
 
 test('the model download error names the size of the model in use', () => {
-  expect(modelDownloadError().message).toContain('(77 MB)');
+  expect(modelDownloadError().message).toContain(`(${SPEECH_MODEL_MB.q8} MB)`);
   expect(modelDownloadError('41 MB').message).toContain('(41 MB)');
 });
