@@ -21,6 +21,7 @@ import { isModelError, loadModelBytes } from './model-fetch';
 import { modelEntry } from './model-manifest';
 import { StageError, NamedError } from './input-error';
 import { isReclaim, tagCodec } from './codec-guard';
+import { isChunkLoadFailure } from './lazy-import';
 import { context2d, releaseCanvas } from './canvas-memory';
 
 /** Roll-back switch: false puts every finder back on the CPU delegate. */
@@ -46,6 +47,8 @@ export function modelFor(finder: PersonFinder, shape?: Shape): string {
 /** Longest side of the picture the segmenter is given, and the smaller one a device too slow even for Fast falls back to. */
 const WORK = 512;
 const WORK_SMALL = 256;
+/** The last rung before the run is stopped: an even smaller picture, with the browser given a turn between frames. */
+const WORK_TINY = 160;
 /** Frames in a row whose mask came back empty that reuse the last good one before the run is stopped. */
 const MAX_EMPTY = 3;
 /** Share of the previous mask kept in each new one: steadier edges, slight lag on fast moves. */
@@ -142,6 +145,14 @@ function fault(): 'throw' | 'empty' | undefined {
 }
 const FAULT_MESSAGE = 'x';
 
+/** Lets the browser paint and take input. A message, unlike a timer, is not slowed down in a background tab. */
+const yieldToBrowser = () =>
+  new Promise<void>((resolve) => {
+    const c = new MessageChannel();
+    c.port1.onmessage = () => (c.port1.close(), resolve());
+    c.port2.postMessage(0);
+  });
+
 /** Throw away the shared segmenter, so the next run builds a fresh one. */
 function drop() {
   const old = segmenter;
@@ -152,6 +163,66 @@ function drop() {
 
 /** An emscripten abort ("Aborted()", "Aborted(OOM)") or a plain out-of-memory failure. */
 const isAbort = (e: unknown) => /^Aborted\(|out of memory|Cannot enlarge memory|memory access out of bounds/i.test(e instanceof Error ? e.message : String(e));
+
+
+/** The words for each way the person finder can fail to start (Marketing's copy, STAA-742). */
+const COPY = {
+  load: "The person finder didn't finish loading, even after a second try. Check your connection, then press Run again.",
+  start: "The person finder couldn't start in this browser. Close other tabs and press Run again, or try an up-to-date Chrome, Edge or Safari.",
+  webgl: "The person finder needs WebGL, which this browser doesn't provide. Turn on hardware acceleration in the browser's settings, or use an up-to-date Chrome, Edge, Firefox or Safari.",
+  stalled: "Finding the person took more than 5 seconds a frame on this device, even on Fast at a smaller picture size, so the run was stopped. Close other tabs and apps and press Run again, or try a faster computer.",
+};
+/** The names this file gives a failed start; load() lets them through untouched. */
+const START_NAMES = new Set(['WebGLUnavailable', 'PersonFinderLoadFailed', 'PersonFinderStartFailed']);
+/** Pause before the one retry of a script, wasm or engine start that failed. */
+const RETRY_PAUSE_MS = 800;
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/**
+ * Test-only: makes the engine's start fail on purpose, so a spec can drive the retry and the delegate fallback. `times` calls to
+ * start an engine fail; `delegate` limits that to one delegate.
+ */
+type StartFault = { times: number; delegate?: 'CPU' | 'GPU' };
+let startFaults = 0;
+const startFault = (delegate: 'CPU' | 'GPU') => {
+  const f = (globalThis as { __stayputStartFault?: StartFault }).__stayputStartFault;
+  if (!f || startFaults >= f.times || (f.delegate && f.delegate !== delegate)) return false;
+  startFaults++;
+  return true;
+};
+
+const loadFailed = (cause: unknown) => {
+  const err = new NamedError('PersonFinderLoadFailed', COPY.load, { cause });
+  // A page script that would not load stays failed for this page in some browsers (Chromium remembers it by address): reloading is what helps.
+  if (isChunkLoadFailure(cause) && typeof location !== 'undefined') Object.assign(err, { link: { href: location.pathname, text: 'Reload' } });
+  return err;
+};
+const startFailed = (cause: unknown) => new NamedError('PersonFinderStartFailed', COPY.start, { cause });
+
+/** The engine's script, tried once more after a pause if the first try failed. A bundled chunk keeps its address, so only a transient failure is helped. */
+async function loadTasks(): Promise<typeof import('@mediapipe/tasks-vision')> {
+  try {
+    return await import('@mediapipe/tasks-vision');
+  } catch (first) {
+    await wait(RETRY_PAUSE_MS);
+    try {
+      return await import('@mediapipe/tasks-vision');
+    } catch (again) {
+      throw loadFailed(again ?? first);
+    }
+  }
+}
+
+/** Whether the engine's own files can be fetched: tells a start that failed for want of them (LoadFailed) from one that failed with them in hand (StartFailed). */
+async function engineReachable(): Promise<boolean> {
+  const dir = vendorDir('mediapipe');
+  try {
+    const answers = await Promise.all(['vision_wasm_internal.js', 'vision_wasm_internal.wasm'].map((f) => fetch(dir + f, { method: 'HEAD', cache: 'no-store' })));
+    return answers.every((a) => a.ok);
+  } catch {
+    return false;
+  }
+}
 
 function load(model: string): Promise<ImageSegmenter> {
   if (segmenter && segmenter.model !== model) drop();
@@ -168,24 +239,24 @@ function load(model: string): Promise<ImageSegmenter> {
   return mine.ready.catch((e) => {
     if (isAbort(e)) throw new MemoryError();
     // Offline, no room, a download that failed or a file that failed its check keep their own names and messages.
-    if (isModelError(e)) throw e;
-    // Whatever stopped the person finder from starting is one kind, and the message stays as it was.
-    const failed = new NamedError('PersonMaskFailed', e instanceof Error && e.message ? e.message : 'The person finder could not be started in this browser.');
-    failed.name = 'ModelLoadError';
-    throw failed;
+    if (isModelError(e) || (e instanceof Error && START_NAMES.has(e.name))) throw e;
+    // Anything else that stopped the person finder from starting is a failed start, with the original kept as the cause.
+    throw startFailed(e);
   });
 }
 
 function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2RenderingContext | null; frameMs?: number[] }): Promise<ImageSegmenter> {
   return (async () => {
+    // No WebGL, no engine (even its CPU path needs it): refused now, before the model is downloaded.
+    const webgl = probeWebGL();
+    if (!webgl.any) throw new NamedError('WebGLUnavailable', COPY.webgl);
     // The model first, whole and checked, outside the chip attempt (a failed download says nothing about the chip); offline or
     // no room ends here, before any script is loaded.
     const bytes = await loadModelBytes(model, { onProgress: (f) => downloadListener?.(f), label: { model: 'person finder', size: model === MODELS.edges ? 'about 20 MB' : 'about 4 MB', failName: 'ModelDownloadFailed' }, entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
-    const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
+    const { FilesetResolver, ImageSegmenter } = await loadTasks();
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
-    const webgl = probeWebGL();
-    if (!webgl.any) throw new NamedError('PersonMaskFailed', 'The person finder needs WebGL, which this browser does not provide. Turn on hardware acceleration in the browser settings, or use an up-to-date Chrome, Edge, Firefox or Safari.');
-    const make = async (delegate: 'CPU' | 'GPU') => {
+    const once = async (delegate: 'CPU' | 'GPU') => {
+      if (startFault(delegate)) throw new NamedError('StartFaultInjected', 'start fault injected');
       const fileset = await FilesetResolver.forVisionTasks(vendorDir('mediapipe').replace(/\/$/, ''));
       return ImageSegmenter.createFromOptions(fileset, {
         baseOptions: { modelAssetBuffer: bytes, delegate },
@@ -194,7 +265,24 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
         outputCategoryMask: false,
       });
     };
-    if (GPU_FOR_EDGES && model === MODELS.edges && !gpuFailed && webgl.chip) {
+    // One fresh try after a pause; what is left is named by whether the engine's files were reachable. A memory abort keeps its own kind.
+    const make = async (delegate: 'CPU' | 'GPU') => {
+      try {
+        return await once(delegate);
+      } catch (first) {
+        if (isAbort(first)) throw first;
+        await wait(RETRY_PAUSE_MS);
+        try {
+          return await once(delegate);
+        } catch (again) {
+          if (isAbort(again)) throw again;
+          throw (await engineReachable()) ? startFailed(again) : loadFailed(again);
+        }
+      }
+    };
+    let triedChip = false;
+    const startOnChip = async (): Promise<ImageSegmenter | undefined> => {
+      triedChip = true;
       try {
         // A chip whose graphics cannot be set up may never answer, rather than fail: give it a while, then move on.
         let timer: ReturnType<typeof setTimeout> | undefined;
@@ -206,14 +294,30 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
         holder.sentinel = makeGL();
         return seg;
       } catch (e) {
+        // The engine's files never arrived (after their retry): the processor would fail the same way, so say so now.
+        if (e instanceof Error && (e.name === 'PersonFinderLoadFailed' || isAbort(e))) throw e;
         gpuFailed = true;
         console.warn('The graphics chip could not start the person finder, using the CPU', e);
+        return undefined;
       }
+    };
+    if (GPU_FOR_EDGES && model === MODELS.edges && !gpuFailed && webgl.chip) {
+      const onChip = await startOnChip();
+      if (onChip) return onChip;
     }
-    const seg = await make('CPU');
-    // The CPU path needs a WebGL context too (see probeWebGL), and loses it the same way: a context held here goes with it.
-    holder.sentinel = makeGL();
-    return seg;
+    try {
+      const seg = await make('CPU');
+      // The CPU path needs a WebGL context too (see probeWebGL), and loses it the same way: a context held here goes with it.
+      holder.sentinel = makeGL();
+      return seg;
+    } catch (e) {
+      // The processor would not start it and the chip was never tried (Fast, or a chip the first look passed over): try the other delegate before giving up.
+      if (!(e instanceof Error && e.name === 'PersonFinderStartFailed') || triedChip || !webgl.chip) throw e;
+      console.warn('The processor could not start the person finder, trying the graphics chip', e);
+      const onChip = await startOnChip();
+      if (onChip) return onChip;
+      throw e;
+    }
   })();
 }
 
@@ -257,6 +361,8 @@ export class Matte {
   private sinceCheck = 0;
   /** Frames in a row on the processor that took over FRAME_STALL_MS. */
   private slowStreak = 0;
+  /** Set on the last rung: each frame starts after the browser has had a turn. */
+  private yielding = false;
 
   /** Give the frame-size canvases back at the end of a video: Safari frees them late, and each is 33 MB at 4K. */
   dispose() {
@@ -299,6 +405,7 @@ export class Matte {
       this.prev = undefined;
     }
     context2d(this.small).drawImage(ctx.canvas, 0, 0, sw, sh);
+    if (this.yielding) await yieldToBrowser();
     // Timestamps must only grow, across videos too; the frame's own time can repeat after a seek, so count instead.
     clock += 33;
     let result: ReturnType<ImageSegmenter['segmentForVideo']> | undefined;
@@ -415,7 +522,13 @@ export class Matte {
           console.warn('The person finder is too slow here, using a smaller picture');
           this.work = WORK_SMALL;
           this.fellBack.push('Looked at a smaller picture part way, because this device was too slow for the full one.');
-        } else throw new StageError('PersonFinderStalled', new NamedError('PersonMaskFailed', 'Finding the person took more than 5 seconds a frame on this device, so the run was stopped. Try a shorter or smaller video, or choose Fast.'));
+        } else if (this.work > WORK_TINY) {
+          // The last rung: a smaller picture still, and the browser gets a turn before each frame (a phone that is busy with the page, or starved, answers sooner).
+          console.warn('The person finder is still too slow here, using the smallest picture');
+          this.work = WORK_TINY;
+          this.yielding = true;
+          this.fellBack.push('Looked at an even smaller picture part way, because this device was too slow for the full one.');
+        } else throw new StageError('PersonFinderStalled', new NamedError('PersonMaskFailed', COPY.stalled));
       }
       if (onChip) {
         console.warn('One frame took over 5 seconds on the graphics chip, using the CPU');
