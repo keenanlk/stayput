@@ -255,6 +255,41 @@ test.describe('a person finder that stalls', () => {
     await expect(page.locator('#results-list')).toContainText('Looked at a smaller picture part way');
   });
 
+  test('Fast at the smaller picture that still stalls takes the smallest picture, with the browser given a turn, and finishes', async ({ page }) => {
+    test.setTimeout(300_000);
+    await stubAnalytics(page);
+    await slowUntil(page, 'using the smallest picture');
+    await openBackground(page, 'fast');
+    await page.locator('#run').click();
+    await finished(page);
+    await expect(page.locator('#results-list')).toContainText('Looked at an even smaller picture part way');
+    expect((await toolRuns(page))[0]).toMatchObject({ outcome: 'ok' });
+  });
+
+  test('frames that are slow only because the page was hidden never count as a stall', async ({ page }) => {
+    test.setTimeout(300_000);
+    await stubAnalytics(page);
+    await slowUntil(page, null);
+    // The page reports itself hidden from the moment the clock starts jumping.
+    await page.addInitScript(() => {
+      addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('progress-text')!;
+        new MutationObserver(() => {
+          const pct = /Replacing the background.*?(\d+)%/.exec(el.textContent ?? '')?.[1];
+          if (pct && Number(pct) >= 10 && !document.hidden) {
+            Object.defineProperty(document, 'hidden', { get: () => true, configurable: true });
+            document.dispatchEvent(new Event('visibilitychange'));
+          }
+        }).observe(el, { childList: true, characterData: true, subtree: true });
+      });
+    });
+    await openBackground(page, 'fast');
+    await page.locator('#run').click();
+    await finished(page);
+    await expect(page.locator('#results-list')).not.toContainText('smaller picture');
+    expect((await toolRuns(page))[0]).toMatchObject({ outcome: 'ok' });
+  });
+
   test('a device that stays too slow ends as PersonFinderStalled, after Fast and the smaller picture', async ({ page }) => {
     test.setTimeout(300_000);
     await stubAnalytics(page);
@@ -262,7 +297,7 @@ test.describe('a person finder that stalls', () => {
     await openBackground(page, 'edges');
     await page.locator('#run').click();
     await failed(page);
-    await expect(page.locator('#error')).toContainText('took more than 5 seconds');
+    await expect(page.locator('#error')).toContainText("Finding the person took more than 5 seconds a frame on this device, even on Fast at a smaller picture size, so the run was stopped. Close other tabs and apps and press Run again, or try a faster computer.");
     expect((await toolRuns(page))[0]).toMatchObject({ outcome: 'error', error_class: 'PersonFinderStalled' });
   });
 });

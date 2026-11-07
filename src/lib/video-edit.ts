@@ -180,8 +180,19 @@ export async function frameEstimate(file: File): Promise<number | undefined> {
 export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(readOrNull);
-    if (!video) throw new NamedError('NoVideoTrack', 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    // Three different things are told apart: no recognised container, a container whose picture track the reader failed on (a damaged or cut-off file), and a file with no picture track at all.
+    const format = await input.getFormat().catch(readOrNull);
+    if (!format) throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    const video = await input.getPrimaryVideoTrack().catch((e) => {
+      readOrNull(e);
+      throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).', { cause: e });
+    });
+    if (!video) {
+      // A container with no track of any kind has lost its index (a phone file cut off before it was written out): damaged, not a recording without a picture.
+      const tracks = await input.getTracks().catch(() => [null]);
+      if (tracks.length === 0) throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+      throw new NamedError('NoVideoTrack', 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    }
     try {
       return { ...shownSize(video), duration: await input.computeDuration() };
     } catch (e) {

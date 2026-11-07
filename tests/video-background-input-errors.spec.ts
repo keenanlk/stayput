@@ -97,14 +97,14 @@ test.describe('InputError: each refusal says what to do', () => {
   }
 });
 
-test.describe('UnreadableFile: refused early', () => {
+test.describe('UnreadableContainer: refused early', () => {
   test('a file that is not a video this page opens is refused before the person finder is fetched', async ({ page }) => {
     let finderFetched = false;
     await page.route(/mediapipe|selfie|\.tflite/i, (r) => ((finderFetched = true), r.continue()));
     await open(page);
     await page.locator('#file-input').setInputFiles([{ name: 'clip.mp4', mimeType: 'video/mp4', buffer: Buffer.from('this is not a video '.repeat(200)) }]);
     await page.locator('#run').click();
-    await expectError(page, 'clip.mp4 is not a video this page can read (MP4, MOV, WebM or MKV)', 'UnreadableFile');
+    await expectError(page, 'clip.mp4 is not a video this page can read (MP4, MOV, WebM or MKV)', 'UnreadableContainer');
     expect(finderFetched).toBe(false);
   });
 });

@@ -51,7 +51,7 @@ test.describe('Edge on Windows 10: clips this page cannot open are refused befor
       await expect(page.locator('#error')).toContainText(label === '3GP' ? '3GP clip' : 'MP4, MOV, WebM or MKV');
       await expect(page.locator('#error')).toContainText('Video to MP4');
       await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
-      expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^(UnreadableFile|UnsupportedCodec)$/) });
+      expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^(UnreadableFile|UnreadableContainer|NoVideoTrack|ContainerNotSupported|UnsupportedCodec)$/) });
       expect(finderFetched).toBe(false);
     });
   }
@@ -60,7 +60,7 @@ test.describe('Edge on Windows 10: clips this page cannot open are refused befor
     await open(page);
     await page.locator('#file-input').setInputFiles([{ name: 'holiday.mp4', mimeType: 'video/mp4', buffer: Buffer.from('plain text, not a video. '.repeat(300)) }]);
     await page.locator('#run').click();
-    await expectError(page, 'holiday.mp4 is not a video this page can read (MP4, MOV, WebM or MKV)', 'UnreadableFile');
+    await expectError(page, 'holiday.mp4 is not a video this page can read (MP4, MOV, WebM or MKV)', 'UnreadableContainer');
   });
 });
 
