@@ -8,6 +8,7 @@ import { baseName } from './files';
 import { NamedError } from './input-error';
 import { nameBare } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
+import { explainNoContainer } from './container-sniff';
 
 /** The shortest part a run makes: a sliver shorter than this holds no picture a player will show. */
 export const MIN_PART_SECONDS = 0.1;
@@ -120,12 +121,17 @@ export async function readDuration(file: File): Promise<number> {
       if (isNotReadable(e)) throw notReadable(e);
       return null;
     });
-    if (!format) throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format) throw await explainNoContainer(file);
     const track = await input.getPrimaryVideoTrack().catch((e) => {
       if (isNotReadable(e)) throw notReadable(e);
       throw nameBare('VideoReadFailed', e);
     });
-    if (!track) throw new NamedError('NoVideoTrack', 'This file has no video track.');
+    if (!track) {
+      // A container the reader recognised that holds no track of any kind has lost its index (a file cut off or damaged): not a recording without a picture.
+      const tracks = await input.getTracks().catch(() => [null]);
+      if (tracks.length === 0) throw new NamedError('ContainerParseFailed', 'This looks like a video, but this page could not read how it is laid out. The file may be damaged or cut short. Make an MP4 copy first, then pick that.');
+      throw new NamedError('NoVideoTrack', 'This file has no video track.');
+    }
     const seconds = await input.computeDuration().catch((e) => {
       if (isNotReadable(e)) throw notReadable(e);
       throw nameBare('VideoReadFailed', e);

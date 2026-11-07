@@ -108,8 +108,8 @@ test.describe('on the page', () => {
         const real = VideoDecoder.prototype.configure;
         let calls = 0;
         VideoDecoder.prototype.configure = function (this: VideoDecoder, c: VideoDecoderConfig) {
-          // Starting the conversion is tried twice (the first failure is retried), so both tries fail here.
-          if ((window as unknown as { __arm?: boolean }).__arm && (++calls === n || (n === 1 && calls === 2))) throw new Error('forced');
+          // A failure while starting or running the conversion is tried once more on a fresh reader (calls 1-2 start and run the first try; 3-4 the second), so both tries fail here.
+          if ((window as unknown as { __arm?: boolean }).__arm && (++calls === n || (n === 1 && calls === 2) || (n === 2 && calls === 4))) throw new Error('forced');
           return real.call(this, c);
         };
       }, n);
