@@ -4,8 +4,8 @@ import { EncoderUnavailable, hasVideoEncoder, requireH264Encoder } from '../lib/
 import { describeEdit } from './video-edit-shell';
 import { resumeWhenHidden, retryNote } from '../lib/edit-recovery';
 import { pageRecoveryHooks } from '../lib/recovery-hooks';
-import { NamedError, UnreadableFile, UnsupportedCodec, isUnspecific } from '../lib/input-error';
-import { snapshotFile } from '../lib/read-failure';
+import { NamedError, UnsupportedCodec, isUnspecific } from '../lib/input-error';
+import { retryUnreadable, snapshotFile } from '../lib/read-failure';
 import { saveHandoff } from '../lib/handoff';
 import { nameBare } from '../lib/bare-error';
 import { lazyImport, warm } from '../lib/lazy-import';
@@ -150,6 +150,27 @@ function stepFailure(step: string, e: unknown): Error {
   return nameBare(step, e);
 }
 
+/** Whether the browser's own player opens the file's picture: separates a layout our reader refuses from a file that is damaged or is no video. */
+function playerOpens(file: File): Promise<boolean> {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    const url = URL.createObjectURL(file);
+    const done = (ok: boolean) => {
+      clearTimeout(timer);
+      video.removeAttribute('src');
+      video.load();
+      URL.revokeObjectURL(url);
+      resolve(ok);
+    };
+    const timer = setTimeout(() => done(false), 5000);
+    video.muted = true;
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => done(video.videoWidth > 0);
+    video.onerror = () => done(false);
+    video.src = url;
+  });
+}
+
 /** The background picture, opened. A file that will not open (HEIC rejects with something that is not an Error) is said so by name; a failure that already has a name of its own is kept. */
 async function decodePicture(file: File) {
   try {
@@ -261,9 +282,10 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
   if (!hasVideoEncoder()) throw new EncoderUnavailable();
   await requireH264Encoder();
   const { assertReadable, editVideo, videoSize, frameEstimate } = await lazyImport(() => import('../lib/video-edit'));
-  // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download.
+  // A clip this browser cannot decode (HEVC, say) is said so now, before the person finder's download. A read the phone refuses is tried once more.
+  const notice = (message: string) => progress.set(message, 0);
   for (const v of videos) {
-    await assertReadable(v.file).catch((e) => {
+    await retryUnreadable(v.file, () => assertReadable(v.file), notice).catch((e) => {
       // A 3GP with H.263 video opens as MP4 but cannot be decoded: the iPhone/HEVC advice would send the person the wrong way.
       if (e instanceof Error && e.name === 'UnsupportedCodec' && /\.3g[p2]$/i.test(v.file.name)) {
         throw new UnsupportedCodec(`${v.file.name} is a 3GP clip with video this browser cannot decode. Make an MP4 copy with the Video to MP4 tool, then add that.`);
@@ -272,10 +294,15 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
     });
   }
   // A file that is not a video this page opens (3GP, AVI, WMV, a renamed file) is said so now, with the way on, not after the download.
+  // It keeps the class of what was wrong (UnreadableContainer, NoVideoTrack), so a clip with no picture is not counted as a damaged file.
   for (const v of videos) {
-    await videoSize(v.file).catch((e) => {
-      if (!(e instanceof Error) || !['UnreadableFile', 'NoVideoTrack', 'UnreadableContainer'].includes(e.name)) return;
-      throw Object.assign(new UnreadableFile(`${v.file.name} is not a video this page can read (MP4, MOV, WebM or MKV). Make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
+    await retryUnreadable(v.file, () => videoSize(v.file), notice).catch(async (e) => {
+      if (!(e instanceof Error) || !['UnreadableFile', 'NoVideoTrack', 'UnreadableContainer'].includes(e.name)) throw e;
+      // The reader refused a file the browser's own player opens: a layout this page cannot read, not a damaged file.
+      if (e.name !== 'NoVideoTrack' && (await playerOpens(v.file))) {
+        throw Object.assign(new NamedError('ContainerNotSupported', `${v.file.name} plays in this browser, but this page cannot read how the file is laid out. Make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
+      }
+      throw Object.assign(new NamedError(e.name, `${v.file.name} is not a video this page can read (MP4, MOV, WebM or MKV). Make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
     });
   }
   const which = finder();

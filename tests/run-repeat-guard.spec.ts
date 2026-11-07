@@ -43,7 +43,7 @@ test.describe('a failure that would only repeat', () => {
     for (let i = 0; i < 5; i++) await page.locator('#run').click({ force: true });
     await page.waitForTimeout(500);
     await expect.poll(async () => (await runs(page)).length).toBe(1);
-    expect((await runs(page))[0]!.d).toMatchObject({ outcome: 'error', error_class: 'UnreadableFile' });
+    expect((await runs(page))[0]!.d).toMatchObject({ outcome: 'error', error_class: 'UnreadableContainer' });
     await expect(page.locator('#run-hint')).toContainText('holiday.mp4 is not a video this page can read');
     await expect(page.locator('#run-hint')).toContainText(HINT);
   });
