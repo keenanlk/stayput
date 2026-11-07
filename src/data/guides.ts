@@ -3269,6 +3269,138 @@ export const guides: Guide[] = [
     ],
   },
   {
+    slug: 'sejda-alternative',
+    title: 'A Free Sejda Alternative With No Hourly Task Limit and No Upload',
+    description: 'Sejda\'s free web service allows 3 tasks per hour, on documents up to 200 pages or 100 MB, and the files are processed on its servers. Here is a browser-based alternative for merging, compressing, splitting, signing and editing PDFs, where your files are not uploaded.',
+    heading: 'A free Sejda alternative with no hourly task limit and no upload',
+    dek: 'Sejda\'s free web tools stop you after 3 tasks an hour, and the PDF goes to its servers. Here is what changes when the file never leaves your device.',
+    keywords: ['sejda alternative', 'free sejda alternative', 'sejda alternative no limit', 'sejda 3 tasks per hour', 'sejda alternative no upload', 'sites like sejda'],
+    updated: '2026-11-07',
+    tools: ['merge-pdf', 'compress-pdf', 'split-pdf', 'edit-pdf', 'sign-pdf', 'ocr-pdf', 'crop-pdf', 'redact-pdf', 'pdf-to-word'],
+    sections: [
+      {
+        h: 'What Sejda does well',
+        p: [
+          'Sejda is a long-running PDF service with a wide toolset: merge, split, compress, edit, fill and sign, OCR, convert to and from Office formats, Bates numbering and multi-step workflows. It can open files from Dropbox, Google Drive and OneDrive, and it also sells a desktop app. It is a legitimate, widely used service.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'As of November 2026, per [sejda.com/compress-pdf](https://www.sejda.com/compress-pdf), the free web service is for documents up to 200 pages or 100 MB and 3 tasks per hour. Go over that and Sejda asks you to upgrade or wait out the hour. Its paid web plans start at $5 for a 7-day pass or $7.50 a month.',
+          'Sejda\'s web tools are upload-based: its [desktop page](https://www.sejda.com/desktop) says Sejda Web is the browser-based service "where files are uploaded and processed on our servers". The compress page says files are automatically deleted after 2 hours.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s PDF tools run inside the browser tab, so your files are not uploaded and there is no task count to run out of. [Merge PDF](/tools/merge-pdf), [split PDF](/tools/split-pdf) and [compress PDF](/tools/compress-pdf) handle the everyday jobs, and compress can fit a file under a size you type, such as 1 MB or 200 KB. [Sign PDF](/tools/sign-pdf) and [edit PDF](/tools/edit-pdf) add a signature, new text, highlights or images. [Crop PDF](/tools/crop-pdf) trims margins, and [redact PDF](/tools/redact-pdf) removes text for good rather than covering it.',
+          '[OCR PDF](/tools/ocr-pdf) makes a scanned PDF searchable by reading the text on your device, and [PDF to Word](/tools/pdf-to-word) rebuilds paragraphs and headings in a .docx. They are free, need no account and show no ads. There is no page or file-size tier: the limit is your device\'s memory (phones hold less).',
+        ],
+      },
+      {
+        h: 'Where Sejda still has the edge',
+        p: [
+          'Sejda can change text that is already in a PDF, convert Word, Excel and HTML to PDF, add Bates numbers and chain tasks into workflows, which Stayput doesn\'t do today. Stayput\'s OCR reads English only. If you want an installed app rather than a browser tab, Sejda Desktop processes files on your computer, and its free plan allows 3 tasks a day. For merging, compressing, splitting, signing, cropping or redacting a PDF in a browser without an hourly cap and without uploading it, a browser tool covers the common case. For more on PDF sites with free-plan limits, see the [iLovePDF alternative](/guides/ilovepdf-alternative).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What are Sejda\'s free limits?', a: 'As of November 2026, its Compress PDF page says the free service is for documents up to 200 pages or 100 MB and 3 tasks per hour. Some tools have lower limits of their own.' },
+      { q: 'Does Sejda upload my files?', a: 'Sejda Web does: its own site says files are uploaded and processed on its servers and deleted automatically after 2 hours. Sejda Desktop processes files on your computer.' },
+      { q: 'Is there a Sejda alternative with no hourly limit?', a: 'Yes. Stayput\'s PDF tools run in your browser, so there is no task count per hour or per day. They are free and need no account.' },
+      { q: 'Can I edit the existing text in a PDF with Stayput?', a: 'Not yet. Edit PDF adds new text, boxes, highlights, drawings and images and can rotate, delete or reorder pages, but it can\'t change text that is already there. PDF to Word gives you an editable copy as a starting point.' },
+    ],
+  },
+  {
+    slug: 'tinypng-alternative',
+    title: 'A Free TinyPNG Alternative With No 5 MB Cap and No Upload',
+    description: 'TinyPNG\'s free web tool takes 20 images per session at up to 5 MB each, and its terms say the images you send are stored for up to 48 hours. Here is a browser-based alternative for compressing PNG, JPG and WebP images, where your images are not uploaded.',
+    heading: 'A free TinyPNG alternative with no 5 MB cap and no upload',
+    dek: 'TinyPNG compresses well, but every image goes to its servers first, with a 5 MB cap on the free plan. Here is what changes when the image never leaves your device.',
+    keywords: ['tinypng alternative', 'free tinypng alternative', 'tinypng alternative no upload', 'tinypng without limit', 'tinypng 5mb limit', 'compress png without uploading'],
+    updated: '2026-11-07',
+    tools: ['png-compressor', 'compress-image', 'convert-image', 'resize-image', 'crop-image', 'strip-exif'],
+    sections: [
+      {
+        h: 'What TinyPNG does well',
+        p: [
+          'TinyPNG, run by Tinify, is one of the best-known image compressors on the web. It shrinks PNG, JPEG, WebP and AVIF files and converts between formats, including to AVIF and JPEG XL. It also offers a developer API, a WordPress plugin, a Figma plugin and an image CDN. It is a legitimate, widely used service.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'As of November 2026, per [tinypng.com/pricing/web](https://tinypng.com/pricing/web), the free web plan compresses up to 20 images per session at up to 5 MB each and converts 3 per session. Web Pro, at $3.25 a month billed annually, removes the count, raises the cap to 75 MB per image and lists ad-free use. A high-resolution photo straight from a camera can pass 5 MB.',
+          'TinyPNG is upload-based: its [terms](https://tinypng.com/terms) say Tinify may temporarily store the content you submit, and that submitted content is stored for a maximum of 48 hours.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s image tools run inside the browser tab, so your images are not uploaded and there is no per-session count or 5 MB cap. [PNG compressor](/png-compressor) rewrites a PNG with a palette of up to 256 colours and keeps transparency, and the file usually drops by 60 to 80 percent. Lossless keeps every pixel, and a folder of exports comes back as one zip. If a file would not get smaller, you get the original back.',
+          '[Compress image](/tools/compress-image) shrinks JPG, PNG and WebP photos to a quality or to a size such as 100 KB, in batches. [Convert image](/tools/convert-image) turns them into WebP, JPG or PNG, and [JPG to AVIF](/jpg-to-avif) writes AVIF. [Resize](/resize-image), [crop](/tools/crop-image) and [remove EXIF data](/tools/strip-exif) cover the rest of getting an image ready for the web. They are free, need no account and show no ads, and the limit is your device\'s memory (phones hold less).',
+        ],
+      },
+      {
+        h: 'Where TinyPNG still has the edge',
+        p: [
+          'TinyPNG\'s API, WordPress and Figma plugins and image CDN compress images automatically as part of a site or design workflow, which a browser tab can\'t do. It also writes JPEG XL, which Stayput doesn\'t yet. For compressing a batch of PNGs, JPGs or WebPs by hand without sending them anywhere, a browser tool covers the common case. A palette PNG can show slight banding on photos and smooth gradients, so convert those to JPG or WebP instead.',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What is TinyPNG\'s free limit?', a: 'As of November 2026, its pricing page lists up to 20 compressions per session, 5 MB per image and 3 conversions per session on the free web plan.' },
+      { q: 'How long does TinyPNG keep my images?', a: 'Its terms say submitted content is stored for a maximum of 48 hours, as of November 2026.' },
+      { q: 'Can I compress PNG images without uploading them?', a: 'Yes. Stayput\'s PNG compressor reduces the colours and writes the PNG in your browser tab, and your browser\'s network panel shows the images are not uploaded.' },
+      { q: 'Is there a TinyPNG alternative with no file size limit?', a: 'Stayput has no per-image cap or per-session count. The limit is how much your device can hold in memory, so very large images may need a computer rather than a phone.' },
+    ],
+  },
+  {
+    slug: 'pdf-candy-alternative',
+    title: 'A Free PDF Candy Alternative That Doesn\'t Upload Your Files',
+    description: 'PDF Candy\'s free plan has page and hourly restrictions and no batch processing, and it keeps uploaded files for up to 2 hours. Here is a browser-based alternative for EPUB, merging, compressing and OCR, where your files are not uploaded.',
+    heading: 'A free PDF Candy alternative that doesn\'t upload your files',
+    dek: 'PDF Candy\'s free plan works, with page, hourly and batch limits, and your file goes to its servers first. Here is what changes when it never leaves your device.',
+    keywords: ['pdf candy alternative', 'pdfcandy alternative', 'free pdf candy alternative', 'pdf candy alternative no upload', 'pdf candy hourly limit', 'sites like pdf candy'],
+    updated: '2026-11-07',
+    tools: ['epub-to-pdf', 'pdf-to-epub', 'merge-pdf', 'compress-pdf', 'ocr-pdf', 'image-to-pdf', 'pdf-to-word', 'reorder-pdf', 'unlock-pdf', 'protect-pdf'],
+    sections: [
+      {
+        h: 'What PDF Candy does well',
+        p: [
+          'PDF Candy, from Icecream Apps, lists more than 90 PDF tools in one place: editing, merging, splitting, compressing, converting to and from Office and e-book formats, OCR, and AI tools that summarize, translate or chat with a PDF. Its free plan shows no ads and needs no account, and it also sells a desktop app. It is a legitimate, widely used service.',
+        ],
+      },
+      {
+        h: 'Why people look for an alternative',
+        p: [
+          'As of November 2026, per [pdfcandy.com/pricing.html](https://pdfcandy.com/pricing.html), the free plan comes with page and hourly restrictions, no batch processing and a limited file size. The paid web plan, at $6 a month, lists no hourly limits, files up to 500 MB per task and processing with no queue.',
+          'PDF Candy is upload-based: the same page says all uploaded files and processed output are kept for no longer than 2 hours.',
+        ],
+      },
+      {
+        h: 'What changes with a browser-based tool',
+        p: [
+          'Stayput\'s PDF tools run inside the browser tab, so your files are not uploaded and there is no hourly count. [EPUB to PDF](/tools/epub-to-pdf) and [PDF to EPUB](/tools/pdf-to-epub) convert e-books in batches. PDF to EPUB turns headings into chapters and drops page headers and numbers. [Merge PDF](/tools/merge-pdf) and [compress PDF](/tools/compress-pdf) take several files at once, and compress can fit a PDF under a size such as 1 MB. [OCR PDF](/tools/ocr-pdf) makes scanned PDFs searchable on your device.',
+          '[Image to PDF](/tools/image-to-pdf), [PDF to Word](/tools/pdf-to-word), [reorder or delete pages](/tools/reorder-pdf), [unlock](/tools/unlock-pdf) and [protect](/tools/protect-pdf) cover the other everyday jobs. They are free and need no account, and the limit is your device\'s memory (phones hold less).',
+        ],
+      },
+      {
+        h: 'Where PDF Candy still has the edge',
+        p: [
+          'PDF Candy converts Word, Excel and PowerPoint to PDF, handles more e-book formats such as MOBI, and has AI summaries, translation and chat, none of which Stayput offers today. Stayput\'s OCR reads English only, EPUB to PDF handles Latin, Greek and Cyrillic scripts, and an EPUB made from a PDF keeps the text and headings but not pictures or tables. For converting e-books, merging, compressing or making a scan searchable without the file leaving your device, a browser tool covers the common case. See also the [Smallpdf alternative](/guides/smallpdf-alternative).',
+        ],
+      },
+    ],
+    faq: [
+      { q: 'What are PDF Candy\'s free limits?', a: 'As of November 2026, its pricing page lists page and hourly restrictions, no batch processing and a limited file size on the free plan. The paid plans remove the hourly limit and allow files up to 500 MB per task.' },
+      { q: 'How long does PDF Candy keep my files?', a: 'Its pricing page says uploaded files and processed output are kept for no longer than 2 hours, as of November 2026.' },
+      { q: 'Can I convert EPUB to PDF without uploading the book?', a: 'Yes. Stayput\'s EPUB to PDF lays out the book and writes the PDF in your browser tab, and it takes several books at once. Books in Latin, Greek and Cyrillic scripts work; other scripts are refused rather than printed as empty boxes.' },
+      { q: 'Is there a PDF Candy alternative that processes several files at once for free?', a: 'Yes. Stayput\'s merge, compress, OCR, EPUB to PDF and PDF to EPUB tools take several files at once, for free, with no account.' },
+    ],
+  },
+  {
     slug: 'how-to-transcribe-audio-to-text',
     title: 'How to Transcribe Audio to Text (iPhone, Android, Windows, Mac)',
     description: 'Turning a recording into text used to mean typing it out by hand or paying per minute. Here is how to transcribe audio on each platform, plus a free browser tool with no upload and no per-minute charge.',
