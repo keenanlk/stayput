@@ -22,25 +22,42 @@ export const RESUME_BACKOFF_MS = [500, 1500, 3000] as const;
 /** The longest a download waits for the connection to come back before it counts a try as used, in milliseconds. */
 export const OFFLINE_PATIENCE_MS = 120_000;
 
+const abortError = (signal: AbortSignal): unknown => signal.reason ?? new DOMException('The operation was aborted.', 'AbortError');
+
 /**
  * Resolves at once when the browser thinks it is online; otherwise when it says it is, or after `ms`. A phone that
  * leaves Wi-Fi, enters a tunnel or is backgrounded drops the connection for longer than the few seconds of backoff
- * below, so the tries are not spent while there is no network to try on.
+ * below, so the tries are not spent while there is no network to try on. When `signal` aborts the wait ends at once
+ * and rejects with the abort reason, so a cancel is not noticed minutes later.
  */
-export function waitForOnline(ms: number = OFFLINE_PATIENCE_MS, nav: { onLine?: boolean } | undefined = globalThis.navigator, target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> | undefined = globalThis): Promise<void> {
+export function waitForOnline(ms: number = OFFLINE_PATIENCE_MS, nav: { onLine?: boolean } | undefined = globalThis.navigator, target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> | undefined = globalThis, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) return Promise.reject(abortError(signal));
   if (!nav || nav.onLine !== false || !target?.addEventListener) return Promise.resolve();
-  return new Promise((resolve) => {
-    const done = () => {
+  return new Promise((resolve, reject) => {
+    const finish = (err?: unknown) => {
       clearTimeout(timer);
       target.removeEventListener('online', done);
-      resolve();
+      signal?.removeEventListener('abort', onAbort);
+      if (err === undefined) resolve();
+      else reject(err);
     };
+    const done = () => finish();
+    const onAbort = () => finish(abortError(signal!));
     const timer = setTimeout(done, ms);
     target.addEventListener('online', done);
+    signal?.addEventListener('abort', onAbort, { once: true });
   });
 }
 
-const wait = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
+/** A pause that a `signal` cuts short (rejecting with its reason). */
+const wait = (ms: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) return reject(abortError(signal));
+    if (!(ms > 0)) return resolve();
+    const onAbort = () => (clearTimeout(timer), reject(abortError(signal!)));
+    const timer = setTimeout(() => (signal?.removeEventListener('abort', onAbort), resolve()), ms);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
 
 /** The size a response promises, or 0 when it promises none that can be checked (no length, or a compressed body). */
 export function promisedSize(res: Response): number {
@@ -74,7 +91,7 @@ export async function fetchResumable(
   init: RequestInit | undefined,
   onProgress?: (got: number, total: number) => void,
   waits: readonly number[] = RESUME_BACKOFF_MS,
-  online: () => Promise<void> = waitForOnline,
+  online: (signal?: AbortSignal) => Promise<void> = (signal) => waitForOnline(undefined, undefined, undefined, signal),
 ): Promise<Response> {
   const first = await doFetch(input, init);
   if (!first.ok || !first.body) return first;
@@ -103,9 +120,9 @@ export async function fetchResumable(
   async function reconnect(): Promise<ReadableStream<Uint8Array>> {
     for (;;) {
       if (retries >= waits.length) throw new TypeError(`Failed to fetch: ${input} stopped at ${got} bytes`);
-      await wait(waits[retries++]!);
+      await wait(waits[retries++]!, init?.signal ?? undefined);
       // No network right now: wait for it to come back, up to a while, before this try is made (and used).
-      await online();
+      await online(init?.signal ?? undefined);
       try {
         const headers = new Headers(init?.headers);
         if (got > 0) headers.set('Range', `bytes=${got}-`);
@@ -117,7 +134,9 @@ export async function fetchResumable(
         // A host that ignored the range sent the file from its first byte: drop what was already handed on.
         skipping = resumed ? 0 : got;
         return next.body;
-      } catch {
+      } catch (err) {
+        // A cancel is not "could not reach the host": stop, do not spend the remaining tries.
+        if (init?.signal?.aborted) throw err;
         // Could not reach the host this time; the next pass waits and tries again.
       }
     }
@@ -212,6 +231,35 @@ export const modelVerifyFailed = (label: ModelLabel) =>
     `The ${label.model} was downloaded twice, but neither copy matched what was expected, so both were thrown away instead of used. Something on the way, often a public or work network, is changing the file. Try again later or on another network.`,
   );
 
+/**
+ * Import the ONNX Runtime wasm module at `url` (the speech worker's own run of it comes from the same address, so it finds
+ * this one already loaded). A dynamic import that fails because the device lost its connection is otherwise reported by
+ * ONNX Runtime as "no available backend found", at once; here it waits for the network (up to `online`'s patience)
+ * and tries once more, and what still fails is ModelOffline when the browser is offline and ModelDownloadError otherwise.
+ * Other tools that load ONNX Runtime do not call this and are not affected.
+ */
+export async function importWhenOnline(
+  url: string,
+  opts: { label: ModelLabel; doImport?: (url: string) => Promise<unknown>; online?: (signal?: AbortSignal) => Promise<void>; signal?: AbortSignal; isOffline?: () => boolean },
+): Promise<void> {
+  const doImport = opts.doImport ?? ((u: string) => import(/* @vite-ignore */ u));
+  const online = opts.online ?? ((signal?: AbortSignal) => waitForOnline(undefined, undefined, undefined, signal));
+  const isOffline = opts.isOffline ?? offline;
+  // A device that was offline before the import began is ModelOffline at once, as for the model files; only a connection lost
+  // during the import is waited for.
+  const wasOffline = isOffline();
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await doImport(url);
+      return;
+    } catch (err) {
+      if (opts.signal?.aborted) throw err;
+      if (wasOffline || attempt >= 1) throw isOffline() ? modelOffline(opts.label) : modelDownloadError(opts.label);
+      await online(opts.signal);
+    }
+  }
+}
+
 const isQuota = (e: unknown) => e instanceof Error && (e.name === 'QuotaExceededError' || /quota/i.test(e.message));
 
 /** True when the browser says the device is offline. */
@@ -292,7 +340,7 @@ export async function uncachedBytes(name: string, paths: string[], sizeOf: (path
 export async function downloadVerified(
   doFetch: FetchLike,
   url: string,
-  opts: { label: ModelLabel; entry?: ModelEntry; onProgress?: (got: number, total: number) => void; init?: RequestInit; waits?: readonly number[]; online?: () => Promise<void> },
+  opts: { label: ModelLabel; entry?: ModelEntry; onProgress?: (got: number, total: number) => void; init?: RequestInit; waits?: readonly number[]; online?: (signal?: AbortSignal) => Promise<void> },
 ): Promise<Response> {
   const { label, entry } = opts;
   for (let attempt = 0; ; attempt++) {
@@ -300,7 +348,9 @@ export async function downloadVerified(
     try {
       // The second try skips the browser's HTTP cache: /models/ is served immutable, so a stale copy there would come back as it was.
       res = await fetchResumable(doFetch, url, attempt > 0 ? { ...opts.init, cache: 'reload' } : opts.init, opts.onProgress, opts.waits, opts.online);
-    } catch {
+    } catch (err) {
+      // A cancel stays a cancel; it is not a failed download.
+      if (opts.init?.signal?.aborted) throw err;
       throw offline() ? modelOffline(label) : modelDownloadError(label);
     }
     if (!res.ok) return res;

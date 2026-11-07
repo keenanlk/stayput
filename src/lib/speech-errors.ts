@@ -7,6 +7,7 @@
 import { NamedError, isUnspecific } from './input-error';
 
 import { isNotReadable } from './read-failure';
+import { SPEECH_MODEL_MB } from '../data/speech-size';
 
 export const SPEECH_ERRORS = ['ModelDownloadError', 'ModelOffline', 'StorageFull', 'ModelVerifyFailed', 'ModelLoadError', 'OutOfMemoryError', 'AudioDecodeError', 'WorkerCrashError', 'SpeechModelError', 'NoSpeechFound', 'RecordingTooLong', 'UnsupportedSound', 'AudioDamaged', 'NotAnAudioFile'] as const;
 export type SpeechErrorName = (typeof SPEECH_ERRORS)[number];
@@ -24,8 +25,9 @@ export class SpeechError extends Error {
 
 const make = (name: SpeechErrorName, message: string) => new SpeechError(name, message);
 
-export const modelDownloadError = () =>
-  make('ModelDownloadError', 'The speech model (77 MB) could not be downloaded, even after trying again. Try again on a better connection: Wi-Fi, if you are on mobile data.');
+/** `size` is what this device is fetching ("41 MB" for the smaller model); the base model's when not given. */
+export const modelDownloadError = (size = `${SPEECH_MODEL_MB.q8} MB`) =>
+  make('ModelDownloadError', `The speech model (${size}) could not be downloaded, even after trying again. Try again on a better connection: Wi-Fi, if you are on mobile data.`);
 export const modelLoadError = () =>
   make('ModelLoadError', 'The speech model downloaded but could not be started in this browser. Reload the page and try again, or use an up-to-date Chrome, Edge or Firefox on a computer.');
 export const outOfMemoryError = () =>

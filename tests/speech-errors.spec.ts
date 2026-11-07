@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { audioDecodeError, encodeFailedError, encodeMemoryError, looksLikeMemory, plainCaptionError, phoneSpeechMemoryError, recordingTooLongError, restartsOnce, speechSecondsBudget, unknownCaptionError } from '../src/lib/speech-errors';
+import { modelDownloadError, audioDecodeError, encodeFailedError, encodeMemoryError, looksLikeMemory, plainCaptionError, phoneSpeechMemoryError, recordingTooLongError, restartsOnce, speechSecondsBudget, unknownCaptionError } from '../src/lib/speech-errors';
 
 test('a RangeError counts as memory only when its message says so', () => {
   const alloc = new RangeError('Array buffer allocation failed');
@@ -62,4 +62,9 @@ test('a recording over the memory budget is refused as RecordingTooLong, with th
   const err = recordingTooLongError(7200, speechSecondsBudget(2, false));
   expect(err.name).toBe('RecordingTooLong');
   expect(err.message).toMatch(/minutes/);
+});
+
+test('the model download error names the size of the model in use', () => {
+  expect(modelDownloadError().message).toContain('(77 MB)');
+  expect(modelDownloadError('41 MB').message).toContain('(41 MB)');
 });
