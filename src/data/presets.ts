@@ -7137,7 +7137,7 @@ export const presets: Preset[] = [
     defaults: { stems: 'vocals', format: 'wav' },
     intro: [
       'An acapella is the vocal of a song on its own. Producers use them to remix and mash up tracks, singers use them to hear exactly how a phrase is sung, and they make lyrics far easier to write down. Official acapellas are rarely released, so the usual way to get one is to separate it from the finished song.',
-      'A worked example: a 4 minute FLAC of a song you want to remix at a different tempo. Drop it here; vocals only and WAV are already chosen, since a remix needs every bit of quality, and the result is a 16-bit stereo WAV of about 50 MB. The model predicts the music, and the vocal is what is left when that is subtracted from the song, so it lines up sample for sample with the original and drops into your project at bar one.',
+      'A worked example: a 4 minute FLAC of a song you want to remix at a different tempo. Drop it here; vocals only and WAV are already chosen, since a remix needs every bit of quality, and the result is a 16-bit stereo WAV of about 42 MB. The model predicts the music, and the vocal is what is left when that is subtracted from the song, so it lines up sample for sample with the original and drops into your project at bar one.',
       'Expect some bleed. Hi-hats, snare hits and sustained synths that share the voice’s frequencies can leave traces in the acapella, most noticeable in gaps between phrases. A gate or a little editing in your audio editor cleans those up; for sampling a single phrase, pick one where the arrangement is sparse.',
     ],
     steps: [
