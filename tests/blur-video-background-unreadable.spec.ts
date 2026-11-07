@@ -48,7 +48,8 @@ test.describe('Edge on Windows 10: clips this page cannot open are refused befor
       await page.locator('#file-input').setInputFiles([{ name, mimeType: type, buffer: readFileSync(fixture(name)) }]);
       await page.locator('#run').click();
       await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 30_000 });
-      await expect(page.locator('#error')).toContainText(label === '3GP' ? '3GP clip' : 'MP4, MOV, WebM or MKV');
+      // WebKit's own player opens some of these (AVI, FLV): the page then says the file plays but its layout is one it cannot read.
+      await expect(page.locator('#error')).toContainText(label === '3GP' ? /3GP clip|plays in this browser/ : /MP4, MOV, WebM or MKV|plays in this browser, but this page cannot read how the file is laid out/);
       await expect(page.locator('#error')).toContainText('Video to MP4');
       await expect.poll(async () => (await events(page)).filter((e) => e.n === 'tool_run').length).toBe(1);
       expect((await events(page)).find((e) => e.n === 'tool_run')!.d).toMatchObject({ outcome: 'error', error_class: expect.stringMatching(/^(UnreadableFile|UnreadableContainer|NoVideoTrack|ContainerNotSupported|UnsupportedCodec)$/) });
