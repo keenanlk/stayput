@@ -36,7 +36,7 @@ createShell({
           throw nameBare('FaceFinderFailed', e);
         });
         const mask = await findSubject(bitmap, (f) =>
-          progress.set(`Downloading the cut-out model and its runtime (one time, about 42 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),
+          progress.set(`Downloading the cut-out model and its runtime (one time, about 50 MB): ${Math.round(f * 100)}%`, share(0.1 + 0.4 * f)),
         );
         if (coverage(mask) < 0.005) throw new UnreadableFile('No person, pet or object was found in this photo. Try one with a clear subject.');
         const face = faces[0];

@@ -16,7 +16,7 @@ export const SPEECH_MODEL_SIZE = `${SPEECH_MODEL_MB.q8} MB, or ${SPEECH_MODEL_MB
 export const SPEECH_TINY_FIRST_USE_BYTES = {
   'onnx/encoder_model_quantized.onnx': 10_124_990,
   'onnx/decoder_model_merged_quantized.onnx': 30_719_241,
-  'ort-wasm-simd-threaded.wasm': 3_324_243,
+  'ort-wasm-simd-threaded.wasm': 3_551_187,
   'ort-wasm-simd-threaded.mjs': 9_486,
   'tokenizer.json': 653_537,
   'tokenizer_config.json': 6_172,

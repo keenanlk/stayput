@@ -16,7 +16,7 @@ createShell({
       try {
         const result = await readText(bitmap, (stage, f) =>
           stage === 'loading'
-            ? progress.set(`Loading the text reader (one time, about 6 MB): ${Math.round(f * 100)}%`, share(0.05))
+            ? progress.set(`Loading the text reader (one time, about 4 MB): ${Math.round(f * 100)}%`, share(0.05))
             : progress.set(`Reading the text in ${entry.file.name}…`, share(0.3)),
         );
         if (!result.text) throw new UnreadableFile('No clear text found. This works best on screenshots, scans and photos where the text fills most of the frame; try cropping to the text.');

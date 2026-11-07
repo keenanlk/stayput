@@ -160,29 +160,29 @@ interface Download {
 
 /** Tools that download a model or engine on first use, by base tool slug. */
 const downloads: Record<string, Download> = {
-  'remove-background': { what: 'cut-out model', size: '42 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 42 MB in all) to your browser, and after that the tool works offline.' },
-  'sticker-maker': { what: 'cut-out model', size: '42 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 42 MB in all) to your browser, and after that the tool works offline.' },
-  'passport-photo': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
-  'profile-picture-maker': { what: 'face finder and cut-out model', size: '46 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 46 MB in all) to your browser, and after that the tool works offline.' },
+  'remove-background': { what: 'cut-out model', size: '50 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 50 MB in all) to your browser, and after that the tool works offline.' },
+  'sticker-maker': { what: 'cut-out model', size: '50 MB', text: 'The first run downloads the cut-out model and the WebAssembly engine that runs it (about 50 MB in all) to your browser, and after that the tool works offline.' },
+  'passport-photo': { what: 'face finder and cut-out model', size: '54 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 54 MB in all) to your browser, and after that the tool works offline.' },
+  'profile-picture-maker': { what: 'face finder and cut-out model', size: '54 MB', text: 'The first run downloads the face finder, the cut-out model and the WebAssembly engines that run them (about 54 MB in all) to your browser, and after that the tool works offline.' },
   // Format-pair pages on the image converter that fetch the AVIF encoder when a conversion starts (keyed by page slug).
   'jpg-to-avif': { what: 'AVIF encoder', size: '3.5 MB' },
   'png-to-avif': { what: 'AVIF encoder', size: '3.5 MB' },
   'upscale-image': { what: 'upscaling model', size: '4.9 MB' },
   'remove-object': { what: 'object removal model', size: '28 MB' },
-  'image-to-word': { what: 'text reader', size: '6 MB' },
-  'image-to-text': { what: 'text reader', size: '6 MB' },
-  'ocr-pdf': { what: 'text reader', size: '6 MB' },
+  'image-to-word': { what: 'text reader', size: '4 MB' },
+  'image-to-text': { what: 'text reader', size: '4 MB' },
+  'ocr-pdf': { what: 'text reader', size: '4 MB' },
   'transcribe': { what: 'speech model', size: SPEECH_MODEL_SIZE },
   'vocal-remover': { what: 'separation model', size: '67 MB' },
   'mp3-to-midi': {
     what: 'note model',
     size: '0.2 MB',
-    text: 'The first run downloads the note model (0.2 MB, from this site) and the engine that runs it (about 14 MB, less compressed) to your browser, and after that the tool works offline.',
+    text: 'The first run downloads the note model (0.2 MB, from this site) and the engine that runs it (about 3.5 MB, which unpacks to about 14 MB) to your browser, and after that the tool works offline.',
   },
   'video-background-remover': {
     what: 'person finder',
     size: '28 MB',
-    text: 'The first run downloads the person finder and its engine (about 28 MB, or about 12 MB with the Fast option) to your browser, and after that the tool works offline.',
+    text: 'The first run downloads the person finder and its engine (about 20 MB, or about 4 MB with the Fast option) to your browser, and after that the tool works offline.',
   },
   'blur-face-video': { what: 'face detector', size: '4 MB' },
   'add-subtitles-to-video': {

@@ -27,7 +27,7 @@ createShell({
       try {
         const result = await readText(bitmap, (stage, f) =>
           stage === 'loading'
-            ? progress.set(`Loading the text reader (one time, about 6 MB): ${Math.round(f * 100)}%`, share(0.05))
+            ? progress.set(`Loading the text reader (one time, about 4 MB): ${Math.round(f * 100)}%`, share(0.05))
             : progress.set(`Reading the text in ${entry.file.name}…`, share(0.3)),
         );
         const text = join ? unwrap(result.text) : result.text;
