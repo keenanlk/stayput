@@ -2869,7 +2869,7 @@ export const guides: Guide[] = [
     heading: 'remove.bg is closing: a free alternative that does not upload your photos',
     dek: 'remove.bg\'s own site says its standalone website closes on 1 December 2026 (checked 12 October 2026). Stayput\'s background remover is free, needs no account, and your photos are not uploaded.',
     keywords: ['remove.bg alternative', 'remove.bg shutting down', 'remove.bg closing', 'remove.bg canva', 'remove.bg replacement', 'free remove.bg alternative', 'background remover no upload', 'remove.bg alternative full resolution'],
-    updated: '2026-10-13',
+    updated: '2026-11-06',
     tools: ['remove-background', 'make-background-transparent', 'white-background', 'blur-background'],
     sections: [
       {
@@ -2890,7 +2890,7 @@ export const guides: Guide[] = [
       {
         h: 'What changes with a browser-based tool',
         p: [
-          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, and it is free, with no account; your photos are not uploaded. The result is the same size as your photo (a 12 megapixel photo gives a 12 megapixel cut-out), limited by what your device can hold in memory, with no watermark and no credits. The first photo downloads the cut-out model and the WebAssembly runtime that runs it (about 42 MB in all); the first run needs a connection, and after that the model is cached. After your first run you can turn off Wi-Fi and it keeps working.',
+          'Stayput\'s [background remover](/tools/remove-background) runs the cutout model (ISNet) directly in the browser using onnxruntime-web, and it is free, with no account; your photos are not uploaded. The result is the same size as your photo (a 12 megapixel photo gives a 12 megapixel cut-out), limited by what your device can hold in memory, with no watermark and no credits. The first photo downloads the cut-out model and the WebAssembly runtime that runs it (about 50 MB in all); the first run needs a connection, and after that the model is cached. After your first run you can turn off Wi-Fi and it keeps working.',
           '[Make background transparent](/make-background-transparent) and [white background](/white-background) apply the same cutout for a transparent PNG or a plain white backdrop, and [blur background](/blur-background) keeps the subject sharp while blurring everything behind it. For a step-by-step walkthrough, see [how to remove the background from a photo](/guides/remove-background-from-a-photo).',
         ],
       },
@@ -2899,7 +2899,7 @@ export const guides: Guide[] = [
         p: [
           'Stayput has no API, no desktop app and no Photoshop plug-in. If you used remove.bg through its API, that moves to Leonardo.Ai per remove.bg\'s API page (checked 12 October 2026).',
           'We use one general-purpose model (ISNet, 8-bit weights). We have not run a side-by-side comparison with remove.bg, so we cannot say which cuts fine hair or low-contrast subjects better. Fine hair and fur are kept as soft edges; if part of the subject goes missing or background stays, try the "Keep around the edges" setting.',
-          'Each photo takes a few seconds depending on your device, and the first run waits for the one-time download of about 42 MB.',
+          'Each photo takes a few seconds depending on your device, and the first run waits for the one-time download of about 50 MB.',
           'You can drop several photos and download them in one zip.',
         ],
       },
@@ -2914,7 +2914,7 @@ export const guides: Guide[] = [
       { q: 'Is remove.bg shutting down?', a: 'Its own site says so. A notice on remove.bg (checked 12 October 2026) states: "The standalone website will no longer be available from 1 December 2026 at 9:00am CET." It says background removal is moving to Canva.' },
       { q: 'What happens to my remove.bg credits?', a: 'Its terms and conditions (checked 12 October 2026) say unused credits expire on 1 December 2026 and are non-refundable.' },
       { q: 'What happens to the remove.bg API?', a: 'Its API page (checked 12 October 2026) says that from 1 December 2026 background removal moves to Leonardo.Ai, also part of Canva. Stayput has no API.' },
-      { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model and the WebAssembly runtime that runs it (about 42 MB in all), so it needs a connection then.' },
+      { q: 'Is there a free remove.bg alternative that does not upload my photos?', a: 'Yes. Stayput\'s background remover is free, needs no account, and your photos are not uploaded: the cut-out model runs in your browser tab. The first run downloads the model and the WebAssembly runtime that runs it (about 50 MB in all), so it needs a connection then.' },
       { q: 'Does it work as well as remove.bg?', a: 'We have not compared them side by side. Stayput uses one general-purpose model, and fine hair and low-contrast subjects may need a second try with the edge setting. There is no API, desktop app or plug-in.' },
       { q: 'Is the result full resolution?', a: 'It is the same size as your photo: a 12 megapixel photo gives a 12 megapixel cut-out, limited by what your device can hold in memory. There is no low-resolution preview and no watermark.' },
       { q: 'Can I do many photos at once?', a: 'Yes. Drop several photos and download them all in one zip.' },
@@ -3187,7 +3187,7 @@ export const guides: Guide[] = [
     heading: 'A free TinyWow alternative that never uploads your files',
     dek: 'TinyWow puts a lot of tools in one place, but your files go to it first. Here is what changes when they never leave your device.',
     keywords: ['tinywow alternative', 'free tinywow alternative', 'tinywow alternative no ads', 'sites like tinywow', 'tinywow alternative no upload'],
-    updated: '2026-11-05',
+    updated: '2026-11-06',
     tools: ['remove-text-from-image', 'remove-background', 'upscale-image', 'combine-images', 'compress-image', 'image-to-text', 'merge-pdf', 'compress-pdf'],
     sections: [
       {
@@ -3207,7 +3207,7 @@ export const guides: Guide[] = [
         h: 'What changes with a browser-based tool',
         p: [
           'Stayput\'s tools run inside the browser tab, so your files are not uploaded and there is nothing to delete afterwards. [Remove text from an image](/remove-text-from-image) and [remove objects](/tools/remove-object) fill in whatever you brush over with a small AI model that runs on your device, [remove background](/tools/remove-background) cuts out the subject at the photo\'s full resolution, and [upscale image](/tools/upscale-image) makes a picture 2, 3 or 4 times bigger. [Combine images](/combine-images), [compress image](/tools/compress-image), [image to text](/tools/image-to-text), [merge PDF](/tools/merge-pdf) and [compress PDF](/tools/compress-pdf) handle the everyday jobs.',
-          'They are free, need no account, show no ads and add no watermark. The AI tools download their model once on first use (about 28 MB for the object eraser, about 42 MB in all for the background remover), and after that they work offline.',
+          'They are free, need no account, show no ads and add no watermark. The AI tools download their model once on first use (about 28 MB for the object eraser, about 50 MB in all for the background remover), and after that they work offline.',
         ],
       },
       {
@@ -3231,7 +3231,7 @@ export const guides: Guide[] = [
     heading: 'A free iLoveIMG alternative that doesn\'t upload your images',
     dek: 'iLoveIMG\'s free plan works, with caps on batch size and file size per task. Here is what changes when the image never leaves your device.',
     keywords: ['iloveimg alternative', 'free iloveimg alternative', 'iloveimg alternative no upload', 'iloveimg alternative no ads', 'iloveimg file size limit'],
-    updated: '2026-11-05',
+    updated: '2026-11-06',
     tools: ['compress-image', 'resize-image', 'crop-image', 'convert-image', 'upscale-image', 'remove-background', 'watermark-image', 'blur-face'],
     sections: [
       {
@@ -3251,7 +3251,7 @@ export const guides: Guide[] = [
         h: 'What changes with a browser-based tool',
         p: [
           'Stayput\'s image tools run inside the browser tab, so your images are not uploaded and there is no per-task count or file-size tier. [Compress image](/tools/compress-image) and [resize image](/resize-image) take a whole batch at once, [crop image](/tools/crop-image), [convert image](/tools/convert-image) and [watermark image](/tools/watermark-image) cover the everyday edits, and [blur face](/blur-face) finds the faces in a photo for you.',
-          '[Remove background](/tools/remove-background) and [upscale image](/tools/upscale-image) run their AI models on your device, with no 6 MB cap on the photo you start from; the upscaled picture can be up to about 16.7 megapixels (4096 × 4096). Each model downloads once on first use (about 42 MB in all for the background remover, about 4.9 MB for the upscaler), and after that the tools work offline. Everything is free, with no account, no ads and no watermark; the limit is your device\'s memory (phones hold less).',
+          '[Remove background](/tools/remove-background) and [upscale image](/tools/upscale-image) run their AI models on your device, with no 6 MB cap on the photo you start from; the upscaled picture can be up to about 16.7 megapixels (4096 × 4096). Each model downloads once on first use (about 50 MB in all for the background remover, about 4.9 MB for the upscaler), and after that the tools work offline. Everything is free, with no account, no ads and no watermark; the limit is your device\'s memory (phones hold less).',
         ],
       },
       {

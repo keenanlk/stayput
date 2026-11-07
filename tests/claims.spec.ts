@@ -218,20 +218,23 @@ test('every speech model download size on a page or in llms.txt names both paths
   expect(bad).toEqual([]);
 });
 
-// The image background remover family downloads the cut-out model and its onnxruntime WebAssembly runtime:
-// about 42 MB on the wire (38.7 + 3.3), 46.5 MB of it model once decoded. Passport photo and profile
-// picture add the ~4 MB face finder (about 46 MB). The old "about 46 MB" for the model alone was the
-// decoded model size, and "about 50 MB" for the face tools was derived from it.
+// The image background remover family downloads the cut-out model and its onnxruntime WebAssembly runtime. Measured on
+// Cloudflare (which sends the .onnx uncompressed, the runtime compressed): about 50 MB on the wire (46.5 model + 3.4-3.6
+// runtime). Passport photo and profile picture add the ~4 MB face finder (about 54 MB). "About 46 MB" for the model alone is
+// the decoded model size, and "about 42 MB" was the Vercel-era wire size (brotli model).
 test('cut-out model pages quote the measured download, not the decoded model size', () => {
   const files = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.html') || f === 'llms.txt');
   const bad = files.flatMap((f) => {
     const text = scannable(readFileSync(new URL(f, dist), 'utf8'));
-    // "46 MB" is right only where the face finder is added to the 42 MB (passport photo, profile picture).
-    return text.split(/(?<=[.!?])\s+/).filter((s) => /cut-?out model/i.test(s) && /\b(46|50) ?MB\b/.test(s) && !/face finder/i.test(s)).map((s) => `${f}: ${s}`);
+    // "54 MB" is right only where the face finder is added (passport photo, profile picture); 42 and 46 are stale everywhere.
+    return text
+      .split(/(?<=[.!?])\s+/)
+      .filter((s) => (/cut-?out model/i.test(s) && /\b(42|46|54) ?MB\b/.test(s) && !/face finder/i.test(s)) || (/cut-?out model/i.test(s) && /\b(42|46) ?MB\b/.test(s)))
+      .map((s) => `${f}: ${s}`);
   });
   expect(bad).toEqual([]);
-  for (const f of ['remove-background', 'sticker-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 42 MB/);
-  for (const f of ['passport-photo', 'profile-picture-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 46 MB/);
+  for (const f of ['remove-background', 'sticker-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 50 MB/);
+  for (const f of ['passport-photo', 'profile-picture-maker']) expect(scannable(readFileSync(new URL(`tools/${f}.html`, dist), 'utf8'))).toMatch(/about 54 MB/);
 });
 
 // A tool that exists to add a watermark must not say it adds none. The shared lead and the default

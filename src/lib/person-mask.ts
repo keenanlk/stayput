@@ -252,7 +252,7 @@ function build(model: string, holder: { gpu: boolean; sentinel?: WebGL2Rendering
     if (!webgl.any) throw new NamedError('WebGLUnavailable', COPY.webgl);
     // The model first, whole and checked, outside the chip attempt (a failed download says nothing about the chip); offline or
     // no room ends here, before any script is loaded.
-    const bytes = await loadModelBytes(model, { onProgress: (f) => downloadListener?.(f), label: { model: 'person finder', size: model === MODELS.edges ? 'about 28 MB' : 'about 12 MB', failName: 'ModelDownloadFailed' }, entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
+    const bytes = await loadModelBytes(model, { onProgress: (f) => downloadListener?.(f), label: { model: 'person finder', size: model === MODELS.edges ? 'about 20 MB' : 'about 4 MB', failName: 'ModelDownloadFailed' }, entry: modelEntry(model), onKeepFailed: (err) => console.warn('The person finder could not be kept for next time', err) });
     const { FilesetResolver, ImageSegmenter } = await loadTasks();
     // Each attempt loads its own fileset, so a failed chip attempt cannot leave the CPU one with a broken module.
     const once = async (delegate: 'CPU' | 'GPU') => {
