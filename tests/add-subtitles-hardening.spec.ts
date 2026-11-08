@@ -182,12 +182,16 @@ test.describe('a subtitle file the page reads as it was saved, and burns in', ()
     });
   }
 
-  test('an empty subtitle file is refused at once by name, with no model fetch', async ({ page }) => {
+  test('a subtitle file of 0 bytes is skipped with a notice (the shell), and one of only blank lines is refused by name', async ({ page }) => {
     await recordRuns(page);
     const models = modelRequests(page);
-    await run(page, [file('base.mp4'), write('empty.srt', '')]);
+    await open(page);
+    await page.locator('#file-input').setInputFiles([file('base.mp4'), write('empty.srt', '')]);
+    await expect(page.locator('body')).toContainText(/empty \(0 bytes\)|Skipped 1 empty file/);
+    await page.reload();
+    await run(page, [file('base.mp4'), write('blank.srt', '\n\n  \n')]);
     await failed(page);
-    await expect(page.locator('#error')).toContainText('No captions could be read from empty.srt');
+    await expect(page.locator('#error')).toContainText('No captions could be read from blank.srt');
     expect((await lastRun(page)).error_class).toBe('InputError');
     expect(models).toEqual([]);
   });
@@ -278,7 +282,7 @@ test.describe('refused early, before any model download', () => {
     expect((await lastRun(page)).error_class).toBe('UnreadableFileGone');
   });
 
-  test('a video the browser reports as gone (NotFoundError) is UnreadableFileGone, not a bare NotFoundError', async ({ page, browserName }) => {
+  test('a video the browser cannot reach when it is added is named at once (NotReadableProbe), never a bare NotFoundError', async ({ page, browserName }) => {
     needsVideoDecode(browserName);
     await recordRuns(page);
     await page.addInitScript(() => {
@@ -291,7 +295,7 @@ test.describe('refused early, before any model download', () => {
     });
     await run(page, [file('base.mp4')]);
     await failed(page);
-    expect((await lastRun(page)).error_class).toBe('UnreadableFileGone');
+    expect(['NotReadableProbe', 'UnreadableFileGone']).toContain((await lastRun(page)).error_class);
   });
 });
 

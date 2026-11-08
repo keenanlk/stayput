@@ -117,13 +117,14 @@ test('an encoder stall is tried once more, in real-time mode, and the run finish
   expect(modes.at(-1)).toBe('realtime');
 });
 
-test('an encoder that stalls again is reported as EncoderStall after exactly one more try', async ({ page }) => {
+test('an encoder that stalls again is reported as EncoderStall after one more try, and one more format where the browser can write VP9', async ({ page }, info) => {
   test.setTimeout(90_000);
   await recordRuns(page);
   await breakEncoder(page, { name: 'EncoderStall', times: 99 });
   await start(page, [clip, srtFile()]);
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-  expect(await page.evaluate(() => (window as never as { __thrown: number }).__thrown)).toBe(2);
+  // Chromium also asks whether VP9 answers (the probe's frame is the third throw) and, finding it silent, gives up; WebKit has no VP9 to ask about.
+  expect(await page.evaluate(() => (window as never as { __thrown: number }).__thrown)).toBe(info.project.name === 'webkit' ? 2 : 3);
   expect((await lastRun(page)).error_class).toBe('EncoderStall');
 });
 

@@ -100,7 +100,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
     const bytes = await subsFiles[0].file.arrayBuffer().then((b) => new Uint8Array(b)).catch((e) => Promise.reject<Uint8Array>(isNotReadable(e) ? notReadable(e) : e));
     given = tidyCaptions(parseSubtitles(decodeSubtitleBytes(bytes)));
   }
-  if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT, WebVTT or ASS file.`);
+  if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
 
   const look = radio('look', 'outline') as Look;
   const size = radio('size', 'medium') as Size;
