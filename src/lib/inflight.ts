@@ -5,7 +5,7 @@
  * Stored: the tool's slug, the phase, the time and the input's total size (sent only as the existing size bucket). Nothing else about the file is stored or sent, and the marker never leaves the device.
  */
 import { trackToolRun } from './analytics';
-import { CAPTION_TOOLS, noteLostRun } from './working-size';
+import { CAPTION_TOOLS, CUT_TOOLS, noteLostCut, noteLostRun } from './working-size';
 import { rememberTinyModel } from './speech-path';
 
 /**
@@ -182,6 +182,8 @@ export function reportLostTab(): void {
   const cls = m.hidden ? 'TabLostWhileHidden' : m.phase === 'run' ? 'TabLostDuringRun' : 'TabLostDuringPreview';
   // A caption run the browser closed: the redraw starts smaller in this tab (see capAtRisk). Kept as a flag in this tab; nothing more is sent.
   if (cls === 'TabLostDuringRun' && CAPTION_TOOLS.includes(m.tool)) noteLostRun();
+  // A split the browser closed: this tab's next split copies each part from its key frame instead of re-encoding. A flag in this tab only.
+  if (m.phase === 'run' && CUT_TOOLS.includes(m.tool)) noteLostCut();
   // A speech run the browser closed (on a phone, most likely out of memory): this tab's next speech run starts with the smaller model. A flag in this tab only.
   if (m.phase === 'run' && SPEECH_TOOLS.includes(m.tool)) rememberTinyModel();
   send(m.tool, cls, {}, typeof m.bytes === 'number' ? m.bytes : 0);

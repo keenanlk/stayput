@@ -53,12 +53,12 @@ test.describe('readDuration names why it refuses', () => {
     });
   }
 
-  test('a 0-byte file is UnreadableContainer', async () => {
-    expect(await nameOf(Buffer.alloc(0))).toMatchObject({ name: 'UnreadableContainer' });
+  test('a 0-byte file is UnreadableHeaderShort (the start of it could not be read in full)', async () => {
+    expect(await nameOf(Buffer.alloc(0))).toMatchObject({ name: 'UnreadableHeaderShort' });
   });
 
-  test('plain text is UnreadableContainer', async () => {
-    expect(await nameOf(Buffer.from('not a video. '.repeat(200)))).toMatchObject({ name: 'UnreadableContainer' });
+  test('plain text is NotAVideoContainer', async () => {
+    expect(await nameOf(Buffer.from('not a video. '.repeat(200)))).toMatchObject({ name: 'NotAVideoContainer' });
   });
 
   test('an audio-only M4A given to a video tool is NoVideoTrack', async ({}, testInfo) => {
@@ -90,7 +90,7 @@ test('a file that stays gone after one more read is UnreadableFileGone, with the
 });
 
 test('every new name is letters and digits only', () => {
-  for (const n of ['UnreadableFileGone', 'UnreadableContainer', 'NoVideoTrack', 'UnknownDuration']) expect(n).toMatch(/^[A-Za-z][A-Za-z0-9]{0,39}$/);
+  for (const n of ['UnreadableFileGone', 'UnreadableContainer', 'NotAVideoContainer', 'UnreadableHeaderShort', 'NoVideoTrack', 'UnknownDuration']) expect(n).toMatch(/^[A-Za-z][A-Za-z0-9]{0,39}$/);
 });
 
 // In the browser: the same files through the splitter page, and the class the page records.
@@ -101,7 +101,7 @@ const events = (page: Page): Promise<Ev[]> => page.evaluate(() => JSON.parse(ses
 test.describe('on the splitter page', () => {
   test.setTimeout(120_000);
   for (const [label, want, shown] of [
-    ['a file with no video structure', 'UnreadableContainer', 'not a video this page can read'],
+    ['a file with no video structure', 'NotAVideoContainer', 'not a video this page can read'],
     ['an audio-only M4A', 'NoVideoTrack', 'no video track'],
   ] as const) {
     test(`${label} records ${want}`, async ({ page }, testInfo) => {

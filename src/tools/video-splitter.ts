@@ -7,6 +7,7 @@ import { InputError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
 import { lazyImport, warm } from '../lib/lazy-import';
 import { isNotReadable, probeReadable, snapshotFile } from '../lib/read-failure';
+import { lostCut } from '../lib/working-size';
 
 /**
  * Video splitter. The length is read from the file's container; the parts are
@@ -26,6 +27,13 @@ let fileSize = 0;
 let loading: Promise<void> | undefined;
 /** The picked file copied into memory (up to 50 MB), so a phone that lets go of it later cannot fail a cut. */
 let held: { picked: File; copy: Promise<File> } | undefined;
+
+/**
+ * Parts already cut for the file in `held`, by their place in the plan. A run the hidden page cut short starts again from the
+ * top (see resumeIfHidden in wake-lock.ts); the parts it had finished are used again, so the second go cuts only what is left.
+ * Each is a file on this device (or a blob in memory), cleared when the file changes or the run finishes.
+ */
+let finished = new Map<string, OutputFile>();
 
 /** The file to work from: the in-memory copy of the pick when there is one, else the pick itself. */
 function workFile(picked: File): Promise<File> {
@@ -171,9 +179,11 @@ const shell = createShell({
       duration = 0;
       fileSize = 0;
       held = undefined;
+      finished = new Map();
       delete $('tool').dataset.duration;
       return update();
     }
+    finished = new Map();
     loading = workFile(files[0]!.file).then((f) => load(f)).catch((e) => {
       duration = 0;
       update();
@@ -201,13 +211,22 @@ const shell = createShell({
       // Run is kept off for a bad list, so this is only a press that got past that: the person's input, not a failure.
       throw new InputError(e instanceof Error ? e.message : 'Check the times and try again.');
     }
-    const exact = bool('exact');
+    // After the browser closed this page mid-split (an iPhone short of memory), every part is copied from its key frame: nothing is decoded or re-encoded.
+    const careful = lostCut();
+    const exact = bool('exact') && !careful;
+    if (careful) progress.set('The browser closed this page during the last split, so each part is copied from the key frame at or before its start. That uses far less memory.', 0);
     // The cutting code loads on first use (and is warmed when the file is added).
     const { trimVideo } = await loadCutTool();
     const outs: OutputFile[] = [];
     for (const [i, part] of parts.entries()) {
       const label = `Part ${i + 1} of ${parts.length}`;
       progress.set(label, i / parts.length);
+      const key = `${exact}|${careful}|${parts.length}|${part.start}|${part.end}`;
+      const done = finished.get(key);
+      if (done) {
+        outs.push(done);
+        continue;
+      }
       // One part at a time: only the finished file is kept.
       const r = await rereading(
         file,
@@ -217,17 +236,21 @@ const shell = createShell({
             end: part.end,
             exact,
             mute: false,
+            copyOnly: careful,
             onProgress: (f) => progress.set(`${label}: ${Math.round(f * 100)}%`, (i + f) / parts.length),
             onNotice: (m) => progress.set(`${label}: ${m}`, i / parts.length),
           }),
         (m) => progress.set(`${label}: ${m}`, i / parts.length),
       );
-      outs.push({
+      const out: OutputFile = {
         name: videoPartName(entry.file.name, i, parts.length, r.ext),
         blob: r.blob,
         note: `${clock(part.start)} to ${clock(part.end)}, ${exact ? 'cut exactly' : r.keyframeCopy ? 'copied from the key frame at or before the start' : 'fast cut'}${retryNote(r.retry, r.width && r.height ? { width: r.width, height: r.height } : undefined)}`,
-      });
+      };
+      finished.set(`${key}`, out);
+      outs.push(out);
     }
+    finished = new Map();
     return outs;
   },
 });
