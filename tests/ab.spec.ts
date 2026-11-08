@@ -31,8 +31,10 @@ function runOnce(keys: string, session: Map<string, string> | 'throws' = new Map
 test('about 1000 fresh visits split 50/50 within 5%', () => {
   let b = 0;
   for (let i = 0; i < 1000; i++) if (runOnce('t').get('data-ab-t') === 'B') b++;
-  expect(b).toBeGreaterThan(450);
-  expect(b).toBeLessThan(550);
+  // b ~ Binomial(1000, 0.5): mean 500, sd sqrt(250) = 15.8. Bounds of +/-80 are 5.06 sd, so a fair picker
+  // fails about 4 runs in 10 million; a 60/40 picker (6 sd off) still fails every time.
+  expect(b).toBeGreaterThan(420);
+  expect(b).toBeLessThan(580);
 });
 
 test('the label is kept for the visit, and each key is picked on its own', () => {
