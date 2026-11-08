@@ -130,17 +130,56 @@ export async function retryUnreadable<T>(file: Blob, job: () => Promise<T>, onNo
   }
 }
 
-/** Videos up to this size are copied into memory. A larger one is only checked: a copy would hold it in memory twice, and for a big file the failure is usually the size of the read itself, which a copy cannot fix. */
+/** Videos up to this size are copied into memory. A larger one is copied to temporary disk space when there is room (input-copy.ts), otherwise only checked: a copy in memory would hold it twice, and for a big file the failure is usually the size of the read itself, which a copy cannot fix. */
 export const SNAPSHOT_LIMIT = 50 * 1024 * 1024;
 const CHUNK = 8 * 1024 * 1024;
 
+/** Copies made by snapshotFile, so a second call on one (a tool that still takes its own copy) returns it as it is. */
+const snapshots = new WeakSet<object>();
+
+/** Copies a tool took itself, right after the pick (the splitter's), by the File they are a copy of: the run uses them rather than reading the picked File again. */
+const earlyCopies = new WeakMap<File, Promise<File>>();
+
+/** Records `copy` (pending or done) as the copy of `picked` that the run should work from. */
+export function noteEarlyCopy(picked: File, copy: Promise<File>): void {
+  earlyCopies.set(picked, copy);
+}
+
+/** The early copy of `picked` that was taken and holds, or undefined. */
+export async function earlyCopyOf(picked: File): Promise<File | undefined> {
+  return earlyCopies.get(picked)?.catch(() => undefined);
+}
+
+/**
+ * Reads bytes `start` to `end` of `file`, each try after the pauses in `pauses`. A read that never works is NotReadableError
+ * (or OutOfMemoryError when the memory ran out). The one exception: the file's last byte alone is out of reach while everything
+ * before it reads. That is not taken as a lost file, the result is 'end-only', and the caller goes on with the file as it was.
+ */
+export async function readPiece(file: Blob, start: number, end: number, pauses = [250, 750]): Promise<ArrayBuffer | 'end-only'> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await file.slice(start, end).arrayBuffer();
+    } catch (e) {
+      if (ranOutOfMemory(e)) throw readMemoryError(e);
+      if (!isNotReadable(e)) throw e;
+      if (attempt >= pauses.length) {
+        if (end === file.size && end - start > 1 && (await file.slice(start, end - 1).arrayBuffer().then(() => true, () => false))) return 'end-only';
+        unreachable.add(file);
+        throw notReadable(e);
+      }
+      await new Promise((r) => setTimeout(r, pauses[attempt]));
+    }
+  }
+}
+
 /**
  * Copies `file` into memory in one go, while the browser still lets us at it. On Android a picked file can stop being
- * readable a moment later (a content:// file from Photos or Drive, read late or twice), so a tool takes this copy first
+ * readable a moment later (a content:// file from Photos or Drive, read late or twice), so the run takes this copy first
  * and works from it. Each piece is tried a few times; a file that never reads ends with NotReadableError after about a
  * second. A file over `limit` is only checked, and returned as it was. Nothing leaves the device.
  */
 export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIMIT, pauses = [250, 750]): Promise<File> {
+  if (snapshots.has(file)) return file;
   if (file.size === 0 || file.size > limit) {
     await probeReadable(file);
     return file;
@@ -149,22 +188,30 @@ export async function snapshotFile<T extends File>(file: T, limit = SNAPSHOT_LIM
   if (unreachable.has(file)) await probeReadable(file, 0);
   const parts: ArrayBuffer[] = [];
   for (let at = 0; at < file.size; at += CHUNK) {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        parts.push(await file.slice(at, Math.min(file.size, at + CHUNK)).arrayBuffer());
-        break;
-      } catch (e) {
-        if (ranOutOfMemory(e)) throw readMemoryError(e);
-        if (!isNotReadable(e)) throw e;
-        if (attempt >= pauses.length) {
-          unreachable.add(file);
-          throw notReadable(e);
-        }
-        await new Promise((r) => setTimeout(r, pauses[attempt]));
-      }
-    }
+    const piece = await readPiece(file, at, Math.min(file.size, at + CHUNK), pauses);
+    if (piece === 'end-only') return file;
+    parts.push(piece);
   }
-  return new File(parts, file.name, { type: file.type, lastModified: file.lastModified });
+  const copy = new File(parts, file.name, { type: file.type, lastModified: file.lastModified });
+  snapshots.add(copy);
+  return copy;
+}
+
+/**
+ * Runs `job` over all of a run's files; if it fails because a file could not be read, waits a moment, checks every file is
+ * reachable and runs it once more (see retryUnreadable, which does the same for one file).
+ */
+export async function retryRun<T>(files: readonly Blob[], job: () => Promise<T>, onNotice?: (message: string) => void, pause = 1000): Promise<T> {
+  try {
+    return await job();
+  } catch (e) {
+    // A failure that already checked the files and found one out of reach (a tool's own retry did) is not tried a third time.
+    if (!isNotReadable(e) || notReadableClass(e) === 'NotReadableProbe') throw e;
+    await new Promise((r) => setTimeout(r, pause));
+    for (const file of files) await probeReadable(file);
+    onNotice?.('The file could not be read the first time. Trying once more.');
+    return await job();
+  }
 }
 
 /** Whether `e`, or the error it wraps, is the browser saying the file is no longer there (NotFoundError): moved, deleted or its permission taken back. */

@@ -137,6 +137,8 @@ for (const path of PAGES) {
         });
         await open(page, path);
         await page.locator('#file-input').setInputFiles(speech(info.project.name));
+        // The file is checked end to end when it is added: arm the failure once Run is on, so it hits the run, not the check.
+        await expect(page.locator('#run')).toBeEnabled();
         await page.evaluate((n) => ((window as unknown as { __fail: number }).__fail = n), reads);
         await page.locator('#run').click();
         if (ok) {

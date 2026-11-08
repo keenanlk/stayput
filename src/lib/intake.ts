@@ -5,12 +5,12 @@
  * Free of vendor and codec imports so a spec can load it.
  */
 import { NamedError } from './input-error';
-import { isNotReadable, probeReadable, SNAPSHOT_LIMIT } from './read-failure';
+import { isNotReadable, notReadable, probeReadable, SNAPSHOT_LIMIT } from './read-failure';
 import { SNIFF_BYTES, sniffBytes, type Container } from './sniff';
 
 export interface IntakeProblem {
-  /** The error class: UnsupportedContainer or FileNotDownloaded. */
-  name: 'UnsupportedContainer' | 'FileNotDownloaded';
+  /** The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not; UnreadableFileGone for a file that was refused before and is added again. */
+  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone';
   message: string;
   /** One phrase of the message that links to a page that fixes it. */
   link?: { text: string; href: string };
@@ -35,6 +35,18 @@ const ZERO_HEAD_OK = /\.(iso|img|dmg|bin|dat|raw|tga|vhd|vhdx|vmdk)$/i;
 const SAVE_STEPS =
   'Save it to this device first: in Google Photos or Drive, open the file, tap the three dots and choose Download (or Save to device). On a Chromebook, right-click it in the Files app and turn on "Available offline". On an iPhone or iPad, open it in the Files app and tap the cloud icon to download it. Then add the saved copy here.';
 
+/** Whether a tool's file input takes audio or video: the tools whose files are checked end to end at add time and copied at Run (input-copy.ts). */
+export function takesMedia(accept: string): boolean {
+  return /(^|,)\s*(audio|video)\//.test(accept);
+}
+
+const MEDIA_EXT = /\.(mp4|m4v|mov|qt|webm|mkv|avi|wmv|flv|3gp|3g2|ts|mts|m2ts|mpe?g|ogv|mp3|wav|m4a|m4b|aac|ogg|oga|opus|flac|aiff?|aifc|wma|amr|mid|midi|caf|weba)$/i;
+
+/** Whether a picked file is itself audio or video (a tool that takes pictures and a song, like the slideshow maker, is not about to read its photos end to end). */
+export function isMediaFile(file: File): boolean {
+  return file.type.startsWith('audio/') || file.type.startsWith('video/') || (!/^(image|text)\//.test(file.type) && MEDIA_EXT.test(file.name));
+}
+
 function readFirst(file: Blob): Promise<Uint8Array> {
   return file.slice(0, SNIFF_BYTES).arrayBuffer().then((b) => new Uint8Array(b));
 }
@@ -54,8 +66,21 @@ export async function inspectFile(file: File, tool: string, base: string, accept
     try {
       await probeReadable(file);
       return null;
-    } catch {
+    } catch (again) {
+      // The same File failed here before and still does: it will not come back, so say to pick it again.
+      if ((again as { name?: string }).name === 'UnreadableFileGone') return { name: 'UnreadableFileGone', message: (again as Error).message };
       return { name: 'FileNotDownloaded', message: `${file.name} cannot be read by the browser, which usually means it is still in the cloud and not saved on this device yet. ${SAVE_STEPS}` };
+    }
+  }
+
+  // An audio or video file is reached end to end now, once: its first byte, then its last (a last byte alone out of reach is let go if the
+  // middle reads). A file the browser cannot reach is refused here, with the same words a failed run would give, and Run stays off for it.
+  if (takesMedia(accept) && isMediaFile(file)) {
+    try {
+      await probeReadable(file);
+    } catch (e) {
+      if ((e as { name?: string }).name === 'UnreadableFileGone') return { name: 'UnreadableFileGone', message: (e as Error).message };
+      if (isNotReadable(e)) return { name: 'NotReadableProbe', message: notReadable().message };
     }
   }
 

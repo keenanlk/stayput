@@ -21,7 +21,9 @@ import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 import { persistAfterRun } from './model-fetch';
 import { failsTheSameAgain } from './edit-recovery';
-import { inspectFile, type IntakeProblem } from './intake';
+import { inspectFile, isMediaFile, takesMedia, type IntakeProblem } from './intake';
+import { copyInput, releaseInputCopies } from './input-copy';
+import { retryRun } from './read-failure';
 import { CAPTION_TOOLS, forgetWorkingSize, LOST_SIDE, lostRun, riskSize, workingSize } from './working-size';
 
 export interface ShellFile {
@@ -86,6 +88,8 @@ export interface ShellOptions {
   folders?: boolean;
   /** A long video job: keep the screen on while it runs, and say so if the page was hidden when it failed. */
   keepAwake?: boolean;
+  /** Read the files again once when a read fails part-way (the default for audio and video tools). Off for a tool that does its own re-reading (the splitter). */
+  rereads?: boolean;
   /** Send one tool_start event when Run is pressed (the caption tools, where phones abandon runs). */
   announceStart?: boolean;
   /** A video job that starts at the smaller size that last worked in this tab (see edit-recovery.ts): says so, and offers "Try full size". */
@@ -235,6 +239,7 @@ export function createShell(opts: ShellOptions) {
   const desktopTeaser = mountDesktopTeaser(root);
   const downloadAll = $<HTMLButtonElement>('download-all');
 
+  const media = takesMedia(input.accept);
   let files: ShellFile[] = [];
   let nextId = 1;
   let outputs: OutputFile[] = [];
@@ -273,7 +278,14 @@ export function createShell(opts: ShellOptions) {
     }
     render();
     const added = files.filter((f) => !intake.has(f.id));
-    checking = Promise.all(added.map(async (f) => intake.set(f.id, (await inspectFile(f.file, root.dataset.slug ?? '', root.dataset.base ?? '', input.accept).catch(() => null)) ?? undefined))).then(updateRunBlock);
+    // Run stays off until the check has finished, so a file is never run before it is known to be reachable.
+    const reaching = media && added.some((f) => isMediaFile(f.file));
+    if (reaching) checks++;
+    checking = Promise.all(added.map(async (f) => intake.set(f.id, (await inspectFile(f.file, root.dataset.slug ?? '', root.dataset.base ?? '', input.accept).catch(() => null)) ?? undefined))).then(() => {
+      if (reaching) checks--;
+      updateRunBlock();
+    });
+    updateRunBlock();
     if (!attempt || attempt.ok) {
       attempt = { ok: false };
       trackFilesAdded({ tool: root.dataset.slug ?? 'unknown', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0) });
@@ -311,6 +323,8 @@ export function createShell(opts: ShellOptions) {
       // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
       await checking;
       await opts.onFilesChanged?.(files.filter((f) => !intake.get(f.id)));
+      // A tool that sets its own hint there (the speech tools' model note) must not hide why Run is off.
+      if (runBlock) setHint(runBlock, runLink);
     } catch (e) {
       const first = files[0];
       previewFailed(e, first ? describeError(first.file, e) : undefined);
@@ -364,9 +378,11 @@ export function createShell(opts: ShellOptions) {
   // What the file-intake check found for each picked file (see intake.ts); a file with a problem keeps Run disabled.
   const intake = new Map<number, IntakeProblem | undefined>();
   let checking: Promise<void> = Promise.resolve();
+  let checks = 0;
   const intakeProblem = () => files.map((f) => intake.get(f.id)).find(Boolean);
 
   let runBlock = '';
+  let runLink: { text: string; href: string } | undefined;
   // Set when a run failed in a way the same file and options will repeat; any change to the files or an option clears it.
   let repeatBlock = '';
   function unlockRepeat() {
@@ -382,10 +398,11 @@ export function createShell(opts: ShellOptions) {
     const link = own?.message ? own.link : next === found?.message ? found?.link : undefined;
     if (next !== runBlock) {
       runBlock = next;
+      runLink = link;
       setHint(next, link);
       hint.dataset.problem = !own?.message && next === found?.message ? found?.name ?? '' : '';
     }
-    run.disabled = files.length === 0 || busy || !!runBlock;
+    run.disabled = files.length === 0 || busy || checks > 0 || !!runBlock;
   }
 
   function render() {
@@ -665,8 +682,13 @@ export function createShell(opts: ShellOptions) {
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
     const clearMarker = markInflight(tool, 'run', inputBytes);
     try {
+      // Audio and video tools: work from one copy taken now, while the browser still reads the picked files, and read again once
+      // when a read fails part-way (after a check that the files are still reachable). The tools' own retries still apply inside.
+      await releaseInputCopies();
+      const source = media ? await Promise.all(files.map(async (f) => (isMediaFile(f.file) ? { ...f, file: await copyInput(f.file) } : f))) : files;
+      const work = (p: Progress) => (media && opts.rereads !== false ? retryRun(source.filter((f) => isMediaFile(f.file)).map((f) => f.file), () => opts.process(source, p), (m) => p.set(m, 0)) : opts.process(source, p));
       const result = await resumeIfHidden(
-        () => (watching ? watchProgress((tick) => opts.process(files, watchedProgress(tick)), () => undefined) : opts.process(files, progressApi)),
+        () => (watching ? watchProgress((tick) => work(watchedProgress(tick)), () => undefined) : work(progressApi)),
         mine,
         () => progressApi.set('The page was hidden, so the run stopped. Starting again: keep this tab open and the screen on.', 0),
       );
@@ -752,6 +774,7 @@ export function createShell(opts: ShellOptions) {
   });
   run.addEventListener('click', () => void execute());
   clear.addEventListener('click', () => {
+    void releaseInputCopies();
     files = [];
     repeatBlock = '';
     attempt = undefined;

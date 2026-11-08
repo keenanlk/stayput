@@ -69,12 +69,13 @@ test('a 226 MB video splits into 2 and 4 parts of the right length, each kept in
     await load(page, big, parts);
     await page.locator('#run').click();
     await expect(page.locator('#results')).toHaveClass(/is-active/, { timeout: 240_000 });
-    // The parts are files on disk, not buffers in this tab (on main this is 0 files).
+    // The parts are files on disk, not buffers in this tab (on main this is 0 files; the input copy is the extra one).
     // (A browser that has no room for a 1 GB set of files falls back to memory, so this holds for the default size only.)
     const disk = await onDisk(page);
     console.log(`parts=${parts} on-disk files=${disk.files} bytes=${disk.bytes}`);
     if (SECONDS <= 60) {
-      expect(disk.files).toBe(parts);
+      // The parts, and the one copy of the picked video the run works from (kept until the next run, Clear or leaving the page).
+      expect(disk.files).toBe(parts + 1);
       expect(disk.bytes).toBeGreaterThan(statSync(big).size * 0.8);
     }
     const files = await download(page);
