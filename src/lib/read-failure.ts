@@ -192,7 +192,8 @@ export async function retryRun<T>(files: readonly Blob[], job: () => Promise<T>,
   try {
     return await job();
   } catch (e) {
-    if (!isNotReadable(e)) throw e;
+    // A failure that already checked the files and found one out of reach (a tool's own retry did) is not tried a third time.
+    if (!isNotReadable(e) || notReadableClass(e) === 'NotReadableProbe') throw e;
     await new Promise((r) => setTimeout(r, pause));
     for (const file of files) await probeReadable(file);
     onNotice?.('The file could not be read the first time. Trying once more.');

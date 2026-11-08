@@ -275,7 +275,13 @@ export function createShell(opts: ShellOptions) {
     }
     render();
     const added = files.filter((f) => !intake.has(f.id));
-    checking = Promise.all(added.map(async (f) => intake.set(f.id, (await inspectFile(f.file, root.dataset.slug ?? '', root.dataset.base ?? '', input.accept).catch(() => null)) ?? undefined))).then(updateRunBlock);
+    // Run stays off until the check has finished, so a file is never run before it is known to be reachable.
+    checks++;
+    checking = Promise.all(added.map(async (f) => intake.set(f.id, (await inspectFile(f.file, root.dataset.slug ?? '', root.dataset.base ?? '', input.accept).catch(() => null)) ?? undefined))).then(() => {
+      checks--;
+      updateRunBlock();
+    });
+    updateRunBlock();
     if (!attempt || attempt.ok) {
       attempt = { ok: false };
       trackFilesAdded({ tool: root.dataset.slug ?? 'unknown', files: files.length, inputBytes: files.reduce((n, f) => n + f.file.size, 0) });
@@ -313,6 +319,8 @@ export function createShell(opts: ShellOptions) {
       // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
       await checking;
       await opts.onFilesChanged?.(files.filter((f) => !intake.get(f.id)));
+      // A tool that sets its own hint there (the speech tools' model note) must not hide why Run is off.
+      if (runBlock) setHint(runBlock, runLink);
     } catch (e) {
       const first = files[0];
       previewFailed(e, first ? describeError(first.file, e) : undefined);
@@ -366,9 +374,11 @@ export function createShell(opts: ShellOptions) {
   // What the file-intake check found for each picked file (see intake.ts); a file with a problem keeps Run disabled.
   const intake = new Map<number, IntakeProblem | undefined>();
   let checking: Promise<void> = Promise.resolve();
+  let checks = 0;
   const intakeProblem = () => files.map((f) => intake.get(f.id)).find(Boolean);
 
   let runBlock = '';
+  let runLink: { text: string; href: string } | undefined;
   // Set when a run failed in a way the same file and options will repeat; any change to the files or an option clears it.
   let repeatBlock = '';
   function unlockRepeat() {
@@ -384,10 +394,11 @@ export function createShell(opts: ShellOptions) {
     const link = own?.message ? own.link : next === found?.message ? found?.link : undefined;
     if (next !== runBlock) {
       runBlock = next;
+      runLink = link;
       setHint(next, link);
       hint.dataset.problem = !own?.message && next === found?.message ? found?.name ?? '' : '';
     }
-    run.disabled = files.length === 0 || busy || !!runBlock;
+    run.disabled = files.length === 0 || busy || checks > 0 || !!runBlock;
   }
 
   function render() {
