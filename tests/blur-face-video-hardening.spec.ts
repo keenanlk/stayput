@@ -131,7 +131,8 @@ test.describe('clips from ffmpeg', () => {
 });
 
 test.describe('the face finder', () => {
-  test('the model file cannot be fetched: ModelDownloadFailed with a plain message', async ({ page }) => {
+  test('the model file cannot be fetched: ModelDownloadFailed with a plain message', async ({ page, browserName }) => {
+    needsEncode(browserName);
     test.setTimeout(240_000);
     await open(page);
     await page.route('**/models/blaze_face_short_range.tflite', (route) => route.abort());
@@ -165,7 +166,8 @@ test.describe('the face finder', () => {
     expect(refused).toBeGreaterThan(0);
   });
 
-  test('the engine fails to start every time: the failure is named for the face finder, not a bare error', async ({ page }) => {
+  test('the engine fails to start every time: the failure is named for the face finder, not a bare error', async ({ page, browserName }) => {
+    needsEncode(browserName);
     test.setTimeout(240_000);
     await open(page);
     await page.route('**/vendor/mediapipe*/**/*.wasm', (route) => route.abort());
