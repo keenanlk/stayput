@@ -85,13 +85,57 @@ function parseStamp(s: string): number {
   return Number(h) * 3600 + Number(min) * 60 + Number(sec) + Number(frac.padEnd(3, '0')) / 1000;
 }
 
+/** Whether the text is an Advanced SubStation (.ass) or SubStation (.ssa) script, which keeps its captions as Dialogue lines. */
+export function looksLikeAss(file: string): boolean {
+  return /^\s*\[(?:Script Info|Events|V4\+? Styles)\]/im.test(file) && /^\s*Dialogue:/im.test(file);
+}
+
+/** The words of an ASS caption: override blocks dropped, \N and \n as line breaks, \h as a space. */
+const assText = (raw: string) =>
+  raw
+    .replace(/\{[^}]*\}/g, '')
+    .replace(/\\[Nn]/g, '\n')
+    .replace(/\\h/g, ' ')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join('\n');
+
+/** Read the Dialogue lines of an .ass or .ssa script (the [Events] Format line says which field is which; the text is the last and may hold commas). */
+function parseAss(file: string): Segment[] {
+  const out: Segment[] = [];
+  let fields = ['layer', 'start', 'end', 'style', 'name', 'marginl', 'marginr', 'marginv', 'effect', 'text'];
+  for (const line of file.split('\n')) {
+    const format = /^\s*Format:\s*(.*)$/i.exec(line);
+    if (format && /\btext\b/i.test(format[1]!) && /\bstart\b/i.test(format[1]!)) {
+      fields = format[1]!.split(',').map((f) => f.trim().toLowerCase());
+      continue;
+    }
+    const dialogue = /^\s*Dialogue:\s*(.*)$/i.exec(line);
+    if (!dialogue) continue;
+    const parts = dialogue[1]!.split(',');
+    const textAt = fields.indexOf('text');
+    const startAt = fields.indexOf('start');
+    const endAt = fields.indexOf('end');
+    if (textAt < 0 || startAt < 0 || endAt < 0 || parts.length <= textAt) continue;
+    const start = parseStamp(parts[startAt]!);
+    const end = parseStamp(parts[endAt]!);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) continue;
+    const text = assText(parts.slice(textAt).join(','));
+    if (text) out.push({ start, end, text });
+  }
+  return out.sort((x, y) => x.start - y.start);
+}
+
 /**
- * Read an SRT or WebVTT file into timed segments. Numbering, VTT headers,
+ * Read an SRT, WebVTT or ASS/SSA file into timed segments. Numbering, VTT headers,
  * notes and styling tags are dropped; a caption's lines are kept as lines.
  */
 export function parseSubtitles(file: string): Segment[] {
   const out: Segment[] = [];
-  const blocks = file.replace(/^﻿/, '').replace(/\r\n?/g, '\n').split(/\n\s*\n/);
+  const text = file.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+  if (looksLikeAss(text)) return parseAss(text);
+  const blocks = text.split(/\n\s*\n/);
   for (const block of blocks) {
     const lines = block.split('\n');
     const at = lines.findIndex((l) => l.includes('-->'));
@@ -168,4 +212,25 @@ export function captionAt(segments: Segment[], seconds: number): Segment | undef
     else return s;
   }
   return undefined;
+}
+
+/**
+ * Captions that can be looked up by time: sorted, and none overlapping the next. A caption that starts while another is
+ * showing cuts the first short at its start, and two that start together become one caption with both texts, so a
+ * file with overlapping times draws every caption instead of losing some to the lookup.
+ */
+export function tidyCaptions(segments: Segment[]): Segment[] {
+  const sorted = [...segments].sort((a, b) => a.start - b.start || a.end - b.end);
+  const out: Segment[] = [];
+  for (const s of sorted) {
+    const last = out.at(-1);
+    if (last && s.start - last.start < 0.001) {
+      last.end = Math.max(last.end, s.end);
+      if (!last.text.split('\n').includes(s.text)) last.text += `\n${s.text}`;
+      continue;
+    }
+    if (last && last.end > s.start) last.end = s.start;
+    out.push({ ...s });
+  }
+  return out.filter((s) => s.end > s.start);
 }

@@ -44,7 +44,8 @@ export async function planVideoCodec(
   size: { width: number; height: number; bitrate?: number | Quality },
   codecs: VideoCodec[] = VIDEO_CODECS,
 ): Promise<CodecPlan> {
-  await requireH264Encoder();
+  // A plan that is not allowed H.264 (VP9 only: the last rung, or a browser whose H.264 encoder is silent) does not ask for it.
+  if (codecs.includes('avc')) await requireH264Encoder();
   const codec = await getFirstEncodableVideoCodec(codecs, size);
   if (codec !== 'avc') return { codec };
   const bitrate = typeof size.bitrate === 'number' ? size.bitrate : 8_000_000;

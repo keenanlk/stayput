@@ -4791,7 +4791,7 @@ export const tools: Tool[] = [
     heading: 'Add subtitles to a video',
     tagline: 'Captions written from the speech and burned into the picture, on your own device. Or bring an SRT and burn in that.',
     category: 'media',
-    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,.ts,.mts,.m2ts,.srt,.vtt',
+    accept: 'video/*,.mp4,.mov,.m4v,.webm,.mkv,.ts,.mts,.m2ts,.srt,.vtt,.ass,.ssa',
     multiple: true,
     dropLabel: 'Drop a video, and an SRT or VTT file if you have one',
     action: 'Add subtitles',

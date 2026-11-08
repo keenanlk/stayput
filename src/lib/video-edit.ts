@@ -76,6 +76,8 @@ export interface EditOptions {
    * Only the caption redraw asks: it holds a canvas and a speech model's leftovers, which is what ran phones out of memory.
    */
   capFirstTry?: boolean;
+  /** Write VP9 from the first try, for a browser whose H.264 encoder never answers but which can write VP9 (see vp9Offered). */
+  vp9First?: boolean;
   /** Said when the job starts over after the page was hidden, or at a smaller size after the encoder gave up. */
   onNotice?: (message: string) => void;
 }
@@ -242,7 +244,8 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
       file,
       () =>
         withRecovery(
-          async (attempt) => {
+          async (tried) => {
+            const attempt: Attempt = opts.vp9First ? { ...tried, vp9: true, retry: tried.retry ?? 'vp9' } : tried;
             const done = encodeRun(attempt);
             try {
               const r = await editVideoOnce(file, opts, attempt, (side) => (made = side));
