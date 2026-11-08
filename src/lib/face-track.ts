@@ -44,3 +44,32 @@ export function grow(r: Rect, margin: number, width: number, height: number): Re
   const y1 = Math.min(height, r.y + r.h * (1 + margin));
   return { x: x0, y: y0, w: Math.max(0, x1 - x0), h: Math.max(0, y1 - y0) };
 }
+
+/** Frames longer than this (pixels, longest side) are looked at in a smaller copy; the face finder reads 128 px tiles anyway. */
+export const SCAN_LIMIT = 1920;
+
+/** Share to shrink a frame by before looking for faces: 1 up to `limit` on the longest side, smaller beyond it. */
+export function scanScale(width: number, height: number, limit: number = SCAN_LIMIT): number {
+  const longest = Math.max(width, height);
+  return longest > limit ? limit / longest : 1;
+}
+
+/** A rectangle found in a scaled-down copy, back in the frame's own pixels. */
+export function unscale(r: Rect, scale: number): Rect {
+  return scale === 1 ? r : { x: r.x / scale, y: r.y / scale, w: r.w / scale, h: r.h / scale };
+}
+
+/** Whether a failure got as far as the engine starting or stopping: Emscripten's own error (RuntimeError, "Aborted(...)"). */
+export function isEngineAbort(e: unknown): boolean {
+  return e instanceof Error && (e.name === 'RuntimeError' || /^Aborted\(/.test(e.message));
+}
+
+/**
+ * Whether a failed look is worth one more go: the model file did not arrive (ModelDownloadFailed), the engine aborted while
+ * starting, or it ran out of memory and was dropped (a fresh one is made by the next call). Offline, no room to keep the file
+ * and a file that does not match what was expected will not change by trying again.
+ */
+export function isRetryable(e: unknown): boolean {
+  if (!(e instanceof Error)) return false;
+  return e.name === 'ModelDownloadFailed' || e.name === 'OutOfMemoryError' || isEngineAbort(e) || (e.name === 'TypeError' && /fetch|network|load/i.test(e.message));
+}
