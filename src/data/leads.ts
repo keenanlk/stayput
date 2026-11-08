@@ -109,7 +109,7 @@ const does: Record<string, string> = {
   'flatten-pdf': 'Flattens a filled-in PDF form, comments, stamps and signatures into the page so they cannot be edited, and keeps the text selectable.',
   'resize-pdf': 'Changes the page size of a PDF to A4, US Letter, Legal, A3, A5 or Tabloid, scaling and centring the content.',
   'transcribe': 'Turns speech in an audio or video file (MP3, WAV, M4A, MP4, MOV) into text, SRT subtitles or WebVTT captions with Whisper, in 16 or more languages.',
-  'add-subtitles-to-video': 'Burns captions into an MP4, MOV or WebM and saves an MP4, either written from the speech by Whisper or taken from your own SRT or VTT file.',
+  'add-subtitles-to-video': 'Burns captions into an MP4, MOV or WebM and saves an MP4, either written from the speech by Whisper or taken from your own SRT, VTT or ASS file.',
   'mp3-to-midi': 'Turns a recording of one instrument, a voice or a hummed tune (MP3, WAV, M4A, FLAC) of up to five minutes into a MIDI file of its notes, with an AI model.',
   'vocal-remover': 'Removes the vocals from a song for karaoke, or keeps only the vocals, using an AI separation model (MP3, WAV, M4A, FLAC or video in).',
   'video-background-remover': 'Removes the background behind the person in a video: blur it, fill it with a colour or green screen, or put a picture behind them.',
@@ -188,7 +188,7 @@ const downloads: Record<string, Download> = {
   'add-subtitles-to-video': {
     what: 'speech model',
     size: SPEECH_MODEL_SIZE,
-    text: `Writing captions from speech downloads the speech model (${SPEECH_MODEL_SIZE}) and the engine that runs it on first use and then works offline; burning in your own SRT or VTT file needs no model.`,
+    text: `Writing captions from speech downloads the speech model (${SPEECH_MODEL_SIZE}) and the engine that runs it on first use and then works offline; burning in your own SRT, VTT or ASS file needs no model.`,
   },
 };
 
