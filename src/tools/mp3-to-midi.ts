@@ -1,8 +1,9 @@
 import { createShell, num } from '../lib/shell';
 import { replaceExt } from '../lib/files';
 import { channelsOf, decodeAudio, formatDuration } from '../lib/audio';
-import { UnreadableFile, NamedError } from '../lib/input-error';
+import { NamedError } from '../lib/input-error';
 import { fromWorkerFailure } from '../lib/worker-error';
+import { refuseSoundlessContainer } from '../lib/decode-guard';
 import { halve, type TempoResult } from '../lib/bpm-key';
 import { noteName } from '../lib/basic-pitch';
 import { writeMidi, type MidiNote } from '../lib/midi';
@@ -19,10 +20,14 @@ import type { Reply as BpmReply } from '../lib/bpm-key.worker';
 const MAX_SECONDS = 5 * 60;
 /** Slack for the padding some encoders add, so a file that is exactly five minutes is not refused. */
 const SLACK_SECONDS = 2;
+/** Shortest clip read, less a little: one decoder reports a half-second file as 0.4999 s. */
+const MIN_SECONDS = 0.5 - 0.02;
 /** Shortest clip the beat finder can say anything about. */
 const MIN_TEMPO_SECONDS = 10;
 const DEFAULT_BPM = 120;
 const RATE = 44100;
+/** How long the tempo finder gets before the notes are written without its guess. */
+const BPM_PATIENCE_MS = 20_000;
 
 const panel = document.getElementById('mm-panel')!;
 const summaryEl = document.getElementById('mm-summary')!;
@@ -142,6 +147,8 @@ function checkLength(seconds: number) {
 
 /** The dropped file's length, read once per file; while it is over the limit Run stays off, so no failed run is recorded. */
 let known: { file: File; duration: number } | undefined;
+/** The dropped file has no sound to read, found from its container at drop time. */
+let unplayable: { file: File; message: string } | undefined;
 
 let noteWorker: Worker | undefined;
 let bpmWorker: Worker | undefined;
@@ -149,11 +156,14 @@ let nextId = 1;
 /** The model has been fetched in this session, so later runs skip the download message. */
 let modelReady = false;
 
-function transcribe(audio: Float32Array, onLoading: (f: number) => void, onWindow: (done: number, total: number) => void) {
+type Transcribed = { notes: MidiNote[] };
+
+/** One try at the notes in a worker of its own; the worker is dropped (never reused) when it fails. */
+function transcribeOnce(audio: Float32Array, onLoading: (f: number) => void, onWindow: (done: number, total: number) => void) {
   noteWorker ??= new Worker(new URL('../lib/basic-pitch.worker.ts', import.meta.url), { type: 'module' });
   const w = noteWorker;
   const id = nextId++;
-  return new Promise<{ notes: MidiNote[] }>((resolve, reject) => {
+  return new Promise<Transcribed>((resolve, reject) => {
     const onMessage = (e: MessageEvent<Reply>) => {
       const msg = e.data;
       if (msg.id !== id) return;
@@ -161,12 +171,16 @@ function transcribe(audio: Float32Array, onLoading: (f: number) => void, onWindo
       if (msg.type === 'progress') return onWindow(msg.done, msg.total);
       done();
       if (msg.type === 'done') resolve(msg);
-      else reject(fromWorkerFailure(msg.name, msg.message));
+      else {
+        // A session that failed to start stays failed in its worker, so the next try gets a new one.
+        drop(w);
+        reject(fromWorkerFailure(msg.name, msg.message));
+      }
     };
     const onError = (e: ErrorEvent) => {
       done();
-      noteWorker = undefined;
-      reject(new NamedError('Mp3ToMidiFailed', e.message || 'The note model stopped unexpectedly. The file may be too long for this device’s memory.'));
+      drop(w);
+      reject(crashed(e.message));
     };
     const done = () => {
       w.removeEventListener('message', onMessage);
@@ -178,40 +192,85 @@ function transcribe(audio: Float32Array, onLoading: (f: number) => void, onWindo
   });
 }
 
+function drop(w: Worker) {
+  w.terminate();
+  if (noteWorker === w) noteWorker = undefined;
+}
+
+/** The words a stopped worker is shown with; they are the page's existing ones. */
+const STOPPED = 'The note model stopped unexpectedly. The file may be too long for this device’s memory.';
+
+/** A worker that died: OutOfMemoryError when its message says memory ran out, else the engine stopping for a reason it did not give. */
+function crashed(message: string | undefined) {
+  return new NamedError(/out of memory|Aborted\(|allocat|Cannot enlarge memory/i.test(message ?? '') ? 'OutOfMemoryError' : 'Mp3ToMidiFailed', STOPPED);
+}
+
+/** Failures a second try cannot change: the device is offline, has no room, or is being handed a changed file. */
+const FINAL = ['ModelOffline', 'StorageFull', 'ModelVerifyFailed'];
+
+/** The notes, with one fresh worker (and so a fresh download, engine import and session) if the first try fails. */
+async function transcribe(audio: Float32Array, onLoading: (f: number) => void, onWindow: (done: number, total: number) => void): Promise<Transcribed> {
+  // The worker takes the samples over, so the first try gets a copy to leave the originals for the second.
+  const spare = audio.slice();
+  try {
+    return await transcribeOnce(audio, onLoading, onWindow);
+  } catch (first) {
+    if (first instanceof Error && FINAL.includes(first.name)) throw first;
+    return transcribeOnce(spare, onLoading, onWindow);
+  }
+}
+
 /** A tempo for the clip from the BPM finder's worker, or null when no steady beat is found. */
 function estimateTempo(mono: Float32Array): Promise<TempoResult | null> {
-  bpmWorker ??= new Worker(new URL('../lib/bpm-key.worker.ts', import.meta.url), { type: 'module' });
-  const w = bpmWorker;
+  let w: Worker;
+  try {
+    bpmWorker ??= new Worker(new URL('../lib/bpm-key.worker.ts', import.meta.url), { type: 'module' });
+    w = bpmWorker;
+  } catch {
+    return Promise.resolve(null);
+  }
   const id = nextId++;
   return new Promise((resolve) => {
+    const finish = (tempo: TempoResult | null, broken = false) => {
+      clearTimeout(timer);
+      w.removeEventListener('message', onMessage);
+      w.removeEventListener('error', onError);
+      if (broken) {
+        w.terminate();
+        if (bpmWorker === w) bpmWorker = undefined;
+      }
+      resolve(tempo);
+    };
     const onMessage = (e: MessageEvent<BpmReply>) => {
-      if (e.data.id !== id) return;
-      w.removeEventListener('message', onMessage);
-      w.removeEventListener('error', onError);
-      resolve('error' in e.data ? null : e.data.tempo);
+      if (e.data.id === id) finish('error' in e.data ? null : e.data.tempo);
     };
-    const onError = () => {
-      w.removeEventListener('message', onMessage);
-      w.removeEventListener('error', onError);
-      bpmWorker = undefined;
-      resolve(null);
-    };
+    const onError = () => finish(null, true);
+    // The tempo is a nicety: a worker that never answers must not hold up notes that are already found.
+    const timer = setTimeout(() => finish(null, true), BPM_PATIENCE_MS);
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);
-    w.postMessage({ id, mono }, [mono.buffer]);
+    try {
+      w.postMessage({ id, mono }, [mono.buffer]);
+    } catch {
+      finish(null, true);
+    }
   });
 }
 
 const shell = createShell({
   // A file whose header already shows it is too long is refused at drop time, not as a failed run.
-  runBlocker: () => (known ? lengthRefusal(known.duration) : ''),
+  runBlocker: () => unplayable?.message || (known ? lengthRefusal(known.duration) : ''),
   async onFilesChanged(files) {
     known = undefined;
+    unplayable = undefined;
     shell.refresh();
     const file = files[0]?.file;
     if (!file) return;
     const duration = await fileDuration(file);
     if (duration !== null && files[0]?.file === file) known = { file, duration };
+    // A video with no sound track, or a file cut short, is refused now (as a hint, not a failed run) with the decoder's own wording.
+    const refusal = await refuseSoundlessContainer(file).then(() => '', (e) => (e instanceof Error ? e.message : ''));
+    if (refusal && files[0]?.file === file) unplayable = { file, message: refusal };
     shell.refresh();
   },
   outputFormat: () => 'mid',
@@ -232,8 +291,8 @@ const shell = createShell({
     const mono = first!.slice();
     let peak = 0;
     for (let i = 0; i < mono.length; i++) peak = Math.max(peak, Math.abs(mono[i]!));
-    if (peak < 0.001) throw new UnreadableFile('This file is silent, so there are no notes to find.');
-    if (seconds < 0.5) throw new NamedError('ClipTooShort', 'This clip is too short to hold a note. Use a clip of at least half a second.');
+    if (peak < 0.001) throw new NamedError('SilentFile', 'This file is silent, so there are no notes to find.');
+    if (seconds < MIN_SECONDS) throw new NamedError('ClipTooShort', 'This clip is too short to hold a note. Use a clip of at least half a second.');
 
     const typed = Math.round(num('bpm', 0));
     const tempoGuess = typed === 0 && seconds >= MIN_TEMPO_SECONDS ? estimateTempo(mono.slice()) : Promise.resolve(null);

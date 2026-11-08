@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseMidi, writeMidi } from '../src/lib/midi';
-import { silentWav8, wav } from './music-synth';
+import { piano, silentWav8, TUNE, wav } from './music-synth';
 import { siteHost } from './allowed-host';
 
 const dir = mkdtempSync(join(tmpdir(), 'mp3-to-midi-'));
@@ -12,26 +12,6 @@ const clip = join(dir, 'secret-melody-name.wav');
 const tooLong = join(dir, 'twenty-minutes.wav');
 const tooShort = join(dir, 'blip.wav');
 const noise = join(dir, 'hiss.wav');
-
-/** Ten notes of a tune, one every 0.6 s, each sounding 0.5 s, played by a piano-like tone (three decaying harmonics). */
-const TUNE = [60, 62, 64, 65, 67, 69, 71, 72, 67, 64];
-
-function piano(): Float32Array {
-  const sr = 22050;
-  const out = new Float32Array(Math.round(0.6 * TUNE.length * sr) + sr);
-  TUNE.forEach((midi, n) => {
-    const f = 440 * 2 ** ((midi - 69) / 12);
-    const from = Math.round((0.3 + n * 0.6) * sr);
-    for (let i = 0; i < 0.5 * sr; i++) {
-      const t = i / sr;
-      const env = Math.min(1, t / 0.005) * Math.exp(-2.5 * t) * Math.min(1, (0.5 - t) / 0.03);
-      let v = 0;
-      for (let h = 1; h <= 3; h++) v += Math.sin(2 * Math.PI * f * h * t) / h ** 1.5;
-      out[from + i] = (out[from + i] ?? 0) + 0.3 * env * v;
-    }
-  });
-  return out;
-}
 
 test.beforeAll(() => {
   writeFileSync(clip, wav(piano(), 22050));

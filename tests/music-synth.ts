@@ -89,3 +89,23 @@ export function silentWav8(seconds: number, sr: number): Buffer {
   buf.writeUInt32LE(n, 40);
   return buf;
 }
+
+/** Ten notes of a tune, one every 0.6 s, each sounding 0.5 s, played by a piano-like tone (three decaying harmonics). */
+export const TUNE = [60, 62, 64, 65, 67, 69, 71, 72, 67, 64];
+
+export function piano(): Float32Array {
+  const sr = 22050;
+  const out = new Float32Array(Math.round(0.6 * TUNE.length * sr) + sr);
+  TUNE.forEach((midi, n) => {
+    const f = 440 * 2 ** ((midi - 69) / 12);
+    const from = Math.round((0.3 + n * 0.6) * sr);
+    for (let i = 0; i < 0.5 * sr; i++) {
+      const t = i / sr;
+      const env = Math.min(1, t / 0.005) * Math.exp(-2.5 * t) * Math.min(1, (0.5 - t) / 0.03);
+      let v = 0;
+      for (let h = 1; h <= 3; h++) v += Math.sin(2 * Math.PI * f * h * t) / h ** 1.5;
+      out[from + i] = (out[from + i] ?? 0) + 0.3 * env * v;
+    }
+  });
+  return out;
+}

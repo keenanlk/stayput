@@ -10,13 +10,14 @@
 import type { InferenceSession, Tensor } from 'onnxruntime-web';
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
-import { fetchResumable, wholeOrNull } from './model-fetch';
+import { fetchResumable, importWhenOnline, modelDownloadError, modelOffline, wholeOrNull } from './model-fetch';
 import { KEPT_FRAMES, PITCHES, WINDOW_FRAMES, WINDOW_SAMPLES, framesFor, notesFromActivations, windowAt, windowCount } from './basic-pitch';
 import type { MidiNote } from './midi';
 import { NamedError } from './input-error';
 
 export const MODEL_URL = '/models/nmp.onnx';
 const MODEL_BYTES = 230_444;
+const LABEL = { model: 'note model' };
 
 export type Request = { id: number; audio: Float32Array };
 export type Reply =
@@ -30,7 +31,10 @@ interface Loaded { ort: Ort; session: InferenceSession }
 let loaded: Promise<Loaded> | undefined;
 
 async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
-  const res = await fetchResumable((i, o) => fetch(i, o), MODEL_URL, undefined, (got, total) => total && onProgress(Math.min(1, got / total)));
+  // A dropped or blocked download has already been waited out and resumed; what is left is named for the connection, not a bare TypeError.
+  const res = await fetchResumable((i, o) => fetch(i, o), MODEL_URL, undefined, (got, total) => total && onProgress(Math.min(1, got / total))).catch((e) => {
+    throw navigator.onLine === false ? modelOffline(LABEL) : modelDownloadError(LABEL);
+  });
   if (!res.ok) throw new NamedError('ModelDownloadError', `The note model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
   const whole = await wholeOrNull(res);
   if (!whole) throw new NamedError('BasicPitchWorkerFailed', 'The note model download stopped short. Check your connection and try again.');
@@ -42,7 +46,14 @@ async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> 
 function load(onProgress: (f: number) => void): Promise<Loaded> {
   loaded ??= (async () => {
     const model = await fetchModel(onProgress);
-    const ort = (await import('onnxruntime-web/wasm')) as unknown as Ort;
+    // The engine's import waits for a lost connection to return and tries once more; a worker that still fails is replaced by the page.
+    let ort!: Ort;
+    await importWhenOnline('onnxruntime-web/wasm', {
+      label: LABEL,
+      doImport: async () => {
+        ort = (await import('onnxruntime-web/wasm')) as unknown as Ort;
+      },
+    });
     ort.env.wasm.wasmPaths = vendorDir('ort');
     // Threads need a cross-origin-isolated page, which this site is not.
     ort.env.wasm.numThreads = 1;
@@ -80,6 +91,7 @@ self.onmessage = async (e: MessageEvent<Request>) => {
     }
     post({ id, type: 'done', notes: notesFromActivations(frames, onsets, nFrames) });
   } catch (err) {
-    post({ id, type: 'error', ...workerFailure(err) });
+    // A failure with no name of its own (onnxruntime throws plain errors, even strings) is the engine, or memory when it says so.
+    post({ id, type: 'error', ...workerFailure(err, 'NoteEngineFailed') });
   }
 };
