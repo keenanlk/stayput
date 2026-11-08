@@ -40,6 +40,13 @@ export function takesMedia(accept: string): boolean {
   return /(^|,)\s*(audio|video)\//.test(accept);
 }
 
+const MEDIA_EXT = /\.(mp4|m4v|mov|qt|webm|mkv|avi|wmv|flv|3gp|3g2|ts|mts|m2ts|mpe?g|ogv|mp3|wav|m4a|m4b|aac|ogg|oga|opus|flac|aiff?|aifc|wma|amr|mid|midi|caf|weba)$/i;
+
+/** Whether a picked file is itself audio or video (a tool that takes pictures and a song, like the slideshow maker, is not about to read its photos end to end). */
+export function isMediaFile(file: File): boolean {
+  return file.type.startsWith('audio/') || file.type.startsWith('video/') || (!/^(image|text)\//.test(file.type) && MEDIA_EXT.test(file.name));
+}
+
 function readFirst(file: Blob): Promise<Uint8Array> {
   return file.slice(0, SNIFF_BYTES).arrayBuffer().then((b) => new Uint8Array(b));
 }
@@ -68,7 +75,7 @@ export async function inspectFile(file: File, tool: string, base: string, accept
 
   // An audio or video file is reached end to end now, once: its first byte, then its last (a last byte alone out of reach is let go if the
   // middle reads). A file the browser cannot reach is refused here, with the same words a failed run would give, and Run stays off for it.
-  if (takesMedia(accept)) {
+  if (takesMedia(accept) && isMediaFile(file)) {
     try {
       await probeReadable(file);
     } catch (e) {

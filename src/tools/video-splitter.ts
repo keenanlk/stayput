@@ -173,6 +173,8 @@ for (const el of document.querySelectorAll('input[name="vs-mode"], #vs-times, #v
 }
 
 const shell = createShell({
+  // The cuts re-read a failed file themselves (see rereading below).
+  rereads: false,
   keepAwake: true,
   remembersSize: true,
   async onFilesChanged(files) {
