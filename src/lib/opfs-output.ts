@@ -32,6 +32,8 @@ export class OutputWriteError extends Error {
 
 export interface OpfsOutput {
   target: StreamTarget;
+  /** Write `data` at byte `at` (for a caller that copies a file in pieces rather than through the stream). */
+  write(data: Uint8Array, at: number): Promise<void>;
   /** Finish the file and return it as a Blob that reads from the file on disk. */
   finish(type: string): Promise<Blob>;
   /** Give up: close and delete the file. */
@@ -121,6 +123,10 @@ export async function openOpfsOutput(expectedBytes = 0): Promise<OpfsOutput | un
     };
     return {
       target: new StreamTarget(writable, { chunked: true, chunkSize: CHUNK }),
+      write: (data, at) =>
+        call(w, { type: 'write', data, at }).catch(() => {
+          throw new OutputWriteError();
+        }),
       async finish(type) {
         await call(w, { type: 'close' });
         const root = await navigator.storage.getDirectory();

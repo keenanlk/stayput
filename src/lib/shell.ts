@@ -21,7 +21,9 @@ import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 import { persistAfterRun } from './model-fetch';
 import { failsTheSameAgain } from './edit-recovery';
-import { inspectFile, type IntakeProblem } from './intake';
+import { inspectFile, takesMedia, type IntakeProblem } from './intake';
+import { copyInput, releaseInputCopies } from './input-copy';
+import { retryRun } from './read-failure';
 import { CAPTION_TOOLS, forgetWorkingSize, LOST_SIDE, lostRun, riskSize, workingSize } from './working-size';
 
 export interface ShellFile {
@@ -641,6 +643,7 @@ export function createShell(opts: ShellOptions) {
     showSizeNote();
   }
 
+  const media = takesMedia(input.accept);
   const watching = opts.watch ?? (!opts.keepAwake && picturesOnly(input.accept));
   /** The progress the tool sees when a run is watched: every new text or fraction counts as movement. */
   const watchedProgress = (tick: (key: unknown) => void): Progress => ({
@@ -665,8 +668,13 @@ export function createShell(opts: ShellOptions) {
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
     const clearMarker = markInflight(tool, 'run', inputBytes);
     try {
+      // Audio and video tools: work from one copy taken now, while the browser still reads the picked files, and read again once
+      // when a read fails part-way (after a check that the files are still reachable). The tools' own retries still apply inside.
+      await releaseInputCopies();
+      const source = media ? await Promise.all(files.map(async (f) => ({ ...f, file: await copyInput(f.file) }))) : files;
+      const work = (p: Progress) => (media ? retryRun(source.map((f) => f.file), () => opts.process(source, p), (m) => p.set(m, 0)) : opts.process(source, p));
       const result = await resumeIfHidden(
-        () => (watching ? watchProgress((tick) => opts.process(files, watchedProgress(tick)), () => undefined) : opts.process(files, progressApi)),
+        () => (watching ? watchProgress((tick) => work(watchedProgress(tick)), () => undefined) : work(progressApi)),
         mine,
         () => progressApi.set('The page was hidden, so the run stopped. Starting again: keep this tab open and the screen on.', 0),
       );
@@ -752,6 +760,7 @@ export function createShell(opts: ShellOptions) {
   });
   run.addEventListener('click', () => void execute());
   clear.addEventListener('click', () => {
+    void releaseInputCopies();
     files = [];
     repeatBlock = '';
     attempt = undefined;
