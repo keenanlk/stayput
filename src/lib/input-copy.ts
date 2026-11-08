@@ -49,11 +49,8 @@ async function copyToDisk(file: File): Promise<File | undefined> {
 
 /** The file to work from: see the notes at the top of this file. Throws NotReadableError or OutOfMemoryError for a file that cannot be read. */
 export async function copyInput(file: File): Promise<File> {
-  if (file.size > SNAPSHOT_LIMIT) {
-    const copy = await copyToDisk(file);
-    if (copy) return copy;
-    await probeReadable(file);
-    return file;
-  }
+  // First, whether the file is reachable at all: a file that is not is NotReadableProbe now, or UnreadableFileGone for one that failed before.
+  await probeReadable(file);
+  if (file.size > SNAPSHOT_LIMIT) return (await copyToDisk(file)) ?? file;
   return snapshotFile(file);
 }
