@@ -47,8 +47,8 @@ test.beforeAll(() => {
   ff('-i', fx('tune.wav'), '-ac', '2', fx('stereo.wav'));
   ff('-i', fx('tune.wav'), '-af', 'pan=5.1|c0=c0|c1=c0|c2=c0|c3=c0|c4=c0|c5=c0', fx('surround-5.1.wav'));
 
-  // Lengths: just under half a second, exactly half a second, exactly five minutes, just over.
-  ff(...tone(0.49, 22050), fx('len-0.49s.wav'));
+  // Lengths: well under half a second, exactly half a second, exactly five minutes, just over.
+  ff(...tone(0.45, 22050), fx('len-0.45s.wav'));
   ff(...tone(0.5, 22050), fx('len-0.5s.wav'));
   ff(...tone(300, 8000), '-ac', '1', fx('len-300s.wav'));
   ff(...tone(310, 8000), '-ac', '1', fx('len-310s.wav'));
@@ -245,11 +245,11 @@ test.describe('rates, channels and lengths', () => {
     });
   }
 
-  test('a clip under half a second ends as ClipTooShort, before the model is fetched', async ({ page }) => {
+  test('a clip well under half a second ends as ClipTooShort, before the model is fetched', async ({ page }) => {
     await open(page);
     const seen: string[] = [];
     page.on('request', (r) => seen.push(r.url()));
-    const o = await runFile(page, fx('len-0.49s.wav'), '0.49s');
+    const o = await runFile(page, fx('len-0.45s.wav'), '0.45s');
     expect(o.cls).toBe('ClipTooShort');
     expect(seen.some((u) => u.includes('/models/'))).toBe(false);
   });

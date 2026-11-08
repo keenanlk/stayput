@@ -20,6 +20,8 @@ import type { Reply as BpmReply } from '../lib/bpm-key.worker';
 const MAX_SECONDS = 5 * 60;
 /** Slack for the padding some encoders add, so a file that is exactly five minutes is not refused. */
 const SLACK_SECONDS = 2;
+/** Shortest clip read, less a little: one decoder reports a half-second file as 0.4999 s. */
+const MIN_SECONDS = 0.5 - 0.02;
 /** Shortest clip the beat finder can say anything about. */
 const MIN_TEMPO_SECONDS = 10;
 const DEFAULT_BPM = 120;
@@ -290,7 +292,7 @@ const shell = createShell({
     let peak = 0;
     for (let i = 0; i < mono.length; i++) peak = Math.max(peak, Math.abs(mono[i]!));
     if (peak < 0.001) throw new NamedError('SilentFile', 'This file is silent, so there are no notes to find.');
-    if (seconds < 0.5) throw new NamedError('ClipTooShort', 'This clip is too short to hold a note. Use a clip of at least half a second.');
+    if (seconds < MIN_SECONDS) throw new NamedError('ClipTooShort', 'This clip is too short to hold a note. Use a clip of at least half a second.');
 
     const typed = Math.round(num('bpm', 0));
     const tempoGuess = typed === 0 && seconds >= MIN_TEMPO_SECONDS ? estimateTempo(mono.slice()) : Promise.resolve(null);
