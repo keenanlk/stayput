@@ -100,7 +100,7 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
     const bytes = await subsFiles[0].file.arrayBuffer().then((b) => new Uint8Array(b)).catch((e) => Promise.reject<Uint8Array>(isNotReadable(e) ? notReadable(e) : e));
     given = tidyCaptions(parseSubtitles(decodeSubtitleBytes(bytes)));
   }
-  if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
+  if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT, WebVTT, ASS or SSA file.`);
 
   const look = radio('look', 'outline') as Look;
   const size = radio('size', 'medium') as Size;
@@ -140,6 +140,11 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
         file,
         () =>
           speechModule.transcribeFile(file, { language, task: bool('translate') ? 'translate' : 'transcribe', format: 'srt', onProgress: (m, f) => progress.set(m, share(f * 0.4)) }).catch((e) => {
+            // A video with no sound track keeps its name (NoSoundTrack) but points at the subtitle file this tool can burn in.
+            if (e instanceof Error && e.name === 'NoSoundTrack') {
+              e.message = `${file.name} has no sound, so there are no words to write captions from. To burn in captions you already have, drop an SRT, VTT or ASS file with the video.`;
+              throw e;
+            }
             if (isNotReadable(e)) throw keepSalvage(e, notReadable(e));
             const plain = plainCaptionError(e);
             // On a phone with a video this big, an error that names no cause, or a worker that just died, is memory.

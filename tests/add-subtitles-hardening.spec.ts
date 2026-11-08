@@ -240,7 +240,7 @@ test.describe('refused early, before any model download', () => {
     const models = modelRequests(page);
     await run(page, [file('base.mp4')]);
     await failed(page);
-    await expect(page.locator('#error')).toContainText(/no sound track/i);
+    await expect(page.locator('#error')).toContainText(/has no sound, so there are no words to write captions from/);
     expect((await lastRun(page)).error_class).toBe('NoSoundTrack');
     expect(models).toEqual([]);
   });

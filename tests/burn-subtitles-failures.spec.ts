@@ -170,6 +170,6 @@ test('a video with no sound and no subtitle file gets a plain message under its 
   await recordRuns(page);
   await start(page, [clip]);
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-  await expect(page.locator('#error')).toContainText('No sound track was found');
+  await expect(page.locator('#error')).toContainText('has no sound, so there are no words to write captions from. To burn in captions you already have, drop an SRT, VTT or ASS file with the video.');
   expect((await lastRun(page)).error_class).toBe('NoSoundTrack');
 });
