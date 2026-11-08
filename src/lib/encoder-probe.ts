@@ -294,5 +294,10 @@ export async function vp9Offered(): Promise<boolean> {
   }
 }
 
+/** Whether VP9 in the same MP4 is on offer (vp9Offered) and its encoder really hands back packets: the way out for a browser whose H.264 encoder is silent. */
+export async function vp9Answers(): Promise<boolean> {
+  return (await vp9Offered()) && (await answers({ codec: 'vp09.00.10.08', width: 320, height: 240, bitrate: 1_000_000, framerate: 15 }, PROBE_MS)) === 'yes';
+}
+
 /** Whether this browser has a video encoder to ask. False means no tool that re-encodes can work here. */
 export const hasVideoEncoder = () => typeof VideoEncoder !== 'undefined';

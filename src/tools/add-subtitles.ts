@@ -1,17 +1,18 @@
 import { bool, createShell, radio, str, type Progress, type ShellFile } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
-import { captionAt, fitCaptions, parseSubtitles, toSrt, type Segment } from '../lib/captions';
+import { captionAt, fitCaptions, parseSubtitles, tidyCaptions, toSrt, type Segment } from '../lib/captions';
+import { decodeSubtitleBytes } from '../lib/subtitle-text';
 import { captionFont, drawCaption, type Look, type Place, type Size } from '../lib/burn';
-import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder } from '../lib/encoder-probe';
+import { CaptionsUnavailable, ensureH264Encoder, hasVideoEncoder, vp9Answers } from '../lib/encoder-probe';
 import { EncoderStall } from '../lib/encoder-watchdog';
 import { encodeFailedError, encodeMemoryError, isRecordingTooLong, keepSalvage, looksLikeMemory, noSpeechFound, phoneSpeechMemoryError, plainCaptionError, SpeechError, unknownCaptionError } from '../lib/speech-errors';
 import { describeEdit } from './video-edit-shell';
 import { isPhoneBrowser, overPhoneLimit, phoneLimitNote, TRIM_LINK } from '../lib/phone-limit';
 import { speechDownloadNote } from '../lib/speech-path';
-import { InputError } from '../lib/input-error';
+import { InputError, NamedError } from '../lib/input-error';
 import { pageHiddenDuringRun } from '../lib/wake-lock';
 import { retryNote } from '../lib/edit-recovery';
-import { isNotReadable, notReadable, probeReadable, retryUnreadable } from '../lib/read-failure';
+import { isFileGone, isNotReadable, notReadable, probeReadable, retryUnreadable } from '../lib/read-failure';
 
 /**
  * Add subtitles to a video, burned into the picture. The captions come from
@@ -21,7 +22,7 @@ import { isNotReadable, notReadable, probeReadable, retryUnreadable } from '../l
  * leaves the tab.
  */
 
-const isSubs = (f: File) => /\.(srt|vtt)$/i.test(f.name);
+const isSubs = (f: File) => /\.(srt|vtt|ass|ssa)$/i.test(f.name);
 
 function srtOutput(file: File, segments: Segment[]): OutputFile {
   const body = toSrt(segments);
@@ -53,7 +54,9 @@ const shell = createShell({
     running = true;
     try {
       return await run(files, progress);
-    } catch (e) {
+    } catch (e0) {
+      // A file the browser says is gone (moved, deleted, a cloud copy let go) is its own name, not the browser's bare NotFoundError.
+      const e = isFileGone(e0) ? goneError(e0) : e0;
       // A run that failed after the page was hidden says so (see the shell), not that it ran out of memory.
       if ((e as { memory?: boolean } | null)?.memory && !pageHiddenDuringRun()) {
         reloadAdvised = true;
@@ -70,6 +73,17 @@ const shell = createShell({
 // Before any file is added, the hint above Run already says what the first run downloads.
 shell.setHint(speechDownloadNote(0));
 
+/** An encoder that stopped answering, by name (the watchdog's own class, or the same kind rethrown). */
+const isStall = (e: unknown) => e instanceof EncoderStall || (e as { name?: string } | null)?.name === 'EncoderStall';
+
+/** A picked file the browser cannot find any more: it keeps any caption file already written, and says to pick the file again. */
+function goneError(cause: unknown): Error {
+  const out = new NamedError('UnreadableFileGone', 'This file could not be read. It may have been moved, deleted or still be syncing from a cloud app. Pick it again, or save it to the phone first.', { cause });
+  const salvage = (cause as { salvage?: OutputFile[] } | null)?.salvage;
+  if (salvage) Object.assign(out, { salvage });
+  return out;
+}
+
 /** An error the page will show as "out of memory", marked so the page can advise a reload. */
 const asMemory = <T extends Error>(e: T): T => Object.assign(e, { memory: true });
 
@@ -80,7 +94,12 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
   if (subsFiles.length > 1) throw new InputError('Add one subtitle file at a time, with the video it belongs to.');
   if (subsFiles.length === 1 && videos.length > 1) throw new InputError('A subtitle file fits one video. Add just that video with it.');
   // A subtitle file the phone cannot read is said so, not reported as one with no captions in it.
-  const given = subsFiles[0] ? parseSubtitles(await subsFiles[0].file.text().catch((e) => Promise.reject(isNotReadable(e) ? notReadable(e) : e))) : undefined;
+  // The bytes are read as the encoding they show (UTF-8, UTF-16, Windows-1252); SRT, WebVTT and ASS/SSA are all read, and captions that overlap are trimmed so each one shows.
+  let given: Segment[] | undefined;
+  if (subsFiles[0]) {
+    const bytes = await subsFiles[0].file.arrayBuffer().then((b) => new Uint8Array(b)).catch((e) => Promise.reject<Uint8Array>(isNotReadable(e) ? notReadable(e) : e));
+    given = tidyCaptions(parseSubtitles(decodeSubtitleBytes(bytes)));
+  }
   if (given && given.length === 0) throw new InputError(`No captions could be read from ${subsFiles[0]!.file.name}. It should be an SRT or WebVTT file.`);
 
   const look = radio('look', 'outline') as Look;
@@ -92,7 +111,12 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
   // Find out now, in a second or two, that this browser cannot encode, not after minutes of transcribing.
   progress.set('Checking this browser can write the video…', 0);
   if (!hasVideoEncoder()) throw new CaptionsUnavailable("Burned-in captions don't work in this browser yet, because it has no video encoder. Video to subtitles makes an SRT or WebVTT subtitle file from the same video, and that does work here.");
-  if (!(await ensureH264Encoder())) throw new CaptionsUnavailable();
+  // An H.264 encoder that never answers: where the browser can write VP9 in the same MP4 (Chromium), the redraw does that; elsewhere this is said now, before any transcribing.
+  let vp9First = false;
+  if (!(await ensureH264Encoder())) {
+    if (!(await vp9Answers())) throw new CaptionsUnavailable();
+    vp9First = true;
+  }
   // A video this browser cannot decode (HEVC on some phones, say) is said so now, not after the speech model's download and minutes of transcribing.
   for (const v of videos) {
     // A video the phone cannot reach is said so now, after one more look, not after the model download.
@@ -140,10 +164,11 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
     let shown = 0;
     let last: Segment | undefined;
     // A redraw that starts again counts the captions from the start.
-    const redraw = () => {
+    const redraw = (vp9 = vp9First) => {
       shown = 0;
       last = undefined;
       return editVideo(file, {
+      vp9First: vp9,
       // A phone starts a 4K source at 1080p (720p with little memory), and any source at 720p after a lost run in this tab; the note says so.
       capFirstTry: true,
       // After the page was hidden, or an encoder that stopped, the redraw starts again by itself: say so.
@@ -171,9 +196,20 @@ async function run(files: ShellFile[], progress: Progress): Promise<OutputFile[]
       onProgress: (f) => progress.set(`Adding subtitles to ${file.name}: ${Math.round(f * 100)}%`, share(start + f * (1 - start))),
       });
     };
-    const r = await redraw().catch((e) => {
-      // A stall part way through: the same plain message and link as the early check.
-      if (e instanceof EncoderStall) throw new CaptionsUnavailable();
+    const r = await redraw()
+      // An encoder that stopped, after the retries inside the redraw: Chromium, which can write VP9, tries that once; the captions are kept for the hand-over below either way.
+      .catch(async (e) => {
+        if (!isStall(e) || vp9First || !(await vp9Answers())) throw e;
+        progress.set(`${file.name}: This device's video encoder stopped. Trying once more with a different video format.`, share(start));
+        return redraw(true);
+      })
+      .catch((e) => {
+      // A stall part way through: the same plain message and link as the early check, with the captions already written beside it.
+      if (isStall(e)) {
+        const stalled = new CaptionsUnavailable() as CaptionsUnavailable & { salvage?: OutputFile[] };
+        if (!given) stalled.salvage = [srtOutput(file, segments)];
+        throw stalled;
+      }
       // A file the phone could not read is not an encoder or memory failure; its name stays NotReadableError.
       if (isNotReadable(e)) {
         const unread = notReadable(e) as Error & { salvage?: OutputFile[] };
