@@ -137,6 +137,19 @@ const CHUNK = 8 * 1024 * 1024;
 /** Copies made by snapshotFile, so a second call on one (a tool that still takes its own copy) returns it as it is. */
 const snapshots = new WeakSet<object>();
 
+/** Copies a tool took itself, right after the pick (the splitter's), by the File they are a copy of: the run uses them rather than reading the picked File again. */
+const earlyCopies = new WeakMap<File, Promise<File>>();
+
+/** Records `copy` (pending or done) as the copy of `picked` that the run should work from. */
+export function noteEarlyCopy(picked: File, copy: Promise<File>): void {
+  earlyCopies.set(picked, copy);
+}
+
+/** The early copy of `picked` that was taken and holds, or undefined. */
+export async function earlyCopyOf(picked: File): Promise<File | undefined> {
+  return earlyCopies.get(picked)?.catch(() => undefined);
+}
+
 /**
  * Reads bytes `start` to `end` of `file`, each try after the pauses in `pauses`. A read that never works is NotReadableError
  * (or OutOfMemoryError when the memory ran out). The one exception: the file's last byte alone is out of reach while everything

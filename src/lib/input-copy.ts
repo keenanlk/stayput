@@ -10,7 +10,7 @@
  * Nothing leaves the device and the copy has no name of the person's own: the File keeps the name only in memory.
  */
 import { openOpfsOutput, opfsOutputAvailable, releaseOutput, OutputWriteError } from './opfs-output';
-import { probeReadable, readPiece, snapshotFile, SNAPSHOT_LIMIT } from './read-failure';
+import { earlyCopyOf, probeReadable, readPiece, snapshotFile, SNAPSHOT_LIMIT } from './read-failure';
 
 const CHUNK = 8 * 1024 * 1024;
 /** OPFS-backed copies of the current run, to delete when the next run starts or the list is cleared. */
@@ -49,6 +49,9 @@ async function copyToDisk(file: File): Promise<File | undefined> {
 
 /** The file to work from: see the notes at the top of this file. Throws NotReadableError or OutOfMemoryError for a file that cannot be read. */
 export async function copyInput(file: File): Promise<File> {
+  // A tool that already copied the file at the pick (the splitter) has a copy that holds: work from it, as long as it is a real copy.
+  const early = await earlyCopyOf(file);
+  if (early && early !== file) return early;
   // First, whether the file is reachable at all: a file that is not is NotReadableProbe now, or UnreadableFileGone for one that failed before.
   await probeReadable(file);
   if (file.size > SNAPSHOT_LIMIT) return (await copyToDisk(file)) ?? file;

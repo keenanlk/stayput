@@ -6,7 +6,7 @@ import { planFor, readDuration, videoPartName, type VideoPart } from '../lib/vid
 import { InputError } from '../lib/input-error';
 import { nameBare } from '../lib/bare-error';
 import { lazyImport, warm } from '../lib/lazy-import';
-import { isNotReadable, probeReadable, snapshotFile } from '../lib/read-failure';
+import { isNotReadable, noteEarlyCopy, probeReadable, snapshotFile } from '../lib/read-failure';
 import { lostCut } from '../lib/working-size';
 
 /**
@@ -37,7 +37,10 @@ let finished = new Map<string, OutputFile>();
 
 /** The file to work from: the in-memory copy of the pick when there is one, else the pick itself. */
 function workFile(picked: File): Promise<File> {
-  if (held?.picked !== picked) held = { picked, copy: snapshotFile(picked) };
+  if (held?.picked !== picked) {
+    held = { picked, copy: snapshotFile(picked) };
+    noteEarlyCopy(picked, held.copy);
+  }
   // A failed copy is dropped, so the next call reads the file again.
   held.copy.catch(() => (held = held?.picked === picked ? undefined : held));
   return held.copy;

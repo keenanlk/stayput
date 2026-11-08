@@ -455,7 +455,7 @@ test.describe("forced failures", () => {
 });
 
 test.describe("the page", () => {
-  test("/ogg-to-mp3 reads the input once, with no spare copy", async ({
+  test("/ogg-to-mp3 reads the input once for the shared copy and once to decode, with no spare buffer copies", async ({
     page,
   }, info) => {
     // WebKit cannot decode Ogg itself, so it takes the fallback decoder, which reads the file again.
@@ -488,7 +488,7 @@ test.describe("the page", () => {
       await page.evaluate(
         () => (window as unknown as { __reads: number }).__reads,
       ),
-    ).toBe(1);
+    ).toBe(2); // the shared copy taken at Run (read once from the picked file), then the decode's one read of that copy
     expect(
       await page.evaluate(
         () => (window as unknown as { __copies: number }).__copies,
