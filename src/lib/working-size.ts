@@ -12,6 +12,9 @@ const FULL_KEY = 'stayput:full-size';
 /** Set when the page loaded again after the browser closed it mid-run of a caption tool (see reportLostTab in inflight.ts). A flag only: no file data. */
 const LOST_KEY = 'stayput:lost-run';
 
+/** Set when the page loaded again after the browser closed it mid-run of a video splitter. A flag only: no file data. */
+const LOST_CUT_KEY = 'stayput:lost-cut';
+
 /** The tools whose caption redraw starts smaller after a lost run: the slugs inflight.ts stores for them. */
 export const CAPTION_TOOLS = ['burn-subtitles-into-video', 'add-subtitles-to-video', 'auto-caption-video'];
 /** Where a caption redraw starts after a lost run in this tab, and on a phone with 3 GB of memory or less and a 4K source. */
@@ -59,6 +62,20 @@ export function noteLostRun(): void {
     store()?.setItem(LOST_KEY, '1');
   } catch {
     // Not remembered: the next run starts at full size, which is the default.
+  }
+}
+
+/** The slugs inflight.ts stores for the video splitter (the base page and its split-video preset). */
+export const CUT_TOOLS = ['video-splitter', 'split-video'];
+
+/** The browser closed this page during a split earlier in this tab: the next split copies every part from its key frame and re-encodes nothing. */
+export const lostCut = (): boolean => store()?.getItem(LOST_CUT_KEY) === '1';
+
+export function noteLostCut(): void {
+  try {
+    store()?.setItem(LOST_CUT_KEY, '1');
+  } catch {
+    // Not remembered: the next split starts as usual.
   }
 }
 

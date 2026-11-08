@@ -34,8 +34,9 @@ import { EncoderRefused, encodeRun, requireH264Encoder } from './encoder-probe';
 import { aacSafeSampleRate, codecsFor, planVideoCodec } from './video-codec';
 import { unplayable } from './video-compress';
 import { NamedError, UnsupportedCodec } from './input-error';
-import { memoryRange, nameBare, cutFailed, type CutStep } from './bare-error';
+import { isBare, memoryRange, nameBare, cutFailed, type CutStep } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
+import { explainNoContainer } from './container-sniff';
 import { pageRecoveryHooks } from './recovery-hooks';
 import { openOpfsOutput, type OpfsOutput } from './opfs-output';
 import { adoptPlan, capScale, hardwareOption, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
@@ -47,6 +48,8 @@ export interface TrimOptions {
   end: number;
   exact: boolean;
   mute: boolean;
+  /** Copy from the key frame at or before the start and re-encode nothing: the smallest working set (used after the browser closed the page mid-split). */
+  copyOnly?: boolean;
   onProgress?: (fraction: number) => void;
   /** Said when the cut starts over after the page was hidden, or at a smaller size after the encoder gave up. */
   onNotice?: (message: string) => void;
@@ -72,7 +75,7 @@ const ENCODER_FAILURES = new Set(['EncodingError', 'OperationError', 'InvalidSta
 /**
  * Cuts the part. A failure that comes from the device and not the file (page hidden, encoder or memory gave up) gets one
  * more try (see edit-recovery.ts). Every failure leaves here with a name: NotReadableError for a file the phone could
- * not read, UnreadableContainer, NoVideoTrack or UnsupportedCodec for what the file is, CutFailed plus the step it stopped at (CutFailedOpenInput,
+ * not read, NotAVideoContainer, ContainerParseFailed, UnreadableHeaderShort, NoVideoTrack or UnsupportedCodec for what the file is, CutFailed plus the step it stopped at (CutFailedOpenInput,
  * CutFailedKeyframe, CutFailedEncoderPlan, CutFailedInit, CutFailedExecute) for any other plain error.
  */
 export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResult> {
@@ -86,15 +89,19 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
       async (attempt) => {
         const done = encodeRun(attempt);
         try {
-          const r = await withInitRetry(() => step, () => withMemoryFallback(() => toDisk, () => (toDisk = false), (disk) => trimOnce(file, opts, attempt, (side) => (made = side), false, (at) => testFault((step = at)), disk)));
+          const r = await withInitRetry(() => step, () => withMemoryFallback(() => toDisk, () => (toDisk = false), (disk) => trimOnce(file, opts, attempt, (side) => (made = side), !!opts.copyOnly && !opts.exact, (at) => testFault((step = at)), disk)));
           const retry = retryOf(attempt);
-          return retry ? { ...r, retry } : r;
+          const out = opts.copyOnly && !opts.exact ? { ...r, keyframeCopy: true } : r;
+          return retry ? { ...out, retry } : out;
         } catch (e) {
           if (isNotReadable(e)) throw notReadable(e);
           e = memoryRange(e);
           // A fast cut re-encodes a part whose start is far from a key frame. When the encoder fails, copy from the key frame.
           const name = (e as { name?: string } | null)?.name ?? '';
-          if (!opts.exact && !attempt.capped && ENCODER_FAILURES.has(name) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
+          // A plain error from the encoder plan, the converter set-up or the run itself (nothing says whose fault it was) takes the same way out:
+          // a copy needs no decoder or encoder, so it holds far less in memory than the re-encode that just failed.
+          const plainFailure = isBare(e) && (step === 'EncoderPlan' || step === 'Init' || step === 'Execute');
+          if (!opts.exact && !attempt.capped && (ENCODER_FAILURES.has(name) || plainFailure) && !page.hooks.wasHidden() && !page.hooks.reclaimed(e)) {
             try {
               return { ...(await withMemoryFallback(() => toDisk, () => (toDisk = false), (disk) => trimOnce(file, opts, attempt, (side) => (made = side), true, (at) => testFault((step = at)), disk))), keyframeCopy: true };
             } catch (again) {
@@ -115,15 +122,15 @@ export async function trimVideo(file: File, opts: TrimOptions): Promise<TrimResu
 }
 
 /**
- * A bare error while the converter is set up (CutFailedInit) is a codec or memory hiccup more often than a bad file:
- * the cut starts over once, on a fresh reader, before it counts as failed. Named errors (what the file is) are not retried.
+ * A bare error while the converter is set up or running (CutFailedInit, CutFailedExecute) is a codec or memory hiccup more often than a bad file:
+ * the cut starts over once, on a fresh reader and a fresh converter, before it counts as failed. Named errors (what the file is) are not retried.
  */
 async function withInitRetry<T>(stepNow: () => CutStep, run: () => Promise<T>): Promise<T> {
   try {
     return await run();
   } catch (e) {
     const bare = !(e instanceof NamedError) && !isNotReadable(e) && !(e as { name?: string } | null)?.name?.match(/^(Encod|Operation|Invalid|NotSupported|Unsupported|Cut|Out)/);
-    if (stepNow() !== 'Init' || !bare) throw e;
+    if ((stepNow() !== 'Init' && stepNow() !== 'Execute') || !bare) throw e;
     await new Promise((r) => setTimeout(r, 400));
     return run();
   }
@@ -140,11 +147,22 @@ async function withMemoryFallback<T>(onDisk: () => boolean, stopDisk: () => void
   }
 }
 
-/** Test hook: a spec sets `__stayputCutFault` to a step's name to make that step fail with a bare error (TypeError); with `__stayputCutFaultOnce` it fails only the first time. */
+/**
+ * Test hook: a spec sets `__stayputCutFault` to a step's name to make that step fail with a bare error (TypeError); with `__stayputCutFaultOnce` it fails only the first time,
+ * with `__stayputCutFaultTimes` (a number) that many times, after letting `__stayputCutFaultSkip` calls of that step through. `__stayputCutLog`, when it is an array, collects the name of every step reached.
+ */
 function testFault(step: CutStep) {
-  const g = globalThis as { __stayputCutFault?: string; __stayputCutFaultOnce?: boolean };
+  const g = globalThis as { __stayputCutFault?: string; __stayputCutFaultOnce?: boolean; __stayputCutFaultTimes?: number; __stayputCutFaultSkip?: number; __stayputCutLog?: string[] };
+  g.__stayputCutLog?.push(step);
   if (g.__stayputCutFault !== step) return;
-  if (g.__stayputCutFaultOnce) g.__stayputCutFault = undefined;
+  if (g.__stayputCutFaultSkip && g.__stayputCutFaultSkip > 0) {
+    g.__stayputCutFaultSkip--;
+    return;
+  }
+  if (typeof g.__stayputCutFaultTimes === 'number') {
+    if (g.__stayputCutFaultTimes <= 0) return;
+    g.__stayputCutFaultTimes--;
+  } else if (g.__stayputCutFaultOnce) g.__stayputCutFault = undefined;
   throw new TypeError('forced');
 }
 
@@ -171,7 +189,7 @@ async function cutOnce(file: File, opts: TrimOptions, attempt: Attempt, sized: (
       if (isNotReadable(e)) throw notReadable(e);
       return null;
     });
-    if (!format) throw new NamedError('UnreadableContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+    if (!format) throw await explainNoContainer(file);
     const video = await input.getPrimaryVideoTrack();
     if (!video) throw new NamedError('NoVideoTrack', 'This file has no video track.');
     if (opts.exact && !(await video.canDecode())) throw new UnsupportedCodec(unplayable());
