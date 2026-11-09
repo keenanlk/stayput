@@ -6,11 +6,16 @@
  */
 import { NamedError } from './input-error';
 import { isNotReadable, notReadable, probeReadable, SNAPSHOT_LIMIT } from './read-failure';
-import { SNIFF_BYTES, sniffBytes, type Container } from './sniff';
+import { SNIFF_BYTES, kindOf, sniffBytes, type Container } from './sniff';
+import { COPY, wrongThing, type Family } from './unreadable';
 
 export interface IntakeProblem {
-  /** The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not; UnreadableFileGone for a file that was refused before and is added again. */
-  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone';
+  /**
+   * The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not;
+   * UnreadableFileGone for a file that was refused before and is added again; EmptyFile, NotAnImageFile, NotAPdfFile, NotAnArchiveFile, NotAGifFile,
+   * NotAVideoContainer or NotAnAudioFile for a file of no use to the tool, named for what it is.
+   */
+  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone' | 'EmptyFile' | 'NotAnImageFile' | 'NotAPdfFile' | 'NotAnArchiveFile' | 'NotAGifFile' | 'NotAVideoContainer' | 'NotAnAudioFile';
   message: string;
   /** One phrase of the message that links to a page that fixes it. */
   link?: { text: string; href: string };
@@ -47,6 +52,40 @@ export function isMediaFile(file: File): boolean {
   return file.type.startsWith('audio/') || file.type.startsWith('video/') || (!/^(image|text)\//.test(file.type) && MEDIA_EXT.test(file.name));
 }
 
+/**
+ * Which one kind of file a tool takes, from its accept list: pictures, GIFs, PDFs or archives. A tool that takes more than one kind (a picture or a PDF,
+ * a song and photos) has none: it is left to read what it is given, as before.
+ */
+export function fileFamily(accept: string): Family | undefined {
+  const tokens = accept.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
+  if (tokens.length === 0) return undefined;
+  const of = (t: string): Family | undefined => {
+    if (t === 'image/gif' || t === '.gif') return 'gif';
+    if (t.startsWith('image/') || /^\.(jpe?g|png|webp|heic|heif|avif|jxl|bmp|tiff?|svg|psd|ico)$/.test(t)) return 'image';
+    if (t === 'application/pdf' || t === '.pdf') return 'pdf';
+    if (/^(application\/(zip|x-zip-compressed|x-7z-compressed|vnd\.rar|x-rar-compressed|x-tar|gzip)|\.(zip|7z|rar|tar|tgz|gz|cbz|cbr))$/.test(t)) return 'archive';
+    return undefined;
+  };
+  const families = tokens.map(of);
+  const first = families[0];
+  if (!first || families.some((f) => f !== first)) {
+    // A list of both GIF and other pictures is the picture family (its GIF members are pictures too).
+    return families.every((f) => f === 'gif' || f === 'image') && families.includes('image') ? 'image' : undefined;
+  }
+  return first;
+}
+
+/** Whether the first bytes are plain text: no NUL bytes and almost all of them printable. */
+function looksLikeText(head: Uint8Array): boolean {
+  if (head.length === 0) return false;
+  let odd = 0;
+  for (const b of head) {
+    if (b === 0) return false;
+    if (b < 9 || (b > 13 && b < 32)) odd++;
+  }
+  return odd / head.length < 0.02;
+}
+
 function readFirst(file: Blob): Promise<Uint8Array> {
   return file.slice(0, SNIFF_BYTES).arrayBuffer().then((b) => new Uint8Array(b));
 }
@@ -75,7 +114,11 @@ export async function inspectFile(file: File, tool: string, base: string, accept
 
   // An audio or video file is reached end to end now, once: its first byte, then its last (a last byte alone out of reach is let go if the
   // middle reads). A file the browser cannot reach is refused here, with the same words a failed run would give, and Run stays off for it.
-  if (takesMedia(accept) && isMediaFile(file)) {
+  const family = fileFamily(accept);
+  const media = takesMedia(accept) && isMediaFile(file);
+  if ((family || media) && file.size === 0) return { name: 'EmptyFile', message: COPY.EmptyFile };
+  // Pictures, GIFs, PDFs and archives are reached the same way (see fileFamily).
+  if (media || family) {
     try {
       await probeReadable(file);
     } catch (e) {
@@ -90,6 +133,10 @@ export async function inspectFile(file: File, tool: string, base: string, accept
     return { name: 'FileNotDownloaded', message: `${file.name} looks empty on this device, which usually means it is still in the cloud and only a placeholder was picked. ${SAVE_STEPS}` };
   }
 
+  // A file that is empty, or plainly another kind of file than the tool takes, is refused now and named for what it is (by its first bytes, not its name).
+  const wrong = wrongAtAdd(file, head, container, accept);
+  if (wrong) return wrong;
+
   const fix = CONVERTERS[container];
   if (!fix || OWN_REFUSAL.has(tool) || OWN_REFUSAL.has(base) || !/(^|,)\s*video\//.test(accept)) return null;
   // A .wma is the same container as a .wmv: only a file named for video, or typed as video, is a WMV.
@@ -98,6 +145,25 @@ export async function inspectFile(file: File, tool: string, base: string, accept
   // The video-to-MP4 page reads AVI and FLV itself; no page reads WMV.
   if (container !== 'asf' && (LEGACY_READERS.has(tool) || LEGACY_READERS.has(base))) return null;
   return unsupported(file, fix);
+}
+
+function wrongAtAdd(file: File, head: Uint8Array, container: Container, accept: string): IntakeProblem | null {
+  if (file.size === 0) return { name: 'EmptyFile', message: COPY.EmptyFile };
+  const family = fileFamily(accept);
+  if (family) {
+    // A generic ISO-media brand ('mp4') could still be a picture container this browser opens, so only a clear mismatch is refused.
+    if (container === 'mp4') return null;
+    const wrong = wrongThing(family, head, file.size);
+    return wrong ? { name: wrong.name as IntakeProblem['name'], message: wrong.message } : null;
+  }
+  if (!takesMedia(accept) || !isMediaFile(file)) return null;
+  const video = /(^|,)\s*video\//.test(accept);
+  const kind = kindOf(container);
+  // Pictures, PDFs, archives and plain text are no video and no sound. (A tool that takes pictures and a song is not about to refuse its photos.)
+  const notMedia = kind === 'image' || container === 'pdf' || container === 'zip' || (container === 'unknown' && looksLikeText(head));
+  if (!notMedia) return null;
+  if (video) return { name: 'NotAVideoContainer', message: 'This file is not a video this page can read (MP4, MOV, WebM or MKV).' };
+  return { name: 'NotAnAudioFile', message: "This file doesn't look like a recording or a video. Choose an audio or video file (MP3, M4A, WAV, MP4, MOV, WebM and so on)." };
 }
 
 function unsupported(file: File, fix: { label: string; text?: string; href?: string }): IntakeProblem {
