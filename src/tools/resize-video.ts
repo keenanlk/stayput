@@ -29,7 +29,7 @@ videoEditShell({
       return { mute, width, height };
     }
     const { videoSize } = await import('../lib/video-edit');
-    const { width, height } = await videoSize(file);
+    const { width, height } = await videoSize(file, true);
     if (choice.endsWith('%')) {
       const f = Number(choice.slice(0, -1)) / 100;
       return { mute, width: width * f };

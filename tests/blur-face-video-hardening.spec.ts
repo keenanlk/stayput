@@ -120,13 +120,13 @@ test.describe('clips from ffmpeg', () => {
     }
   });
 
-  test('a file that is not a video, renamed .mp4, is refused as UnreadableContainer', async ({ page }) => {
+  test('a file that is not a video, renamed .mp4, is refused as NotAVideoContainer', async ({ page }) => {
     test.setTimeout(240_000);
     await open(page);
     await start(page, clip('not-a-video.mp4'));
     const { d, text } = await finish(page, 'not-a-video.mp4');
     expect(d.outcome).toBe('error');
-    expect(d.error_class, text).toBe('UnreadableContainer');
+    expect(d.error_class, text).toBe('NotAVideoContainer');
   });
 });
 

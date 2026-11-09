@@ -40,7 +40,7 @@ test('a file with no video track is recorded under a named error class', async (
   await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
   const run = await page.evaluate(() => (JSON.parse(sessionStorage.getItem('__ev') || '[]') as { n: string; d: Record<string, string> }[]).filter((e) => e.n === 'tool_run').at(-1)?.d);
   expect(run?.outcome).toBe('error');
-  expect(run?.error_class).toBe('UnreadableFile');
+  expect(run?.error_class).toBe('NotAVideoContainer');
 });
 
 test('the sound is reversed where it lies and padded or cut to the video length', () => {

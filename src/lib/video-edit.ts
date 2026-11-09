@@ -179,21 +179,27 @@ export async function frameEstimate(file: File): Promise<number | undefined> {
   }
 }
 
-/** Size of the picture as it is shown (rotation metadata applied), before any edit. */
-export async function videoSize(file: File): Promise<{ width: number; height: number; duration: number }> {
+const NOT_A_VIDEO = 'This file is not a video this page can read (MP4, MOV, WebM or MKV).';
+
+/**
+ * Size of the picture as it is shown (rotation metadata applied), before any edit. `named` tells why a file has no picture (see
+ * container-sniff); without it a file with no container or no tracks is the one UnreadableContainer, as the video background tool still
+ * counts it (its own read of that class is still open).
+ */
+export async function videoSize(file: File, named = false): Promise<{ width: number; height: number; duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     // Three different things are told apart: no recognised container, a container whose picture track the reader failed on (a damaged or cut-off file), and a file with no picture track at all.
     const format = await input.getFormat().catch(readOrNull);
-    if (!format) throw await explainNoContainer(file);
+    if (!format) throw named ? await explainNoContainer(file) : new NamedError('UnreadableContainer', NOT_A_VIDEO);
     const video = await input.getPrimaryVideoTrack().catch((e) => {
       readOrNull(e);
-      throw containerParseFailed(e);
+      throw named ? containerParseFailed(e) : new NamedError('UnreadableContainer', NOT_A_VIDEO, { cause: e });
     });
     if (!video) {
       // A container with no track of any kind has lost its index (a phone file cut off before it was written out): damaged, not a recording without a picture.
       const tracks = await input.getTracks().catch(() => [null]);
-      if (tracks.length === 0) throw containerParseFailed();
+      if (tracks.length === 0) throw named ? containerParseFailed() : new NamedError('UnreadableContainer', NOT_A_VIDEO);
       throw new NamedError('NoVideoTrack', 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
     }
     try {

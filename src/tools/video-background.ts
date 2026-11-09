@@ -174,7 +174,7 @@ function playerOpens(file: File): Promise<boolean> {
 /** The background picture, opened. A file that will not open (HEIC rejects with something that is not an Error) is said so by name; a failure that already has a name of its own is kept. */
 async function decodePicture(file: File) {
   try {
-    return await (await import('../lib/image')).decodeImage(file);
+    return await (await import('../lib/image')).decodeImageRaw(file);
   } catch (e) {
     if (e instanceof Error && !isUnspecific(e)) throw e;
     throw Object.assign(new NamedError('PictureUnreadable', 'This picture could not be opened. Remove it and add a JPEG or PNG copy instead.'), { cause: e });
