@@ -36,7 +36,7 @@ const LEGACY_READERS = new Set(['video-to-mp4']);
 const OWN_REFUSAL = new Set(['video-background-remover']);
 
 /** Tools that read the start of the file themselves when it is added and say what is wrong with it in their own words (the splitters). */
-const OWN_EARLY_CHECK = new Set(['video-splitter', 'split-video']);
+const OWN_EARLY_CHECK = new Set(['video-splitter', 'split-video', 'audio-splitter']);
 
 /** File types where a long run of zero bytes at the start is normal (disk images and raw dumps). */
 const ZERO_HEAD_OK = /\.(iso|img|dmg|bin|dat|raw|tga|vhd|vhdx|vmdk)$/i;
