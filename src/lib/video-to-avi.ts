@@ -7,6 +7,7 @@
  * the page's own LAME encoder) or 16-bit PCM for short clips and for Motion JPEG. AAC never goes
  * into an AVI. Nothing leaves the tab.
  */
+import { requireVideoTrack } from './container-sniff';
 import {
   AudioSampleSink,
   AudioSampleSource,
@@ -32,7 +33,7 @@ import { adoptPlan, capScale, hardwareOption, type Attempt, type RetryKind } fro
 import { runRecovered } from './video-run';
 import { H264Unavailable } from './encoder-probe';
 import { unplayable } from './video-compress';
-import { UnsupportedCodec, NamedError, UnreadableFile } from './input-error';
+import { UnsupportedCodec, NamedError } from './input-error';
 import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { overPhoneLimit, PHONE_SAFE_BYTES, TRIM_LINK } from './phone-limit';
@@ -120,8 +121,7 @@ export function convertToAvi(file: File, opts: AviOptions): Promise<AviResult> {
 async function aviOnce(file: File, opts: AviOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<AviResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     let width = even(video.displayWidth);
     let height = even(video.displayHeight);

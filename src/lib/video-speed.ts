@@ -6,6 +6,7 @@
  * pitch (see stretch.ts), and both are encoded again into an MP4 (H.264 and
  * AAC where the browser has them). Nothing leaves the tab.
  */
+import { requireVideoTrack } from './container-sniff';
 import {
   AudioSampleSource,
   BlobSource,
@@ -31,7 +32,7 @@ import { runRecovered } from './video-run';
 import { timeStretch } from './stretch';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError, UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
+import { InputError, UnsupportedCodec, NamedError } from './input-error';
 
 export interface SpeedOptions {
   /** 2 plays twice as fast, 0.5 at half speed. */
@@ -67,8 +68,7 @@ async function speedOnce(file: File, opts: SpeedOptions, attempt: Attempt, sized
   const speed = opts.speed;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    const video = await requireVideoTrack(input, file, 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
     if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const duration = await input.computeDuration();
     const width = video.codedWidth;

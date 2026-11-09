@@ -5,7 +5,8 @@
  * preferred because every phone and site plays it; VP9 or AV1 with Opus are
  * the fallback where a browser lacks those encoders. Nothing leaves the tab.
  */
-import { UnsupportedCodec, UnreadableFile, InputError, NamedError } from './input-error';
+import { requireVideoTrack } from './container-sniff';
+import { UnsupportedCodec, InputError, NamedError } from './input-error';
 import {
   BlobSource,
   BufferTarget,
@@ -125,8 +126,7 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
 async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<CompressResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     const soundOk = sound ? await sound.canDecode() : false;

@@ -8,6 +8,7 @@
  * is) and AAC: where the browser cannot write those, the conversion is refused
  * rather than falling back to VP9, AV1 or Opus. Nothing leaves the tab.
  */
+import { requireVideoTrack } from './container-sniff';
 import {
   BlobSource,
   BufferTarget,
@@ -32,7 +33,7 @@ import { adoptPlan, hardwareOption, type Attempt, type RetryKind } from './edit-
 import { runRecovered } from './video-run';
 import { H264Unavailable } from './encoder-probe';
 import { CODEC_NAMES, unplayable } from './video-compress';
-import { UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
+import { UnsupportedCodec, NamedError } from './input-error';
 import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -93,8 +94,7 @@ async function convertOnce(file: File, opts: ConvertOptions, container: ConvertF
   const mov = container === 'mov';
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     const sourceVideo = video.codec;
     const width = video.displayWidth;
     const height = video.displayHeight;

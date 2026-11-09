@@ -6,6 +6,7 @@
  * as Opus. A browser with no VP8 or VP9 encoder (Safari on some versions) says
  * so and writes nothing. Nothing leaves the tab.
  */
+import { requireVideoTrack } from './container-sniff';
 import {
   BlobSource,
   BufferTarget,
@@ -26,7 +27,7 @@ import {
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
 import { CODEC_NAMES, unplayable } from './video-compress';
-import { UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
+import { UnsupportedCodec, NamedError } from './input-error';
 import { evenSize, peekScale, type ConvertOptions, type ConvertResult } from './video-convert';
 import { capScale, hardwareOption, type Attempt } from './edit-recovery';
 import { runRecovered } from './video-run';
@@ -42,8 +43,7 @@ export function convertToWebm(file: File, opts: ConvertOptions): Promise<Convert
 async function webmOnce(file: File, opts: ConvertOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<ConvertResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new UnreadableFile('This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
+    const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
     const sourceVideo = video.codec;
     const width = video.displayWidth;
     const height = video.displayHeight;

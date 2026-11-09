@@ -31,7 +31,8 @@ import { watchEncode } from './encoder-watchdog';
 import type { RetryKind } from './edit-recovery';
 import { memoryRange, nameBare } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
-import { InputError, UnsupportedCodec, UnreadableFile, NamedError } from './input-error';
+import { containerParseFailed, explainNoContainer, requireVideoTrack } from './container-sniff';
+import { InputError, UnsupportedCodec, NamedError } from './input-error';
 
 export interface LoopOptions {
   repeats: number;
@@ -60,8 +61,7 @@ export interface LoopResult {
 export async function probeLoop(file: File): Promise<{ duration: number }> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    const video = await requireVideoTrack(input, file, 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
     return { duration: (await pictureLength(video)).length };
   } finally {
     input.dispose?.();
@@ -90,9 +90,19 @@ export async function loopVideo(file: File, opts: LoopOptions): Promise<LoopResu
 async function loopOnce(file: File, opts: LoopOptions): Promise<LoopResult> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const format = await input.getFormat().catch(() => null);
-    const video = format ? await input.getPrimaryVideoTrack().catch(() => null) : null;
-    if (!format || !video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    const format = await input.getFormat().catch((e) => {
+      if (isNotReadable(e)) throw notReadable(e);
+      return null;
+    });
+    if (!format) throw await explainNoContainer(file);
+    const video = await input.getPrimaryVideoTrack().catch((e) => {
+      if (isNotReadable(e)) throw notReadable(e);
+      throw containerParseFailed(e);
+    });
+    if (!video) {
+      const tracks = await input.getTracks().catch(() => [null]);
+      throw tracks.length === 0 ? containerParseFailed() : new NamedError('NoVideoTrack', 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    }
     const outFormat =
       format === WEBM ? new WebMOutputFormat() : format === MATROSKA ? new MkvOutputFormat() : format === QTFF ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack().catch(() => null);

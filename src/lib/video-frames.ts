@@ -4,10 +4,11 @@
  * the frames asked for, drawn upright onto canvases that are saved as JPG or
  * PNG. Nothing leaves the tab.
  */
+import { requireVideoTrack } from './container-sniff';
 import { BlobSource, CanvasSink, Input, MATROSKA, MP4, MPEG_TS, QTFF, WEBM } from 'mediabunny';
 import { canvasToBlob } from './image';
 import { unplayable } from './video-compress';
-import { UnreadableFile, UnsupportedCodec } from './input-error';
+import { UnsupportedCodec } from './input-error';
 
 /** 'all' for every frame, a number for that many frames a second, or 'spread:N' for N frames across the video. */
 export type FrameEvery = 'all' | number | `spread:${number}`;
@@ -53,8 +54,7 @@ export function frameTimes(every: Exclude<FrameEvery, 'all'>, first: number, dur
 export async function extractFrames(file: File, opts: FramesOptions): Promise<FramesInfo> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
-    const video = await input.getPrimaryVideoTrack().catch(() => null);
-    if (!video) throw new UnreadableFile('This file has no video this page can read (MP4, MOV, WebM or MKV).');
+    const video = await requireVideoTrack(input, file, 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
     if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
     const first = await video.getFirstTimestamp();
     const duration = Math.max(0, (await video.computeDuration()) - first);
