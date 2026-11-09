@@ -14,6 +14,7 @@ import { blur as boxBlur } from '../lib/blur';
 import { TimeLeft } from '../lib/time-left';
 import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
 import { noteRunDetail } from '../lib/inflight';
+import { lightNow } from '../lib/light-run';
 
 /**
  * Video background remover: the people in each frame are found by MediaPipe's
@@ -245,7 +246,7 @@ const shell = createShell({
     // Where the run is, so a TypeError (no name of its own) is recorded as the step that threw it.
     let step = 'BackgroundSetupFailed';
     // From the first moment of the run, a leave records the mode and how far it got (see inflight.ts).
-    noteRunDetail({ mode: finder() === 'fast' ? 'fast' : 'better', fraction: 0 });
+    noteRunDetail({ mode: lightNow() || finder() === 'fast' ? 'fast' : 'better', fraction: 0 });
     // The new background picture is closed when the run ends, however it ends.
     const held: { picture?: ImageBitmap } = {};
     try {
@@ -305,7 +306,8 @@ async function run(files: ShellFile[], progress: Progress, at: (step: string) =>
       throw Object.assign(new NamedError(e.name, `${v.file.name} is not a video this page can read (MP4, MOV, WebM or MKV). Make an MP4 copy with the Video to MP4 tool, then add that.`), { cause: e });
     });
   }
-  const which = finder();
+  // A lighter start (after a lost run, or a big video on an at-risk device) uses Fast, as a phone does by default.
+  const which = lightNow() ? 'fast' : finder();
   const size = which === 'fast' ? '12' : '28';
   progress.set(`Loading the person finder, once (about ${size} MB)…`, 0.01);
   at('PersonFinderLoadFailed');

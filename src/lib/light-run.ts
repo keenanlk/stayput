@@ -57,3 +57,5 @@ export const LIGHT_CANVAS_PIXELS = 2048 * 2048;
 export const LIGHT_OUTPUT_PIXELS = 4_194_304;
 /** A file over this many bytes is decoded in stretches while light (the full limit is 150 MB on a phone, 1 GB elsewhere). */
 export const LIGHT_STRETCH_BYTES = 40 * 1024 ** 2;
+/** The most pixels a photo is drawn at for a cut-out or other model tool while light: 8 megapixels. */
+export const LIGHT_MODEL_PIXELS = 8_000_000;
