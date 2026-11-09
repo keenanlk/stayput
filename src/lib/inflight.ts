@@ -5,7 +5,8 @@
  * Stored: the tool's slug, the phase, the time and the input's total size (sent only as the existing size bucket). Nothing else about the file is stored or sent, and the marker never leaves the device.
  */
 import { trackToolRun } from './analytics';
-import { CAPTION_TOOLS, CUT_TOOLS, noteLostCut, noteLostRun } from './working-size';
+import { CAPTION_TOOLS, CUT_TOOLS, noteLostCut, noteLostFamily, noteLostRun } from './working-size';
+import { familyOf } from './tool-family';
 import { rememberTinyModel } from './speech-path';
 
 /**
@@ -186,5 +187,8 @@ export function reportLostTab(): void {
   if (m.phase === 'run' && CUT_TOOLS.includes(m.tool)) noteLostCut();
   // A speech run the browser closed (on a phone, most likely out of memory): this tab's next speech run starts with the smaller model. A flag in this tab only.
   if (m.phase === 'run' && SPEECH_TOOLS.includes(m.tool)) rememberTinyModel();
+  // The shared record: every heavy tool of this family starts lighter on its next run in this tab (see light-run.ts). A flag only; a preview is not a lost run.
+  const family = familyOf(m.tool);
+  if (m.phase === 'run' && family) noteLostFamily(family);
   send(m.tool, cls, {}, typeof m.bytes === 'number' ? m.bytes : 0);
 }

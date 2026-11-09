@@ -4,6 +4,8 @@
  * It is one number in sessionStorage (gone when the tab closes): no file name, size or content, and nothing is sent anywhere.
  */
 
+import type { Family } from './tool-family';
+
 const KEY = 'stayput:work-size';
 /** Set when a phone's 4K source was started at 1080p without a failure (see capAtRisk in recovery-hooks.ts); cleared by "Try full size". */
 const RISK_KEY = 'stayput:risk-size';
@@ -14,6 +16,13 @@ const LOST_KEY = 'stayput:lost-run';
 
 /** Set when the page loaded again after the browser closed it mid-run of a video splitter. A flag only: no file data. */
 const LOST_CUT_KEY = 'stayput:lost-cut';
+
+/**
+ * The shared record of a lost run: the families (see tool-family.ts) whose last run the browser closed in this tab. A list of
+ * family names in sessionStorage, nothing else: no tool, file name, size or content, and nothing is sent anywhere.
+ * The caption and splitter flags above stay as they are; reportLostTab writes them and this record from one place.
+ */
+const LOST_FAMILY_KEY = 'stayput:lost-family';
 
 /** The tools whose caption redraw starts smaller after a lost run: the slugs inflight.ts stores for them. */
 export const CAPTION_TOOLS = ['burn-subtitles-into-video', 'add-subtitles-to-video', 'auto-caption-video'];
@@ -79,6 +88,27 @@ export function noteLostCut(): void {
   }
 }
 
+function lostFamilies(): string[] {
+  try {
+    const v = JSON.parse(store()?.getItem(LOST_FAMILY_KEY) ?? '[]') as unknown;
+    return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+/** The browser closed this page during a run of this family earlier in this tab, and "Try full size" has not been pressed since. */
+export const lostFamily = (family: Family): boolean => lostFamilies().includes(family) && !fullSizeChosen();
+
+export function noteLostFamily(family: Family): void {
+  try {
+    const now = lostFamilies();
+    if (!now.includes(family)) store()?.setItem(LOST_FAMILY_KEY, JSON.stringify([...now, family]));
+  } catch {
+    // Not remembered: the next run starts at full size, which is the default.
+  }
+}
+
 export function rememberWorkingSize(side: number): void {
   if (!SIDES.includes(side)) return;
   try {
@@ -94,6 +124,7 @@ export function forgetWorkingSize(): void {
     store()?.removeItem(KEY);
     store()?.removeItem(RISK_KEY);
     store()?.removeItem(LOST_KEY);
+    store()?.removeItem(LOST_FAMILY_KEY);
     store()?.setItem(FULL_KEY, '1');
   } catch {
     // Nothing to forget.

@@ -362,7 +362,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
     // Encoders want even sides; H.264 in most browsers also refuses odd ones.
     // A retry after the encoder gave up asks for a smaller picture than the first try's.
     const longest = Math.max(width, height);
-    if (opts.capFirstTry) capAtRisk(attempt, Math.max(shown.width, shown.height), true);
+    capAtRisk(attempt, Math.max(shown.width, shown.height), !!opts.capFirstTry, file.size, !opts.capFirstTry);
     const capK = capScale(attempt, longest);
     // Bitrate first, then the test encode at the real size below can lower the size before the file is decoded.
 

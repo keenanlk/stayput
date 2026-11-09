@@ -8,6 +8,7 @@
  * back, since the network only sees colour.
  */
 import { makeCanvas } from './image';
+import { LIGHT_OUTPUT_PIXELS, lightNow } from './light-run';
 import { NamedError } from './input-error';
 import { fromWorkerFailure } from './worker-error';
 
@@ -25,7 +26,7 @@ function getWorker(): Worker {
 
 /** The size a picture will come out at for `factor`, held under the canvas limit. */
 export function targetSize(w: number, h: number, factor: number): { width: number; height: number; factor: number } {
-  const most = Math.sqrt(MAX_OUTPUT_PIXELS / (w * h));
+  const most = Math.sqrt((lightNow() ? LIGHT_OUTPUT_PIXELS : MAX_OUTPUT_PIXELS) / (w * h));
   const f = Math.min(factor, most);
   return { width: Math.max(1, Math.floor(w * f)), height: Math.max(1, Math.floor(h * f)), factor: f };
 }
