@@ -11,7 +11,7 @@ import { decodeWma, isAsf } from './wma-convert';
 import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
 import { retryUnreadable } from './read-failure';
 import { isPhoneBrowser } from './phone-limit';
-import { stretchLimit } from './light-run';
+import { stretchLimit } from './phone-limit';
 import { AUDIO_COPY, stageError } from './bare-error';
 import { resampleTo } from './odd-audio';
 

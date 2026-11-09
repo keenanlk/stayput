@@ -17,6 +17,9 @@ const VIDEO = /video|^gif-to-mp4$|slideshow|screen-recorder|-to-(mp4|webm|avi|mo
 /** The speech tools: they keep their own lighter path (the tiny model), so they have no family here. */
 const SPEECH = new Set(['transcribe', 'video-to-subtitles', 'auto-caption-video', 'add-subtitles-to-video']);
 
+/** Tools that start light only after a lost run: their up-front size cap for an at-risk device already exists (remove-object's iOS canvas limit). */
+export const LOST_ONLY = new Set(['remove-object']);
+
 export function familyOf(slug: string): Family | undefined {
   if (SPEECH.has(slug)) return undefined;
   // The video-background person finder is a model, not an encoder-only job: it reuses Fast mode on phones.

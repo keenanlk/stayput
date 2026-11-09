@@ -1,4 +1,5 @@
 import { formatBytes } from './files';
+import type { Family } from './tool-family';
 
 /**
  * How big a video can be for the caption tools on a phone. Measured in Safari on an iPhone 16 Pro (iOS 18.4
@@ -32,3 +33,29 @@ export const TRIM_LINK = { text: 'Trim it first', href: '/tools/trim-video' };
 
 /** Shown above Run before any run, so the download is no surprise on mobile data. */
 export const MODEL_DOWNLOAD_NOTE = 'The first run downloads the speech model, about 77 MB (95 MB on computers with WebGPU), once.';
+
+// ---- The state of the lighter start (see working-size.ts). It lives here, with the device checks, so the low-level libraries that read it need no import of their own. ----
+export type LightWhy = 'lost' | 'atrisk';
+let active: LightWhy | undefined;
+let activeFamily: Family | undefined;
+/** Set by the shell as a run starts (beginLight in working-size.ts) and cleared as it ends. */
+export function setLight(family: Family | undefined, why: LightWhy | undefined): void {
+  activeFamily = family;
+  active = why;
+}
+/** Whether the run in progress started light. With families named, only a run of one of those families counts: a light sound decode does not shrink a picture. */
+export const lightNow = (...families: Family[]): LightWhy | undefined => (!families.length || (activeFamily && families.includes(activeFamily)) ? active : undefined);
+
+/** The canvas pixel limit while light: a quarter of iOS Safari's 4096 × 4096, which is 2048 × 2048. */
+export const LIGHT_CANVAS_PIXELS = 2048 * 2048;
+/** An upscaled picture's pixel limit while light (the full limit is 16.7 million). */
+export const LIGHT_OUTPUT_PIXELS = 4_194_304;
+/** A file over this many bytes is decoded in stretches while light (the full limit is 150 MB on a phone, 1 GB elsewhere). */
+export const LIGHT_STRETCH_BYTES = 40 * 1024 ** 2;
+/** The most pixels a photo is drawn at for a cut-out or other model tool while light: 8 megapixels. */
+export const LIGHT_MODEL_PIXELS = 8_000_000;
+
+/** The size above which a sound is decoded in stretches: `normal`, or at most 40 MB while light. */
+export const stretchLimit = (normal: number): number => (lightNow('audio') ? Math.min(LIGHT_STRETCH_BYTES, normal) : normal);
+/** The most pixels an upscaled picture may have: `normal`, or 4 million while light. */
+export const outputPixelLimit = (normal: number): number => (lightNow('model') ? Math.min(LIGHT_OUTPUT_PIXELS, normal) : normal);

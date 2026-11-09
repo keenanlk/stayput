@@ -7,7 +7,7 @@
  * the model and runtime is ever fetched.
  */
 import { makeCanvas } from './image';
-import { lightNow } from './light-run';
+import { lightNow } from './phone-limit';
 import { blur as boxBlur } from './blur';
 import { refineMask } from './mask';
 import { NamedError } from './input-error';

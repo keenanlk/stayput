@@ -125,8 +125,8 @@ function sync() {
 
 async function showImage(file: File) {
   const decoded = await decodeImage(file);
-  // A lighter start (after a lost run, or a big photo on an at-risk device) edits at 2048 × 2048 pixels at most (see light-run.ts).
-  const why = beginLight('model', file.size);
+  // A lighter start (after a lost run; a big photo on an at-risk device already has the iOS canvas limit) edits at 2048 × 2048 pixels at most (see light-run.ts).
+  const why = beginLight('model', 0);
   try {
     // A picture bigger than this browser can draw is edited at the largest size that works.
     const fit = canvasWorks(decoded.width, decoded.height) ? { width: decoded.width, height: decoded.height } : fitCanvas(decoded.width, decoded.height);

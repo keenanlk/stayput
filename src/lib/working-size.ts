@@ -5,6 +5,7 @@
  */
 
 import type { Family } from './tool-family';
+import { isIosBrowser, setLight, type LightWhy } from './phone-limit';
 
 const KEY = 'stayput:work-size';
 /** Set when a phone's 4K source was started at 1080p without a failure (see capAtRisk in recovery-hooks.ts); cleared by "Try full size". */
@@ -129,4 +130,52 @@ export function forgetWorkingSize(): void {
   } catch {
     // Nothing to forget.
   }
+}
+
+
+// ---- The lighter start (was light-run.ts; kept in this module so the page's shell loads one file less). ----
+/**
+ * One question for every heavy tool: "should this run start lighter?". Yes when the browser closed this page during a run of
+ * the same family earlier in this tab ('lost'), or when this device is detected here as at risk (iOS, or a reported 3 GB of
+ * memory or less) and the input is over the family's budget ('atrisk'). "Try full size" (fullSizeChosen) turns both off.
+ * Everything is decided on this device from a flag in this tab and the input's size; nothing is stored about a file or sent.
+ */
+
+/** A device where a heavy run is likely to be closed by the browser: an iPhone or iPad, or a phone that reports 3 GB or less. */
+export function atRiskDevice(nav: Pick<Navigator, 'userAgent' | 'maxTouchPoints'> & { deviceMemory?: number } = navigator): boolean {
+  const gb = nav.deviceMemory;
+  return isIosBrowser(nav) || (typeof gb === 'number' && gb <= 3);
+}
+
+/**
+ * The input size, per family, above which an at-risk device starts light from the first run. The video, caption and audio figures
+ * come from the measured phone limit (PHONE_SAFE_BYTES, 150 MB for a whole-file audio decode, 40 MB here for starting in stretches);
+ * the picture, PDF and archive figures are in bytes too (a phone photo is 2 to 6 MB, so 8 MB is a large one).
+ */
+export const LIGHT_BUDGET: Record<Family, number> = {
+  video: 200_000_000,
+  model: 6_000_000,
+  audio: 40_000_000,
+  image: 8_000_000,
+  archive: 60_000_000,
+  pdf: 60_000_000,
+};
+
+/**
+ * Whether a run of `family` starts light, and why. `size` is the total input in bytes. A lost run wins over the at-risk start because it is the stronger evidence.
+ */
+export function lightRun(family: Family, size = 0, nav?: Parameters<typeof atRiskDevice>[0]): LightWhy | undefined {
+  if (fullSizeChosen()) return undefined;
+  if (lostFamily(family)) return 'lost';
+  return size > LIGHT_BUDGET[family] && atRiskDevice(nav) ? 'atrisk' : undefined;
+}
+
+/** The shell calls this as a run starts: the library code below it (canvas, decode, upscale) asks `lightNow()` while the run goes. */
+export function beginLight(family: Family | undefined, size: number): LightWhy | undefined {
+  const why = family ? lightRun(family, size) : undefined;
+  setLight(family, why);
+  return why;
+}
+export function endLight(): void {
+  setLight(undefined, undefined);
 }

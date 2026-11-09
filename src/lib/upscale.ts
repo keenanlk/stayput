@@ -8,7 +8,7 @@
  * back, since the network only sees colour.
  */
 import { makeCanvas } from './image';
-import { outputPixelLimit } from './light-run';
+import { outputPixelLimit } from './phone-limit';
 import { NamedError } from './input-error';
 import { fromWorkerFailure } from './worker-error';
 

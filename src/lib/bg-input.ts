@@ -5,7 +5,7 @@
  */
 import { canvasToBlob, decodeImage, loadWebpEncoder, type Decoded, type EncodeType } from './image';
 import { IOS_CANVAS_PIXELS } from './canvas-cap';
-import { LIGHT_MODEL_PIXELS, lightNow } from './light-run';
+import { LIGHT_MODEL_PIXELS, lightNow } from './phone-limit';
 import { isIosBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 import { readHead } from './files';

@@ -3,7 +3,7 @@
  * and still loses tabs to big ones, so a picture over that is drawn smaller there. Everywhere else the size is tried:
  * a canvas the browser cannot allocate has no 2d context, or reads back blank.
  */
-import { LIGHT_CANVAS_PIXELS, lightNow } from './light-run';
+import { LIGHT_CANVAS_PIXELS, lightNow } from './phone-limit';
 import { isIosBrowser } from './phone-limit';
 
 /** Pixels in the largest canvas Safari on iOS reliably draws (4096 × 4096). */

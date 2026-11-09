@@ -25,7 +25,7 @@ import { inspectFile, isMediaFile, takesMedia, type IntakeProblem } from './inta
 import { copyInput, releaseInputCopies } from './input-copy';
 import { retryRun } from './read-failure';
 import { CAPTION_TOOLS, CUT_TOOLS, forgetWorkingSize, LOST_SIDE, lostFamily, lostRun, riskSize, workingSize } from './working-size';
-import { familyOf } from './tool-family';
+import { familyOf, LOST_ONLY } from './tool-family';
 import { beginLight, endLight, lightRun } from './light-run';
 import { ATRISK_LIGHT_NOTE, LOST_CAPTION_TAIL, LOST_LIGHT_NOTE, LOST_VIDEO_NOTE } from './light-copy';
 
@@ -676,10 +676,7 @@ export function createShell(opts: ShellOptions) {
   const lightNote = family && !(family === 'video' && opts.remembersSize) ? document.createElement('p') : null;
   function showLightNote() {
     if (!lightNote || !family) return;
-    const why = lightRun(
-      family,
-      files.reduce((n, f) => n + f.file.size, 0),
-    );
+    const why = lightRun(family, LOST_ONLY.has(root.dataset.slug ?? '') ? 0 : files.reduce((n, f) => n + f.file.size, 0));
     lightNote.hidden = !why;
     if (!why) return;
     lightNote.className = 'hint';
