@@ -40,16 +40,20 @@ export function lightRun(family: Family, size = 0, nav?: Parameters<typeof atRis
 }
 
 let active: LightWhy | undefined;
+let activeFamily: Family | undefined;
 /** The shell calls this as a run starts: the library code below it (canvas, decode, upscale) asks `lightNow()` while the run goes. */
 export function beginLight(family: Family | undefined, size: number): LightWhy | undefined {
+  activeFamily = family;
   active = family ? lightRun(family, size) : undefined;
   return active;
 }
 export function endLight(): void {
   active = undefined;
+  activeFamily = undefined;
 }
 /** Whether the run in progress started light (see beginLight). */
-export const lightNow = (): LightWhy | undefined => active;
+/** With families named, only a run of one of those families counts: a light sound decode does not shrink a picture. */
+export const lightNow = (...families: Family[]): LightWhy | undefined => (!families.length || (activeFamily && families.includes(activeFamily)) ? active : undefined);
 
 /** The canvas pixel limit while light: a quarter of iOS Safari's 4096 × 4096, which is 2048 × 2048. */
 export const LIGHT_CANVAS_PIXELS = 2048 * 2048;
@@ -59,3 +63,8 @@ export const LIGHT_OUTPUT_PIXELS = 4_194_304;
 export const LIGHT_STRETCH_BYTES = 40 * 1024 ** 2;
 /** The most pixels a photo is drawn at for a cut-out or other model tool while light: 8 megapixels. */
 export const LIGHT_MODEL_PIXELS = 8_000_000;
+
+/** The size above which a sound is decoded in stretches: `normal`, or at most 40 MB while light. */
+export const stretchLimit = (normal: number): number => (lightNow('audio') ? Math.min(LIGHT_STRETCH_BYTES, normal) : normal);
+/** The most pixels an upscaled picture may have: `normal`, or 4 million while light. */
+export const outputPixelLimit = (normal: number): number => (lightNow('model') ? Math.min(LIGHT_OUTPUT_PIXELS, normal) : normal);

@@ -11,7 +11,7 @@ import { decodeWma, isAsf } from './wma-convert';
 import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
 import { retryUnreadable } from './read-failure';
 import { isPhoneBrowser } from './phone-limit';
-import { LIGHT_STRETCH_BYTES, lightNow } from './light-run';
+import { stretchLimit } from './light-run';
 import { AUDIO_COPY, stageError } from './bare-error';
 import { resampleTo } from './odd-audio';
 
@@ -19,7 +19,7 @@ import { resampleTo } from './odd-audio';
 export const SAMPLE_RATE = 44100;
 
 /** The size above which a file is decoded in stretches instead of read whole: a phone gives a tab far less memory than a computer. */
-export const stretchBytes = (phone = isPhoneBrowser()) => (lightNow() ? Math.min(LIGHT_STRETCH_BYTES, phone ? 150 * 1024 ** 2 : 1024 ** 3) : phone ? 150 * 1024 ** 2 : 1024 ** 3);
+export const stretchBytes = (phone = isPhoneBrowser()) => stretchLimit(phone ? 150 * 1024 ** 2 : 1024 ** 3);
 
 /** The first bytes say a WAV is the 64-bit variant (RF64, or BW64) that the browsers' decoders do not all read. */
 async function isRf64(file: Blob): Promise<boolean> {

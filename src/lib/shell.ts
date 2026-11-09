@@ -899,6 +899,7 @@ export function createShell(opts: ShellOptions) {
   const lostChecked = reportLostTab();
   if (lostChecked) void lostChecked.then(() => (showSizeNote(), showLightNote()));
   showSizeNote();
+  showLightNote();
   root.dataset.ready = 'true';
   void adoptHandoff();
 
