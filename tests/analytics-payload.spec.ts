@@ -392,10 +392,10 @@ test('a file with no readable sound in an audio tool fails with AudioDecodeError
   expect(out.data).toMatchObject({ tool: 'volume-booster', outcome: 'error', error_class: 'AudioDecodeError' });
 });
 
-test('a file that is not a video fails with UnreadableContainer in a video edit', async ({ page, baseURL }) => {
+test('a file that is not a video fails with NotAVideoContainer in a video edit', async ({ page, baseURL }) => {
   const out = await failedRun(page, baseURL!, '/blur-video-background', { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
   expect(out.shown).toContain('not a video this page can read');
-  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'UnreadableContainer' });
+  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'NotAVideoContainer' });
 });
 
 test('search and next-step events send only what /privacy lists, and never the typed words', async ({ page, baseURL }) => {
@@ -547,18 +547,23 @@ async function failedRunOf(page: Page, baseURL: string, slug: string, file: Para
   return { shown: (await page.locator('#error').innerText()).replace(/\s+/g, ' '), data: run.payload.data as Record<string, string>, raw: JSON.stringify(sent) };
 }
 
-for (const [label, body] of [
-  ['text with a .pdf name', 'secret-notes plain text with a .pdf extension\n'.repeat(20)],
-  ['a PDF header and then damage', '%PDF-1.4\nsecret-notes this is not a PDF body\n'.repeat(20)],
-] as const) {
-  test(`Watermark PDF on ${label} fails as UnreadableFile, not a bare Error`, async ({ page, baseURL }) => {
-    const out = await failedRunOf(page, baseURL!, 'watermark-pdf', { name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from(body) }, async () => {
-      await page.locator('#wm-text').fill('DRAFT');
-    });
-    expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'UnreadableFile' });
-    expect(out.raw).not.toContain('secret-notes');
+// Text with a .pdf name is turned away when it is added (by its first bytes); a PDF header and then damage gets as far as the PDF reader, which names what is wrong.
+test('Watermark PDF on text with a .pdf name is refused at add as NotAPdfFile', async ({ page, baseURL }) => {
+  await captureAnalytics(page, baseURL!);
+  await page.goto(`${SITE}/tools/watermark-pdf`);
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('secret-notes plain text with a .pdf extension\n'.repeat(20)) });
+  await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NotAPdfFile');
+  await expect(page.locator('#run')).toBeDisabled();
+});
+
+test('Watermark PDF on a PDF header and then damage fails as PdfNoPages, not a bare Error', async ({ page, baseURL }) => {
+  const out = await failedRunOf(page, baseURL!, 'watermark-pdf', { name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nsecret-notes this is not a PDF body\n'.repeat(20)) }, async () => {
+    await page.locator('#wm-text').fill('DRAFT');
   });
-}
+  expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'PdfNoPages' });
+  expect(out.raw).not.toContain('secret-notes');
+});
 
 test('Audio to video reports a named class, from the shared runner, when the browser encoder fails at creation at every size', async ({ page, baseURL }) => {
   test.setTimeout(180_000);

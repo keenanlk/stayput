@@ -34,6 +34,9 @@ const LEGACY_READERS = new Set(['video-to-mp4']);
 /** Tools that already refuse these containers themselves, with a message of their own, once Run is pressed. */
 const OWN_REFUSAL = new Set(['video-background-remover']);
 
+/** Tools that read the start of the file themselves when it is added and say what is wrong with it in their own words (the splitters). */
+const OWN_EARLY_CHECK = new Set(['video-splitter', 'split-video']);
+
 /** File types where a long run of zero bytes at the start is normal (disk images and raw dumps). */
 const ZERO_HEAD_OK = /\.(iso|img|dmg|bin|dat|raw|tga|vhd|vhdx|vmdk)$/i;
 
@@ -135,7 +138,7 @@ export async function inspectFile(file: File, tool: string, base: string, accept
   }
 
   // A file that is empty, or plainly another kind of file than the tool takes, is refused now and named for what it is (by its first bytes, not its name).
-  const wrong = wrongAtAdd(file, head, container, accept);
+  const wrong = OWN_REFUSAL.has(tool) || OWN_REFUSAL.has(base) || OWN_EARLY_CHECK.has(tool) || OWN_EARLY_CHECK.has(base) ? null : wrongAtAdd(file, head, container, accept);
   if (wrong) return wrong;
 
   const fix = CONVERTERS[container];
