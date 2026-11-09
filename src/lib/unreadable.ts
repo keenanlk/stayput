@@ -41,7 +41,7 @@ export function fits(family: Family, c: Container): boolean {
   switch (family) {
     case 'image': return kindOf(c) === 'image' || c === 'unknown';
     case 'gif': return c === 'gif';
-    case 'pdf': return c === 'pdf';
+    case 'pdf': return c === 'pdf' || c === 'unknown';
     // Archives other than ZIP (7z, RAR, TAR, gzip) have no signature in sniff, so 'unknown' passes; only a file known to be something else is refused.
     case 'archive': return c === 'zip' || c === 'unknown';
   }

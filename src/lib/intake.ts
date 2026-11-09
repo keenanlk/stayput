@@ -7,7 +7,7 @@
 import { NamedError } from './input-error';
 import { isNotReadable, notReadable, probeReadable, SNAPSHOT_LIMIT } from './read-failure';
 import { SNIFF_BYTES, kindOf, sniffBytes, type Container } from './sniff';
-import { COPY, wrongThing, type Family } from './unreadable';
+import { copy, labelOf, wrongThing, type Family } from './unreadable';
 
 export interface IntakeProblem {
   /**
@@ -75,6 +75,8 @@ export function fileFamily(accept: string): Family | undefined {
   return first;
 }
 
+const latin1 = (b: Uint8Array) => String.fromCharCode(...b.subarray(0, 2048));
+
 /** Whether the first bytes are plain text: no NUL bytes and almost all of them printable. */
 function looksLikeText(head: Uint8Array): boolean {
   if (head.length === 0) return false;
@@ -116,7 +118,6 @@ export async function inspectFile(file: File, tool: string, base: string, accept
   // middle reads). A file the browser cannot reach is refused here, with the same words a failed run would give, and Run stays off for it.
   const family = fileFamily(accept);
   const media = takesMedia(accept) && isMediaFile(file);
-  if ((family || media) && file.size === 0) return { name: 'EmptyFile', message: COPY.EmptyFile };
   // Pictures, GIFs, PDFs and archives are reached the same way (see fileFamily).
   if (media || family) {
     try {
@@ -140,7 +141,7 @@ export async function inspectFile(file: File, tool: string, base: string, accept
   const fix = CONVERTERS[container];
   if (!fix || OWN_REFUSAL.has(tool) || OWN_REFUSAL.has(base) || !/(^|,)\s*video\//.test(accept)) return null;
   // A .wma is the same container as a .wmv: only a file named for video, or typed as video, is a WMV.
-  const isWmv = /\.wmv$/i.test(file.name) || file.type === 'video/x-ms-wmv';
+  const isWmv = !/\.wma$/i.test(file.name) && !file.type.startsWith('audio/');
   if (container === 'asf' && !isWmv) return null;
   // The video-to-MP4 page reads AVI and FLV itself; no page reads WMV.
   if (container !== 'asf' && (LEGACY_READERS.has(tool) || LEGACY_READERS.has(base))) return null;
@@ -148,13 +149,20 @@ export async function inspectFile(file: File, tool: string, base: string, accept
 }
 
 function wrongAtAdd(file: File, head: Uint8Array, container: Container, accept: string): IntakeProblem | null {
-  if (file.size === 0) return { name: 'EmptyFile', message: COPY.EmptyFile };
+  // (An empty file never gets here: the shell refuses it when it is picked.)
   const family = fileFamily(accept);
   if (family) {
     // A generic ISO-media brand ('mp4') could still be a picture container this browser opens, so only a clear mismatch is refused.
     if (container === 'mp4') return null;
     const wrong = wrongThing(family, head, file.size);
-    return wrong ? { name: wrong.name as IntakeProblem['name'], message: wrong.message } : null;
+    if (wrong) return { name: wrong.name as IntakeProblem['name'], message: wrong.message };
+    // Plain text is no picture and no PDF. (An SVG is text too, and a PDF may have junk before its header.)
+    const marked = family === 'image' ? /<svg|<\?xml|<!doctype/i.test(latin1(head)) : family === 'pdf' ? latin1(head).includes('%PDF-') : true;
+    if ((family === 'image' || family === 'pdf') && container === 'unknown' && looksLikeText(head) && !marked) {
+      const name = family === 'image' ? 'NotAnImageFile' : 'NotAPdfFile';
+      return { name, message: copy(name, labelOf('unknown')) };
+    }
+    return null;
   }
   if (!takesMedia(accept) || !isMediaFile(file)) return null;
   const video = /(^|,)\s*video\//.test(accept);
