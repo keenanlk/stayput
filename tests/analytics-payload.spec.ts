@@ -547,18 +547,21 @@ async function failedRunOf(page: Page, baseURL: string, slug: string, file: Para
   return { shown: (await page.locator('#error').innerText()).replace(/\s+/g, ' '), data: run.payload.data as Record<string, string>, raw: JSON.stringify(sent) };
 }
 
-for (const [label, body] of [
-  ['text with a .pdf name', 'secret-notes plain text with a .pdf extension\n'.repeat(20)],
-  ['a PDF header and then damage', '%PDF-1.4\nsecret-notes this is not a PDF body\n'.repeat(20)],
-] as const) {
-  test(`Watermark PDF on ${label} fails as UnreadableFile, not a bare Error`, async ({ page, baseURL }) => {
-    const out = await failedRunOf(page, baseURL!, 'watermark-pdf', { name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from(body) }, async () => {
-      await page.locator('#wm-text').fill('DRAFT');
-    });
-    expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'UnreadableFile' });
-    expect(out.raw).not.toContain('secret-notes');
+test('Watermark PDF on text with a .pdf name fails as NotAPdfFile, not a bare Error', async ({ page, baseURL }) => {
+  const out = await failedRunOf(page, baseURL!, 'watermark-pdf', { name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('secret-notes plain text with a .pdf extension\n'.repeat(20)) }, async () => {
+    await page.locator('#wm-text').fill('DRAFT');
   });
-}
+  expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'NotAPdfFile' });
+  expect(out.raw).not.toContain('secret-notes');
+});
+
+test('Watermark PDF on a PDF header and then damage fails as PdfNoPages, not a bare Error', async ({ page, baseURL }) => {
+  const out = await failedRunOf(page, baseURL!, 'watermark-pdf', { name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nsecret-notes this is not a PDF body\n'.repeat(20)) }, async () => {
+    await page.locator('#wm-text').fill('DRAFT');
+  });
+  expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'PdfNoPages' });
+  expect(out.raw).not.toContain('secret-notes');
+});
 
 test('Audio to video reports a named class, from the shared runner, when the browser encoder fails at creation at every size', async ({ page, baseURL }) => {
   test.setTimeout(180_000);

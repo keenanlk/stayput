@@ -6,10 +6,7 @@
  * Kept free of browser and codec imports (mediabunny is loaded only by the one retry) so a spec can drive it directly.
  */
 import { NamedError } from './input-error';
-import { isFileGone, isNotReadable, notReadable } from './read-failure';
-
-/** How much of the start of the file is looked at. */
-export const HEAD_BYTES = 65536;
+import { isNotReadable, notReadable, readHead } from './read-failure';
 
 export type Signature = 'mp4' | 'matroska' | 'ts' | 'other-video';
 
@@ -39,24 +36,12 @@ export function videoSignature(b: Uint8Array): Signature | null {
   return null;
 }
 
-const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/** The first bytes, read up to twice. Throws the named cause when they cannot be had. */
-async function readHead(file: Blob, wait: number): Promise<Uint8Array> {
-  const want = Math.min(file.size, HEAD_BYTES);
-  let gone = false;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    if (attempt) await pause(wait);
-    try {
-      const bytes = new Uint8Array(await file.slice(0, HEAD_BYTES).arrayBuffer());
-      if (want > 0 && bytes.length >= want) return bytes;
-    } catch (e) {
-      if (isNotReadable(e) || isFileGone(e)) gone = true;
-    }
-  }
-  if (gone) return Promise.reject(new NamedError('UnreadableFileGone', 'This file could not be read. It may have been moved, deleted or still be syncing from a cloud app. Pick it again, or save it to the phone first.'));
-  return Promise.reject(new NamedError('UnreadableHeaderShort', 'The start of this file could not be read in full, so this page cannot tell what it is. Pick it again, or save it to the phone first and pick the saved copy.'));
+/** A video whose container was recognised but whose layout (tracks, index) could not be read: damaged, or cut off before the index was written. */
+export function containerParseFailed(cause?: unknown): NamedError {
+  return new NamedError('ContainerParseFailed', 'This looks like a video, but this page could not read how it is laid out. The file may be damaged or cut short. Make an MP4 copy first, then pick that.', { cause });
 }
+
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Whether a fresh reader over the same file finds a container this time. */
 async function detectsNow(file: Blob): Promise<boolean> {
@@ -93,7 +78,37 @@ export async function explainNoContainer(file: Blob, wait = 400, detect: (f: Blo
   if (kind === 'other-video') return new NamedError('ContainerNotSupported', 'This looks like a video in a format this page cannot read (such as AVI, WMV, FLV or MPEG). Make an MP4 copy first, then pick that.');
   if (kind) {
     if (await detect(file)) return notReadable(new NamedError('ContainerReadRetry', 'The first read of the file did not match the second.'), 'probe');
-    return new NamedError('ContainerParseFailed', 'This looks like a video, but this page could not read how it is laid out. The file may be damaged or cut short. Make an MP4 copy first, then pick that.');
+    return containerParseFailed();
   }
   return new NamedError('NotAVideoContainer', 'This file is not a video this page can read (MP4, MOV, WebM or MKV).');
+}
+
+/** The slice of a mediabunny Input that requireVideoTrack uses (the library itself is not imported here). */
+interface TrackReader<T> {
+  getFormat(): Promise<unknown>;
+  getPrimaryVideoTrack(): Promise<T | null>;
+  getTracks(): Promise<unknown[]>;
+}
+
+/**
+ * The picture track of an opened file, or the named cause of there being none: an unreadable read keeps the read-failure name (so the
+ * job reads the file once more); no container at all is told apart by explainNoContainer; a container with no tracks of any kind has lost
+ * its index (ContainerParseFailed); a container with tracks but no picture is NoVideoTrack, with `noVideo` as its message.
+ */
+export async function requireVideoTrack<T>(input: TrackReader<T>, file: Blob, noVideo: string): Promise<T> {
+  let failure: unknown;
+  const track = await input.getPrimaryVideoTrack().catch((e) => {
+    if (isNotReadable(e)) throw notReadable(e);
+    failure = e;
+    return null;
+  });
+  if (track) return track;
+  const format = await input.getFormat().catch((e) => {
+    if (isNotReadable(e)) throw notReadable(e);
+    return null;
+  });
+  if (!format) throw await explainNoContainer(file);
+  const tracks = await input.getTracks().catch(() => [] as unknown[]);
+  if (tracks.length === 0 || failure) throw containerParseFailed(failure);
+  throw new NamedError('NoVideoTrack', noVideo);
 }

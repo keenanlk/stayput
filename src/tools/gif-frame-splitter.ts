@@ -1,7 +1,7 @@
 import { createShell, processEach } from '../lib/shell';
 import { baseName, type OutputFile } from '../lib/files';
 import { canvasToBlob, thumbnail } from '../lib/image';
-import { DamagedGif, UnreadableFile, checkGif, explain } from '../lib/gif-errors';
+import { DamagedGif, readGifBuffer, checkGif, explain } from '../lib/gif-errors';
 
 /**
  * GIF frame splitter. Each GIF is decoded frame by frame in the page (see src/lib/gif-compress.ts)
@@ -18,9 +18,7 @@ createShell({
     summary = '';
     const results = await processEach(files, progress, 'Splitting', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       let frames = 0;
       checkGif(
         new Uint8Array(buffer),

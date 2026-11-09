@@ -1,7 +1,8 @@
 import { createShell, processEach, str } from '../lib/shell';
 import { vendorDir } from '../lib/vendor';
-import { UnreadableFile } from '../lib/input-error';
 import type { OutputFile } from '../lib/files';
+import { readHead } from '../lib/files';
+import { COPY, explainUnreadable, isFileGone, isNotReadable, rereadOnce } from '../lib/read-failure';
 import { extractWithSevenZip, sniffArchive } from '../lib/sevenzip';
 
 /**
@@ -63,7 +64,7 @@ async function viaLibarchive(file: File, password: string, status: (files: numbe
       if (!(f instanceof File)) continue;
       out.push({ name: `${path}${f.name}`, blob: f });
     }
-    if (!out.length) throw new UnreadableFile(NO_FILES);
+    if (!out.length) throw new NamedError('ArchiveHasNoFiles', NO_FILES);
     return out;
   } finally {
     await archive.close().catch(() => undefined);
@@ -78,23 +79,38 @@ createShell({
       const status = (n: number) => progress.set(`${entry.file.name}: ${plural(n, 'file')} extracted`, (i + 0.5) / files.length);
       const viaSevenZip = async (pw: string): Promise<OutputFile[]> => {
         const list = await extractWithSevenZip(entry.file, pw, status);
-        if (!list.length) throw new UnreadableFile(NO_FILES);
+        if (!list.length) throw new NamedError('ArchiveHasNoFiles', NO_FILES);
         return list.map(({ path, blob }) => ({ name: path, blob }));
       };
-      const kind = await sniffArchive(entry.file);
-      // 7z and RAR with a password: libarchive cannot decrypt either, 7-Zip can.
-      if (kind && password) return viaSevenZip(password);
-      try {
-        return await viaLibarchive(entry.file, password, status);
-      } catch (e) {
-        if (!kind || e instanceof NamedError) throw e;
-        // libarchive could not list a 7z or RAR: file names hidden behind a password, or a variant 7-Zip reads.
+      // A file that is empty, of another type or cut short is named for that; whatever else the readers refuse is ArchiveParseFailed.
+      const extract = async (): Promise<OutputFile[]> => {
+        const kind = await sniffArchive(entry.file);
+        // 7z and RAR with a password: libarchive cannot decrypt either, 7-Zip can.
+        if (kind && password) return viaSevenZip(password);
         try {
-          return await viaSevenZip('');
-        } catch (e2) {
-          throw e2 instanceof Error && e2.name === 'PasswordRequired' ? e2 : e;
+          return await viaLibarchive(entry.file, password, status);
+        } catch (e) {
+          if (!kind || (e instanceof NamedError && e.name !== 'ArchiveHasNoFiles')) throw e;
+          // libarchive could not list a 7z or RAR: file names hidden behind a password, or a variant 7-Zip reads.
+          try {
+            return await viaSevenZip('');
+          } catch (e2) {
+            throw e2 instanceof Error && e2.name === 'PasswordRequired' ? e2 : e;
+          }
         }
-      }
+      };
+      return rereadOnce(async () => {
+        await readHead(entry.file, 16);
+        if (entry.file.size === 0) throw new NamedError('EmptyFile', COPY.EmptyFile);
+        try {
+          return await extract();
+        } catch (e) {
+          if (isNotReadable(e) || isFileGone(e) || (e instanceof Error && ['PasswordRequired', 'WrongPassword', 'ArchiveHasNoFiles'].includes(e.name))) throw e;
+          const why = await explainUnreadable(entry.file, 'archive', { name: 'ArchiveParseFailed', message: e instanceof Error && e.message ? e.message : 'This archive could not be read.', cause: e });
+          // A failure that already has a name of its own (running out of memory, say) keeps it unless the file itself explains it.
+          throw why.name === 'ArchiveParseFailed' && e instanceof Error && e.name !== 'Error' ? e : why;
+        }
+      });
     });
   },
   resultsTitle: (outputs) => `${plural(outputs.length, 'file')} extracted`,

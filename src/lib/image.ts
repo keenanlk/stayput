@@ -6,6 +6,7 @@ import { decodeTiffPages, isTiffFile } from './tiff';
 import { svgFallbackSize } from './svg-size';
 import { vendorDir, vendorEntry } from './vendor';
 import { NamedError } from './input-error';
+import { COPY, explainUnreadable, isNotReadable, rereadOnce } from './read-failure';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
 
@@ -56,8 +57,8 @@ function wasmCodecFor(file: Blob, ext: string): WasmCodec | undefined {
   return undefined;
 }
 
-/** Decode any supported image into an ImageBitmap with EXIF orientation applied. A picture too big for this device's memory is refused as OutOfMemoryError, in plain words. */
-export async function decodeImage(file: File): Promise<Decoded> {
+/** Decode any supported image into an ImageBitmap with EXIF orientation applied. A picture too big for this device's memory is refused as OutOfMemoryError, in plain words. This is the decode without the named causes (the picture-input code keeps its own wording for a failed one). */
+export async function decodeImageRaw(file: File): Promise<Decoded> {
   try {
     return await decodeImageUnguarded(file);
   } catch (e) {
@@ -65,6 +66,29 @@ export async function decodeImage(file: File): Promise<Decoded> {
     if (!oom) throw e;
     throw new NamedError('OutOfMemoryError', 'This picture is too large for this device to open. Try a smaller copy of it, or use a computer.', { cause: e });
   }
+}
+
+/** Names of the failures that say only "the decoders did not open it": these get a closer look at the file. */
+const DECODER_REFUSED = new Set(['ImageFailed', 'CodecsFailed', 'HeicFailed', 'Error', 'EncodingError', 'InvalidStateError', 'DataError']);
+
+/**
+ * Decode any supported image. The file is read by its first bytes, not its name or type (a PNG named .jpg, a HEIC named .jpg), and a read
+ * the phone refuses is made once more. When every decoder (the browser's own, then the HEIC, AVIF and JPEG XL ones, then an <img>) has
+ * refused, the failure is named for its cause: an empty file, a file of another type, a file cut short, or a decoder that failed on a
+ * picture whose start is right.
+ */
+export async function decodeImage(file: File): Promise<Decoded> {
+  return rereadOnce(async () => {
+    // A head that cannot be read is a read failure, not an undecodable picture: it goes to the re-read below.
+    await readHead(file, 16);
+    if (file.size === 0) throw new NamedError('EmptyFile', COPY.EmptyFile);
+    try {
+      return await decodeImageRaw(file);
+    } catch (e) {
+      if (!(e instanceof Error) || !DECODER_REFUSED.has(e.name) || isNotReadable(e)) throw e;
+      throw await explainUnreadable(file, 'image', { name: 'ImageDecodeFailed', message: COPY.ImageDecodeFailed, cause: e });
+    }
+  });
 }
 
 async function decodeImageUnguarded(file: File): Promise<Decoded> {

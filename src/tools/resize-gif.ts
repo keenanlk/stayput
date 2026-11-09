@@ -2,7 +2,7 @@ import { createShell, processEach, radio } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
 import { InputError } from '../lib/input-error';
-import { DamagedGif, UnreadableFile, checkGif, explain, gifSize } from '../lib/gif-errors';
+import { DamagedGif, readGifBuffer, checkGif, explain, gifSize } from '../lib/gif-errors';
 
 /**
  * Resize GIF. Each GIF is decoded and rewritten at the new size in the page
@@ -143,9 +143,7 @@ createShell({
     const { compressGif, gifFrameCount } = await import('../lib/gif-compress');
     return processEach(files, progress, 'Resizing', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       const bytes = new Uint8Array(buffer);
       checkGif(bytes, undefined, 1, 1);
       const size = gifSize(bytes)!;

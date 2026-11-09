@@ -4,6 +4,9 @@
  * that says what to try next. Used by the GIF tools (compress, resize and crop).
  */
 
+import { NamedError } from './input-error';
+import { COPY, isFileGone, isNotReadable, readMemoryError, rereadOnce } from './read-failure';
+
 class GifError extends Error {
   constructor(name: string, message: string) {
     super(message);
@@ -31,6 +34,23 @@ export class GifTooLarge extends GifError {
   }
 }
 
+/**
+ * The bytes of a picked GIF. A read the browser refuses is made once more; a file that still will not read is UnreadableFileGone, an
+ * empty file is EmptyFile, and a read that ran out of memory is OutOfMemoryError. (It used to be a bare UnreadableFile for all of them.)
+ */
+export function readGifBuffer(file: Blob): Promise<ArrayBuffer> {
+  return rereadOnce(async () => {
+    if (file.size === 0) throw new NamedError('EmptyFile', COPY.EmptyFile);
+    try {
+      return await file.arrayBuffer();
+    } catch (e) {
+      if (isNotReadable(e) || isFileGone(e)) throw e;
+      throw readMemoryError(e);
+    }
+  });
+}
+
+/** Kept for code that still names it; new code reads with readGifBuffer, which names the cause. */
 export class UnreadableFile extends GifError {
   constructor() {
     super('UnreadableFile', "This device couldn't read the file. If it is in a cloud folder or still downloading, save it to the device first and add it again.");

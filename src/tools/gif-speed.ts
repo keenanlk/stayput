@@ -1,7 +1,7 @@
 import { bool, createShell, num, processEach, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
-import { DamagedGif, UnreadableFile, checkGif, explain } from '../lib/gif-errors';
+import { DamagedGif, readGifBuffer, checkGif, explain } from '../lib/gif-errors';
 
 /**
  * GIF speed and reverse. Each GIF is decoded, re-timed and rewritten in the page (see
@@ -21,9 +21,7 @@ createShell({
     const { compressGif, gifFrameCount } = await import('../lib/gif-compress');
     return processEach(files, progress, 'Changing', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       const bytes = new Uint8Array(buffer);
       checkGif(
         bytes,

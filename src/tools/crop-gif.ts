@@ -3,7 +3,7 @@ import { suffixName, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
 import { cropBox } from '../lib/crop-box';
 import { InputError } from '../lib/input-error';
-import { DamagedGif, UnreadableFile, checkGif, explain, gifSize } from '../lib/gif-errors';
+import { DamagedGif, readGifBuffer, checkGif, explain, gifSize } from '../lib/gif-errors';
 import { firstFrame } from '../lib/gif-preview';
 import type { GifLevel } from '../lib/gif-compress';
 
@@ -22,9 +22,7 @@ function unload() {
 
 async function load(file: File) {
   unload();
-  const buffer = await file.arrayBuffer().catch(() => {
-    throw new UnreadableFile();
-  });
+  const buffer = await readGifBuffer(file);
   const { source, width, height } = await firstFrame(buffer, new Uint8Array(buffer));
   cropBox.show(source, width, height);
   if ('close' in source) source.close();
@@ -44,9 +42,7 @@ const shell = createShell({
   async process(files, progress) {
     const { compressGif, gifFrameCount } = await import('../lib/gif-compress');
     return processEach(files, progress, 'Cropping', async (entry) => {
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       const bytes = new Uint8Array(buffer);
       checkGif(bytes, undefined, 1, 1);
       const size = gifSize(bytes)!;

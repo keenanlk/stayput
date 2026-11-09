@@ -4,7 +4,7 @@ import { thumbnail } from '../lib/image';
 import { drawText, loadFont } from '../lib/image-text';
 import { createTextStage } from '../lib/text-stage';
 import { InputError } from '../lib/input-error';
-import { DamagedGif, UnreadableFile, checkGif, explain } from '../lib/gif-errors';
+import { DamagedGif, readGifBuffer, checkGif, explain } from '../lib/gif-errors';
 import { firstFrame } from '../lib/gif-preview';
 
 /**
@@ -24,9 +24,7 @@ const shell = createShell({
   async onFilesChanged(files) {
     if (files.length === 0) return stage.show(undefined);
     try {
-      const buffer = await files[0]!.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(files[0]!.file);
       const { source } = await firstFrame(buffer, new Uint8Array(buffer));
       const bitmap = 'close' in source ? (source as ImageBitmap) : await createImageBitmap(source);
       stage.show(bitmap, 'Drag the text on the picture to move it. The same text goes on every frame.');
@@ -42,9 +40,7 @@ const shell = createShell({
     await loadFont(s.font);
     const { compressGif, gifFrameCount } = await import('../lib/gif-compress');
     return processEach(files, progress, 'Adding text to', async (entry) => {
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       checkGif(
         new Uint8Array(buffer),
         () => {

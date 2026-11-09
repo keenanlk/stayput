@@ -2,7 +2,7 @@ import { createShell, num, str, bool, radio, type ShellFile } from '../lib/shell
 import { canvasToBlob, decodeImage, thumbnail } from '../lib/image';
 import { baseName, formatBytes, type OutputFile } from '../lib/files';
 import { InputError, NamedError, UnreadableFile } from '../lib/input-error';
-import { DamagedGif, checkGif, explain, gifSize, UnreadableFile as GifUnreadable } from '../lib/gif-errors';
+import { DamagedGif, checkGif, explain, gifSize, readGifBuffer } from '../lib/gif-errors';
 import { isPhoneBrowser } from '../lib/phone-limit';
 import { gifWriter } from '../lib/encoders';
 import { MAX_PIXELS, MAX_PIXELS_PHONE, keptCount, layoutSheet, sheetJson, sliceSheet, trimTrailingEmpty, type Layout } from '../lib/sprite-sheet';
@@ -37,10 +37,7 @@ const decode = (file: File) =>
     throw e instanceof Error && e.name !== 'Error' ? e : new UnreadableFile(`${file.name} could not be read as a picture. Check that it is a PNG, JPG, WebP or GIF.`);
   });
 
-const readBytes = (file: File) =>
-  file.arrayBuffer().catch(() => {
-    throw new GifUnreadable();
-  });
+const readBytes = (file: File) => readGifBuffer(file);
 
 /** Draw `bitmap` into a cell of the sheet, scaled down to fit (never up) and centred. */
 function drawInCell(ctx: OffscreenCanvasRenderingContext2D, source: CanvasImageSource, sw: number, sh: number, x: number, y: number, w: number, h: number) {

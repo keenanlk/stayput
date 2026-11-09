@@ -157,7 +157,7 @@ export async function decryptPdf(bytes: Uint8Array, password = ''): Promise<Uint
   if (!out) {
     if (/invalid password/i.test(stderr)) throw new PasswordRequiredError(password !== '');
     const detail = lastLine(stderr);
-    throw new UnreadableFile(`This PDF could not be unlocked${detail ? ` (${detail})` : ''}.`);
+    throw new NamedError('PdfEncryptionUnsupported', `This PDF could not be unlocked${detail ? ` (${detail})` : ''}.`);
   }
   return out;
 }

@@ -2,7 +2,7 @@ import { createShell } from '../lib/shell';
 import type { OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
 import { InputError } from '../lib/input-error';
-import { UnreadableFile, checkGif, explain, gifSize, MEMORY_BUDGET, GifTooLarge } from '../lib/gif-errors';
+import { readGifBuffer, checkGif, explain, gifSize, MEMORY_BUDGET, GifTooLarge } from '../lib/gif-errors';
 
 /**
  * Merge GIFs. The frames of every GIF are joined in the order listed into one
@@ -25,9 +25,7 @@ createShell({
     let frames = 0;
     for (const [i, entry] of files.entries()) {
       progress.set(`Reading ${entry.file.name} (${i + 1} of ${files.length})`, (i / files.length) * 0.1);
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       checkGif(new Uint8Array(buffer), undefined, 1, 1);
       buffers.push(buffer);
     }

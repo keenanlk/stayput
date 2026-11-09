@@ -92,8 +92,8 @@ export async function inspectFile(file: File, tool: string, base: string, accept
 
   const fix = CONVERTERS[container];
   if (!fix || OWN_REFUSAL.has(tool) || OWN_REFUSAL.has(base) || !/(^|,)\s*video\//.test(accept)) return null;
-  // A .wma is the same container as a .wmv: only a file named for video, or typed as video, is a WMV.
-  const isWmv = /\.wmv$/i.test(file.name) || file.type === 'video/x-ms-wmv';
+  // A .wma is the same container as a .wmv: only a file not named or typed as audio is a WMV (so a WMV header under an .mp4 name is refused too).
+  const isWmv = !/\.wma$/i.test(file.name) && !file.type.startsWith('audio/');
   if (container === 'asf' && !isWmv) return null;
   // The video-to-MP4 page reads AVI and FLV itself; no page reads WMV.
   if (container !== 'asf' && (LEGACY_READERS.has(tool) || LEGACY_READERS.has(base))) return null;

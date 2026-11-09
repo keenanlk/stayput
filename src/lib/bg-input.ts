@@ -3,7 +3,7 @@
  * and drawing and saving the result at a size this device can manage. `decodeImage` and `canvasToBlob` in image.ts are
  * shared with every image tool and the scanner pages, so they are left as they are and wrapped here.
  */
-import { canvasToBlob, decodeImage, loadWebpEncoder, type Decoded, type EncodeType } from './image';
+import { canvasToBlob, decodeImageRaw, loadWebpEncoder, type Decoded, type EncodeType } from './image';
 import { IOS_CANVAS_PIXELS } from './canvas-cap';
 import { isIosBrowser } from './phone-limit';
 import { NamedError } from './input-error';
@@ -85,7 +85,7 @@ const REDUCED_PIXELS = 48_000_000;
  */
 export async function openPicture(file: File): Promise<Decoded & { reducedFrom?: { width: number; height: number } }> {
   try {
-    return await decodeImage(file);
+    return await decodeImageRaw(file);
   } catch (e) {
     if (e instanceof Error && e.name === 'OutOfMemoryError') {
       const size = await headerSize(file).catch(() => undefined);

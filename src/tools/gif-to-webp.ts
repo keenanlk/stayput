@@ -1,7 +1,7 @@
 import { bindRange, createShell, num, processEach, str } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
-import { DamagedGif, UnreadableFile, checkGif, explain } from '../lib/gif-errors';
+import { DamagedGif, readGifBuffer, checkGif, explain } from '../lib/gif-errors';
 
 /**
  * GIF to animated WebP. Each GIF is decoded in the page, every frame is encoded by the WebAssembly
@@ -29,9 +29,7 @@ createShell({
     return processEach(files, progress, 'Converting', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
       progress.set(`Reading ${entry.file.name}…`, share(0.02));
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       const bytes = new Uint8Array(buffer);
       // Refuse anything that is not a GIF before the encoder is fetched.
       checkGif(bytes, undefined, 1, 1);
