@@ -547,14 +547,12 @@ async function failedRunOf(page: Page, baseURL: string, slug: string, file: Para
   return { shown: (await page.locator('#error').innerText()).replace(/\s+/g, ' '), data: run.payload.data as Record<string, string>, raw: JSON.stringify(sent) };
 }
 
-// Text with a .pdf name is turned away when it is added (by its first bytes); a PDF header and then damage gets as far as the PDF reader, which names what is wrong.
-test('Watermark PDF on text with a .pdf name is refused at add as NotAPdfFile', async ({ page, baseURL }) => {
-  await captureAnalytics(page, baseURL!);
-  await page.goto(`${SITE}/tools/watermark-pdf`);
-  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
-  await page.locator('#file-input').setInputFiles({ name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('secret-notes plain text with a .pdf extension\n'.repeat(20)) });
-  await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NotAPdfFile');
-  await expect(page.locator('#run')).toBeDisabled();
+test('Watermark PDF on text with a .pdf name fails as NotAPdfFile, not a bare Error', async ({ page, baseURL }) => {
+  const out = await failedRunOf(page, baseURL!, 'watermark-pdf', { name: 'secret-notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('secret-notes plain text with a .pdf extension\n'.repeat(20)) }, async () => {
+    await page.locator('#wm-text').fill('DRAFT');
+  });
+  expect(out.data).toMatchObject({ tool: 'watermark-pdf', outcome: 'error', error_class: 'NotAPdfFile' });
+  expect(out.raw).not.toContain('secret-notes');
 });
 
 test('Watermark PDF on a PDF header and then damage fails as PdfNoPages, not a bare Error', async ({ page, baseURL }) => {

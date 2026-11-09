@@ -7,15 +7,16 @@
 import { NamedError } from './input-error';
 import { isNotReadable, notReadable, probeReadable, SNAPSHOT_LIMIT } from './read-failure';
 import { SNIFF_BYTES, kindOf, sniffBytes, type Container } from './sniff';
-import { copy, labelOf, wrongThing, type Family } from './unreadable';
+import { labelOf } from './unreadable';
 
 export interface IntakeProblem {
   /**
    * The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not;
-   * UnreadableFileGone for a file that was refused before and is added again; EmptyFile, NotAnImageFile, NotAPdfFile, NotAnArchiveFile, NotAGifFile,
-   * NotAVideoContainer or NotAnAudioFile for a file of no use to the tool, named for what it is.
+   * UnreadableFileGone for a file that was refused before and is added again; NotAVideoContainer or NotAnAudioFile for a file that is no video or
+   * sound. (Pictures, GIFs, PDFs and archives are not refused here: a batch tool skips its bad file and does the rest, so each of those names its cause
+   * when its file is read.)
    */
-  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone' | 'EmptyFile' | 'NotAnImageFile' | 'NotAPdfFile' | 'NotAnArchiveFile' | 'NotAGifFile' | 'NotAVideoContainer' | 'NotAnAudioFile';
+  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone' | 'NotAVideoContainer' | 'NotAnAudioFile';
   message: string;
   /** One phrase of the message that links to a page that fixes it. */
   link?: { text: string; href: string };
@@ -54,31 +55,6 @@ const MEDIA_EXT = /\.(mp4|m4v|mov|qt|webm|mkv|avi|wmv|flv|3gp|3g2|ts|mts|m2ts|mp
 export function isMediaFile(file: File): boolean {
   return file.type.startsWith('audio/') || file.type.startsWith('video/') || (!/^(image|text)\//.test(file.type) && MEDIA_EXT.test(file.name));
 }
-
-/**
- * Which one kind of file a tool takes, from its accept list: pictures, GIFs, PDFs or archives. A tool that takes more than one kind (a picture or a PDF,
- * a song and photos) has none: it is left to read what it is given, as before.
- */
-export function fileFamily(accept: string): Family | undefined {
-  const tokens = accept.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
-  if (tokens.length === 0) return undefined;
-  const of = (t: string): Family | undefined => {
-    if (t === 'image/gif' || t === '.gif') return 'gif';
-    if (t.startsWith('image/') || /^\.(jpe?g|png|webp|heic|heif|avif|jxl|bmp|tiff?|svg|psd|ico)$/.test(t)) return 'image';
-    if (t === 'application/pdf' || t === '.pdf') return 'pdf';
-    if (/^(application\/(zip|x-zip-compressed|x-7z-compressed|vnd\.rar|x-rar-compressed|x-tar|gzip)|\.(zip|7z|rar|tar|tgz|gz|cbz|cbr))$/.test(t)) return 'archive';
-    return undefined;
-  };
-  const families = tokens.map(of);
-  const first = families[0];
-  if (!first || families.some((f) => f !== first)) {
-    // A list of both GIF and other pictures is the picture family (its GIF members are pictures too).
-    return families.every((f) => f === 'gif' || f === 'image') && families.includes('image') ? 'image' : undefined;
-  }
-  return first;
-}
-
-const latin1 = (b: Uint8Array) => String.fromCharCode(...b.subarray(0, 2048));
 
 /** Whether the first bytes are plain text: no NUL bytes and almost all of them printable. */
 function looksLikeText(head: Uint8Array): boolean {
@@ -119,10 +95,7 @@ export async function inspectFile(file: File, tool: string, base: string, accept
 
   // An audio or video file is reached end to end now, once: its first byte, then its last (a last byte alone out of reach is let go if the
   // middle reads). A file the browser cannot reach is refused here, with the same words a failed run would give, and Run stays off for it.
-  const family = fileFamily(accept);
-  const media = takesMedia(accept) && isMediaFile(file);
-  // Pictures, GIFs, PDFs and archives are reached the same way (see fileFamily).
-  if (media || family) {
+  if (takesMedia(accept) && isMediaFile(file)) {
     try {
       await probeReadable(file);
     } catch (e) {
@@ -153,20 +126,6 @@ export async function inspectFile(file: File, tool: string, base: string, accept
 
 function wrongAtAdd(file: File, head: Uint8Array, container: Container, accept: string): IntakeProblem | null {
   // (An empty file never gets here: the shell refuses it when it is picked.)
-  const family = fileFamily(accept);
-  if (family) {
-    // A generic ISO-media brand ('mp4') could still be a picture container this browser opens, so only a clear mismatch is refused.
-    if (container === 'mp4') return null;
-    const wrong = wrongThing(family, head, file.size);
-    if (wrong) return { name: wrong.name as IntakeProblem['name'], message: wrong.message };
-    // Plain text is no picture and no PDF. (An SVG is text too, and a PDF may have junk before its header.)
-    const marked = family === 'image' ? /<svg|<\?xml|<!doctype/i.test(latin1(head)) : family === 'pdf' ? latin1(head).includes('%PDF-') : true;
-    if ((family === 'image' || family === 'pdf') && container === 'unknown' && looksLikeText(head) && !marked) {
-      const name = family === 'image' ? 'NotAnImageFile' : 'NotAPdfFile';
-      return { name, message: copy(name, labelOf('unknown')) };
-    }
-    return null;
-  }
   if (!takesMedia(accept) || !isMediaFile(file)) return null;
   const video = /(^|,)\s*video\//.test(accept);
   const kind = kindOf(container);

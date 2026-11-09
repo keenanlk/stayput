@@ -21,7 +21,7 @@ import { isIosBrowser, isPhoneBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 import { persistAfterRun } from './model-fetch';
 import { failsTheSameAgain } from './edit-recovery';
-import { fileFamily, inspectFile, isMediaFile, takesMedia, type IntakeProblem } from './intake';
+import { inspectFile, isMediaFile, takesMedia, type IntakeProblem } from './intake';
 import { copyInput, releaseInputCopies } from './input-copy';
 import { retryRun } from './read-failure';
 import { CAPTION_TOOLS, forgetWorkingSize, LOST_SIDE, lostRun, riskSize, workingSize } from './working-size';
@@ -240,8 +240,6 @@ export function createShell(opts: ShellOptions) {
   const downloadAll = $<HTMLButtonElement>('download-all');
 
   const media = takesMedia(input.accept);
-  // A tool that takes one kind of file (pictures, GIFs, PDFs or archives) gets the same reach check at add and the same read-again at Run as the audio and video tools.
-  const family = fileFamily(input.accept);
   let files: ShellFile[] = [];
   let nextId = 1;
   let outputs: OutputFile[] = [];
@@ -281,7 +279,7 @@ export function createShell(opts: ShellOptions) {
     render();
     const added = files.filter((f) => !intake.has(f.id));
     // Run stays off until the check has finished, so a file is never run before it is known to be reachable.
-    const reaching = (media && added.some((f) => isMediaFile(f.file))) || (!!family && added.length > 0);
+    const reaching = media && added.some((f) => isMediaFile(f.file));
     if (reaching) checks++;
     checking = Promise.all(added.map(async (f) => intake.set(f.id, (await inspectFile(f.file, root.dataset.slug ?? '', root.dataset.base ?? '', input.accept).catch(() => null)) ?? undefined))).then(() => {
       if (reaching) checks--;
@@ -688,8 +686,7 @@ export function createShell(opts: ShellOptions) {
       // when a read fails part-way (after a check that the files are still reachable). The tools' own retries still apply inside.
       await releaseInputCopies();
       const source = media ? await Promise.all(files.map(async (f) => (isMediaFile(f.file) ? { ...f, file: await copyInput(f.file) } : f))) : files;
-      const rereadable = media ? source.filter((f) => isMediaFile(f.file)).map((f) => f.file) : family ? source.map((f) => f.file) : [];
-      const work = (p: Progress) => (rereadable.length > 0 && opts.rereads !== false ? retryRun(rereadable, () => opts.process(source, p), (m) => p.set(m, 0)) : opts.process(source, p));
+      const work = (p: Progress) => (media && opts.rereads !== false ? retryRun(source.filter((f) => isMediaFile(f.file)).map((f) => f.file), () => opts.process(source, p), (m) => p.set(m, 0)) : opts.process(source, p));
       const result = await resumeIfHidden(
         () => (watching ? watchProgress((tick) => work(watchedProgress(tick)), () => undefined) : work(progressApi)),
         mine,

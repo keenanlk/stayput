@@ -14,12 +14,12 @@ export type Family = 'image' | 'gif' | 'pdf' | 'archive';
 /** The user-facing sentences. `{type}` is replaced with what the file really is ("a PDF", "a video"). */
 export const COPY = {
   EmptyFile: 'This file is empty (0 bytes). Pick it again, or check that it finished saving or downloading.',
-  NotAnImageFile: 'This file is {type}, not a picture. Pick a PNG, JPG, WebP, GIF or HEIC.',
-  NotAPdfFile: 'This file is {type}, not a PDF. Pick a PDF.',
-  NotAnArchiveFile: 'This file is {type}, not an archive this tool opens (ZIP, 7z, RAR, TAR).',
-  NotAGifFile: 'This file is {type}, not a GIF. Pick a GIF.',
+  NotAnImageFile: 'This file is not a picture. It looks like {type}. Pick a PNG, JPG, WebP, GIF or HEIC.',
+  NotAPdfFile: 'This file is not a PDF. It looks like {type}. Pick a PDF.',
+  NotAnArchiveFile: 'This file is not an archive this tool opens (ZIP, 7z, RAR, TAR). It looks like {type}.',
+  NotAGifFile: 'This file is not a GIF. It looks like {type}. Pick a GIF.',
   FileTruncated: 'This file looks cut short, so it cannot be read in full. Download or copy it again, then pick the new copy.',
-  ImageDecodeFailed: 'This browser could not open this picture, although it is {type}. Save it again as a PNG or JPG, or try another browser.',
+  ImageDecodeFailed: 'This browser could not open this picture, although it looks like {type}. Save it again as a PNG or JPG, or try another browser.',
   PdfNoPages: 'This PDF has no pages this tool can find, so it may be damaged. Open it in a PDF viewer, save a copy, and pick that.',
 } as const;
 
