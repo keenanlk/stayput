@@ -8,7 +8,7 @@ import type * as PdfJs from 'pdfjs-dist';
 import type { TextContent } from 'pdfjs-dist/types/src/display/api';
 import { canvasToBlob } from './image';
 import { unlockPdf } from './unlock';
-import { COPY, copy, explainBytes, labelOf } from './unreadable';
+import { COPY, copy, explainBytes, labelOf } from './read-failure';
 import { SNIFF_BYTES, sniffBytes } from './sniff';
 
 let pdfLibPromise: Promise<typeof PdfLib> | undefined;

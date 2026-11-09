@@ -2,8 +2,7 @@ import { createShell, processEach, str } from '../lib/shell';
 import { vendorDir } from '../lib/vendor';
 import type { OutputFile } from '../lib/files';
 import { readHead } from '../lib/files';
-import { isFileGone, isNotReadable, rereadOnce } from '../lib/read-failure';
-import { COPY, explainUnreadable } from '../lib/unreadable';
+import { COPY, explainUnreadable, isFileGone, isNotReadable, rereadOnce } from '../lib/read-failure';
 import { extractWithSevenZip, sniffArchive } from '../lib/sevenzip';
 
 /**
@@ -91,7 +90,7 @@ createShell({
         try {
           return await viaLibarchive(entry.file, password, status);
         } catch (e) {
-          if (!kind || e instanceof NamedError) throw e;
+          if (!kind || (e instanceof NamedError && e.name !== 'ArchiveHasNoFiles')) throw e;
           // libarchive could not list a 7z or RAR: file names hidden behind a password, or a variant 7-Zip reads.
           try {
             return await viaSevenZip('');

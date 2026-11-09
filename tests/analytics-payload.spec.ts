@@ -392,10 +392,10 @@ test('a file with no readable sound in an audio tool fails with AudioDecodeError
   expect(out.data).toMatchObject({ tool: 'volume-booster', outcome: 'error', error_class: 'AudioDecodeError' });
 });
 
-test('a file that is not a video fails with NotAVideoContainer in a video edit', async ({ page, baseURL }) => {
+test('a file that is not a video fails with UnreadableContainer in a video edit', async ({ page, baseURL }) => {
   const out = await failedRun(page, baseURL!, '/blur-video-background', { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
   expect(out.shown).toContain('not a video this page can read');
-  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'NotAVideoContainer' });
+  expect(out.data).toMatchObject({ outcome: 'error', error_class: 'UnreadableContainer' });
 });
 
 test('search and next-step events send only what /privacy lists, and never the typed words', async ({ page, baseURL }) => {

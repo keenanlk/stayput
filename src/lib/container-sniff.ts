@@ -6,10 +6,7 @@
  * Kept free of browser and codec imports (mediabunny is loaded only by the one retry) so a spec can drive it directly.
  */
 import { NamedError } from './input-error';
-import { isFileGone, isNotReadable, notReadable } from './read-failure';
-
-/** How much of the start of the file is looked at. */
-export const HEAD_BYTES = 65536;
+import { isNotReadable, notReadable, readHead } from './read-failure';
 
 export type Signature = 'mp4' | 'matroska' | 'ts' | 'other-video';
 
@@ -45,23 +42,6 @@ export function containerParseFailed(cause?: unknown): NamedError {
 }
 
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/** The first bytes, read up to twice. Throws the named cause when they cannot be had. */
-export async function readHead(file: Blob, wait: number): Promise<Uint8Array> {
-  const want = Math.min(file.size, HEAD_BYTES);
-  let gone = false;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    if (attempt) await pause(wait);
-    try {
-      const bytes = new Uint8Array(await file.slice(0, HEAD_BYTES).arrayBuffer());
-      if (want > 0 && bytes.length >= want) return bytes;
-    } catch (e) {
-      if (isNotReadable(e) || isFileGone(e)) gone = true;
-    }
-  }
-  if (gone) return Promise.reject(new NamedError('UnreadableFileGone', 'This file could not be read. It may have been moved, deleted or still be syncing from a cloud app. Pick it again, or save it to the phone first.'));
-  return Promise.reject(new NamedError('UnreadableHeaderShort', 'The start of this file could not be read in full, so this page cannot tell what it is. Pick it again, or save it to the phone first and pick the saved copy.'));
-}
 
 /** Whether a fresh reader over the same file finds a container this time. */
 async function detectsNow(file: Blob): Promise<boolean> {

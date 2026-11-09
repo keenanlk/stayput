@@ -5,8 +5,7 @@
  */
 
 import { NamedError } from './input-error';
-import { isFileGone, isNotReadable, readMemoryError, rereadOnce } from './read-failure';
-import { COPY } from './unreadable';
+import { COPY, isFileGone, isNotReadable, readMemoryError, rereadOnce } from './read-failure';
 
 class GifError extends Error {
   constructor(name: string, message: string) {

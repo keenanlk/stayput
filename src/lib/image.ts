@@ -6,8 +6,7 @@ import { decodeTiffPages, isTiffFile } from './tiff';
 import { svgFallbackSize } from './svg-size';
 import { vendorDir, vendorEntry } from './vendor';
 import { NamedError } from './input-error';
-import { isNotReadable, rereadOnce } from './read-failure';
-import { COPY, explainUnreadable } from './unreadable';
+import { COPY, explainUnreadable, isNotReadable, rereadOnce } from './read-failure';
 
 export type EncodeType = 'image/jpeg' | 'image/png' | 'image/webp';
 

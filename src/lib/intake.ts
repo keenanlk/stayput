@@ -6,17 +6,11 @@
  */
 import { NamedError } from './input-error';
 import { isNotReadable, notReadable, probeReadable, SNAPSHOT_LIMIT } from './read-failure';
-import { SNIFF_BYTES, kindOf, sniffBytes, type Container } from './sniff';
-import { labelOf } from './unreadable';
+import { SNIFF_BYTES, sniffBytes, type Container } from './sniff';
 
 export interface IntakeProblem {
-  /**
-   * The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not;
-   * UnreadableFileGone for a file that was refused before and is added again; NotAVideoContainer or NotAnAudioFile for a file that is no video or
-   * sound. (Pictures, GIFs, PDFs and archives are not refused here: a batch tool skips its bad file and does the rest, so each of those names its cause
-   * when its file is read.)
-   */
-  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone' | 'NotAVideoContainer' | 'NotAnAudioFile';
+  /** The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not; UnreadableFileGone for a file that was refused before and is added again. */
+  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone';
   message: string;
   /** One phrase of the message that links to a page that fixes it. */
   link?: { text: string; href: string };
@@ -35,9 +29,6 @@ const LEGACY_READERS = new Set(['video-to-mp4']);
 /** Tools that already refuse these containers themselves, with a message of their own, once Run is pressed. */
 const OWN_REFUSAL = new Set(['video-background-remover']);
 
-/** Tools that read the start of the file themselves when it is added and say what is wrong with it in their own words (the splitters). */
-const OWN_EARLY_CHECK = new Set(['video-splitter', 'split-video', 'audio-splitter']);
-
 /** File types where a long run of zero bytes at the start is normal (disk images and raw dumps). */
 const ZERO_HEAD_OK = /\.(iso|img|dmg|bin|dat|raw|tga|vhd|vhdx|vmdk)$/i;
 
@@ -54,17 +45,6 @@ const MEDIA_EXT = /\.(mp4|m4v|mov|qt|webm|mkv|avi|wmv|flv|3gp|3g2|ts|mts|m2ts|mp
 /** Whether a picked file is itself audio or video (a tool that takes pictures and a song, like the slideshow maker, is not about to read its photos end to end). */
 export function isMediaFile(file: File): boolean {
   return file.type.startsWith('audio/') || file.type.startsWith('video/') || (!/^(image|text)\//.test(file.type) && MEDIA_EXT.test(file.name));
-}
-
-/** Whether the first bytes are plain text: no NUL bytes and almost all of them printable. */
-function looksLikeText(head: Uint8Array): boolean {
-  if (head.length === 0) return false;
-  let odd = 0;
-  for (const b of head) {
-    if (b === 0) return false;
-    if (b < 9 || (b > 13 && b < 32)) odd++;
-  }
-  return odd / head.length < 0.02;
 }
 
 function readFirst(file: Blob): Promise<Uint8Array> {
@@ -110,30 +90,14 @@ export async function inspectFile(file: File, tool: string, base: string, accept
     return { name: 'FileNotDownloaded', message: `${file.name} looks empty on this device, which usually means it is still in the cloud and only a placeholder was picked. ${SAVE_STEPS}` };
   }
 
-  // A file that is empty, or plainly another kind of file than the tool takes, is refused now and named for what it is (by its first bytes, not its name).
-  const wrong = OWN_REFUSAL.has(tool) || OWN_REFUSAL.has(base) || OWN_EARLY_CHECK.has(tool) || OWN_EARLY_CHECK.has(base) ? null : wrongAtAdd(file, head, container, accept);
-  if (wrong) return wrong;
-
   const fix = CONVERTERS[container];
   if (!fix || OWN_REFUSAL.has(tool) || OWN_REFUSAL.has(base) || !/(^|,)\s*video\//.test(accept)) return null;
-  // A .wma is the same container as a .wmv: only a file named for video, or typed as video, is a WMV.
+  // A .wma is the same container as a .wmv: only a file not named or typed as audio is a WMV (so a WMV header under an .mp4 name is refused too).
   const isWmv = !/\.wma$/i.test(file.name) && !file.type.startsWith('audio/');
   if (container === 'asf' && !isWmv) return null;
   // The video-to-MP4 page reads AVI and FLV itself; no page reads WMV.
   if (container !== 'asf' && (LEGACY_READERS.has(tool) || LEGACY_READERS.has(base))) return null;
   return unsupported(file, fix);
-}
-
-function wrongAtAdd(file: File, head: Uint8Array, container: Container, accept: string): IntakeProblem | null {
-  // (An empty file never gets here: the shell refuses it when it is picked.)
-  if (!takesMedia(accept) || !isMediaFile(file)) return null;
-  const video = /(^|,)\s*video\//.test(accept);
-  const kind = kindOf(container);
-  // Pictures, PDFs, archives and plain text are no video and no sound. (A tool that takes pictures and a song is not about to refuse its photos.)
-  const notMedia = kind === 'image' || container === 'pdf' || container === 'zip' || (container === 'unknown' && looksLikeText(head));
-  if (!notMedia) return null;
-  if (video) return { name: 'NotAVideoContainer', message: 'This file is not a video this page can read (MP4, MOV, WebM or MKV).' };
-  return { name: 'NotAnAudioFile', message: "This file doesn't look like a recording or a video. Choose an audio or video file (MP3, M4A, WAV, MP4, MOV, WebM and so on)." };
 }
 
 function unsupported(file: File, fix: { label: string; text?: string; href?: string }): IntakeProblem {
