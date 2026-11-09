@@ -895,7 +895,9 @@ export function createShell(opts: ShellOptions) {
   mountNextSteps(root);
   warmDecoders(input.accept);
   // Landing pages load the tool module on demand; this marks the shell as live.
-  reportLostTab();
+  // Usually settled at once; a marker with an owner waits a moment for the lock check, and the notes are drawn again after it.
+  const lostChecked = reportLostTab();
+  if (lostChecked) void lostChecked.then(() => (showSizeNote(), showLightNote()));
   showSizeNote();
   root.dataset.ready = 'true';
   void adoptHandoff();
