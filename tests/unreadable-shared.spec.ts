@@ -87,6 +87,8 @@ function zip(): Buffer {
   return Buffer.concat([local, central, end]);
 }
 const PDF_NO_PAGES = Buffer.from('%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF\n');
+/** A PDF that says it is encrypted, with an encryption dictionary that is nonsense: the unlock engine cannot remove it. */
+const PDF_BAD_ENCRYPTION = Buffer.from('%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>\nendobj\n4 0 obj\n<< /Filter /Standard /V 9 /R 9 /O (x) /U (x) /P -1 >>\nendobj\ntrailer\n<< /Root 1 0 R /Size 5 /Encrypt 4 0 R /ID [<00><00>] >>\n%%EOF\n');
 const cut = (b: Buffer, at: number) => b.subarray(0, at);
 const corruptMiddle = (b: Buffer) => {
   const out = Buffer.from(b);
@@ -137,6 +139,7 @@ const ROWS: Row[] = [
   { id: 'gif-truncated', path: GIFT, file: f('cut.gif', 'image/gif', cut(gif, Math.floor(gif.length * 0.5))), expect: { at: 'ran', cls: 'ok' } },
   { id: 'png-as-gif', path: GIFT, file: f('photo.gif', 'image/gif', png), expect: { at: 'run', cls: 'NotAGif' } },
   { id: 'pdf-no-page-tree', path: PDFT, file: f('nopages.pdf', 'application/pdf', PDF_NO_PAGES), expect: { at: 'run', cls: 'PdfNoPages' } },
+  { id: 'pdf-bad-encryption', path: PDFT, file: f('locked.pdf', 'application/pdf', PDF_BAD_ENCRYPTION), expect: { at: 'run', cls: 'PdfEncryptionUnsupported' } },
   { id: 'pdf-text-named-pdf', path: PDFT, file: f('notes.pdf', 'application/pdf', text), expect: { at: 'run', cls: 'NotAPdfFile' } },
   { id: 'pdf-truncated', path: PDFT, file: f('cut.pdf', 'application/pdf', cut(fixture('owner-locked.pdf'), 400)), expect: { at: 'run', cls: 'FileTruncated' } },
   { id: 'zip-truncated', path: ARCHIVE, file: f('cut.zip', 'application/zip', cut(zip(), 120)), expect: { at: 'run', cls: 'FileTruncated' } },
