@@ -7,6 +7,7 @@
  * the model and runtime is ever fetched.
  */
 import { makeCanvas } from './image';
+import { lightNow } from './phone-limit';
 import { blur as boxBlur } from './blur';
 import { refineMask } from './mask';
 import { NamedError } from './input-error';
@@ -48,7 +49,8 @@ function toTensor(bitmap: ImageBitmap): Float32Array {
  */
 export async function findSubject(bitmap: ImageBitmap, onLoading?: (fraction: number) => void, keep = 0): Promise<Uint8ClampedArray> {
   try {
-    return await findSubjectOnce(bitmap, onLoading, keep, false);
+    // A lighter start (see light-run.ts) begins with the lean session the retry below falls back to.
+    return await findSubjectOnce(bitmap, onLoading, keep, !!lightNow());
   } catch (e) {
     // A model that failed to start or run (a phone short of memory, say) leaves its session broken: a fresh worker gets one more try,
     // with the engine set to use less memory (no pre-planned buffers, lighter graph optimisation), which is slower and smaller.

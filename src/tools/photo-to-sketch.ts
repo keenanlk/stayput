@@ -1,5 +1,6 @@
 import { createShell, processEach, bindRange, num, radio, str } from '../lib/shell';
 import { canvasToBlob, decodeImage, drawScaled, extForType, thumbnail, type EncodeType } from '../lib/image';
+import { lightNow } from '../lib/light-run';
 import { suffixName, type OutputFile } from '../lib/files';
 import { sketch, type SketchStyle } from '../lib/sketch';
 import { effectPreview } from '../lib/effect-preview';
@@ -13,7 +14,9 @@ const LABEL: Record<SketchStyle, string> = { pencil: 'pencil sketch', charcoal: 
 
 /** Draw the picture on white at up to `longest` pixels and turn it into a sketch. Stroke width scales with the picture, so the preview matches the full-size result. */
 function render(bitmap: ImageBitmap, longest?: number) {
-  const k = longest ? Math.min(1, longest / Math.max(bitmap.width, bitmap.height)) : 1;
+  // A lighter start (see light-run.ts) draws at 2048 pixels on the longest side at most.
+  const side = lightNow() ? Math.min(longest ?? Infinity, 2048) : longest;
+  const k = side ? Math.min(1, side / Math.max(bitmap.width, bitmap.height)) : 1;
   const w = Math.max(1, Math.round(bitmap.width * k));
   const h = Math.max(1, Math.round(bitmap.height * k));
   const canvas = drawScaled(bitmap, w, h, '#ffffff');

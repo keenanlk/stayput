@@ -5,6 +5,7 @@
  */
 import { canvasToBlob, decodeImageRaw, loadWebpEncoder, type Decoded, type EncodeType } from './image';
 import { IOS_CANVAS_PIXELS } from './canvas-cap';
+import { LIGHT_MODEL_PIXELS, lightNow } from './phone-limit';
 import { isIosBrowser } from './phone-limit';
 import { NamedError } from './input-error';
 import { readHead } from './files';
@@ -111,7 +112,9 @@ export async function openPicture(file: File): Promise<Decoded & { reducedFrom?:
 
 /** The largest scale at which a picture of this size is drawn on this device: Safari on iPhone caps one canvas at 16.7 million pixels. */
 export function startScale(width: number, height: number, ios = isIosBrowser()): number {
-  return ios && width * height > IOS_CANVAS_PIXELS ? Math.sqrt(IOS_CANVAS_PIXELS / (width * height)) * 0.99 : 1;
+  const full = ios && width * height > IOS_CANVAS_PIXELS ? Math.sqrt(IOS_CANVAS_PIXELS / (width * height)) * 0.99 : 1;
+  // A lighter start (after a lost run, or a big photo on an at-risk device) draws at 8 megapixels at most.
+  return lightNow() && width * height > LIGHT_MODEL_PIXELS ? Math.min(full, Math.sqrt(LIGHT_MODEL_PIXELS / (width * height))) : full;
 }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));

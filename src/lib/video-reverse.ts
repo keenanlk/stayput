@@ -163,7 +163,7 @@ async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, s
     // A retry after the encoder gave up asks for a smaller picture than the first try's: each frame is drawn at that size.
     // A phone given a 4K source starts at 1080p; the test encode below can lower the size further before the picture is read.
     const longest = Math.max(width, height);
-    capAtRisk(attempt, longest);
+    capAtRisk(attempt, longest, false, file.size);
     const evenSide = (n: number) => Math.max(2, 2 * Math.round(n / 2));
     // Always even: the encoder was checked at an even size, and an odd picture (853x481) cannot be encoded as it is.
     const sizeAt = (k: number) => ({ w: k < 1 ? evenSide(width * k) : evenSide(width), h: k < 1 ? evenSide(height * k) : evenSide(height) });

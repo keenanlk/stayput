@@ -5,6 +5,8 @@ import { inpaint } from '../lib/inpaint';
 import { InputError, NamedError } from '../lib/input-error';
 import { isBare, nameBare } from '../lib/bare-error';
 import { canvasWorks, fitCanvas } from '../lib/canvas-cap';
+import { beginLight, endLight } from '../lib/light-run';
+import { lightEditNote } from '../lib/light-copy';
 
 /* ------------------------------------------------------------------ */
 /* Elements                                                            */
@@ -123,6 +125,8 @@ function sync() {
 
 async function showImage(file: File) {
   const decoded = await decodeImage(file);
+  // A lighter start (after a lost run; a big photo on an at-risk device already has the iOS canvas limit) edits at 2048 × 2048 pixels at most (see light-run.ts).
+  const why = beginLight('model', 0);
   try {
     // A picture bigger than this browser can draw is edited at the largest size that works.
     const fit = canvasWorks(decoded.width, decoded.height) ? { width: decoded.width, height: decoded.height } : fitCanvas(decoded.width, decoded.height);
@@ -136,8 +140,9 @@ async function showImage(file: File) {
     work = next;
     srcW = fit.width;
     srcH = fit.height;
-    sizeNote = fit.width === decoded.width && fit.height === decoded.height ? '' : `Edited at ${fit.width} × ${fit.height}, the largest picture this browser can draw.`;
+    sizeNote = fit.width === decoded.width && fit.height === decoded.height ? '' : why ? lightEditNote(fit.width, fit.height, why) : `Edited at ${fit.width} × ${fit.height}, the largest picture this browser can draw.`;
   } finally {
+    endLight();
     decoded.bitmap.close();
   }
   previewScale = Math.min(1, PREVIEW_MAX / srcW, PREVIEW_MAX / srcH);

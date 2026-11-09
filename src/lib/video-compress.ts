@@ -167,7 +167,7 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
     }
 
     // A retry after the encoder gave up asks for a smaller picture than the first try's; a phone given a 4K source starts at 1080p.
-    capAtRisk(attempt, Math.max(srcW, srcH));
+    capAtRisk(attempt, Math.max(srcW, srcH), false, file.size);
     const wanted = capScale(attempt, Math.max(width, height));
     // The test encode at the real size can lower it further before the file is decoded.
     const plan = await planVideoCodec({ width: wanted < 1 ? even(width * wanted) : width, height: wanted < 1 ? even(height * wanted) : height, bitrate: videoBitrate }, codecsFor(attempt));

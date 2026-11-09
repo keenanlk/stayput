@@ -2,7 +2,8 @@ import type { Attempt, RecoveryHooks } from './edit-recovery';
 import { isPhoneBrowser } from './phone-limit';
 import { sameSizeRung, vp9Offered } from './encoder-probe';
 import { forgetPageHidden, looksReclaimed } from './wake-lock';
-import { fullSizeChosen, LOST_SIDE, lostRun, noteRiskSize, rememberWorkingSize, workingSize } from './working-size';
+import { fullSizeChosen, LOST_SIDE, lostFamily, lostRun, noteRiskSize, rememberWorkingSize, workingSize } from './working-size';
+import { atRiskDevice, LIGHT_BUDGET } from './light-run';
 
 /**
  * The page-side half of edit-recovery.ts: whether the page was hidden since the job started, waiting for it to come
@@ -57,14 +58,21 @@ const lowMemory = (): boolean => {
  * or less), and the file's note says so. With `afterLostRun` (the caption redraw), a tab that was closed by the browser mid-run earlier
  * starts any source over 720p at 720p. "Try full size" turns all of it off.
  */
-export function capAtRisk(attempt: Attempt, sourceLongest: number, afterLostRun = false): void {
+export function capAtRisk(attempt: Attempt, sourceLongest: number, afterLostRun = false, inputBytes = 0, lostOnly = false): void {
   if (attempt.maxSide || !isPhoneBrowser() || fullSizeChosen()) return;
-  if (afterLostRun && lostRun() && sourceLongest > LOST_SIDE) {
+  // A run of any video tool the browser closed (the caption tools by their own flag, the rest by the shared record), or a very large
+  // file on an at-risk device: start any source over 720p at 720p, in realtime, with no read-back canvases.
+  // The caption redraw keeps its own flag (a lost run of another tool does not change it); every other video tool reads the shared record.
+  const lost = afterLostRun ? lostRun() : lostFamily('video');
+  const big = inputBytes > LIGHT_BUDGET.video && atRiskDevice();
+  if ((lost || big) && sourceLongest > LOST_SIDE) {
     attempt.maxSide = LOST_SIDE;
-    attempt.retry = 'lost';
+    attempt.retry = lost ? 'lost' : 'atrisk';
+    attempt.latencyMode ??= 'realtime';
+    if (big && !lost) noteRiskSize(1280);
     return;
   }
-  if (sourceLongest <= AT_RISK_SOURCE) return;
+  if (lostOnly || sourceLongest <= AT_RISK_SOURCE) return;
   const side = lowMemory() ? 1280 : 1920;
   attempt.maxSide = side;
   attempt.retry = 'atrisk';

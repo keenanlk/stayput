@@ -5,7 +5,8 @@
  * Stored: the tool's slug, the phase, the time and the input's total size (sent only as the existing size bucket). Nothing else about the file is stored or sent, and the marker never leaves the device.
  */
 import { trackToolRun } from './analytics';
-import { CAPTION_TOOLS, CUT_TOOLS, noteLostCut, noteLostRun } from './working-size';
+import { CAPTION_TOOLS, CUT_TOOLS, noteLostCut, noteLostFamily, noteLostRun } from './working-size';
+import { familyOf } from './tool-family';
 import { rememberTinyModel } from './speech-path';
 
 /**
@@ -23,6 +24,8 @@ interface Marker {
   phase: Phase;
   t: number;
   hidden: boolean;
+  /** Which page load wrote this marker (random, per load): a duplicated tab copies sessionStorage, and the original page may still be running. */
+  owner?: string;
   /** Size of the input, so the loss is recorded under the same `input` size bucket as the run's other outcomes. Stays on this device. */
   bytes?: number;
 }
@@ -38,7 +41,7 @@ const store = (): Storage | undefined => {
 function read(): Marker | undefined {
   try {
     const m = JSON.parse(store()?.getItem(KEY) ?? 'null') as Marker | null;
-    return m && typeof m.tool === 'string' && /^[a-z0-9-]{1,60}$/.test(m.tool) && (m.phase === 'run' || m.phase === 'preview') && typeof m.t === 'number' ? m : undefined;
+    return m && (m.owner === undefined || (typeof m.owner === 'string' && /^[a-z0-9]{8,32}$/.test(m.owner))) && typeof m.tool === 'string' && /^[a-z0-9-]{1,60}$/.test(m.tool) && (m.phase === 'run' || m.phase === 'preview') && typeof m.t === 'number' ? m : undefined;
   } catch {
     return undefined;
   }
@@ -92,6 +95,41 @@ function send(tool: string, errorClass: string, extra: { leftAfter?: string; lef
   trackToolRun({ tool, outcome: 'error', files: 1, inputBytes, ms: 0, errorClass, ...extra });
 }
 
+/** This page load's id, and the lock it holds while a marker it wrote is in place (see ownerIsAlive). */
+const PAGE_ID = Math.random().toString(36).slice(2, 12).padEnd(10, '0');
+const LOCK_PREFIX = 'stayput-inflight-';
+let releaseLock: (() => void) | undefined;
+
+/** Holds a Web Lock named for this page while its marker stands. The browser drops the lock when the page dies, which is how a later load can tell a killed page from one that is still running. */
+function holdLock() {
+  if (releaseLock || typeof navigator === 'undefined' || !navigator.locks) return;
+  try {
+    void navigator.locks
+      .request(LOCK_PREFIX + PAGE_ID, () => new Promise<void>((resolve) => (releaseLock = resolve)))
+      .catch(() => undefined);
+  } catch {
+    // No lock: a duplicated tab may be counted as a lost run, which is how it was before.
+  }
+}
+function dropLock() {
+  releaseLock?.();
+  releaseLock = undefined;
+}
+
+/**
+ * Whether the page that wrote this marker is still running. "Duplicate tab" (and a link opened with its opener) copies this tab's
+ * sessionStorage, marker included, into a tab whose original is alive and well: that is no lost run. A killed page's lock is gone.
+ */
+async function ownerIsAlive(owner: string | undefined): Promise<boolean> {
+  if (!owner || owner === PAGE_ID || typeof navigator === 'undefined' || !navigator.locks?.query) return false;
+  try {
+    const held = await navigator.locks.query();
+    return !!held.held?.some((l) => l.name === LOCK_PREFIX + owner);
+  } catch {
+    return false;
+  }
+}
+
 let current: { tool: string; phase: Phase } | undefined;
 let wired = false;
 /** True once the page has started to be left (`beforeunload`, then `pagehide`), until it is shown again. */
@@ -135,6 +173,7 @@ function wire() {
     const m = read();
     const d = detail;
     remove();
+    dropLock();
     if (!m) return;
     if (phase === 'run' && d) send(tool, 'LeftDuringRun', { leftAfter: leftAfterBucket(Date.now() - m.t), leftAt: leftAtBucket(d.fraction), ...(d.mode ? { mode: d.mode } : {}) }, m.bytes);
     else send(tool, phase === 'run' ? 'LeftDuringRun' : 'LeftDuringPreview', {}, m.bytes);
@@ -153,7 +192,11 @@ export function markInflight(tool: string, phase: Phase, bytes?: number): () => 
   const mine = { tool, phase };
   current = mine;
   detail = undefined;
-  const put = () => current === mine && write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden, ...(bytes && bytes > 0 ? { bytes } : {}) });
+  const put = () => {
+    if (current !== mine) return;
+    write({ tool, phase, t: Date.now(), hidden: typeof document !== 'undefined' && document.hidden, owner: PAGE_ID, ...(bytes && bytes > 0 ? { bytes } : {}) });
+    holdLock();
+  };
   const timer = phase === 'preview' ? setTimeout(put, PREVIEW_MARK_DELAY_MS) : undefined;
   if (!timer) put();
   const finish = () => {
@@ -161,6 +204,7 @@ export function markInflight(tool: string, phase: Phase, bytes?: number): () => 
     current = undefined;
     detail = undefined;
     remove();
+    dropLock();
   };
   return () => {
     clearTimeout(timer);
@@ -174,11 +218,21 @@ export function markInflight(tool: string, phase: Phase, bytes?: number): () => 
 export const SPEECH_TOOLS = ['transcribe', 'video-to-subtitles', 'auto-caption-video', 'add-subtitles-to-video'];
 
 /** At page load: a marker left by an earlier load of this tab means that tab died mid-work. Records it once and clears it. */
-export function reportLostTab(): void {
+export function reportLostTab(): Promise<void> | void {
   const m = read();
   if (!m) return;
   remove();
   if (Date.now() - m.t > MAX_AGE_MS || m.t > Date.now() + 60_000) return;
+  // A marker copied into a duplicated tab belongs to a page that is still running; only a marker whose page is gone is a lost run.
+  if (m.owner && typeof navigator !== 'undefined' && !!navigator.locks?.query) {
+    return ownerIsAlive(m.owner).then((alive) => {
+      if (!alive) record(m);
+    });
+  }
+  record(m);
+}
+
+function record(m: Marker): void {
   const cls = m.hidden ? 'TabLostWhileHidden' : m.phase === 'run' ? 'TabLostDuringRun' : 'TabLostDuringPreview';
   // A caption run the browser closed: the redraw starts smaller in this tab (see capAtRisk). Kept as a flag in this tab; nothing more is sent.
   if (cls === 'TabLostDuringRun' && CAPTION_TOOLS.includes(m.tool)) noteLostRun();
@@ -186,5 +240,8 @@ export function reportLostTab(): void {
   if (m.phase === 'run' && CUT_TOOLS.includes(m.tool)) noteLostCut();
   // A speech run the browser closed (on a phone, most likely out of memory): this tab's next speech run starts with the smaller model. A flag in this tab only.
   if (m.phase === 'run' && SPEECH_TOOLS.includes(m.tool)) rememberTinyModel();
+  // The shared record: every heavy tool of this family starts lighter on its next run in this tab (see light-run.ts). A flag only; a preview is not a lost run.
+  const family = familyOf(m.tool);
+  if (m.phase === 'run' && family) noteLostFamily(family);
   send(m.tool, cls, {}, typeof m.bytes === 'number' ? m.bytes : 0);
 }

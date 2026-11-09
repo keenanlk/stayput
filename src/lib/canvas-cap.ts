@@ -3,6 +3,7 @@
  * and still loses tabs to big ones, so a picture over that is drawn smaller there. Everywhere else the size is tried:
  * a canvas the browser cannot allocate has no 2d context, or reads back blank.
  */
+import { LIGHT_CANVAS_PIXELS, lightNow } from './phone-limit';
 import { isIosBrowser } from './phone-limit';
 
 /** Pixels in the largest canvas Safari on iOS reliably draws (4096 × 4096). */
@@ -11,6 +12,7 @@ export const IOS_CANVAS_PIXELS = 4096 * 4096;
 /** Whether a canvas of this size can be drawn into and read back. */
 export function canvasWorks(width: number, height: number): boolean {
   if (isIosBrowser() && width * height > IOS_CANVAS_PIXELS) return false;
+  if (lightNow() && width * height > LIGHT_CANVAS_PIXELS) return false;
   const c = document.createElement('canvas');
   c.width = width;
   c.height = height;
@@ -30,7 +32,8 @@ export function canvasWorks(width: number, height: number): boolean {
 export function fitCanvas(width: number, height: number): { width: number; height: number } | null {
   let w = width;
   let h = height;
-  const cap = isIosBrowser() ? Math.sqrt(IOS_CANVAS_PIXELS / (width * height)) : 1;
+  const limit = lightNow() ? LIGHT_CANVAS_PIXELS : isIosBrowser() ? IOS_CANVAS_PIXELS : Infinity;
+  const cap = Math.sqrt(limit / (width * height));
   let scale = Math.min(1, cap);
   for (let i = 0; i < 12; i++) {
     w = Math.max(1, Math.floor(width * scale));

@@ -24,7 +24,10 @@ import { failsTheSameAgain } from './edit-recovery';
 import { inspectFile, isMediaFile, takesMedia, type IntakeProblem } from './intake';
 import { copyInput, releaseInputCopies } from './input-copy';
 import { retryRun } from './read-failure';
-import { CAPTION_TOOLS, forgetWorkingSize, LOST_SIDE, lostRun, riskSize, workingSize } from './working-size';
+import { CAPTION_TOOLS, CUT_TOOLS, forgetWorkingSize, LOST_SIDE, lostFamily, lostRun, riskSize, workingSize } from './working-size';
+import { familyOf, LOST_ONLY } from './tool-family';
+import { beginLight, endLight, lightRun } from './light-run';
+import { ATRISK_LIGHT_NOTE, LOST_CAPTION_TAIL, LOST_LIGHT_NOTE, LOST_VIDEO_NOTE } from './light-copy';
 
 export interface ShellFile {
   id: number;
@@ -436,6 +439,7 @@ export function createShell(opts: ShellOptions) {
       list.append(li);
     }
     updateRunBlock();
+    showLightNote?.();
     clear.hidden = files.length === 0;
     drop.classList.toggle('is-compact', files.length > 0);
     root.dataset.count = String(files.length);
@@ -625,7 +629,8 @@ export function createShell(opts: ShellOptions) {
   function showSizeNote() {
     if (!sizeNote) return;
     // After the browser closed a caption run's page: videos in this tab start at 720p (see capAtRisk in recovery-hooks.ts).
-    const lost = lostRun() && CAPTION_TOOLS.includes(root.dataset.slug ?? '');
+    const slug = root.dataset.slug ?? '';
+    const lost = CAPTION_TOOLS.includes(slug) ? lostRun() : familyOf(slug) === 'video' && !CUT_TOOLS.includes(slug) && lostFamily('video');
     const side = lost ? LOST_SIDE : (workingSize() ?? riskSize());
     sizeNote.hidden = !side;
     if (!side) return;
@@ -640,11 +645,15 @@ export function createShell(opts: ShellOptions) {
       forgetWorkingSize();
       showSizeNote();
     });
-    if (lost) {
+    if (lost && CAPTION_TOOLS.includes(slug)) {
       const a = document.createElement('a');
       a.href = '/video-to-subtitles';
       a.textContent = 'Video to subtitles';
-      sizeNote.replaceChildren(`The last run stopped because the browser closed this page, most likely out of memory. In this tab, videos are now made at ${name} so the next run is lighter. If you only need the subtitle file, use `, a, '. ', full);
+      sizeNote.replaceChildren(LOST_VIDEO_NOTE(name) + LOST_CAPTION_TAIL, a, '. ', full);
+      return;
+    }
+    if (lost) {
+      sizeNote.replaceChildren(LOST_VIDEO_NOTE(name), full);
       return;
     }
     sizeNote.textContent = workingSize()
@@ -656,6 +665,38 @@ export function createShell(opts: ShellOptions) {
     sizeNote.hidden = true;
     hint.before(sizeNote);
     showSizeNote();
+  }
+
+  /**
+   * The same note for the other families (model, audio, picture, PDF, archive; and video tools without a size note): this tool starts at a
+   * lighter setting because the browser closed the page last time, or up front because the device is at risk and the file is large.
+   * "Try full size" clears it. The video tools with a size note show it there (above).
+   */
+  const family = familyOf(root.dataset.slug ?? '');
+  const lightNote = family && !(family === 'video' && opts.remembersSize) ? document.createElement('p') : null;
+  function showLightNote() {
+    if (!lightNote || !family) return;
+    const why = lightRun(family, LOST_ONLY.has(root.dataset.slug ?? '') ? 0 : files.reduce((n, f) => n + f.file.size, 0));
+    lightNote.hidden = !why;
+    if (!why) return;
+    lightNote.className = 'hint';
+    lightNote.id = 'light-run-note';
+    lightNote.dataset.why = why;
+    const full = document.createElement('button');
+    full.type = 'button';
+    full.className = 'btn btn-sm btn-ghost';
+    full.textContent = 'Try full size';
+    full.addEventListener('click', () => {
+      forgetWorkingSize();
+      showLightNote();
+      showSizeNote();
+    });
+    lightNote.replaceChildren(why === 'lost' ? LOST_LIGHT_NOTE : ATRISK_LIGHT_NOTE, full);
+  }
+  if (lightNote) {
+    lightNote.hidden = true;
+    hint.before(lightNote);
+    showLightNote();
   }
 
   const watching = opts.watch ?? (!opts.keepAwake && picturesOnly(input.accept));
@@ -681,6 +722,8 @@ export function createShell(opts: ShellOptions) {
     const mine = (guard = opts.keepAwake ? guardRun() : undefined);
     if (opts.announceStart) trackToolStart({ tool, files: files.length, inputBytes, format: opts.outputFormat?.() });
     const clearMarker = markInflight(tool, 'run', inputBytes);
+    // A lighter start (see light-run.ts): the library code under this run reads it while the run goes.
+    beginLight(family, inputBytes);
     try {
       // Audio and video tools: work from one copy taken now, while the browser still reads the picked files, and read again once
       // when a read fails part-way (after a check that the files are still reachable). The tools' own retries still apply inside.
@@ -723,8 +766,10 @@ export function createShell(opts: ShellOptions) {
       if (failsTheSameAgain(errorClass)) repeatBlock = repeatHint(e);
     } finally {
       clearMarker();
+      endLight();
       mine?.release();
       showSizeNote();
+      showLightNote();
       setBusy(false);
       updateRunBlock();
     }
@@ -847,8 +892,11 @@ export function createShell(opts: ShellOptions) {
   mountNextSteps(root);
   warmDecoders(input.accept);
   // Landing pages load the tool module on demand; this marks the shell as live.
-  reportLostTab();
+  // Usually settled at once; a marker with an owner waits a moment for the lock check, and the notes are drawn again after it.
+  const lostChecked = reportLostTab();
+  if (lostChecked) void lostChecked.then(() => (showSizeNote(), showLightNote()));
   showSizeNote();
+  showLightNote();
   root.dataset.ready = 'true';
   void adoptHandoff();
 

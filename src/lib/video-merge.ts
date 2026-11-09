@@ -131,7 +131,7 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
     // A retry after the encoder gave up asks for a smaller picture than the first try's; a phone given a 4K first clip starts at 1080p.
     const shown = { w: clips[0]!.track.displayWidth, h: clips[0]!.track.displayHeight };
     const longest = Math.max(shown.w, shown.h);
-    capAtRisk(attempt, longest);
+    capAtRisk(attempt, longest, false, files.reduce((n, f) => n + f.size, 0));
     const wanted = capScale(attempt, longest);
     // The test encode at the real size can lower it further before any picture is read.
     const plan = await planVideoCodec({ width: even(shown.w * wanted), height: even(shown.h * wanted), bitrate: QUALITY_HIGH }, codecsFor(attempt));
