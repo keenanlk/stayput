@@ -34,7 +34,7 @@ const LABEL: Partial<Record<Container, string>> = {
 };
 
 export const copy = (name: keyof typeof COPY, type = 'another type of file') => COPY[name].replace('{type}', type);
-export const labelOf = (c: Container): string => LABEL[c] ?? (c === 'unknown' ? 'not a type this page knows' : 'another type of file');
+export const labelOf = (c: Container): string => LABEL[c] ?? (c === 'unknown' ? 'text or another kind of file' : 'another type of file');
 
 /** Whether a container is one the family's tools can open. */
 export function fits(family: Family, c: Container): boolean {
@@ -101,10 +101,22 @@ export async function explainUnreadable(file: Blob, family: Family, fallback: { 
   const wrong = wrongThing(family, head, file.size);
   if (wrong) return wrong;
   const c = sniffBytes(head.subarray(0, SNIFF_BYTES));
+  // Every decoder has refused it and its start is no picture's start: it is not a picture (a text file named .jpg).
+  if (c === 'unknown' && (family === 'image' || family === 'gif')) return new NamedError(WRONG_TYPE[family], copy(WRONG_TYPE[family], labelOf(c)), { cause: fallback.cause });
   try {
     if (file.size > 0 && looksCutShort(c, await readTail(file))) return new NamedError('FileTruncated', COPY.FileTruncated, { cause: fallback.cause });
   } catch {
     // The end could not be read: say what the decoder said.
   }
+  return new NamedError(fallback.name, fallback.message.replace('{type}', labelOf(c)), { cause: fallback.cause });
+}
+
+/** The same checks for bytes already in memory (the PDF code holds the whole file): empty, another type, cut short, or a parser that refused a good start. */
+export function explainBytes(bytes: Uint8Array, family: Family, fallback: { name: string; message: string; cause?: unknown }): NamedError {
+  if (bytes.length === 0) return new NamedError('EmptyFile', COPY.EmptyFile);
+  const wrong = wrongThing(family, bytes, bytes.length);
+  if (wrong) return wrong;
+  const c = sniffBytes(bytes.subarray(0, SNIFF_BYTES));
+  if (looksCutShort(c, bytes.subarray(Math.max(0, bytes.length - 4096)))) return new NamedError('FileTruncated', COPY.FileTruncated, { cause: fallback.cause });
   return new NamedError(fallback.name, fallback.message.replace('{type}', labelOf(c)), { cause: fallback.cause });
 }

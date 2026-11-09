@@ -2,7 +2,7 @@ import { bool, createShell, processEach, radio } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
 import { InputError } from '../lib/input-error';
-import { DamagedGif, UnreadableFile, checkGif, explain } from '../lib/gif-errors';
+import { DamagedGif, readGifBuffer, checkGif, explain } from '../lib/gif-errors';
 
 /**
  * Rotate and flip GIF. Each GIF is decoded, turned and rewritten in the page (see
@@ -19,9 +19,7 @@ createShell({
     const { compressGif, gifFrameCount } = await import('../lib/gif-compress');
     return processEach(files, progress, 'Rotating', async (entry, index) => {
       const share = (f: number) => (index + f) / files.length;
-      const buffer = await entry.file.arrayBuffer().catch(() => {
-        throw new UnreadableFile();
-      });
+      const buffer = await readGifBuffer(entry.file);
       const bytes = new Uint8Array(buffer);
       checkGif(
         bytes,
