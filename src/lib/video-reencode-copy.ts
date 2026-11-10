@@ -8,9 +8,9 @@ export const COMPRESS_COPY = {
   tooLong: (targetMB: number, mostMinutes: number) =>
     `This video is too long to fit in ${targetMB} MB and still be watchable. Trim it to under ${mostMinutes} minute${mostMinutes === 1 ? '' : 's'}, or choose a larger size.`,
   /** Note on the result when it is as big as or bigger than the original. */
-  larger: 'the result is as big as, or bigger than, the original: this video is already compressed about as far as it goes, so keep the original, or choose a lower quality or resolution',
+  larger: 'as big as, or bigger than, the original: this video was already well compressed, so keep the original or try a lower quality or resolution',
   /** Note on a result made through the browser's own video player. */
-  viaPlayer: "decoded with the browser's own video player, because it could not decode this video the usual way",
+  viaPlayer: "read through the browser's own video player, as this video could not be read the usual way",
 };
 
 export const MERGE_COPY = {
@@ -18,11 +18,11 @@ export const MERGE_COPY = {
   clip: (name: string) => `${name}: `,
   /** Over the phone budget, refused before any work. `which` is the clip to shorten or leave out. */
   tooBig: (which: string, minutes: number, mb: number) =>
-    `These videos are too long to join on this phone: about ${minutes} minutes, ${mb} MB in all. Shorten ${which} (Trim video does it), join fewer clips, or use a computer.`,
+    `These videos are too big to join on this phone: about ${minutes} minutes and ${mb} MB in all. Shorten ${which} with Trim video, join fewer clips, or use a computer.`,
   /** Note on a result in which a clip was decoded by the browser's own player. */
-  viaPlayer: "some clips were decoded with the browser's own video player, because it could not decode them the usual way",
+  viaPlayer: "some clips were read through the browser's own video player, as they could not be read the usual way",
 };
 
 export const RESIZE_COPY = {
-  viaPlayer: "decoded with the browser's own video player, because it could not decode this video the usual way",
+  viaPlayer: "read through the browser's own video player, as this video could not be read the usual way",
 };
