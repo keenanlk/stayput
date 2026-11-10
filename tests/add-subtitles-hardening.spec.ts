@@ -238,10 +238,13 @@ test.describe('refused early, before any model download', () => {
     needsVideoDecode(browserName);
     await recordRuns(page);
     const models = modelRequests(page);
-    await run(page, [file('base.mp4')]);
-    await failed(page);
-    await expect(page.locator('#error')).toContainText(/has no sound, so there are no words to write captions from/);
-    expect((await lastRun(page)).error_class).toBe('NoSoundTrack');
+    await open(page);
+    await page.locator('#file-input').setInputFiles([file('base.mp4')]);
+    // Refused when it is added, in the tool's own words, and not a run.
+    await expect(page.locator('#run-hint')).toContainText(/has no sound, so there are no words to write captions from/);
+    await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NoSoundTrack');
+    await expect(page.locator('#run')).toBeDisabled();
+    expect(await page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]').filter((e: { n: string }) => e.n === 'tool_run'))).toEqual([]);
     expect(models).toEqual([]);
   });
 

@@ -7,11 +7,11 @@
 import { NamedError } from './input-error';
 import { isNotReadable, notReadable, probeReadable, SNAPSHOT_LIMIT } from './read-failure';
 import { SNIFF_BYTES, sniffBytes, type Container } from './sniff';
-import { CUT_SHORT, noSoundText } from './audio-causes';
+import { noSoundText } from './audio-causes';
 
 export interface IntakeProblem {
   /** The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not; UnreadableFileGone for a file that was refused before and is added again. */
-  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone' | 'NoSoundTrack' | 'AudioCutShort';
+  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone' | 'NoSoundTrack';
   message: string;
   /** One phrase of the message that links to a page that fixes it. */
   link?: { text: string; href: string };
@@ -106,14 +106,13 @@ export async function inspectFile(file: File, tool: string, base: string, accept
     return { name: 'FileNotDownloaded', message: `${file.name} looks empty on this device, which usually means it is still in the cloud and only a placeholder was picked. ${SAVE_STEPS}` };
   }
 
-  // A video with no sound track can't be helped by a tool that needs sound: said now, with the cut-short check that reads the same index.
+  // A video with no sound track can't be helped by a tool that needs sound: said now, (the same index read that finds a file cut short, which is left to Run).
   if ((NEEDS_SOUND.has(tool) || NEEDS_SOUND.has(base)) && VIDEO_CONTAINERS.has(container)) {
     const refusal = await import('./decode-guard').then((m) => m.refuseSoundlessContainer(file)).then(() => null, (e: unknown) => (e instanceof Error ? e : null));
     if (refusal?.name === 'NoSoundTrack') {
       const own = OR_SUBTITLE_FILE.has(tool) || OR_SUBTITLE_FILE.has(base);
       return { name: 'NoSoundTrack', message: noSoundText(file.name, tool, base), unlessWith: own ? SUBTITLE_FILE : undefined };
     }
-    if (refusal?.name === 'AudioCutShort') return { name: 'AudioCutShort', message: CUT_SHORT };
   }
 
   const fix = CONVERTERS[container];

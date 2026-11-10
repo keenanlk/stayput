@@ -104,12 +104,16 @@ test('a recording the device cannot read is recorded under the error that stoppe
 });
 
 // A video with a picture and no sound track at all is told apart from a sound that could not be read.
-test('a video with no sound track is recorded as NoSoundTrack', async ({ page }) => {
+test('a video with no sound track is refused when it is added, as NoSoundTrack, and is no run', async ({ page }) => {
   await page.addInitScript(() => delete (window as unknown as { AudioDecoder?: unknown }).AudioDecoder);
   const silent = readFileSync(fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url)));
-  await transcribe(page, silent, 'clip.webm');
-  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-  expect((await lastRun(page))?.error_class).toBe('NoSoundTrack');
+  await stubSpeech(page);
+  await page.goto('/tools/transcribe');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles({ name: 'clip.webm', mimeType: 'video/webm', buffer: silent });
+  await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NoSoundTrack');
+  await expect(page.locator('#run')).toBeDisabled();
+  expect(await lastRun(page)).toBeUndefined();
 });
 
 /** A silent mono 16-bit WAV of the given length: big enough for its claimed duration, so the early refusal believes it. */

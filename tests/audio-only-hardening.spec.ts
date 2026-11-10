@@ -131,7 +131,8 @@ test.describe("stageError", () => {
       "AudioDecodeFailed",
       new RangeError("Array buffer allocation failed"),
     ) as Error & { links?: { href: string }[] };
-    expect(e.name).toBe("OutOfMemoryError");
+    // A decode step's memory failure is its own class (AudioOutOfMemory); the other steps keep OutOfMemoryError.
+    expect(e.name).toBe("AudioOutOfMemory");
     expect(e.cause).toBeInstanceOf(RangeError);
     expect(e.message).toContain("recording");
     expect(e.links?.map((l) => l.href)).toEqual([
@@ -321,7 +322,7 @@ test.describe("a two-hour recording", () => {
       });
     }
 
-    test("a recording over the phone limit is decoded in stretches, not handed whole to the browser", async ({ page }, info) => {
+    test("a recording over the phone limit is never handed whole to the browser: it is refused early as AudioTooLong", async ({ page }, info) => {
       test.setTimeout(900_000);
       // 3 hours of mono 8 kHz, 16-bit: about 173 MB, over the 150 MB a phone decodes whole.
       test.skip(info.project.name !== "chromium", "one 173 MB fixture is enough");
@@ -341,7 +342,8 @@ test.describe("a two-hour recording", () => {
       await page.locator("#run").click();
       const result = await outcome(page, 840_000);
       expect(BARE).not.toContain(result);
-      if (info.project.name === "chromium") expect(result).toBe("ok");
+      // The decoded sound (about 2 GB for 3 hours, even mono) is more than a phone's tab can hold, so it is said at once, from the header.
+      expect(result).toBe("AudioTooLong");
       expect(await page.evaluate(() => (window as unknown as { __whole: number }).__whole)).toBe(0);
     });
 

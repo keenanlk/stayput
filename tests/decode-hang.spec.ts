@@ -25,6 +25,6 @@ for (const path of ['/increase-video-volume', '/remove-background-noise-from-vid
     await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 15_000 });
     const run = await page.evaluate(() => (window as unknown as { __events: { n: string; d: Record<string, string> }[] }).__events.filter((e) => e.n === 'tool_run').at(-1)?.d);
     expect(run?.outcome).toBe('error');
-    expect(run?.error_class).toBe('AudioDecodeError');
+    expect(run?.error_class).toBe('AudioCutShort');
   });
 }

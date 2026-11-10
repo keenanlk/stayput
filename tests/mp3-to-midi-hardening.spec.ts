@@ -165,12 +165,9 @@ test.describe('files the browser may refuse', () => {
     const o = await runFile(page, fx('no-sound.mp4'), 'video-no-sound');
     expect(o.state).toBe('blocked');
     expect(seen.some((u) => u.includes('/models/'))).toBe(false);
-    // Forced past the drop check, the run itself ends as NoSoundTrack.
-    await page.evaluate(() => ((document.getElementById('run') as HTMLButtonElement).disabled = false));
-    await page.locator('#run').click();
-    await expect(page.locator('#error')).toBeVisible({ timeout: 30_000 });
-    const run = (await events(page)).filter((e) => e.n === 'tool_run').pop();
-    expect(run?.d.error_class).toBe('NoSoundTrack');
+    // The shell's add-time check names it, and a refusal is no run.
+    await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NoSoundTrack');
+    expect((await events(page)).filter((e) => e.n === 'tool_run')).toEqual([]);
   });
 
   test('a silent file ends as SilentFile, not UnreadableFile, before the model is fetched', async ({ page }) => {

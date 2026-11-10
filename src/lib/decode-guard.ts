@@ -91,7 +91,9 @@ export async function refuseOverBudget(file: Blob, rate: number): Promise<void> 
   try {
     const track = await input.getPrimaryAudioTrack().catch(() => null);
     const seconds = track ? await track.computeDuration().catch(() => NaN) : NaN;
-    if (Number.isFinite(seconds) && seconds > budget) throw audioTooLong(seconds, budget);
+    // The budget is counted in stereo; a mono recording holds half as much for the same length.
+    const channels = Math.max(1, Math.min(2, track?.numberOfChannels ?? 2));
+    if (Number.isFinite(seconds) && (seconds * channels) / 2 > budget) throw audioTooLong(seconds, Math.floor((budget * 2) / channels));
   } catch (e) {
     if (e instanceof Error && e.name === 'AudioTooLong') throw e;
   } finally {

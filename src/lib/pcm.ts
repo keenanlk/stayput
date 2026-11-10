@@ -8,7 +8,7 @@ import { ALL_FORMATS, AudioBufferSink, AudioSample, BlobSource, Input, type Audi
 import { foldToStereo } from './fold-channels';
 import { NamedError } from './input-error';
 import { isNotReadable, retryUnreadable } from './read-failure';
-import { decodeWithin, isCutShortWav, refuseOverBudget, refuseSoundlessContainer } from './decode-guard';
+import { decodeWithin, isCutShortWav, refuseSoundlessContainer } from './decode-guard';
 import { audioCutShort, namedDecodeCause } from './audio-causes';
 import { audioDecodeError } from './speech-errors';
 import { decoderOrder, soundOf, type SoundKind } from './audio-codecs';
@@ -133,7 +133,6 @@ async function decodedByCodecs(track: InputAudioTrack, rate: number): Promise<Fl
  */
 export async function decodePcmSliced(file: Blob, rate = SAMPLE_RATE, whole = true): Promise<Float32Array[] | null> {
   await refuseSoundlessContainer(file);
-  await refuseOverBudget(file, rate);
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   let sound: SoundKind | null = null;
   let cause: unknown;

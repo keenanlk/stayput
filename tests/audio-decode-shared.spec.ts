@@ -43,8 +43,8 @@ test.beforeAll(() => {
     b.writeUInt32BE(0, b.indexOf('stts', start) + 8);
   }
   writeFileSync(fx('zero-length-track.mp4'), b);
-  // 16 minutes of an 8 kHz mono WAV: 15 MB on disk, 340 MB once decoded at 44.1 kHz in stereo.
-  ff('-f', 'lavfi', '-i', 'sine=frequency=300:duration=960:sample_rate=8000', '-ac', '1', fx('long-16min.wav'));
+  // 16 minutes of an 8 kHz stereo WAV: 30 MB on disk, 340 MB once decoded at 44.1 kHz.
+  ff('-f', 'lavfi', '-i', 'sine=frequency=300:duration=960:sample_rate=8000', '-ac', '2', fx('long-16min.wav'));
   // An MP3 cut off part-way.
   const mp3 = readFileSync(edge('good.mp3'));
   writeFileSync(fx('cut.mp3'), mp3.subarray(0, Math.floor(mp3.length * 0.5)));
@@ -128,7 +128,7 @@ test.describe('a video with no sound track is refused when it is added', () => {
   });
 });
 
-test.describe('a file cut short is refused, and named', () => {
+test.describe('a file cut short ends under its own class', () => {
   for (const [label, file] of [
     ['an MP4 with its moov atom cut off', edge('truncated-moov-end.mp4')],
     ['a zero-length sound track', 'zero-length-track.mp4'],
@@ -136,12 +136,11 @@ test.describe('a file cut short is refused, and named', () => {
     test(label, async ({ page, browserName }) => {
       await open(page, '/tools/video-to-mp3');
       await add(page, file.includes('/') ? file : fx(file));
-      // Said before Run, with its own class, and no run recorded.
-      await expect(page.locator('#run')).toBeDisabled();
-      await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'AudioCutShort');
-      await expect(page.locator('#run-hint')).toContainText('cut short');
-      expect(await runs(page)).toEqual([]);
-      record(`cut short: ${label}`, browserName, { refusedAtAdd: 'AudioCutShort' });
+      // Not a video without sound, so Run is on; the run ends under its own class.
+      await expect(page.locator('#run')).toBeEnabled();
+      const o = await run(page, 60_000);
+      expect(o).toEqual({ state: 'error', cls: 'AudioCutShort' });
+      record(`cut short: ${label}`, browserName, o);
     });
   }
 
