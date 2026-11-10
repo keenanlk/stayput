@@ -8,7 +8,7 @@ export const COMPRESS_COPY = {
   tooLong: (targetMB: number, mostMinutes: number) =>
     `This video is too long to fit in ${targetMB} MB and still be watchable. Trim it to under ${mostMinutes} minute${mostMinutes === 1 ? '' : 's'}, or choose a larger size.`,
   /** Note on the result when it is as big as or bigger than the original. */
-  larger: 'the result is not smaller than the original: this video is already compressed about as far as it goes, so keep the original, or choose a smaller size or resolution',
+  larger: 'the result is as big as, or bigger than, the original: this video is already compressed about as far as it goes, so keep the original, or choose a lower quality or resolution',
   /** Note on a result made through the browser's own video player. */
   viaPlayer: "decoded with the browser's own video player, because it could not decode this video the usual way",
 };
