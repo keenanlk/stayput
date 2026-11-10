@@ -86,3 +86,13 @@ export const DESKTOP_DECODED_BYTES = 3 * 1024 ** 3;
 
 export const audioTooLong = (seconds: number, budget: number) =>
   new NamedError('AudioTooLong', `This recording is about ${Math.round(seconds / 60)} minutes, more than this device can read at once without running out of memory (about ${Math.max(1, Math.floor(budget / 60))} minutes). Cut it into shorter parts first, or use a computer.`);
+
+/**
+ * What a video with no sound track is told, refused when the file is added. A tool whose work depends on sound says what it needs in its own
+ * words (remove-noise, add-subtitles); every other sound tool says it in general.
+ */
+const NO_SOUND_TEXT: Record<string, (name: string) => string> = {
+  'remove-noise': (name) => `${name} has no sound to clean.`,
+  'add-subtitles-to-video': (name) => `${name} has no sound, so there are no words to write captions from. To burn in captions you already have, drop an SRT, VTT or ASS file with the video.`,
+};
+export const noSoundText = (name: string, ...slugs: string[]): string => (slugs.map((s) => NO_SOUND_TEXT[s]).find(Boolean) ?? ((n: string) => `${n} has no sound track, so there is nothing here for this tool to work on. Add a video or recording that has sound.`))(name);

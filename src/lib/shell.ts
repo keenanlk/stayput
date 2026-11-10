@@ -325,7 +325,7 @@ export function createShell(opts: ShellOptions) {
       // A file the intake check refused is not handed to the tool: trim-video, for one, would feed a WMV to its <video>, and
       // Linux WebKit's media pipeline can stall on it so that the page no longer answers a click on Clear.
       await checking;
-      await opts.onFilesChanged?.(files.filter((f) => !intake.get(f.id)));
+      await opts.onFilesChanged?.(files.filter((f) => !problemOf(f)));
       // A tool that sets its own hint there (the speech tools' model note) must not hide why Run is off.
       if (runBlock) setHint(runBlock, runLink);
     } catch (e) {
@@ -363,6 +363,8 @@ export function createShell(opts: ShellOptions) {
     hideResults();
     hideError();
     render();
+    // A sibling that cured another file's problem may have gone (a subtitle file beside a video with no sound).
+    updateRunBlock();
     void filesChanged();
   }
 
@@ -382,7 +384,12 @@ export function createShell(opts: ShellOptions) {
   const intake = new Map<number, IntakeProblem | undefined>();
   let checking: Promise<void> = Promise.resolve();
   let checks = 0;
-  const intakeProblem = () => files.map((f) => intake.get(f.id)).find(Boolean);
+  // A problem that a sibling file cures (a subtitle file beside a video with no sound) is not one.
+  const problemOf = (f: ShellFile) => {
+    const p = intake.get(f.id);
+    return p?.unlessWith && files.some((g) => g !== f && p.unlessWith!.test(g.file.name)) ? undefined : p;
+  };
+  const intakeProblem = () => files.map(problemOf).find(Boolean);
 
   let runBlock = '';
   let runLink: { text: string; href: string } | undefined;
