@@ -151,7 +151,7 @@
   {
    "id": "mediapipe",
    "name": "MediaPipe Tasks Vision",
-   "version": "1.2.0",
+   "version": "1.2.2",
    "npm": "@mediapipe/tasks-vision",
    "licences": [
     {
@@ -160,15 +160,15 @@
     }
    ],
    "project": "https://ai.google.dev/edge/mediapipe",
-   "source": "https://www.npmjs.com/package/@mediapipe/tasks-vision/v/1.2.0",
-   "shipped": "JavaScript bundled into the site; WebAssembly served from /vendor/mediapipe-tasks-vision@1.2.0/ (face blur, video background removal)",
+   "source": "https://www.npmjs.com/package/@mediapipe/tasks-vision/v/1.2.2",
+   "shipped": "JavaScript bundled into the site; WebAssembly served from /vendor/mediapipe-tasks-vision@1.2.2/ (face blur, video background removal)",
    "kind": "library",
    "note": "The npm package is the exact source we link; upstream does not publish a Git tag for 1.2.0 (the nearest is v1.0.0 at https://github.com/google-ai-edge/mediapipe/tree/v1.0.0)."
   },
   {
    "id": "qpdf-wasm",
    "name": "qpdf-wasm",
-   "version": "0.3.0",
+   "version": "0.3.1",
    "npm": "@neslinesli93/qpdf-wasm",
    "licences": [
     {
@@ -177,8 +177,8 @@
     }
    ],
    "project": "https://github.com/neslinesli93/qpdf-wasm",
-   "source": "https://github.com/neslinesli93/qpdf-wasm/tree/0.3.0",
-   "shipped": "Served from /vendor/neslinesli93-qpdf-wasm@0.3.0/ (JavaScript and WebAssembly: compress, unlock and protect PDFs)",
+   "source": "https://github.com/neslinesli93/qpdf-wasm/tree/0.3.1",
+   "shipped": "Served from /vendor/neslinesli93-qpdf-wasm@0.3.1/ (JavaScript and WebAssembly: compress, unlock and protect PDFs)",
    "kind": "library",
    "note": "This ISC licence covers only the wrapper. The qpdf program inside it is Apache-2.0, listed below."
   },
@@ -711,7 +711,7 @@
   {
    "id": "pdfjs",
    "name": "PDF.js",
-   "version": "6.4.299",
+   "version": "6.5.438",
    "npm": "pdfjs-dist",
    "licences": [
     {
@@ -720,7 +720,7 @@
     }
    ],
    "project": "https://mozilla.github.io/pdf.js/",
-   "source": "https://github.com/mozilla/pdf.js/tree/v6.4.299",
+   "source": "https://github.com/mozilla/pdf.js/tree/v6.5.438",
    "shipped": "Bundled into the site JavaScript, plus its worker (showing PDF pages)",
    "kind": "library",
    "copyright": "Copyright Mozilla Foundation"
@@ -1512,11 +1512,11 @@
    "licences": [
     {
      "name": "Apache-2.0",
-     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/LICENSE-qpdf.txt"
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.1/LICENSE-qpdf.txt"
     },
     {
      "name": "NOTICE",
-     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.1/NOTICE-qpdf.md"
     }
    ],
    "project": "https://github.com/qpdf/qpdf",
@@ -1535,7 +1535,7 @@
    "licences": [
     {
      "name": "MIT-style licence, reproduced in qpdf's NOTICE",
-     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.1/NOTICE-qpdf.md"
     }
    ],
    "project": "https://github.com/qpdf/qpdf/blob/v12.2.0/NOTICE.md",
@@ -1552,7 +1552,7 @@
    "licences": [
     {
      "name": "Public domain (see qpdf's NOTICE)",
-     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/NOTICE-qpdf.md"
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.1/NOTICE-qpdf.md"
     }
    ],
    "project": "https://github.com/qpdf/qpdf/blob/v12.2.0/NOTICE.md",
@@ -1586,7 +1586,7 @@
    "licences": [
     {
      "name": "IJG, BSD-3-Clause and zlib licenses (libjpeg-turbo)",
-     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.0/LICENSE-libjpeg-turbo.md"
+     "url": "/vendor/neslinesli93-qpdf-wasm@0.3.1/LICENSE-libjpeg-turbo.md"
     }
    ],
    "project": "https://github.com/ImageMagick/jpeg-turbo",
@@ -1858,7 +1858,7 @@
   {
    "id": "mediapipe-wasm",
    "name": "MediaPipe runtime (TensorFlow Lite, XNNPACK, ruy, OpenCV, libpng, libjpeg)",
-   "version": "as pinned by MediaPipe tasks-vision 1.2.0",
+   "version": "as pinned by MediaPipe tasks-vision 1.2.2",
    "npm": null,
    "licences": [
     {
@@ -1895,7 +1895,7 @@
    "via": "mediapipe",
    "copyleft": "mpl",
    "copyright": "Copyright (C) 2008 Gael Guennebaud; (C) 2007-2011 Benoit Jacob; and other Eigen contributors",
-   "replace": "/vendor/mediapipe-tasks-vision@1.2.0/vision_wasm_internal.wasm"
+   "replace": "/vendor/mediapipe-tasks-vision@1.2.2/vision_wasm_internal.wasm"
   },
   {
    "id": "eigen-ort",
