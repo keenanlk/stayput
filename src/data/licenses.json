@@ -151,7 +151,7 @@
   {
    "id": "mediapipe",
    "name": "MediaPipe Tasks Vision",
-   "version": "1.2.0",
+   "version": "1.2.2",
    "npm": "@mediapipe/tasks-vision",
    "licences": [
     {
@@ -168,7 +168,7 @@
   {
    "id": "qpdf-wasm",
    "name": "qpdf-wasm",
-   "version": "0.3.0",
+   "version": "0.3.1",
    "npm": "@neslinesli93/qpdf-wasm",
    "licences": [
     {
@@ -500,7 +500,7 @@
   {
    "id": "mediabunny",
    "name": "Mediabunny",
-   "version": "1.61.0",
+   "version": "1.65.2",
    "npm": "mediabunny",
    "licences": [
     {
@@ -509,7 +509,7 @@
     }
    ],
    "project": "https://mediabunny.dev",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.65.2",
    "shipped": "Bundled into the site JavaScript (video and audio tools)",
    "kind": "library",
    "copyleft": "mpl",
@@ -518,7 +518,7 @@
   {
    "id": "mediabunny-ac3",
    "name": "Mediabunny AC-3 extension",
-   "version": "1.61.0",
+   "version": "1.65.2",
    "npm": "@mediabunny/ac3",
    "licences": [
     {
@@ -527,7 +527,7 @@
     }
    ],
    "project": "https://mediabunny.dev/guide/extensions/ac3",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.65.2",
    "shipped": "A separate script the page fetches only when a sound in Dolby Digital (AC-3) or Dolby Digital Plus (E-AC-3) is read (audio and caption tools)",
    "kind": "library",
    "copyleft": "mpl",
@@ -545,7 +545,7 @@
     }
    ],
    "project": "https://ffmpeg.org",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.65.2",
    "via": "mediabunny-ac3",
    "shipped": "Compiled to WebAssembly and embedded in the Mediabunny AC-3 extension script, loaded only for Dolby Digital sound. Only FFmpeg libavcodec's AC-3 and E-AC-3 coders are included.",
    "kind": "wasm",
@@ -711,7 +711,7 @@
   {
    "id": "pdfjs",
    "name": "PDF.js",
-   "version": "6.4.299",
+   "version": "6.5.438",
    "npm": "pdfjs-dist",
    "licences": [
     {
@@ -720,7 +720,7 @@
     }
    ],
    "project": "https://mozilla.github.io/pdf.js/",
-   "source": "https://github.com/mozilla/pdf.js/tree/v6.4.299",
+   "source": "https://github.com/mozilla/pdf.js/tree/v6.5.438",
    "shipped": "Bundled into the site JavaScript, plus its worker (showing PDF pages)",
    "kind": "library",
    "copyright": "Copyright Mozilla Foundation"
