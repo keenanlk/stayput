@@ -104,7 +104,7 @@ test.describe('a video with no sound track is refused when it is added', () => {
         const text = (await page.locator('#run-hint').textContent()) ?? '';
         if (tool === 'remove-noise') expect(text).toContain('has no sound to clean');
         else if (tool === 'add-subtitles-to-video') expect(text).toContain('SRT, VTT or ASS');
-        else expect(text).toContain('has no sound track');
+        else expect(text).toContain('has no sound track, so this tool has nothing to work on. Use a video or recording that has sound instead.');
         // Not a run: nothing was pressed, nothing is recorded.
         expect(await runs(page)).toEqual([]);
         record(`no-sound ${tool} .${ext}`, browserName, { refusedAtAdd: true });

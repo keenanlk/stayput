@@ -27,7 +27,7 @@ const NO_SOUND_TEXT: Record<string, (name: string) => string> = {
   'add-subtitles-to-video': (name) => `${name} has no sound, so there are no words to write captions from. To burn in captions you already have, drop an SRT, VTT or ASS file with the video.`,
 };
 /** Kept here, not in audio-causes.ts: this file is in every page's shell, and a shared module would become one more file each page's install fetches. */
-const noSoundText = (name: string, ...slugs: string[]): string => (slugs.map((s) => NO_SOUND_TEXT[s]).find(Boolean) ?? ((n: string) => `${n} has no sound track, so there is nothing here for this tool to work on. Add a video or recording that has sound.`))(name);
+const noSoundText = (name: string, ...slugs: string[]): string => (slugs.map((s) => NO_SOUND_TEXT[s]).find(Boolean) ?? ((n: string) => `${n} has no sound track, so this tool has nothing to work on. Use a video or recording that has sound instead.`))(name);
 
 /** Where to send a container this tool cannot read. Only pages that are live are listed. */
 const CONVERTERS: Partial<Record<Container, { label: string; text?: string; href?: string }>> = {

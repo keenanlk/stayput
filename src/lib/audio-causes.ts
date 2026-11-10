@@ -85,4 +85,4 @@ export const PHONE_DECODED_BYTES = 300 * 1024 ** 2;
 export const DESKTOP_DECODED_BYTES = 3 * 1024 ** 3;
 
 export const audioTooLong = (seconds: number, budget: number) =>
-  new NamedError('AudioTooLong', `This recording is about ${Math.round(seconds / 60)} minutes, more than this device can read at once without running out of memory (about ${Math.max(1, Math.floor(budget / 60))} minutes). Cut it into shorter parts first, or use a computer.`);
+  new NamedError('AudioTooLong', `This recording is about ${Math.ceil(seconds / 60)} minutes, more than this device can read at once without running out of memory (about ${Math.max(1, Math.floor(budget / 60))} minutes). Cut it into shorter parts first, or use a computer.`);
