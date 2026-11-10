@@ -197,10 +197,17 @@ for (const r of REFUSED) {
 }
 
 test('a video with no sound track is refused when it is added, as NoSoundTrack, and is no run', async ({ browser }) => {
-  const o = await splitFile(browser, fx('video-no-audio.mp4'), { times: '20' });
-  record('video-no-audio.mp4', o);
-  expect(o.state).toBe('blocked');
-  expect(o.message).toContain('has no sound track');
+  const { page, close } = await open(browser);
+  try {
+    await page.locator('#file-input').setInputFiles(fx('video-no-audio.mp4'));
+    await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NoSoundTrack', { timeout: 60_000 });
+    await expect(page.locator('#run-hint')).toContainText('has no sound track');
+    await expect(page.locator('#run')).toBeDisabled();
+    expect((await events(page)).filter((e) => e.n === 'tool_run')).toEqual([]);
+    record('video-no-audio.mp4', { state: 'blocked', message: 'refused at add', names: [], sizes: [], ms: 0 });
+  } finally {
+    await close();
+  }
 });
 
 test('a zero-length file is turned away when it is added, with the reason (no run is started)', async ({ browser }) => {

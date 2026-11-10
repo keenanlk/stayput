@@ -10,6 +10,8 @@ import { withoutSoftwareEncoder } from './no-software-encoder';
 // the settings Mediabunny picks first; the page must then use settings that work, or say so at once
 // and link to Video to subtitles. Runs in the chromium project and in the webkit project (CI).
 const clip = fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url));
+// A video with a sound track: one with none is refused when it is added, before the encoder is ever asked.
+const spoken = fileURLToPath(new URL('./fixtures/static/speech.mov', import.meta.url));
 
 function srtFile(): string {
   const file = join(mkdtempSync(join(tmpdir(), 'stayput-')), 'clip.srt');
@@ -77,7 +79,7 @@ test('an encoder that never answers is caught at once, with a plain message and 
   page.on('request', (r) => requested.push(r.url()));
   await open(page);
   // No subtitle file, so a working page would start transcribing (and downloading the speech model).
-  await page.locator('#file-input').setInputFiles([clip]);
+  await page.locator('#file-input').setInputFiles([spoken]);
   const started = Date.now();
   await page.locator('#run').click();
   const error = page.locator('#error');

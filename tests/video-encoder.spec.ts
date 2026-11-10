@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 // encoder can go silent with the settings Mediabunny picks first; each tool must still give a playable
 // mp4, and say so at once when no encoder answers. Runs in the chromium project and in the webkit project (CI).
 const clip = fileURLToPath(new URL('./fixtures/static/clip.webm', import.meta.url));
+// A video with a sound track: a caption page refuses one with none when it is added, before Run.
+const spoken = fileURLToPath(new URL('./fixtures/static/speech.mov', import.meta.url));
 // 4 s of H.264 with a 440 Hz tone, AAC mono at 16 kHz (the shape phone recordings have).
 const toneClip = fileURLToPath(new URL('./fixtures/static/tone-16k-mono.mp4', import.meta.url));
 // 4 s of a 1280x720 picture turned 90 degrees by the file (so it shows as 720x1280, the way an iPhone holds the camera), in a
@@ -273,7 +275,7 @@ for (const [path, model, message] of [
     const fetched: string[] = [];
     page.on('request', (r) => r.url().includes('/models/') && fetched.push(r.url()));
     await open(page, path);
-    await page.locator('#file-input').setInputFiles([clip]);
+    await page.locator('#file-input').setInputFiles([path === '/auto-caption-video' ? spoken : clip]);
     await page.locator('#run').click();
     const error = page.locator('#error');
     await expect(error).toHaveClass(/is-active/, { timeout: 20_000 });

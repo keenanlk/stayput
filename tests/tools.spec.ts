@@ -2290,8 +2290,9 @@ test('MP4 to WAV page writes a 44.1 kHz WAV, mono on request, and a video withou
   await page.goto('/tools/video-to-mp3');
   await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
   await page.locator('#file-input').setInputFiles([staticFx('clip.webm')]);
-  await page.locator('#run').click();
-  await expect(page.locator('#error')).toContainText('No audio could be read from this file');
+  // Said when the file is added, in plain words, with Run off.
+  await expect(page.locator('#run-hint')).toContainText('has no sound track');
+  await expect(page.locator('#run')).toBeDisabled();
 });
 
 test('OGG, Opus, FLAC, MP3 and MKV landing pages turn real files into MP3 and WAV, and no bytes leave the tab', async ({ page }) => {

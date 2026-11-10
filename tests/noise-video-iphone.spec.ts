@@ -62,13 +62,13 @@ test('on an iPhone with no audio encoder, noise removal still finishes with a do
   expect(duration).toBeLessThan(18);
 });
 
-test('a video with no sound track says so', async ({ page }) => {
+test('a video with no sound track says so when it is added, and Run stays off', async ({ page }) => {
   test.setTimeout(90_000);
   await open(page);
   await page.locator('#file-input').setInputFiles(silent);
-  await page.locator('#run').click();
-  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-  await expect(page.locator('#error')).toContainText('has no sound to clean');
+  await expect(page.locator('#run-hint')).toContainText('has no sound to clean', { timeout: 60_000 });
+  await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NoSoundTrack');
+  await expect(page.locator('#run')).toBeDisabled();
 });
 
 test('if the MP3 encoder cannot load, the page says the sound encoder could not load', async ({ page }) => {

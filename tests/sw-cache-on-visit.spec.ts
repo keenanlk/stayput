@@ -22,7 +22,8 @@ test('install fetches a small shell, not every page and chunk', async ({ page, c
   await page.evaluate(() => navigator.serviceWorker.ready);
   await expect.poll(async () => (await names(page)).pages, { timeout: 30_000 }).toContain('/tools/heic-to-jpg');
   await page.waitForTimeout(2000);
-  expect(sw.length).toBeLessThan(30);
+  // 30 files today: the add-time sound check adds two small files (about 9 KB together) the shell can reach; the sound decoders themselves are not among them.
+  expect(sw.length).toBeLessThan(32);
   const { pages, assets } = await names(page);
   expect(pages.filter((p) => p.startsWith('/tools/') || p.startsWith('/guides/')).length).toBe(1);
   expect(assets.length).toBeLessThan(80);
