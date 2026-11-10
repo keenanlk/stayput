@@ -15,6 +15,11 @@ updates:
         versions: [">1.61.0"]
       - dependency-name: "@mediabunny/ac3"
         versions: [">1.61.0"]
+      # Hold Playwright at 1.64.1. 1.65.0 (new Chromium) kills the page while
+      # the 24 megapixel canvas specs build their input: tests/image-to-ascii.spec.ts:115
+      # and tests/compare-images.spec.ts:132 fail with "Execution context was destroyed".
+      - dependency-name: "@playwright/test"
+        versions: [">1.64.1"]
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
