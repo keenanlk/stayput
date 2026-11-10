@@ -28,12 +28,17 @@ import {
   type InputAudioTrack,
   type InputVideoTrack,
 } from 'mediabunny';
-import { CODEC_NAMES, unplayable } from './video-compress';
+import { CODEC_NAMES } from './video-compress';
+import { requireVideoTrack } from './container-sniff';
+import { drawContain, decodeOrElement, elementFrames, ELEMENT_FPS, type ElementClip } from './video-fallback';
+import { mergeBudget, overBudget } from './merge-budget';
+import { memoryRange, nameBare } from './bare-error';
+import { MERGE_COPY } from './video-reencode-copy';
 import { watchEncode } from './encoder-watchdog';
 import { codecsFor, planVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { InputError, UnsupportedCodec, NamedError } from './input-error';
+import { InputError, NamedError } from './input-error';
 import { capAtRisk, pageRecoveryHooks } from './recovery-hooks';
 import { adoptPlan, capScale, encodeOptions, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
@@ -55,6 +60,8 @@ export interface MergeResult {
   audioDropped: boolean;
   /** Set when the file was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
   retry?: RetryKind;
+  /** Set when a clip was decoded by the browser's own player (a <video> element), because WebCodecs could not decode it. */
+  viaPlayer?: boolean;
 }
 
 const MAX_FPS = 60;
@@ -106,13 +113,19 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
   try {
     return await withRecovery(
       async (attempt) => {
-        const r = await mergeOnce(files, opts, attempt, (side) => (made = side));
+        const r = await mergeOnce(files, opts, attempt, (side) => (made = side)).catch((e) => {
+          // A buffer that could not be allocated is memory, so the ladder's smaller picture gets its try.
+          throw memoryRange(e);
+        });
         const retry = retryOf(attempt);
         return retry ? { ...r, retry } : r;
       },
       () => made,
       page.hooks,
     );
+  } catch (e) {
+    // A failure with no name of its own is named for the merge, so it never records as a plain Error.
+    throw nameBare('MergeFailedRun', e);
   } finally {
     page.dispose();
   }
@@ -120,14 +133,25 @@ export async function mergeVideos(files: File[], opts: MergeOptions): Promise<Me
 
 async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<MergeResult> {
   const inputs = files.map((f) => new Input({ source: new BlobSource(f), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] }));
+  const players: (ElementClip | null)[] = [];
   try {
-    const clips: { track: InputVideoTrack; first: number; length: number; name: string }[] = [];
+    const clips: { track: InputVideoTrack; first: number; length: number; name: string; player: ElementClip | null }[] = [];
     for (const [i, input] of inputs.entries()) {
-      const track = await input.getPrimaryVideoTrack().catch(() => null);
-      if (!track) throw new NamedError('VideoMergeFailed', `${files[i]!.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
-      if (!(await track.canDecode())) throw new UnsupportedCodec(`${files[i]!.name}: ${unplayable()}`);
-      clips.push({ track, ...(await pictureLength(track)), name: files[i]!.name });
+      const name = files[i]!.name;
+      // A clip that cannot be read keeps its own class (a read failure is never renamed) and its message starts with the clip's name.
+      const track = await requireVideoTrack(input, files[i]!, 'This file has no video this page can read (MP4, MOV, WebM or MKV).').catch((e: Error) => {
+        e.message = `${MERGE_COPY.clip(name)}${e.message}`;
+        throw e;
+      });
+      // WebCodecs cannot decode it: the browser's own player may. Neither: a class named for the cause, with the clip's name.
+      const player = await decodeOrElement(track, files[i]!, MERGE_COPY.clip(name));
+      players.push(player);
+      const span = await pictureLength(track).catch(() => null);
+      clips.push({ track, ...(span ?? { first: 0, length: player?.duration ?? 0 }), name, player });
     }
+    // Over what a phone can hold: refused now, naming the clip to shorten.
+    const tooBig = overBudget(clips.map((c, i) => ({ name: c.name, size: files[i]!.size, length: c.length })), mergeBudget());
+    if (tooBig) throw tooBig;
     // A retry after the encoder gave up asks for a smaller picture than the first try's; a phone given a 4K first clip starts at 1080p.
     const shown = { w: clips[0]!.track.displayWidth, h: clips[0]!.track.displayHeight };
     const longest = Math.max(shown.w, shown.h);
@@ -141,7 +165,7 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
     sized(Math.max(width, height));
     const total = clips.reduce((s, c) => s + c.length, 0);
     const videoCodec = plan.codec;
-    if (!videoCodec) throw new NamedError('VideoMergeFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
+    if (!videoCodec) throw new NamedError('MergeFailedPlan', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
     // Where the browser cannot encode sound (iPhone Safari) but every clip carries the same
     // AAC, the clips' own packets are laid end to end instead, with no decoding or encoding.
@@ -192,6 +216,23 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
         let offset = 0;
         let lastKept = -Infinity;
         for (const clip of clips) {
+          if (clip.player) {
+            // Frames from the browser's player, at a steady rate: the same canvas and encoder as the other clips.
+            for await (const f of elementFrames(clip.player, ELEMENT_FPS)) {
+              const t = offset + f.time;
+              if (f.time >= clip.length) break;
+              drawContain(ctx, f.video, width, height);
+              const frame = new VideoSample(canvas, { timestamp: t, duration: Math.max(1 / MAX_FPS, Math.min(1 / ELEMENT_FPS, clip.length - f.time)) });
+              await feed.until(t);
+              await videoSource.add(frame);
+              frame.close();
+              lastKept = t;
+              report(Math.min(0.99, t / Math.max(0.001, total)));
+            }
+            if (packetSource) await copyClipSound(packetSource, copy![clips.indexOf(clip)]!, clip, offset);
+            offset += clip.length;
+            continue;
+          }
           for await (const sample of new VideoSampleSink(clip.track).samples()) {
             const t = offset + sample.timestamp - clip.first;
             if (t < lastKept + 1 / MAX_FPS - 1e-4 || t >= offset + clip.length) {
@@ -223,7 +264,7 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
       () => output.cancel(),
     );
     const buffer = output.target.buffer;
-    if (!buffer) throw new NamedError('VideoMergeFailed', 'The video could not be written.');
+    if (!buffer) throw new NamedError('MergeFailedWrite', 'The video could not be written.');
     opts.onProgress?.(1);
     return {
       blob: new Blob([buffer], { type: 'video/mp4' }),
@@ -233,8 +274,10 @@ async function mergeOnce(files: File[], opts: MergeOptions, attempt: Attempt, si
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       audio: !!audioSource || !!packetSource,
       audioDropped: !opts.mute && hadSound && !audioSource && !packetSource,
+      ...(players.some(Boolean) ? { viaPlayer: true } : {}),
     };
   } finally {
+    for (const p of players) p?.dispose();
     for (const input of inputs) input.dispose?.();
   }
 }

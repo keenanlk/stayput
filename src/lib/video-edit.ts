@@ -26,7 +26,8 @@ import {
   type InputVideoTrack,
   type Rotation,
 } from 'mediabunny';
-import { CODEC_NAMES, unplayable } from './video-compress';
+import { CODEC_NAMES } from './video-compress';
+import { decodeOrElement, encodeFromElement, refused, unplayable, type ElementClip } from './video-fallback';
 import { executeWatched } from './encoder-watchdog';
 import { EncoderUnavailable, encodeRun, hasVideoEncoder } from './encoder-probe';
 import { codecsFor, planVideoCodec } from './video-codec';
@@ -44,6 +45,8 @@ import { context2d, releaseCanvas } from './canvas-memory';
 import { adoptPlan, capScale, hardwareOption, isShrinkable, retryOf, withRecovery, type Attempt, type RetryKind } from './edit-recovery';
 
 export interface EditOptions {
+  /** Tell apart where a decoder failed: before the first picture (DecodeFailedFirstFrame) or part-way (DecodeFailedMidRun), instead of one DecodeFailed. */
+  namedDecodeSteps?: boolean;
   mute?: boolean;
   /** Clockwise, applied first. */
   rotate?: Rotation;
@@ -101,6 +104,8 @@ export interface EditResult {
   timing?: { frames: number; paintMs: number; loopMs: number };
   /** Set when the first try failed and this is the second: after the page was hidden, or at a smaller size. */
   retry?: RetryKind;
+  /** Set when the pictures were decoded by the browser's own player (a <video> element), because WebCodecs could not decode them. */
+  viaPlayer?: boolean;
 }
 
 /**
@@ -283,18 +288,19 @@ export async function editVideo(file: File, opts: EditOptions): Promise<EditResu
  * the picture is decoded again where the run stopped: if that fails it was the decoder (DecodeFailed, not retried), otherwise the
  * encoder, and the error is returned as it came.
  */
-async function decoderOrEncoder(e: unknown, video: InputVideoTrack, duration: number, at: number): Promise<unknown> {
+async function decoderOrEncoder(e: unknown, video: InputVideoTrack, duration: number, at: number, named = false): Promise<unknown> {
   const name = (e as { name?: string } | null)?.name;
   if (name !== 'EncodingError' && name !== 'OperationError') return e;
   // A hidden page or a reclaimed codec fails a decoder too; the recovery that waits for the page handles those.
   if (document.hidden || isReclaim(e)) return e;
   return probeDecode(video, duration, at > 0 ? at : undefined).then(
     () => e,
-    (failed) => failed,
+    (failed) => (named && failed instanceof Error && failed.name === 'DecodeFailed' ? Object.assign(failed, { name: at > 0 ? 'DecodeFailedMidRun' : 'DecodeFailedFirstFrame' }) : failed),
   );
 }
 
 async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, sized?: (longestSide: number) => void): Promise<EditResult> {
+  let element: ElementClip | null = null;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const format = await input.getFormat().catch(readOrNull);
@@ -343,7 +349,8 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       };
     }
 
-    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
+    // WebCodecs cannot decode it: for a plain resize, rotate or flip the browser's own player may. Painted and cropped edits need WebCodecs frames.
+    element = await decodeOrElement(video, file, '', !opts.paint && !opts.crop);
     const crop = opts.crop
       ? {
           left: Math.max(0, Math.round(opts.crop.left)),
@@ -400,6 +407,11 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       flip = !flip;
     }
 
+    if (element) {
+      // Frames from the browser's own player; the output is the same MP4 a WebCodecs run writes.
+      const r = await encodeFromElement(file, element, { width, height, codec: videoCodec, bitrate, fit: 'fill', rotate, flip, attempt, mute: !!opts.mute, hasSound: !!sound, onProgress: opts.onProgress, stage: 'EditFailedWrite' });
+      return { blob: new Blob([r.buffer], { type: 'video/mp4' }), ext: 'mp4', width, height, duration, videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec, reencoded: true, audio: r.audio, audioDropped: r.audioDropped, viaPlayer: true };
+    }
     const paint = opts.paint;
     const timing = { frames: 0, paintMs: 0, loopMs: 0 };
     let loopStart = 0;
@@ -463,7 +475,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       });
       if (!conversion.isValid) {
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-        throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : failure('EditUnsupported', 'This browser cannot edit this video.');
+        throw reason === 'undecodable_source_codec' ? await refused(video, file) : failure('EditUnsupported', 'This browser cannot edit this video.');
       }
       await executeWatched(conversion, (p, t) => {
         processedTime = t;
@@ -474,7 +486,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       await out.disk?.abort();
       // Mediabunny cancels without waiting; let the failed try's decoder and encoder go before anything opens another.
       await releaseConversion(conversion, isShrinkable(e));
-      throw await decoderOrEncoder(e, video, duration, processedTime);
+      throw await decoderOrEncoder(e, video, duration, processedTime, opts.namedDecodeSteps);
     } finally {
       unguard();
       releaseCanvas(frame?.canvas);
@@ -493,6 +505,7 @@ async function editVideoOnce(file: File, opts: EditOptions, attempt: Attempt, si
       timing: paint ? timing : undefined,
     };
   } finally {
+    element?.dispose();
     input.dispose?.();
   }
 }
