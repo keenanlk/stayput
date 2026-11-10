@@ -165,11 +165,14 @@ test('writing captions from the speech of a file the phone cannot read says so, 
   expect(['AudioDecodeError', 'NoSoundTrack']).not.toContain(errorClass);
 });
 
-test('a video with no sound and no subtitle file gets a plain message under its own name', async ({ page }) => {
+test('a video with no sound and no subtitle file is refused when it is added, in plain words, and is no run', async ({ page }) => {
   test.setTimeout(90_000);
   await recordRuns(page);
-  await start(page, [clip]);
-  await expect(page.locator('#error')).toHaveClass(/is-active/, { timeout: 60_000 });
-  await expect(page.locator('#error')).toContainText('has no sound, so there are no words to write captions from. To burn in captions you already have, drop an SRT, VTT or ASS file with the video.');
-  expect((await lastRun(page)).error_class).toBe('NoSoundTrack');
+  await page.goto('/burn-subtitles-into-video');
+  await expect(page.locator('#tool')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#file-input').setInputFiles([clip]);
+  await expect(page.locator('#run-hint')).toContainText('has no sound, so there are no words to write captions from. To burn in captions you already have, drop an SRT, VTT or ASS file with the video.');
+  await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NoSoundTrack');
+  await expect(page.locator('#run')).toBeDisabled();
+  expect(await page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]').filter((e: { n: string }) => e.n === 'tool_run'))).toEqual([]);
 });

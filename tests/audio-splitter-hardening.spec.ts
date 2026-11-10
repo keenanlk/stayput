@@ -183,7 +183,6 @@ test('splits an MP3 into MP3 parts', async ({ browser }) => {
 
 // ---- Files that cannot be split: a named class for the real cause ----
 const REFUSED: { file: string; what: string; cls: RegExp }[] = [
-  { file: 'video-no-audio.mp4', what: 'a video with no sound track', cls: /^NoSoundTrack$/ },
   { file: 'text-renamed.mp3', what: 'a text file renamed .mp3', cls: /^(AudioDecodeError|UnreadableFile)$/ },
 ];
 for (const r of REFUSED) {
@@ -196,6 +195,20 @@ for (const r of REFUSED) {
     expect(o.message.length).toBeGreaterThan(20);
   });
 }
+
+test('a video with no sound track is refused when it is added, as NoSoundTrack, and is no run', async ({ browser }) => {
+  const { page, close } = await open(browser);
+  try {
+    await page.locator('#file-input').setInputFiles(fx('video-no-audio.mp4'));
+    await expect(page.locator('#run-hint')).toHaveAttribute('data-problem', 'NoSoundTrack', { timeout: 60_000 });
+    await expect(page.locator('#run-hint')).toContainText('has no sound track');
+    await expect(page.locator('#run')).toBeDisabled();
+    expect((await events(page)).filter((e) => e.n === 'tool_run')).toEqual([]);
+    record('video-no-audio.mp4', { state: 'blocked', message: 'refused at add', names: [], sizes: [], ms: 0 });
+  } finally {
+    await close();
+  }
+});
 
 test('a zero-length file is turned away when it is added, with the reason (no run is started)', async ({ browser }) => {
   const o = await splitFile(browser, fx('zero-length.mp3'), { times: '20' });

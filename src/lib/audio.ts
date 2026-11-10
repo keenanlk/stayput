@@ -8,7 +8,8 @@
 import { vendorDir } from './vendor';
 import { audioDecodeError } from './speech-errors';
 import { decodeWma, isAsf } from './wma-convert';
-import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
+import { decodeWithin, isCutShortWav, refuseOverBudget, refuseSoundlessContainer } from './decode-guard';
+import { audioCutShort, namedDecodeCause } from './audio-causes';
 import { retryUnreadable } from './read-failure';
 import { isPhoneBrowser } from './phone-limit';
 import { stretchLimit } from './phone-limit';
@@ -44,6 +45,7 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE, oddCodecs = tr
   // Windows Media Audio: no browser decodes it, so a separately loaded decoder module does.
   if (await isAsf(file)) return decodeWma(file, rate);
   await refuseSoundlessContainer(file);
+  await refuseOverBudget(file, rate);
   if (file.size > stretchBytes()) {
     const { decodePcmSliced } = await import('./pcm');
     // The stretch decoder's out-of-memory error is worded for a video; this is a recording.
@@ -65,12 +67,14 @@ export async function decodeAudio(file: File, rate = SAMPLE_RATE, oddCodecs = tr
     buffer = await decodeThroughDemuxer(file, rate, first).catch(async (error) => {
       // Sound in a codec the browser lacks (Opus in MP4, ALAC, AC-3, AMR): the page's decoders, or a named refusal.
       // A decoder that hung is not asked twice over, and a WAV the format itself rules out is named as such.
-      const hung = (first as { cause?: { name?: string } } | null)?.cause?.name === 'DecodeTimeout';
+      const named = namedDecodeCause(first);
+      // A decoder that hung, or a device out of memory, is not asked again by another decoder: it would only wait as long or fail the same way.
+      const hung = named?.name === 'DecodeTimeout' || named?.name === 'AudioOutOfMemory' || (first as { cause?: { name?: string } } | null)?.cause?.name === 'DecodeTimeout';
       const odd = oddCodecs && !hung && !(await isRf64(file)) ? await (await import('./pcm')).decodePcmByPageDecoders(file, rate) : null;
       if (odd?.[0]?.length) return toAudioBuffer(odd, rate);
       // Chrome cannot read AIFF at all, so plain PCM AIFF is read by hand as a last resort.
       const aiff = await decodeAiff(await read().catch(() => null), rate);
-      if (!aiff) throw (await unsupportedWav(file)) ?? error;
+      if (!aiff) throw (await unsupportedWav(file)) ?? named ?? namedDecodeCause(error) ?? ((await isCutShortWav(file)) ? audioCutShort(undefined, first) : error);
       return aiff;
     });
   }

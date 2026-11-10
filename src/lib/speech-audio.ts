@@ -148,7 +148,7 @@ function unlessUnreadable(e: unknown): null {
   return null;
 }
 
-const SPEECH_OWN = ['AudioDecodeError', 'OutOfMemoryError', 'UnsupportedSound', 'AudioDamaged', 'NotAnAudioFile'];
+const SPEECH_OWN = ['AudioDecodeError', 'OutOfMemoryError', 'UnsupportedSound', 'AudioDamaged', 'NotAnAudioFile', 'AudioCutShort', 'DecodeTimeout', 'AudioOutOfMemory', 'AudioTooLong'];
 
 /** Anything a decode throws, as one of the page's own errors. */
 function asSpeechError(e: unknown): Error {

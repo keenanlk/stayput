@@ -10,11 +10,24 @@ import { SNIFF_BYTES, sniffBytes, type Container } from './sniff';
 
 export interface IntakeProblem {
   /** The error class: UnsupportedContainer or FileNotDownloaded; NotReadableProbe for a file whose start reads but whose end or middle does not; UnreadableFileGone for a file that was refused before and is added again. */
-  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone';
+  name: 'UnsupportedContainer' | 'FileNotDownloaded' | 'NotReadableProbe' | 'UnreadableFileGone' | 'NoSoundTrack';
   message: string;
   /** One phrase of the message that links to a page that fixes it. */
   link?: { text: string; href: string };
+  /** The problem does not apply while another file in the list has a name matching this (a subtitle file beside a video with no sound). */
+  unlessWith?: RegExp;
 }
+
+/**
+ * What a video with no sound track is told, refused when the file is added. A tool whose work depends on sound says what it needs in its own
+ * words (remove-noise, add-subtitles); every other sound tool says it in general.
+ */
+const NO_SOUND_TEXT: Record<string, (name: string) => string> = {
+  'remove-noise': (name) => `${name} has no sound to clean.`,
+  'add-subtitles-to-video': (name) => `${name} has no sound, so there are no words to write captions from. To burn in captions you already have, drop an SRT, VTT or ASS file with the video.`,
+};
+/** Kept here, not in audio-causes.ts: this file is in every page's shell, and a shared module would become one more file each page's install fetches. */
+const noSoundText = (name: string, ...slugs: string[]): string => (slugs.map((s) => NO_SOUND_TEXT[s]).find(Boolean) ?? ((n: string) => `${n} has no sound track, so this tool has nothing to work on. Use a video or recording that has sound instead.`))(name);
 
 /** Where to send a container this tool cannot read. Only pages that are live are listed. */
 const CONVERTERS: Partial<Record<Container, { label: string; text?: string; href?: string }>> = {
@@ -28,6 +41,19 @@ const LEGACY_READERS = new Set(['video-to-mp4']);
 
 /** Tools that already refuse these containers themselves, with a message of their own, once Run is pressed. */
 const OWN_REFUSAL = new Set(['video-background-remover']);
+
+/**
+ * Tools that need the file's sound (their work is the sound, or words from it). A video container with no sound track is refused for them when it
+ * is added, as an input problem: nothing here counts it as a run. Presets are matched by the tool they are a preset of.
+ */
+const NEEDS_SOUND = new Set([
+  'video-to-mp3', 'trim-audio', 'audio-converter', 'volume-booster', 'remove-noise', 'merge-audio', 'transcribe', 'add-subtitles-to-video', 'vocal-remover', 'audio-splitter',
+  'audio-reverser', 'compress-audio', 'pitch-changer', 'bpm-key-finder', 'mp3-to-midi', 'remove-silence', 'audio-to-video',
+]);
+/** Of those, the tools that can still do their work on a video with no sound when given words of their own (an SRT, VTT or ASS file). */
+const OR_SUBTITLE_FILE = new Set(['add-subtitles-to-video']);
+const SUBTITLE_FILE = /\.(srt|vtt|ass|ssa)$/i;
+const VIDEO_CONTAINERS = new Set<Container>(['mp4', 'mov', '3gp', 'webm', 'mkv']);
 
 /** File types where a long run of zero bytes at the start is normal (disk images and raw dumps). */
 const ZERO_HEAD_OK = /\.(iso|img|dmg|bin|dat|raw|tga|vhd|vhdx|vmdk)$/i;
@@ -88,6 +114,15 @@ export async function inspectFile(file: File, tool: string, base: string, accept
   // A head shorter than the file claims is not a placeholder, and a big file is left to the tool (it reads in pieces and says what failed).
   if (container === 'zeros' && file.size <= SNAPSHOT_LIMIT && head.length >= Math.min(file.size, SNIFF_BYTES) && !ZERO_HEAD_OK.test(file.name)) {
     return { name: 'FileNotDownloaded', message: `${file.name} looks empty on this device, which usually means it is still in the cloud and only a placeholder was picked. ${SAVE_STEPS}` };
+  }
+
+  // A video with no sound track can't be helped by a tool that needs sound: said now, (the same index read that finds a file cut short, which is left to Run).
+  if ((NEEDS_SOUND.has(tool) || NEEDS_SOUND.has(base)) && VIDEO_CONTAINERS.has(container)) {
+    const refusal = await import('./decode-guard').then((m) => m.refuseSoundlessContainer(file)).then(() => null, (e: unknown) => (e instanceof Error ? e : null));
+    if (refusal?.name === 'NoSoundTrack') {
+      const own = OR_SUBTITLE_FILE.has(tool) || OR_SUBTITLE_FILE.has(base);
+      return { name: 'NoSoundTrack', message: noSoundText(file.name, tool, base), unlessWith: own ? SUBTITLE_FILE : undefined };
+    }
   }
 
   const fix = CONVERTERS[container];

@@ -109,7 +109,7 @@ export function stageError(step: string, e: unknown, opts: StageOptions = {}): E
   if (named) return e;
   const oom = ranOutOfMemory(e);
   const copy = oom ? opts.memory ?? AUDIO_COPY.memory : { message: opts.message ?? STEP_COPY[step]?.message ?? (e instanceof Error && e.message ? e.message : 'Something went wrong.'), links: opts.links ?? STEP_COPY[step]?.links };
-  const err = new NamedError(oom ? 'OutOfMemoryError' : step, copy.message, { cause: e });
+  const err = new NamedError(oom ? (/Decode/.test(step) ? 'AudioOutOfMemory' : 'OutOfMemoryError') : step, copy.message, { cause: e });
   if (copy.links?.length) (err as Error & { links?: ErrorLink[] }).links = copy.links;
   return err;
 }
