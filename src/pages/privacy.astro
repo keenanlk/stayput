@@ -1,5 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
+// Self-hosted builds (PUBLIC_ANALYTICS=off, the Docker default) carry no usage counter.
+const analyticsOn = import.meta.env.PUBLIC_ANALYTICS !== 'off';
 ---
 <Base title="Privacy | Stayput" description="Stayput never uploads your files. Here is exactly what the site does and does not do with your data.">
   <article class="wrap-narrow prose page">
@@ -17,6 +19,7 @@ import Base from '../layouts/Base.astro';
     <p>That is the complete list. There are no advertising scripts, no fonts from third parties and no cookies.</p>
     <p>The tools that cut a person out of a video (blur video background, green screen video and video background remover) and the tools that find faces (passport photo maker, profile picture maker, blur and pixelate image when you use its face finder, and blur faces in video) use Google's open-source MediaPipe library, served from this site. About a minute after it starts, the library tries to send a usage log to Google (odml.pa.googleapis.com). The site's security policy makes your browser refuse that request, so nothing reaches Google. You may see the blocked request as an error in your browser's console.</p>
     <h2>Usage counting</h2>
+    {!analyticsOn && <p><strong>This copy of Stayput was built without analytics.</strong> It loads no counting script and sends no usage data anywhere. The rest of this section describes how the hosted site at stayput.dev counts visits.</p>}
     <p>To know whether Stayput is useful, we count page views and a few anonymous events with Umami, an open-source analytics tool we host ourselves. It sets no cookies and stores nothing in your browser, and it does not follow you across sites. (The small notes the site itself keeps in your browser are described below; they never leave your device as-is.) Our server does group the events of one browser into a session, described under "What the stats server can see" below. If your browser sends a Do Not Track or Global Privacy Control signal, nothing is recorded at all.</p>
     <p>Every event, page views included, carries the site's address (stayput.dev) and the path of the page it happened on, such as "/tools/strip-exif". It never carries the query string or fragment of the address, the page title, your screen size, your browser language or the address of the page you came from. The details below are added for the events that have them:</p>
     <ul>
