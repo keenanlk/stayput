@@ -55,7 +55,7 @@
   },
   "qpdf": {
     "package": "@neslinesli93/qpdf-wasm",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "entry": "qpdf.js",
     "files": { "qpdf.js": "dist/qpdf.js", "qpdf.wasm": "dist/qpdf.wasm" },
     "licences": {
@@ -66,13 +66,11 @@
   },
   "mediapipe": {
     "package": "@mediapipe/tasks-vision",
-    "version": "1.2.0",
+    "version": "1.2.2",
     "entry": "vision_wasm_internal.js",
     "files": {
       "vision_wasm_internal.js": "wasm/vision_wasm_internal.js",
-      "vision_wasm_internal.wasm": "wasm/vision_wasm_internal.wasm",
-      "vision_wasm_nosimd_internal.js": "wasm/vision_wasm_nosimd_internal.js",
-      "vision_wasm_nosimd_internal.wasm": "wasm/vision_wasm_nosimd_internal.wasm"
+      "vision_wasm_internal.wasm": "wasm/vision_wasm_internal.wasm"
     }
   },
   "lame": {
