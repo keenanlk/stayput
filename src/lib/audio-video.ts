@@ -121,7 +121,7 @@ export async function audioToVideo(
   picture: ImageBitmap | null,
   opts: { shape: Shape; backdrop: Backdrop; title: string; onProgress?: (f: number) => void; onNotice?: (message: string) => void },
 ): Promise<AudioVideoResult> {
-  const pcm = await decodePcm(audio);
+  const pcm = await decodePcm(audio, true);
   if (!pcm) throw new UnreadableFile('No sound could be read from this file. It may use a format this browser cannot decode.');
   const sound = stereo(pcm);
   const duration = sound[0]!.length / SAMPLE_RATE;

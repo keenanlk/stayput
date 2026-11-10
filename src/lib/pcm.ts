@@ -8,15 +8,24 @@ import { ALL_FORMATS, AudioBufferSink, AudioSample, BlobSource, Input, type Audi
 import { foldToStereo } from './fold-channels';
 import { NamedError } from './input-error';
 import { isNotReadable, retryUnreadable } from './read-failure';
-import { decodeWithin, refuseSoundlessContainer } from './decode-guard';
+import { decodeWithin, isCutShortWav, refuseOverBudget, refuseSoundlessContainer } from './decode-guard';
+import { audioCutShort, namedDecodeCause } from './audio-causes';
+import { audioDecodeError } from './speech-errors';
 import { decoderOrder, soundOf, type SoundKind } from './audio-codecs';
 import { amrPcm, bareSound, ensureAc3, hasAudioDecoder, refusalFor } from './odd-audio';
 
 export const SAMPLE_RATE = 48_000;
 
-/** The file's sound as one or two channels at 48 kHz, or null when it has none the browser can read. */
-export async function decodePcm(file: Blob): Promise<Float32Array[] | null> {
+/**
+ * The file's sound as one or two channels at 48 kHz, or null when it has none the browser can read. The same order of decoders as the
+ * audio tools (decodeAudio): the browser's own decoder, the demuxer (Mediabunny, packets decoded in stretches), then the page's decoders
+ * (WebCodecs, Dolby, the AMR build) and the JS AIFF reader. With `strict`, a file nothing could read ends as the named cause (a codec this
+ * browser lacks, a file cut short, a decoder out of memory or out of time) instead of null; the video tools, which carry on without sound,
+ * leave it off.
+ */
+export async function decodePcm(file: Blob, strict = false): Promise<Float32Array[] | null> {
   const ctx = new OfflineAudioContext(2, 1, SAMPLE_RATE);
+  let first: unknown;
   try {
     await refuseSoundlessContainer(file);
     const buffer = await decodeWithin(ctx, () => retryUnreadable(file, () => file.arrayBuffer()));
@@ -24,13 +33,50 @@ export async function decodePcm(file: Blob): Promise<Float32Array[] | null> {
   } catch (e) {
     // A file the browser cannot read is not one it cannot decode: say so, as the demuxer would only fail the same way.
     if (isNotReadable(e) || (e instanceof Error && e.name === 'NoSoundTrack')) throw e;
-    // Safari refuses a QuickTime .mov whole; its sound track is read through the demuxer instead.
-    const { demuxedFileSound } = await import('./demux-audio');
-    return demuxedFileSound(file, SAMPLE_RATE, false).catch((err) => {
+    first = e;
+  }
+  const named = namedDecodeCause(first);
+  // A decoder that hung, or a device out of memory, is not asked again by another decoder: it would only wait as long or fail the same way.
+  const spent = named?.name === 'DecodeTimeout' || named?.name === 'AudioOutOfMemory';
+  // Safari refuses a QuickTime .mov whole; its sound track is read through the demuxer instead.
+  const { demuxedFileSound } = await import('./demux-audio');
+  const demuxed = spent ? null : await demuxedFileSound(file, SAMPLE_RATE, false).catch((err) => {
+    if (isNotReadable(err)) throw err;
+    return null;
+  });
+  if (demuxed?.[0]?.length) return demuxed;
+  let refusal: Error | null = null;
+  if (!spent) {
+    // Sound in a codec the browser lacks (Opus or FLAC in MP4, ALAC, AC-3, AMR): the page's own decoders.
+    const odd = await decodePcmByPageDecoders(file, SAMPLE_RATE).catch((err) => {
       if (isNotReadable(err)) throw err;
+      refusal = err instanceof Error ? err : null;
       return null;
     });
+    if (odd?.[0]?.length) return odd;
+    // Chrome cannot read AIFF at all: plain PCM AIFF is read by hand.
+    if (file.size <= WHOLE_FILE_LIMIT) {
+      const aiff = await readAiff(file);
+      if (aiff) return aiff;
+    }
   }
+  if (!strict) return null;
+  throw named ?? refusal ?? ((await isCutShortWav(file)) ? audioCutShort(undefined, first) : audioDecodeError(undefined, first));
+}
+
+/** Plain PCM AIFF or AIFC as channels at 48 kHz, or null when the file is not one this can read. */
+async function readAiff(file: Blob): Promise<Float32Array[] | null> {
+  const head = new Uint8Array(await file.slice(0, 12).arrayBuffer().catch(() => new ArrayBuffer(0)));
+  const form = new TextDecoder('latin1').decode(head.subarray(0, 4));
+  if (form !== 'FORM') return null;
+  const { parseAiff } = await import('./aiff');
+  const aiff = parseAiff(await file.arrayBuffer().catch(() => new ArrayBuffer(0)));
+  if (!aiff) return null;
+  const source = new AudioBuffer({ length: aiff.channels[0]!.length, numberOfChannels: aiff.channels.length, sampleRate: aiff.sampleRate });
+  aiff.channels.forEach((ch, c) => source.copyToChannel(ch as Float32Array<ArrayBuffer>, c));
+  const { resampleTo } = await import('./odd-audio');
+  const out = await resampleTo(source, SAMPLE_RATE);
+  return Array.from({ length: Math.min(2, out.numberOfChannels) }, (_, i) => out.getChannelData(i));
 }
 
 /** The largest file handed to the browser's decoder whole once the demuxer could not place its sound: it reads the file into memory, and a phone gives a tab far less than a desktop. */
@@ -87,6 +133,7 @@ async function decodedByCodecs(track: InputAudioTrack, rate: number): Promise<Fl
  */
 export async function decodePcmSliced(file: Blob, rate = SAMPLE_RATE, whole = true): Promise<Float32Array[] | null> {
   await refuseSoundlessContainer(file);
+  await refuseOverBudget(file, rate);
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   let sound: SoundKind | null = null;
   let cause: unknown;

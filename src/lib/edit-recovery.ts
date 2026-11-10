@@ -18,7 +18,7 @@
 import { codecFailure } from './codec-guard';
 
 /** Errors that say what the file is, or what the person gave: a retry cannot change them. */
-const FINAL = new Set(['InputError', 'UnreadableFile', 'UnreadableFileGone', 'EmptyFile', 'NotAnImageFile', 'NotAPdfFile', 'NotAnArchiveFile', 'NotAGifFile', 'FileTruncated', 'ImageDecodeFailed', 'PdfNoPages', 'PdfParseFailed', 'ArchiveParseFailed', 'PdfEncryptionUnsupported', 'UnreadableContainer', 'NotAVideoContainer', 'ContainerParseFailed', 'UnreadableHeaderShort', 'ContainerNotSupported', 'NoVideoTrack', 'UnknownDuration', 'UnsupportedCodec', 'AudioDecodeError', 'UnsupportedSound', 'AudioDamaged', 'NotAnAudioFile', 'UnsupportedAudioCodec', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound', 'DecodeFailed']);
+const FINAL = new Set(['InputError', 'UnreadableFile', 'UnreadableFileGone', 'EmptyFile', 'NotAnImageFile', 'NotAPdfFile', 'NotAnArchiveFile', 'NotAGifFile', 'FileTruncated', 'ImageDecodeFailed', 'PdfNoPages', 'PdfParseFailed', 'ArchiveParseFailed', 'PdfEncryptionUnsupported', 'UnreadableContainer', 'NotAVideoContainer', 'ContainerParseFailed', 'UnreadableHeaderShort', 'ContainerNotSupported', 'NoVideoTrack', 'UnknownDuration', 'UnsupportedCodec', 'AudioDecodeError', 'UnsupportedSound', 'AudioDamaged', 'NotAnAudioFile', 'UnsupportedAudioCodec', 'AudioCutShort', 'DecodeTimeout', 'AudioOutOfMemory', 'AudioTooLong', 'NoSoundTrack', 'ConversionInvalid', 'EditUnsupported', 'NoSpeechFound', 'DecodeFailed']);
 
 /**
  * What the shell stops an instant repeat of: FINAL, plus the other names that say the file itself cannot be used
