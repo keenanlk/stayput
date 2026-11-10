@@ -162,7 +162,8 @@ test('compress-video: a size target the length cannot meet is CompressTargetTooS
   expect((await lastRun(page))?.error_class).toBe('CompressTargetTooSmall');
 });
 
-test('compress-video: a result bigger than the original is reported as an outcome, not a failure', async ({ page }) => {
+test('compress-video: a result bigger than the original is reported as an outcome, not a failure', async ({ page, browserName }) => {
+  test.skip(browserName === 'webkit', "Safari's encoder makes this tiny clip smaller; the bigger-output case is Chromium's");
   test.setTimeout(240_000);
   await stubAnalytics(page);
   // A 1-second flat clip of a few KB: the encoder's output is bigger than it.
@@ -313,7 +314,8 @@ test('resize-video: a rotated source comes out upright at the size asked for', a
 });
 
 // ---- Reading failures win ----
-test('a read failure is never renamed by the new classes (Android NotReadable still ends as its own class)', async ({ browser }) => {
+test('a read failure is never renamed by the new classes (Android NotReadable still ends as its own class)', async ({ browser, browserName }) => {
+  test.skip(browserName === 'webkit', 'An Android phone is Chromium; the read-failure classes are covered on WebKit by their own specs');
   const context = await browser.newContext({ userAgent: ANDROID });
   const page = await context.newPage();
   await stubAnalytics(page);
