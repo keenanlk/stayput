@@ -500,7 +500,7 @@
   {
    "id": "mediabunny",
    "name": "Mediabunny",
-   "version": "1.65.2",
+   "version": "1.61.0",
    "npm": "mediabunny",
    "licences": [
     {
@@ -509,7 +509,7 @@
     }
    ],
    "project": "https://mediabunny.dev",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.65.2",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
    "shipped": "Bundled into the site JavaScript (video and audio tools)",
    "kind": "library",
    "copyleft": "mpl",
@@ -518,7 +518,7 @@
   {
    "id": "mediabunny-ac3",
    "name": "Mediabunny AC-3 extension",
-   "version": "1.65.2",
+   "version": "1.61.0",
    "npm": "@mediabunny/ac3",
    "licences": [
     {
@@ -527,7 +527,7 @@
     }
    ],
    "project": "https://mediabunny.dev/guide/extensions/ac3",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.65.2",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
    "shipped": "A separate script the page fetches only when a sound in Dolby Digital (AC-3) or Dolby Digital Plus (E-AC-3) is read (audio and caption tools)",
    "kind": "library",
    "copyleft": "mpl",
@@ -545,7 +545,7 @@
     }
    ],
    "project": "https://ffmpeg.org",
-   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.65.2",
+   "source": "https://github.com/Vanilagy/mediabunny/tree/v1.61.0",
    "via": "mediabunny-ac3",
    "shipped": "Compiled to WebAssembly and embedded in the Mediabunny AC-3 extension script, loaded only for Dolby Digital sound. Only FFmpeg libavcodec's AC-3 and E-AC-3 coders are included.",
    "kind": "wasm",

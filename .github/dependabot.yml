@@ -6,6 +6,15 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    ignore:
+      # Hold mediabunny and its AC-3 plugin at 1.61.x. 1.62 and later (checked
+      # through 1.65.2) stall on WebKit: tests/video-compress-recovery.spec.ts
+      # and tests/video-encoder.spec.ts time out on CI. Remove this once those
+      # two specs pass on a newer release.
+      - dependency-name: "mediabunny"
+        versions: [">1.61.0"]
+      - dependency-name: "@mediabunny/ac3"
+        versions: [">1.61.0"]
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
