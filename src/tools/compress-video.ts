@@ -2,6 +2,7 @@ import { bool, createShell, processEach, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { retryNote } from '../lib/edit-recovery';
 import type { CompressMode } from '../lib/video-compress';
+import { COMPRESS_COPY } from '../lib/video-reencode-copy';
 
 /**
  * Compress video. Each file is read, re-encoded and written as MP4 in the
@@ -49,6 +50,8 @@ createShell({
       const notes = [`${r.width}×${r.height}`, clock(r.duration), r.videoCodec];
       if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
       if (mode === 'size' && r.blob.size > targetMB * 1e6) notes.push(`a little over ${targetMB} MB, try the next size down`);
+      if (r.larger) notes.push(COMPRESS_COPY.larger);
+      if (r.viaPlayer) notes.push(COMPRESS_COPY.viaPlayer);
       const out: OutputFile = {
         name: suffixName(entry.file.name, '-compressed', 'mp4'),
         blob: r.blob,

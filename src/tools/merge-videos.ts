@@ -2,6 +2,7 @@ import { bool, createShell } from '../lib/shell';
 import type { OutputFile } from '../lib/files';
 import { retryNote } from '../lib/edit-recovery';
 import { InputError } from '../lib/input-error';
+import { MERGE_COPY } from '../lib/video-reencode-copy';
 
 /**
  * Merge videos. The clips are decoded, laid end to end and encoded once into
@@ -33,6 +34,7 @@ createShell({
     );
     const notes = [`${files.length} videos joined`, clock(r.duration), `${r.width}×${r.height}`, r.videoCodec];
     if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
+    if (r.viaPlayer) notes.push(MERGE_COPY.viaPlayer);
     const out: OutputFile = {
       name: 'merged.mp4',
       blob: r.blob,

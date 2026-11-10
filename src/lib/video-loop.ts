@@ -26,13 +26,14 @@ import {
   WebMOutputFormat,
   type InputVideoTrack,
 } from 'mediabunny';
-import { CODEC_NAMES, unplayable } from './video-compress';
+import { CODEC_NAMES } from './video-compress';
+import { decodeOrElement } from './video-fallback';
 import { watchEncode } from './encoder-watchdog';
 import type { RetryKind } from './edit-recovery';
 import { memoryRange, nameBare } from './bare-error';
 import { isNotReadable, notReadable } from './read-failure';
 import { containerParseFailed, explainNoContainer, requireVideoTrack } from './container-sniff';
-import { InputError, UnsupportedCodec, NamedError } from './input-error';
+import { InputError, NamedError } from './input-error';
 
 export interface LoopOptions {
   repeats: number;
@@ -111,7 +112,8 @@ async function loopOnce(file: File, opts: LoopOptions): Promise<LoopResult> {
 
     if (!videoOk || !soundOk) {
       // Not copyable: join the clip to itself through the merge path, which re-encodes once.
-      if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
+      // WebCodecs cannot decode it: the browser's own player may (the merge below plays it that way), else a class named for the cause.
+      (await decodeOrElement(video, file))?.dispose();
       const { mergeVideos } = await import('./video-merge');
       const r = await mergeVideos(Array.from({ length: opts.repeats }, () => file), { mute: opts.mute, onProgress: opts.onProgress, onNotice: opts.onNotice });
       return { blob: r.blob, ext: 'mp4', width: r.width, height: r.height, duration: r.duration, videoCodec: r.videoCodec, copied: false, audio: r.audio, audioDropped: r.audioDropped, retry: r.retry };

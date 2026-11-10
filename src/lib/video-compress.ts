@@ -6,7 +6,10 @@
  * the fallback where a browser lacks those encoders. Nothing leaves the tab.
  */
 import { requireVideoTrack } from './container-sniff';
-import { UnsupportedCodec, InputError, NamedError } from './input-error';
+import { InputError, NamedError } from './input-error';
+import { nameBare } from './bare-error';
+import { decodeOrElement, encodeFromElement, refused, unplayable, type ElementClip } from './video-fallback';
+import { COMPRESS_COPY } from './video-reencode-copy';
 import {
   BlobSource,
   BufferTarget,
@@ -62,6 +65,10 @@ export interface CompressResult {
   audioDropped: boolean;
   /** Set when the file was made on a retry after the encoder gave up or the page was hidden. */
   retry?: RetryKind;
+  /** Set when the file was decoded by the browser's own player (a <video> element), because WebCodecs could not decode it. */
+  viaPlayer?: boolean;
+  /** Set when the result is as big as, or bigger than, the original: an outcome, not a failure. */
+  larger?: boolean;
 }
 
 const QUALITY: Record<Exclude<CompressMode, 'size'>, Quality> = { small: QUALITY_LOW, balanced: QUALITY_MEDIUM, high: QUALITY_HIGH };
@@ -73,13 +80,7 @@ const MIN_BPP = 0.05;
 
 const even = (n: number) => Math.max(2, 2 * Math.round(n / 2));
 
-export function unplayable(nav: Pick<Navigator, 'userAgent'> | undefined = typeof navigator === 'undefined' ? undefined : navigator): string {
-  // "Try Safari" does not help on an Android phone, where the clip is usually HEVC or HDR from the camera.
-  if (nav && /Android/i.test(nav.userAgent)) {
-    return 'This phone cannot decode this video. Clips recorded as HEVC (H.265) or HDR often cannot be read in the browser here: in the camera settings choose "Most compatible" (H.264) or turn HDR video off, record again, then add the new clip. Nothing was uploaded.';
-  }
-  return 'This browser cannot decode this video. iPhone videos are often HEVC (H.265), which Chrome and Firefox on Windows or Linux cannot read: try Safari, or set the iPhone camera to "Most Compatible".';
-}
+export { unplayable };
 
 /** Width and height with the short side at most `short`, keeping the aspect ratio. */
 function fit(w: number, h: number, short: number): { width: number; height: number } {
@@ -103,14 +104,16 @@ async function copiedSoundBitrate(track: InputAudioTrack): Promise<number> {
 export async function compressVideo(file: File, opts: CompressOptions): Promise<CompressResult> {
   const page = pageRecoveryHooks(opts.onNotice);
   let made = 0;
+  const at = { step: 'Open' };
   try {
     return await withRecovery(
       async (attempt) => {
         const done = encodeRun(attempt);
         try {
-          const r = await compressOnce(file, opts, attempt, (side) => (made = side));
+          const r = await compressOnce(file, opts, attempt, (side) => (made = side), at);
           const retry = retryOf(attempt);
-          return retry ? { ...r, retry } : r;
+          const done2 = retry ? { ...r, retry } : r;
+          return r.blob.size >= file.size ? { ...done2, larger: true } : done2;
         } finally {
           done();
         }
@@ -118,16 +121,22 @@ export async function compressVideo(file: File, opts: CompressOptions): Promise<
       () => made,
       page.hooks,
     );
+  } catch (e) {
+    // A failure with no name of its own is named for the step it stopped at (see CompressFailed* in the error classes).
+    throw nameBare(`CompressFailed${at.step}`, e);
   } finally {
     page.dispose();
   }
 }
 
-async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<CompressResult> {
+async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt, sized: (longestSide: number) => void, at: { step: string }): Promise<CompressResult> {
+  at.step = 'Open';
+  let element: ElementClip | null = null;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
-    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
+    // WebCodecs cannot decode it: the browser's own player may (HEVC on a Mac, say). Neither: a class named for the cause.
+    element = await decodeOrElement(video, file);
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     const soundOk = sound ? await sound.canDecode() : false;
     const duration = await input.computeDuration();
@@ -155,7 +164,7 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
       videoBitrate = bits;
       if (bits < 120_000) {
         const most = Math.floor((target * 8 * 0.9) / (184_000 * 60));
-        throw new NamedError('VideoCompressFailed', `This video is too long to fit in ${opts.targetMB} MB and still be watchable. Trim it to under ${most} minute${most === 1 ? '' : 's'}, or choose a larger size.`);
+        throw new NamedError('CompressTargetTooSmall', COMPRESS_COPY.tooLong(opts.targetMB ?? 10, most));
       }
       // Pick the largest picture that the bitrate can fill with enough detail.
       const fps = 30;
@@ -166,6 +175,7 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
       audioBitrate = QUALITY[opts.mode];
     }
 
+    at.step = 'Plan';
     // A retry after the encoder gave up asks for a smaller picture than the first try's; a phone given a 4K source starts at 1080p.
     capAtRisk(attempt, Math.max(srcW, srcH), false, file.size);
     const wanted = capScale(attempt, Math.max(width, height));
@@ -178,7 +188,7 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
     }
     sized(Math.max(width, height));
     const videoCodec = plan.codec;
-    if (!videoCodec) throw new NamedError('VideoCompressFailed', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
+    if (!videoCodec) throw new NamedError('CompressFailedPlan', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
     const audioCodec =
       sound && soundOk && !copySound
         ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: Math.min(2, sound.numberOfChannels), sampleRate: 48_000, bitrate: audioBitrate })
@@ -186,7 +196,18 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
 
     const audioRate = await aacSafeSampleRate(sound);
 
+    let dropped = false;
+    let soundKept = false;
     const encodeAt = async (bitrate: number | Quality, onProgress?: (f: number) => void): Promise<ArrayBuffer> => {
+      at.step = 'Init';
+      if (element) {
+        // Frames come from the player; the picture is baked at the output size, sound is decoded by the page and re-encoded.
+        at.step = 'Execute';
+        const r = await encodeFromElement(file, element, { width, height, codec: videoCodec, bitrate, fit: 'contain', attempt, mute: opts.mute, hasSound: !!sound || (!opts.mute && !!(await input.getPrimaryAudioTrack().catch(() => null))), onProgress, stage: 'CompressFailedWrite' });
+        dropped = r.audioDropped;
+        soundKept = r.audio;
+        return r.buffer;
+      }
       const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
       const conversion = await Conversion.init({
         input,
@@ -211,11 +232,13 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
       });
       if (!conversion.isValid) {
         const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-        throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoCompressFailed', 'This browser cannot convert this video.');
+        throw reason === 'undecodable_source_codec' ? await refused(video, file) : new NamedError('CompressFailedInit', 'This browser cannot convert this video.');
       }
+      at.step = 'Execute';
       await executeWatched(conversion, onProgress);
+      at.step = 'Write';
       const buffer = output.target.buffer;
-      if (!buffer) throw new NamedError('VideoCompressFailed', 'The video could not be written.');
+      if (!buffer) throw new NamedError('CompressFailedWrite', 'The video could not be written.');
       return buffer;
     };
 
@@ -253,10 +276,12 @@ async function compressOnce(file: File, opts: CompressOptions, attempt: Attempt,
       height,
       duration,
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
-      audio: !!audioCodec || copySound,
-      audioDropped: !!sound && !audioCodec && !copySound,
+      ...(element
+        ? { audio: soundKept, audioDropped: dropped, viaPlayer: true }
+        : { audio: !!audioCodec || copySound, audioDropped: !!sound && !audioCodec && !copySound }),
     };
   } finally {
+    element?.dispose();
     input.dispose?.();
   }
 }

@@ -17,6 +17,7 @@ sync();
 videoEditShell({
   suffix: '-resized',
   verb: 'Resizing',
+  namedDecodeSteps: true,
   async options(file) {
     const mute = bool('mute');
     const choice = str('size', '720');

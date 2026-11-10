@@ -1,6 +1,7 @@
 import { createShell, processEach } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { nameBare } from '../lib/bare-error';
+import { RESIZE_COPY } from '../lib/video-reencode-copy';
 import { retryNote } from '../lib/edit-recovery';
 import { lazyImport, warm } from '../lib/lazy-import';
 import type { EditOptions, EditResult } from '../lib/video-edit';
@@ -26,6 +27,8 @@ export function describeEdit(r: EditResult): string {
 export function videoEditShell(config: {
   suffix: string;
   verb: string;
+  /** Name where a decoder failed (DecodeFailedFirstFrame, DecodeFailedMidRun) instead of one DecodeFailed. */
+  namedDecodeSteps?: boolean;
   /** Read the options for one file (some depend on the video's own size). */
   options: (file: File) => Promise<Omit<EditOptions, 'onProgress'>> | Omit<EditOptions, 'onProgress'>;
   /** More to say about the file just made, after the size and codec. */
@@ -56,6 +59,7 @@ export function videoEditShell(config: {
         // A file the phone could not read is read once more, and a failure with no name of its own is named, inside editVideo.
         const r = await editVideo(entry.file, {
           ...options,
+          namedDecodeSteps: config.namedDecodeSteps,
           onNotice: (message) => progress.set(`${entry.file.name}: ${message}`, share(0.02)),
           onProgress: (f) => progress.set(`${config.verb} ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.02 + f * 0.98)),
         });
@@ -63,7 +67,7 @@ export function videoEditShell(config: {
           name: suffixName(entry.file.name, config.suffix, r.ext),
           blob: r.blob,
           originalSize: entry.file.size,
-          note: [describeEdit(r) + retryNote(r.retry, r), config.note?.()].filter(Boolean).join(', '),
+          note: [describeEdit(r) + retryNote(r.retry, r), r.viaPlayer ? RESIZE_COPY.viaPlayer : undefined, config.note?.()].filter(Boolean).join(', '),
         };
         return out;
       });
