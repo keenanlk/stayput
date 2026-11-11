@@ -18,8 +18,8 @@
 /pdf-to-kindle	PDF to Kindle: Make a PDF Readable, No Upload | Stayput
 /resize-image-to-3000x3000	Resize an Image to 3000×3000, No Upload | Stayput
 /guides/is-ezgif-safe	Is Ezgif Safe? What Happens to Your Uploads
-/guides/is-freeconvert-safe	Is FreeConvert Safe? Its File Policy Explained
-/guides/is-ilovepdf-safe	Is iLovePDF Safe? How It Handles Your PDFs
+/guides/is-freeconvert-safe	Is FreeConvert.com Safe to Use? Its File Policy Explained
+/guides/is-ilovepdf-safe	Is iLovePDF Safe to Use? How It Handles Your PDFs
 /jpg-to-svg	JPG to SVG Converter for Cricut, No Upload | Stayput
 /tools/adjust-image	Adjust Photo Brightness and Contrast, No Upload | Stayput
 /tools/archive-extractor	Open RAR, ZIP and 7z Files Online, No Upload | Stayput

@@ -627,10 +627,10 @@ export const tools: Tool[] = [
     lead:
       'Removes the open password and the print, copy and edit restrictions from a PDF and saves a copy that opens freely; if the PDF asks for a password to open, you need to know it, because this cannot crack passwords. It is free, and your PDF and its password are not uploaded: the PDF is unlocked in your browser. The size limit is your device’s memory (phones hold less), and after your first run on a protected PDF the page works offline.',
     name: 'Unlock PDF',
-    title: 'Unlock PDF: Remove a PDF Password, Free and Private | Stayput',
+    title: 'Unlock PDF: Free PDF Password Remover, No Upload | Stayput',
     description:
-      'Remove the password and restrictions from a PDF you can open. Runs in your browser, so the file and its password are never uploaded.',
-    heading: 'Unlock a PDF',
+      'Unlock a PDF: remove the password and the print, copy and edit locks from a PDF you can open. Free, in your browser; the file and password are not uploaded.',
+    heading: 'Unlock a PDF and remove its password',
     tagline: 'Remove the open password and the print, copy and edit restrictions from a PDF whose password you know.',
     category: 'pdf',
     accept: 'application/pdf,.pdf',
@@ -644,6 +644,10 @@ export const tools: Tool[] = [
       'Save copies that open without a password and have no restrictions.',
     ],
     faq: [
+      {
+        q: 'How do I remove a password from a PDF?',
+        a: 'Drop the PDF here, type the password that opens it and press Remove password. The copy that downloads opens without a password and has no print, copy or edit restrictions. A PDF that opens without a password but blocks printing or copying needs no password here at all.',
+      },
       {
         q: 'Can this open a PDF when I don’t know the password?',
         a: 'No. It removes a password you already have, so you don’t have to type it every time or so other apps can edit the file. It does not guess or crack passwords.',
@@ -2489,8 +2493,8 @@ export const tools: Tool[] = [
     icon: 'pen',
     name: 'Signature maker',
     title: 'Free Signature Maker & Generator, Transparent PNG | Stayput',
-    description: 'Draw, type or photograph your signature and save it as a transparent PNG, or an SVG when drawn. Free, no sign-up; nothing you make is uploaded.',
-    heading: 'Make a signature',
+    description: 'Signature maker: draw, type or photograph your signature and save it as a transparent PNG, or an SVG when drawn. Free, no sign-up; nothing is uploaded.',
+    heading: 'Signature maker: make a transparent PNG signature',
     tagline: 'Draw it with a finger or mouse, type your name in a script font, or take it from a photo. Save a transparent PNG for documents, or place it on a PDF.',
     category: 'pdf',
     accept: '.txt',
@@ -5303,10 +5307,10 @@ export const tools: Tool[] = [
     slug: 'image-to-base64',
     icon: 'convert',
     name: 'Image to Base64',
-    title: 'Image to Base64 Converter, Data URI, No Upload | Stayput',
+    title: 'Image to Base64 Converter: PNG, JPG, SVG to Data URI | Stayput',
     description:
-      'Turn PNG, JPG, WebP, GIF, SVG, AVIF or ICO images into Base64 and ready-to-paste data URIs, HTML and CSS snippets. Free, in your browser, nothing is uploaded.',
-    heading: 'Convert image to Base64',
+      'Convert an image to Base64: PNG, JPG, WebP, GIF, SVG, AVIF or ICO to a data URI or raw string, with HTML and CSS to copy. Free, nothing is uploaded.',
+    heading: 'Convert an image to Base64 or a data URI',
     tagline: 'Get the data URI, the raw Base64 and ready-made HTML and CSS for any image, with the size it adds. Your image never leaves this tab.',
     category: 'images',
     accept: 'image/*,.svg,.ico,.avif',
@@ -5320,6 +5324,10 @@ export const tools: Tool[] = [
       'Press Copy next to the one you need, or download the data URI as a .txt file.',
     ],
     faq: [
+      {
+        q: 'How do I convert a PNG to Base64?',
+        a: 'Drop the PNG here and press Encode to Base64. Copy the data URI for an img src or a CSS url(), or the raw Base64 for JSON or an API field. JPG, WebP, GIF, SVG, AVIF and ICO work the same way.',
+      },
       {
         q: 'What is the difference between the data URI and the Base64?',
         a: 'The Base64 is the file’s bytes written as text. The data URI is that text with a prefix such as data:image/png;base64, in front, which is what a browser needs to show it from an img src or a CSS url(). Use the data URI for HTML and CSS, and the raw Base64 for an API field or JSON that wants only the encoded bytes.',

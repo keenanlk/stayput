@@ -122,7 +122,7 @@ const does: Record<string, string> = {
   'create-zip': 'Zips files or whole folders into one ZIP and can lock it with an AES-256 password.',
   'rename-files': 'Renames many files at once with a prefix or suffix, numbering, find and replace or a letter-case change, shows every new name first, and downloads the result as a ZIP.',
   'raw-preview': 'Pulls the full-size JPEG preview out of Canon CR2 and CR3, Nikon NEF, Sony ARW and DNG RAW files, byte for byte, and tells you its size before you download it.',
-  'image-to-base64': 'Encodes PNG, JPG, WebP, GIF, SVG, AVIF and ICO images as Base64 and gives you the data URI, HTML and CSS snippets, with the size the encoding adds.',
+  'image-to-base64': 'Converts an image to a Base64 string: a PNG, JPG, WebP, GIF, SVG, AVIF or ICO becomes a data URI, raw Base64 and ready-to-paste HTML and CSS, with the size the encoding adds.',
   'favicon-generator': 'Makes favicon.ico, apple-touch-icon, Android and maskable icons and a site.webmanifest from one PNG, JPG or SVG.',
   'remove-background': 'Removes the background from a photo and saves a transparent PNG, or a white or coloured background, at full resolution.',
   'passport-photo': 'Makes a 2 × 2 inch US passport photo or a 35 × 45 mm photo from a selfie, plus a 4 × 6 print sheet.',
