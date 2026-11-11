@@ -786,10 +786,10 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-freeconvert-safe',
-    title: 'Is FreeConvert Safe? Its File Policy Explained',
-    description: 'As of October 2026, FreeConvert says it stores uploads on AWS in Ireland and deletes them after 8 hours. What that means for private files, and how to convert common formats without uploading.',
+    title: 'Is FreeConvert.com Safe to Use? Its File Policy Explained',
+    description: 'Yes, for everyday files: FreeConvert.com deletes uploads after 8 hours and keeps them on AWS in Ireland, its privacy policy says. When not to upload.',
     heading: 'Is FreeConvert safe?',
-    dek: 'FreeConvert is a legitimate service with a clear deletion policy. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
+    dek: 'Yes: FreeConvert.com is a legitimate converter with a clear deletion policy, and fine for everyday files. Whether it is safe for a particular file depends on whether that file should be uploaded anywhere.',
     keywords: ['is freeconvert safe', 'freeconvert safe', 'is freeconvert.com safe', 'freeconvert privacy', 'is freeconvert legit', 'freeconvert virus'],
     updated: '2026-10-14',
     tools: ['convert-image', 'compress-image', 'video-to-gif', 'video-to-mp3'],
@@ -834,6 +834,7 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
+      { q: 'Is FreeConvert.com safe to use?', a: 'For everyday files, yes. It is a legitimate service, and its privacy policy says uploads are deleted automatically after 8 hours. Like any upload converter, it keeps your file on its servers until then, so for private documents use a tool that works on your device, such as [Convert image](/tools/convert-image).' },
       { q: 'Is FreeConvert legit?', a: 'Yes. Its terms name TransMedia Inc. of Toronto, Canada as the operator, and its privacy policy gives a fixed deletion period.' },
       { q: 'How long does FreeConvert keep my files?', a: 'As of October 2026, its privacy policy says uploaded files are deleted automatically after 8 hours, and you can delete them manually before then.' },
       { q: 'Where are FreeConvert files stored?', a: 'On Amazon Web Services in Ireland, according to its privacy policy.' },
@@ -842,10 +843,10 @@ export const guides: Guide[] = [
   },
   {
     slug: 'is-ilovepdf-safe',
-    title: 'Is iLovePDF Safe? How It Handles Your PDFs',
-    description: 'As of October 2026, iLovePDF says it is ISO 27001 certified and deletes files within two hours. What that covers, and how to edit PDFs without uploading.',
+    title: 'Is iLovePDF Safe to Use? How It Handles Your PDFs',
+    description: 'Yes, for ordinary PDFs: iLovePDF is ISO 27001 certified, follows GDPR and deletes files within two hours. When to keep a PDF off any server instead.',
     heading: 'Is iLovePDF safe?',
-    dek: 'iLovePDF is an established European service with good published practices. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
+    dek: 'Yes: iLovePDF is an established European service with good published practices, and fine for ordinary PDFs. For confidential PDFs, the safer question is whether they need to be uploaded at all.',
     keywords: ['is ilovepdf safe', 'ilovepdf safe', 'is ilovepdf legit', 'ilovepdf privacy', 'ilovepdf security', 'ilovepdf alternative'],
     updated: '2026-10-14',
     tools: ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf'],
@@ -890,10 +891,10 @@ export const guides: Guide[] = [
       },
     ],
     faq: [
-      { q: 'Is iLovePDF legit?', a: 'Yes. It is an established Europe-based service with ISO/IEC 27001 certification and GDPR compliance, according to its security page.' },
+      { q: 'Is iLovePDF safe to use?', a: 'For ordinary PDFs, yes. It is an established Europe-based service with ISO/IEC 27001 certification and GDPR compliance, and its security page says processed files are deleted within two hours. For confidential documents, use a tool that does not upload them.' },
       { q: 'How long does iLovePDF keep my files?', a: 'As of October 2026, its security page says processed files are deleted automatically within two hours. Documents signed with its e-signature service are kept for up to five years.' },
       { q: 'Does iLovePDF have an offline version?', a: 'Yes. Per its desktop page, iLovePDF Desktop for Windows and Mac processes files offline. Browser tools like Stayput’s are another option that needs no installation.' },
-      { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s Merge PDF joins files inside the page; after one visit and a short wait, it keeps working with the network switched off.' },
+      { q: 'How can I merge PDFs without uploading them?', a: 'Use a tool that runs in the browser. Stayput’s [Merge PDF](/tools/merge-pdf) joins files inside the page; after one visit and a short wait, it keeps working with the network switched off.' },
     ],
   },
   {
