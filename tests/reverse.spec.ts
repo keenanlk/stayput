@@ -127,14 +127,14 @@ test('an odd-sized video comes out with even sides and plays', async ({ page }) 
   expect(look.duration).toBeGreaterThan(0);
 });
 
-test('a 10-bit HEVC clip is reversed or refused as UnsupportedCodec, never a bare Error', async ({ page }) => {
+test('a 10-bit HEVC clip is reversed or refused with the class of its cause (UnsupportedHdr here), never a bare Error', async ({ page }) => {
   test.setTimeout(240_000);
   await stubBeacon(page);
   await open(page, tenBit);
   await page.locator('#run').click();
   await expect.poll(() => page.evaluate(() => JSON.parse(sessionStorage.getItem('__ev') || '[]').some((e: { n: string }) => e.n === 'tool_run')), { timeout: 150_000 }).toBe(true);
   const run = await page.evaluate(() => (JSON.parse(sessionStorage.getItem('__ev') || '[]') as { n: string; d: Record<string, string> }[]).filter((e) => e.n === 'tool_run').at(-1)?.d);
-  if (run?.outcome === 'error') expect(['UnsupportedCodec', 'UnreadableFile']).toContain(run.error_class);
+  if (run?.outcome === 'error') expect(['UnsupportedCodec', 'UnsupportedHevc', 'UnsupportedHdr', 'UnreadableFile']).toContain(run.error_class);
   else expect(run?.outcome).not.toBe('error');
 });
 
