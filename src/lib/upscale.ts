@@ -12,6 +12,7 @@ import { LIGHT_OUTPUT_PIXELS, isPhoneBrowser, fullSizeChosen, lightNow } from '.
 import { NamedError } from './input-error';
 import { fromWorkerFailure } from './worker-error';
 import { MODEL_STALL_MS } from './model-stall';
+import { modelOffline, networkUp } from './model-fetch';
 import { ranOutOfMemory } from './bare-error';
 import { UPSCALE_COPY, crashError, memoryError } from './upscale-copy';
 
@@ -51,8 +52,14 @@ export function targetSize(w: number, h: number, factor: number, light = lightNo
   return { width: Math.max(1, Math.floor(w * f)), height: Math.max(1, Math.floor(h * f)), factor: f };
 }
 
+/** How the model is named in the shared download messages. */
+const MODEL_LABEL = { model: 'upscaling model', size: '4.9 MB' };
+
 /** The worker died, or went silent, rather than answering: the one failure that is tried again on a new worker. */
-class WorkerGone extends Error {}
+class WorkerGone extends Error {
+  /** Whether the worker had said anything at all: one that never did could not even start (its script did not load). */
+  heard = false;
+}
 
 type Done = { rgba: Uint8ClampedArray; width: number; height: number };
 type RunOpts = { onLoading?: (f: number) => void; onProgress?: (f: number) => void; /** Only tests set this (as __stayputUpscaleSilentMs). */ silentMs?: number };
@@ -69,6 +76,7 @@ function run(rgba: Uint8ClampedArray, width: number, height: number, opts: RunOp
     let watchdog: ReturnType<typeof setTimeout> | undefined;
     // 'start': nothing heard yet. 'model': downloading or starting the model. 'run': the tiles.
     let phase: 'start' | 'model' | 'run' = 'start';
+    const gone = (why: string) => Object.assign(new WorkerGone(why), { heard: phase !== 'start' });
     const settle = (finish: () => void) => {
       clearTimeout(watchdog);
       w.removeEventListener('message', onMessage);
@@ -89,7 +97,7 @@ function run(rgba: Uint8ClampedArray, width: number, height: number, opts: RunOp
         );
         return;
       }
-      watchdog = setTimeout(() => settle(() => reject(new WorkerGone('The upscaler stopped answering.'))), opts.silentMs ?? (globalThis as { __stayputUpscaleSilentMs?: number }).__stayputUpscaleSilentMs ?? UPSCALE_SILENT_MS);
+      watchdog = setTimeout(() => settle(() => reject(gone('The upscaler stopped answering.'))), opts.silentMs ?? (globalThis as { __stayputUpscaleSilentMs?: number }).__stayputUpscaleSilentMs ?? UPSCALE_SILENT_MS);
     };
     const onMessage = (e: MessageEvent) => {
       const msg = e.data as { id: number; type: string; fraction?: number; rgba?: Uint8ClampedArray; width?: number; height?: number; name?: string; message?: string };
@@ -111,7 +119,7 @@ function run(rgba: Uint8ClampedArray, width: number, height: number, opts: RunOp
         reject(fromWorkerFailure(msg.name, msg.message ?? 'Upscaling failed.'));
       });
     };
-    const onError = (e: ErrorEvent) => settle(() => reject(new WorkerGone(e.message || 'The upscaler stopped.')));
+    const onError = (e: ErrorEvent) => settle(() => reject(gone(e.message || 'The upscaler stopped.')));
     w.addEventListener('message', onMessage);
     w.addEventListener('error', onError);
     arm();
@@ -120,12 +128,16 @@ function run(rgba: Uint8ClampedArray, width: number, height: number, opts: RunOp
   });
 }
 
-/** Run on the worker; one that dies or goes silent is replaced and the same picture is sent once more. A second death is WorkerCrashError. */
+/**
+ * Run on the worker. One that dies or goes silent is replaced and the same picture sent once more; a second death is
+ * WorkerCrashError. A model that downloaded but will not start (ModelLoadError) leaves its worker unfit to try again, so that too
+ * is retried once on a new worker, and a second failure keeps its own name.
+ */
 async function runOnFreshWorkerIfLost(rgba: Uint8ClampedArray, width: number, height: number, opts: RunOpts): Promise<Done> {
   try {
     return await run(rgba, width, height, opts);
   } catch (e) {
-    if (!(e instanceof WorkerGone)) throw e;
+    if (!(e instanceof WorkerGone) && !(e instanceof Error && e.name === 'ModelLoadError')) throw e;
   }
   dropWorker();
   try {
@@ -133,6 +145,8 @@ async function runOnFreshWorkerIfLost(rgba: Uint8ClampedArray, width: number, he
   } catch (e) {
     if (!(e instanceof WorkerGone)) throw e;
     dropWorker();
+    // A worker that never started, on a device with no connection, is a page that cannot fetch its own script: offline, not a crash.
+    if (!e.heard && (typeof navigator !== 'undefined' && navigator.onLine === false ? true : !(await networkUp()))) throw modelOffline(MODEL_LABEL);
     throw crashError(e);
   }
 }
