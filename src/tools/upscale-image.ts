@@ -3,6 +3,7 @@ import { canvasToBlob, decodeImage, extForType, thumbnail, type EncodeType } fro
 import { suffixName, type OutputFile } from '../lib/files';
 import { upscaleImage } from '../lib/upscale';
 import { NamedError } from '../lib/input-error';
+import { UPSCALE_COPY } from '../lib/upscale-copy';
 
 bindRange('quality', 'quality-out');
 
@@ -25,24 +26,39 @@ createShell({
       const decoded = await decodeImage(entry.file);
       const type = outputType(entry.file, choice);
       try {
-        const { canvas, factor: made } = await upscaleImage(decoded.bitmap, factor, {
+        const { canvas, factor: made, smaller } = await upscaleImage(decoded.bitmap, factor, {
           background: type === 'image/jpeg' ? '#ffffff' : undefined,
           onLoading: (f) => progress.set(`Downloading the upscaling model (4.9 MB, once): ${Math.round(f * 100)}%`, share(0.05)),
           onProgress: (f) => progress.set(`Upscaling ${entry.file.name}: ${Math.round(f * 100)}%`, share(0.1 + f * 0.8)),
         });
         progress.set(`Saving ${entry.file.name}…`, share(0.95));
-        const blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : quality);
-        if (blob.type !== type) throw new NamedError('UpscaleImageFailed', `This browser cannot save ${extForType(type).toUpperCase()} images.`);
-        const bmp = await createImageBitmap(canvas);
-        const capped = made < factor - 0.01 ? `, held to ${fmt(made)} (the largest a browser can hold)` : '';
+        const format = extForType(type).toUpperCase();
+        let blob: Blob;
+        try {
+          blob = await canvasToBlob(canvas, type, type === 'image/png' ? undefined : quality);
+        } catch (e) {
+          // A picture too big to encode is a memory failure; anything else is the save step.
+          throw e instanceof Error && e.name === 'OutOfMemoryError' ? e : new NamedError('UpscaleSaveFailed', UPSCALE_COPY.save(format), { cause: e });
+        }
+        if (blob.type !== type) throw new NamedError('UpscaleSaveFailed', UPSCALE_COPY.save(format));
+        // The small preview is a courtesy: a browser that cannot make one still hands over the picture.
+        let previewUrl: string | undefined;
+        try {
+          const bmp = await createImageBitmap(canvas);
+          previewUrl = await thumbnail(bmp);
+          bmp.close();
+        } catch {
+          previewUrl = undefined;
+        }
+        const why = smaller === 'memory' ? `, ${UPSCALE_COPY.smallerMemory(fmt(made))}` : smaller === 'device' ? `, ${UPSCALE_COPY.smallerDevice(fmt(made))}` : '';
+        const capped = !smaller && made < factor - 0.01 ? `, held to ${fmt(made)} (the largest a browser can hold)` : '';
         const out: OutputFile = {
           name: suffixName(entry.file.name, `-${Math.round(made)}x`, extForType(type)),
           blob,
           originalSize: entry.file.size,
-          previewUrl: await thumbnail(bmp),
-          note: `${decoded.bitmap.width}×${decoded.bitmap.height} to ${canvas.width}×${canvas.height}${capped}`,
+          previewUrl,
+          note: `${decoded.bitmap.width}×${decoded.bitmap.height} to ${canvas.width}×${canvas.height}${capped}${why}`,
         };
-        bmp.close();
         return out;
       } finally {
         decoded.bitmap.close();

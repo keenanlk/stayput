@@ -10,6 +10,8 @@ import * as ort from 'onnxruntime-web/wasm';
 import { vendorDir } from './vendor';
 import { workerFailure } from './worker-error';
 import { NamedError } from './input-error';
+import { loadModelBytes } from './model-fetch';
+import { modelEntry } from './model-manifest';
 
 export const MODEL_URL = '/models/realesr-general-x4v3.onnx';
 export const SCALE = 4;
@@ -19,34 +21,21 @@ const PAD = 10;
 export type Request = { id: number; type: 'upscale'; rgba: Uint8ClampedArray; width: number; height: number };
 export type Reply =
   | { id: number; type: 'loading'; fraction: number }
+  | { id: number; type: 'working' }
   | { id: number; type: 'progress'; fraction: number }
   | { id: number; type: 'done'; rgba: Uint8ClampedArray; width: number; height: number }
   | { id: number; type: 'error'; name: string; message: string };
 
 let session: Promise<ort.InferenceSession> | undefined;
 
-async function fetchModel(onProgress: (f: number) => void): Promise<Uint8Array> {
-  const res = await fetch(MODEL_URL);
-  if (!res.ok || !res.body) throw new NamedError('ModelDownloadError', `The upscaling model could not be downloaded (HTTP ${res.status}). Check your connection and try again.`);
-  const total = Number(res.headers.get('content-length')) || 0;
-  const reader = res.body.getReader();
-  const parts: Uint8Array[] = [];
-  let got = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    parts.push(value);
-    got += value.length;
-    if (total) onProgress(Math.min(1, got / total));
-  }
-  const bytes = new Uint8Array(got);
-  let o = 0;
-  for (const p of parts) {
-    bytes.set(p, o);
-    o += p.length;
-  }
-  return bytes;
-}
+/** The model, whole and checked: a kept copy that still matches the manifest, else a resumed, size- and hash-checked download (see model-fetch.ts). */
+const fetchModel = (onProgress: (f: number) => void): Promise<Uint8Array> =>
+  loadModelBytes(MODEL_URL, {
+    label: { model: 'upscaling model', size: '4.9 MB' },
+    entry: modelEntry(MODEL_URL),
+    onProgress,
+    onKeepFailed: (err) => console.warn('The upscaling model could not be kept for next time', err),
+  });
 
 function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {
   session ??= (async () => {
@@ -54,11 +43,23 @@ function load(onProgress: (f: number) => void): Promise<ort.InferenceSession> {
     // Threads need a cross-origin-isolated page, which this site is not.
     ort.env.wasm.numThreads = 1;
     const model = await fetchModel(onProgress);
-    return ort.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+    try {
+      return await ort.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+    } catch (err) {
+      // A file that downloaded whole but will not start: out of memory when it says so, else the load itself.
+      const f = failure(err, 'ModelLoadError');
+      throw new NamedError(f.name, f.message);
+    }
   })();
   // A failed load (offline on first use, say) may be retried by the next request.
   session.catch(() => (session = undefined));
   return session;
+}
+
+/** workerFailure, with a RangeError (a buffer that could not be made) counted as memory like the engine's own messages. */
+function failure(err: unknown, step: string): { name: string; message: string } {
+  if (err instanceof RangeError) return { name: 'OutOfMemoryError', message: err.message };
+  return workerFailure(err, step);
 }
 
 async function upscale(s: ort.InferenceSession, rgba: Uint8ClampedArray, W: number, H: number, onProgress: (f: number) => void): Promise<Uint8ClampedArray> {
@@ -111,10 +112,19 @@ self.onmessage = async (e: MessageEvent<Request>) => {
   const { id, rgba, width, height } = e.data;
   const post = (msg: Reply, transfer: Transferable[] = []) => (self as unknown as Worker).postMessage(msg, transfer);
   try {
+    // The page waits for a first word, so a worker that never starts is told apart from one that is downloading.
+    post({ id, type: 'loading', fraction: 0 });
     const s = await load((fraction) => post({ id, type: 'loading', fraction }));
-    const result = await upscale(s, rgba, width, height, (fraction) => post({ id, type: 'progress', fraction }));
+    post({ id, type: 'working' });
+    let result: Uint8ClampedArray;
+    try {
+      result = await upscale(s, rgba, width, height, (fraction) => post({ id, type: 'progress', fraction }));
+    } catch (err) {
+      const f = failure(err, 'UpscaleRunFailed');
+      throw new NamedError(f.name, f.message);
+    }
     post({ id, type: 'done', rgba: result, width: width * SCALE, height: height * SCALE }, [result.buffer]);
   } catch (err) {
-    post({ id, type: 'error', ...workerFailure(err) });
+    post({ id, type: 'error', ...workerFailure(err, 'UpscaleRunFailed') });
   }
 };
