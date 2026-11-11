@@ -1,6 +1,7 @@
 import { bool, createShell, processEach, str } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { retryNote } from '../lib/edit-recovery';
+import { PLAYER_COPY } from '../lib/video-reencode-copy';
 
 /**
  * Change video speed. Each video is re-timed and re-encoded in the page (see
@@ -31,7 +32,8 @@ createShell({
         onNotice: (m) => progress.set(m, share(0.02)),
       });
       const notes = [`${speed}× speed`, `now ${clock(r.duration)}`, `${r.width}×${r.height}`, r.videoCodec];
-      if (!r.audio) notes.push('no sound');
+      if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
+      if (r.viaPlayer) notes.push(PLAYER_COPY.viaPlayer);
       const out: OutputFile = {
         name: suffixName(entry.file.name, `-${String(speed).replace('.', '_')}x`, 'mp4'),
         blob: r.blob,

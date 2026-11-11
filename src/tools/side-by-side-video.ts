@@ -2,6 +2,7 @@ import { createShell, str } from '../lib/shell';
 import { formatBytes, suffixName, type OutputFile } from '../lib/files';
 import { retryNote } from '../lib/edit-recovery';
 import { NamedError } from '../lib/input-error';
+import { PLAYER_COPY } from '../lib/video-reencode-copy';
 import { isPhoneBrowser, PHONE_SAFE_BYTES } from '../lib/phone-limit';
 import type { SbsFit, SbsLayout, SbsLength, SbsSound } from '../lib/side-by-side-plan';
 
@@ -104,6 +105,7 @@ const shell = createShell({
     const notes = [`${r.width}×${r.height}`, clock(r.duration), `${r.fps} fps`, r.videoCodec];
     if (r.audio) notes.push('with sound');
     else notes.push(r.audioNote || 'no sound');
+    if (r.viaPlayer) notes.push(PLAYER_COPY.viaPlayerSome);
     const out: OutputFile = {
       name: suffixName(files[0]!.file.name, '-side-by-side', 'mp4'),
       blob: r.blob,

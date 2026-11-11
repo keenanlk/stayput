@@ -1,6 +1,7 @@
 import { bool, createShell, processEach } from '../lib/shell';
 import { replaceExt, type OutputFile } from '../lib/files';
 import { retryNote } from '../lib/edit-recovery';
+import { PLAYER_COPY } from '../lib/video-reencode-copy';
 
 /**
  * Video to AVI. Each file is re-encoded in the page and written by a hand-made AVI writer (see
@@ -34,6 +35,7 @@ createShell({
       const notes = [`${r.width}×${r.height}`, clock(r.duration), `${r.videoCodec} at ${Math.round(r.fps * 100) / 100} fps`];
       if (r.audio) notes.push(`${r.audio} sound`);
       else notes.push(r.audioDropped ? 'sound left out: this browser cannot read it' : 'no sound');
+      if (r.viaPlayer) notes.push(PLAYER_COPY.viaPlayer);
       const out: OutputFile = {
         name: replaceExt(entry.file.name, 'avi'),
         blob: r.blob,

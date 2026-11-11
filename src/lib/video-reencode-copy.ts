@@ -26,3 +26,13 @@ export const MERGE_COPY = {
 export const RESIZE_COPY = {
   viaPlayer: "read through the browser's own video player, as this video could not be read the usual way",
 };
+
+/** Sentences shared by the tools added to the player fallback after the first three (convert, speed, reverse, frames, side by side). */
+export const PLAYER_COPY = {
+  /** The same sentence as COMPRESS_COPY.viaPlayer and RESIZE_COPY.viaPlayer. */
+  viaPlayer: RESIZE_COPY.viaPlayer,
+  /** The same sentence as MERGE_COPY.viaPlayer: a note for a result made from two clips. */
+  viaPlayerSome: MERGE_COPY.viaPlayer,
+  /** existing (side by side): the sound of the chosen clip could not be read. */
+  soundUnreadable: 'sound left out: this browser cannot read it',
+};

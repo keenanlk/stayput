@@ -1,6 +1,7 @@
 import { bool, createShell, processEach } from '../lib/shell';
 import { suffixName, type OutputFile } from '../lib/files';
 import { retryNote } from '../lib/edit-recovery';
+import { PLAYER_COPY } from '../lib/video-reencode-copy';
 
 /**
  * Reverse video. Each video is decoded backwards in short windows and encoded
@@ -29,7 +30,8 @@ createShell({
         onNotice: (m) => progress.set(`${entry.file.name}: ${m}`, share(0.02)),
       });
       const notes = ['reversed', clock(r.duration), `${r.width}×${r.height}`, r.videoCodec];
-      if (!r.audio) notes.push('no sound');
+      if (!r.audio) notes.push(r.audioDropped ? 'sound left out: this browser cannot encode it' : 'no sound');
+      if (r.viaPlayer) notes.push(PLAYER_COPY.viaPlayer);
       const out: OutputFile = {
         name: suffixName(entry.file.name, '-reversed', 'mp4'),
         blob: r.blob,

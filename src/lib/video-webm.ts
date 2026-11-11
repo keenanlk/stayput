@@ -26,8 +26,9 @@ import {
   type VideoCodec,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
-import { CODEC_NAMES, unplayable } from './video-compress';
-import { UnsupportedCodec, NamedError } from './input-error';
+import { CODEC_NAMES } from './video-compress';
+import { decodeOrElement, encodeFromElement, refused, type ElementClip } from './video-fallback';
+import { NamedError } from './input-error';
 import { evenSize, peekScale, type ConvertOptions, type ConvertResult } from './video-convert';
 import { capScale, hardwareOption, type Attempt } from './edit-recovery';
 import { runRecovered } from './video-run';
@@ -41,6 +42,7 @@ export function convertToWebm(file: File, opts: ConvertOptions): Promise<Convert
 }
 
 async function webmOnce(file: File, opts: ConvertOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<ConvertResult> {
+  let element: ElementClip | null = null;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
@@ -54,7 +56,8 @@ async function webmOnce(file: File, opts: ConvertOptions, attempt: Attempt, size
     let copyVideo = !!sourceVideo && WEBM_VIDEO.includes(sourceVideo);
     let best: VideoCodec | null = null;
     if (!copyVideo) {
-      if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
+      // WebCodecs cannot decode it: the browser's own player may (HEVC on a Mac, say). Neither: a class named for the cause.
+      element = await decodeOrElement(video, file);
       best = await getFirstEncodableVideoCodec(['vp9', 'vp8'], { width: evenSize(evenW * peekScale(attempt, Math.max(evenW, evenH))), height: evenSize(evenH * peekScale(attempt, Math.max(evenW, evenH))), bitrate: QUALITY_HIGH });
       if (!best) {
         throw new NamedError('VideoWebmFailed', 'This browser cannot write WebM video (it has no VP8 or VP9 encoder). Use a recent Chrome, Edge or Firefox on a computer.');
@@ -66,6 +69,29 @@ async function webmOnce(file: File, opts: ConvertOptions, attempt: Attempt, size
     const outW = k < 1 ? evenSize(evenW * k) : evenW;
     const outH = k < 1 ? evenSize(evenH * k) : evenH;
     sized(copyVideo ? 0 : Math.max(outW, outH));
+
+    if (element) {
+      // A WebM holds VP8, VP9 or AV1 picture and Opus sound only: the pictures come from the player and the sound is decoded by the page.
+      const hasSound = !opts.mute && !!(await input.getPrimaryAudioTrack().catch(() => null));
+      const r = await encodeFromElement(file, element, {
+        width: outW,
+        height: outH,
+        codec: videoCodec,
+        bitrate: QUALITY_HIGH,
+        fit: 'contain',
+        attempt,
+        mute: opts.mute,
+        hasSound,
+        container: 'webm',
+        onProgress: opts.onProgress,
+        stage: 'VideoWebmFailedWrite',
+      });
+      // Same refusal as the usual path: a WebM without its sound is not written unless the person asked for that.
+      if (r.audioDropped) {
+        throw new NamedError('VideoWebmFailed', 'This browser cannot convert this file’s sound to Opus, which a WebM needs. Tick Remove the sound to convert the picture alone, or use a recent Chrome, Edge or Firefox.');
+      }
+      return { blob: new Blob([r.buffer], { type: 'video/webm' }), width: outW, height: outH, duration, videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec, videoCopied: false, audio: r.audio, audioDropped: false, viaPlayer: true };
+    }
 
     const sound = opts.mute ? null : await input.getPrimaryAudioTrack();
     let audioCodec: AudioCodec | null = null;
@@ -92,7 +118,7 @@ async function webmOnce(file: File, opts: ConvertOptions, attempt: Attempt, size
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoWebmFailed', 'This browser cannot convert this video.');
+      throw reason === 'undecodable_source_codec' ? await refused(video, file) : new NamedError('VideoWebmFailed', 'This browser cannot convert this video.');
     }
     if (audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack())) {
       throw new NamedError('VideoWebmFailed', 'This browser cannot read this file’s sound. Tick Remove the sound to convert the picture alone, or use a recent Chrome, Edge or Firefox.');
@@ -111,6 +137,7 @@ async function webmOnce(file: File, opts: ConvertOptions, attempt: Attempt, size
       audioDropped: false,
     };
   } finally {
+    element?.dispose();
     input.dispose?.();
   }
 }

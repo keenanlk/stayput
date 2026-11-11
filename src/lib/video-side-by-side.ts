@@ -26,16 +26,18 @@ import {
   type InputAudioTrack,
   type InputVideoTrack,
 } from 'mediabunny';
-import { CODEC_NAMES, unplayable } from './video-compress';
+import { CODEC_NAMES } from './video-compress';
+import { decodeOrElement, showAt, drawInCell, type ElementClip } from './video-fallback';
 import { watchEncode } from './encoder-watchdog';
 import { codecsFor, planVideoCodec } from './video-codec';
 import { adoptPlan, capScale, encodeOptions, type Attempt, type RetryKind } from './edit-recovery';
 import { runRecovered } from './video-run';
 import { SAMPLE_RATE, decodePcm, pcmFeeder, stereo } from './pcm';
 import { firstEncodableSound, noAudioEncoder } from './mp3-fallback';
-import { UnsupportedCodec, NamedError } from './input-error';
+import { NamedError } from './input-error';
 import { nameBare } from './bare-error';
 import { copyClipSound, pictureLength } from './video-merge';
+import { PLAYER_COPY } from './video-reencode-copy';
 import { estimateMemory, memoryVerdict, outputFps, outputSeconds, planSideBySide, scalePlan, type Plan, type SbsFit, type SbsLayout, type SbsLength, type SbsSound } from './side-by-side-plan';
 
 export interface SideBySideOptions {
@@ -62,6 +64,8 @@ export interface SideBySideResult {
   audioNote: string;
   /** Set when the file was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
   retry?: RetryKind;
+  /** Set when a clip was decoded by the browser's own player (a <video> element), because WebCodecs could not decode it. */
+  viaPlayer?: boolean;
 }
 
 interface Clip {
@@ -73,20 +77,35 @@ interface Clip {
   rate: number;
   width: number;
   height: number;
+  /** Set when only the browser's own player can read this clip's pictures: they are taken from it, one frame at a time. */
+  player: ElementClip | null;
 }
 
 const mb = (n: number) => `${Math.round(n / 1e6).toLocaleString('en-US')} MB`;
 
 async function openClip(file: File): Promise<Clip> {
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
-  const track = await input.getPrimaryVideoTrack().catch(() => null);
-  if (!track) throw new NamedError('NoVideoTrack', `${file.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
-  if (!(await track.canDecode())) throw new UnsupportedCodec(`${file.name}: ${unplayable()}`);
-  const { first, length } = await pictureLength(track);
-  if (length <= 0) throw new NamedError('NoPicture', `${file.name} has no picture to show.`);
-  const stats = await track.computePacketStats(120).catch(() => null);
-  return { file, input, track, first, length, rate: stats?.averagePacketRate ?? 30, width: track.displayWidth, height: track.displayHeight };
+  let player: ElementClip | null = null;
+  try {
+    const track = await input.getPrimaryVideoTrack().catch(() => null);
+    if (!track) throw new NamedError('NoVideoTrack', `${file.name} has no video this page can read (MP4, MOV, WebM or MKV).`);
+    // WebCodecs cannot decode it: the browser's own player may. Neither: a class named for the cause, and the message names this clip.
+    player = await decodeOrElement(track, file, `${file.name}: `);
+    const { first, length } = await pictureLength(track);
+    if (length <= 0) throw new NamedError('NoPicture', `${file.name} has no picture to show.`);
+    const stats = await track.computePacketStats(120).catch(() => null);
+    return { file, input, track, first, length, rate: stats?.averagePacketRate ?? 30, width: track.displayWidth, height: track.displayHeight, player };
+  } catch (e) {
+    player?.dispose();
+    input.dispose?.();
+    throw e;
+  }
 }
+
+const closeClip = (c: Clip) => {
+  c.player?.dispose();
+  c.input.dispose?.();
+};
 
 /** Draw a sample into its cell of the output, letterboxed or cropped to fill. */
 function drawCell(ctx: OffscreenCanvasRenderingContext2D, scratch: OffscreenCanvas, sample: VideoSample, cell: Plan['a'], fit: SbsFit) {
@@ -99,7 +118,14 @@ function drawCell(ctx: OffscreenCanvasRenderingContext2D, scratch: OffscreenCanv
 
 /** What a memory estimate would be for these two clips and options, without encoding anything. */
 export async function sideBySideEstimate(files: File[], o: Omit<SideBySideOptions, 'onProgress'>) {
-  const [a, b] = await Promise.all(files.slice(0, 2).map(openClip));
+  const opened = await Promise.allSettled(files.slice(0, 2).map(openClip));
+  const failed = opened.find((r): r is PromiseRejectedResult => r.status === 'rejected');
+  if (failed) {
+    // One clip could not be opened: the other is closed, and the error names the one that failed.
+    for (const r of opened) if (r.status === 'fulfilled') closeClip(r.value);
+    throw failed.reason;
+  }
+  const [a, b] = opened.map((r) => (r as PromiseFulfilledResult<Clip>).value);
   try {
     const plan = planSideBySide(a!.width, a!.height, b!.width, b!.height, o.layout, o.fit);
     const fps = outputFps(a!.rate, b!.rate);
@@ -107,8 +133,8 @@ export async function sideBySideEstimate(files: File[], o: Omit<SideBySideOption
     const bytes = estimateMemory({ ...plan, fps, seconds, sound: o.sound, soundSeconds: Math.max(a!.length, b!.length) });
     return { ...plan, fps, seconds, bytes, refusal: memoryVerdict(bytes, !!o.phone, mb) };
   } finally {
-    a!.input.dispose?.();
-    b!.input.dispose?.();
+    closeClip(a!);
+    closeClip(b!);
   }
 }
 
@@ -151,7 +177,7 @@ async function sideBySideOnce(files: File[], opts: SideBySideOptions, attempt: A
     if (k < wanted) plan = scaleBy(k);
     sized(Math.max(plan.width, plan.height));
     const videoCodec = found.codec;
-    if (!videoCodec) throw new NamedError('VideoSideBySideFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
+    if (!videoCodec) throw new NamedError('SideBySideCodecFailed', 'This browser cannot encode video at this size. Try a recent version of Chrome, Edge or Safari.');
 
     stage = 'SideBySideSoundFailed';
     // Sound: A's, B's, or both mixed, cut or padded with silence to the output's length.
@@ -190,7 +216,7 @@ async function sideBySideOnce(files: File[], opts: SideBySideOptions, attempt: A
           for (const ch of pcm) for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(ch[i]!));
           if (peak > 1) for (const ch of pcm) for (let i = 0; i < len; i++) ch[i]! /= peak;
         } else {
-          audioNote = 'sound left out: this browser cannot read it';
+          audioNote = PLAYER_COPY.soundUnreadable;
         }
         if (pcm) {
           audioCodec = await firstEncodableSound(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH });
@@ -228,22 +254,29 @@ async function sideBySideOnce(files: File[], opts: SideBySideOptions, attempt: A
         const ctx = canvas.getContext('2d')!;
         const scratchA = new OffscreenCanvas(plan.a.w, plan.a.h);
         const scratchB = new OffscreenCanvas(plan.b.w, plan.b.h);
-        const itA = new VideoSampleSink(a.track).samplesAtTimestamps(times(a));
-        const itB = new VideoSampleSink(b.track).samplesAtTimestamps(times(b));
+        // A clip only the browser's player can read is not decoded here: the player is moved to each moment and drawn from.
+        const itA = a.player ? null : new VideoSampleSink(a.track).samplesAtTimestamps(times(a));
+        const itB = b.player ? null : new VideoSampleSink(b.track).samplesAtTimestamps(times(b));
+        const at = (clip: Clip, k: number) => Math.min(k / fps, Math.max(0, clip.length - 0.5 / fps));
         let lastA: VideoSample | null = null;
         let lastB: VideoSample | null = null;
         for (let k = 0; k < frames; k++) {
-          const [ra, rb] = await Promise.all([itA.next(), itB.next()]);
-          const sa: VideoSample | null = ra.value ?? lastA;
-          const sb: VideoSample | null = rb.value ?? lastB;
+          const [ra, rb] = await Promise.all([
+            itA ? itA.next() : showAt(a.player!.video, at(a, k)).then(() => null),
+            itB ? itB.next() : showAt(b.player!.video, at(b, k)).then(() => null),
+          ]);
+          const sa: VideoSample | null = ra?.value ?? lastA;
+          const sb: VideoSample | null = rb?.value ?? lastB;
           if (lastA && lastA !== sa) lastA.close();
           if (lastB && lastB !== sb) lastB.close();
           lastA = sa;
           lastB = sb;
           ctx.fillStyle = '#000';
           ctx.fillRect(0, 0, plan.width, plan.height);
-          if (sa) drawCell(ctx, scratchA, sa, plan.a, opts.fit);
-          if (sb) drawCell(ctx, scratchB, sb, plan.b, opts.fit);
+          if (a.player) drawInCell(ctx, a.player.video, plan.a.x, plan.a.y, plan.a.w, plan.a.h, opts.fit);
+          else if (sa) drawCell(ctx, scratchA, sa, plan.a, opts.fit);
+          if (b.player) drawInCell(ctx, b.player.video, plan.b.x, plan.b.y, plan.b.w, plan.b.h, opts.fit);
+          else if (sb) drawCell(ctx, scratchB, sb, plan.b, opts.fit);
           const t = k / fps;
           const frame = new VideoSample(canvas, { timestamp: t, duration: 1 / fps });
           await feed.until(t);
@@ -266,7 +299,7 @@ async function sideBySideOnce(files: File[], opts: SideBySideOptions, attempt: A
     );
     stage = 'SideBySideWriteFailed';
     const buffer = output.target.buffer;
-    if (!buffer) throw new NamedError('VideoSideBySideFailed', 'The video could not be written.');
+    if (!buffer) throw new NamedError('SideBySideWriteFailed', 'The video could not be written.');
     opts.onProgress?.(1);
     return {
       blob: new Blob([buffer], { type: 'video/mp4' }),
@@ -277,10 +310,11 @@ async function sideBySideOnce(files: File[], opts: SideBySideOptions, attempt: A
       videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
       audio: !!audioSource || !!packetSource,
       audioNote,
+      ...(a.player || b.player ? { viaPlayer: true } : {}),
     };
   } catch (e) {
     throw nameBare(stage, e);
   } finally {
-    for (const c of clips) c.input.dispose?.();
+    for (const c of clips) closeClip(c);
   }
 }

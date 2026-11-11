@@ -26,14 +26,16 @@ import {
   AudioSampleSource,
   getFirstEncodableAudioCodec,
   type AudioCodec,
+  type VideoCodec,
 } from 'mediabunny';
 import { executeWatched } from './encoder-watchdog';
 import { aacSafeSampleRate, codecsFor, planVideoCodec, type CodecPlan } from './video-codec';
 import { adoptPlan, hardwareOption, type Attempt, type RetryKind } from './edit-recovery';
 import { runRecovered } from './video-run';
 import { H264Unavailable } from './encoder-probe';
-import { CODEC_NAMES, unplayable } from './video-compress';
-import { UnsupportedCodec, NamedError } from './input-error';
+import { CODEC_NAMES } from './video-compress';
+import { decodeOrElement, encodeFromElement, refused, type ElementClip } from './video-fallback';
+import { NamedError } from './input-error';
 import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 
@@ -57,6 +59,8 @@ export interface ConvertResult {
   audioDropped: boolean;
   /** Set when a re-encode was made on a retry, or at the smaller size that worked earlier in this tab. */
   retry?: RetryKind;
+  /** Set when the pictures came through the browser's own video player (a <video> element), because WebCodecs could not decode them. */
+  viaPlayer?: boolean;
 }
 
 /**
@@ -92,6 +96,7 @@ function convertVideo(file: File, opts: ConvertOptions, container: ConvertFormat
 
 async function convertOnce(file: File, opts: ConvertOptions, container: ConvertFormat, attempt: Attempt, sized: (longestSide: number) => void): Promise<ConvertResult> {
   const mov = container === 'mov';
+  let element: ElementClip | null = null;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
@@ -116,7 +121,8 @@ async function convertOnce(file: File, opts: ConvertOptions, container: ConvertF
       // iPhone HEVC in a browser that cannot decode it: MP4 can hold HEVC as it is,
       // which plays on Apple devices, Android and recent Windows.
       if (sourceVideo === 'hevc') copyVideo = true;
-      else throw new UnsupportedCodec(unplayable());
+      // Anything else WebCodecs cannot decode: the browser's own player may (AV1 on a Safari without it, say); neither is a class named for the cause.
+      else element = await decodeOrElement(video, file);
     }
     if (!copyVideo && silent) throw silent;
     if (!copyVideo && !best && mov) throw new NamedError('VideoConvertFailed', 'This browser cannot write H.264 video, which a MOV needs to play in QuickTime. Use a recent Safari, Chrome or Edge.');
@@ -128,6 +134,39 @@ async function convertOnce(file: File, opts: ConvertOptions, container: ConvertF
     const outH = k < 1 ? evenSize(evenH * k) : evenH;
     sized(copyVideo ? 0 : Math.max(outW, outH));
     const duration = await input.computeDuration();
+
+    if (element) {
+      // The pictures come from the player and are written as H.264 (or the codec the browser can write, for an MP4); the sound is decoded by the page and re-encoded.
+      const hasSound = !opts.mute && !!(await input.getPrimaryAudioTrack().catch(() => null));
+      const r = await encodeFromElement(file, element, {
+        width: outW,
+        height: outH,
+        codec: videoCodec as VideoCodec,
+        bitrate: QUALITY_HIGH,
+        fit: 'contain',
+        attempt,
+        mute: opts.mute,
+        hasSound,
+        container,
+        soundCodec: mov ? undefined : (config) => firstEncodableSound(['aac', 'opus'], config),
+        onProgress: opts.onProgress,
+        stage: 'VideoConvertFailedWrite',
+      });
+      if (mov && r.audioDropped) {
+        throw new NamedError('VideoConvertFailed', 'This browser cannot convert this file’s sound to AAC, which a MOV needs to play in QuickTime. Tick Remove the sound to convert the picture alone, or use a recent Safari, Chrome or Edge.');
+      }
+      return {
+        blob: new Blob([r.buffer], { type: mov ? 'video/quicktime' : 'video/mp4' }),
+        width: outW,
+        height: outH,
+        duration,
+        videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec,
+        videoCopied: false,
+        audio: r.audio,
+        audioDropped: r.audioDropped,
+        viaPlayer: true,
+      };
+    }
 
     // MP3 is re-encoded for a MOV: QuickTime's own sound codec is AAC.
     const audioCopy = mov ? ['aac'] : PLAYS_EVERYWHERE_AUDIO;
@@ -175,7 +214,7 @@ async function convertOnce(file: File, opts: ConvertOptions, container: ConvertF
     });
     if (!conversion.isValid) {
       const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-      throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoConvertFailed', 'This browser cannot convert this video.');
+      throw reason === 'undecodable_source_codec' ? await refused(video, file) : new NamedError('VideoConvertFailed', 'This browser cannot convert this video.');
     }
     // The sound track can still be discarded when this browser cannot decode it.
     const soundLost = !!audioCodec && conversion.discardedTracks.some((d) => d.track.isAudioTrack());
@@ -206,6 +245,7 @@ async function convertOnce(file: File, opts: ConvertOptions, container: ConvertF
       audioDropped: !!sound && !pcm && (!audioCodec || soundLost),
     };
   } finally {
+    element?.dispose();
     input.dispose?.();
   }
 }

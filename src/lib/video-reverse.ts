@@ -27,8 +27,9 @@ import {
   type VideoSamplePixelFormat,
 } from 'mediabunny';
 import { watchEncode } from './encoder-watchdog';
-import { CODEC_NAMES, unplayable } from './video-compress';
-import { InputError, NamedError, UnsupportedCodec } from './input-error';
+import { CODEC_NAMES } from './video-compress';
+import { decodeOrElement, encodeFromElement, refused, type ElementClip } from './video-fallback';
+import { InputError, NamedError } from './input-error';
 import { codecsFor, planVideoCodec } from './video-codec';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { capAtRisk, pageRecoveryHooks } from './recovery-hooks';
@@ -50,6 +51,10 @@ export interface ReverseResult {
   duration: number;
   videoCodec: string;
   audio: boolean;
+  /** Set when the file had sound that this browser could not read or encode, so it was left out (player path only; the usual path says so by throwing). */
+  audioDropped?: boolean;
+  /** Set when the pictures came through the browser's own video player (a <video> element), because WebCodecs could not decode them. */
+  viaPlayer?: boolean;
   /** Set when the file was made on a retry after the encoder gave up or the page was hidden, or at the smaller size that worked earlier in this tab. */
   retry?: RetryKind;
 }
@@ -141,25 +146,30 @@ export async function reverseVideo(file: File, opts: ReverseOptions): Promise<Re
 }
 
 async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<ReverseResult> {
+  let element: ElementClip | null = null;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await requireVideoTrack(input, file, 'This file has no video this page can read (MP4, MOV, WebM or MKV).');
-    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
-    const first = await video.getFirstTimestamp();
+    // WebCodecs cannot decode it: the browser's own player may (HEVC on a Mac, say). Neither: a class named for the cause.
+    element = await decodeOrElement(video, file);
+    const first = element ? 0 : await video.getFirstTimestamp();
     let end = first;
     let packets = 0;
     const keys: number[] = [];
-    await stage('ReverseIndex', async () => {
-      for await (const p of new EncodedPacketSink(video).packets(undefined, undefined, { metadataOnly: true })) {
-        end = Math.max(end, p.timestamp + p.duration);
-        if (p.type === 'key') keys.push(p.timestamp);
-        packets++;
-      }
-    });
-    const total = end - first;
+    // The player seeks to each frame from the end, one frame held at a time, so it needs no keyframe index and no frame window.
+    if (!element) {
+      await stage('ReverseIndex', async () => {
+        for await (const p of new EncodedPacketSink(video).packets(undefined, undefined, { metadataOnly: true })) {
+          end = Math.max(end, p.timestamp + p.duration);
+          if (p.type === 'key') keys.push(p.timestamp);
+          packets++;
+        }
+      });
+    }
+    const total = element ? element.duration : end - first;
     if (!(total > 0)) throw new InputError('This video has no frames to reverse.');
-    const width = video.codedWidth;
-    const height = video.codedHeight;
+    const width = element ? element.width : video.codedWidth;
+    const height = element ? element.height : video.codedHeight;
     // A retry after the encoder gave up asks for a smaller picture than the first try's: each frame is drawn at that size.
     // A phone given a 4K source starts at 1080p; the test encode below can lower the size further before the picture is read.
     const longest = Math.max(width, height);
@@ -175,6 +185,29 @@ async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, s
     sized(Math.max(outW, outH));
     const videoCodec = plan.codec;
     if (!videoCodec) throw new NamedError('VideoEncodeUnsupported', 'This browser cannot encode video. Use a recent version of Chrome, Edge, Safari or Firefox.');
+
+    if (element) {
+      const hasSound = !opts.mute && !!(await input.getPrimaryAudioTrack().catch(() => null));
+      const { firstEncodableSound } = await import('./mp3-fallback');
+      const r = await stage('ReverseEncode', () =>
+        encodeFromElement(file, element!, {
+          width: outW,
+          height: outH,
+          codec: videoCodec,
+          bitrate: QUALITY_HIGH,
+          fit: 'contain',
+          attempt,
+          mute: opts.mute,
+          hasSound,
+          reverse: true,
+          soundMap: (pcm, seconds) => reverseInPlace(pcm, Math.round(seconds * SAMPLE_RATE)),
+          soundCodec: (config) => firstEncodableSound(['aac', 'opus'], config),
+          onProgress: opts.onProgress,
+          stage: 'ReverseFinalize',
+        }),
+      );
+      return { blob: new Blob([r.buffer], { type: 'video/mp4' }), width: outW, height: outH, duration: total, videoCodec: CODEC_NAMES[videoCodec] ?? videoCodec, audio: r.audio, audioDropped: r.audioDropped, viaPlayer: true };
+    }
 
     let sound: Float32Array[] | null = null;
     if (!opts.mute && (await input.getPrimaryAudioTrack())) {
@@ -287,7 +320,7 @@ async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, s
           held.length = 0;
         }
         // Nothing reached the encoder (every frame was unreadable): the file is one this browser cannot play, not a failed write.
-        if (!added) throw new UnsupportedCodec(unplayable());
+        if (!added) throw await refused(video, file);
         await stage('ReverseEncode', () => feed.until(Infinity));
         videoSource.close();
         audioSource?.close();
@@ -308,6 +341,7 @@ async function reverseOnce(file: File, opts: ReverseOptions, attempt: Attempt, s
       audio: !!audioSource,
     };
   } finally {
+    element?.dispose();
     input.dispose?.();
   }
 }
