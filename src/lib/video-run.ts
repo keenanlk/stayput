@@ -14,11 +14,13 @@ import { memoryRange, nameBare } from './bare-error';
  * Runs `job` until it works or the ladder is used up. `job` calls `sized(longestSide)` once it knows the size of the picture it
  * writes, so a failure can be retried one step smaller, and reads `attempt` for the size cap and encoder settings.
  * The result carries `retry` when the file was made on a retry or at the size remembered from earlier in the tab.
+ * With `at`, a bare error is named for the step the job had reached (`<step><at.step>`, the CutFailed<Step> pattern); without it, `step` alone.
  */
 export async function runRecovered<T extends object>(
   step: string,
   onNotice: ((message: string) => void) | undefined,
   job: (attempt: Attempt, sized: (longestSide: number) => void) => Promise<T>,
+  at?: { step: string },
 ): Promise<T & { retry?: RetryKind }> {
   const page = pageRecoveryHooks(onNotice);
   let made = 0;
@@ -32,7 +34,7 @@ export async function runRecovered<T extends object>(
           return retry ? { ...r, retry } : r;
         } catch (e) {
           if (isNotReadable(e)) throw notReadable(e);
-          throw nameBare(step, memoryRange(e));
+          throw nameBare(at ? `${step}${at.step}` : step, memoryRange(e));
         } finally {
           done();
         }

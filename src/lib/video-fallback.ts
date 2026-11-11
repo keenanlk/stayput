@@ -11,7 +11,7 @@
  * Nothing leaves the tab: the file is played from a local object URL.
  */
 import type { InputVideoTrack } from 'mediabunny';
-import { BufferTarget, Mp4OutputFormat, Output, VideoSample, VideoSampleSource, AudioSampleSource, getFirstEncodableAudioCodec, QUALITY_HIGH, type Quality, type VideoCodec } from 'mediabunny';
+import { BufferTarget, Mp4OutputFormat, MovOutputFormat, WebMOutputFormat, Output, VideoSample, VideoSampleSource, AudioSampleSource, getFirstEncodableAudioCodec, QUALITY_HIGH, type AudioCodec, type Quality, type VideoCodec } from 'mediabunny';
 import { DecodeFailed, NamedError, UnsupportedCodec } from './input-error';
 import { watchEncode } from './encoder-watchdog';
 import { encodeOptions, type Attempt } from './edit-recovery';
@@ -148,22 +148,34 @@ const mimeOfName = (name: string): string => {
 export const refused = undecodableError;
 
 /** Moves the element to `t` seconds and waits for the frame. A frame that never arrives is a decoder failure (DecodeFailed, final). */
-async function seekTo(video: HTMLVideoElement, t: number): Promise<void> {
+export async function showAt(video: HTMLVideoElement, t: number): Promise<void> {
   if (Math.abs(video.currentTime - t) < 1e-3 && video.readyState >= 2) return;
   const seeked = once(video, 'seeked', SEEK_MS);
   video.currentTime = t;
   if (!(await seeked)) throw new DecodeFailed();
 }
 
+export interface FrameWalk {
+  /** Source seconds per output second (2 plays twice as fast). Default 1. */
+  speed?: number;
+  /** Walk from the end to the start. */
+  reverse?: boolean;
+}
+
 /**
  * The element's frames at `fps`, one per step: each yield has the element showing that moment, ready to draw with drawImage.
- * The caller draws before asking for the next one.
+ * The caller draws before asking for the next one. `time` is the output's clock (a sped-up clip is shorter); with `reverse` the
+ * last moment comes first. Only one frame is ever held, so a long clip never grows memory.
  */
-export async function* elementFrames(clip: ElementClip, fps: number): AsyncGenerator<{ time: number; video: HTMLVideoElement }> {
+export async function* elementFrames(clip: ElementClip, fps: number, walk: FrameWalk = {}): AsyncGenerator<{ time: number; video: HTMLVideoElement }> {
+  const speed = walk.speed && walk.speed > 0 ? walk.speed : 1;
   const step = 1 / fps;
-  const last = Math.max(0, clip.duration - step / 2);
+  const length = clip.duration / speed;
+  const last = Math.max(0, length - step / 2);
+  const top = Math.max(0, clip.duration - 0.001);
   for (let t = 0; t <= last + 1e-6; t += step) {
-    await seekTo(clip.video, Math.min(t, Math.max(0, clip.duration - 0.001)));
+    const source = walk.reverse ? clip.duration - t * speed - 0.001 : t * speed;
+    await showAt(clip.video, Math.min(Math.max(0, source), top));
     yield { time: t, video: clip.video };
   }
 }
@@ -176,6 +188,21 @@ export function drawContain(ctx: OffscreenCanvasRenderingContext2D | CanvasRende
   const w = video.videoWidth * k;
   const h = video.videoHeight * k;
   ctx.drawImage(video, (width - w) / 2, (height - h) / 2, w, h);
+}
+
+/** Draws the element's frame into the cell at (x, y, w, h): letterboxed on black (`contain`) or cropped to fill it (`cover`). */
+export function drawInCell(ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D, video: HTMLVideoElement, x: number, y: number, w: number, h: number, fit: 'contain' | 'cover'): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.fillStyle = '#000';
+  ctx.fillRect(x, y, w, h);
+  const k = (fit === 'cover' ? Math.max : Math.min)(w / video.videoWidth, h / video.videoHeight);
+  const dw = video.videoWidth * k;
+  const dh = video.videoHeight * k;
+  ctx.drawImage(video, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  ctx.restore();
 }
 
 /** Frame rate of the element path. A seek per frame is slow, so it stays at the usual 30. */
@@ -199,12 +226,25 @@ export interface ElementEncode {
   onProgress?: (fraction: number) => void;
   /** Named for the step that failed, so an element-path failure is never a bare error. */
   stage?: string;
+  /** The file format written: an MP4 (the default), a QuickTime MOV (H.264 and AAC only) or a WebM (Opus only). */
+  container?: 'mp4' | 'mov' | 'webm';
+  /** Frames a second of the output (default 30). */
+  fps?: number;
+  /** Speed change and direction (see FrameWalk); the sound is changed the same way through `soundMap`. */
+  speed?: number;
+  reverse?: boolean;
+  /** Changes the decoded sound before it is encoded (stretch it for a speed change, reverse it). */
+  soundMap?: (pcm: Float32Array[], seconds: number) => Float32Array[];
+  /** Picks the sound codec the output can hold; the default is AAC, then Opus (Opus only for a WebM, AAC only for a MOV). */
+  soundCodec?: (config: { numberOfChannels: number; sampleRate: number; bitrate: Quality }) => Promise<AudioCodec | null>;
 }
 
 export interface ElementEncoded {
   buffer: ArrayBuffer;
   audio: boolean;
   audioDropped: boolean;
+  /** Seconds the output lasts. */
+  seconds: number;
 }
 
 /** Encodes the element's pictures (and the file's sound) into an MP4. This is the fallback body shared by compress and the edit tools. */
@@ -219,11 +259,16 @@ export async function encodeFromElement(file: File, clip: ElementClip, o: Elemen
       sound = null;
     }
     if (sound) sound = stereo(sound);
+    if (sound && o.soundMap) sound = o.soundMap(sound, clip.duration);
   }
-  const audioCodec = sound ? await getFirstEncodableAudioCodec(['aac', 'opus'], { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH }) : null;
-  const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
+  const container = o.container ?? 'mp4';
+  const fps = o.fps ?? ELEMENT_FPS;
+  const config = { numberOfChannels: 2, sampleRate: SAMPLE_RATE, bitrate: QUALITY_HIGH };
+  const audioCodec = !sound ? null : o.soundCodec ? await o.soundCodec(config) : await getFirstEncodableAudioCodec(container === 'webm' ? ['opus'] : container === 'mov' ? ['aac'] : ['aac', 'opus'], config);
+  const format = container === 'webm' ? new WebMOutputFormat() : container === 'mov' ? new MovOutputFormat({ fastStart: 'in-memory' }) : new Mp4OutputFormat({ fastStart: 'in-memory' });
+  const output = new Output({ format, target: new BufferTarget() });
   const videoSource = new VideoSampleSource({ codec: o.codec, bitrate: o.bitrate, ...encodeOptions(o.attempt) });
-  output.addVideoTrack(videoSource, { frameRate: ELEMENT_FPS });
+  output.addVideoTrack(videoSource, { frameRate: fps });
   const audioSource = audioCodec && sound ? new AudioSampleSource({ codec: audioCodec, bitrate: QUALITY_HIGH }) : null;
   if (audioSource) output.addAudioTrack(audioSource);
   await output.start();
@@ -234,8 +279,8 @@ export async function encodeFromElement(file: File, clip: ElementClip, o: Elemen
   await watchEncode(
     async (progress) => {
       let at = 0;
-      const total = Math.max(0.001, clip.duration);
-      for await (const f of elementFrames(clip, ELEMENT_FPS)) {
+      const total = Math.max(0.001, clip.duration / (o.speed && o.speed > 0 ? o.speed : 1));
+      for await (const f of elementFrames(clip, fps, { speed: o.speed, reverse: o.reverse })) {
         if (o.fit === 'contain' && !o.rotate && !o.flip) {
           drawContain(ctx, f.video, o.width, o.height);
         } else {
@@ -249,7 +294,7 @@ export async function encodeFromElement(file: File, clip: ElementClip, o: Elemen
           ctx.drawImage(f.video, -w / 2, -h / 2, w, h);
           ctx.setTransform(1, 0, 0, 1, 0, 0);
         }
-        const frame = new VideoSample(canvas, { timestamp: f.time, duration: Math.max(1 / ELEMENT_FPS, Math.min(1 / ELEMENT_FPS, total - f.time)) });
+        const frame = new VideoSample(canvas, { timestamp: f.time, duration: Math.max(1 / fps, Math.min(1 / fps, total - f.time)) });
         await feed.until(f.time);
         await videoSource.add(frame);
         frame.close();
@@ -268,5 +313,5 @@ export async function encodeFromElement(file: File, clip: ElementClip, o: Elemen
   const buffer = (output.target as BufferTarget).buffer;
   if (!buffer) throw new NamedError(o.stage ?? 'ElementEncodeFailed', 'The video could not be written.');
   o.onProgress?.(1);
-  return { buffer, audio: !!audioSource, audioDropped: hadSound && !audioSource };
+  return { buffer, audio: !!audioSource, audioDropped: hadSound && !audioSource, seconds: Math.max(0.001, clip.duration / (o.speed && o.speed > 0 ? o.speed : 1)) };
 }

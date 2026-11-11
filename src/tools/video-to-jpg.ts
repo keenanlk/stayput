@@ -3,6 +3,7 @@ import { baseName, type OutputFile } from '../lib/files';
 import { thumbnail } from '../lib/image';
 import type { FrameEvery } from '../lib/video-frames';
 import { NamedError } from '../lib/input-error';
+import { PLAYER_COPY } from '../lib/video-reencode-copy';
 
 /**
  * Video to JPG. Frames are decoded and saved as images in the page (see
@@ -48,6 +49,7 @@ createShell({
     });
     if (!outs.length) throw new NamedError('VideoToJpgFailed', 'No frames could be read from this video.');
     if (info.capped) outs[outs.length - 1]!.note += `, stopped at ${LIMIT} frames: pick fewer frames a second to cover the whole video`;
+    if (info.viaPlayer) outs[outs.length - 1]!.note += `, ${PLAYER_COPY.viaPlayer}`;
     return outs;
   },
   resultsTitle: (outs) => `${outs.length} frame${outs.length === 1 ? '' : 's'}`,

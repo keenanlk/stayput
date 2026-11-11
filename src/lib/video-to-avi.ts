@@ -32,8 +32,8 @@ import { pickVideoCodec, planVideoCodec } from './video-codec';
 import { adoptPlan, capScale, hardwareOption, type Attempt, type RetryKind } from './edit-recovery';
 import { runRecovered } from './video-run';
 import { H264Unavailable } from './encoder-probe';
-import { unplayable } from './video-compress';
-import { UnsupportedCodec, NamedError } from './input-error';
+import { decodeOrElement, encodeFromElement, elementFrames, drawContain, refused, type ElementClip } from './video-fallback';
+import { NamedError } from './input-error';
 import { firstEncodableSound } from './mp3-fallback';
 import { SAMPLE_RATE, decodePcm, pcmFeeder } from './pcm';
 import { overPhoneLimit, PHONE_SAFE_BYTES, TRIM_LINK } from './phone-limit';
@@ -60,6 +60,8 @@ export interface AviResult {
   audioDropped: boolean;
   /** Set when the H.264 pass was made on a retry, or at the smaller size that worked earlier in this tab. */
   retry?: RetryKind;
+  /** Set when the pictures came through the browser's own video player (a <video> element), because WebCodecs could not decode them. */
+  viaPlayer?: boolean;
 }
 
 /** Clips shorter than this keep uncompressed sound (about 11 MB a minute); longer ones get MP3. */
@@ -119,10 +121,12 @@ export function convertToAvi(file: File, opts: AviOptions): Promise<AviResult> {
 }
 
 async function aviOnce(file: File, opts: AviOptions, attempt: Attempt, sized: (longestSide: number) => void): Promise<AviResult> {
+  let element: ElementClip | null = null;
   const input = new Input({ source: new BlobSource(file), formats: [MP4, QTFF, WEBM, MATROSKA, MPEG_TS] });
   try {
     const video = await requireVideoTrack(input, file, 'This file has no video this page can read. It may be an audio file (try Video to MP3) or a format browsers do not open.');
-    if (!(await video.canDecode())) throw new UnsupportedCodec(unplayable());
+    // WebCodecs cannot decode it: the browser's own player may (HEVC on a Mac, say). Neither: a class named for the cause.
+    element = await decodeOrElement(video, file);
     let width = even(video.displayWidth);
     let height = even(video.displayHeight);
     if (!opts.compat) {
@@ -152,7 +156,7 @@ async function aviOnce(file: File, opts: AviOptions, attempt: Attempt, sized: (l
 
     // Refuse before any slow work: what an AVI cannot hold, and what a phone cannot hold in memory.
     // A few real pictures are saved as JPEGs first, so the estimate follows the footage and not a worst case.
-    const jpegBytes = opts.compat ? await sampleJpegBytes(video, width, height, duration) : undefined;
+    const jpegBytes = opts.compat && !element ? await sampleJpegBytes(video, width, height, duration) : undefined;
     const estimate = estimateAviBytes({ duration, width, height, fps: rate.fps, compat: opts.compat, sound: sound ? (pcmSound ? 'PCM' : 'MP3') : null, soundRate, channels, jpegBytes });
     if (estimate > AVI_LIMIT_BYTES) throw oversize(estimate);
     if (overPhoneLimit(Math.max(file.size, estimate))) throw phoneRefusal(Math.max(file.size, estimate));
@@ -171,9 +175,9 @@ async function aviOnce(file: File, opts: AviOptions, attempt: Attempt, sized: (l
     }
 
     if (opts.compat) {
-      frames = await jpegFrames(video, { width, height, duration, rate, onProgress: (f) => opts.onProgress?.(0.03 + f * 0.95) });
+      frames = await jpegFrames(video, { width, height, duration, rate, element, onProgress: (f) => opts.onProgress?.(0.03 + f * 0.95) });
     } else {
-      const encoded = await h264Frames({ attempt, input, file, video, width, height, duration, rate, sound: sound && !pcmSound ? sound : null, onProgress: (f) => opts.onProgress?.(0.03 + f * 0.9) });
+      const encoded = await h264Frames({ attempt, input, file, video, element, width, height, duration, rate, sound: sound && !pcmSound ? sound : null, onProgress: (f) => opts.onProgress?.(0.03 + f * 0.9) });
       frames = encoded.frames;
       if (encoded.mp3) {
         audio = { kind: 'mp3', channels: encoded.channels, sampleRate: encoded.sampleRate, bitrate: MP3_BITRATE, frames: encoded.mp3 };
@@ -185,8 +189,9 @@ async function aviOnce(file: File, opts: AviOptions, attempt: Attempt, sized: (l
 
     const aviBlob = writeAvi({ fourcc: opts.compat ? 'MJPG' : 'H264', width, height, fpsNum: rate.num, fpsDen: rate.den, frames }, audio);
     opts.onProgress?.(1);
-    return { blob: aviBlob, width, height, duration, fps: rate.fps, videoCodec: opts.compat ? 'Motion JPEG' : 'H.264', audio: audioLabel, audioDropped };
+    return { blob: aviBlob, width, height, duration, fps: rate.fps, videoCodec: opts.compat ? 'Motion JPEG' : 'H.264', audio: audioLabel, audioDropped, ...(element ? { viaPlayer: true } : {}) };
   } finally {
+    element?.dispose();
     input.dispose?.();
   }
 }
@@ -281,9 +286,10 @@ async function sampleJpegBytes(video: VideoTrack, width: number, height: number,
 /** One JPEG per output frame at a constant rate, drawn from the decoded picture by a canvas. */
 async function jpegFrames(
   video: VideoTrack,
-  o: { width: number; height: number; duration: number; rate: { num: number; den: number; fps: number }; onProgress: (f: number) => void },
+  o: { width: number; height: number; duration: number; rate: { num: number; den: number; fps: number }; element: ElementClip | null; onProgress: (f: number) => void },
 ): Promise<AviFrame[]> {
   const count = Math.max(1, Math.round((o.duration * o.rate.num) / o.rate.den));
+  if (o.element) return jpegFramesFromElement(o.element, o, count);
   const sink = new CanvasSink(video, { width: o.width, height: o.height, fit: 'contain', poolSize: 2 });
   const frames: AviFrame[] = [];
   const times = (function* () {
@@ -322,6 +328,35 @@ async function jpegFrames(
   return frames;
 }
 
+/** The same pictures taken from the browser's own player, one per output frame at the constant rate, one held at a time. */
+async function jpegFramesFromElement(
+  clip: ElementClip,
+  o: { width: number; height: number; rate: { fps: number }; onProgress: (f: number) => void },
+  count: number,
+): Promise<AviFrame[]> {
+  const frames: AviFrame[] = [];
+  const canvas = new OffscreenCanvas(o.width, o.height);
+  const ctx = canvas.getContext('2d')!;
+  let bytes = 0;
+  await watchEncode(
+    async (progress) => {
+      for await (const f of elementFrames(clip, o.rate.fps)) {
+        if (frames.length >= count) break;
+        drawContain(ctx, f.video, o.width, o.height);
+        const data = await canvasJpeg(canvas);
+        frames.push({ data, key: true });
+        bytes += data.length + 25;
+        if (bytes > AVI_LIMIT_BYTES - 200_000_000) throw oversize((bytes / frames.length) * count);
+        progress(frames.length / count);
+        o.onProgress(frames.length / count);
+      }
+    },
+    () => undefined,
+  );
+  if (!frames.length) throw new NamedError('VideoToAviFailed', 'No picture could be read from this video.');
+  return frames;
+}
+
 async function canvasJpeg(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<Uint8Array> {
   const blob =
     'convertToBlob' in canvas
@@ -340,6 +375,8 @@ async function h264Frames(o: {
   input: Input;
   file: File;
   video: VideoTrack;
+  /** Set when only the browser's own player can read the pictures: they are taken from it (see encodeFromElement). */
+  element: ElementClip | null;
   width: number;
   height: number;
   duration: number;
@@ -365,12 +402,31 @@ async function h264Frames(o: {
     const config = { numberOfChannels: channels, sampleRate: SAMPLE_RATE, bitrate: MP3_BITRATE };
     const mp3: AudioCodec | null = await firstEncodableSound([], config);
     if (mp3) {
-      if (await o.sound.canDecode()) wantSound = true;
+      if (o.element || (await o.sound.canDecode())) wantSound = true;
       else {
         pcm = await decodePcm(o.file);
         wantSound = !!pcm;
       }
     }
+  }
+
+  if (o.element) {
+    // The pictures come from the player at the constant rate; the sound is decoded by the page and encoded as MP3.
+    const r = await encodeFromElement(o.file, o.element, {
+      width: o.width,
+      height: o.height,
+      codec: 'avc',
+      bitrate,
+      fit: 'contain',
+      attempt: o.attempt,
+      mute: !wantSound,
+      hasSound: wantSound,
+      fps: o.rate.fps,
+      soundCodec: (config) => firstEncodableSound([], { ...config, bitrate: MP3_BITRATE }),
+      onProgress: (f) => o.onProgress(f * 0.9),
+      stage: 'VideoToAviFailedWrite',
+    });
+    return readBack(r.buffer, r.audio, channels, o.onProgress);
   }
 
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
@@ -384,7 +440,7 @@ async function h264Frames(o: {
   });
   if (!conversion.isValid) {
     const reason = conversion.discardedTracks.find((d) => d.track.isVideoTrack())?.reason;
-    throw reason === 'undecodable_source_codec' ? new UnsupportedCodec(unplayable()) : new NamedError('VideoToAviFailed', 'This browser cannot convert this video.');
+    throw reason === 'undecodable_source_codec' ? await refused(o.video, o.file) : new NamedError('VideoToAviFailed', 'This browser cannot convert this video.');
   }
   let feeding: Promise<void> | null = null;
   if (pcm) {
@@ -399,8 +455,11 @@ async function h264Frames(o: {
   if (pcm) await output.finalize();
   const buffer = output.target.buffer;
   if (!buffer) throw new NamedError('VideoToAviFailed', 'The video could not be written.');
+  return readBack(buffer, wantSound, channels, o.onProgress);
+}
 
-  // Read the new MP4 back, packet by packet.
+/** Reads the temporary MP4 back, packet by packet, as AVI chunks (and its MP3 sound, if it has some). */
+async function readBack(buffer: ArrayBuffer, wantSound: boolean, channels: number, onProgress: (f: number) => void): Promise<{ frames: AviFrame[]; mp3: Uint8Array[] | null; channels: number; sampleRate: number }> {
   const temp = new Input({ source: new BufferSource(buffer), formats: [MP4] });
   try {
     const vTrack = await temp.getPrimaryVideoTrack();
@@ -427,7 +486,7 @@ async function h264Frames(o: {
         if (!mp3.length) mp3 = null;
       }
     }
-    o.onProgress(1);
+    onProgress(1);
     return { frames, mp3, channels, sampleRate: SAMPLE_RATE };
   } finally {
     temp.dispose?.();
