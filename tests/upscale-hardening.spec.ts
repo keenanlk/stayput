@@ -200,7 +200,7 @@ test.describe('the worker', () => {
     const got = await runFile(page, edge('good.png'));
     if (report('worker dies twice', got)) return;
     expect(got.label).toBe('WorkerCrashError');
-    expect(got.message).toContain('stopped unexpectedly');
+    expect(got.message).toContain('stopped twice');
     expect(Date.now() - t0).toBeLessThan(30_000);
     expect(await made(page)).toBe(2);
   });
@@ -253,7 +253,7 @@ test.describe('the worker', () => {
     expect(sent.map((s) => s.w)).toEqual([800, 400]);
     expect(sent[1]!.worker).not.toBe(sent[0]!.worker);
     expect(got.note).toContain('800×600 to 1600×1200');
-    expect(got.note).toContain('a smaller size than asked, because the first try ran out of memory');
+    expect(got.note).toContain('a smaller scale than you chose, because the first try ran out of memory');
   });
 
   test('out of memory at the smaller scale too is OutOfMemoryError', async ({ page }) => {
@@ -262,7 +262,7 @@ test.describe('the worker', () => {
     const got = await runFile(page, await bigPng(800, 600, 'photo.png'));
     if (report('memory failure twice', got)) return;
     expect(got.label).toBe('OutOfMemoryError');
-    expect(got.message).toContain('even at a smaller size');
+    expect(got.message).toContain('even at a smaller scale');
     expect(await asked(page)).toHaveLength(2);
   });
 });
@@ -283,7 +283,7 @@ test.describe('a big picture', () => {
       // Held to the picture's own size: the network sees 1000 × 750, not the 1181 × 886 a computer starts with.
       expect((await asked(page)).map((s) => [s.w, s.h])).toEqual([[1000, 750]]);
       expect(got.note).toContain('4000×3000 to 4000×3000');
-      expect(got.note).toContain('a smaller size than asked, because this device may run low on memory');
+      expect(got.note).toContain('a smaller scale than you chose, because this device may run low on memory');
     });
   });
 
@@ -297,7 +297,7 @@ test.describe('a big picture', () => {
     expect(sent).toHaveLength(1);
     expect(sent[0]!.w).toBeGreaterThan(1100);
     expect(got.note).toContain('held to');
-    expect(got.note).not.toContain('smaller size than asked');
+    expect(got.note).not.toContain('smaller scale than you chose');
   });
 });
 
