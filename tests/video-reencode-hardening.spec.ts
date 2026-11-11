@@ -340,6 +340,8 @@ test('a read failure is never renamed by the new classes (Android NotReadable st
     };
   });
   await open(page, '/tools/compress-video', [SOUND]);
+  // Run stays disabled while the file-intake check reads the file. Only once it is enabled is the check over, so the reads can start failing without hitting the check itself (which would refuse the file before Run, and Run would never enable).
+  await expect(page.locator('#run')).toBeEnabled();
   await page.evaluate(() => ((window as unknown as { __late: boolean }).__late = true));
   await page.locator('#run').click();
   await failed(page);
