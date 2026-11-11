@@ -20,6 +20,7 @@ jobs:
   # Typecheck and IndexNow script tests. Runs beside the build.
   checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -35,6 +36,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -71,6 +73,9 @@ jobs:
   playwright:
     needs: build
     runs-on: ubuntu-latest
+    # Shards take 8-20 min. If one stalls, Playwright's globalTimeout (24 min) stops it first and prints
+    # what was still running; this 30 min limit is the backstop that covers setup and the upload step.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -110,7 +115,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - run: npx playwright test --shard=${{ matrix.shard }}/8
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always()
         with:
           name: playwright-report-${{ matrix.shard }}
           path: test-results/
@@ -121,6 +126,7 @@ jobs:
     if: always()
     needs: [checks, build, playwright]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Require every job to have succeeded
         run: |
@@ -135,6 +141,7 @@ jobs:
     needs: build-and-test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # One deploy at a time, in the order they reach this job.
     concurrency:
       group: cloudflare-production
@@ -205,6 +212,7 @@ jobs:
     needs: build
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       pull-requests: write

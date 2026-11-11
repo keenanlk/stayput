@@ -14,6 +14,9 @@ export default defineConfig({
   expect: { timeout: process.env.CI ? 15_000 : 5_000 },
   fullyParallel: true,
   workers: 2,
+  // CI only. A shard takes 8-20 min including setup, so 24 min means it is stalled. Stopping here lets Playwright
+  // list the tests still running, and leaves time before the job's 30 min limit for the artifact upload.
+  globalTimeout: process.env.CI ? 24 * 60_000 : 0,
   reporter: 'list',
   use: {
     baseURL: 'http://localhost:4321',
